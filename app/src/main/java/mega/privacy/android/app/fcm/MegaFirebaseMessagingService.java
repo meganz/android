@@ -52,7 +52,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -60,16 +59,13 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -86,6 +82,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     ChatSettings chatSettings;
 
     boolean isLoggingIn = false;
+    boolean showMessageNotificationAfterPush = false;
 
     String remoteMessageType = "";
 
@@ -148,6 +145,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                 if(remoteMessageType.equals("1")){
                     log("show SharedFolder Notification");
+                    //Leave the flag showMessageNotificationAfterPush as it is
+                    //If true - wait until connection finish
+                    //If false, no need to change it
+                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null) {
                         log("RootNode = null");
@@ -156,6 +157,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 }
                 else if(remoteMessageType.equals("3")){
                     log("show ContactRequest Notification");
+                    //Leave the flag showMessageNotificationAfterPush as it is
+                    //If true - wait until connection finish
+                    //If false, no need to change it
+                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     String gSession = credentials.getSession();
                     if (megaApi.getRootNode() == null) {
                         log("RootNode = null");
@@ -163,6 +168,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     }
                 }
                 else if(remoteMessageType.equals("4")) {
+                    log("CALL notification");
+                    //Leave the flag showMessageNotificationAfterPush as it is
+                    //If true - wait until connection finish
+                    //If false, no need to change it
+                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                     String gSession = credentials.getSession();
 
                     if (megaApi.getRootNode() == null) {
@@ -170,7 +180,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         performLoginProccess(gSession);
                     }
                     else{
-                        log("RootNode is NOT null");
+                        log("RootNode is NOT null - wait CALLDATA:onChatCallUpdate");
 //                        String gSession = credentials.getSession();
                         int ret = megaChatApi.getInitState();
                         log("result of init ---> " + ret);
@@ -179,32 +189,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         int connectionState = megaChatApi.getConnectionState();
                         log("connection state ---> "+connectionState);
 
-                        MegaHandleList handleList = megaChatApi.getChatCalls();
-                        if(handleList!=null){
-                            long numberOfCalls = handleList.size();
-                            log("Number of calls in progress: "+numberOfCalls);
-                            if(numberOfCalls==1){
-
-                                long chatId = handleList.get(0);
-
-                                MegaChatCall call = megaChatApi.getChatCall(chatId);
-                                if(call!=null){
-                                    if(call.getStatus()<=MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                                        launchCallActivity(call);
-                                    }
-                                    else{
-                                        log("Launch not in correct status");
-                                    }
-                                }
-                            }
-                            else if (numberOfCalls>1){
-                                log("MORE than one call in progress: "+numberOfCalls);
-                                checkQueuedCalls();
-                            }
-                            else{
-                                log("ERROR. No calls to launch");
-                            }
-                        }
+                        removeListeners();
                     }
 
                 }else if(remoteMessageType.equals("2")){
@@ -213,6 +198,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         String gSession = credentials.getSession();
                         if (megaApi.getRootNode() == null){
                             log("RootNode = null");
+                            showMessageNotificationAfterPush = true;
+
                             performLoginProccess(gSession);
 
                             h = new Handler(Looper.getMainLooper());
@@ -234,6 +221,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             );
                         }
                         else{
+                            //Leave the flag showMessageNotificationAfterPush as it is
+                            //If true - wait until connection finish
+                            //If false, no need to change it
+                            log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+
                             removeListeners();
                             megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
                         }
@@ -379,10 +371,16 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             //megaChatApi.setBackgroundStatus(true, this);
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Connected to chat!");
-                megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
+                if(showMessageNotificationAfterPush){
+                    showMessageNotificationAfterPush = false;
+                    megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
+                }
+                else{
+                    log("Login do not started by CHAT message");
+                }
             }
             else{
-                log("EEEERRRRROR WHEN CONNECTING " + e.getErrorString());
+                log("EEEERRRRROR WHEN CONNECTING" + e.getErrorString());
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
@@ -393,22 +391,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
-    }
-
-    public void launchCallActivity(MegaChatCall call){
-        log("launchCallActivity: "+call.getStatus());
-        MegaApplication.setShowPinScreen(false);
-
-        Intent i = new Intent(this, ChatCallActivity.class);
-        i.putExtra("chatHandle", call.getChatid());
-        i.putExtra("callId", call.getId());
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-        startActivity(i);
-
-        MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-        log("Launch call: "+chatRoom.getTitle());
-        removeListeners();
     }
 
     public void showSharedFolderNotification(MegaNode n) {
@@ -588,19 +570,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(notificationId, notificationBuilder.build());
-    }
-
-    public void checkQueuedCalls(){
-        log("checkQueuedCalls");
-        removeListeners();
-
-        try{
-            AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-            notificationBuilder.checkQueuedCalls();
-        }
-        catch (Exception e){
-            log("EXCEPTION: "+e.getMessage());
-        }
     }
 
     public Bitmap createDefaultAvatar(String email){
