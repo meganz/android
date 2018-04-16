@@ -43,9 +43,10 @@
             android:layout_height="wrap_content"
             android:alpha="0.54"
             android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:visibility="visible" />
+            android:paddingLeft="-2dp"
+            android:paddingRight="-2dp"
+            android:visibility="visible"
+            android:src="@drawable/ic_copy_to_clipboard"/>
 
         <TextView
             android:id="@+id/recovery_key_copytoclipboard_text"
