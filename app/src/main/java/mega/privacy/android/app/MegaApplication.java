@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -29,6 +28,7 @@ import java.util.Locale;
 import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -42,9 +42,11 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNotificationListenerInterface;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -955,13 +957,48 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+		if (call.getStatus() >= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
 			clearIncomingCallNotification(call.getId());
 		}
 
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1){
-			if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
-				if(call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT){
+		MegaHandleList handleList = megaChatApi.getChatCalls();
+		if(handleList!=null) {
+
+			long numberOfCalls = handleList.size();
+			log("Number of calls in progress: " + numberOfCalls);
+			if (numberOfCalls == 1) {
+
+				if (call.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+
+					long chatId = handleList.get(0);
+
+					if(openCallChatId!=chatId){
+						MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
+						if (callToLaunch != null) {
+							if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+								launchCallActivity(callToLaunch);
+							} else {
+								log("Launch not in correct status");
+							}
+						}
+					}
+					else{
+						log("Call already opened");
+					}
+				}
+			} else if (numberOfCalls > 1) {
+				log("MORE than one call in progress: " + numberOfCalls);
+				checkQueuedCalls();
+
+			} else {
+				log("ERROR. No calls to launch");
+			}
+		}
+
+		//Show missed call if time out ringing (for incoming calls)
+		if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
+			try{
+				if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT && !(call.isIgnored()))){
 					log("onChatCallUpdate:TERM_CODE_ANSWER_TIMEOUT");
 					if(call.isLocalTermCode()==false){
 						log("onChatCallUpdate:localTermCodeNotLocal");
@@ -975,7 +1012,38 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					}
 				}
 			}
+			catch(Exception e){
+				log("EXCEPTION when showing missed call notification: "+e.getMessage());
+			}
 		}
+	}
+
+	public void checkQueuedCalls(){
+		log("checkQueuedCalls");
+
+		try{
+			AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+			notificationBuilder.checkQueuedCalls();
+		}
+		catch (Exception e){
+			log("EXCEPTION: "+e.getMessage());
+		}
+	}
+
+	public void launchCallActivity(MegaChatCall call){
+		log("launchCallActivity: "+call.getStatus());
+		MegaApplication.setShowPinScreen(false);
+
+		Intent i = new Intent(this, ChatCallActivity.class);
+		i.putExtra("chatHandle", call.getChatid());
+		i.putExtra("callId", call.getId());
+		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+		startActivity(i);
+
+		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+		log("Launch call: "+chatRoom.getTitle());
+
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {

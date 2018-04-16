@@ -1129,7 +1129,7 @@ public final class AdvancedNotificationBuilder {
                     MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
                     if(call!=null){
                         log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
-                        if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                        if((call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS) && (call.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING)){
                             callInProgress = call;
                             log("FOUND Call in progress: "+callInProgress.getChatid());
                             break;
@@ -1141,8 +1141,11 @@ public final class AdvancedNotificationBuilder {
                     long openCallChatId = MegaApplication.getOpenCallChatId();
                     log("openCallId: "+openCallChatId);
                     if(openCallChatId!=-1){
-                        callInProgress = megaChatApi.getChatCall(openCallChatId);
-                        log("FOUND Call activity shown: "+callInProgress.getChatid());
+                        MegaChatCall possibleCall = megaChatApi.getChatCall(openCallChatId);
+                        if(possibleCall.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING){
+                            callInProgress = possibleCall;
+                            log("FOUND Call activity shown: "+callInProgress.getChatid());
+                        }
                     }
                 }
 
@@ -1190,8 +1193,16 @@ public final class AdvancedNotificationBuilder {
                     }
                 }
 
-                if(callIncoming!=null){
-                    showIncomingCallNotification(callIncoming, callInProgress);
+                if(callInProgress!=null){
+                    if(callIncoming!=null){
+                        showIncomingCallNotification(callIncoming, callInProgress);
+                    }
+                    else{
+                        log("ERROR:callIncoming is NULL");
+                    }
+                }
+                else{
+                    log("callInProgress NOT found");
                 }
             }
             else{
