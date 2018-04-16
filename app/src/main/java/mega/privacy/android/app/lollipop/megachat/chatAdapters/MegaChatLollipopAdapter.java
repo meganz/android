@@ -3496,10 +3496,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 String numberString;
                 long unreadMessages = Math.abs(((ChatActivityLollipop)context).generalUnreadCount);
                 if(((ChatActivityLollipop)context).generalUnreadCount<0){
-                    numberString = "+"+((ChatActivityLollipop)context).generalUnreadCount;
+                    numberString = "+"+unreadMessages;
                 }
                 else{
-                    numberString = ((ChatActivityLollipop)context).generalUnreadCount+"";
+                    numberString = unreadMessages+"";
                 }
 
                 String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int)unreadMessages, numberString);
