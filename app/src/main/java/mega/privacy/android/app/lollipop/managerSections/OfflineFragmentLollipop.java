@@ -1086,6 +1086,12 @@ public class OfflineFragmentLollipop extends Fragment{
 						log("Video file");
 
 						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						if (context instanceof ManagerActivityLollipop) {
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
+							if (accountInfo != null) {
+								videoIntent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
 						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						videoIntent.putExtra("FILENAME", currentNode.getName());
@@ -1104,6 +1110,12 @@ public class OfflineFragmentLollipop extends Fragment{
 						log("Audio file");
 
 						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						if (context instanceof ManagerActivityLollipop) {
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
+							if (accountInfo != null) {
+								audioIntent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
 						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						audioIntent.putExtra("FILENAME", currentNode.getName());
@@ -1124,7 +1136,13 @@ public class OfflineFragmentLollipop extends Fragment{
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-						pdfIntent.putExtra("APP", true);
+						if (context instanceof ManagerActivityLollipop) {
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
+							if (accountInfo != null) {
+								pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
+						pdfIntent.putExtra("inside", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
