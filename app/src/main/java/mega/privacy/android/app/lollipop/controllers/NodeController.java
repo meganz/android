@@ -200,6 +200,9 @@ public class NodeController {
         else if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+        else if (context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
     }
 
     public void selectContactToSendNode(MegaNode node){
@@ -931,7 +934,6 @@ public class NodeController {
                             File pdfFile = new File(localPath);
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                            pdfIntent.putExtra("APP", true);
                             pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
                                 pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
