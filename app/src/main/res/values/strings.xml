@@ -1686,6 +1686,8 @@
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
     <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device\'s camera</string>
+    <string name="contact_view" context="positive button on dialog to view a contact">View</string>
+
 
     <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Open with</string>
 
