@@ -578,6 +578,10 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);
@@ -634,7 +638,11 @@ public class InboxFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					pdfIntent.putExtra("APP", true);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					pdfIntent.putExtra("inside", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);

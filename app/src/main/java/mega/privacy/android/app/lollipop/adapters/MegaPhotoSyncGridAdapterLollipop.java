@@ -521,6 +521,11 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						}
 						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 						mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
+						MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+						if(accountInfo!=null) {
+							mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+						}
 						mediaIntent.putExtra("HANDLE", file.getHandle());
 						mediaIntent.putExtra("FILENAME", file.getName());
 						String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
