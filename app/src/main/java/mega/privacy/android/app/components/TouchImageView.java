@@ -536,13 +536,13 @@ public class TouchImageView extends ImageView {
         }
         return delta;
     }
-    
-    private float getImageWidth() {
+
+    public float getImageWidth() {
         log("getImageWidth");
     	return matchViewWidth * normalizedScale;
     }
     
-    private float getImageHeight() {
+    public float getImageHeight() {
         log("getImageHeight");
     	return matchViewHeight * normalizedScale;
     }

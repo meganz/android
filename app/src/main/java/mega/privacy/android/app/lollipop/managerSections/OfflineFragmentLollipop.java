@@ -62,14 +62,16 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 public class OfflineFragmentLollipop extends Fragment{
+
+	public static ImageView imageDrag;
 	
 	MegaPreferences prefs;
 	
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -77,10 +79,10 @@ public class OfflineFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaOfflineLollipopAdapter adapter;
+	public static MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
-	ArrayList<MegaOffline> mOffList= null;
+	public static ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
 	boolean isList = true;
@@ -903,7 +905,7 @@ public class OfflineFragmentLollipop extends Fragment{
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1072,15 +1074,16 @@ public class OfflineFragmentLollipop extends Fragment{
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
-
+						intent.putExtra("screenPosition", screenPosition);
 						if (context instanceof ManagerActivityLollipop){
 							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 							if(accountInfo!=null){
 								intent.putExtra("typeAccount", accountInfo.getAccountType());
 							}
 						}
-
 						startActivity(intent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
 						log("Video file");
@@ -1093,20 +1096,25 @@ public class OfflineFragmentLollipop extends Fragment{
 							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						}
 						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						mediaIntent.putExtra("FILENAME", currentNode.getName());
+						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
 						mediaIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						mediaIntent.putExtra("position", position);
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 						mediaIntent.putExtra("offlinePathDirectory", currentFile.getParent());
 						mediaIntent.putExtra("pathNavigation", pathNavigation);
 						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
+						mediaIntent.putExtra("screenPosition", screenPosition);
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
 							mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(mediaIntent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
