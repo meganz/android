@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -687,7 +688,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (hashes == null){
 			if(url != null) {
 				if(availableFreeSpace < size) {
-					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+					showSnackbarNotSpace();
 					return;
 				}
 				
@@ -760,7 +761,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 						String path = dlFiles.get(document);
 						
 						if(availableFreeSpace < document.getSize()){
-							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+							showSnackbarNotSpace();
 							continue;
 						}
 						
@@ -775,7 +776,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+						showSnackbarNotSpace();
 						continue;
 					}
 					
@@ -800,6 +801,13 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+
+	public void showSnackbarNotSpace(){
+		log("showSnackbarNotSpace");
+		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+		mySnackbar.show();
 	}
 
 	public void touchImage() {

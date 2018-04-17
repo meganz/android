@@ -12,6 +12,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,11 +23,11 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.media.ToneGenerator;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -53,6 +55,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,8 +65,8 @@ import android.widget.TextView;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -72,7 +75,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -94,6 +99,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
@@ -102,11 +108,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
     MegaUser myUser;
+    Chronometer myChrono;
 
     public static int REMOTE_VIDEO_NOT_INIT = -1;
     public static int REMOTE_VIDEO_ENABLED = 1;
     public static int REMOTE_VIDEO_DISABLED = 0;
-
 
     private LocalCameraCallFragment localCameraFragment;
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
@@ -116,8 +122,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ViewGroup parent;
     ViewGroup parentFS;
 
+    // flagMyAvatar if true - small avatar circle is contact's avatar
+    // flagMyAvatar if false - small avatar circle is my avatar
+    boolean flagMyAvatar;
+
+    // flagContactAvatar if true - big avatar circle is contact's avatar
+    // flagContactAvatar if false - big avatar circle is my avatar
+    boolean flagContactAvatar;
+
     long chatId;
-    long callId;
+    boolean callInitiator;
     MegaChatRoom chat;
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
@@ -131,6 +145,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     AppBarLayout appBarLayout;
     Toolbar tB;
     ActionBar aB;
+
+    boolean avatarRequested = false;
 
     Timer timer = null;
     Timer ringerTimer = null;
@@ -207,6 +223,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     ImageView thirdArrowVideo;
     ImageView fourArrowVideo;
 
+    long startTime, timeInMilliseconds = 0;
+    Handler customHandler = new Handler();
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");
@@ -263,6 +282,77 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //            }
 //        }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateScreenStatusInProgress(){
+        log("updateScreenStatusInProgress");
+        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
+        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+        flagMyAvatar = false;
+        setProfileMyAvatar();
+        flagContactAvatar = true;
+        setProfileContactAvatar();
+
+        stopAudioSignals();
+
+        updateLocalVideoStatus();
+        updateLocalAudioStatus();
+        updateRemoteAudioStatus();
+        updateRemoteVideoStatus();
+        startClock();
+    }
+
+    public void setCallInfo(){
+        log("setCallInfo");
+
+        fullName = chat.getTitle();
+        email = chat.getPeerEmail(0);
+        userHandle = chat.getPeerHandle(0);
+
+        if (fullName.trim() != null) {
+            if (fullName.trim().isEmpty()) {
+                log("1 - Put email as fullname");
+                String[] splitEmail = email.split("[@._]");
+                fullName = splitEmail[0];
+            }
+        } else {
+            log("2 - Put email as fullname");
+            String[] splitEmail = email.split("[@._]");
+            fullName = splitEmail[0];
+        }
+
+        aB.setTitle(fullName);
+    }
+
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        log("onNewIntent");
+
+        Bundle extras = intent.getExtras();
+        log(getIntent().getAction());
+        if (extras != null) {
+            long newChatId = extras.getLong("chatHandle", -1);
+            log("New chat id: "+newChatId);
+            if(chatId==newChatId){
+                log("Its the same call");
+            }
+            else{
+                log("New intent to the activity with a new chatId");
+                //Check the new call if in progress
+                chatId = newChatId;
+                chat = megaChatApi.getChatRoom(chatId);
+                callChat = megaChatApi.getChatCall(chatId);
+                callInitiator = false;
+
+                setCallInfo();
+                updateScreenStatusInProgress();
+
+                log("Start call Service");
+                Intent intentService = new Intent(this, CallService.class);
+                intentService.putExtra("chatHandle", callChat.getChatid());
+                this.startService(intentService);
+            }
+        }
     }
 
     @Override
@@ -322,7 +412,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         megaChatApi.addChatCallListener(this);
-
         myUser = megaApi.getMyUser();
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -361,6 +450,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         aB.setHomeButtonEnabled(false);
         aB.setDisplayHomeAsUpEnabled(false);
         aB.setTitle(" ");
+        myChrono = new Chronometer(context);
 
         linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
         RelativeLayout.LayoutParams layoutCompress = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -460,10 +550,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
-            log("Chat handle to call: " + chatId);
+            callInitiator = extras.getBoolean("callInitiator", false);
+            log("Chat handle to call: " + chatId+ " initiator: "+callInitiator);
             if (chatId != -1) {
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
+
                 if (callChat == null){
                     megaChatApi.removeChatCallListener(this);
                     MegaApplication.activityPaused();
@@ -476,6 +568,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     return;
                 }
 
+                log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
                 this.startService(intentService);
@@ -485,23 +578,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 int callStatus = callChat.getStatus();
                 log("The status of the callChat is: " + callStatus);
 
-                fullName = chat.getTitle();
-                email = chat.getPeerEmail(0);
-                userHandle = chat.getPeerHandle(0);
-
-                if (fullName.trim() != null) {
-                    if (fullName.trim().isEmpty()) {
-                        log("1 - Put email as fullname");
-                        String[] splitEmail = email.split("[@._]");
-                        fullName = splitEmail[0];
-                    }
-                } else {
-                    log("2 - Put email as fullname");
-                    String[] splitEmail = email.split("[@._]");
-                    fullName = splitEmail[0];
-                }
-
-                aB.setTitle(fullName);
+                setCallInfo();
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
                     log("Incoming call");
@@ -510,11 +587,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
 
                     contactAvatarLayout.setVisibility(View.VISIBLE);
-                    setProfileMyAvatar(true);
-                    setProfileContactAvatar(userHandle, fullName, false);
+                    flagMyAvatar = true;
+                    setProfileMyAvatar();
+                    flagContactAvatar = false;
+                    setProfileContactAvatar();
 
-                    Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-                    ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
+                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+
                     ringerTimer = new Timer();
                     MyRingerTask myRingerTask = new MyRingerTask();
                     ringerTimer.schedule(myRingerTask, 0, 500);
@@ -530,23 +609,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
                 else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
-                    relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    setProfileMyAvatar(false);
-                    setProfileContactAvatar(userHandle, fullName, true);
-
-                    updateLocalVideoStatus();
-                    updateLocalAudioStatus();
-                    updateRemoteAudioStatus();
-                    updateRemoteVideoStatus();
+                    updateScreenStatusInProgress();
                 }
                 else{
                     log("Outgoing call");
 
                     relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                     relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                    setProfileMyAvatar(false);
-                    setProfileContactAvatar(userHandle, fullName, true);
+                    flagMyAvatar = false;
+                    setProfileMyAvatar();
+                    flagContactAvatar = true;
+                    setProfileContactAvatar();
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -587,7 +660,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {}
 
-    public void createDefaultAvatar(long userHandle,  String fullName, boolean flag) {
+    public void createDefaultAvatar(long userHandle,  String fullName) {
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -610,7 +683,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             radius = defaultAvatar.getHeight()/2;
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        if(flag){
+        if(flagContactAvatar){
             myImage.setImageBitmap(defaultAvatar);
             String contactFirstLetter = fullName.charAt(0) + "";
             contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
@@ -629,7 +702,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
-    public void setProfileContactAvatar(long userHandle,  String fullName, boolean flag){
+    public void setProfileContactAvatar(){
+        log("setProfileContactAvatar");
         Bitmap bitmap = null;
         File avatar = null;
         if (context.getExternalCacheDir() != null) {
@@ -646,29 +720,64 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
                 if (bitmap != null) {
-                    if(flag){
+                    if(flagContactAvatar){
                         myImage.setImageBitmap(bitmap);
                         myInitialLetter.setVisibility(GONE);
                     }else{
                         contactImage.setImageBitmap(bitmap);
                         contactInitialLetter.setVisibility(GONE);
                     }
-
                 }
                 else{
-                    createDefaultAvatar(userHandle, fullName, flag);
+                    UserAvatarListener listener = new UserAvatarListener(this);
+                    avatar.delete();
+                    if(!avatarRequested){
+                        avatarRequested = true;
+                        if (context.getExternalCacheDir() != null){
+                            megaApi.getUserAvatar(chat.getPeerEmail(0), context.getExternalCacheDir().getAbsolutePath() + "/" + chat.getPeerEmail(0) + ".jpg", listener);
+                        }
+                        else{
+                            megaApi.getUserAvatar(chat.getPeerEmail(0), context.getCacheDir().getAbsolutePath() + "/" + chat.getPeerEmail(0) + ".jpg", listener);
+                        }
+                    }
+
+                    createDefaultAvatar(chat.getPeerHandle(0), chat.getPeerFullname(0));
                 }
             }
             else{
-                createDefaultAvatar(userHandle, fullName, flag);
+                UserAvatarListener listener = new UserAvatarListener(this);
+
+                if(!avatarRequested){
+                    avatarRequested = true;
+                    if (context.getExternalCacheDir() != null){
+                        megaApi.getUserAvatar(chat.getPeerEmail(0), context.getExternalCacheDir().getAbsolutePath() + "/" + chat.getPeerEmail(0) + ".jpg", listener);
+                    }
+                    else{
+                        megaApi.getUserAvatar(chat.getPeerEmail(0), context.getCacheDir().getAbsolutePath() + "/" + chat.getPeerEmail(0) + ".jpg", listener);
+                    }
+                }
+
+                createDefaultAvatar(chat.getPeerHandle(0), chat.getPeerFullname(0));
             }
         }
         else{
-            createDefaultAvatar(userHandle, fullName, flag);
+            UserAvatarListener listener = new UserAvatarListener(this);
+
+            if(!avatarRequested){
+                avatarRequested = true;
+                if (context.getExternalCacheDir() != null){
+                    megaApi.getUserAvatar(chat.getPeerEmail(0), context.getExternalCacheDir().getAbsolutePath() + "/" + chat.getPeerEmail(0) + ".jpg", listener);
+                }
+                else{
+                    megaApi.getUserAvatar(chat.getPeerEmail(0), context.getCacheDir().getAbsolutePath() + "/" + chat.getPeerEmail(0) + ".jpg", listener);
+                }
+            }
+
+            createDefaultAvatar(chat.getPeerHandle(0), chat.getPeerFullname(0));
         }
     }
 
-    public void createMyDefaultAvatar(boolean flag) {
+    public void createMyDefaultAvatar() {
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
@@ -698,7 +807,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             radius = defaultAvatar.getHeight()/2;
 
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        if(flag){
+        if(flagMyAvatar){
             myImage.setImageBitmap(defaultAvatar);
             myInitialLetter.setText(myFirstLetter);
             myInitialLetter.setTextSize(40);
@@ -714,8 +823,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     }
 
-    public void setProfileMyAvatar(boolean flag) {
-        log("setProfileMyAvatar: "+flag);
+    public void setProfileMyAvatar() {
+        log("setProfileMyAvatar: "+ flagMyAvatar);
         Bitmap myBitmap = null;
         File avatar = null;
         if (context != null) {
@@ -734,7 +843,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 myBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 myBitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, myBitmap, 3);
                 if (myBitmap != null) {
-                    if(flag){
+                    if(flagMyAvatar){
                         myImage.setImageBitmap(myBitmap);
                         myInitialLetter.setVisibility(GONE);
                     }else{
@@ -743,14 +852,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
                 else{
-                    createMyDefaultAvatar(flag);
+                    createMyDefaultAvatar();
                 }
             }
             else {
-                createMyDefaultAvatar(flag);
+                createMyDefaultAvatar();
             }
         } else {
-            createMyDefaultAvatar(flag);
+            createMyDefaultAvatar();
         }
     }
 
@@ -826,43 +935,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaChatApi.removeChatVideoListener(this);
         }
 
-        if(thePlayer!=null){
-            thePlayer.stop();
-            thePlayer.release();
-            thePlayer=null;
-        }
-
-        if (toneGenerator != null) {
-            toneGenerator.stopTone();
-            toneGenerator.release();
-            toneGenerator = null;
-        }
-
-        if(ringtone!=null){
-            ringtone.stop();
-        }
-
-        if (timer!=null){
-            timer.cancel();
-            timer = null;
-        }
-
-        if (ringerTimer != null) {
-            ringerTimer.cancel();
-            ringerTimer = null;
-        }
-
-        if (vibrator != null){
-            if (vibrator.hasVibrator()){
-                vibrator.cancel();
-            }
-        }
+        stopAudioSignals();
 
         MegaApplication.activityPaused();
 
         super.onDestroy();
     }
-
 
     @Override
     public void onBackPressed() {
@@ -985,140 +1063,222 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
 
-        this.callChat = call;
-        if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            int callStatus = callChat.getStatus();
-            switch (callStatus){
-                case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
+        if(call.getChatid()==chatId){
+            log("onChatCallUpdate: "+call.getStatus());
+            this.callChat = call;
 
-                    videoFAB.setOnClickListener(null);
-                    answerCallFAB.setOnTouchListener(null);
-                    videoFAB.setOnTouchListener(null);
-                    videoFAB.setOnClickListener(this);
+            if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
+                int callStatus = callChat.getStatus();
+                switch (callStatus){
+                    case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
 
-                    setProfileMyAvatar(true);
-                    setProfileContactAvatar(userHandle, fullName, false);
+                        videoFAB.setOnClickListener(null);
+                        answerCallFAB.setOnTouchListener(null);
+                        videoFAB.setOnTouchListener(null);
+                        videoFAB.setOnClickListener(this);
+                        flagMyAvatar = true;
+                        setProfileMyAvatar();
+                        flagContactAvatar = false;
+                        setProfileContactAvatar();
 
-                    if (localCameraFragmentFS != null) {
-                        localCameraFragmentFS.setVideoFrame(false);
-                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                        ftFS.remove(localCameraFragmentFS);
-                        localCameraFragmentFS = null;
-                        contactAvatarLayout.setVisibility(View.VISIBLE);
-                        parentFS.setVisibility(View.GONE);
-                        fragmentContainerLocalCameraFS.setVisibility(View.GONE);
-                    }
-
-                    updateLocalVideoStatus();
-                    updateRemoteVideoStatus();
-
-                    if(thePlayer!=null){
-                        thePlayer.stop();
-                        thePlayer.release();
-                        thePlayer=null;
-                    }
-
-                    if (toneGenerator != null) {
-                        toneGenerator.stopTone();
-                        toneGenerator.release();
-                        toneGenerator = null;
-                    }
-
-                    if (ringtone!=null){
-                        ringtone.stop();
-                    }
-
-                    if (ringerTimer != null) {
-                        ringerTimer.cancel();
-                        ringerTimer = null;
-                    }
-
-                    if (vibrator != null){
-                        if (vibrator.hasVibrator()){
-                            vibrator.cancel();
+                        if (localCameraFragmentFS != null) {
+                            localCameraFragmentFS.setVideoFrame(false);
+                            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+                            ftFS.remove(localCameraFragmentFS);
+                            localCameraFragmentFS = null;
+                            contactAvatarLayout.setVisibility(View.VISIBLE);
+                            parentFS.setVisibility(View.GONE);
+                            fragmentContainerLocalCameraFS.setVisibility(View.GONE);
                         }
-                    }
 
-                    rtcAudioManager.start(null);
+                        updateLocalVideoStatus();
+                        updateRemoteVideoStatus();
 
-                    showInitialFABConfiguration();
-                    startClock();
-                    if(callChat.hasRemoteAudio()){
-                        log("Remote audio is connected");
+                        stopAudioSignals();
+
+                        rtcAudioManager.start(null);
+
+                        showInitialFABConfiguration();
+                        startClock();
+
+                        break;
                     }
-                    else{
-                        log("Remote audio is NOT connected");
+                    case MegaChatCall.CALL_STATUS_TERMINATING:{
+                        log("Terminating call of chat: "+chatId);
+                        break;
                     }
-                    if(callChat.hasRemoteVideo()){
-                        log("Remote video is connected");
+                    case MegaChatCall.CALL_STATUS_DESTROYED:{
+                        log("CALL_STATUS_DESTROYED:TERM code of the call: "+call.getTermCode());
+
+                        stopAudioSignals();
+
+                        rtcAudioManager.stop();
+                        MegaApplication.activityPaused();
+
+                        try{
+                            if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) && (!callInitiator)){
+                                AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+                                notificationBuilder.showMissedCallNotification(call);
+                            }
+                        }
+                        catch(Exception e){
+                            log("EXCEPTION when showing missed call notification: "+e.getMessage());
+                        }
+
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            super.finishAndRemoveTask();
+                        }
+                        else {
+                            super.finish();
+                        }
+                        break;
                     }
-                    else{
-                        log("Remote video is NOT connected");
-                    }
-                    break;
                 }
-                case MegaChatCall.CALL_STATUS_DESTROYED:{
+            }
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
+                log("Remote flags have changed");
+                updateRemoteVideoStatus();
+                updateRemoteAudioStatus();
+            }
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
+                log("Local flags have changed");
+                updateLocalAudioStatus();
+                updateLocalVideoStatus();
+            }
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
+                log("CHANGE_TYPE_RINGING_STATUS");
+            }
+            else{
+                log("CHANGE_TYPE_RINGING_STATUS: "+call.getChanges());
+            }
+        }
+    }
 
-                    if(thePlayer != null){
-                        thePlayer.stop();
-                        thePlayer.release();
-                        thePlayer=null;
-                    }
+    public void stopAudioSignals(){
+        log("stopAudioSignals");
 
-                    if (toneGenerator != null) {
-                        toneGenerator.stopTone();
-                        toneGenerator.release();
-                        toneGenerator = null;
-                    }
+        try{
+            if(thePlayer!=null){
+                thePlayer.stop();
+                thePlayer.release();
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping player");
+        }
 
-                    if(ringtone != null){
-                        ringtone.stop();
-                    }
+        try{
+            if (toneGenerator != null) {
+                toneGenerator.stopTone();
+                toneGenerator.release();
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping tone generator");
+        }
 
-                    if (timer != null){
-                        timer.cancel();
-                        timer = null;
-                    }
+        try{
+            if(ringtone != null){
+                ringtone.stop();
+            }
+        }
+        catch(Exception e){
+            log("Exception stopping ring tone");
+        }
 
-                    if (ringerTimer != null) {
-                        ringerTimer.cancel();
-                        ringerTimer = null;
-                    }
+        try{
+            if (timer != null){
+                timer.cancel();
+            }
 
-                    if (vibrator != null){
-                        if (vibrator.hasVibrator()) {
-                            vibrator.cancel();
-                        }
-                    }
+            if (ringerTimer != null) {
+                ringerTimer.cancel();
+            }
 
-                    rtcAudioManager.stop();
-                    MegaApplication.activityPaused();
-                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        super.finishAndRemoveTask();
-                    }
-                    else {
-                        super.finish();
-                    }
-                    break;
+        }
+        catch(Exception e){
+            log("Exception stopping ringing timer");
+        }
+
+        try{
+            if (vibrator != null){
+                if (vibrator.hasVibrator()) {
+                    vibrator.cancel();
                 }
             }
         }
-        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
-            log("Remote flags have changed");
-            updateRemoteVideoStatus();
-            updateRemoteAudioStatus();
+        catch(Exception e){
+            log("Exception stopping vibrator");
         }
-        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
-            log("Local flags have changed");
-            updateLocalAudioStatus();
-            updateLocalVideoStatus();
-        }
-        else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
-            log("CHANGE_TYPE_RINGING_STATUS");
+
+        thePlayer=null;
+        toneGenerator = null;
+        timer = null;
+        ringerTimer = null;
+    }
+
+    public Bitmap createDefaultAvatar(){
+        log("createDefaultAvatar()");
+
+        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(defaultAvatar);
+        Paint paintText = new Paint();
+        Paint paintCircle = new Paint();
+
+        paintText.setColor(Color.WHITE);
+        paintText.setTextSize(150);
+        paintText.setAntiAlias(true);
+        paintText.setTextAlign(Paint.Align.CENTER);
+        Typeface face = Typeface.SANS_SERIF;
+        paintText.setTypeface(face);
+        paintText.setAntiAlias(true);
+        paintText.setSubpixelText(true);
+        paintText.setStyle(Paint.Style.FILL);
+
+        if(chat.isGroup()){
+            paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
         }
         else{
-            log("CHANGE_TYPE_RINGING_STATUS: "+call.getChanges());
+            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(chat.getPeerHandle(0)));
+            if(color!=null){
+                log("The color to set the avatar is "+color);
+                paintCircle.setColor(Color.parseColor(color));
+                paintCircle.setAntiAlias(true);
+            }
+            else{
+                log("Default color to the avatar");
+                paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+                paintCircle.setAntiAlias(true);
+            }
         }
+
+        int radius;
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+            radius = defaultAvatar.getWidth()/2;
+        else
+            radius = defaultAvatar.getHeight()/2;
+
+        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
+
+        if(chat.getTitle()!=null){
+            if(!chat.getTitle().isEmpty()){
+                char title = chat.getTitle().charAt(0);
+                String firstLetter = new String(title+"");
+
+                if(!firstLetter.equals("(")){
+
+                    log("Draw letter: "+firstLetter);
+                    Rect bounds = new Rect();
+
+                    paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
+                    int xPos = (c.getWidth()/2);
+                    int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
+                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+                }
+
+            }
+        }
+        return defaultAvatar;
     }
 
     int width = 0;
@@ -1673,30 +1833,57 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
+    public static String getDateFromMillis(long d) {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df.format(d);
+    }
+
     private void startClock(){
+        long seconds = 0;
 
-        timer = new Timer();
-        MyTimerTask myTimerTask = new MyTimerTask();
-
-        timer.schedule(myTimerTask, 0, 1000);
-    }
-
-    private class MyTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            milliseconds = milliseconds +1000;
-            SimpleDateFormat formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
-            final String strDate = formatter.format(new Date(milliseconds));
-
-            runOnUiThread(new Runnable(){
-
-                @Override
-                public void run() {
-                    aB.setSubtitle(strDate);
-                }});
+        if(callChat!=null){
+            seconds = callChat.getDuration();
         }
+        long baseTime = SystemClock.uptimeMillis() - (seconds*1000);
+        myChrono.setBase(baseTime);
+        customHandler.postDelayed(updateTimerThread, 1000);
     }
+
+    private Runnable updateTimerThread = new Runnable() {
+        public void run() {
+            long elapsedTime = SystemClock.uptimeMillis() - myChrono.getBase();
+            aB.setSubtitle(getDateFromMillis(elapsedTime));
+            customHandler.postDelayed(this, 0);
+        }
+    };
+
+
+//    private void startClock(){
+//
+//        timer = new Timer();
+//        MyTimerTask myTimerTask = new MyTimerTask();
+//
+//        timer.schedule(myTimerTask, 0, 1000);
+//    }
+//
+//    private class MyTimerTask extends TimerTask {
+//
+//        @Override
+//        public void run() {
+//            milliseconds = milliseconds +1000;
+//            log("***********milliseconds: "+milliseconds);
+//            SimpleDateFormat formatter = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+//            final String strDate = formatter.format(new Date(milliseconds));
+//
+//            runOnUiThread(new Runnable(){
+//
+//                @Override
+//                public void run() {
+//                    aB.setSubtitle(strDate);
+//                }});
+//        }
+//    }
 
     private class MyRingerTask extends TimerTask {
 

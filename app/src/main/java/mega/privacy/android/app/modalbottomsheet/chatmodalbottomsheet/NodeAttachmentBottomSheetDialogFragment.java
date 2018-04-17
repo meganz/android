@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -20,26 +19,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -48,8 +36,6 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 
 public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -167,6 +153,10 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
 
+        if(message.getMessage()==null){
+            return;
+        }
+
         if(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()){
             if(messageMega.isDeletable()){
                 log("Message DELETABLE");
@@ -178,10 +168,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
             }
         }else{
             optionRemove.setVisibility(View.GONE);
-
         }
-
-
 
         optionImport = (LinearLayout) contentView.findViewById(R.id.option_import_layout);
 

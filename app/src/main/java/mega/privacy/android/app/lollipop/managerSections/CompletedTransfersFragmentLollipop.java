@@ -5,22 +5,18 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
@@ -29,16 +25,13 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaTransfer;
 
 
 public class CompletedTransfersFragmentLollipop extends Fragment {
 
 	Context context;
-	ActionBar aB;
 	RecyclerView listView;
 	MegaCompletedTransfersAdapter adapter;
 	
@@ -91,16 +84,6 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		
-		aB.setTitle(getResources().getString(R.string.section_transfers));
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-//		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -166,7 +149,6 @@ public class CompletedTransfersFragmentLollipop extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
 	public int onBackPressed(){

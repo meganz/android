@@ -1493,7 +1493,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if(request.getText()!=null) {
                     log("NEW title: "+request.getText());
                     infoTitleChatText.setText(request.getText());
-                    aB.setTitle(request.getText());
                 }
             }
             else{
@@ -1651,7 +1650,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 log("NEW title: "+chat.getTitle());
                 infoTitleChatText.setText(chat.getTitle());
-                aB.setTitle(chat.getTitle());
 
                 if (chat.getTitle().length() > 0){
                     String chatTitle = chat.getTitle().trim();
