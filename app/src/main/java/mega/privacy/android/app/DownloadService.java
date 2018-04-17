@@ -618,35 +618,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						pdfIntent.putExtra("isUrl", false);
 						startActivity(pdfIntent);
 					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
-						log("Video file");
-
-						Intent videoIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-						videoIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
-							videoIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Video/Audio file");
+						Intent mediaIntent;
+						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported()){
+							mediaIntent = new Intent(Intent.ACTION_VIEW);
+						}
+						else {
+							mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+						}
+						mediaIntent.putExtra("isPlayList", false);
+						mediaIntent.putExtra("HANDLE", currentDocument.getHandle());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
-							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(videoIntent);
-					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						log("Audio file");
-
-						Intent audioIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-						audioIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
-							audioIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						else{
-							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(audioIntent);
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(mediaIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
 						log("Download is document");

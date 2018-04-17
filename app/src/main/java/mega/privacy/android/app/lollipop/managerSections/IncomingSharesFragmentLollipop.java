@@ -819,10 +819,19 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("position", position);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -874,7 +883,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("APP", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());

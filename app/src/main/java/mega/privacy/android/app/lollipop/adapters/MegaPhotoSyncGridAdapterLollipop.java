@@ -101,6 +101,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
+	String defaultPath;
 	
 	private ActionMode actionMode;
 	
@@ -485,7 +486,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
+					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
 						MegaNode file = n;
 
 						if (megaApi.httpServerIsRunning() == 0) {
@@ -510,7 +511,22 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						log("FILENAME: " + file.getName());
 				  		
 				  		//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-						Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						Intent mediaIntent;
+						if (MimeTypeList.typeForName(n.getName()).isVideoNotSupported()){
+							mediaIntent = new Intent(Intent.ACTION_VIEW);
+						}
+						else {
+							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						}
+						mediaIntent.putExtra("position", positionInNodes);
+						if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
+							mediaIntent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
+						}
+						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
+						mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
 						mediaIntent.putExtra("HANDLE", file.getHandle());
 						mediaIntent.putExtra("FILENAME", file.getName());
 						String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);

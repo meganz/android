@@ -581,11 +581,20 @@ public class InboxFragmentLollipop extends Fragment{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("position", position);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					log("localPath: "+localPath);
-					if (localPath != null){
+					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -636,7 +645,7 @@ public class InboxFragmentLollipop extends Fragment{
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("APP", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());

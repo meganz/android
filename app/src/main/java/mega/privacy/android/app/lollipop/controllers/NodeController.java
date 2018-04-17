@@ -945,37 +945,30 @@ public class NodeController {
                             pdfIntent.putExtra("isUrl", false);
                             context.startActivity(pdfIntent);
                         }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
-                            log("Video file");
-                            File videoFile = new File(localPath);
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                            log("Video/Audio file");
+                            File mediaFile = new File(localPath);
 
-                            Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            videoIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
-                                videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                            Intent mediaIntent;
+                            if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported()){
+                                mediaIntent = new Intent(Intent.ACTION_VIEW);
+
+                            }
+                            else {
+                                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            }
+                            mediaIntent.putExtra("isPlayList", false);
+                            mediaIntent.putExtra("HANDLE", tempNode.getHandle());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+
                             }
                             else{
-                                videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
-                            videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            context.startActivity(videoIntent);
-                        }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            log("Audio file");
-                            File audioFile = new File(localPath);
-
-                            Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            audioIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && audioFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
-                                audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            else{
-                                audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            context.startActivity(audioIntent);
+                            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            context.startActivity(mediaIntent);
                         }
                         else {
                             log("MimeTypeList other file");
