@@ -1082,66 +1082,56 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						startActivity(intent);
 					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
 						log("Video file");
 
-						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-						videoIntent.putExtra("FILENAME", currentNode.getName());
-						videoIntent.putExtra("path", currentFile.getAbsolutePath());
-						videoIntent.putExtra("pathNavigation", pathNavigation);
+						Intent mediaIntent;
+						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported()){
+							mediaIntent = new Intent(Intent.ACTION_VIEW);
+						}
+						else {
+							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						}
+						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						mediaIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						mediaIntent.putExtra("position", position);
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+						mediaIntent.putExtra("offlinePathDirectory", currentFile.getParent());
+						mediaIntent.putExtra("pathNavigation", pathNavigation);
+						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
-							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						startActivity(videoIntent);
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						startActivity(mediaIntent);
 					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						log("Audio file");
+				}
+				else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+					log("Pdf file");
 
-						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-						audioIntent.putExtra("FILENAME", currentNode.getName());
-						audioIntent.putExtra("path", currentFile.getAbsolutePath());
-						audioIntent.putExtra("pathNavigation", pathNavigation);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						else{
-							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						startActivity(audioIntent);
-          			}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-						log("Pdf file");
+					//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
-						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
-
-						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-						pdfIntent.putExtra("APP", true);
-						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
-						pdfIntent.putExtra("pathNavigation", pathNavigation);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						else{
-							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						context.startActivity(pdfIntent);
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.putExtra("APP", true);
+					pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+					pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+					pdfIntent.putExtra("path", currentFile.getAbsolutePath());
+					pdfIntent.putExtra("pathNavigation", pathNavigation);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					}
 					else{
-						openFile(currentFile);
-					}					
-				}					
+						pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					}
+					pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					context.startActivity(pdfIntent);
+				}
+				else{
+					openFile(currentFile);
+				}
 			}
 		}
     }

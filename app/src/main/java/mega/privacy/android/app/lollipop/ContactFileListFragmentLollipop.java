@@ -687,10 +687,17 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("position", position);
+					mediaIntent.putExtra("adapterType", Constants.CONTACT_FILE_ADAPTER);
+					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					} else {
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -741,7 +748,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("APP", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					if (localPath != null  && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
