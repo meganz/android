@@ -42,6 +42,8 @@ import android.text.Spanned;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -83,6 +85,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     boolean isLoggingIn = false;
     boolean showMessageNotificationAfterPush = false;
+    boolean beep = false;
 
     String remoteMessageType = "";
 
@@ -100,11 +103,15 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         megaChatApi = app.getMegaChatApi();
         megaApi.addGlobalListener(this);
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+
+        showMessageNotificationAfterPush = false;
+        beep = false;
     }
 
     @Override
     public void onDestroy() {
         log("onDestroyFCM");
+        megaApi.removeGlobalListener(this);
         super.onDestroy();
     }
 
@@ -188,17 +195,39 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("online status ---> "+status);
                         int connectionState = megaChatApi.getConnectionState();
                         log("connection state ---> "+connectionState);
-
-                        removeListeners();
                     }
 
                 }else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
+
                     if(Util.isChatEnabled()){
+                        String data = remoteMessage.getData().get("data");
+
+                        if(data!=null){
+                            JSONObject object = null;
+                            try{
+                                object = new JSONObject(data);
+                                int silentData = object.getInt("silent");
+                                if(silentData != 1){
+                                    beep = true;
+                                }
+                            }
+                            catch(Exception e){
+                                log("ERROR:JSONObject:Parser");
+                                beep = true;
+                            }
+                        }
+                        else{
+                            log("NO DATA on the PUSH");
+                            beep = true;
+                        }
+
+                        log("notification should beep: "+ beep);
+                        showMessageNotificationAfterPush = true;
+
                         String gSession = credentials.getSession();
                         if (megaApi.getRootNode() == null){
                             log("RootNode = null");
-                            showMessageNotificationAfterPush = true;
 
                             performLoginProccess(gSession);
 
@@ -226,8 +255,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             //If false, no need to change it
                             log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
 
-                            removeListeners();
-                            megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
+                            megaChatApi.pushReceived(beep, ((MegaApplication) getApplication()));
+                            beep = false;
                         }
                     }
                 }
@@ -373,7 +402,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 log("Connected to chat!");
                 if(showMessageNotificationAfterPush){
                     showMessageNotificationAfterPush = false;
-                    megaChatApi.pushReceived(true, ((MegaApplication) getApplication()));
+                    megaChatApi.pushReceived(beep, ((MegaApplication) getApplication()));
+                    beep = false;
                 }
                 else{
                     log("Login do not started by CHAT message");
@@ -395,8 +425,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     public void showSharedFolderNotification(MegaNode n) {
         log("showSharedFolderNotification");
-
-        removeListeners();
 
         try {
             ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -524,8 +552,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     public void showContactRequestNotification(MegaContactRequest crToShow) {
         log("showContactRequestNotification");
-
-        removeListeners();
 
         String notificationContent;
         if(crToShow!=null){
@@ -690,9 +716,5 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 log("Exception when showing IPC request: " + e.getMessage());
             }
         }
-    }
-
-    public void removeListeners(){
-        megaApi.removeGlobalListener(this);
     }
 }

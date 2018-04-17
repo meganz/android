@@ -1272,6 +1272,7 @@ public final class AdvancedNotificationBuilder {
     public void generateChatNotification(MegaChatRequest request){
         log("generateChatNotification");
         boolean beep = request.getFlag();
+        log("should beep: "+beep);
 
         MegaHandleList chatHandleList = request.getMegaHandleList();
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
@@ -1292,6 +1293,7 @@ public final class AdvancedNotificationBuilder {
             }
         });
 
+        log("generateChatNotification for: "+chats.size()+" chats");
         for(int i=0; i<chats.size(); i++){
             if(MegaApplication.getOpenChatId() != chats.get(i).getChatId()){
 
