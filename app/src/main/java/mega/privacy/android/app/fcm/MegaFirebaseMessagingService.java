@@ -61,10 +61,10 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -76,7 +76,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaGlobalListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatCallListenerInterface {
+public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaGlobalListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -101,7 +101,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-        megaChatApi.addChatCallListener(this);
         megaApi.addGlobalListener(this);
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     }
@@ -182,19 +181,28 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                         MegaHandleList handleList = megaChatApi.getChatCalls();
                         if(handleList!=null){
-                            if(handleList.size()==0){
-                                log("NO calls in progress");
-                            }
-                            else if(handleList.size()==1){
+                            long numberOfCalls = handleList.size();
+                            log("Number of calls in progress: "+numberOfCalls);
+                            if(numberOfCalls==1){
+
                                 long chatId = handleList.get(0);
 
                                 MegaChatCall call = megaChatApi.getChatCall(chatId);
                                 if(call!=null){
-                                    launchCallActivity(call);
+                                    if(call.getStatus()<=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                                        launchCallActivity(call);
+                                    }
+                                    else{
+                                        log("Launch not in correct status");
+                                    }
                                 }
                             }
+                            else if (numberOfCalls>1){
+                                log("MORE than one call in progress: "+numberOfCalls);
+                                checkQueuedCalls();
+                            }
                             else{
-                                log("MORE than one call in progress - not supported yet");
+                                log("ERROR. No calls to launch");
                             }
                         }
                     }
@@ -385,46 +393,20 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     }
 
-    @Override
-    public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-        log("onChatCallUpdate: " + call.getChatid() + " " + call.getStatus());
-
-        if(call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-            launchCallActivity(call);
-        }
-
-        if(call.hasRemoteAudio()){
-            log("Remote audio is connected");
-        }
-        else{
-            log("Remote audio is NOT connected");
-        }
-        if(call.hasRemoteVideo()){
-            log("Remote video is connected");
-        }
-        else{
-            log("Remote video is NOT connected");
-        }
-    }
-
     public void launchCallActivity(MegaChatCall call){
-        log("launchCallActivity");
+        log("launchCallActivity: "+call.getStatus());
         MegaApplication.setShowPinScreen(false);
 
-        if(call.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
-
-            Intent i = new Intent(this, ChatCallActivity.class);
-            i.putExtra("chatHandle", call.getChatid());
-            i.putExtra("callId", call.getId());
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent i = new Intent(this, ChatCallActivity.class);
+        i.putExtra("chatHandle", call.getChatid());
+        i.putExtra("callId", call.getId());
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            startActivity(i);
+        startActivity(i);
 
-            removeListeners();
-        }
-        else{
-            log("Not in RINGING status");
-        }
+        MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+        log("Launch call: "+chatRoom.getTitle());
+        removeListeners();
     }
 
     public void showSharedFolderNotification(MegaNode n) {
@@ -606,6 +588,19 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
+    public void checkQueuedCalls(){
+        log("checkQueuedCalls");
+        removeListeners();
+
+        try{
+            AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+            notificationBuilder.checkQueuedCalls();
+        }
+        catch (Exception e){
+            log("EXCEPTION: "+e.getMessage());
+        }
+    }
+
     public Bitmap createDefaultAvatar(String email){
         log("createDefaultAvatar()");
 
@@ -727,7 +722,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     }
 
     public void removeListeners(){
-        megaChatApi.removeChatCallListener(this);
         megaApi.removeGlobalListener(this);
     }
 }
