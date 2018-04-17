@@ -940,7 +940,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					Intent mediaIntent;
 					boolean internalIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 						internalIntent=false;
 					}

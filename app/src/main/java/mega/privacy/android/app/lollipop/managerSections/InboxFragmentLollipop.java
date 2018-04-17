@@ -575,7 +575,7 @@ public class InboxFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
@@ -584,9 +584,9 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					log("localPath: "+localPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
@@ -672,7 +672,7 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 		}
     }
-	
+
 	private void updateActionModeTitle() {
 		if (actionMode == null || getActivity() == null) {
 			return;
