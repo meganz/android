@@ -148,4 +148,6 @@
     <color name="color_background_new_messages">#FFF7F7F7</color>
     <color name="color_text_new_messages">#B3000000</color>
 
+    <color name="shape_page_number">#E600BFA5</color>
+
 </resources>

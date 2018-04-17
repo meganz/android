@@ -1112,13 +1112,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         String mimeType = MimeTypeList.typeForName(file.getName()).getType();
                         log("FILENAME: " + file.getName());
 
-                        //Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
                         Intent mediaIntent;
                         if (MimeTypeList.typeForName(n.getName()).isVideoNotSupported()){
                             mediaIntent = new Intent(Intent.ACTION_VIEW);
                         }
                         else {
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        }
+                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+                        if(accountInfo!=null){
+                            mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
                         }
                         mediaIntent.putExtra("position", positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
@@ -1129,6 +1132,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         }
                         mediaIntent.putExtra("orderGetChildren", orderGetChildren);
                         mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
                         mediaIntent.putExtra("HANDLE", file.getHandle());
                         mediaIntent.putExtra("FILENAME", file.getName());
                         mediaIntent.putExtra("screenPosition", screenPosition);

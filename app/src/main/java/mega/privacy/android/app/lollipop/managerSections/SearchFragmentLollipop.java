@@ -64,7 +64,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-public class SearchFragmentLollipop extends Fragment implements OnClickListener{
+public class SearchFragmentLollipop extends Fragment{
 
 	public static ImageView imageDrag;
 
@@ -505,14 +505,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		this.context = context;
 	}
 	
-	@Override
-	public void onClick(View v) {
-
-		switch(v.getId()){
-
-		}
-	}
-	
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -530,6 +522,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		}
 		else{
 			((ManagerActivityLollipop)context).textSubmitted = true;
+			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
 
@@ -652,6 +646,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("screenPosition", screenPosition);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
@@ -707,7 +705,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					pdfIntent.putExtra("APP", true);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					pdfIntent.putExtra("inside", true);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
@@ -742,7 +744,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
-						startActivity(pdfIntent);
+						context.startActivity(pdfIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -1005,8 +1007,8 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes");
-		this.nodes = nodes;
 
+		this.nodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(nodes);
 			visibilityFastScroller();
