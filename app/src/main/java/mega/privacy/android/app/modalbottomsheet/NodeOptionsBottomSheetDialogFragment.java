@@ -78,6 +78,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private LinearLayout optionClearShares;
     private LinearLayout optionLeaveShares;
     private LinearLayout optionSendInbox;
+    private LinearLayout optionSendChat;
     private LinearLayout optionRename;
     private LinearLayout optionMove;
     private LinearLayout optionCopy;
@@ -180,6 +181,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionClearShares = (LinearLayout) contentView.findViewById(R.id.option_clear_share_layout);
         optionLeaveShares = (LinearLayout) contentView.findViewById(R.id.option_leave_share_layout);
         optionSendInbox = (LinearLayout) contentView.findViewById(R.id.option_send_inbox_layout);
+        optionSendInbox.setVisibility(View.GONE);
+        optionSendChat = (LinearLayout) contentView.findViewById(R.id.option_send_chat_layout);
         optionRename = (LinearLayout) contentView.findViewById(R.id.option_rename_layout);
         optionMove = (LinearLayout) contentView.findViewById(R.id.option_move_layout);
         optionCopy = (LinearLayout) contentView.findViewById(R.id.option_copy_layout);
@@ -195,8 +198,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionShare.setOnClickListener(this);
         optionClearShares.setOnClickListener(this);
         optionLeaveShares.setOnClickListener(this);
-        optionSendInbox.setOnClickListener(this);
+//        optionSendInbox.setOnClickListener(this);
         optionRename.setOnClickListener(this);
+        optionSendChat.setOnClickListener(this);
         optionMove.setOnClickListener(this);
         optionCopy.setOnClickListener(this);
         optionRubbishBin.setOnClickListener(this);
@@ -240,6 +244,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     else{
                         nodeThumb.setImageResource(R.drawable.ic_folder_list);
                     }
+                    optionSendChat.setVisibility(View.GONE);
                 } else {
                     long nodeSize = node.getSize();
                     nodeInfo.setText(Util.getSizeString(nodeSize));
@@ -266,9 +271,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     } else {
                         nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     }
+
+                    optionSendChat.setVisibility(View.VISIBLE);
                 }
             }
-
 
             switch (drawerItem) {
                 case CLOUD_DRIVE: {
@@ -320,7 +326,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionClearShares.setVisibility(View.GONE);
                         }
 
-                        optionSendInbox.setVisibility(View.VISIBLE);
                         optionDownload.setVisibility(View.VISIBLE);
                         optionInfo.setVisibility(View.VISIBLE);
                         optionRubbishBin.setVisibility(View.VISIBLE);
@@ -356,12 +361,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionClearShares.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionRubbishBin.setVisibility(View.GONE);
-                        optionSendInbox.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
                         optionLink.setVisibility(View.GONE);
                         optionRemoveLink.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.GONE);
+                        optionSendChat.setVisibility(View.GONE);
 
                     }
                     break;
@@ -392,7 +397,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemoveLink.setVisibility(View.GONE);
                     }
 
-                    optionSendInbox.setVisibility(View.VISIBLE);
                     optionDownload.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
@@ -433,7 +437,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionInfo.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
-                        optionSendInbox.setVisibility(View.GONE);
+                        optionSendChat.setVisibility(View.GONE);
 
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
                         log("DeepTree value:" + dBT);
@@ -573,7 +577,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRename.setVisibility(View.VISIBLE);
                         optionMove.setVisibility(View.VISIBLE);
                         optionCopy.setVisibility(View.VISIBLE);
-                        optionSendInbox.setVisibility(View.VISIBLE);
                         optionRubbishBin.setVisibility(View.VISIBLE);
 
                         //Hide
@@ -625,7 +628,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemove.setVisibility(View.VISIBLE);
                     }
 
-                    optionSendInbox.setVisibility(View.VISIBLE);
                     optionDownload.setVisibility(View.VISIBLE);
                     optionInfo.setVisibility(View.VISIBLE);
                     optionLink.setVisibility(View.VISIBLE);
@@ -859,7 +861,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     return;
                 }
 
-
                 if(megaApi!=null && megaApi.getRootNode()!=null){
                     ArrayList<MegaUser> contacts = megaApi.getContacts();
                     if(contacts==null){
@@ -880,6 +881,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("Online but not megaApi");
                     ((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
                 }
+
+                dismissAllowingStateLoss();
+                break;
+            }
+            case R.id.option_send_chat_layout:{
+                log("Send chat option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+
+                nC.selectChatsToSendNode(node);
 
                 dismissAllowingStateLoss();
                 break;

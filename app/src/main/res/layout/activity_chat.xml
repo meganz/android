@@ -33,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
+                android:elevation="4dp"
                 app:titleTextAppearance="@style/ToolbarTitle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -48,7 +49,6 @@
                 android:orientation="vertical">
                 <LinearLayout
                     android:layout_width="match_parent"
-
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:orientation="vertical">
@@ -63,19 +63,19 @@
                         android:id="@+id/writing_linear_layout_chat"
                         android:layout_width="match_parent"
                         android:focusableInTouchMode="true"
-                        android:layout_height="48dp">
+                        android:layout_height="wrap_content">
 
                         <ImageButton
                             android:id="@+id/send_message_icon_chat"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_centerVertical="true"
                             android:background="@null"
                             android:layout_alignBottom="@id/edit_text_chat"
                             android:tint="@color/accentColor"
-                            android:src="@drawable/ic_send_black"
-                            android:layout_marginBottom="3dp"/>
+                            android:src="@drawable/ic_send_black"/>
 
                         <mega.privacy.android.app.components.emojicon.EmojiconEditText
                             android:id="@id/edit_text_chat"
@@ -92,8 +92,9 @@
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
                             emojicon:emojiconSize="16sp"
-                            android:minLines="2"
-                            android:lines="6"/>
+                            android:minLines="1"
+                            android:maxLines="5"
+                            android:textColor="@color/black"/>
 
                         <RelativeLayout
                             android:id="@+id/writing_disabled_linear_layout_chat"
@@ -102,64 +103,197 @@
                             android:visibility="gone"
                             android:background="@color/transparent_white">
                         </RelativeLayout>
-
-
                     </RelativeLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:orientation="horizontal"
                         android:layout_alignBottom="@+id/edit_text_chat">
-                        <ImageButton
-                            android:id="@+id/keyboard_icon_chat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:tint="@color/transparent_black"
-                            android:src="@drawable/ic_emoticon_white"
-                            android:layout_marginLeft="18dp"
-                            android:layout_marginRight="38dp"
-                            android:layout_gravity="center_vertical"/>
 
-                        <ImageButton
-                            android:id="@+id/media_icon_chat"
+                        <RelativeLayout
+                            android:id="@+id/rl_keyboard_icon_chat"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:tint="@color/transparent_black"
-                            android:src="@drawable/ic_media"
-                            android:layout_marginRight="38dp"
-                            android:layout_gravity="center_vertical"/>
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <ImageButton
+                                android:id="@+id/keyboard_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:tint="@color/transparent_black"
+                                android:src="@drawable/ic_emoticon_white"
+                                android:layout_centerInParent="true"/>
+                        </RelativeLayout>
 
-                        <ImageButton
-                            android:id="@+id/send_contact_icon_chat"
+                        <RelativeLayout
+                            android:id="@+id/rl_media_icon_chat"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:tint="@color/transparent_black"
-                            android:src="@drawable/ic_send_contact"
-                            android:layout_marginRight="38dp"
-                            android:layout_gravity="center_vertical"/>
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <ImageButton
+                                android:id="@+id/media_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:tint="@color/transparent_black"
+                                android:src="@drawable/ic_media"
+                                android:layout_centerInParent="true"/>
 
-                        <ImageButton
-                            android:id="@+id/pick_file_system_icon_chat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:tint="@color/transparent_black"
-                            android:src="@drawable/ic_pick_file_system"
-                            android:layout_marginRight="38dp"
-                            android:layout_gravity="center_vertical"/>
+                        </RelativeLayout>
 
-                        <ImageButton
-                            android:id="@+id/pick_cloud_drive_icon_chat"
+                        <RelativeLayout
+                            android:id="@+id/rl_send_contact_icon_chat"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:tint="@color/transparent_black"
-                            android:src="@drawable/ic_pick_cloud_drive"
-                            android:layout_gravity="center_vertical"/>
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <ImageButton
+                                android:id="@+id/send_contact_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:tint="@color/transparent_black"
+                                android:src="@drawable/ic_send_contact"
+                                android:layout_centerInParent="true"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rl_pick_file_system_icon_chat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <ImageButton
+                                android:id="@+id/pick_file_system_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:tint="@color/transparent_black"
+                                android:src="@drawable/ic_pick_file_system"
+                                android:layout_centerInParent="true"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rl_pick_cloud_drive_icon_chat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+                            <ImageButton
+                                android:id="@+id/pick_cloud_drive_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:tint="@color/transparent_black"
+                                android:src="@drawable/ic_pick_cloud_drive"
+                                android:layout_centerInParent="true"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rl_pick_file_storage_icon_chat"
+                            android:layout_width="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent">
+
+                            <ImageButton
+                                android:id="@+id/pick_file_storage_icon_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:tint="@color/transparent_black"
+                                android:src="@drawable/ic_collections_white"
+                                android:layout_centerInParent="true"/>
+                        </RelativeLayout>
+
                     </LinearLayout>
+
+                    <!--<RelativeLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="48dp"-->
+                    <!--android:layout_alignBottom="@+id/edit_text_chat">-->
+                    <!--<LinearLayout-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:orientation="horizontal"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:layout_centerVertical="true">-->
+
+                    <!--<ImageButton-->
+                    <!--android:id="@+id/keyboard_icon_chat"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@null"-->
+                    <!--android:tint="@color/transparent_black"-->
+                    <!--android:src="@drawable/ic_emoticon_white"-->
+                    <!--android:layout_gravity="center_vertical"/>-->
+
+                    <!--<ImageButton-->
+                    <!--android:id="@+id/media_icon_chat"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@null"-->
+                    <!--android:tint="@color/transparent_black"-->
+                    <!--android:src="@drawable/ic_media"-->
+                    <!--android:layout_marginLeft="30dp"-->
+                    <!--android:layout_gravity="center_vertical"/>-->
+
+                    <!--<ImageButton-->
+                    <!--android:id="@+id/send_contact_icon_chat"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@null"-->
+                    <!--android:tint="@color/transparent_black"-->
+                    <!--android:src="@drawable/ic_send_contact"-->
+                    <!--android:layout_marginLeft="30dp"-->
+                    <!--android:layout_gravity="center_vertical"/>-->
+
+                    <!--<ImageButton-->
+                    <!--android:id="@+id/pick_file_system_icon_chat"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@null"-->
+                    <!--android:tint="@color/transparent_black"-->
+                    <!--android:src="@drawable/ic_pick_file_system"-->
+                    <!--android:layout_marginLeft="30dp"-->
+                    <!--android:layout_gravity="center_vertical"/>-->
+
+                    <!--<ImageButton-->
+                    <!--android:id="@+id/pick_cloud_drive_icon_chat"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@null"-->
+                    <!--android:layout_marginLeft="30dp"-->
+                    <!--android:tint="@color/transparent_black"-->
+                    <!--android:src="@drawable/ic_pick_cloud_drive"-->
+                    <!--android:layout_gravity="center_vertical"/>-->
+
+                    <!--<ImageButton-->
+                    <!--android:id="@+id/pick_file_storage_icon_chat"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@null"-->
+                    <!--android:tint="@color/transparent_black"-->
+                    <!--android:layout_marginLeft="30dp"-->
+                    <!--android:src="@drawable/ic_collections_white"-->
+                    <!--android:layout_gravity="center_vertical"/>-->
+                    <!--</LinearLayout>-->
+                    <!---->
+                    <!--</RelativeLayout>-->
+
+                    <!--File storage fragment-->
+
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_file_storage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:background="@android:color/transparent">
+                        <FrameLayout
+                            android:id="@+id/fragment_container_file_storage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"/>
+
+                    </RelativeLayout>
                 </LinearLayout>
             </RelativeLayout>
 
@@ -180,14 +314,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/background_chat">
-
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/messages_chat_list_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:choiceMode="multipleChoice"
                         android:paddingBottom="24dp"/>
-
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -204,41 +336,91 @@
                         android:layout_height="18dp"
                         android:layout_marginTop="4dp"
                         android:ellipsize="middle"
-                        android:maxLines="1"
                         android:singleLine="true"
                         android:textColor="@color/name_my_account"
                         android:textSize="14sp"/>
                 </RelativeLayout>
 
+                <RelativeLayout
+                    android:id="@+id/message_jump_layout"
+                    android:layout_width="163dp"
+                    android:layout_height="36dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="12dp"
+                    android:animateLayoutChanges="true"
+                    android:background="@drawable/dark_rounded_jump_to_latest">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_new_messages"
+                            android:layout_marginRight="12dp"/>
+                        <TextView
+                            android:id="@+id/message_jump_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:singleLine="true"
+                            android:fontFamily="Roboto"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/call_in_progress_layout"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_below="@+id/toolbar_chat"
+                android:background="@color/accentColor">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="Tap to return to call"/>
+
+            </RelativeLayout>
             <!--<android.support.design.widget.CoordinatorLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentBottom="true"-->
-                <!--android:layout_alignParentRight="true">-->
-                <!--<android.support.design.widget.FloatingActionButton-->
-                    <!--android:id="@+id/fab_chat"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--app:fabSize="mini"-->
-                    <!--android:layout_gravity="bottom|end"-->
-                    <!--app:elevation="6dp"-->
-                    <!--app:borderWidth="0dp"-->
-                    <!--android:scaleType="center"-->
-                    <!--app:backgroundTint="@color/accentColor"-->
-                    <!--app:pressedTranslationZ="12dp"-->
-                    <!--android:layout_marginLeft="16dp"-->
-                    <!--android:layout_marginRight="16dp"-->
-                    <!--android:layout_marginBottom="12dp"-->
-                    <!--android:src="@drawable/ic_add_white"-->
-                    <!--android:layout_alignParentRight="true"-->
-                    <!--android:layout_alignParentBottom="true"/>-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_alignParentRight="true">-->
+            <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/fab_chat"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:fabSize="mini"-->
+            <!--android:layout_gravity="bottom|end"-->
+            <!--app:elevation="6dp"-->
+            <!--app:borderWidth="0dp"-->
+            <!--android:scaleType="center"-->
+            <!--app:backgroundTint="@color/accentColor"-->
+            <!--app:pressedTranslationZ="12dp"-->
+            <!--android:layout_marginLeft="16dp"-->
+            <!--android:layout_marginRight="16dp"-->
+            <!--android:layout_marginBottom="12dp"-->
+            <!--android:src="@drawable/ic_add_white"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_alignParentBottom="true"/>-->
             <!--</android.support.design.widget.CoordinatorLayout>-->
 
         </RelativeLayout>
 
-        </RelativeLayout>
+    </RelativeLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

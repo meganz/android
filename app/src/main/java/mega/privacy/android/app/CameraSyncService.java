@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -362,7 +361,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 										log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
 										if(chatSettings==null) {
 											log("1 - shouldRun: ERROR----> Switch OFF chat");
-											chatSettings = new ChatSettings(false+"", true + "", "",true + "");
+											chatSettings = new ChatSettings();
+											chatSettings.setEnabled(false+"");
 											dbH.setChatSettings(chatSettings);
 										}
 										else{
@@ -1944,7 +1944,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				.setContentTitle(message).setContentText(contentText)
 				.setOngoing(false);
 
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}
 
 	public void retryLater(){
@@ -2325,7 +2325,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 				if(Util.isVideoFile(transfer.getPath())){
 					log("Is video!!!");
-					ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+					File previewDir = PreviewUtils.getPreviewFolder(this);
+					File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+					File thumbDir = ThumbnailUtils.getThumbFolder(this);
+					File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+					megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+					megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
 					MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 					if(node!=null){
