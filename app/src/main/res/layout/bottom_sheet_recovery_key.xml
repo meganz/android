@@ -46,7 +46,7 @@
             android:paddingLeft="-2dp"
             android:paddingRight="-2dp"
             android:visibility="visible"
-            android:src="@drawable/ic_copy_to_clipboard"/>
+            android:src="@drawable/ic_b_clipboard"/>
 
         <TextView
             android:id="@+id/recovery_key_copytoclipboard_text"
