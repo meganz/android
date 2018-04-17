@@ -63,13 +63,15 @@ import nz.mega.sdk.MegaNode;
 
 public class InboxFragmentLollipop extends Fragment{
 
+	public static ImageView imageDrag;
+
 	public static int GRID_WIDTH = 400;
 	
 	Context context;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
-	MegaBrowserLollipopAdapter adapter;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
+	public static MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
@@ -486,7 +488,7 @@ public class InboxFragmentLollipop extends Fragment{
         context = activity;
     }
 	
-	public void itemClick(int position) {
+	public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -536,7 +538,7 @@ public class InboxFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					intent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -548,29 +550,14 @@ public class InboxFragmentLollipop extends Fragment{
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					startActivity(intent);
+					intent.putExtra("screenPosition", screenPosition);
+					context.startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
 
@@ -590,8 +577,11 @@ public class InboxFragmentLollipop extends Fragment{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);
+					imageDrag = imageView;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					log("localPath: "+localPath);
 					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
@@ -605,10 +595,28 @@ public class InboxFragmentLollipop extends Fragment{
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-						startActivity(mediaIntent);
+						context.startActivity(mediaIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -618,27 +626,10 @@ public class InboxFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
@@ -656,6 +647,24 @@ public class InboxFragmentLollipop extends Fragment{
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());

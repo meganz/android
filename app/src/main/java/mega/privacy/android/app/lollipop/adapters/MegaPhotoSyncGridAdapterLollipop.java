@@ -61,7 +61,7 @@ import nz.mega.sdk.MegaShare;
 
 
 public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid> {
-	
+
 	private class Media {
 		public String filePath;
 		public long timestamp;
@@ -466,6 +466,15 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 			if (n != null){
 				if (!n.isFolder()){
+					ImageView imageView = holder.imageViews.get(index);
+					int[] positionIV = new int[2];
+					imageView.getLocationOnScreen(positionIV);
+					int[] screenPosition = new int[4];
+					screenPosition[0] = positionIV[0];
+					screenPosition[1] = positionIV[1];
+					screenPosition[2] = imageView.getWidth();
+					screenPosition[3] = imageView.getHeight();
+
 					if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
 						
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -484,29 +493,14 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						else{
 							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
 						}
+						intent.putExtra("screenPosition", screenPosition);
 						context.startActivity(intent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						CameraUploadFragmentLollipop.imageDrag = imageView;
 					}
 					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
 						MegaNode file = n;
 
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-						}
-
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
-
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-						}
-						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-						}
-
-						String url = megaApi.httpServerGetLocalLink(file);
 						String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 						log("FILENAME: " + file.getName());
 				  		
@@ -542,6 +536,24 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						}
 						else {
+							if (megaApi.httpServerIsRunning() == 0) {
+								megaApi.httpServerStart();
+							}
+
+							ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+							ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+							activityManager.getMemoryInfo(mi);
+
+							if(mi.totalMem>Constants.BUFFER_COMP){
+								log("Total mem: "+mi.totalMem+" allocate 32 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							}
+							else{
+								log("Total mem: "+mi.totalMem+" allocate 16 MB");
+								megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							}
+
+							String url = megaApi.httpServerGetLocalLink(file);
 							mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 						}
 				  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
@@ -554,59 +566,6 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							NodeController nC = new NodeController(context);
 							nC.prepareForDownload(handleList);
 				  		}						
-					}
-					else if (MimeTypeList.typeForName(n.getName()).isPdf()){
-						MegaNode file = n;
-
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
-						}
-
-						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-						activityManager.getMemoryInfo(mi);
-
-						if(mi.totalMem>Constants.BUFFER_COMP){
-							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-						}
-						else{
-							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-						}
-
-						String url = megaApi.httpServerGetLocalLink(file);
-						String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-						log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
-
-						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-						pdfIntent.putExtra("APP", true);
-						String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-						if (localPath != null){
-							File mediaFile = new File(localPath);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-							}
-							else{
-								pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-							}
-							pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						}
-						else {
-							pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-						}
-						pdfIntent.putExtra("HANDLE", file.getHandle());
-						if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
-							context.startActivity(pdfIntent);
-						}
-						else{
-							Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(n.getHandle());
-							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList);
-						}
 					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();

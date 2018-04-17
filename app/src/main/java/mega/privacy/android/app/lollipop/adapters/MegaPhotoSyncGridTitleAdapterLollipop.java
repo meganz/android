@@ -1064,6 +1064,15 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
             if (n != null){
                 if (!n.isFolder()){
+                    ImageView imageView = holder.getImageView();
+                    int[] positionIV = new int[2];
+                    imageView.getLocationOnScreen(positionIV);
+                    int[] screenPosition = new int[4];
+                    screenPosition[0] = positionIV[0];
+                    screenPosition[1] = positionIV[1];
+                    screenPosition[2] = imageView.getWidth();
+                    screenPosition[3] = imageView.getHeight();
+
                     if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
                         Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                         intent.putExtra("position", positionInNodes);
@@ -1092,29 +1101,14 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         else{
                             intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
                         }
+                        intent.putExtra("screenPosition", screenPosition);
                         context.startActivity(intent);
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
                         MegaNode file = n;
 
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart();
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if(mi.totalMem>Constants.BUFFER_COMP){
-                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                        }
-                        else{
-                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                        }
-
-                        String url = megaApi.httpServerGetLocalLink(file);
                         String mimeType = MimeTypeList.typeForName(file.getName()).getType();
                         log("FILENAME: " + file.getName());
 
@@ -1137,6 +1131,18 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
                         mediaIntent.putExtra("HANDLE", file.getHandle());
                         mediaIntent.putExtra("FILENAME", file.getName());
+                        mediaIntent.putExtra("screenPosition", screenPosition);
+                        if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+                            mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
+                        }else{
+                            mediaIntent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+                            long[] arrayHandles = new long[nodes.size()];
+                            for(int i = 0; i < nodes.size(); i++) {
+                                arrayHandles[i] = nodes.get(i).getHandle();
+                            }
+                            mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
+                        }
                         String localPath = findLocalPath(file.getName(), file.getSize());
                         if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
                             File mediaFile = new File(localPath);
@@ -1149,6 +1155,24 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         }
                         else {
+                            if (megaApi.httpServerIsRunning() == 0) {
+                                megaApi.httpServerStart();
+                            }
+
+                            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                            activityManager.getMemoryInfo(mi);
+
+                            if(mi.totalMem>Constants.BUFFER_COMP){
+                                log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                            }
+                            else{
+                                log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                            }
+
+                            String url = megaApi.httpServerGetLocalLink(file);
                             mediaIntent.setDataAndType(Uri.parse(url), mimeType);
                         }
                         if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
@@ -1161,6 +1185,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             NodeController nC = new NodeController(context);
                             nC.prepareForDownload(handleList);
                         }
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else{
                         ArrayList<Long> handleList = new ArrayList<Long>();

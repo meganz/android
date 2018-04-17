@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -74,6 +75,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
+	public static ImageView imageDrag;
+
 	Context context;
 	ActionBar aB;
 	LinearLayout linearLayoutRecycler;
@@ -84,7 +87,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -115,8 +118,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ArrayList<MegaNode> nodes;
 	public ActionMode actionMode;
 
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
@@ -870,8 +873,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-    public void itemClick(int position) {
-		log("itemClick:position: " + position);
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+		log("item click position: " + position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			log("itemClick:multiselectON");
@@ -927,8 +930,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					startActivity(intent);
-
+					intent.putExtra("screenPosition", screenPosition);
+					context.startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					log("itemClick:isFile:isVideoReproducibleOrIsAudio");
@@ -958,7 +963,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
 						File mediaFile = new File(localPath);
@@ -1026,7 +1033,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
-
+					imageDrag = imageView;
 					if(internalIntent){
 						context.startActivity(mediaIntent);
 					}
@@ -1045,29 +1052,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							nC.prepareForDownload(handleList);
 						}
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					log("itemClick:isFile:isPdf");
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName() + " TYPE: "+mimeType);
 
@@ -1085,6 +1075,24 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
