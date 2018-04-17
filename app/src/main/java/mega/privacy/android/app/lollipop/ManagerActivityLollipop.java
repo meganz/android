@@ -2356,8 +2356,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
-//		megaApi.shouldShowPasswordReminderDialog(false, this);
-		showRememberPasswordDialog(false);
+		megaApi.shouldShowPasswordReminderDialog(false, this);
+//		showRememberPasswordDialog(false);
 		log("END onCreate");
 //		showTransferOverquotaDialog();
 	}
