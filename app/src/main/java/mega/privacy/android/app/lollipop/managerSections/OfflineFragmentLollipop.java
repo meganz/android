@@ -1108,29 +1108,29 @@ public class OfflineFragmentLollipop extends Fragment{
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(mediaIntent);
 					}
-				}
-				else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-					log("Pdf file");
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+						log("Pdf file");
 
-					//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
+						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
-					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					pdfIntent.putExtra("APP", true);
-					pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-					pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-					pdfIntent.putExtra("path", currentFile.getAbsolutePath());
-					pdfIntent.putExtra("pathNavigation", pathNavigation);
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+						pdfIntent.putExtra("APP", true);
+						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
+						pdfIntent.putExtra("pathNavigation", pathNavigation);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						context.startActivity(pdfIntent);
 					}
 					else{
-						pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						openFile(currentFile);
 					}
-					pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					context.startActivity(pdfIntent);
-				}
-				else{
-					openFile(currentFile);
 				}
 			}
 		}
