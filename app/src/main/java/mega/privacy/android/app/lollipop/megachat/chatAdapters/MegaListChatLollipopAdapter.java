@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -463,11 +464,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
-		holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
+
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape");
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(255, outMetrics));
+		}else{
+			log("Portrait");
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
+		}
 
 		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
 		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
 
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape");
+			holder.textViewContent.setMaxWidth(Util.scaleWidthPx(255, outMetrics));
+		}else{
+			log("Portrait");
+			holder.textViewContent.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
+		}
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
