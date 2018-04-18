@@ -1807,4 +1807,6 @@
 
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
 
+    <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
+
 </resources>

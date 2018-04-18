@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,8 +29,12 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,10 +42,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -84,6 +93,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -92,6 +103,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -106,6 +118,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -115,15 +128,23 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
+import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements VideoRendererEventListener, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener, DraggableView.DraggableListener{
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener, DraggableView.DraggableListener{
 
     int[] screenPosition;
     int mLeftDelta;
@@ -133,10 +154,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     int screenWidth;
     int screenHeight;
 
-    public static int REQUEST_CODE_SELECT_CHAT = 1005;
+    public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
+    public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
     private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
     private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
+
+    static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
     
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
@@ -155,10 +179,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private Toolbar tB;
     private ActionBar aB;
 
-    private MenuItem shareIcon;
-    private MenuItem propertiesIcon;
-    private MenuItem chatIcon;
-    private MenuItem downloadIcon;
+    private MenuItem shareMenuItem;
+    private MenuItem downloadMenuItem;
+    private MenuItem propertiesMenuItem;
+    private MenuItem chatMenuItem;
+    private MenuItem getlinkMenuItem;
+    private MenuItem renameMenuItem;
+    private MenuItem moveMenuItem;
+    private MenuItem copyMenuItem;
+    private MenuItem moveToTrashMenuItem;
+    private MenuItem removeMenuItem;
+    private MenuItem removelinkMenuItem;
+    private MenuItem loopMenuItem;
 
     private RelativeLayout audioVideoPlayerContainer;
     private RelativeLayout playerLayout;
@@ -209,6 +241,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
+    private boolean fromShared = false;
+    int accountType;
+    int typeExport = -1;
+    private AlertDialog renameDialog;
+    String regex = "[*|\\?:\"<>\\\\\\\\/]";
+    boolean moveToRubbish = false;
+    ProgressDialog moveToTrashStatusDialog;
+    private boolean loop = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -216,20 +257,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         setContentView(R.layout.activity_audiovideoplayer);
 
+        audioVideoPlayerLollipop= this;
+
         draggableView.setViewAnimator(new ExitViewAnimator());
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        if (savedInstanceState != null) {
-            currentTime = savedInstanceState.getLong("currentTime");
-            fileName = savedInstanceState.getString("fileName");
-            handle = savedInstanceState.getLong("handle");
-            uri = Uri.parse(savedInstanceState.getString("uri"));
-            renamed = savedInstanceState.getBoolean("renamed");
-        }
-        else {
-            currentTime = 0;
-        }
 
         Intent intent = getIntent();
         if (intent == null){
@@ -237,6 +269,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             finish();
             return;
         }
+
+        if (savedInstanceState != null) {
+            currentTime = savedInstanceState.getLong("currentTime");
+            fileName = savedInstanceState.getString("fileName");
+            handle = savedInstanceState.getLong("handle");
+            uri = Uri.parse(savedInstanceState.getString("uri"));
+            renamed = savedInstanceState.getBoolean("renamed");
+            loop = savedInstanceState.getBoolean("loop");
+        }
+        else {
+            currentTime = 0;
+            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+        }
+
+        fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
         if (adapterType == Constants.OFFLINE_ADAPTER){
@@ -373,6 +420,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
 
         log("Add transfer listener");
         megaApi.addTransferListener(this);
+        megaApi.addGlobalListener(this);
 
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -729,7 +777,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             @Override
             public void onDismiss(DialogInterface dialog) {
                 if (loading) {
-                    finish();
+//                    finish();
                 }
             }
         });
@@ -1136,6 +1184,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         outState.putString("fileName", fileName);
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
+        outState.putBoolean("loop", loop);
     }
 
     public String getFileName(Uri uri) {
@@ -1194,21 +1243,236 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
-        shareIcon = menu.findItem(R.id.full_video_viewer_share);
-        downloadIcon = menu.findItem(R.id.full_video_viewer_download);
-
-        if (isUrl) {
-            shareIcon.setVisible(false);
-            downloadIcon.setVisible(true);
+        shareMenuItem = menu.findItem(R.id.full_video_viewer_share);
+        downloadMenuItem = menu.findItem(R.id.full_video_viewer_download);
+        chatMenuItem = menu.findItem(R.id.full_video_viewer_chat);
+        propertiesMenuItem = menu.findItem(R.id.full_video_viewer_properties);
+        getlinkMenuItem = menu.findItem(R.id.full_video_viewer_get_link);
+        renameMenuItem = menu.findItem(R.id.full_video_viewer_rename);
+        moveMenuItem = menu.findItem(R.id.full_video_viewer_move);
+        copyMenuItem = menu.findItem(R.id.full_video_viewer_copy);
+        moveToTrashMenuItem = menu.findItem(R.id.full_video_viewer_move_to_trash);
+        removeMenuItem = menu.findItem(R.id.full_video_viewer_remove);
+        removelinkMenuItem = menu.findItem(R.id.full_video_viewer_remove_link);
+        loopMenuItem = menu.findItem(R.id.full_video_viewer_loop);
+        if (loop){
+            loopMenuItem.setChecked(true);
         }
         else {
-            shareIcon.setVisible(true);
-            downloadIcon.setVisible(false);
+            loopMenuItem.setChecked(false);
         }
 
-        propertiesIcon = menu.findItem(R.id.full_video_viewer_properties);
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            getlinkMenuItem.setVisible(false);
+            removelinkMenuItem.setVisible(false);
+            shareMenuItem.setVisible(true);
+            propertiesMenuItem.setVisible(true);
+            downloadMenuItem.setVisible(false);
+            renameMenuItem.setVisible(false);
+            moveMenuItem.setVisible(false);
+            copyMenuItem.setVisible(false);
+            moveToTrashMenuItem.setVisible(false);
+            removeMenuItem.setVisible(false);
+            chatMenuItem.setVisible(true);
+        }
+        else if(adapterType == Constants.SEARCH_ADAPTER){
+            MegaNode node = megaApi.getNodeByHandle(handle);
 
-        chatIcon = menu.findItem(R.id.full_video_viewer_chat);
+            if (isUrl){
+                shareMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
+            }
+            else {
+                downloadMenuItem.setVisible(false);
+                shareMenuItem.setVisible(true);
+            }
+            if(node.isExported()){
+                removelinkMenuItem.setVisible(true);
+                getlinkMenuItem.setVisible(false);
+            }
+            else{
+                removelinkMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(true);
+            }
+
+            propertiesMenuItem.setVisible(true);
+            renameMenuItem.setVisible(true);
+            moveMenuItem.setVisible(true);
+            copyMenuItem.setVisible(true);
+
+            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                chatMenuItem.setVisible(true);
+            }
+            else{
+                chatMenuItem.setVisible(false);
+            }
+
+            MegaNode parent = megaApi.getNodeByHandle(handle);
+            while (megaApi.getParentNode(parent) != null){
+                parent = megaApi.getParentNode(parent);
+            }
+
+            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                moveToTrashMenuItem.setVisible(true);
+                removeMenuItem.setVisible(false);
+            }
+            else{
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(true);
+            }
+        }
+        else {
+            MegaNode node = megaApi.getNodeByHandle(handle);
+
+            if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                shareMenuItem.setVisible(false);
+            }
+            else{
+                if(fromShared){
+                    shareMenuItem.setVisible(false);
+                }
+                if(isFolderLink){
+                    shareMenuItem.setVisible(false);
+                }
+            }
+            if (isUrl){
+                shareMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
+            }
+            else {
+                shareMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(false);
+            }
+            copyMenuItem.setVisible(true);
+
+            if(node.isExported()){
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(true);
+            }
+            else{
+                if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                    getlinkMenuItem.setVisible(false);
+                    removelinkMenuItem.setVisible(false);
+                }
+                else{
+                    if(fromShared){
+                        removelinkMenuItem.setVisible(false);
+                        getlinkMenuItem.setVisible(false);
+                    }
+                    else{
+                        if(isFolderLink){
+                            getlinkMenuItem.setVisible(false);
+                            removelinkMenuItem.setVisible(false);
+
+                        }
+                        else{
+                            getlinkMenuItem.setVisible(true);
+                            removelinkMenuItem.setVisible(false);
+                        }
+                    }
+                }
+            }
+            if(fromShared){
+                removeMenuItem.setVisible(false);
+                chatMenuItem.setVisible(false);
+
+                node = megaApi.getNodeByHandle(handle);
+                int accessLevel = megaApi.getAccess(node);
+
+                switch(accessLevel){
+                    case MegaShare.ACCESS_OWNER:
+                    case MegaShare.ACCESS_FULL:{
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+                        break;
+                    }
+                    case MegaShare.ACCESS_READWRITE:
+                    case MegaShare.ACCESS_READ:{
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                }
+            }
+            else{
+                if(isFolderLink){
+                    propertiesMenuItem.setVisible(false);
+                    moveToTrashMenuItem.setVisible(false);
+                    removeMenuItem.setVisible(false);
+                    renameMenuItem.setVisible(false);
+                    moveMenuItem.setVisible(false);
+                    copyMenuItem.setVisible(false);
+                    chatMenuItem.setVisible(false);
+                }
+                else{
+                    propertiesMenuItem.setVisible(true);
+
+                    if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                        removeMenuItem.setVisible(false);
+                        node = megaApi.getNodeByHandle(handle);
+                        int accessLevel = megaApi.getAccess(node);
+                        switch(accessLevel){
+
+                            case MegaShare.ACCESS_OWNER:
+                            case MegaShare.ACCESS_FULL:{
+                                renameMenuItem.setVisible(true);
+                                moveMenuItem.setVisible(true);
+                                moveToTrashMenuItem.setVisible(true);
+                                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                    chatMenuItem.setVisible(true);
+                                }
+                                else{
+                                    chatMenuItem.setVisible(false);
+                                }
+                                break;
+                            }
+                            case MegaShare.ACCESS_READWRITE:
+                            case MegaShare.ACCESS_READ:{
+                                renameMenuItem.setVisible(false);
+                                moveMenuItem.setVisible(false);
+                                moveToTrashMenuItem.setVisible(false);
+                                chatMenuItem.setVisible(false);
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                            chatMenuItem.setVisible(true);
+                        }
+                        else{
+                            chatMenuItem.setVisible(false);
+                        }
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+
+                        node = megaApi.getNodeByHandle(handle);
+
+                        final long handle = node.getHandle();
+                        MegaNode parent = megaApi.getNodeByHandle(handle);
+
+                        while (megaApi.getParentNode(parent) != null){
+                            parent = megaApi.getParentNode(parent);
+                        }
+
+                        if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+
+                            moveToTrashMenuItem.setVisible(true);
+                            removeMenuItem.setVisible(false);
+
+                        }
+                        else{
+                            moveToTrashMenuItem.setVisible(false);
+                            removeMenuItem.setVisible(true);
+                            getlinkMenuItem.setVisible(false);
+                            removelinkMenuItem.setVisible(false);
+                        }
+                    }
+                }
+            }
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -1237,49 +1501,27 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             case R.id.full_video_viewer_chat:{
                 log("Chat option");
                 long[] longArray = new long[1];
-
                 longArray[0] = handle;
+//
+//                Intent i = new Intent(this, ChatExplorerActivity.class);
+//                i.putExtra("NODE_HANDLES", longArray);
+//                startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
 
-                Intent i = new Intent(this, ChatExplorerActivity.class);
-                i.putExtra("NODE_HANDLES", longArray);
-                startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+                if(nC ==null){
+                    nC = new NodeController(this);
+                }
+                nC.selectChatsToSendNodes(longArray);
+
                 break;
             }
             case R.id.full_video_viewer_share: {
                 log("Share option");
-
                 intentToSendFile(uri);
-
                 break;
             }
             case R.id.full_video_viewer_properties: {
                 log("Info option");
-
-                Intent i = new Intent(this, FileInfoActivityLollipop.class);
-                if (isOffline){
-                    i.putExtra("name", fileName);
-                    i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
-                    i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-                    i.putExtra("path", path);
-                    if (pathNavigation != null){
-                        i.putExtra("pathNavigation", pathNavigation);
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
-                    }
-                    else{
-                        i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
-                    }
-                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                else {
-                    MegaNode node = megaApi.getNodeByHandle(handle);
-                    i.putExtra("handle", node.getHandle());
-                    i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-                    i.putExtra("name", node.getName());
-                }
-                startActivity(i);
-                renamed = false;
+                showPropertiesActivity();
                 break;
             }
             case R.id.full_video_viewer_download: {
@@ -1287,8 +1529,492 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 downloadFile();
                 break;
             }
+            case R.id.full_video_viewer_get_link: {
+                showGetLinkActivity();
+                break;
+            }
+            case R.id.full_video_viewer_remove_link: {
+                showRemoveLink();
+                break;
+            }
+            case R.id.full_video_viewer_rename: {
+                showRenameDialog();
+                break;
+            }
+            case R.id.full_video_viewer_move: {
+                showMove();
+                break;
+            }
+            case R.id.full_video_viewer_copy: {
+                showCopy();
+                break;
+            }
+            case R.id.full_video_viewer_move_to_trash: {
+                moveToTrash();
+                break;
+            }
+            case R.id.full_video_viewer_remove: {
+                moveToTrash();
+                break;
+            }
+            case R.id.full_video_viewer_loop: {
+                if (loopMenuItem.isChecked()){
+                    log("Loop NOT checked");
+                    loopMenuItem.setChecked(false);
+                    loop = false;
+                }
+                else {
+                    loopMenuItem.setChecked(true);
+                    log("Loop checked");
+                    loop = true;
+                }
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void moveToTrash(){
+        log("moveToTrash");
+
+        moveToRubbish = false;
+        if (!mega.privacy.android.app.utils.Util.isOnline(this)){
+            Snackbar.make(containerAudioVideoPlayer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        if(isFinishing()){
+            return;
+        }
+
+        final MegaNode rubbishNode = megaApi.getRubbishNode();
+
+        MegaNode parent = megaApi.getNodeByHandle(handle);
+        while (megaApi.getParentNode(parent) != null){
+            parent = megaApi.getParentNode(parent);
+        }
+
+        if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+            moveToRubbish = true;
+        }
+        else{
+            moveToRubbish = false;
+        }
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Check if the node is not yet in the rubbish bin (if so, remove it)
+
+                        if (moveToRubbish){
+                            megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, AudioVideoPlayerLollipop.this);
+                            ProgressDialog temp = null;
+                            try{
+                                temp = new ProgressDialog(AudioVideoPlayerLollipop.this);
+                                temp.setMessage(getString(R.string.context_move_to_trash));
+                                temp.show();
+                            }
+                            catch(Exception e){
+                                return;
+                            }
+                            moveToTrashStatusDialog = temp;
+                        }
+                        else{
+                            megaApi.remove(megaApi.getNodeByHandle(handle), AudioVideoPlayerLollipop.this);
+                            ProgressDialog temp = null;
+                            try{
+                                temp = new ProgressDialog(AudioVideoPlayerLollipop.this);
+                                temp.setMessage(getString(R.string.context_delete_from_mega));
+                                temp.show();
+                            }
+                            catch(Exception e){
+                                return;
+                            }
+                            moveToTrashStatusDialog = temp;
+                        }
+
+
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        if (moveToRubbish){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            String message= getResources().getString(R.string.confirmation_move_to_rubbish);
+            builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
+                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        }
+        else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            String message= getResources().getString(R.string.confirmation_delete_from_mega);
+            builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        }
+    }
+
+
+    public void showCopy(){
+        log("showCopy");
+
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(handle);
+
+        Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
+        long[] longArray = new long[handleList.size()];
+        for (int i=0; i<handleList.size(); i++){
+            longArray[i] = handleList.get(i);
+        }
+        intent.putExtra("COPY_FROM", longArray);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+    }
+
+    public void showMove(){
+        log("showMove");
+
+        ArrayList<Long> handleList = new ArrayList<Long>();
+        handleList.add(handle);
+
+        Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
+        long[] longArray = new long[handleList.size()];
+        for (int i=0; i<handleList.size(); i++){
+            longArray[i] = handleList.get(i);
+        }
+        intent.putExtra("MOVE_FROM", longArray);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+    }
+
+    private void showKeyboardDelayed(final View view) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+            }
+        }, 50);
+    }
+
+    public void showRenameDialog() {
+        log("showRenameDialog");
+        final MegaNode node = megaApi.getNodeByHandle(handle);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        //	    layout.setLayoutParams(params);
+
+        final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
+        input.setSingleLine();
+        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
+        input.setText(node.getName());
+
+
+        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(final View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (node.isFolder()) {
+                        input.setSelection(0, input.getText().length());
+                    } else {
+                        String[] s = node.getName().split("\\.");
+                        if (s != null) {
+                            int numParts = s.length;
+                            int lastSelectedPos = 0;
+                            if (numParts == 1) {
+                                input.setSelection(0, input.getText().length());
+                            } else if (numParts > 1) {
+                                for (int i = 0; i < (numParts - 1); i++) {
+                                    lastSelectedPos += s[i].length();
+                                    lastSelectedPos++;
+                                }
+                                lastSelectedPos--; //The last point should not be selected)
+                                input.setSelection(0, lastSelectedPos);
+                            }
+                        }
+                        showKeyboardDelayed(v);
+                    }
+                }
+            }
+        });
+
+
+        layout.addView(input, params);
+
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), 0, mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+
+        final RelativeLayout error_layout = new RelativeLayout(AudioVideoPlayerLollipop.this);
+        layout.addView(error_layout, params1);
+
+        final ImageView error_icon = new ImageView(AudioVideoPlayerLollipop.this);
+        error_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_input_warning));
+        error_layout.addView(error_icon);
+        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        error_icon.setLayoutParams(params_icon);
+
+        error_icon.setColorFilter(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.login_warning));
+
+        final TextView textError = new TextView(AudioVideoPlayerLollipop.this);
+        error_layout.addView(textError);
+        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params_text_error.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+        textError.setLayoutParams(params_text_error);
+
+        textError.setTextColor(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.login_warning));
+
+        error_layout.setVisibility(View.GONE);
+
+        input.getBackground().mutate().clearColorFilter();
+        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (error_layout.getVisibility() == View.VISIBLE) {
+                    error_layout.setVisibility(View.GONE);
+                    input.getBackground().mutate().clearColorFilter();
+                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+        });
+
+        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                                          KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    String value = v.getText().toString().trim();
+                    if (value.length() == 0) {
+                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        textError.setText(getString(R.string.invalid_string));
+                        error_layout.setVisibility(View.VISIBLE);
+                        input.requestFocus();
+
+                    } else {
+                        boolean result = matches(regex, value);
+                        if (result) {
+                            input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            textError.setText(getString(R.string.invalid_characters));
+                            error_layout.setVisibility(View.VISIBLE);
+                            input.requestFocus();
+
+                        } else {
+                            //						nC.renameNode(node, value);
+                            renameDialog.dismiss();
+                            rename(value, node);
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+        builder.setPositiveButton(getString(R.string.context_rename),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = input.getText().toString().trim();
+                        if (value.length() == 0) {
+                            return;
+                        }
+                        rename(value, node);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                input.getBackground().clearColorFilter();
+            }
+        });
+        builder.setView(layout);
+        renameDialog = builder.create();
+        renameDialog.show();
+        renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String value = input.getText().toString().trim();
+
+                if (value.length() == 0) {
+                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    textError.setText(getString(R.string.invalid_string));
+                    error_layout.setVisibility(View.VISIBLE);
+                    input.requestFocus();
+                }
+                else{
+                    boolean result=matches(regex, value);
+                    if(result){
+                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        textError.setText(getString(R.string.invalid_characters));
+                        error_layout.setVisibility(View.VISIBLE);
+                        input.requestFocus();
+
+                    }else{
+                        //nC.renameNode(node, value);
+                        renameDialog.dismiss();
+                        rename(value, node);
+                    }
+                }
+            }
+        });
+    }
+
+    private void rename(String newName, MegaNode node){
+        if (newName.equals(node.getName())) {
+            return;
+        }
+
+        if(!mega.privacy.android.app.utils.Util.isOnline(this)){
+            Snackbar.make(containerAudioVideoPlayer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        if (isFinishing()){
+            return;
+        }
+
+        ProgressDialog temp = null;
+        try{
+            temp = new ProgressDialog(this);
+            temp.setMessage(getString(R.string.context_renaming));
+            temp.show();
+        }
+        catch(Exception e){
+            return;
+        }
+        statusDialog = temp;
+
+        log("renaming " + node.getName() + " to " + newName);
+
+        megaApi.renameNode(node, newName, this);
+    }
+
+    public static boolean matches(String regex, CharSequence input) {
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(input);
+        return m.find();
+    }
+
+    public void showRemoveLink(){
+        android.support.v7.app.AlertDialog removeLinkDialog;
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+        TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+        TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+        TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
+        TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
+
+        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(25, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(10, outMetrics), 0);
+
+        url.setVisibility(View.GONE);
+        key.setVisibility(View.GONE);
+        symbol.setVisibility(View.GONE);
+        removeText.setVisibility(View.VISIBLE);
+
+        removeText.setText(getString(R.string.context_remove_link_warning_text));
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        float density = getResources().getDisplayMetrics().density;
+
+        float scaleW = mega.privacy.android.app.utils.Util.getScaleW(outMetrics, density);
+        float scaleH = mega.privacy.android.app.utils.Util.getScaleH(outMetrics, density);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
+        }else{
+            removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleW));
+
+        }
+
+        builder.setView(dialoglayout);
+
+        builder.setPositiveButton(getString(R.string.context_remove), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                typeExport=TYPE_EXPORT_REMOVE;
+                megaApi.disableExport(megaApi.getNodeByHandle(handle), audioVideoPlayerLollipop);
+            }
+        });
+
+        builder.setNegativeButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        removeLinkDialog = builder.create();
+        removeLinkDialog.show();
+    }
+
+    public void showGetLinkActivity(){
+        log("showGetLinkActivity");
+        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
+        linkIntent.putExtra("handle", handle);
+        linkIntent.putExtra("account", accountType);
+        startActivity(linkIntent);
+    }
+
+    public void showPropertiesActivity(){
+        Intent i = new Intent(this, FileInfoActivityLollipop.class);
+        if (isOffline){
+            i.putExtra("name", fileName);
+            i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
+            i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+            i.putExtra("path", path);
+            if (pathNavigation != null){
+                i.putExtra("pathNavigation", pathNavigation);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
+            }
+            else{
+                i.setDataAndType(uri, MimeTypeList.typeForName(fileName).getType());
+            }
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        else {
+            MegaNode node = megaApi.getNodeByHandle(handle);
+            i.putExtra("handle", node.getHandle());
+            i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+            i.putExtra("name", node.getName());
+        }
+        startActivity(i);
+        renamed = false;
     }
 
     public void downloadFile() {
@@ -1343,7 +2069,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             return;
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+        if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             log("Send to "+chatHandles.length+" chats");
 
@@ -1373,6 +2099,73 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 nC = new NodeController(this);
             }
             nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+        }
+        else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+
+            if(!mega.privacy.android.app.utils.Util.isOnline(this)){
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                return;
+            }
+
+            final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
+            final long toHandle = intent.getLongExtra("MOVE_TO", 0);
+            final int totalMoves = moveHandles.length;
+
+            MegaNode parent = megaApi.getNodeByHandle(toHandle);
+            moveToRubbish = false;
+
+            ProgressDialog temp = null;
+            try{
+                temp = new ProgressDialog(this);
+                temp.setMessage(getString(R.string.context_moving));
+                temp.show();
+            }
+            catch(Exception e){
+                return;
+            }
+            statusDialog = temp;
+
+            for(int i=0; i<moveHandles.length;i++){
+                megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+            }
+        }
+        else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+            if(!mega.privacy.android.app.utils.Util.isOnline(this)){
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                return;
+            }
+
+            final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
+            final long toHandle = intent.getLongExtra("COPY_TO", 0);
+            final int totalCopy = copyHandles.length;
+
+            ProgressDialog temp = null;
+            try{
+                temp = new ProgressDialog(this);
+                temp.setMessage(getString(R.string.context_copying));
+                temp.show();
+            }
+            catch(Exception e){
+                return;
+            }
+            statusDialog = temp;
+
+            MegaNode parent = megaApi.getNodeByHandle(toHandle);
+            for(int i=0; i<copyHandles.length;i++){
+                MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+                if (cN != null){
+                    log("cN != null, i = " + i + " of " + copyHandles.length);
+                    megaApi.copyNode(cN, parent, this);
+                }
+                else{
+                    log("cN == null, i = " + i + " of " + copyHandles.length);
+                    try {
+                        statusDialog.dismiss();
+                        Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+                    }
+                    catch (Exception ex) {}
+                }
+            }
         }
     }
 
@@ -1432,7 +2225,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     protected void onResume() {
         super.onResume();
         log("onResume");
-
+        if (megaApi.getNodeByHandle(handle) == null){
+            finish();
+        }
         updateFile();
     }
 
@@ -1484,6 +2279,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                         MegaApplication app = (MegaApplication)getApplication();
                         megaApi = app.getMegaApi();
                         megaApi.addTransferListener(this);
+                        megaApi.addGlobalListener(this);
                     }
                     if (megaApi.httpServerIsRunning() == 0) {
                         megaApi.httpServerStart();
@@ -2002,5 +2798,134 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish");
+
+        if (request.getType() == MegaRequest.TYPE_RENAME){
+
+            try {
+                statusDialog.dismiss();
+            }
+            catch (Exception ex) {}
+
+            if (e.getErrorCode() == MegaError.API_OK){
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
+                updateFile();
+            }
+            else{
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_MOVE){
+            try {
+                statusDialog.dismiss();
+            }
+            catch (Exception ex) {}
+
+            if (moveToRubbish){
+                if (e.getErrorCode() == MegaError.API_OK){
+                    this.finish();
+                }
+                else{
+                    Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+                }
+                moveToRubbish = false;
+                log("move to rubbish request finished");
+            }
+            else{
+                if (e.getErrorCode() == MegaError.API_OK){
+                    Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
+                    finish();
+                }
+                else{
+                    Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
+                }
+                log("move nodes request finished");
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_REMOVE){
+
+
+            if (e.getErrorCode() == MegaError.API_OK){
+                if (moveToTrashStatusDialog.isShowing()){
+                    try {
+                        moveToTrashStatusDialog.dismiss();
+                    }
+                    catch (Exception ex) {}
+                    Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
+                }
+                finish();
+            }
+            else{
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
+            }
+            log("remove request finished");
+        }
+        else if (request.getType() == MegaRequest.TYPE_COPY){
+            try {
+                statusDialog.dismiss();
+            }
+            catch (Exception ex) {}
+
+            if (e.getErrorCode() == MegaError.API_OK){
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+            }
+            else{
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+            }
+            log("copy nodes request finished");
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
+    }
+
+    @Override
+    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+
+    }
+
+    @Override
+    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
+        log("onNodesUpdate");
+        if (megaApi.getNodeByHandle(handle) == null){
+            return;
+        }
+        supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void onReloadNeeded(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onAccountUpdate(MegaApiJava api) {
+
+    }
+
+    @Override
+    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+
+    }
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
+
     }
 }

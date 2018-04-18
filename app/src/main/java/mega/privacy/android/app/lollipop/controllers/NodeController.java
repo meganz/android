@@ -203,6 +203,9 @@ public class NodeController {
         else if (context instanceof PdfViewerActivityLollipop){
             ((PdfViewerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+        else if (context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
     }
 
     public void selectContactToSendNode(MegaNode node){
