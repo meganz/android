@@ -206,7 +206,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     private RelativeLayout bottomLayout;
     private TextView fileNameTextView;
-    private boolean shareIt = true;
     int accountType;
     int typeExport = -1;
     private Handler handler;
@@ -246,9 +245,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         else {
             currentPage = 0;
+            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
         }
         fromShared = intent.getBooleanExtra("fromShared", false);
-        accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
         inside = intent.getBooleanExtra("inside", false);
         handle = intent.getLongExtra("HANDLE", -1);
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
@@ -958,6 +957,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     downloadMenuItem.setVisible(true);
                 }
                 else {
+                    shareMenuItem.setVisible(true);
                     downloadMenuItem.setVisible(false);
                 }
                 if(node.isExported()){
@@ -994,12 +994,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     removeMenuItem.setVisible(true);
                 }
 
-            }else {
+            }
+            else {
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if(type==Constants.CONTACT_FILE_ADAPTER){
                     shareMenuItem.setVisible(false);
-                }else{
+                }
+                else{
                     if(fromShared){
                         shareMenuItem.setVisible(false);
                     }
@@ -1012,6 +1014,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     downloadMenuItem.setVisible(true);
                 }
                 else {
+                    shareMenuItem.setVisible(true);
                     downloadMenuItem.setVisible(false);
                 }
                 copyMenuItem.setVisible(true);
@@ -1019,20 +1022,24 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(node.isExported()){
                     getlinkMenuItem.setVisible(false);
                     removelinkMenuItem.setVisible(true);
-                }else{
+                }
+                else{
                     if(type==Constants.CONTACT_FILE_ADAPTER){
                         getlinkMenuItem.setVisible(false);
                         removelinkMenuItem.setVisible(false);
-                    }else{
+                    }
+                    else{
                         if(fromShared){
                             removelinkMenuItem.setVisible(false);
                             getlinkMenuItem.setVisible(false);
-                        } else{
+                        }
+                        else{
                             if(isFolderLink){
                                 getlinkMenuItem.setVisible(false);
                                 removelinkMenuItem.setVisible(false);
 
-                            }else{
+                            }
+                            else{
                                 getlinkMenuItem.setVisible(true);
                                 removelinkMenuItem.setVisible(false);
                             }
@@ -1048,7 +1055,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     int accessLevel = megaApi.getAccess(node);
 
                     switch(accessLevel){
-
                         case MegaShare.ACCESS_OWNER:
                         case MegaShare.ACCESS_FULL:{
                             renameMenuItem.setVisible(true);
@@ -1064,7 +1070,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             break;
                         }
                     }
-                }else{
+                }
+                else{
                     if(isFolderLink){
                         propertiesMenuItem.setVisible(false);
                         moveToTrashMenuItem.setVisible(false);
@@ -1073,8 +1080,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         moveMenuItem.setVisible(false);
                         copyMenuItem.setVisible(false);
                         chatMenuItem.setVisible(false);
-
-                    }else{
+                    }
+                    else{
                         propertiesMenuItem.setVisible(true);
 
                         if(type==Constants.CONTACT_FILE_ADAPTER){
@@ -1082,7 +1089,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             node = megaApi.getNodeByHandle(handle);
                             int accessLevel = megaApi.getAccess(node);
                             switch(accessLevel){
-
                                 case MegaShare.ACCESS_OWNER:
                                 case MegaShare.ACCESS_FULL:{
                                     renameMenuItem.setVisible(true);
@@ -1105,8 +1111,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                                     break;
                                 }
                             }
-
-                        }else{
+                        }
+                        else{
                             if(Util.isChatEnabled()){
                                 chatMenuItem.setVisible(true);
                             }
@@ -1126,12 +1132,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             }
 
                             if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-
                                 moveToTrashMenuItem.setVisible(true);
                                 removeMenuItem.setVisible(false);
 
-                            }else{
-
+                            }
+                            else{
                                 moveToTrashMenuItem.setVisible(false);
                                 removeMenuItem.setVisible(true);
                                 getlinkMenuItem.setVisible(false);
@@ -1184,7 +1189,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 break;
             }
             case R.id.pdf_viewer_get_link: {
-                shareIt = false;
                 showGetLinkActivity();
                 break;
             }
@@ -1596,7 +1600,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void showRemoveLink(){
-        shareIt = false;
         android.support.v7.app.AlertDialog removeLinkDialog;
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
