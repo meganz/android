@@ -10,8 +10,10 @@ import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
@@ -40,6 +42,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -74,6 +77,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	Object fragment;
 
 	DisplayMetrics outMetrics;
+	ChatController cC;
 
 	DatabaseHandler dbH = null;
 	ChatItemPreferences chatPrefs = null;
@@ -97,6 +101,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 
 		listFragment = _listView;
+
+		cC = new ChatController(context);
 		
 		if(chats!=null)
     	{
@@ -1130,7 +1136,434 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 				holder.textViewDate.setVisibility(View.GONE);
 			}
+			else if(messageType==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
+				log("Message Type -> TYPE_ALTER_PARTICIPANTS");
+				int privilege = chat.getLastMessagePriv();
+				log("Privilege: "+privilege);
+				String textToShow = "";
+
+				if(chat.getLastMessageHandle()==megaChatApi.getMyUserHandle()){
+					log("I have changed the permissions");
+
+					String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+					if(fullNameAction==null){
+						fullNameAction = "";
+					}
+
+					if(fullNameAction.trim().length()<=0){
+						log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+						fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+					}
+
+					if(privilege!=MegaChatRoom.PRIV_RM){
+						log("I was added");
+						textToShow = String.format(context.getString(R.string.message_add_participant), megaChatApi.getMyFullname(), fullNameAction);
+						try{
+							textToShow = textToShow.replace("[A]", "");
+							textToShow = textToShow.replace("[/A]", "");
+							textToShow = textToShow.replace("[B]", "");
+							textToShow = textToShow.replace("[/B]", "");
+							textToShow = textToShow.replace("[C]", "");
+							textToShow = textToShow.replace("[/C]", "");
+						}
+						catch (Exception e){}
+					}
+					else{
+						log("I was removed or left");
+						if(chat.getLastMessageSender()==chat.getLastMessageHandle()){
+							log("I left the chat");
+							textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), megaChatApi.getMyFullname());
+							try{
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							}
+							catch (Exception e){}
+						}
+						else{
+							textToShow = String.format(context.getString(R.string.message_remove_participant), megaChatApi.getMyFullname(), fullNameAction);
+							try{
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+								textToShow = textToShow.replace("[C]", "");
+								textToShow = textToShow.replace("[/C]", "");
+							}
+							catch (Exception e){}
+						}
+					}
+
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+
+					holder.textViewContent.setText(result);
+				}
+				else{
+
+					String fullNameTitle = cC.getFullName(chat.getLastMessageHandle(), chat.getChatId());
+
+
+					if(fullNameTitle==null){
+						fullNameTitle = "";
+					}
+
+					if(fullNameTitle.trim().length()<=0){
+
+						log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+						fullNameTitle = megaChatApi.getContactEmail(chat.getLastMessageHandle());
+					}
+
+					if(privilege!=MegaChatRoom.PRIV_RM){
+						log("Participant was added");
+						if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+							log("By me");
+							textToShow = String.format(context.getString(R.string.message_add_participant), fullNameTitle, megaChatApi.getMyFullname());
+							try{
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+								textToShow = textToShow.replace("[C]", "");
+								textToShow = textToShow.replace("[/C]", "");
+							}
+							catch (Exception e){}
+						}
+						else{
+//                        textToShow = String.format(context.getString(R.string.message_add_participant), message.getHandleOfAction()+"");
+							log("By other");
+							String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+							if(fullNameAction==null){
+								fullNameAction = "";
+							}
+
+							if(fullNameAction.trim().length()<=0){
+								log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+								fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+							}
+
+							textToShow = String.format(context.getString(R.string.message_add_participant), fullNameTitle, fullNameAction);
+							try{
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+								textToShow = textToShow.replace("[C]", "");
+								textToShow = textToShow.replace("[/C]", "");
+							}
+							catch (Exception e){}
+
+						}
+					}//END participant was added
+					else{
+						log("Participant was removed or left");
+						if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+							textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameTitle, megaChatApi.getMyFullname());
+							try{
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+								textToShow = textToShow.replace("[C]", "");
+								textToShow = textToShow.replace("[/C]", "");
+							}
+							catch (Exception e){}
+						}
+						else{
+
+							if(chat.getLastMessageSender()==chat.getLastMessageHandle()){
+								log("The participant left the chat");
+
+								textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), fullNameTitle);
+								try{
+									textToShow = textToShow.replace("[A]", "");
+									textToShow = textToShow.replace("[/A]", "");
+									textToShow = textToShow.replace("[B]", "");
+									textToShow = textToShow.replace("[/B]", "");
+								}
+								catch (Exception e){}
+
+							}
+							else{
+								log("The participant was removed");
+								String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+								if(fullNameAction==null){
+									fullNameAction = "";
+								}
+
+								if(fullNameAction.trim().length()<=0){
+
+									log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+									fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+								}
+
+								textToShow = String.format(context.getString(R.string.message_remove_participant), fullNameTitle, fullNameAction);
+								try{
+									textToShow = textToShow.replace("[A]", "");
+									textToShow = textToShow.replace("[/A]", "");
+									textToShow = textToShow.replace("[B]", "");
+									textToShow = textToShow.replace("[/B]", "");
+									textToShow = textToShow.replace("[C]", "");
+									textToShow = textToShow.replace("[/C]", "");
+								}
+								catch (Exception e){}
+							}
+//                        textToShow = String.format(context.getString(R.string.message_remove_participant), message.getHandleOfAction()+"");
+						}
+					} //END participant removed
+
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+
+					holder.textViewContent.setText(result);
+				}
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+			}
+			else if(messageType==MegaChatMessage.TYPE_PRIV_CHANGE){
+				log("PRIVILEGE CHANGE message");
+
+				int privilege = chat.getLastMessagePriv();
+				log("Privilege of the user: "+privilege);
+
+				String privilegeString = "";
+				if(privilege==MegaChatRoom.PRIV_MODERATOR){
+					privilegeString = context.getString(R.string.administrator_permission_label_participants_panel);
+				}
+				else if(privilege==MegaChatRoom.PRIV_STANDARD){
+					privilegeString = context.getString(R.string.standard_permission_label_participants_panel);
+				}
+				else if(privilege==MegaChatRoom.PRIV_RO){
+					privilegeString = context.getString(R.string.observer_permission_label_participants_panel);
+				}
+				else {
+					log("Change to other");
+					privilegeString = "Unknow";
+				}
+
+				String textToShow = "";
+
+				if(chat.getLastMessageHandle()==megaChatApi.getMyUserHandle()){
+					log("a moderator change my privilege");
+
+					if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+						log("I changed my Own permission");
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, megaChatApi.getMyFullname());
+						try{
+							textToShow = textToShow.replace("[A]", "");
+							textToShow = textToShow.replace("[/A]", "");
+							textToShow = textToShow.replace("[B]", "");
+							textToShow = textToShow.replace("[/B]", "");
+							textToShow = textToShow.replace("[C]", "");
+							textToShow = textToShow.replace("[/C]", "");
+							textToShow = textToShow.replace("[D]", "");
+							textToShow = textToShow.replace("[/D]", "");
+							textToShow = textToShow.replace("[E]", "");
+							textToShow = textToShow.replace("[/E]", "");
+						}
+						catch (Exception e){}
+					}
+					else{
+						log("I was change by someone");
+						String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+						if(fullNameAction==null){
+							fullNameAction = "";
+						}
+
+						if(fullNameAction.trim().length()<=0){
+
+							log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+							fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+						}
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), megaChatApi.getMyFullname(), privilegeString, fullNameAction);
+						try{
+							textToShow = textToShow.replace("[A]", "");
+							textToShow = textToShow.replace("[/A]", "");
+							textToShow = textToShow.replace("[B]", "");
+							textToShow = textToShow.replace("[/B]", "");
+							textToShow = textToShow.replace("[C]", "");
+							textToShow = textToShow.replace("[/C]", "");
+							textToShow = textToShow.replace("[D]", "");
+							textToShow = textToShow.replace("[/D]", "");
+							textToShow = textToShow.replace("[E]", "");
+							textToShow = textToShow.replace("[/E]", "");
+						}
+						catch (Exception e){}
+					}
+				}
+				else{
+					log("Participant privilege change!");
+					String fullNameTitle = cC.getFullName(chat.getLastMessageHandle(), chat.getChatId());
+
+
+					if(fullNameTitle==null){
+						fullNameTitle = "";
+					}
+
+					if(fullNameTitle.trim().length()<=0){
+						log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+						fullNameTitle = megaChatApi.getContactEmail(chat.getLastMessageHandle());
+					}
+
+					if(chat.getLastMessageSender()==megaChatApi.getMyUserHandle()){
+						log("The privilege was change by me");
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), fullNameTitle, privilegeString, megaChatApi.getMyFullname());
+						try{
+							textToShow = textToShow.replace("[A]", "");
+							textToShow = textToShow.replace("[/A]", "");
+							textToShow = textToShow.replace("[B]", "");
+							textToShow = textToShow.replace("[/B]", "");
+							textToShow = textToShow.replace("[C]", "");
+							textToShow = textToShow.replace("[/C]", "");
+							textToShow = textToShow.replace("[D]", "");
+							textToShow = textToShow.replace("[/D]", "");
+							textToShow = textToShow.replace("[E]", "");
+							textToShow = textToShow.replace("[/E]", "");
+						}
+						catch (Exception e){}
+
+					}
+					else{
+						log("By other");
+						String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+						if(fullNameAction==null){
+							fullNameAction = "";
+						}
+
+						if(fullNameAction.trim().length()<=0){
+							log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+							fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+						}
+
+						textToShow = String.format(context.getString(R.string.message_permissions_changed), fullNameTitle, privilegeString, fullNameAction);
+						try{
+							textToShow = textToShow.replace("[A]", "");
+							textToShow = textToShow.replace("[/A]", "");
+							textToShow = textToShow.replace("[B]", "");
+							textToShow = textToShow.replace("[/B]", "");
+							textToShow = textToShow.replace("[C]", "");
+							textToShow = textToShow.replace("[/C]", "");
+							textToShow = textToShow.replace("[D]", "");
+							textToShow = textToShow.replace("[/D]", "");
+							textToShow = textToShow.replace("[E]", "");
+							textToShow = textToShow.replace("[/E]", "");
+						}
+						catch (Exception e){}
+					}
+				}
+
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.textViewContent.setText(result);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+			}
+			else if(messageType==MegaChatMessage.TYPE_TRUNCATE){
+				log("Message type TRUNCATE");
+
+				String textToShow = null;
+				if(chat.getLastMessageSender() == megaChatApi.getMyUserHandle()){
+					textToShow = String.format(context.getString(R.string.history_cleared_by), megaChatApi.getMyFullname());
+				}
+				else{
+					String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+					if(fullNameAction==null){
+						fullNameAction = "";
+					}
+
+					if(fullNameAction.trim().length()<=0){
+						log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+						fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+					}
+
+					textToShow = String.format(context.getString(R.string.history_cleared_by), fullNameAction);
+				}
+
+				try{
+					textToShow = textToShow.replace("[A]", "");
+					textToShow = textToShow.replace("[/A]", "");
+					textToShow = textToShow.replace("[B]", "");
+					textToShow = textToShow.replace("[/B]", "");
+				}
+				catch (Exception e){}
+
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.textViewContent.setText(result);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+
+			}
+			else if(messageType==MegaChatMessage.TYPE_CHAT_TITLE) {
+
+				String messageContent = chat.getLastMessage();
+
+				String textToShow = null;
+				if(chat.getLastMessageSender() == megaChatApi.getMyUserHandle()){
+					textToShow = String.format(context.getString(R.string.change_title_messages), megaChatApi.getMyFullname(), messageContent);
+				}
+				else{
+					String fullNameAction = cC.getFullName(chat.getLastMessageSender(), chat.getChatId());
+
+					if(fullNameAction==null){
+						fullNameAction = "";
+					}
+
+					if(fullNameAction.trim().length()<=0){
+						log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+						fullNameAction = megaChatApi.getContactEmail(chat.getLastMessageSender());
+					}
+
+					textToShow = String.format(context.getString(R.string.change_title_messages), fullNameAction, messageContent);
+				}
+
+				try {
+					textToShow = textToShow.replace("[A]", "");
+					textToShow = textToShow.replace("[/A]", "");
+					textToShow = textToShow.replace("[B]", "");
+					textToShow = textToShow.replace("[/B]", "");
+					textToShow = textToShow.replace("[C]", "");
+					textToShow = textToShow.replace("[/C]", "");
+				} catch (Exception e) {
+				}
+
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.textViewContent.setText(result);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+			}
 			else{
+				//OTHER TYPE OF MESSAGE
 				if(lastMessageString==null){
                     log("Message Type-> "+messageType+" last content is NULL ");
 					lastMessageString = context.getString(R.string.error_message_unrecognizable);
