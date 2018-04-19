@@ -50,6 +50,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -128,7 +129,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     MegaPreferences prefs = null;
 
     private AlertDialog alertDialogTransferOverquota;
-    public static ProgressDialog progressDialog = null;
+//    public static ProgressDialog progressDialog = null;
+    public ProgressBar progressBar;
 
     private Notification.Builder mBuilder;
     private NotificationManager mNotificationManager;
@@ -350,6 +352,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         actualPage.setText(""+currentPage);
         totalPages = (TextView) findViewById(R.id.pdf_viewer_total_page_number);
         pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
+        progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
         log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
         if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -378,17 +381,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             isUrl = false;
             loadLocalPDF();
         }
-        progressDialog = new ProgressDialog(PdfViewerActivityLollipop.this);
-        progressDialog.setMessage(getString(R.string.general_loading));
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (loading) {
-                    finish();
-                }
-            }
-        });
+//        progressDialog = new ProgressDialog(PdfViewerActivityLollipop.this);
+//        progressDialog.setMessage(getString(R.string.general_loading));
+//        progressDialog.setCanceledOnTouchOutside(false);
+//        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialog) {
+//                if (loading) {
+//                    finish();
+//                }
+//            }
+//        });
 
         pdfView.setOnClickListener(this);
 
@@ -516,6 +519,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             totalPages = (TextView) findViewById(R.id.pdf_viewer_total_page_number);
             pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
             pageNumber.animate().translationY(-150).start();
+            progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
             log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -645,8 +649,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             } catch (Exception e) {
 
             }
-            if (loading && progressDialog!=null && !transferOverquota) {
-                progressDialog.show();
+//            if (loading && progressDialog!=null && !transferOverquota) {
+//                progressDialog.show();
+//            }
+            if (loading && !transferOverquota){
+                progressBar.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -662,6 +669,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 //        if (loading && progressDialog!=null && !transferOverquota) {
 //            progressDialog.show();
 //        }
+        progressBar.setVisibility(View.VISIBLE);
         try {
             pdfView.fromUri(uri)
                     .defaultPage(currentPage)
@@ -836,10 +844,22 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             MegaNode parentNode = megaApi.getRootNode();
             for (ShareInfo info : infos) {
+//
+//                boolean extension = true;
+//                if (!info.getTitle().endsWith(".pdf")){
+//                    extension = false;
+//                }
+//
                 Intent intent = new Intent(this, UploadService.class);
-                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+//                if (extension){
+                    intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                    intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+//                }
+//                else {
+//                    intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath()+".pdf");
+//                    intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+//                }
+                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle()+".pdf");
                 intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
                 startService(intent);
             }
@@ -996,26 +1016,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             }
             else {
+                shareMenuItem.setVisible(true);
+                boolean shareVisible = true;
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if(type==Constants.CONTACT_FILE_ADAPTER){
                     shareMenuItem.setVisible(false);
+                    shareVisible = false;
                 }
                 else{
                     if(fromShared){
                         shareMenuItem.setVisible(false);
+                        shareVisible = false;
                     }
                     if(isFolderLink){
                         shareMenuItem.setVisible(false);
+                        shareVisible = false;
                     }
-                }
-                if (isUrl){
-                    shareMenuItem.setVisible(false);
-                    downloadMenuItem.setVisible(true);
-                }
-                else {
-                    shareMenuItem.setVisible(true);
-                    downloadMenuItem.setVisible(false);
                 }
                 copyMenuItem.setVisible(true);
 
@@ -1143,6 +1160,16 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                                 removelinkMenuItem.setVisible(false);
                             }
                         }
+                    }
+                }
+                if (isUrl){
+                    downloadMenuItem.setVisible(true);
+                    shareMenuItem.setVisible(false);
+                }
+                else {
+                    downloadMenuItem.setVisible(false);
+                    if (shareVisible){
+                        shareMenuItem.setVisible(true);
                     }
                 }
             }
@@ -2314,9 +2341,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             @Override
             public void onShow(DialogInterface dialog) {
                 transferOverquota = true;
-                if (progressDialog != null) {
-                    progressDialog.hide();
-                }
+//                if (progressDialog != null) {
+//                    progressDialog.hide();
+//                }
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -2324,8 +2352,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
                 transferOverquota = false;
-                if (loading && progressDialog != null && !transferOverquota) {
-                    progressDialog.show();
+//                if (loading && progressDialog != null && !transferOverquota) {
+//                    progressDialog.show();
+//                }
+                if (loading && !transferOverquota){
+                    progressBar.setVisibility(View.VISIBLE);
                 }
             }
 
