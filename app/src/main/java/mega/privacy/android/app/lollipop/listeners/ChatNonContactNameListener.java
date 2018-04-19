@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -93,9 +92,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                     log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
                     updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
                 }
-                else if(holder instanceof MegaChatExplorerAdapter.ViewHolderChatList){
-                    updateAdapter(((MegaChatExplorerAdapter.ViewHolderChatList)holder).currentPosition);
-                }
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
                 log("->Last name received");
@@ -114,9 +110,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                     log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
                     updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
                 }
-                else if(holder instanceof MegaChatExplorerAdapter.ViewHolderChatList){
-                    updateAdapter(((MegaChatExplorerAdapter.ViewHolderChatList)holder).currentPosition);
-                }
             }
             else if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
                 log("->Email received");
@@ -134,9 +127,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
                     log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
                     updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
                 }
-                else if(holder instanceof MegaChatExplorerAdapter.ViewHolderChatList){
-                    updateAdapter(((MegaChatExplorerAdapter.ViewHolderChatList)holder).currentPosition);
-                }
             }
         }
         else{
@@ -153,9 +143,6 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
             }
             else if(adapter instanceof MegaListChatLollipopAdapter){
                 ((MegaListChatLollipopAdapter)adapter).updateNonContactName(position, this.userHandle);
-            }
-            else if(adapter instanceof MegaChatExplorerAdapter){
-                ((MegaChatExplorerAdapter)adapter).updateNonContactName(position, this.userHandle);
             }
 
             receivedFirstName = false;
