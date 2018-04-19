@@ -53,6 +53,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -95,6 +96,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.Inflater;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -174,6 +176,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     private Uri uri;
+    private TextView exoPlayerName;
+    private ProgressBar progressBar;
+    private RelativeLayout playPauseButton;
+    private RelativeLayout containerControls;
 
     private AppBarLayout appBarLayout;
     private Toolbar tB;
@@ -355,11 +361,22 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
+
+
+
+        exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
+
         if (fileName != null) {
-            aB.setTitle(fileName);
+//            aB.setTitle(fileName);
+            aB.setTitle(" ");
+            exoPlayerName.setText(fileName);
+            setTitle(fileName);
         }
         else {
-            aB.setTitle(getFileName(uri));
+//            aB.setTitle(getFileName(uri));
+            aB.setTitle(" ");
+            exoPlayerName.setText(fileName);
+            setTitle(getFileName(uri));
         }
 
         containerAudioVideoPlayer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container);
@@ -368,7 +385,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
         audioContainer.setVisibility(View.GONE);
         
-        audioVideoPlayerContainer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container); 
+        audioVideoPlayerContainer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container);
+        progressBar = (ProgressBar) findViewById(R.id.full_video_viewer_progress_bar);
+        playPauseButton = (RelativeLayout) findViewById(R.id.play_pause_button);
+        containerControls = (RelativeLayout) findViewById(R.id.container_exo_controls);
 
         handler = new Handler();
 
@@ -681,7 +701,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     if (aB.isShowing()) {
-                        simpleExoPlayerView.hideController();
+//                        simpleExoPlayerView.hideController();
                         hideActionStatusBar();
                     }
                     else {
@@ -765,29 +785,29 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
         //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
-        statusDialog = new ProgressDialog(AudioVideoPlayerLollipop.this);
-        statusDialog.setMessage(getString(R.string.general_loading));
-        statusDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                showActionStatusBar();
-            }
-        });
-        statusDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (loading) {
-//                    finish();
-                }
-            }
-        });
+//        statusDialog = new ProgressDialog(AudioVideoPlayerLollipop.this);
+//        statusDialog.setMessage(getString(R.string.general_loading));
+//        statusDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+//            @Override
+//            public void onShow(DialogInterface dialog) {
+//                showActionStatusBar();
+//            }
+//        });
+//        statusDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialog) {
+//                if (loading) {
+////                    finish();
+//                }
+//            }
+//        });
 
         player.addListener(new ExoPlayer.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, Object manifest) {
                 log("onTimelineChanged");
                 if (player.getCurrentPosition() > 0){
-                    statusDialog.dismiss();
+//                    statusDialog.dismiss();
                 }
             }
 
@@ -800,35 +820,44 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
 
                 if (loading && !transferOverquota){
                     try {
-                        statusDialog.setCanceledOnTouchOutside(false);
-                        statusDialog.show();
+//                        statusDialog.setCanceledOnTouchOutside(false);
+//                        statusDialog.show();
                     }
                     catch(Exception e){
                         return;
                     }
                 }
                 else {
-                    statusDialog.hide();
-                    if (!video) {
-                        audioContainer.setVisibility(View.VISIBLE);
-                    }
-                    else {
-                        audioContainer.setVisibility(View.GONE);
-                    }
+//                    statusDialog.hide();
+//                    if (!video) {
+//                        audioContainer.setVisibility(View.VISIBLE);
+//                    }
+//                    else {
+//                        audioContainer.setVisibility(View.GONE);
+//                    }
                 }
                 if (size > 1) {
                     invalidateOptionsMenu();
                     if (isOffLine){
                         MegaOffline n = mediaOffList.get(player.getCurrentWindowIndex());
-                        tB.setTitle(n.getName());
+//                        tB.setTitle(n.getName());
+                        exoPlayerName.setText(n.getName());
                         handle = Long.parseLong(n.getHandle());
                     }
                     else {
                         MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(player.getCurrentWindowIndex()));
-                        tB.setTitle(n.getName());
+//                        tB.setTitle(n.getName());
+                        exoPlayerName.setText(n.getName());
                         handle = n.getHandle();
                     }
                     uri = mediaUris.get(player.getCurrentWindowIndex());
+                    if (uri.toString().contains("http://")){
+                        isUrl = true;
+                    }
+                    else {
+                        isUrl = false;
+                    }
+                    supportInvalidateOptionsMenu();
                 }
             }
 
@@ -843,11 +872,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
 
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.VISIBLE);
+                    playPauseButton.setVisibility(View.GONE);
 
                     if (loading && !transferOverquota && !isOffline){
                         try {
-                            statusDialog.setCanceledOnTouchOutside(false);
-                            statusDialog.show();
+//                            statusDialog.setCanceledOnTouchOutside(false);
+//                            statusDialog.show();
                         }
                         catch(Exception e){
                             return;
@@ -855,7 +886,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
                     }
                 }
                 else {
-                    statusDialog.hide();
+                    progressBar.setVisibility(View.GONE);
+                    playPauseButton.setVisibility(View.VISIBLE);
+//                    statusDialog.hide();
 
                     if (!video) {
                         audioContainer.setVisibility(View.VISIBLE);
@@ -908,7 +941,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
         player.seekTo(currentTime);
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
-        simpleExoPlayerView.showController();
+//        simpleExoPlayerView.showController();
 
         if (savedInstanceState == null){
             ViewTreeObserver observer = simpleExoPlayerView.getViewTreeObserver();
@@ -1222,7 +1255,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
             else {
                 aB.hide();
             }
-            simpleExoPlayerView.hideController();
+            if (video){
+                containerControls.animate().translationY(400).setDuration(400L).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        simpleExoPlayerView.hideController();
+                    }
+                }).start();
+            }
         }
     }
     protected void showActionStatusBar(){
@@ -1232,7 +1272,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
                 tB.animate().translationY(0).setDuration(400L).start();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
-            simpleExoPlayerView.showController();
+            if (video){
+                simpleExoPlayerView.showController();
+                containerControls.animate().translationY(0).setDuration(400L).start();
+            }
         }
     }
 
@@ -1322,26 +1365,24 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
             }
         }
         else {
+            boolean shareVisible = true;
+            shareMenuItem.setVisible(true);
+
             MegaNode node = megaApi.getNodeByHandle(handle);
 
             if(adapterType==Constants.CONTACT_FILE_ADAPTER){
                 shareMenuItem.setVisible(false);
+                shareVisible = false;
             }
             else{
                 if(fromShared){
                     shareMenuItem.setVisible(false);
+                    shareVisible = false;
                 }
                 if(isFolderLink){
                     shareMenuItem.setVisible(false);
+                    shareVisible = false;
                 }
-            }
-            if (isUrl){
-                shareMenuItem.setVisible(false);
-                downloadMenuItem.setVisible(true);
-            }
-            else {
-                shareMenuItem.setVisible(true);
-                downloadMenuItem.setVisible(false);
             }
             copyMenuItem.setVisible(true);
 
@@ -1470,6 +1511,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
                             removelinkMenuItem.setVisible(false);
                         }
                     }
+                }
+            }
+            if (isUrl){
+                downloadMenuItem.setVisible(true);
+                shareMenuItem.setVisible(false);
+            }
+            else {
+                downloadMenuItem.setVisible(false);
+                if (shareVisible){
+                    shareMenuItem.setVisible(true);
                 }
             }
         }
@@ -2057,7 +2108,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else{
-                Snackbar.make(this.getCurrentFocus(), getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(audioVideoPlayerContainer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -2174,8 +2225,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
         log("onVideoEnabled");
         video = true;
         loading = false;
-        statusDialog.dismiss();
-        audioContainer.setVisibility(View.GONE);
+//        statusDialog.dismiss();
+//        audioContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -2271,34 +2322,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
                         setSupportActionBar(tB);
                         aB = getSupportActionBar();
                     }
-                    aB.setTitle(fileName);
+//                    aB.setTitle(fileName);
+                    aB.setTitle(" ");
+                    exoPlayerName.setText(fileName);
                     setTitle(fileName);
-                    invalidateOptionsMenu();
 
-                    if (megaApi == null){
-                        MegaApplication app = (MegaApplication)getApplication();
-                        megaApi = app.getMegaApi();
-                        megaApi.addTransferListener(this);
-                        megaApi.addGlobalListener(this);
-                    }
-                    if (megaApi.httpServerIsRunning() == 0) {
-                        megaApi.httpServerStart();
-                    }
-
-                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-                    activityManager.getMemoryInfo(mi);
-
-                    if(mi.totalMem>Constants.BUFFER_COMP){
-                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                    }
-                    else{
-                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                    }
-
-                    String url = megaApi.httpServerGetLocalLink(file);
                     getDownloadLocation();
                     String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 
@@ -2312,8 +2340,41 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
                         }
                     }
                     else {
-                        uri = Uri.parse(url);
+                        if (megaApi == null){
+                            MegaApplication app = (MegaApplication)getApplication();
+                            megaApi = app.getMegaApi();
+                            megaApi.addTransferListener(this);
+                            megaApi.addGlobalListener(this);
+                        }
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                        }
+
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
+
+                        if(mi.totalMem>Constants.BUFFER_COMP){
+                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else{
+                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        if (url != null){
+                            uri = Uri.parse(url);
+                        }
                     }
+                    if (uri.toString().contains("http://")){
+                        isUrl = true;
+                    }
+                    else {
+                        isUrl = false;
+                    }
+                    supportInvalidateOptionsMenu();
                     renamed = true;
                 }
             }
@@ -2477,7 +2538,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
             @Override
             public void onShow(DialogInterface dialog) {
                 transferOverquota = true;
-                statusDialog.hide();
+//                statusDialog.hide();
                 showActionStatusBar();
             }
         });
@@ -2486,10 +2547,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
                 transferOverquota = false;
-                if (loading) {
-                    statusDialog.setCanceledOnTouchOutside(false);
-                    statusDialog.show();
-                }
+//                if (loading) {
+//                    statusDialog.setCanceledOnTouchOutside(false);
+//                    statusDialog.show();
+//                }
             }
 
         });
@@ -2517,7 +2578,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Meg
     @Override
     public void onAudioEnabled(DecoderCounters counters) {
         loading = false;
-        statusDialog.dismiss();
+//        statusDialog.dismiss();
     }
 
     @Override
