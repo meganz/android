@@ -1088,6 +1088,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                         megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                         megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        megaChatApi.getUserEmail(message.getUserHandle(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1264,6 +1265,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
                         megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
+                        megaChatApi.getUserEmail(message.getHandleOfAction(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1305,6 +1307,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                                 megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                                 megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                                megaChatApi.getUserEmail(message.getUserHandle(), listener);
                             }
                             else{
                                 log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1371,6 +1374,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                                     megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                                     megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                                    megaChatApi.getUserEmail(message.getUserHandle(), listener);
                                 }
                                 else{
                                     log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1492,6 +1496,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                             megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                             megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            megaChatApi.getUserEmail(message.getUserHandle(), listener);
                         }
                         else{
                             log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1640,6 +1645,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
                         megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
+                        megaChatApi.getUserEmail(message.getHandleOfAction(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1699,6 +1705,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                             megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                             megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            megaChatApi.getUserEmail(message.getUserHandle(), listener);
                         }
                         else{
                             log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -2655,6 +2662,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, userHandle);
                             megaChatApi.getUserFirstname(userHandle, listener);
                             megaChatApi.getUserLastname(userHandle, listener);
+                            megaChatApi.getUserEmail(userHandle, listener);
                         }
                         else{
                             log("4-Name already asked and no name received: "+ message.getUserHandle());

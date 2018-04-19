@@ -39,7 +39,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.listeners.ChatListNonContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -911,7 +911,7 @@ public class MegaChatExplorerAdapter extends RecyclerView.Adapter<MegaChatExplor
 							holder.nameRequestedAction=true;
 							holder.currentPosition = position;
 							holder.userHandle = lastMsgSender;
-							ChatListNonContactNameListener listener = new ChatListNonContactNameListener(context, holder, this, lastMsgSender);
+							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, lastMsgSender);
 							megaChatApi.getUserFirstname(lastMsgSender, listener);
 							megaChatApi.getUserLastname(lastMsgSender, listener);
 						}
