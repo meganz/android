@@ -77,8 +77,8 @@ import static android.graphics.Color.WHITE;
 
 public class MyCodeFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
 
-    public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
-    public static int WIDTH = 500;
+    final int RELATIVE_WIDTH = 280;
+    final int WIDTH = 500;
 
     MegaUser myUser;
     String myEmail;
@@ -92,8 +92,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
     private ActionBar aB;
 
     private RelativeLayout relativeContainerQRCode;
-    private RelativeLayout relativeQRCode;
-    private ImageView avatarImage;
     private ImageView qrcode;
     private TextView qrcode_link;
     private Button qrcode_copy_link;
@@ -193,8 +191,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         }
 
         relativeContainerQRCode = (RelativeLayout) v.findViewById(R.id.qr_code_relative_container);
-        relativeQRCode = (RelativeLayout) v.findViewById(R.id.qr_code_relative_layout_avatar);
-        avatarImage = (ImageView) v.findViewById(R.id.qr_code_avatar);
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
         qrcode_copy_link = (Button) v.findViewById(R.id.qr_code_button_copy_link);
@@ -210,21 +206,19 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         }
 
         Configuration configuration = getResources().getConfiguration();
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 280, getResources().getDisplayMetrics());
-        int top, bottom;
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, width);
-        params.gravity = Gravity.CENTER;
+        int width = getDP(RELATIVE_WIDTH);
+        LinearLayout.LayoutParams params;
         if(configuration.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            top = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, getResources().getDisplayMetrics());
-            bottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
-            params.setMargins(0, top, 0, bottom);
+            params = new LinearLayout.LayoutParams(width-80, width-80);
+            params.gravity = Gravity.CENTER;
+            params.setMargins(0, 0, 0, getDP(20));
             relativeContainerQRCode.setLayoutParams(params);
-            relativeContainerQRCode.setPadding(0,-80,0,0);
+            relativeContainerQRCode.setPadding(0, -40, 0, 0);
 
         }else{
-            top = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 55, getResources().getDisplayMetrics());
-            bottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 58, getResources().getDisplayMetrics());
-            params.setMargins(0, top, 0, bottom);
+            params = new LinearLayout.LayoutParams(width, width);
+            params.gravity = Gravity.CENTER;
+            params.setMargins(0, getDP(55), 0, getDP(58));
             relativeContainerQRCode.setLayoutParams(params);
         }
         createLink();
@@ -232,22 +226,30 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         return v;
     }
 
+    int getDP(int value){
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
+    }
+
     public Bitmap createQRCode (Bitmap qr, Bitmap avatar){
         log("createQRCode");
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 72, getResources().getDisplayMetrics());
+        int width = (int)getResources().getDimension(R.dimen.width_qr);
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(WHITE);
         int pos = (c.getWidth()/2) - (width/2);
-        int border = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
-        float radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics());
+//        int border = getDP(4);
+//        float radius = getDP(40);
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
         c.drawBitmap(qr, 0f, 0f, null);
-        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
+        c.drawRect(getResources().getDimension(R.dimen.start_avatar_qr),
+                getResources().getDimension(R.dimen.start_avatar_qr),
+                getResources().getDimension(R.dimen.end_avatar_qr),
+                getResources().getDimension(R.dimen.end_avatar_qr), paint);
+//        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
         c.drawBitmap(avatar, pos, pos, null);
 
         return qrCode;
@@ -270,7 +272,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         int w = bitMatrix.getWidth();
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
-        int color = getResources().getColor(R.color.lollipop_primary_color);
+        int color = context.getResources().getColor(R.color.lollipop_primary_color);
         float resize = 12.2f;
 
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);

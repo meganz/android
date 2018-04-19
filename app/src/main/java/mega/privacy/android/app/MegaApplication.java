@@ -832,7 +832,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
-		log("onChatNotification: "+msg.getContent());
+		log("onChatNotification");
 
 		int unread = megaChatApi.getUnreadChats();
 		//Add Android version check if needed

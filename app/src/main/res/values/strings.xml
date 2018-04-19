@@ -1686,6 +1686,8 @@
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
     <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device\'s camera</string>
+    <string name="contact_view" context="positive button on dialog to view a contact">View</string>
+
 
     <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Open with</string>
 
@@ -1804,5 +1806,7 @@
     </plurals>
 
     <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[A]Loading[/A] [B]Messages...[/B]</string>
+
+    <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
 
 </resources>

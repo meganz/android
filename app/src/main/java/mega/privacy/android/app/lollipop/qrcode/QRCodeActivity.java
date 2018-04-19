@@ -53,6 +53,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
     private static int REQUEST_DOWNLOAD_FOLDER = 1000;
+    private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -111,6 +112,31 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+        }
+        else {
+            initActivity();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initActivity();
+                } else {
+                    this.finish();
+                }
+                return;
+            }
+        }
+    }
+
+    void initActivity(){
         viewPagerQRCode.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -128,8 +154,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 }
                 else {
                     qrCodeFragment = 1;
-//                    ScanCodeFragment.scannerView.setAutoFocus(true);
-//                    ScanCodeFragment.scannerView.startCamera();
                     scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
                 }
             }
