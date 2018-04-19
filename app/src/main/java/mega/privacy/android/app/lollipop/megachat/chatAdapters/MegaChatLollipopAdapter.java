@@ -3507,7 +3507,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
-                ((ChatActivityLollipop)context).showJumpMessage();
+//                ((ChatActivityLollipop)context).showJumpMessage();
+                ((ChatActivityLollipop)context).setNewVisibility(true);
+
             }
             else{
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
@@ -3516,6 +3518,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         else{
             ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+
         }
     }
 
