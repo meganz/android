@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -109,6 +110,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	else{
     		log("Number of chats: NULL");
     	}
+
+		if(!(context instanceof ManagerActivityLollipop)){
+			selectedItems = new SparseBooleanArray();
+			multipleSelect = true;
+		}
 	}
 	
 	/*public view holder class*/
@@ -409,6 +415,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
+		if(context instanceof ManagerActivityLollipop){
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+		}
+		else{
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+		}
+
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
 		holder.circlePendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_circle);
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
@@ -635,7 +648,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (selectedItems.size() <= 0){
-						((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+						if(context instanceof ManagerActivityLollipop){
+							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+						}
 					}
 					notifyItemChanged(positionToflip);
 				}
@@ -679,7 +694,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (selectedItems.size() <= 0){
+						if(context instanceof ManagerActivityLollipop){
 							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
+						}
 					}
 				}
 
@@ -784,11 +801,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		switch (v.getId()){
 			case R.id.recent_chat_list_three_dots:{
 				log("click three dots!: "+c.getTitle());
-				if(multipleSelect){
-					((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else{
-					((ManagerActivityLollipop) context).showChatPanel(c);
+				if(context instanceof ManagerActivityLollipop) {
+
+					if (multipleSelect) {
+						((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+					} else {
+						((ManagerActivityLollipop) context).showChatPanel(c);
+					}
 				}
 
 				break;
@@ -799,7 +818,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //					toggleSelection(holder);
 //				}
 
-				((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+				if(context instanceof ManagerActivityLollipop){
+					((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else{
+					((ChatExplorerFragment) fragment).itemClick(currentPosition);
+
+				}
 
 				break;
 			}
@@ -812,8 +837,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		ViewHolderChatList holder = (ViewHolderChatList) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		((RecentChatsFragmentLollipop) fragment).activateActionMode();
-		((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+		if(context instanceof ManagerActivityLollipop) {
+			((RecentChatsFragmentLollipop) fragment).activateActionMode();
+			((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+		}
 
 		return true;
 	}
