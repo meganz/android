@@ -720,7 +720,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-		log("onRequestStart: Chat");
+		log("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override

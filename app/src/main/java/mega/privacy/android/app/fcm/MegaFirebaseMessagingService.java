@@ -42,8 +42,6 @@ import android.text.Spanned;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -201,24 +199,26 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     log("CHAT notification");
 
                     if(Util.isChatEnabled()){
-                        String data = remoteMessage.getData().get("data");
 
-                        if(data!=null){
-                            JSONObject object = null;
-                            try{
-                                object = new JSONObject(data);
-                                int silentData = object.getInt("silent");
-                                if(silentData != 1){
+                        try{
+                            String silent = remoteMessage.getData().get("silent");
+                            log("Silent payload: "+silent);
+
+                            if(silent!=null){
+                                if(silent.equals("1")){
+                                    beep = false;
+                                }
+                                else{
                                     beep = true;
                                 }
                             }
-                            catch(Exception e){
-                                log("ERROR:JSONObject:Parser");
+                            else{
+                                log("NO DATA on the PUSH");
                                 beep = true;
                             }
                         }
-                        else{
-                            log("NO DATA on the PUSH");
+                        catch(Exception e){
+                            log("ERROR:remoteSilentParameter");
                             beep = true;
                         }
 
@@ -254,7 +254,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             //If true - wait until connection finish
                             //If false, no need to change it
                             log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
-
+                            log("(2)Call to pushReceived");
                             megaChatApi.pushReceived(beep, ((MegaApplication) getApplication()));
                             beep = false;
                         }
@@ -361,7 +361,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             if (e.getErrorCode() == MegaError.API_OK){
                 log("OK fetch nodes");
                 if (Util.isChatEnabled()) {
-                    log("Chat enabled-->connect");
+                    log("Chat enabled-->connectInBackground");
 //                    MegaApplication.isFireBaseConnection=true;
                     megaChatApi.connectInBackground(this);
                 }
@@ -402,6 +402,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 log("Connected to chat!");
                 if(showMessageNotificationAfterPush){
                     showMessageNotificationAfterPush = false;
+                    log("Call to pushReceived");
                     megaChatApi.pushReceived(beep, ((MegaApplication) getApplication()));
                     beep = false;
                 }

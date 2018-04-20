@@ -1805,6 +1805,11 @@
         <item context="unread messages" quantity="other">%1$s unread messages</item>
     </plurals>
 
+    <plurals name="plural_number_messages_chat_notification" context="Notification title to show the number of unread chats">
+        <item context="unread message" quantity="one">%1$d unread chat</item>
+        <item context="unread messages" quantity="other">%1$d unread chats</item>
+    </plurals>
+
     <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[A]Loading[/A] [B]Messages...[/B]</string>
 
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
