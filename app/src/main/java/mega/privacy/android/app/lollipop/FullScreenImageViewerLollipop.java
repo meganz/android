@@ -1424,7 +1424,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		ivShadow.setAlpha(0);
 
-		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0)/*.setInterpolator(new DecelerateInterpolator())*/.withEndAction(new Runnable() {
 			@Override
 			public void run() {
 				showActionBar();

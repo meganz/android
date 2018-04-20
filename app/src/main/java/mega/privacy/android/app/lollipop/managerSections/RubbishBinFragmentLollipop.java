@@ -669,8 +669,13 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -727,8 +732,13 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					pdfIntent.putExtra("APP", true);
+					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
