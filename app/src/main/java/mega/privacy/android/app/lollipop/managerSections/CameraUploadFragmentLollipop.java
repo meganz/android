@@ -1705,7 +1705,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
 
 							}
-							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize());
+							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
 							if (localPath != null  && (megaApi.getFingerprint(psHMegaNode).equals(megaApi.getFingerprint(localPath)))){
 								File mediaFile = new File(localPath);
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -1767,18 +1767,23 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	public String findLocalPath (String fileName, long fileSize) {
+	public String findLocalPath (String fileName, long fileSize, MegaNode file) {
 		log("findLocalPath");
 		String localPath = null;
 
-		localPath = getPath(fileName, fileSize, defaultPath);
+		localPath = getPath(fileName, fileSize, defaultPath, file);
 		if (localPath != null) {
 			return localPath;
 		}
 
 		if (localPath == null){
+			boolean isOnMegaDownloads = false;
 			localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-			if (localPath != null) {
+			File f = new File(downloadLocationDefaultPath, file.getName());
+			if(f.exists() && (f.length() == file.getSize())){
+				isOnMegaDownloads = true;
+			}
+			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 				return localPath;
 			}
 		}
@@ -1786,7 +1791,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		return null;
 	}
 
-	public String getPath (String fileName, long fileSize, String destDir) {
+	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
 		log("getPath");
 		String path = null;
 		File dir = new File(destDir);
@@ -1796,15 +1801,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			for (int i=0; i<listFiles.length; i++){
 				log("listFiles[]: "+listFiles[i].getAbsolutePath());
 				if (listFiles[i].isDirectory()){
-					path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath());
+					path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
 					if (path != null) {
 						log("path number X: "+path);
 						return path;
 					}
 				}
 				else {
-					path = Util.getLocalFile(context, fileName, fileSize, listFiles[i].getAbsolutePath());
-					if (path != null) {
+					boolean isOnMegaDownloads = false;
+					path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
 						log("path number X: "+path);
 						return path;
 					}

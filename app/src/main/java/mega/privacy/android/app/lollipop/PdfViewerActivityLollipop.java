@@ -1746,34 +1746,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     fileNameTextView.setText(pdfFileName);
                     supportInvalidateOptionsMenu();
 
-                    if (megaApi == null){
-                        MegaApplication app = (MegaApplication)getApplication();
-                        megaApi = app.getMegaApi();
-                        megaApi.addTransferListener(this);
-                        megaApi.addGlobalListener(this);
-                    }
-                    if (megaApi.httpServerIsRunning() == 0) {
-                        megaApi.httpServerStart();
-                    }
 
-                    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                    ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-                    activityManager.getMemoryInfo(mi);
-
-                    if(mi.totalMem>Constants.BUFFER_COMP){
-                        log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                    }
-                    else{
-                        log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                        megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                    }
-
-                    String url = megaApi.httpServerGetLocalLink(file);
                     getDownloadLocation();
+                    boolean isOnMegaDownloads = false;
                     String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
-
-                    if (localPath != null){
+                    File f = new File(downloadLocationDefaultPath, file.getName());
+                    if(f.exists() && (f.length() == file.getSize())){
+                        isOnMegaDownloads = true;
+                    }
+                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
                         File mediaFile = new File(localPath);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
                             uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
@@ -1783,7 +1764,33 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         }
                     }
                     else {
-                        uri = Uri.parse(url);
+                        if (megaApi == null){
+                            MegaApplication app = (MegaApplication)getApplication();
+                            megaApi = app.getMegaApi();
+                            megaApi.addTransferListener(this);
+                            megaApi.addGlobalListener(this);
+                        }
+                        if (megaApi.httpServerIsRunning() == 0) {
+                            megaApi.httpServerStart();
+                        }
+
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
+
+                        if(mi.totalMem>Constants.BUFFER_COMP){
+                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                        }
+                        else{
+                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                        }
+
+                        String url = megaApi.httpServerGetLocalLink(file);
+                        if (url != null){
+                            uri = Uri.parse(url);
+                        }
                     }
                     renamed = true;
                 }
