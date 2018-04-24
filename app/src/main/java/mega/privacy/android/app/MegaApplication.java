@@ -812,6 +812,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				AdvancedNotificationBuilder notificationBuilder;
 				notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
+				notificationBuilder.removeAllChatNotifications();
 				notificationBuilder.generateChatNotification(request);
 			}
 			else{
@@ -866,29 +867,30 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 							if(msg.isDeleted()){
 								log("Message deleted");
 //								updateChatNotification(chatid, msg);
-								megaChatApi.pushReceived(false, this);
+
+								megaChatApi.pushReceived(false, null);
 							}
 							else if(msg.isEdited()){
 								log("Message edited");
 //								updateChatNotification(chatid, msg);
-								megaChatApi.pushReceived(false, this);
+								megaChatApi.pushReceived(false, null);
 							}
 							else{
 								log("New normal message");
 //								showChatNotification(chatid, msg);
-								megaChatApi.pushReceived(true, this);
+								megaChatApi.pushReceived(true, null);
 							}
 						}
 						else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
 							log("New TRUNCATE message");
 //							showChatNotification(chatid, msg);
-							megaChatApi.pushReceived(true, this);
+							megaChatApi.pushReceived(true, null);
 						}
 					}
 					else{
 						log("Message SEEN");
 //						removeChatSeenNotification(chatid, msg);
-						megaChatApi.pushReceived(false, this);
+						megaChatApi.pushReceived(false, null);
 					}
 				}
 			}

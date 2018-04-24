@@ -198,6 +198,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 }else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
 
+                    if(app.isActivityVisible()){
+                        log("App on foreground --> return");
+                        return;
+                    }
+
                     if(Util.isChatEnabled()){
 
                         try{
@@ -255,7 +260,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             //If false, no need to change it
                             log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                             log("(2)Call to pushReceived");
-                            megaChatApi.pushReceived(beep, ((MegaApplication) getApplication()));
+                            megaChatApi.pushReceived(beep, null);
                             beep = false;
                         }
                     }
@@ -403,7 +408,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 if(showMessageNotificationAfterPush){
                     showMessageNotificationAfterPush = false;
                     log("Call to pushReceived");
-                    megaChatApi.pushReceived(beep, ((MegaApplication) getApplication()));
+                    megaChatApi.pushReceived(beep, null);
                     beep = false;
                 }
                 else{
