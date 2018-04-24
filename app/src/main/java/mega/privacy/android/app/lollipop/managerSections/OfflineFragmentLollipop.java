@@ -1140,6 +1140,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
 						pdfIntent.putExtra("pathNavigation", pathNavigation);
+						pdfIntent.putExtra("screenPosition", screenPosition);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1148,6 +1149,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						context.startActivity(pdfIntent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
 					else{
 						openFile(currentFile);
