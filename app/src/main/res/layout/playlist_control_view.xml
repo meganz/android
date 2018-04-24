@@ -7,43 +7,6 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@+id/audio_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true">
-
-
-        <ImageView
-            android:id="@+id/audio_imageview"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_audiotrack_white"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/audio_imageview"
-            android:text="@string/audio_play"
-            android:textStyle="bold"
-            android:textSize="30sp"
-            android:layout_margin="20dp"
-            android:textColor="@color/white"
-            android:layout_centerHorizontal="true"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/container_frequency_bars"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_above="@+id/container_exo_controls"
-        android:layout_marginBottom="-13dp">
-
-    </RelativeLayout>
-
-    <RelativeLayout
         android:id="@+id/container_exo_controls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +17,7 @@
             android:id="@+id/relative_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/transparent_black"
+            android:background="@color/grey_my_account_background"
             android:layout_below="@+id/exo_progress"
             android:paddingTop="8dp">
 
@@ -65,7 +28,7 @@
                 android:textSize="12sp"
                 android:paddingLeft="8dp"
                 android:includeFontPadding="false"
-                android:textColor="@color/white"
+                android:textColor="@color/name_my_account"
                 android:fontFamily="Roboto"/>
 
             <TextView android:id="@id/exo_duration"
@@ -75,30 +38,17 @@
                 android:textSize="12sp"
                 android:paddingRight="8dp"
                 android:includeFontPadding="false"
-                android:textColor="@color/white"
+                android:textColor="@color/name_my_account"
                 android:fontFamily="Roboto"/>
-
-
-            <TextView
-                android:id="@+id/exo_name_file"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:fontFamily="Roboto"
-                android:layout_below="@id/exo_duration"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="14dp"/>
 
             <RelativeLayout
                 android:id="@+id/container_control_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="24dp"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@id/exo_name_file">
+                android:layout_below="@id/exo_duration">
 
                 <ImageButton
                     android:id="@id/exo_prev"
@@ -109,6 +59,8 @@
                     android:src="@drawable/exo_controls_previous"
                     android:layout_centerVertical="true"
                     android:background="@android:color/transparent"
+
+                    android:tint="@color/black"
                     android:padding="10dp"/>
 
                 <RelativeLayout
@@ -122,15 +74,15 @@
                         android:id="@id/exo_play"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:background="@drawable/ic_fab_default"
-                        android:src="@drawable/ic_w_resume_all_transfers"/>
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_play"/>
 
                     <ImageButton
                         android:id="@id/exo_pause"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:background="@drawable/ic_fab_default"
-                        android:src="@drawable/ic_pause_white_player"/>
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_pause_black"/>
 
                 </RelativeLayout>
 
@@ -161,17 +113,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="80dp"
                     android:src="@drawable/exo_controls_next"
-                    android:background="@android:color/transparent"
-                    android:padding="10dp"/>
-
-                <ImageButton
-                    android:id="@+id/exo_play_list"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="11dp"
-                    android:src="@drawable/ic_list_white"
+                    android:tint="@color/black"
                     android:background="@android:color/transparent"
                     android:padding="10dp"/>
 
