@@ -35,62 +35,6 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/play_pause_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true">
-
-        <ImageButton
-            android:id="@id/exo_play"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:background="@drawable/ic_fab_default"
-            android:src="@drawable/ic_w_resume_all_transfers"/>
-
-        <ImageButton
-            android:id="@id/exo_pause"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:background="@drawable/ic_fab_default"
-            android:src="@drawable/ic_pause_white"/>
-
-    </RelativeLayout>
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center"-->
-        <!--android:paddingTop="4dp"-->
-        <!--android:orientation="horizontal">-->
-
-        <!--<ImageButton android:id="@id/exo_prev"-->
-            <!--style="@style/ExoMediaButton.Previous"/>-->
-
-        <!--<ImageButton android:id="@id/exo_rew"-->
-            <!--style="@style/ExoMediaButton.Rewind"/>-->
-
-        <!--<ImageButton android:id="@id/exo_shuffle"-->
-            <!--style="@style/ExoMediaButton.Shuffle"/>-->
-
-        <!--<ImageButton android:id="@id/exo_repeat_toggle"-->
-            <!--style="@style/ExoMediaButton"/>-->
-
-        <!--<ImageButton android:id="@id/exo_play"-->
-            <!--style="@style/ExoMediaButton.Play"/>-->
-
-        <!--<ImageButton android:id="@id/exo_pause"-->
-            <!--style="@style/ExoMediaButton.Pause"/>-->
-
-        <!--<ImageButton android:id="@id/exo_ffwd"-->
-            <!--style="@style/ExoMediaButton.FastForward"/>-->
-
-        <!--<ImageButton android:id="@id/exo_next"-->
-            <!--style="@style/ExoMediaButton.Next"/>-->
-
-    <!--</LinearLayout>-->
-
-    <RelativeLayout
         android:id="@+id/container_frequency_bars"
         android:layout_width="match_parent"
         android:layout_height="30dp"
@@ -112,7 +56,7 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent_black"
             android:layout_below="@+id/exo_progress"
-            android:paddingTop="16dp">
+            android:paddingTop="8dp">
 
             <TextView android:id="@id/exo_position"
                 android:layout_width="wrap_content"
@@ -134,21 +78,63 @@
                 android:textColor="@color/white"
                 android:fontFamily="Roboto"/>
 
+
+            <TextView
+                android:id="@+id/exo_name_file"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:fontFamily="Roboto"
+                android:layout_below="@id/exo_duration"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="14dp"/>
+
             <RelativeLayout
                 android:id="@+id/container_control_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true">
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="20dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/exo_name_file">
 
                 <ImageButton
                     android:id="@id/exo_prev"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="80dp"
                     android:src="@drawable/exo_controls_previous"
+                    android:layout_centerVertical="true"
                     android:background="@android:color/transparent"
                     android:padding="10dp"/>
 
-                <ImageButton
+                <RelativeLayout
+                    android:id="@+id/play_pause_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true">
+
+                    <ImageButton
+                        android:id="@id/exo_play"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:background="@drawable/ic_fab_default"
+                        android:src="@drawable/ic_w_resume_all_transfers"/>
+
+                    <ImageButton
+                        android:id="@id/exo_pause"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:background="@drawable/ic_fab_default"
+                        android:src="@drawable/ic_pause_white"/>
+
+                </RelativeLayout>
+
+                <!--<ImageButton
                     android:id="@id/exo_rew"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -165,30 +151,31 @@
                     android:layout_marginLeft="60dp"
                     android:src="@drawable/exo_controls_fastforward"
                     android:background="@android:color/transparent"
-                    android:padding="10dp"/>
+                    android:padding="10dp"/>-->
 
                 <ImageButton
                     android:id="@id/exo_next"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/exo_ffwd"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="80dp"
                     android:src="@drawable/exo_controls_next"
                     android:background="@android:color/transparent"
                     android:padding="10dp"/>
 
-            </RelativeLayout>
+                <!--<ImageButton
+                    android:id="@+id/exo_play_list"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="11dp"
+                    android:src="@drawable/ic_list_white"
+                    android:background="@android:color/transparent"
+                    android:padding="10dp"/>-->
 
-            <TextView
-                android:id="@+id/exo_name_file"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:fontFamily="Roboto"
-                android:layout_below="@id/container_control_buttons"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="14dp"/>
+            </RelativeLayout>
 
         </RelativeLayout>
 

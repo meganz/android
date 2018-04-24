@@ -731,6 +731,12 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
@@ -770,6 +776,8 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}
@@ -781,6 +789,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else{
 					adapter.notifyDataSetChanged();

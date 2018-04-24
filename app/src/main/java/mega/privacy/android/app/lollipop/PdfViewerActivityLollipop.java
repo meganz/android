@@ -42,8 +42,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -85,7 +87,13 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -121,6 +129,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
     public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
+    int[] screenPosition;
+    int mLeftDelta;
+    int mTopDelta;
+    float mWidthScale;
+    float mHeightScale;
+    int screenWidth;
+    int screenHeight;
+
     static PdfViewerActivityLollipop pdfViewerActivityLollipop;
 
     MegaApplication app = null;
@@ -129,7 +145,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     MegaPreferences prefs = null;
 
     private AlertDialog alertDialogTransferOverquota;
-//    public static ProgressDialog progressDialog = null;
     public ProgressBar progressBar;
 
     private Notification.Builder mBuilder;
@@ -277,6 +292,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
+        screenHeight = outMetrics.heightPixels;
+        screenWidth = outMetrics.widthPixels;
 
         setContentView(R.layout.activity_pdfviewer);
 
@@ -381,17 +398,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             isUrl = false;
             loadLocalPDF();
         }
-//        progressDialog = new ProgressDialog(PdfViewerActivityLollipop.this);
-//        progressDialog.setMessage(getString(R.string.general_loading));
-//        progressDialog.setCanceledOnTouchOutside(false);
-//        progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//            @Override
-//            public void onDismiss(DialogInterface dialog) {
-//                if (loading) {
-//                    finish();
-//                }
-//            }
-//        });
 
         pdfView.setOnClickListener(this);
 
@@ -422,6 +428,103 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
 
         pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+
+        if (savedInstanceState == null){
+            ViewTreeObserver observer = pdfView.getViewTreeObserver();
+            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+
+                    pdfView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    int[] location = new int[2];
+                    pdfView.getLocationOnScreen(location);
+                    int[] getlocation = new int[2];
+                    getLocationOnScreen(getlocation);
+                    screenPosition = getIntent().getIntArrayExtra("screenPosition");
+                    if (screenPosition != null){
+                        mLeftDelta = getlocation[0] - location[0];
+                        mTopDelta = getlocation[1] - location[1];
+
+                        mWidthScale = (float) screenPosition[2] / pdfView.getWidth();
+                        mHeightScale = (float) screenPosition[3] / pdfView.getHeight();
+                    }
+                    else {
+                        mLeftDelta = (screenWidth/2) - location[0];
+                        mTopDelta = (screenHeight/2) - location[1];
+
+                        mWidthScale = (float) (screenWidth/4) / pdfView.getWidth();
+                        mHeightScale = (float) (screenHeight/4) / pdfView.getHeight();
+                    }
+                    log("mLeftDelta: "+mLeftDelta+" mTopDelta: "+mTopDelta+" mWidthScale: "+mWidthScale+" mHeightScale: "+mHeightScale);
+                    runEnterAnimation();
+
+                    return true;
+                }
+            });
+        }
+    }
+
+    public void runEnterAnimation() {
+        final long duration = 400;
+        if (aB != null && aB.isShowing()) {
+            if(tB != null) {
+                tB.animate().translationY(-220).setDuration(0)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                aB.hide();
+                            }
+                        }).start();
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            } else {
+                aB.hide();
+            }
+        }
+        pageNumber.animate().translationY(0).start();
+
+        pdfView.setPivotX(0);
+        pdfView.setPivotY(0);
+        pdfView.setScaleX(mWidthScale);
+        pdfView.setScaleY(mHeightScale);
+        pdfView.setTranslationX(mLeftDelta);
+        pdfView.setTranslationY(mTopDelta);
+
+        pdfView.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                setToolbarVisibilityShow();
+            }
+        });
+    }
+
+    void getLocationOnScreen(int[] location){
+        if (type == Constants.RUBBISH_BIN_ADAPTER){
+            RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.INBOX_ADAPTER){
+            InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.INCOMING_SHARES_ADAPTER){
+            IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.OUTGOING_SHARES_ADAPTER){
+            OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.CONTACT_FILE_ADAPTER){
+            ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.FOLDER_LINK_ADAPTER){
+            FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.SEARCH_ADAPTER){
+            SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.FILE_BROWSER_ADAPTER){
+            FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
+        else if (type == Constants.OFFLINE_ADAPTER){
+            OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        }
     }
 
     @Override
@@ -473,6 +576,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             Display display = getWindowManager().getDefaultDisplay();
             outMetrics = new DisplayMetrics ();
             display.getMetrics(outMetrics);
+            screenHeight = outMetrics.heightPixels;
+            screenWidth = outMetrics.widthPixels;
 
             setContentView(R.layout.activity_pdfviewer);
 
@@ -561,6 +666,38 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             });
 
             pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+
+            ViewTreeObserver observer = pdfView.getViewTreeObserver();
+            observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+
+                    pdfView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    int[] location = new int[2];
+                    pdfView.getLocationOnScreen(location);
+                    int[] getlocation = new int[2];
+                    getLocationOnScreen(getlocation);
+                    screenPosition = getIntent().getIntArrayExtra("screenPosition");
+                    if (screenPosition != null){
+                        mLeftDelta = getlocation[0] - location[0];
+                        mTopDelta = getlocation[1] - location[1];
+
+                        mWidthScale = (float) screenPosition[2] / pdfView.getWidth();
+                        mHeightScale = (float) screenPosition[3] / pdfView.getHeight();
+                    }
+                    else {
+                        mLeftDelta = (screenWidth/2) - location[0];
+                        mTopDelta = (screenHeight/2) - location[1];
+
+                        mWidthScale = (float) (screenWidth/4) / pdfView.getWidth();
+                        mHeightScale = (float) (screenHeight/4) / pdfView.getHeight();
+                    }
+                    log("mLeftDelta: "+mLeftDelta+" mTopDelta: "+mTopDelta+" mWidthScale: "+mWidthScale+" mHeightScale: "+mHeightScale);
+                    runEnterAnimation();
+
+                    return true;
+                }
+            });
         }
     }
 
@@ -649,9 +786,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             } catch (Exception e) {
 
             }
-//            if (loading && progressDialog!=null && !transferOverquota) {
-//                progressDialog.show();
-//            }
+
             if (loading && !transferOverquota){
                 progressBar.setVisibility(View.VISIBLE);
             }
@@ -666,9 +801,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private void loadLocalPDF() {
         log("loadLocalPDF loading: "+loading);
 
-//        if (loading && progressDialog!=null && !transferOverquota) {
-//            progressDialog.show();
-//        }
         progressBar.setVisibility(View.VISIBLE);
         try {
             pdfView.fromUri(uri)
@@ -844,21 +976,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             MegaNode parentNode = megaApi.getRootNode();
             for (ShareInfo info : infos) {
-//
-//                boolean extension = true;
-//                if (!info.getTitle().endsWith(".pdf")){
-//                    extension = false;
-//                }
-//
+
                 Intent intent = new Intent(this, UploadService.class);
-//                if (extension){
-                    intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                    intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-//                }
-//                else {
-//                    intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath()+".pdf");
-//                    intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-//                }
+                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
                 intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle()+".pdf");
                 intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
                 startService(intent);
@@ -1201,9 +1322,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             case R.id.pdf_viewer_chat: {
                 long[] longArray = new long[1];
                 longArray[0] = handle;
-//                Intent i = new Intent(PdfViewerActivityLollipop.this, ChatExplorerActivity.class);
-//                i.putExtra("NODE_HANDLES", longArray);
-//                startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+
                 if(nC ==null){
                     nC = new NodeController(this);
                 }
@@ -1387,7 +1506,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
-        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
@@ -1456,7 +1575,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         error_layout.setVisibility(View.GONE);
 
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1473,7 +1592,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if (error_layout.getVisibility() == View.VISIBLE) {
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
@@ -1486,7 +1605,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -1494,7 +1613,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     } else {
                         boolean result = matches(regex, value);
                         if (result) {
-                            input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
                             error_layout.setVisibility(View.VISIBLE);
                             input.requestFocus();
@@ -1539,7 +1658,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 String value = input.getText().toString().trim();
 
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -1547,7 +1666,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 else{
                     boolean result=matches(regex, value);
                     if(result){
-                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2348,9 +2467,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             @Override
             public void onShow(DialogInterface dialog) {
                 transferOverquota = true;
-//                if (progressDialog != null) {
-//                    progressDialog.hide();
-//                }
                 progressBar.setVisibility(View.GONE);
             }
         });
@@ -2359,9 +2475,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
                 transferOverquota = false;
-//                if (loading && progressDialog != null && !transferOverquota) {
-//                    progressDialog.show();
-//                }
                 if (loading && !transferOverquota){
                     progressBar.setVisibility(View.VISIBLE);
                 }
@@ -2501,7 +2614,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -2550,7 +2663,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 

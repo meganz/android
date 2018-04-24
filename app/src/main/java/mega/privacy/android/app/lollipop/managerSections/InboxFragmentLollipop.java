@@ -647,6 +647,7 @@ public class InboxFragmentLollipop extends Fragment{
 						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 					pdfIntent.putExtra("inside", true);
+					pdfIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
@@ -685,6 +686,8 @@ public class InboxFragmentLollipop extends Fragment{
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}
@@ -696,6 +699,7 @@ public class InboxFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else{
 					adapter.notifyDataSetChanged();

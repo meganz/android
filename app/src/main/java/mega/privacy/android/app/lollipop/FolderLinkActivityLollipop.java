@@ -1664,6 +1664,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 					Intent pdfIntent = new Intent(FolderLinkActivityLollipop.this, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("APP", true);
+					pdfIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER);
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(this, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());
@@ -1703,6 +1704,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("isFolderLink", true);
+					pdfIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(FolderLinkActivityLollipop.this, pdfIntent)){
 						startActivity(pdfIntent);
 					}
@@ -1714,6 +1717,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						NodeController nC = new NodeController(FolderLinkActivityLollipop.this);
 						nC.prepareForDownload(handleList);
 					}
+					overridePendingTransition(0,0);
 				}
 				else{
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

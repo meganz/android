@@ -151,7 +151,7 @@ import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener, DraggableView.DraggableListener{
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, AudioRendererEventListener, DraggableView.DraggableListener{
 
     int[] screenPosition;
     int mLeftDelta;
@@ -265,6 +265,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private ImageButton nextButton;
     private ImageButton previousButton;
+    private ImageButton playList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -381,13 +382,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
 
         if (fileName != null) {
-//            aB.setTitle(fileName);
             aB.setTitle(" ");
             exoPlayerName.setText(fileName);
             setTitle(fileName);
         }
         else {
-//            aB.setTitle(getFileName(uri));
             aB.setTitle(" ");
             exoPlayerName.setText(fileName);
             setTitle(getFileName(uri));
@@ -407,6 +406,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         previousButton.setOnTouchListener(this);
         nextButton = (ImageButton) findViewById(R.id.exo_next);
         nextButton.setOnTouchListener(this);
+//        playList = (ImageButton) findViewById(R.id.exo_play_list);
 
         handler = new Handler();
 
@@ -719,7 +719,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     if (aB.isShowing()) {
-//                        simpleExoPlayerView.hideController();
                         hideActionStatusBar();
                     }
                     else {
@@ -808,29 +807,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
         //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
-//        statusDialog = new ProgressDialog(AudioVideoPlayerLollipop.this);
-//        statusDialog.setMessage(getString(R.string.general_loading));
-//        statusDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-//            @Override
-//            public void onShow(DialogInterface dialog) {
-//                showActionStatusBar();
-//            }
-//        });
-//        statusDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//            @Override
-//            public void onDismiss(DialogInterface dialog) {
-//                if (loading) {
-////                    finish();
-//                }
-//            }
-//        });
-
         player.addListener(new ExoPlayer.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, Object manifest) {
                 log("onTimelineChanged");
                 if (player.getCurrentPosition() > 0){
-//                    statusDialog.dismiss();
                 }
             }
 
@@ -890,22 +871,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if (playbackState == ExoPlayer.STATE_BUFFERING){
                     audioContainer.setVisibility(View.GONE);
                     progressBar.setVisibility(View.VISIBLE);
-                    playPauseButton.setVisibility(View.GONE);
-
-                    if (loading && !transferOverquota && !isOffline){
-                        try {
-//                            statusDialog.setCanceledOnTouchOutside(false);
-//                            statusDialog.show();
-                        }
-                        catch(Exception e){
-                            return;
-                        }
-                    }
+//                    playPauseButton.setVisibility(View.GONE);
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
-                    playPauseButton.setVisibility(View.VISIBLE);
-//                    statusDialog.hide();
+//                    playPauseButton.setVisibility(View.VISIBLE);
                     if (isVideo) {
                         if ((isMP4 && video) || !isMP4){
                             audioContainer.setVisibility(View.GONE);
@@ -962,7 +932,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         player.seekTo(currentTime);
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
-//        simpleExoPlayerView.showController();
 
         if (savedInstanceState == null){
             ViewTreeObserver observer = simpleExoPlayerView.getViewTreeObserver();
@@ -1357,7 +1326,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         simpleExoPlayerView.setScaleX(mWidthScale);
         simpleExoPlayerView.setScaleY(mHeightScale);
         simpleExoPlayerView.setTranslationX(mLeftDelta);
-        simpleExoPlayerView.setPivotY(mTopDelta);
+        simpleExoPlayerView.setTranslationY(mTopDelta);
 
         ivShadow.setAlpha(0);
 
@@ -1874,10 +1843,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 log("Chat option");
                 long[] longArray = new long[1];
                 longArray[0] = handle;
-//
-//                Intent i = new Intent(this, ChatExplorerActivity.class);
-//                i.putExtra("NODE_HANDLES", longArray);
-//                startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
 
                 if(nC ==null){
                     nC = new NodeController(this);
@@ -2087,7 +2052,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
-        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
@@ -2156,7 +2121,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         error_layout.setVisibility(View.GONE);
 
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2173,7 +2138,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if (error_layout.getVisibility() == View.VISIBLE) {
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
@@ -2186,7 +2151,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2194,7 +2159,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     } else {
                         boolean result = matches(regex, value);
                         if (result) {
-                            input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
                             error_layout.setVisibility(View.VISIBLE);
                             input.requestFocus();
@@ -2239,7 +2204,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 String value = input.getText().toString().trim();
 
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -2247,7 +2212,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 else{
                     boolean result=matches(regex, value);
                     if(result){
-                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2548,8 +2513,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         log("onVideoEnabled");
         video = true;
         loading = false;
-//        statusDialog.dismiss();
-//        audioContainer.setVisibility(View.GONE);
     }
 
     @Override
@@ -2646,7 +2609,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         setSupportActionBar(tB);
                         aB = getSupportActionBar();
                     }
-//                    aB.setTitle(fileName);
                     aB.setTitle(" ");
                     exoPlayerName.setText(fileName);
                     setTitle(fileName);
@@ -2865,7 +2827,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             @Override
             public void onShow(DialogInterface dialog) {
                 transferOverquota = true;
-//                statusDialog.hide();
                 showActionStatusBar();
             }
         });
@@ -2874,10 +2835,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             public void onClick(View v) {
                 alertDialogTransferOverquota.dismiss();
                 transferOverquota = false;
-//                if (loading) {
-//                    statusDialog.setCanceledOnTouchOutside(false);
-//                    statusDialog.show();
-//                }
             }
 
         });
@@ -2905,7 +2862,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onAudioEnabled(DecoderCounters counters) {
         loading = false;
-//        statusDialog.dismiss();
     }
 
     @Override
@@ -2993,7 +2949,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         draggableView.setDraggableListener(this);
         ivShadow = new ImageView(this);
-        ivShadow.setBackgroundColor(getResources().getColor(R.color.black_p50));
+        ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         container.addView(ivShadow, params);
         container.addView(draggableView);
@@ -3109,7 +3065,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -3158,7 +3114,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -3328,5 +3284,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
 
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+//            case R.id.exo_play_list:{
+////                Intent intent = new Intent(AudioVideoPlayerLollipop.this, );
+//                break;
+//            }
+        }
     }
 }
