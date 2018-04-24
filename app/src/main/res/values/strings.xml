@@ -1809,4 +1809,8 @@
 
     <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
 
+    <string name="section_playlist" context="Title of the screen Playlist">Playlist</string>
+    <string name="playlist_state_playing" context="Text shown in playlist subtitle item when a file is reproducing">Now playing...</string>
+    <string name="playlist_state_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Paused</string>
+
 </resources>

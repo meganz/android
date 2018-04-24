@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.ActivityManager;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -14,13 +13,10 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -94,12 +90,9 @@ import com.google.android.exoplayer2.video.VideoRendererEventListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.Inflater;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -122,7 +115,6 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaAccountDetails;
@@ -406,7 +398,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         previousButton.setOnTouchListener(this);
         nextButton = (ImageButton) findViewById(R.id.exo_next);
         nextButton.setOnTouchListener(this);
-//        playList = (ImageButton) findViewById(R.id.exo_play_list);
+        playList = (ImageButton) findViewById(R.id.exo_play_list);
+        playList.setOnClickListener(this);
 
         handler = new Handler();
 
@@ -3289,10 +3282,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-//            case R.id.exo_play_list:{
-////                Intent intent = new Intent(AudioVideoPlayerLollipop.this, );
-//                break;
-//            }
+            case R.id.exo_play_list:{
+                Intent intent = new Intent(AudioVideoPlayerLollipop.this, PlaylistActivity.class);
+                if (adapterType == Constants.OFFLINE_ADAPTER){
+                    intent.putExtra("pathNavigation", pathNavigation);
+                }
+                else{
+                    intent.putExtra("parentNodeHandle", parentNodeHandle);
+                }
+                intent.putExtra("currentPosition", currentPosition);
+                startActivity(intent);
+                player.stop();
+                break;
+            }
         }
     }
 }
