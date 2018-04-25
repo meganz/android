@@ -996,7 +996,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
                 numberToLoad=NUMBER_MESSAGES_TO_LOAD;
             }else{
-                if (unreadCount < 0) {
+                if (generalUnreadCount < 0) {
                     log("loadHistory:A->loadMessages " + chatRoom.getUnreadCount());
                     long unreadAbs = Math.abs(generalUnreadCount);
                     numberToLoad =  (int) unreadAbs+NUMBER_MESSAGES_TO_LOAD;
