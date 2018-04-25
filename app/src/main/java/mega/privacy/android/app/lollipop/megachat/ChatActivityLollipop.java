@@ -720,6 +720,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 // Get the first visible item
 //                            int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
+                if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
+                    hideMessageJump();
+                }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
+                    if(newVisibility){
+                        showJumpMessage();
+                    }
+                }
+
                 if(stateHistory!=MegaChatApi.SOURCE_NONE){
                     if (dy > 0) {
                         // Scrolling up
@@ -728,15 +736,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         // Scrolling down
                         scrollingUp = false;
                     }
-                    if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
-                        hideMessageJump();
-                    }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
-                        if(newVisibility){
-                            showJumpMessage();
-                        }
-                    }
-
-
 
                     if(!scrollingUp){
                         int pos = mLayoutManager.findFirstVisibleItemPosition();
@@ -994,11 +993,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!isTurn) {
                 lastIdMsgSeen = -1;
                 generalUnreadCount = -1;
+                stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                numberToLoad=NUMBER_MESSAGES_TO_LOAD;
+            }else{
+                if (unreadCount < 0) {
+                    log("loadHistory:A->loadMessages " + chatRoom.getUnreadCount());
+                    long unreadAbs = Math.abs(generalUnreadCount);
+                    numberToLoad =  (int) unreadAbs+NUMBER_MESSAGES_TO_LOAD;
+                    stateHistory = megaChatApi.loadMessages(idChat, (int) numberToLoad);
+                }
+                else{
+                    log("loadHistory:B->loadMessages " + chatRoom.getUnreadCount());
+                    numberToLoad =  (int) generalUnreadCount+NUMBER_MESSAGES_TO_LOAD;
+                    stateHistory = megaChatApi.loadMessages(idChat, (int) numberToLoad);
+                }
             }
             lastSeenReceived = true;
             log("loadHistory:C->loadMessages:unread is 0");
-            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-            numberToLoad=NUMBER_MESSAGES_TO_LOAD;
+//            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+//            numberToLoad=NUMBER_MESSAGES_TO_LOAD;
         } else {
             if(!isTurn){
                 lastIdMsgSeen = megaChatApi.getLastMessageSeenId(idChat);
