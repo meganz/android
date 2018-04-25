@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,10 +22,14 @@ import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -48,6 +53,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -170,8 +176,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     Handler handler;
     boolean isFolderLink = false;
-    private SimpleExoPlayerView simpleExoPlayerView;
+
     private SimpleExoPlayer player;
+    private SimpleExoPlayerView simpleExoPlayerView;
     private Uri uri;
     private TextView exoPlayerName;
     private ProgressBar progressBar;
@@ -194,6 +201,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MenuItem removeMenuItem;
     private MenuItem removelinkMenuItem;
     private MenuItem loopMenuItem;
+    private MenuItem searchMenuItem;
 
     private RelativeLayout audioVideoPlayerContainer;
     private RelativeLayout playerLayout;
@@ -224,6 +232,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     private long parentNodeHandle = -1;
     private int adapterType = 0;
+
     private ArrayList<Long> mediaHandles;
     private ArrayList<MegaOffline> offList;
     private ArrayList<MegaOffline> mediaOffList;
@@ -259,6 +268,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private ImageButton previousButton;
     private ImageButton playList;
 
+    FrameLayout fragmentConainer;
+    PlaylistFragment playlistFragment;
+    private boolean onPlayList = false;
+
+    LoopingMediaSource loopingMediaSource = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -288,8 +303,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             renamed = savedInstanceState.getBoolean("renamed");
             loop = savedInstanceState.getBoolean("loop");
             currentPosition = savedInstanceState.getInt("currentPosition");
+            onPlayList = savedInstanceState.getBoolean("onPlayList");
         }
         else {
+            onPlayList = false;
             currentTime = 0;
             accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             Bundle bundle = intent.getExtras();
@@ -310,7 +327,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
         fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
-        adapterType = getIntent().getIntExtra("adapterType", 0);
+        adapterType = intent.getIntExtra("adapterType", 0);
         if (adapterType == Constants.OFFLINE_ADAPTER){
             isOffline = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
@@ -373,13 +390,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
 
+
+        setToolbarTitle(" ");
         if (fileName != null) {
-            aB.setTitle(" ");
             exoPlayerName.setText(fileName);
             setTitle(fileName);
         }
         else {
-            aB.setTitle(" ");
             exoPlayerName.setText(fileName);
             setTitle(getFileName(uri));
         }
@@ -400,6 +417,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         nextButton.setOnTouchListener(this);
         playList = (ImageButton) findViewById(R.id.exo_play_list);
         playList.setOnClickListener(this);
+        fragmentConainer = (FrameLayout) findViewById(R.id.fragment_container);
+        fragmentConainer.setVisibility(View.GONE);
 
         handler = new Handler();
 
@@ -682,6 +701,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             if (size > 1) {
                 sortBySelected();
+                playList.setVisibility(View.VISIBLE);
+            }
+            else {
+                playList.setVisibility(View.GONE);
             }
         }
 
@@ -731,7 +754,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
         MediaSource mediaSource = null;
-        LoopingMediaSource loopingMediaSource = null;
 
         if (isPlayList && size > 1) {
             final List<MediaSource> playlist = new ArrayList<>();
@@ -1307,6 +1329,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 aB.hide();
             }
         }
+        simpleExoPlayerView.hideController();
+        containerControls.animate().translationY(400).setDuration(0).start();
+
         containerAudioVideoPlayer.setBackgroundColor(TRANSPARENT);
         containerAudioVideoPlayer.setElevation(0);
         playerLayout.setBackgroundColor(TRANSPARENT);
@@ -1327,6 +1352,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             @Override
             public void run() {
                 showActionStatusBar();
+                simpleExoPlayerView.showController();
+                containerControls.animate().translationY(0).setDuration(400L).start();
                 containerAudioVideoPlayer.setBackgroundColor(BLACK);
                 playerLayout.setBackgroundColor(BLACK);
                 appBarLayout.setBackgroundColor(BLACK);
@@ -1499,6 +1526,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
         outState.putBoolean("loop", loop);
+        outState.putBoolean("onPlayList", onPlayList);
     }
 
     public String getFileName(Uri uri) {
@@ -1558,6 +1586,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 containerControls.animate().translationY(0).setDuration(400L).start();
             }
         }
+        if (handler == null){
+            handler = new Handler();
+        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!onPlayList){
+                    hideActionStatusBar();
+                }
+            }
+        }, 4000);
+
     }
 
     @Override
@@ -1566,6 +1606,64 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
+
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchMenuItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        if (searchView != null){
+            searchView.setIconifiedByDefault(true);
+        }
+
+//        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+//            @Override
+//            public boolean onMenuItemActionExpand(MenuItem item) {
+//                textsearchQuery = false;
+//                searchQuery = "";
+//                selectDrawerItemLollipop(DrawerItem.SEARCH);
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onMenuItemActionCollapse(MenuItem item) {
+//                log("On collapse search menu item");
+//                drawerItem = DrawerItem.CLOUD_DRIVE;
+//                selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
+//                textSubmitted = true;
+//                return true;
+//            }
+//        });
+//        searchView.setMaxWidth(Integer.MAX_VALUE);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                searchQuery = "" + query;
+//                selectDrawerItemLollipop(DrawerItem.SEARCH);
+//                setToolbarTitle();
+//                supportInvalidateOptionsMenu();
+//                log("Search query: " + query);
+//                textSubmitted = true;
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                log("Searching by text: "+newText);
+//                if(textSubmitted){
+//                    textSubmitted = false;
+//                }
+//                else if (textsearchQuery) {
+//                    selectDrawerItemLollipop(DrawerItem.SEARCH);
+//                }
+//                else{
+//                    searchQuery = newText;
+//                    selectDrawerItemLollipop(DrawerItem.SEARCH);
+//                }
+//                return true;
+//            }
+//
+//        });
 
         shareMenuItem = menu.findItem(R.id.full_video_viewer_share);
         downloadMenuItem = menu.findItem(R.id.full_video_viewer_download);
@@ -1579,233 +1677,252 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         removeMenuItem = menu.findItem(R.id.full_video_viewer_remove);
         removelinkMenuItem = menu.findItem(R.id.full_video_viewer_remove_link);
         loopMenuItem = menu.findItem(R.id.full_video_viewer_loop);
-        if (loop){
-            loopMenuItem.setChecked(true);
-            player.setRepeatMode(Player.REPEAT_MODE_ONE);
+
+        if (!onPlayList){
+            searchMenuItem.setVisible(false);
+            if (loop){
+                loopMenuItem.setChecked(true);
+                player.setRepeatMode(Player.REPEAT_MODE_ONE);
+            }
+            else {
+                loopMenuItem.setChecked(false);
+                player.setRepeatMode(Player.REPEAT_MODE_OFF);
+            }
+
+            if (adapterType == Constants.OFFLINE_ADAPTER){
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                shareMenuItem.setVisible(true);
+                propertiesMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(false);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                chatMenuItem.setVisible(true);
+            }
+            else if(adapterType == Constants.SEARCH_ADAPTER){
+                MegaNode node = megaApi.getNodeByHandle(handle);
+
+                if (isUrl){
+                    shareMenuItem.setVisible(false);
+                    downloadMenuItem.setVisible(true);
+                }
+                else {
+                    downloadMenuItem.setVisible(false);
+                    shareMenuItem.setVisible(true);
+                }
+                if(node.isExported()){
+                    removelinkMenuItem.setVisible(true);
+                    getlinkMenuItem.setVisible(false);
+                }
+                else{
+                    removelinkMenuItem.setVisible(false);
+                    getlinkMenuItem.setVisible(true);
+                }
+
+                propertiesMenuItem.setVisible(true);
+                renameMenuItem.setVisible(true);
+                moveMenuItem.setVisible(true);
+                copyMenuItem.setVisible(true);
+
+                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                    chatMenuItem.setVisible(true);
+                }
+                else{
+                    chatMenuItem.setVisible(false);
+                }
+
+                MegaNode parent = megaApi.getNodeByHandle(handle);
+                while (megaApi.getParentNode(parent) != null){
+                    parent = megaApi.getParentNode(parent);
+                }
+
+                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                    moveToTrashMenuItem.setVisible(true);
+                    removeMenuItem.setVisible(false);
+                }
+                else{
+                    moveToTrashMenuItem.setVisible(false);
+                    removeMenuItem.setVisible(true);
+                }
+            }
+            else {
+                boolean shareVisible = true;
+                shareMenuItem.setVisible(true);
+
+                MegaNode node = megaApi.getNodeByHandle(handle);
+
+                if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                    shareMenuItem.setVisible(false);
+                    shareVisible = false;
+                }
+                else{
+                    if(fromShared){
+                        shareMenuItem.setVisible(false);
+                        shareVisible = false;
+                    }
+                    if(isFolderLink){
+                        shareMenuItem.setVisible(false);
+                        shareVisible = false;
+                    }
+                }
+                copyMenuItem.setVisible(true);
+
+                if(node.isExported()){
+                    getlinkMenuItem.setVisible(false);
+                    removelinkMenuItem.setVisible(true);
+                }
+                else{
+                    if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                        getlinkMenuItem.setVisible(false);
+                        removelinkMenuItem.setVisible(false);
+                    }
+                    else{
+                        if(fromShared){
+                            removelinkMenuItem.setVisible(false);
+                            getlinkMenuItem.setVisible(false);
+                        }
+                        else{
+                            if(isFolderLink){
+                                getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
+
+                            }
+                            else{
+                                getlinkMenuItem.setVisible(true);
+                                removelinkMenuItem.setVisible(false);
+                            }
+                        }
+                    }
+                }
+                if(fromShared){
+                    removeMenuItem.setVisible(false);
+                    chatMenuItem.setVisible(false);
+
+                    node = megaApi.getNodeByHandle(handle);
+                    int accessLevel = megaApi.getAccess(node);
+
+                    switch(accessLevel){
+                        case MegaShare.ACCESS_OWNER:
+                        case MegaShare.ACCESS_FULL:{
+                            renameMenuItem.setVisible(true);
+                            moveMenuItem.setVisible(true);
+                            moveToTrashMenuItem.setVisible(true);
+                            break;
+                        }
+                        case MegaShare.ACCESS_READWRITE:
+                        case MegaShare.ACCESS_READ:{
+                            renameMenuItem.setVisible(false);
+                            moveMenuItem.setVisible(false);
+                            moveToTrashMenuItem.setVisible(false);
+                            break;
+                        }
+                    }
+                }
+                else{
+                    if(isFolderLink){
+                        propertiesMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        removeMenuItem.setVisible(false);
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        copyMenuItem.setVisible(false);
+                        chatMenuItem.setVisible(false);
+                    }
+                    else{
+                        propertiesMenuItem.setVisible(true);
+
+                        if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+                            removeMenuItem.setVisible(false);
+                            node = megaApi.getNodeByHandle(handle);
+                            int accessLevel = megaApi.getAccess(node);
+                            switch(accessLevel){
+
+                                case MegaShare.ACCESS_OWNER:
+                                case MegaShare.ACCESS_FULL:{
+                                    renameMenuItem.setVisible(true);
+                                    moveMenuItem.setVisible(true);
+                                    moveToTrashMenuItem.setVisible(true);
+                                    if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                        chatMenuItem.setVisible(true);
+                                    }
+                                    else{
+                                        chatMenuItem.setVisible(false);
+                                    }
+                                    break;
+                                }
+                                case MegaShare.ACCESS_READWRITE:
+                                case MegaShare.ACCESS_READ:{
+                                    renameMenuItem.setVisible(false);
+                                    moveMenuItem.setVisible(false);
+                                    moveToTrashMenuItem.setVisible(false);
+                                    chatMenuItem.setVisible(false);
+                                    break;
+                                }
+                            }
+                        }
+                        else{
+                            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                chatMenuItem.setVisible(true);
+                            }
+                            else{
+                                chatMenuItem.setVisible(false);
+                            }
+                            renameMenuItem.setVisible(true);
+                            moveMenuItem.setVisible(true);
+
+                            node = megaApi.getNodeByHandle(handle);
+
+                            final long handle = node.getHandle();
+                            MegaNode parent = megaApi.getNodeByHandle(handle);
+
+                            while (megaApi.getParentNode(parent) != null){
+                                parent = megaApi.getParentNode(parent);
+                            }
+
+                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+
+                                moveToTrashMenuItem.setVisible(true);
+                                removeMenuItem.setVisible(false);
+
+                            }
+                            else{
+                                moveToTrashMenuItem.setVisible(false);
+                                removeMenuItem.setVisible(true);
+                                getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
+                            }
+                        }
+                    }
+                }
+                if (isUrl){
+                    downloadMenuItem.setVisible(true);
+                    shareMenuItem.setVisible(false);
+                }
+                else {
+                    downloadMenuItem.setVisible(false);
+                    if (shareVisible){
+                        shareMenuItem.setVisible(true);
+                    }
+                }
+            }
         }
         else {
-            loopMenuItem.setChecked(false);
-            player.setRepeatMode(Player.REPEAT_MODE_OFF);
-        }
-
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+            searchMenuItem.setVisible(true);
             getlinkMenuItem.setVisible(false);
             removelinkMenuItem.setVisible(false);
-            shareMenuItem.setVisible(true);
-            propertiesMenuItem.setVisible(true);
+            shareMenuItem.setVisible(false);
+            propertiesMenuItem.setVisible(false);
             downloadMenuItem.setVisible(false);
             renameMenuItem.setVisible(false);
             moveMenuItem.setVisible(false);
             copyMenuItem.setVisible(false);
             moveToTrashMenuItem.setVisible(false);
             removeMenuItem.setVisible(false);
-            chatMenuItem.setVisible(true);
-        }
-        else if(adapterType == Constants.SEARCH_ADAPTER){
-            MegaNode node = megaApi.getNodeByHandle(handle);
-
-            if (isUrl){
-                shareMenuItem.setVisible(false);
-                downloadMenuItem.setVisible(true);
-            }
-            else {
-                downloadMenuItem.setVisible(false);
-                shareMenuItem.setVisible(true);
-            }
-            if(node.isExported()){
-                removelinkMenuItem.setVisible(true);
-                getlinkMenuItem.setVisible(false);
-            }
-            else{
-                removelinkMenuItem.setVisible(false);
-                getlinkMenuItem.setVisible(true);
-            }
-
-            propertiesMenuItem.setVisible(true);
-            renameMenuItem.setVisible(true);
-            moveMenuItem.setVisible(true);
-            copyMenuItem.setVisible(true);
-
-            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-                chatMenuItem.setVisible(true);
-            }
-            else{
-                chatMenuItem.setVisible(false);
-            }
-
-            MegaNode parent = megaApi.getNodeByHandle(handle);
-            while (megaApi.getParentNode(parent) != null){
-                parent = megaApi.getParentNode(parent);
-            }
-
-            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-                moveToTrashMenuItem.setVisible(true);
-                removeMenuItem.setVisible(false);
-            }
-            else{
-                moveToTrashMenuItem.setVisible(false);
-                removeMenuItem.setVisible(true);
-            }
-        }
-        else {
-            boolean shareVisible = true;
-            shareMenuItem.setVisible(true);
-
-            MegaNode node = megaApi.getNodeByHandle(handle);
-
-            if(adapterType==Constants.CONTACT_FILE_ADAPTER){
-                shareMenuItem.setVisible(false);
-                shareVisible = false;
-            }
-            else{
-                if(fromShared){
-                    shareMenuItem.setVisible(false);
-                    shareVisible = false;
-                }
-                if(isFolderLink){
-                    shareMenuItem.setVisible(false);
-                    shareVisible = false;
-                }
-            }
-            copyMenuItem.setVisible(true);
-
-            if(node.isExported()){
-                getlinkMenuItem.setVisible(false);
-                removelinkMenuItem.setVisible(true);
-            }
-            else{
-                if(adapterType==Constants.CONTACT_FILE_ADAPTER){
-                    getlinkMenuItem.setVisible(false);
-                    removelinkMenuItem.setVisible(false);
-                }
-                else{
-                    if(fromShared){
-                        removelinkMenuItem.setVisible(false);
-                        getlinkMenuItem.setVisible(false);
-                    }
-                    else{
-                        if(isFolderLink){
-                            getlinkMenuItem.setVisible(false);
-                            removelinkMenuItem.setVisible(false);
-
-                        }
-                        else{
-                            getlinkMenuItem.setVisible(true);
-                            removelinkMenuItem.setVisible(false);
-                        }
-                    }
-                }
-            }
-            if(fromShared){
-                removeMenuItem.setVisible(false);
-                chatMenuItem.setVisible(false);
-
-                node = megaApi.getNodeByHandle(handle);
-                int accessLevel = megaApi.getAccess(node);
-
-                switch(accessLevel){
-                    case MegaShare.ACCESS_OWNER:
-                    case MegaShare.ACCESS_FULL:{
-                        renameMenuItem.setVisible(true);
-                        moveMenuItem.setVisible(true);
-                        moveToTrashMenuItem.setVisible(true);
-                        break;
-                    }
-                    case MegaShare.ACCESS_READWRITE:
-                    case MegaShare.ACCESS_READ:{
-                        renameMenuItem.setVisible(false);
-                        moveMenuItem.setVisible(false);
-                        moveToTrashMenuItem.setVisible(false);
-                        break;
-                    }
-                }
-            }
-            else{
-                if(isFolderLink){
-                    propertiesMenuItem.setVisible(false);
-                    moveToTrashMenuItem.setVisible(false);
-                    removeMenuItem.setVisible(false);
-                    renameMenuItem.setVisible(false);
-                    moveMenuItem.setVisible(false);
-                    copyMenuItem.setVisible(false);
-                    chatMenuItem.setVisible(false);
-                }
-                else{
-                    propertiesMenuItem.setVisible(true);
-
-                    if(adapterType==Constants.CONTACT_FILE_ADAPTER){
-                        removeMenuItem.setVisible(false);
-                        node = megaApi.getNodeByHandle(handle);
-                        int accessLevel = megaApi.getAccess(node);
-                        switch(accessLevel){
-
-                            case MegaShare.ACCESS_OWNER:
-                            case MegaShare.ACCESS_FULL:{
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
-                                moveToTrashMenuItem.setVisible(true);
-                                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-                                    chatMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatMenuItem.setVisible(false);
-                                }
-                                break;
-                            }
-                            case MegaShare.ACCESS_READWRITE:
-                            case MegaShare.ACCESS_READ:{
-                                renameMenuItem.setVisible(false);
-                                moveMenuItem.setVisible(false);
-                                moveToTrashMenuItem.setVisible(false);
-                                chatMenuItem.setVisible(false);
-                                break;
-                            }
-                        }
-                    }
-                    else{
-                        if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-                            chatMenuItem.setVisible(true);
-                        }
-                        else{
-                            chatMenuItem.setVisible(false);
-                        }
-                        renameMenuItem.setVisible(true);
-                        moveMenuItem.setVisible(true);
-
-                        node = megaApi.getNodeByHandle(handle);
-
-                        final long handle = node.getHandle();
-                        MegaNode parent = megaApi.getNodeByHandle(handle);
-
-                        while (megaApi.getParentNode(parent) != null){
-                            parent = megaApi.getParentNode(parent);
-                        }
-
-                        if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-
-                            moveToTrashMenuItem.setVisible(true);
-                            removeMenuItem.setVisible(false);
-
-                        }
-                        else{
-                            moveToTrashMenuItem.setVisible(false);
-                            removeMenuItem.setVisible(true);
-                            getlinkMenuItem.setVisible(false);
-                            removelinkMenuItem.setVisible(false);
-                        }
-                    }
-                }
-            }
-            if (isUrl){
-                downloadMenuItem.setVisible(true);
-                shareMenuItem.setVisible(false);
-            }
-            else {
-                downloadMenuItem.setVisible(false);
-                if (shareVisible){
-                    shareMenuItem.setVisible(true);
-                }
-            }
+            chatMenuItem.setVisible(false);
+            loopMenuItem.setVisible(false);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -1826,10 +1943,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         switch (id) {
             case android.R.id.home: {
                 log("onBackPRess");
-                if (player != null) {
-                    player.release();
+                if (onPlayList){
+                    releasePlaylist();
                 }
-                onBackPressed();
+                else {
+                    if (player != null) {
+                        player.release();
+                    }
+                    onBackPressed();
+                }
                 break;
             }
             case R.id.full_video_viewer_chat:{
@@ -1903,6 +2025,36 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    void releasePlaylist(){
+        onPlayList = false;
+        playerLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        fragmentConainer.setVisibility(View.GONE);
+        draggableView.setDraggable(true);
+
+        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_black));
+        setToolbarTitle(" ");
+
+        supportInvalidateOptionsMenu();
+        showActionStatusBar();
+        player.prepare(loopingMediaSource);
+        player.setPlayWhenReady(true);
+        player.seekTo(currentTime);
     }
 
     public void moveToTrash(){
@@ -2602,7 +2754,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         setSupportActionBar(tB);
                         aB = getSupportActionBar();
                     }
-                    aB.setTitle(" ");
+                    setToolbarTitle(" ");
                     exoPlayerName.setText(fileName);
                     setTitle(fileName);
 
@@ -3283,18 +3435,64 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.exo_play_list:{
-                Intent intent = new Intent(AudioVideoPlayerLollipop.this, PlaylistActivity.class);
-                if (adapterType == Constants.OFFLINE_ADAPTER){
-                    intent.putExtra("pathNavigation", pathNavigation);
-                }
-                else{
-                    intent.putExtra("parentNodeHandle", parentNodeHandle);
-                }
-                intent.putExtra("currentPosition", currentPosition);
-                startActivity(intent);
-                player.stop();
+                instantiatePlaylist();
                 break;
             }
         }
+    }
+
+    void instantiatePlaylist(){
+        onPlayList = true;
+        progressBar.setVisibility(View.GONE);
+        playerLayout.setVisibility(View.GONE);
+        fragmentConainer.setVisibility(View.VISIBLE);
+        draggableView.setDraggable(false);
+        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+        setToolbarTitle(getString(R.string.section_playlist));
+        supportInvalidateOptionsMenu();
+
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment != null){
+            getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+        }
+        if (playlistFragment == null){
+            playlistFragment = new PlaylistFragment();
+        }
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, playlistFragment, "playlistFragment");
+        ft.commitNowAllowingStateLoss();
+        player.stop();
+    }
+
+    public long getParentNodeHandle() {
+        return parentNodeHandle;
+    }
+
+    public String getPathNavigation() {
+        return pathNavigation;
+    }
+
+    public int getAdapterType(){
+        return adapterType;
+    }
+
+    public ArrayList<Long> getMediaHandles() {
+        return mediaHandles;
+    }
+
+    public ArrayList<MegaOffline> getMediaOffList() {
+        return mediaOffList;
+    }
+
+    public ArrayList<Uri> getMediaUris() {
+        return mediaUris;
+    }
+
+    public SimpleExoPlayer getPlayer() {
+        return player;
+    }
+
+    public void setToolbarTitle(String title){
+        aB.setTitle(title);
     }
 }

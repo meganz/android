@@ -17,12 +17,12 @@
 
 		<RelativeLayout
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+			android:layout_height="wrap_content">
 
 			<RelativeLayout
 				android:id="@+id/player_layout"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_height="wrap_content"
 				android:background="@color/black">
 
 				<com.google.android.exoplayer2.ui.SimpleExoPlayerView
@@ -31,7 +31,6 @@
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
 					app:controller_layout_id="@layout/player_control_view"/>
-
 
 			</RelativeLayout>
 
@@ -55,6 +54,14 @@
 				android:layout_marginTop="30dp" />
 
 		</RelativeLayout>
+
+
+		<FrameLayout
+			android:id="@+id/fragment_container"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_below="@id/call_toolbar"
+			app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 	</android.support.design.widget.AppBarLayout>
 

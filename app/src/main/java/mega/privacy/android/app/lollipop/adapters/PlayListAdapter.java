@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.PlaylistFragment;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -40,6 +42,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     long parentHandle;
     String parentPath;
     RecyclerView recyclerView;
+    Fragment fragment;
 
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
@@ -56,9 +59,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         public RelativeLayout itemLayout;
     }
 
-    public PlayListAdapter(Context _context, ArrayList<Long> _handles, long _parentHandle, RecyclerView _recyclerView) {
+    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<Long> _handles, long _parentHandle, RecyclerView _recyclerView) {
 
         this.context = _context;
+        this.fragment = _fragment;
         this.handles = _handles;
         this.parentHandle = _parentHandle;
         this.recyclerView = _recyclerView;
@@ -66,11 +70,18 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
+
+        nodes = new ArrayList<>();
+        for (int i =0; i<handles.size(); i++){
+            nodes.add(megaApi.getNodeByHandle(handles.get(i)));
+        }
+        setNodes(nodes);
     }
 
-    public PlayListAdapter(Context _context, ArrayList<MegaOffline> _handles, String _parentPath, RecyclerView _recyclerView) {
+    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<MegaOffline> _handles, String _parentPath, RecyclerView _recyclerView) {
 
         this.context = _context;
+        this.fragment = _fragment;
         this.offNodes = _handles;
         this.parentPath = _parentPath;
         this.recyclerView = _recyclerView;
@@ -87,7 +98,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
-        log("setNodes");
+        log("setNodes size: "+nodes.size());
         this.nodes = nodes;
         notifyDataSetChanged();
     }
@@ -96,21 +107,26 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     @Override
     public PlayListAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
+        log("onCreateViewHolder");
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_playlist, parent, false);
         PlayListAdapter.ViewHolderBrowser holderList = new PlayListAdapter.ViewHolderBrowser(v);
 
-        holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
+        holderList.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout_playlist);
         holderList.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
         holderList.textViewFileName = (TextView) v.findViewById(R.id.file_list_filename);
         holderList.textViewFileSize = (TextView) v.findViewById(R.id.file_list_filesize);
         holderList.textViewState = (TextView) v.findViewById(R.id.file_list_filestate);
 
+        holderList.itemLayout.setTag(holderList);
+        holderList.itemLayout.setOnClickListener(this);
+
         return holderList;
     }
 
     @Override
-    public void onBindViewHolder(PlayListAdapter.ViewHolderBrowser holder, int position) {
+    public void onBindViewHolder(ViewHolderBrowser holder, int position) {
+        log("onBindViewHolder");
 
         MegaNode node = (MegaNode) getItem(position);
         holder.document = node.getHandle();
@@ -218,8 +234,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
+        int currentPosition = holder.getAdapterPosition();
 
+        switch (v.getId()){
+            case R.id.file_list_item_layout_playlist:{
+                ((PlaylistFragment) fragment).itemClick(currentPosition);
+            }
         }
     }
 
