@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -72,6 +73,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
+	Button changePassButton;
 
 	RelativeLayout typeLayout;
 	LinearLayout lastSessionLayout;
@@ -155,16 +157,23 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		}
-		else{
-			mkButton.setBackgroundResource(R.drawable.black_button_border);
-//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
+
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
 
 		setMkButtonText();
+
+		changePassButton = (Button) v.findViewById(R.id.change_pass_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			changePassButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+		}
+		else{
+			changePassButton.setBackgroundResource(R.drawable.black_button_border);
+//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
+		changePassButton.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			log("onCreate: Landscape configuration");
@@ -566,6 +575,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					showMKLayout();
 				}
 
+				break;
+			}
+			case R.id.change_pass_button:{
+				log("Change pass button");
+
+				Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+				startActivity(intent);
 				break;
 			}
 			case R.id.copy_MK_button:{
