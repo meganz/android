@@ -128,7 +128,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
-
+    boolean newVisibility = false;
     boolean getMoreHistory=false;
 
     private AlertDialog errorOpenChatDialog;
@@ -720,13 +720,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 // Get the first visible item
 //                            int firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
 
+                if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
+                    hideMessageJump();
+                }else if((messages.size()-1) > (mLayoutManager.findLastVisibleItemPosition()-1)){
+                    if(newVisibility){
+                        showJumpMessage();
+                    }
+                }
+
                 if(stateHistory!=MegaChatApi.SOURCE_NONE){
                     if (dy > 0) {
                         // Scrolling up
                         scrollingUp = true;
-                        if((messages.size()-1) == (mLayoutManager.findLastVisibleItemPosition()-1)){
-                            hideMessageJump();
-                        }
                     } else {
                         // Scrolling down
                         scrollingUp = false;
@@ -838,6 +843,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }else if(typeMessageJump == TYPE_MESSAGE_JUMP_TO_LEAST){
                             messageJumpText.setText(getResources().getString(R.string.message_jump_latest));
                             messageJumpLayout.setVisibility(View.VISIBLE);
+
                         }
                     }
 
@@ -987,11 +993,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(!isTurn) {
                 lastIdMsgSeen = -1;
                 generalUnreadCount = -1;
+                stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+                numberToLoad=NUMBER_MESSAGES_TO_LOAD;
+            }else{
+                if (generalUnreadCount < 0) {
+                    log("loadHistory:A->loadMessages " + chatRoom.getUnreadCount());
+                    long unreadAbs = Math.abs(generalUnreadCount);
+                    numberToLoad =  (int) unreadAbs+NUMBER_MESSAGES_TO_LOAD;
+                    stateHistory = megaChatApi.loadMessages(idChat, (int) numberToLoad);
+                }
+                else{
+                    log("loadHistory:B->loadMessages " + chatRoom.getUnreadCount());
+                    numberToLoad =  (int) generalUnreadCount+NUMBER_MESSAGES_TO_LOAD;
+                    stateHistory = megaChatApi.loadMessages(idChat, (int) numberToLoad);
+                }
             }
             lastSeenReceived = true;
             log("loadHistory:C->loadMessages:unread is 0");
-            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
-            numberToLoad=NUMBER_MESSAGES_TO_LOAD;
+//            stateHistory = megaChatApi.loadMessages(idChat, NUMBER_MESSAGES_TO_LOAD);
+//            numberToLoad=NUMBER_MESSAGES_TO_LOAD;
         } else {
             if(!isTurn){
                 lastIdMsgSeen = megaChatApi.getLastMessageSeenId(idChat);
@@ -4521,8 +4541,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             listView.setLayoutManager(mLayoutManager);
             listView.setAdapter(adapter);
             adapter.setMessages(messages);
-        }
-        else{
+        }else{
             log("Update adapter with last index: "+lastIndex);
             if(lastIndex<0){
                 log("Arrives the first message of the chat");
@@ -4991,6 +5010,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 log("Ok. Clear history done");
                 showSnackbar(getString(R.string.clear_history_success));
+                hideMessageJump();
             }
             else{
                 log("Error clearing history: "+e.getErrorString());
@@ -5883,10 +5903,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showJumpMessage(){
-        int lastMessage = messages.size()-1;
-        int lastVisiblePosition = mLayoutManager.findLastVisibleItemPosition()-1;
-
-        if((lastMessage > lastVisiblePosition)&&(!isHideJump)&&(typeMessageJump!=TYPE_MESSAGE_NEW_MESSAGE)){
+        if((!isHideJump)&&(typeMessageJump!=TYPE_MESSAGE_NEW_MESSAGE)){
             typeMessageJump = TYPE_MESSAGE_JUMP_TO_LEAST;
             messageJumpText.setText(getResources().getString(R.string.message_jump_latest));
             messageJumpLayout.setVisibility(View.VISIBLE);
@@ -5911,8 +5928,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
         hideMessageJump();
     }
+    public void setNewVisibility(boolean vis){
+        newVisibility = vis;
+    }
 
     public void hideMessageJump(){
+        isHideJump = true;
+        visibilityMessageJump=false;
         if(messageJumpLayout.getVisibility() == View.VISIBLE){
             messageJumpLayout.animate()
                         .alpha(0.0f)
@@ -5921,7 +5943,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             @Override public void run() {
                                 messageJumpLayout.setVisibility(View.GONE);
                                 messageJumpLayout.setAlpha(1.0f);
-                                isHideJump = true;
                             }
                         })
                         .start();
