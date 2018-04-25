@@ -260,7 +260,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             //If false, no need to change it
                             log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
                             log("(2)Call to pushReceived");
-                            megaChatApi.pushReceived(beep, null);
+                            megaChatApi.pushReceived(beep);
                             beep = false;
                         }
                     }
@@ -408,7 +408,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                 if(showMessageNotificationAfterPush){
                     showMessageNotificationAfterPush = false;
                     log("Call to pushReceived");
-                    megaChatApi.pushReceived(beep, null);
+                    megaChatApi.pushReceived(beep);
                     beep = false;
                 }
                 else{
