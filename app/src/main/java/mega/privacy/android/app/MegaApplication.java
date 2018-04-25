@@ -868,29 +868,29 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 								log("Message deleted");
 //								updateChatNotification(chatid, msg);
 
-								megaChatApi.pushReceived(false, null);
+								megaChatApi.pushReceived(false);
 							}
 							else if(msg.isEdited()){
 								log("Message edited");
 //								updateChatNotification(chatid, msg);
-								megaChatApi.pushReceived(false, null);
+								megaChatApi.pushReceived(false);
 							}
 							else{
 								log("New normal message");
 //								showChatNotification(chatid, msg);
-								megaChatApi.pushReceived(true, null);
+								megaChatApi.pushReceived(true);
 							}
 						}
 						else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
 							log("New TRUNCATE message");
 //							showChatNotification(chatid, msg);
-							megaChatApi.pushReceived(true, null);
+							megaChatApi.pushReceived(true);
 						}
 					}
 					else{
 						log("Message SEEN");
 //						removeChatSeenNotification(chatid, msg);
-						megaChatApi.pushReceived(false, null);
+						megaChatApi.pushReceived(false);
 					}
 				}
 			}
