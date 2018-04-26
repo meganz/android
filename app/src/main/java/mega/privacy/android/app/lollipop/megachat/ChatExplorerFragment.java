@@ -31,7 +31,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -51,7 +50,7 @@ public class ChatExplorerFragment extends Fragment{
     Context context;
     ActionBar aB;
     RecyclerView listView;
-    MegaChatExplorerAdapter adapterList;
+    MegaListChatLollipopAdapter adapterList;
     RelativeLayout mainRelativeLayout;
 
     LinearLayoutManager mLayoutManager;
@@ -184,7 +183,7 @@ public class ChatExplorerFragment extends Fragment{
 
             if (adapterList == null){
                 log("adapterList is NULL");
-                adapterList = new MegaChatExplorerAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
+                adapterList = new MegaListChatLollipopAdapter(context, this, chats, listView, MegaListChatLollipopAdapter.ADAPTER_RECENT_CHATS);
             }
             else{
                 adapterList.setChats(chats);

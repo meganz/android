@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\nInside the app you can upgrade your storage space and transfer quota quota with a monthly or yearly subscription.\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your handset, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\nFor more info, please check our website: \n https://mega.nz/mobile_terms.html \n https://mega.nz/mobile_privacy.html \nNew Terms of Service apply effective from 20 February 2016. See https://mega.nz/TermsOfService2016.pdf \n Note: For desktop access to your files Mega needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.</string>
-    -->
+
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
@@ -41,6 +39,7 @@
     -->
     <string name="general_loading" context="state previous to import a file">ローディング</string>
     <string name="general_importing" context="state while importing the file">インポート中</string>
+    <string name="general_forwarding" context="state while importing the file">Forwarding</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">インポート</string>
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">ストレージ</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">転送容量制限</string>
@@ -159,7 +158,7 @@
     <!--
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     -->
-    <string name="alert_larger_file" context="Alert text before download">%sがダウンロードされます。</string>
+    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%sがダウンロードされます。</string>
     <string name="alert_no_app" context="Alert text before download">ファイル%sを開くアプリがありません。ダウンロードを続行しますか？　</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">次回から表示しない</string>
 
@@ -234,10 +233,8 @@
     <string name="section_shared_items" context="title of the screen that shows all the shared items">共有フォルダ</string>
     <string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">ゴミ</string>
     <string name="section_contacts" context="Title of the contact list">知り合い</string>
-    <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">連絡先 [A](%1$d)[/A]</string>
 
-    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">&#160;送信済み要求&#160;</string>
-    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">リクエスト受信</string>
+    <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">連絡先 [A](%1$d)[/A]</string>
     <string name="sent_requests_empty" context="the user has not sent any contact request to other users">リクエストしていません。</string>
     <string name="received_requests_empty" context="the user has not received any contact request from other users">現在リクエストなし</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">転送</string>
@@ -259,11 +256,7 @@
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
-    <string name="empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">ごみ箱を空にします</string>
-    <string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">現在共有フォルダの受信なし</string>
-    <string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">現在共有フォルダの送信なし</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">空のフォルダ</string>
-    <string name="empty_inbox" context="Text that indicates that Inbox is empty">受信トレイが空です</string>
 
     <!--
     <string name="choose_account_activity" context="Title of the activity Choose Account">Choose Account</string>
@@ -302,14 +295,13 @@
 	<!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">受信共有のオーナーは</string>
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">下のボタンを使用して新しい連絡先を追加</string>	
 	<!--
     <string name="no_contacts" context="When an user wants to share a folder but has not any contact yet">There are not contacts in the account. Please add them on the Contacts screen</string>
 	-->
 	<string name="contacts_explorer_list_empty_text" context="Add new contacts before sharing.">共有する新しい連絡先を追加</string>
 	
-	<string name="error_not_enough_free_space" context="Error message">空きスペースが足りません。</string>
+	<string name="error_not_enough_free_space" context="Error message">Not enough free space on your device</string>
 
 	<string name="option_link_without_key" context="Alert Dialog to get link">キーなしのリンク</string>
 	<string name="option_decryption_key" context="Alert Dialog to get link">復号化鍵</string>
@@ -563,8 +555,8 @@
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
-    <string name="overquota_alert_title" context="Title dialog overquota error">クォータ超過！</string>
-    <string name="overquota_alert_text" context="Dialod text overquota error">その操作はできません。アカウントのストレージ制限を超えてしまいます。アカウントをアップグレードしますか？</string>
+    <!--<string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>-->
+    <string name="overquota_alert_text" context="Dialog text overquota error">ストレージ容量の上限を超えました。アカウントをアップグレードしますか？　</string>
 
     <!--
     <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
@@ -651,9 +643,12 @@
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">ストレージ</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN ロック</string>
 
-    <string name="settings_advanced_features" context="Settings category title for cache and offline files">高度な機能</string>
+    <string name="settings_advanced_features" context="Settings category title for cache and offline files">高度</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">キャッシュ消去</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">オフラインのファイルをクリア</string>
+
+    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">アカウントをキャンセルする</string>
+
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">利用している領域 %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">計算中</string>
@@ -760,7 +755,8 @@
     -->
 
     <string name="my_account_title" context="title of the My Account screen">アカウントタイプ</string>
-    <string name="expires_on" context="title of the Expiration Date">&#160;に更新</string>
+    <string name="renews_on" context="title of the Expiration Date">&#160;に更新</string>
+    <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
     <string name="free_account">無料</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
@@ -835,7 +831,7 @@
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">ロギングが無効にしました。</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">ファイルの場所を開く</string>
-    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">サーバーがビジーです。少々お待ちください。</string>
+    <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">無料アカウント</string>
     <string name="my_account_prolite" context="Label in My Account section to show user account type">Liteアカウント</string>
@@ -1020,8 +1016,6 @@
     <!--
     <string name="archive_chat_empty" context="Message shown when the user has no archived chats">No archived conversations</string>
     -->
-    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">会話がありません</string>
-
     <string name="recent_chat_enable_chat" context="Message shown when the user has no archived chats">チャット無効</string>
     <string name="recent_chat_enable_chat_button" context="Message shown when the user has no archived chats">チャットを有効にする</string>
 
@@ -1030,7 +1024,7 @@
     -->
 
     <string name="recent_chat_empty_invite" context="Message shown when the user has no recent chats">ご友人をチャットに招待し、プライバシーとセキュリティを備えた暗号化された当社のプラットフォームをお楽しみください。</string>
-    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">チャットを有効にして[A]、プライバシーとセキュリティを備えた暗号化された当社のプラットフォームをお楽しみください。</string>
+    <!--<string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">Enable Chat[A]and enjoy our encrypted platform with privacy and security.</string>-->
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
@@ -1125,7 +1119,6 @@
     <string name="invalid_status" context="Info label about the status of the user">接続なし</string>
 
     <string name="text_deleted_message" context="Text shown when a message has been deleted in the chat">このメッセージは削除されました。</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">チャット履歴がクリアされました</string>
     <string name="text_deleted_message_by" context="Text shown when a message has been deleted in the chat">[A]このメッセージは[/A][B]%1$s[/B]によって削除されました</string>
 
     <string name="confirmation_delete_several_messages" context="Confirmation before deleting messages">メッセージを削除しますか？　</string>
@@ -1211,6 +1204,7 @@
     -->
 
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">このメッセージは%1$sによって削除されました</string>
+    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">チャット履歴がクリアされました</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$sさんがチャット履歴をクリアしました</string>
 
     <!--
@@ -1237,8 +1231,6 @@
     </plurals>
 
     <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">フォルダを共有する際にエラーが発生しました。もう一度やり直してください。</string>
-
-    <string name="incoming_shares_label" context="title of the section that shows all the incoming shared items">受信共有</string>
 
     <plurals name="confirmation_remove_contact" context="confirmation message before removing a contact">
         <item context="Singular" quantity="one">選択された連絡先に関連付けられているデータはすべて永久に失われます。</item>
@@ -1475,8 +1467,8 @@
     <string name="attachment_upload_panel_contact">知り合い</string>
     <string name="attachment_upload_panel_photo">端末から</string>
 
-    <string name="delete_account" context="Button in My Account section where the user can delete permanently his account">アカウントを削除</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">アカウントを削除すると、クラウドに保存されているデータはすべて完全に失われます。この操作は元に戻すことはできません。</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">アカウントをキャンセル</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">アカウントをキャンセルすると、アカウントデータ、MEGAの連絡先、または会話にアクセスできなくなります。\nこの操作は元に戻すことはできません。</string>
     <string name="delete_button" context="Button in My Account section to confirm the account deletion">削除</string>
 
     <string name="file_properties_info_info_file">インフォ</string>
@@ -1536,7 +1528,7 @@
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">チャット通知</string>
 
     <string name="achievements_title" context="title of the section for achievements">実績</string>
-    <string name="achievements_subtitle" context="subtitle of the section for achievements">友人を招待してボーナスを獲得</string>
+    <string name="achievements_subtitle" context="subtitle of the section for achievements">友人を招待して報酬を獲得</string>
 
     <string name="button_invite_friends" context="button to invite friends for getting achievements">友人を招待</string>
 
@@ -1544,7 +1536,7 @@
 
     <string name="figures_achievements_text" context="sentence to detail the figures of storage and transfer quota related to each achievement">ご紹介ごとに%1$sのストレージと%2$sの転送を取得</string>
 
-    <string name="unlocked_rewards_title" context="title of the section for unlocked rewards">解除ボーナス</string>
+    <string name="unlocked_rewards_title" context="title of the section for unlocked rewards">ロック解除された報酬</string>
 
     <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">ストレージ容量制限</string>
 
@@ -1562,17 +1554,17 @@
 
     <string name="title_achievement_invite_friends" context="title of screen to invite friends and get an achievement">こうなっています。</string>
     <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">無料のMEGAアカウントを作成し、当社のモバイルアプリをインストールするようにお友だちをご招待ください。ご登録およびアプリのインストールに成功するたびに、あなたにボーナスストレージと転送容量を贈呈いたします。</string>
-    <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">MEGAを以前に使用したことのある人を招待した場合、あなたはそのクレジットを受け取ることはありません。また、そのような拒否について通知されることもありません。ご招待されたご連絡先の方々は、端末にMEGAモバイルアプリまたはMEGAアプリをインストールする必要があります。</string>
+    <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">MEGAを以前に使用したことのある人を招待した場合、あなたはそのクレジットを受け取ることはありません。また、そのような拒否について通知されることもありません。ご招待されたご連絡先の方々は、端末にMEGAモバイルアプリまたはMEGAデスクトップアプリをインストールする必要があります。</string>
 
     <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">あなたの電話の連絡先リストから連絡先を選択するか、複数のメールアドレスを入力します。</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">友人をMEGAに招待</string>
     <string name="subtitle_confirmation_invite_friends" context="subtitle of the dialog to confirm the contact request">ありがとうございます！　招待状がメールで送信されました</string>
-    <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">ご友人に、登録してMEGAアプリをインストールするようにお勧めください。ご友人があなたがご入力されたものと同じメールアドレスをご使用の場合、あなたにボーナス分の転送容量を贈呈いたします。</string>
+    <string name="paragraph_confirmation_invite_friends" context="paragraph of the dialog to confirm the contact request">ご友人に、登録してMEGAアプリをインストールするようにお勧めください。ご友人があなたがご入力されたものと同じメールアドレスをご使用の場合、あなたに転送容量報酬を贈呈いたします。</string>
 
     <string name="invalid_email_to_invite" context="Error shown when the user writes a email with an incorrect format">メールが不正です</string>
 
-    <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">MEGAデスクトップアプリをインストールすると、無料のストレージスペース%1$sと転送容量%2$sが得られます。どちらも180日間有効です。MEGAデスクトップアプリは、Windows、macOS、そして大半のLinuxディストリビューションでご利用いただけます。</string>
+    <string name="paragraph_info_achievement_install_desktop" context="info paragraph about the achievement install megasync">MEGAsyncをインストールすると、無料のストレージスペース%1$sと転送容量%2$sが得られます。どちらも180日間有効です。MEGAデスクトップアプリは、Windows、macOS、そして大半のLinuxディストリビューションでご利用いただけます。</string>
     <string name="paragraph_info_achievement_install_mobile_app" context="info paragraph about the achievement install mobile app">当社のモバイルアプリをインストールすると、無料のストレージスペース%1$sと転送容量%2$sが得られます。どちらも180日間有効です。当社は、iOS、Android、Windows Phone用のモバイルアプリをご提供しております。</string>
 
     <string name="result_paragraph_info_achievement_install_desktop" context="info paragraph about the completed achievement install megasync">あなたは当社のMEGAデスクトップアプリのインストールに対して、%1$sのストレージスペースと%2$sの転送容量を受け取りました。</string>
@@ -1590,7 +1582,7 @@
 
     <string name="settings_help" context="Settings category title for Help">ヘルプ</string>
     <string name="settings_help_preference" context="Settings preference title for send feedback">フィードバックを送る</string>
-    <string name="setting_feedback_subject" context="mail subject">フィードバック</string>
+    <string name="setting_feedback_subject" context="mail subject">Androidフィードバック</string>
     <string name="setting_feedback_body" context="mail body">こちらにご意見をお寄せください：</string>
     <string name="settings_feedback_body_device_model" context="mail body">端末モデル</string>
     <string name="settings_feedback_body_android_version" context="mail body">Androidバージョン</string>
@@ -1601,4 +1593,198 @@
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">件名</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">コンテンツ</string>
     <string name="new_file_email_when_uploading" context="Title of the field email when a new contact is created to upload">メール</string>
+
+    <!--<string name="context_empty_inbox" context="Title of the empty text when a fragment is empty">No files on your</string>-->
+    <!--<string name="context_empty_camera_uploads" context="Title of the empty text when a fragment is empty">No media on</string>-->
+
+    <string name="forward_menu_item" context="Item of a menu to forward a message chat to another chatroom">転送</string>
+
+    <string name="general_attach" context="name of the button to attach file from MEGA to another app">添付</string>
+
+    <string name="type_contact" context="when add or share a file with a new contact, it can type by name or mail">連絡先の名前またはメールアドレス</string>
+
+    <string name="max_add_contact" context="when add or share a file with a new contact, message displayed to warn that the maximum number has been reached">この時点では連絡先をこれ以上追加することはできません</string>
+
+    <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">新しいパスワードは古いパスワードと同じにすることはできません</string>
+
+    <string name="action_search_by_date" context="Menu item">日付で検索</string>
+    <string name="general_apply" context="title of a button to apply search by date">適用</string>ç
+    <string name="general_search_month" context="title of a button to apply search by month">先月</string>
+    <string name="general_search_year" context="title of a button to apply search by year">去年</string>
+
+    <string name="label_set_day" context="title of a Search by date tag">設定日</string>
+    <string name="snackbar_search_by_date" context="the user can't choose this date">要求された日付は無効です</string>
+
+    <string name="invalid_characters" context="Error when the user writes a character not allowed">許可されていない文字です</string>
+
+    <string name="audio_play" context="Label shown when audio file is playing">音声ファイル</string>
+
+    <string name="corrupt_pdf_dialog_text" context="when open PDF Viewer, the pdf that it try to open is damaged or does not exist">エラー。PDFファイルが破損しているか、存在しません。</string>
+
+    <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">ユーザーアカウント</string>
+
+    <string name="save_to_mega" context="Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage">私の\nクラウドドライブに保存します</string>
+
+    <string name="chat_already_exists" context="Error message when creating a chat one to one with a contact that already has a chat">このチャットはすでに存在します</string>
+
+    <string name="not_download" context="before sharing a file, has to be downloaded">このファイルはまだダウンロードされていません。</string>
+
+    <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">MEGA連絡先のみ追加できます</string>
+
+    <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">チャットが切断されました</string>
+
+    <string name="call_error" context="Message show when a call cannot be established">エラー。通話を確立できません</string>
+
+    <string name="title_evaluate_the_app_panel" context="Title of dialog to evaluate the app">このアプリにご満足いただけておりますか？　</string>
+    <string name="rate_the_app_panel" context="Label to show rate the app">はい、アプリを評価します</string>
+    <string name="send_feedback_panel" context="Label to show send feedback">いいえ、意見を送信します</string>
+
+    <string name="link_advanced_options" context="title of the section advanced options on the get link screen">詳細設定オプション</string>
+
+    <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">連絡先権限が付与されていません</string>
+
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* 当社の達成プログラムにご参加いただくことを条件とします</string>
+
+    <string name="choose_qr_option_panel" context="Option of the sliding panel to go to QR code section">私のQRコード</string>
+    <string name="section_qr_code" context="Title of the screen that shows the options to the QR code">QRコード</string>
+    <string name="action_reset_qr" context="Option in menu of section  My QR code to reset the QR code">Reset QR code</string>
+    <string name="action_delete_qr" context="Option in menu of section  My QR code to delete the QR code">Delete QR code</string>
+    <string name="save_cloud_drive" context="Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive">To Cloud Drive</string>
+    <string name="save_file_system" context="Option shown in QR code bottom sheet dialog to save QR code in File System">To File System</string>
+    <string name="section_my_code" context="Title of QR code section">MY CODE</string>
+    <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
+    <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">自動承認</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
+    <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
+    <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
+    <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
+    <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
+    <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error ocur trying to share the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occur trying to upload the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
+    <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scann another valid code.</string>
+    <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
+    <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
+    <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
+    <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scan QR code</string>
+    <string name="invite_not_sent_link_text" context="Text of dialog shown when a contact request has not been sent with contact link">The contact link is invalid. Try with another valid link.</string>
+    <string name="button_copy_link" context="get the contact link and copy it">リンクをコピーする</string>
+    <string name="button_create_qr" context="Create QR code">Create QR code</string>
+    <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
+    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device's camera</string>
+
+    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">以下で開く：</string>
+
+    <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">以下で共有：</string>
+
+    <string name="error_enable_chat_before_login" context="Message shown if the user choose enable button and he is not logged in">チャットを有効にする前にログインしてください</string>
+
+    <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Set period</string>
+
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security.[/B]</string>
+    <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[B]チャット[/B]を[C]有効[/C]にして[A][C]、プライバシーとセキュリティが確保された暗号化プラットフォームをお楽しみください。[/C]</string>
+
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]カメラアップロード[/A]に[B]メディアがありません[/B][B][/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]ごみ箱[/A]が[B]空[/B][B]です。[/B]</string>
+
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">あなたの[A]%1$s[/A]に[B]ファイルがありません[/B][B][/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]ファイルがありません[/B][A]%1$s[/A][B]。[/B]</string>
+    <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B][/B][A]%1$s[/A][B]がありません。[/B]</string>
+
+    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">[B]会話[/B]が[A]ありません[/A] </string>
+    <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[B]会話[/B]を[A]読み込み中…[/A] </string>
+
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">受信共有フォルダ</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">送信共有フォルダ</string>
+
+    <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送信済みリクエスト</string>
+    <string name="tab_received_requests" context="Title of the received requests tab. Capital letters">受信リクエスト</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">ストレージ容量超過</string>
+
+    <string name="invalid_link" context="error message shown when an account confirmation link or reset password link is invalid for unknown reasons">リンクが無効です。新しい有効なリンクを要求してください</string>
+
+    <string name="processing_link" context="Message shown when a link is being processing">リンクを処理中&#8230;</string>
+
+    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">あなたのパスワードは簡単に当てられてしまいます。もっと長くしてみて下さい。大文字と小文字を組み合わせて下さい。記号も入れて下さい。名前や辞書にある言葉はよくありません。</string>
+    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">あなたのパスワードはそのままでも行けますが、更に強度を高めることをお勧めします。</string>
+    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">このパスワードは、大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
+    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">このパスワードは大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
+    <string name="pass_very_weak" context="Password very weak">非常に弱い</string>
+    <string name="pass_weak" context="Password weak">弱い</string>
+    <string name="pass_medium" context="Password medium">普通</string>
+    <string name="pass_good" context="Password good">良好</string>
+    <string name="pass_strong" context="Password strong">強い</string>
+    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">パスワードが違います。</string>
+
+    <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">通話中</string>
+    <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">通話に戻るにはクリックしてください</string>
+    <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">通話に戻る</string>
+
+    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">あなたのアカウントは、MEGAのご利用規約に複数違反したため、凍結されました。メールの受信トレイを確認してください。</string>
+    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">あなたのアカウントは、他人の権利の乱用、違法データの共有やインポート、システムの乱用など、MEGAのご利用規約に違反したために終了しました。</string>
+
+    <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
+
+    <plurals name="number_of_versions" formatted="false" context="Number of versions of a file shown on the screen info of the file">
+        <item context="version item" quantity="one">%1$d version</item>
+        <item context="version items" quantity="other">%1$d バージョン</item>
+    </plurals>
+
+    <string name="title_section_versions" context="Title of the section Versions for files">バージョン</string>
+
+    <string name="header_current_section_item" context="Header of the item to show the current version of a file in a list">現在のバージョン</string>
+    <plurals name="header_previous_section_item" context="Header of the item to show the previous versions of a file in a list">
+        <item context="file item" quantity="one">以前のバージョン</item>
+        <item context="file items" quantity="other">以前のバージョン</item>
+    </plurals>
+
+    <string name="general_revert" context="option menu to revert a file version">元に戻す</string>
+    <string name="menu_item_clear_versions" context="option menu to clear all the previous versions">以前のバージョンをクリアする</string>
+    <plurals name="title_dialog_delete_version" context="Title of the dialog to confirm that a version os going to be deleted">
+        <item context="version item" quantity="one">バージョンを削除しますか？　</item>
+        <item context="version items" quantity="other">バージョンを削除しますか？　</item>
+    </plurals>
+
+    <string name="content_dialog_delete_version" context="Content of the dialog to confirm that a version is going to be deleted">このバージョンは永久に削除されます。</string>
+    <string name="content_dialog_delete_multiple_version" context="Content of the dialog to confirm that several versions are going to be deleted">これらの%dバージョンは永久に削除されます。</string>
+
+    <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">チャットのアップロード</string>
+
+    <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">チャットメディアの品質</string>
+
+    <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
+        <item context="the options of what to upload.">オリジナル</item>
+        <item context="the options of what to upload.">普通</item>
+    </string-array>
+
+    <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
+    <string name="file_properties_info_location" cotext="Refers to a location of file">場所</string>
+
+    <string name="file_properties_folder_current_versions" cotext="Title of the label to show the size of the current files inside a folder">Current versions</string>
+    <string name="file_properties_folder_previous_versions" cotext="Title of the label to show the size of the versioned files inside a folder">以前のバージョン</string>
+
+    <plurals name="number_of_versions_inside_folder" formatted="false" context="Number of versioned files inside a folder shown on the screen info of the folder">
+        <item context="version item" quantity="one">%1$d versioned file</item>
+        <item context="version items" quantity="other">%1$d versioned files</item>
+    </plurals>
+
+    <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
+    <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
+
+    <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
+        <item context="version item" quantity="one">ファイル送信完了</item>
+        <item context="version items" quantity="other">Files sent</item>
+    </plurals>
+    <string name="files_send_to_chat_error" context="Error message after sending to chat one or several messages to several chats">Error. Not correctly sent</string>
+
+    <string name="context_send_file_to_chat" context="menu option to send a file to a chat">チャットに送信</string>
+
+    <string name="notification_subtitle_incoming" context="notification subtitle of incoming calls">Incoming call</string>
+
 </resources>

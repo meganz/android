@@ -41,6 +41,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
+import nz.mega.sdk.MegaChatCallListenerInterface;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatNotificationListenerInterface;
@@ -58,7 +60,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface {
+public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 	static final String USER_AGENT = "MEGAAndroid/3.3.4_190";
 
@@ -406,6 +408,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				megaChatApi = new MegaChatApiAndroid(megaApi);
 				megaChatApi.addChatRequestListener(this);
 				megaChatApi.addChatNotificationListener(this);
+				megaChatApi.addChatCallListener(this);
 			}
 		}
 
@@ -417,6 +420,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			if (megaChatApi != null) {
 				megaChatApi.removeChatRequestListener(this);
 				megaChatApi.removeChatNotificationListener(this);
+				megaChatApi.removeChatCallListener(this);
 			}
 		}
 		catch (Exception e){}
@@ -542,6 +546,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private static long openChatId = -1;
 
+	private static long openCallChatId = -1;
+
 	private static boolean recentChatVisible = false;
 	private static boolean chatNotificationReceived = false;
 
@@ -557,6 +563,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public static void setOpenChatId(long openChatId){
 		MegaApplication.openChatId = openChatId;
+	}
+
+	public static long getOpenCallChatId() {
+		return openCallChatId;
+	}
+
+	public static void setOpenCallChatId(long openCallChatId) {
+		MegaApplication.openCallChatId = openCallChatId;
 	}
 
 	public static boolean isRecentChatVisible() {
@@ -734,6 +748,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if (megaChatApi != null){
 					megaChatApi.removeChatRequestListener(this);
 					megaChatApi.removeChatNotificationListener(this);
+					megaChatApi.removeChatCallListener(this);
 				}
 			}
 			catch (Exception exc){}
@@ -1012,6 +1027,47 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 			Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 			notificationBuilder.sendBundledNotification(defaultSoundUri2, "true", chatid, msg);
+		}
+	}
+
+	@Override
+	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
+		if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+			clearIncomingCallNotification(call.getId());
+		}
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1){
+			if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
+				if(call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT){
+					log("onChatCallUpdate:TERM_CODE_ANSWER_TIMEOUT");
+					if(call.isLocalTermCode()==false){
+						log("onChatCallUpdate:localTermCodeNotLocal");
+						try{
+							AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+							notificationBuilder.showMissedCallNotification(call);
+						}
+						catch(Exception e){
+							log("EXCEPTION when showing missed call notification: "+e.getMessage());
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void clearIncomingCallNotification(long chatCallId) {
+		log("clearIncomingCallNotification:chatID: "+chatCallId);
+
+		try{
+			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+			String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+			int notificationId = (notificationCallId).hashCode();
+
+			notificationManager.cancel(notificationId);
+		}
+		catch(Exception e){
+			log("clearIncomingCallNotification:EXCEPTION");
 		}
 	}
 }
