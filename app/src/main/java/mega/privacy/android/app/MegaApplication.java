@@ -25,9 +25,11 @@ import org.webrtc.VideoCapturer;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -837,11 +839,16 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 		int unread = megaChatApi.getUnreadChats();
 		//Add Android version check if needed
-		if(unread==0){
+		if (unread == 0) {
 			//Remove badge indicator - no unread chats
-		}
-		else{
+			ShortcutBadger.applyCount(getApplicationContext(), 0);
+			//Xiaomi support
+			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
+		} else {
 			//Show badge with indicator = unread
+			ShortcutBadger.applyCount(getApplicationContext(), Math.abs(unread));
+			//Xiaomi support
+			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", unread));
 		}
 
 		if(MegaApplication.getOpenChatId() == chatid){
