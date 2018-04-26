@@ -537,8 +537,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				log("Logout button");
-//				megaApi.shouldShowPasswordReminderDialog(true, this);
-				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
+
+				((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
+				megaApi.shouldShowPasswordReminderDialog(true, myAccountInfo);
+//				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
 
 //				AccountController aC = new AccountController(this);
 //				aC.logout(this, megaApi);
