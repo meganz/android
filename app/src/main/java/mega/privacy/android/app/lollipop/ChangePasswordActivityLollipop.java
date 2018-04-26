@@ -29,10 +29,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -60,9 +58,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	boolean changePassword = true;
 	
-	private EditText oldPasswordView, newPassword1View, newPassword2View;
-	private RelativeLayout oldPasswordErrorView, newPassword1ErrorView, newPassword2ErrorView;
-	private TextView oldPasswordErrorText, newPassword1ErrorText, newPassword2ErrorText;
+	private EditText newPassword1View, newPassword2View;
+	private RelativeLayout newPassword1ErrorView, newPassword2ErrorView;
+	private TextView newPassword1ErrorText, newPassword2ErrorText;
 	private Button changePasswordButton;
     private RelativeLayout fragmentContainer;
 	private TextView title;
@@ -72,11 +70,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private ActionBar aB;
 	Toolbar tB;
 
-	private Drawable oldPassword_background;
 	private Drawable newPassword_background;
 	private Drawable newPassword2_background;
 
-	private ImageView toggleButtonOldPasswd;
 	private ImageView toggleButtonNewPasswd;
 	private ImageView toggleButtonNewPasswd2;
 	private boolean passwdVisibility;
@@ -109,54 +105,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		title = (TextView) findViewById(R.id.title_change_pass);
 
-		toggleButtonOldPasswd  = (ImageView) findViewById(R.id.toggle_button_old_passwd);
-		toggleButtonOldPasswd.setOnClickListener(this);
 		toggleButtonNewPasswd = (ImageView) findViewById(R.id.toggle_button_new_passwd);
 		toggleButtonNewPasswd.setOnClickListener(this);
 		toggleButtonNewPasswd2 = (ImageView) findViewById(R.id.toggle_button_new_passwd2);
 		toggleButtonNewPasswd2.setOnClickListener(this);
 		passwdVisibility = false;
 		passwdValid = false;
-		
-		oldPasswordView = (EditText) findViewById(R.id.change_password_oldPassword);
-		oldPasswordView.getBackground().mutate().clearColorFilter();
-
-		oldPasswordErrorView = (RelativeLayout) findViewById(R.id.login_oldPassword_text_error);
-		oldPasswordErrorText = (TextView) findViewById(R.id.login_oldPassword_text_error_text);
-
-		oldPassword_background = oldPasswordView.getBackground().mutate().getConstantState().newDrawable();
-
-		oldPasswordView.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				quitError(oldPasswordView);
-			}
-		});
-
-		oldPasswordView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					toggleButtonOldPasswd.setVisibility(View.VISIBLE);
-					toggleButtonOldPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
-				}
-				else {
-					toggleButtonOldPasswd.setVisibility(View.GONE);
-					passwdVisibility = false;
-					showHidePassword(R.id.toggle_button_old_passwd);
-				}
-			}
-		});
 
 		containerPasswdElements = (LinearLayout) findViewById(R.id.container_passwd_elements);
 		containerPasswdElements.setVisibility(View.GONE);
@@ -283,7 +237,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						log("MK is NULL - close activity");
 						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
-					oldPasswordView.setVisibility(View.GONE);
+
 					title.setText(getString(R.string.title_enter_new_password));
 				}
 				if (getIntent().getAction().equals(Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT)) {
@@ -295,7 +249,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					}
 					mk = null;
-					oldPasswordView.setVisibility(View.GONE);
+
 					title.setText(getString(R.string.title_enter_new_password));
 				}
 			}
@@ -332,26 +286,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 					} else {
 						if (mk == null) {
-							log("procced to park account");
+							log("proceed to park account");
 							onResetPasswordClick(false);
 						} else {
 							log("ok proceed to reset");
 							onResetPasswordClick(true);
 						}
 					}
-				}
-				break;
-			}
-			case R.id.toggle_button_old_passwd: {
-				if (passwdVisibility) {
-					toggleButtonOldPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
-					passwdVisibility = false;
-					showHidePassword(R.id.toggle_button_old_passwd);
-				}
-				else {
-					toggleButtonOldPasswd.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_see));
-					passwdVisibility = true;
-					showHidePassword(R.id.toggle_button_old_passwd);
 				}
 				break;
 			}
@@ -505,12 +446,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	public void showHidePassword (int type) {
 		if(!passwdVisibility){
 			switch (type) {
-				case R.id.toggle_button_old_passwd: {
-					oldPasswordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-					oldPasswordView.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
-					oldPasswordView.setSelection(oldPasswordView.getText().length());
-					break;
-				}
 				case R.id.toggle_button_new_passwd: {
 					newPassword1View.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 					newPassword1View.setTypeface(Typeface.SANS_SERIF, Typeface.NORMAL);
@@ -526,11 +461,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		}else{
 			switch (type) {
-				case R.id.toggle_button_old_passwd: {
-					oldPasswordView.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-					oldPasswordView.setSelection(oldPasswordView.getText().length());
-					break;
-				}
 				case R.id.toggle_button_new_passwd: {
 					newPassword1View.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
 					newPassword1View.setSelection(newPassword1View.getText().length());
@@ -564,15 +494,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		inputMethodManager.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
 		inputMethodManager.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
 
-		final String oldPassword = oldPasswordView.getText().toString();
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
-
-		if(oldPassword.equals(newPassword1)){
-			log("old password and new password are equals");
-			setError(newPassword1View, getString(R.string.old_and_new_passwords_equals));
-			return;
-		}
 
 		if (!newPassword1.equals(newPassword2)){
 			log("no new password repeat");
@@ -600,28 +523,22 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		log("onChangePasswordClick");
 		if(!Util.isOnline(this))
 		{
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
-		
+
 		if (!validateForm(true) || !passwdValid) {
 			return;
 		}
 		
 		InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(oldPasswordView.getWindowToken(), 0);
+
         inputMethodManager.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
         inputMethodManager.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
 		
-		final String oldPassword = oldPasswordView.getText().toString();
+
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
-
-		if(oldPassword.equals(newPassword1)){
-			log("old password and new password are equals");
-			setError(newPassword1View, getString(R.string.old_and_new_passwords_equals));
-			return;
-		}
 
 		if (!newPassword1.equals(newPassword2)){
 			log("no new password repeat");
@@ -629,24 +546,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
 			return;
 		}
-		
-//		if (!checkPassword(oldPassword, newPassword1, newPassword2)){
-//
-//		}
-		
-		final String newPassword = newPassword1;
 
-		
-		progress.setMessage(getString(R.string.my_account_changing_password));
-		progress.show();
-		
-		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-		final UserCredentials oldCredentials = dbH.getCredentials();
-		
-		String currentEmail = oldCredentials.getEmail();
-//		new HashTask().execute(currentEmail, newPassword, oldPassword);
-		changePassword(currentEmail, newPassword, oldPassword);
+		changePassword(newPassword1);
 	}
 	
 //	private boolean checkPassword (String oldPassword, String newPassword1, String newPassword2){
@@ -676,22 +577,15 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	 */
 	private boolean validateForm(boolean withOldPass) {
 		if(withOldPass){
-			String oldPasswordError = getOldPasswordError();
 			String newPassword1Error = getNewPassword1Error();
 			String newPassword2Error = getNewPassword2Error();
 
-//			oldPasswordView.setError(oldPasswordError);
-			setError(oldPasswordView, oldPasswordError);
 //			newPassword1View.setError(newPassword1Error);
 			setError(newPassword1View, newPassword1Error);
 //			newPassword2View.setError(newPassword2Error);
 			setError(newPassword2View, newPassword2Error);
 
-			if (oldPasswordError != null) {
-				oldPasswordView.requestFocus();
-				return false;
-			}
-			else if(newPassword1Error != null) {
+			if(newPassword1Error != null) {
 				newPassword1View.requestFocus();
 				return false;
 			}
@@ -720,18 +614,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		}
 		return true;
 	}
-	
-	/*
-	 * Validate old password
-	 */
-	private String getOldPasswordError() {
-		String value = oldPasswordView.getText().toString();
-		if (value.length() == 0) {
-			return getString(R.string.error_enter_password);
-		}
-		return null;
-	}
-	
+
 	/*
 	 * Validate new password1
 	 */
@@ -754,8 +637,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		return null;
 	}
 	
-	private void changePassword (String email, String newPassword, String oldPassword){
-		megaApi.changePassword(oldPassword, newPassword, this);
+	private void changePassword (String newPassword){
+		log("changePassword");
+		progress.setMessage(getString(R.string.my_account_changing_password));
+		progress.show();
+
+		megaApi.changePassword(null, newPassword, this);
 	}
 	
 	@Override
@@ -764,8 +651,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
 		
 		if (request.getType() == MegaRequest.TYPE_CHANGE_PW){
@@ -779,9 +665,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 				//Intent to MyAccount
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				if(e.getErrorCode()==MegaError.API_EARGS){
-					log("Error, the old pass is not correct");
-					setError(oldPasswordView, getString(R.string.wrong_passwd));
+				if(e.getErrorCode()!=MegaError.API_OK){
+					log("Error, request: "+e.getErrorString());
+
+					showSnackbar(getString(R.string.email_verification_text_error));
 				}
 				else{
 					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
@@ -893,20 +780,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			return;
 		}
 		switch (editText.getId()){
-			case R.id.change_password_oldPassword:{
-				oldPasswordErrorView.setVisibility(View.VISIBLE);
-				oldPasswordErrorText.setText(error);
-				PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-//                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
-				Drawable background = oldPassword_background.mutate().getConstantState().newDrawable();
-				background.setColorFilter(porterDuffColorFilter);
-				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-					oldPasswordView.setBackgroundDrawable(background);
-				} else{
-					oldPasswordView.setBackground(background);
-				}
-			}
-			break;
+
 			case R.id.change_password_newPassword1:{
 				newPassword1ErrorView.setVisibility(View.VISIBLE);
 				newPassword1ErrorText.setText(error);
@@ -919,8 +793,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				} else{
 					newPassword1View.setBackground(background);
 				}
+				break;
 			}
-			break;
 			case R.id.change_password_newPassword2:{
 				newPassword2ErrorView.setVisibility(View.VISIBLE);
 				newPassword2ErrorText.setText(error);
@@ -933,25 +807,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				} else{
 					newPassword2View.setBackground(background);
 				}
+				break;
 			}
-			break;
 		}
 	}
 
 	private void quitError(EditText editText){
 		switch (editText.getId()){
-			case R.id.change_password_oldPassword:{
-				if(oldPasswordErrorView.getVisibility() != View.GONE){
-					oldPasswordErrorView.setVisibility(View.GONE);
-					if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-						oldPasswordView.setBackgroundDrawable(oldPassword_background);
-					} else{
-						oldPasswordView.setBackground(oldPassword_background);
-					}
-
-				}
-			}
-			break;
 			case R.id.change_password_newPassword1:{
 				if(newPassword1ErrorView.getVisibility() != View.GONE){
 					newPassword1ErrorView.setVisibility(View.GONE);
@@ -961,8 +823,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						newPassword1View.setBackground(newPassword_background);
 					}
 				}
+				break;
 			}
-			break;
 			case R.id.change_password_newPassword2:{
 				if(newPassword2ErrorView.getVisibility() != View.GONE){
 					newPassword2ErrorView.setVisibility(View.GONE);
@@ -972,8 +834,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						newPassword2View.setBackground(newPassword2_background);
 					}
 				}
+				break;
 			}
-			break;
 		}
 	}
 
@@ -1001,5 +863,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		}
 		
 		super.onDestroy();
+	}
+
+	public void showSnackbar(String s){
+		log("showSnackbar");
+		Snackbar snackbar = Snackbar.make(fragmentContainer, s, Snackbar.LENGTH_LONG);
+		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
+		snackbarTextView.setMaxLines(5);
+		snackbar.show();
 	}
 }
