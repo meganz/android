@@ -1814,8 +1814,6 @@
 
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
 
-    <string name="change_pass_oldAndNewPasswordMatch" context="Error message shown when the users tryes to change his/her password and writes the current one as the new one">The new and the old password must not match</string>
-
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security options</string>
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
