@@ -1596,7 +1596,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     hideActionStatusBar();
                 }
             }
-        }, 4000);
+        }, 6000);
 
     }
 

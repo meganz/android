@@ -20,6 +20,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.PlaylistFragment;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -31,7 +32,7 @@ import nz.mega.sdk.MegaNode;
  * Created by mega on 24/04/18.
  */
 
-public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolderBrowser> implements View.OnClickListener {
+public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolderBrowser> implements View.OnClickListener, SectionTitleProvider {
 
     MegaApiAndroid megaApi;
 
@@ -44,6 +45,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     RecyclerView recyclerView;
     Fragment fragment;
 
+    @Override
+    public String getSectionTitle(int position) {
+        return getItemNode(position).substring(0, 1);
+    }
+
+    private String getItemNode(int position) {
+        return nodes.get(position).getName();
+    }
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -240,6 +249,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         switch (v.getId()){
             case R.id.file_list_item_layout_playlist:{
                 ((PlaylistFragment) fragment).itemClick(currentPosition);
+                ((PlaylistFragment) fragment).showController();
             }
         }
     }

@@ -60,10 +60,9 @@ public class PlaylistFragment extends Fragment {
     private SimpleExoPlayerView simpleExoPlayerViewPlaylist;
     private SimpleExoPlayer player;
     View v;
+    RelativeLayout containerPlayer;
 
     private MegaApiAndroid megaApi;
-
-    private MenuItem searchMenuItem;
 
     ArrayList<MegaNode> nodes;
     ArrayList<Long> handles = new ArrayList<>();
@@ -127,12 +126,14 @@ public class PlaylistFragment extends Fragment {
 
         contentText = (TextView) v.findViewById(R.id.content_text);
         simpleExoPlayerViewPlaylist = (SimpleExoPlayerView) v.findViewById(R.id.player_view_playlist);
+        containerPlayer  =(RelativeLayout) v.findViewById(R.id.player_layout_container);
         simpleExoPlayerViewPlaylist.setUseController(true);
         simpleExoPlayerViewPlaylist.setPlayer(player);
         simpleExoPlayerViewPlaylist.setControllerAutoShow(false);
         simpleExoPlayerViewPlaylist.setControllerShowTimeoutMs(999999999);
         simpleExoPlayerViewPlaylist.setControllerHideOnTouch(false);
         simpleExoPlayerViewPlaylist.showController();
+
         v.findViewById(R.id.exo_content_frame).setVisibility(View.GONE);
         v.findViewById(R.id.exo_overlay).setVisibility(View.GONE);
 //        simpleExoPlayerViewPlaylist.setOnTouchListener(new View.OnTouchListener() {
@@ -169,11 +170,33 @@ public class PlaylistFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setHasFixedSize(true);
+        recyclerView.setClipToPadding(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         recyclerView.setAdapter(adapter);
         fastScroller.setRecyclerView(recyclerView);
 
+        visibilityFastScroller();
+
         return v;
+    }
+
+    void hideController(){
+        containerPlayer.animate().translationY(220).setDuration(400L).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                containerPlayer.setVisibility(View.GONE);
+            }
+        }).start();
+    }
+
+    public void showController(){
+        containerPlayer.animate().translationY(0).setDuration(400L).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                containerPlayer.setVisibility(View.VISIBLE);
+            }
+        }).start();
     }
 
     public void itemClick(int position) {
