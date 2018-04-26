@@ -2022,12 +2022,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						log("Chat notitificacion received");
-
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
 						if(chatId!=-1){
 							openChat(chatId);
 						}
-
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
 						setIntent(null);

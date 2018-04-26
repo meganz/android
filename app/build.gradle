@@ -71,6 +71,7 @@ dependencies {
 //    compile 'me.dm7.barcodescanner:zxing:1.9.8'
     compile 'com.budiyev.android:code-scanner:1.8.3'
     compile "com.squareup.picasso:picasso:2.4.0"
+    compile 'me.leolin:ShortcutBadger:1.1.21@aar'
 }
 
 apply plugin: 'com.google.gms.google-services'

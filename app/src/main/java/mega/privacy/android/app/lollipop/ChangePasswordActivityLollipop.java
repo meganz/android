@@ -516,7 +516,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		else{
 			megaApi.confirmResetPassword(linkToReset, newPassword, null, this);
 		}
-
 	}
 	
 	public void onChangePasswordClick(){
