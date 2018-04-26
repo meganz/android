@@ -639,18 +639,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	
 	private void changePassword (String newPassword){
 		log("changePassword");
-		if(megaApi.checkPassword(newPassword)){
-			showSnackbar(getString(R.string.change_pass_oldAndNewPasswordMatch));
-		}
-		else{
-			progress.setMessage(getString(R.string.my_account_changing_password));
-			progress.show();
+		progress.setMessage(getString(R.string.my_account_changing_password));
+		progress.show();
 
-			megaApi.changePassword(null, newPassword, this);
-		}
+		megaApi.changePassword(null, newPassword, this);
 	}
-
-
 	
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
@@ -674,12 +667,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 				if(e.getErrorCode()!=MegaError.API_OK){
 					log("Error, request: "+e.getErrorString());
-					if(e.getErrorCode()!=MegaError.API_EARGS){
-						showSnackbar(getString(R.string.wrong_passwd));
-					}
-					else{
-						showSnackbar(getString(R.string.email_verification_text_error));
-					}
+
+					showSnackbar(getString(R.string.email_verification_text_error));
 				}
 				else{
 					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
