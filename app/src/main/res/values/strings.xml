@@ -1730,7 +1730,7 @@
     <string name="pass_medium" context="Password medium">Medium</string>
     <string name="pass_good" context="Password good">Good</string>
     <string name="pass_strong" context="Password strong">Strong</string>
-    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Wrong password</string>
+    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Wrong password, choose another </string>
 
     <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Call in progress</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
@@ -1787,6 +1787,13 @@
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
 
+    <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
+    <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone</string>
+    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Apps &amp; notifications</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">App notifications</string>
+    <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">Switch to On and select your preferences</string>
+
     <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
         <item context="version item" quantity="one">File sent</item>
         <item context="version items" quantity="other">Files sent</item>
@@ -1806,5 +1813,9 @@
     </plurals>
 
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
+
+    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security options</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
+    <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
 </resources>

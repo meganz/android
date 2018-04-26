@@ -359,6 +359,8 @@ public class AccountController {
         dbH.clearCompletedTransfers();
 
         dbH.clearPendingMessage();
+
+        dbH.clearAttributes();
     }
 
     static public void logoutConfirmed(Context context){
