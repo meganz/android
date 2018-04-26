@@ -612,8 +612,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else{
 							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						pdfIntent.putExtra("inside", true);
+						pdfIntent.putExtra("isUrl", false);
 						startActivity(pdfIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
@@ -628,6 +630,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(videoIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
@@ -642,6 +645,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+						audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(audioIntent);
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
@@ -653,7 +657,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						} else {
 							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 						if (MegaApiUtils.isIntentAvailable(this, viewIntent))

@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -526,6 +527,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout errorUploadingPortrait;
         RelativeLayout errorUploadingLandscape;
 
+        LinearLayout newMessagesLayout;
+        TextView newMessagesText;
+
         TextView retryAlert;
         ImageView triangleIcon;
 
@@ -638,6 +642,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.dateLayout.setLayoutParams(dateLayoutParams);
 
             holder.dateText = (TextView) v.findViewById(R.id.message_chat_date_text);
+
+            holder.newMessagesLayout = (LinearLayout) v.findViewById(R.id.message_chat_new_relative_layout);
+            holder.newMessagesText = (TextView) v.findViewById(R.id.message_chat_new_text);
 
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
@@ -1062,8 +1069,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).ownMessageLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat)holder).contactMessageLayout.setVisibility(View.GONE);
 
-
-
                 int privilege = message.getPrivilege();
                 log("Privilege of me: "+privilege);
                 String textToShow = "";
@@ -1083,6 +1088,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                         megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                         megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                        megaChatApi.getUserEmail(message.getUserHandle(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1259,6 +1265,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
                         megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
+                        megaChatApi.getUserEmail(message.getHandleOfAction(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1300,6 +1307,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                                 megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                                 megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                                megaChatApi.getUserEmail(message.getUserHandle(), listener);
                             }
                             else{
                                 log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1366,6 +1374,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                                     megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                                     megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                                    megaChatApi.getUserEmail(message.getUserHandle(), listener);
                                 }
                                 else{
                                     log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1398,12 +1407,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } //END CONTACT MANAGEMENT MESSAGE
         }
         else if(message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE){
-
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
             log("PRIVILEGE CHANGE message");
             if(message.getHandleOfAction()==myUserHandle){
                 log("a moderator change my privilege");
+
                 int privilege = message.getPrivilege();
                 log("Privilege of the user: "+privilege);
 
@@ -1487,6 +1496,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                             megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                             megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            megaChatApi.getUserEmail(message.getUserHandle(), listener);
                         }
                         else{
                             log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1635,6 +1645,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         megaChatApi.getUserFirstname(message.getHandleOfAction(), listener);
                         megaChatApi.getUserLastname(message.getHandleOfAction(), listener);
+                        megaChatApi.getUserEmail(message.getHandleOfAction(), listener);
                     }
                     else{
                         log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1694,6 +1705,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, message.getUserHandle());
                             megaChatApi.getUserFirstname(message.getUserHandle(), listener);
                             megaChatApi.getUserLastname(message.getUserHandle(), listener);
+                            megaChatApi.getUserEmail(message.getUserHandle(), listener);
                         }
                         else{
                             log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -1728,7 +1740,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         else{
             //OTHER TYPE OF MESSAGES
             ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
-
             if(message.getUserHandle()==myUserHandle) {
                 log("MY message!!");
                 log("MY message handle!!: "+message.getMsgId());
@@ -2651,6 +2662,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat)holder), this, userHandle);
                             megaChatApi.getUserFirstname(userHandle, listener);
                             megaChatApi.getUserLastname(userHandle, listener);
+                            megaChatApi.getUserEmail(userHandle, listener);
                         }
                         else{
                             log("4-Name already asked and no name received: "+ message.getUserHandle());
@@ -3473,6 +3485,46 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //        RelativeLayout.LayoutParams ownMessageParams = (RelativeLayout.LayoutParams)((ViewHolderMessageChat)holder).contentOwnMessageText.getLayoutParams();
 //        ownMessageParams.setMargins(Util.scaleWidthPx(11, outMetrics), Util.scaleHeightPx(-14, outMetrics), Util.scaleWidthPx(62, outMetrics), Util.scaleHeightPx(16, outMetrics));
 //        ((ViewHolderMessageChat)holder).contentOwnMessageText.setLayoutParams(ownMessageParams);
+
+        if(((ChatActivityLollipop)context).lastIdMsgSeen !=-1){
+
+            if(((ChatActivityLollipop)context).lastIdMsgSeen == message.getMsgId()){
+
+                log("onBindViewHolder:Last message id match!");
+
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat)holder).newMessagesLayout.getLayoutParams();
+
+                if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
+                }
+                else{
+                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
+                }
+
+                String numberString;
+                long unreadMessages = Math.abs(((ChatActivityLollipop)context).generalUnreadCount);
+                if(((ChatActivityLollipop)context).generalUnreadCount<0){
+                    numberString = "+"+((ChatActivityLollipop)context).generalUnreadCount;
+                }
+                else{
+                    numberString = ((ChatActivityLollipop)context).generalUnreadCount+"";
+                }
+
+                String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int)unreadMessages, numberString);
+                ((ViewHolderMessageChat)holder).newMessagesText.setText(contentUnreadText);
+
+                ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
+                ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
+                ((ChatActivityLollipop)context).showJumpMessage();
+            }
+            else{
+                ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+
+            }
+        }
+        else{
+            ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+        }
     }
 
     public void setUserAvatar(ViewHolderMessageChat holder, MegaChatMessage message){

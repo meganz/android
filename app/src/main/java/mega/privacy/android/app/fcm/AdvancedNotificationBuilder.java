@@ -17,8 +17,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -32,18 +32,22 @@ import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
+import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
@@ -54,15 +58,13 @@ public final class AdvancedNotificationBuilder {
     private static final int SUMMARY_ID = 0;
 
     private final Context context;
-    private final NotificationManagerCompat notificationManager;
+    private NotificationManager notificationManager;
     private final SharedPreferences sharedPreferences;
     DatabaseHandler dbH;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
     private NotificationCompat.Builder mBuilderCompat;
-    private Notification.Builder mBuilder;
-    private NotificationManager mNotificationManager;
 
     public static AdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
@@ -70,12 +72,12 @@ public final class AdvancedNotificationBuilder {
         if (safeContext == null) {
             safeContext = appContext;
         }
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(safeContext);
+        NotificationManager notificationManager = (NotificationManager) safeContext.getSystemService(Context.NOTIFICATION_SERVICE);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(safeContext);
         return new AdvancedNotificationBuilder(safeContext, notificationManager, sharedPreferences, megaApi, megaChatApi);
     }
 
-    public AdvancedNotificationBuilder(Context context, NotificationManagerCompat notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
+    public AdvancedNotificationBuilder(Context context, NotificationManager notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
         this.sharedPreferences = sharedPreferences;
@@ -275,11 +277,26 @@ public final class AdvancedNotificationBuilder {
 
             NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
 
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
             notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
-                    .setShowWhen(true)
-                    .setSound(defaultSoundUri);
+                    .setShowWhen(true);
+
+            if(uriParameter!=null){
+                notificationBuilder.setSound(uriParameter);
+            }
+
+            if(vibration!=null){
+                if(vibration.equals("true")){
+                    notificationBuilder.setVibrate(new long[] {0, 500});
+                }
+            }
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+                //API 25 = Android 7.1
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            }
+            else{
+                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
 
             Spanned firstLine = null;
 
@@ -348,12 +365,6 @@ public final class AdvancedNotificationBuilder {
 
             }
 
-            notificationBuilder.setSound(uriParameter);
-            if(vibration!=null){
-                if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 1000});
-                }
-            }
             String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
             bigTextStyle.setBigContentTitle(textToShow);
             bigTextStyle.bigText(notificationContent);
@@ -414,8 +425,6 @@ public final class AdvancedNotificationBuilder {
             title = chat.getTitle();
         }
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
         Spanned notificationContent;
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
@@ -426,8 +435,26 @@ public final class AdvancedNotificationBuilder {
                 .setShowWhen(true)
                 .setGroup(groupKey)
 //                .setSortKey(String.valueOf(System.currentTimeMillis()))
-                .setSound(defaultSoundUri)
+
                 .setContentIntent(pendingIntent);
+
+        if(uriParameter!=null){
+            notificationBuilder.setSound(uriParameter);
+        }
+
+        if(vibration!=null){
+            if(vibration.equals("true")){
+                notificationBuilder.setVibrate(new long[] {0, 500});
+            }
+        }
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+            //API 25 = Android 7.1
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        }
+        else{
+            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        }
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
 
@@ -469,16 +496,9 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setLargeIcon(largeIcon);
         }
 
-        notificationBuilder.setSound(uriParameter);
-        if(vibration!=null){
-            if(vibration.equals("true")){
-                notificationBuilder.setVibrate(new long[] {0, 1000});
-            }
-        }
         notificationBuilder.setStyle(bigTextStyle);
 
         return notificationBuilder.build();
-
     }
 
     public Notification buildSingleNotificationPreN(Uri uriParameter, MegaChatListItem item, String vibration) {
@@ -550,7 +570,7 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setSound(uriParameter);
             if(vibration!=null){
                 if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                    notificationBuilder.setVibrate(new long[] {0, 500});
                 }
 
             }
@@ -606,7 +626,7 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setSound(uriParameter);
             if(vibration!=null){
                 if(vibration.equals("true")){
-                    notificationBuilder.setVibrate(new long[] {0, 1000});
+                    notificationBuilder.setVibrate(new long[] {0, 500});
                 }
             }
 
@@ -883,7 +903,9 @@ public final class AdvancedNotificationBuilder {
 
         mBuilderCompat = new NotificationCompat.Builder(context);
 
-        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(notificationManager == null){
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
 
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -899,7 +921,227 @@ public final class AdvancedNotificationBuilder {
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
 
-        mNotificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
+        notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
+    }
+
+    public void showIncomingCallNotification(MegaChatCall callToAnswer, MegaChatCall callInProgress) {
+        log("showIncomingCallNotification");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
+            MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(callToAnswer.getChatid());
+
+            MegaChatRoom chatInProgress = megaChatApi.getChatRoom(callInProgress.getChatid());
+            long chatHandleInProgress = -1;
+            if(chatInProgress!=null){
+                chatHandleInProgress = callInProgress.getChatid();
+            }
+            log("showIncomingCallNotification:chatInProgress: "+callInProgress.getChatid());
+
+//        int notificationId = Constants.NOTIFICATION_INCOMING_CALL;
+            long chatCallId = callToAnswer.getId();
+            String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+            int notificationId = (notificationCallId).hashCode();
+
+            Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
+            ignoreIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
+            ignoreIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
+            ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
+            int requestCodeIgnore = notificationId + 1;
+            PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore /* Request code */, ignoreIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+
+            Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
+            answerIntent.putExtra("chatHandleInProgress", chatHandleInProgress);
+            answerIntent.putExtra("chatHandleToAnswer", callToAnswer.getChatid());
+            answerIntent.setAction(CallNotificationIntentService.ANSWER);
+            int requestCodeAnswer = notificationId + 2;
+            PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer /* Request code */, answerIntent,  PendingIntent.FLAG_CANCEL_CURRENT);
+
+            NotificationCompat.Action actionAnswer = new NotificationCompat.Action.Builder(-1, "ANSWER", pendingIntentAnswer).build();
+            NotificationCompat.Action actionIgnore = new NotificationCompat.Action.Builder(-1, "IGNORE", pendingIntentIgnore).build();
+
+            long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
+
+            //No sound just vibration
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setContentTitle(chatToAnswer.getPeerFullname(0))
+                    .setContentText(context.getString(R.string.notification_subtitle_incoming))
+                    .setAutoCancel(false)
+                    .setVibrate(pattern)
+                    .setColor(ContextCompat.getColor(context,R.color.mega))
+                    .addAction(actionIgnore)
+                    .addAction(actionAnswer);
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+                //API 25 = Android 7.1
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            }
+            else{
+                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
+
+            notificationBuilder.setFullScreenIntent(pendingIntentAnswer, true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Bitmap largeIcon = setUserAvatar(chatToAnswer);
+                if(largeIcon!=null){
+                    notificationBuilder.setLargeIcon(largeIcon);
+                }
+            }
+
+            if(notificationManager == null){
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+
+            notificationManager.notify(notificationId, notificationBuilder.build());
+        }
+        else{
+            log("Not supported incoming call notification: "+Build.VERSION.SDK_INT);
+        }
+    }
+
+    public void checkQueuedCalls(){
+        log("checkQueuedCalls");
+
+        MegaHandleList handleList = megaChatApi.getChatCalls();
+        if(handleList!=null){
+            long numberOfCalls = handleList.size();
+            log("checkQueuedCalls: Number of calls in progress: "+numberOfCalls);
+            if (numberOfCalls>1){
+                log("checkQueuedCalls: MORE than one call in progress: "+numberOfCalls);
+                MegaChatCall callInProgress = null;
+                MegaChatCall callIncoming = null;
+
+                for(int i=0; i<handleList.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
+                    if(call!=null){
+                        log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
+                        if(call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                            callInProgress = call;
+                            log("FOUND Call in progress: "+callInProgress.getChatid());
+                            break;
+                        }
+                    }
+                }
+
+                if(callInProgress==null){
+                    long openCallChatId = MegaApplication.getOpenCallChatId();
+                    log("openCallId: "+openCallChatId);
+                    if(openCallChatId!=-1){
+                        callInProgress = megaChatApi.getChatCall(openCallChatId);
+                        log("FOUND Call activity shown: "+callInProgress.getChatid());
+                    }
+                }
+
+                for(int i=0; i<handleList.size(); i++){
+                    MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
+                    if(call!=null){
+
+                        if(call.getStatus()<MegaChatCall.CALL_STATUS_IN_PROGRESS && (!call.isIgnored())){
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if(notificationManager == null){
+                                    notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                                }
+
+                                StatusBarNotification[] notifs = notificationManager.getActiveNotifications();
+                                boolean shown=false;
+
+                                long chatCallId = call.getId();
+                                String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+                                int notificationId = (notificationCallId).hashCode();
+
+                                log("Active Notifications: "+ notifs.length);
+                                for(int k = 0; k< notifs.length; k++){
+                                    if(notifs[k].getId()==notificationId){
+                                        log("Notification for this call already shown");
+                                        shown = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!shown){
+                                    if(callInProgress.getId()!=call.getId()){
+                                        callIncoming = call;
+                                        log("(1) FOUND Call incoming and NOT shown and NOT ignored: "+callIncoming.getChatid());
+                                        break;
+                                    }
+                                }
+                            }
+                            else{
+                                callIncoming = call;
+                                log("(2) FOUND Call incoming and NOT shown and NOT ignored: "+callIncoming.getChatid());
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if(callIncoming!=null){
+                    showIncomingCallNotification(callIncoming, callInProgress);
+                }
+            }
+            else{
+                log("checkQueuedCalls: No calls to launch");
+            }
+        }
+    }
+
+    public void showMissedCallNotification(MegaChatCall call) {
+        log("showMissedCallNotification");
+
+        MegaChatRoom chat = megaChatApi.getChatRoom(call.getChatid());
+
+        String notificationContent = chat.getPeerFullname(0);
+
+        long chatCallId = call.getId();
+        String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
+        int notificationId = (notificationCallId).hashCode() + Constants.NOTIFICATION_MISSED_CALL;
+
+        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+        intent.putExtra("CHAT_ID", chat.getChatId());
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
+
+        long[] pattern = {0, 1000};
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setContentTitle(context.getString(R.string.missed_call_notification_title))
+                .setContentText(notificationContent)
+                .setAutoCancel(true)
+                .setVibrate(pattern)
+                .setSound(defaultSoundUri)
+                .setColor(ContextCompat.getColor(context,R.color.mega))
+                .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+            //API 25 = Android 7.1
+            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        }
+        else{
+            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        }
+
+        notificationBuilder.setFullScreenIntent(pendingIntent, true);
+
+        if(chat.getPeerEmail(0)!=null){
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Bitmap largeIcon = setUserAvatar(chat);
+                if(largeIcon!=null){
+                    notificationBuilder.setLargeIcon(largeIcon);
+                }
+            }
+        }
+
+        if(notificationManager == null){
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+
+        notificationManager.notify(notificationId, notificationBuilder.build());
     }
 
     public static void log(String message) {

@@ -223,8 +223,10 @@ public class AccountController implements View.OnClickListener{
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
+            log("ERROR: " + e.getMessage());
         }catch (IOException e) {
             e.printStackTrace();
+            log("ERROR: " + e.getMessage());
         }
     }
 
