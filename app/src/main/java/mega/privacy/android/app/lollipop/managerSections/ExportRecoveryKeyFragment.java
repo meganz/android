@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,11 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -17,12 +23,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import android.content.Context;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickListener{
 
@@ -155,34 +155,18 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         switch (v.getId()){
             case R.id.copy_MK_button:{
                 log("Copy Master Key button");
-                hideMKLayout();
+                ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.copyMK();
                 break;
             }
             case R.id.save_MK_button:{
                 log("Save Master Key button");
-                hideMKLayout();
+                ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
                 aC.exportMK();
                 break;
             }
         }
-    }
-
-
-    public void showMKLayout(){
-        log("showMKLayout");
-        parentLinearLayout.setVisibility(View.GONE);
-        exportMKLayout.setVisibility(View.VISIBLE);
-        mKLayoutVisible=false;
-    }
-
-    public void hideMKLayout(){
-        log("hideMKLayout");
-        exportMKLayout.setVisibility(View.GONE);
-        parentLinearLayout.setVisibility(View.VISIBLE);
-        mKLayoutVisible=false;
-        ((ManagerActivityLollipop)context).hideMKLayout();
     }
 }
