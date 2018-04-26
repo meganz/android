@@ -425,10 +425,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	private boolean isListRubbishBin = true;
 	public boolean isListCameraUploads = false;
 	public boolean isLargeGridCameraUploads = true;
-//	private boolean isListInbox = true;
+
+	//	private boolean isListInbox = true;
 //	private boolean isListContacts = true;
 //	private boolean isListIncoming = true;
 //	private boolean isListOutgoing = true;
+	public boolean passwordReminderFromMyAccount = false;
 
 	public boolean isList = true;
 
@@ -1134,6 +1136,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (rememberPasswordLogout){
 			outState.putBoolean("rememberPasswordLogout", true);
 		}
+		if (passwordReminderFromMyAccount){
+			outState.putBoolean("passwordReminderFromMyAccount", true);
+		}
 	}
 
 	@Override
@@ -1190,6 +1195,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			levelsSearch = savedInstanceState.getInt("levelsSearch");
 			passwordReminderDialogBlocked = savedInstanceState.getBoolean("passwordReminderDialogBlocked", false);
 			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
+			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -7873,8 +7879,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        }
 	        case R.id.action_menu_logout:{
 				log("action menu logout pressed");
-//				megaApi.shouldShowPasswordReminderDialog(true, this);
-				showRememberPasswordDialog(true);
+				passwordReminderFromMyAccount = true;
+				megaApi.shouldShowPasswordReminderDialog(true, this);
+//				showRememberPasswordDialog(true);
 
 //				AccountController aC = new AccountController(this);
 //				aC.logout(this, megaApi);
@@ -13118,11 +13125,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
 				log("MK exported - USER_ATTR_PWD_REMINDER finished");
-				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
-					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
-					if (request.getFlag()){
-						showRememberPasswordDialog(false);
-					}
+				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+					log("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
 				}
 			}
 			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
@@ -13179,6 +13183,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				}
 			}
+		}
+		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
+			if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
+				log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
+				if (request.getFlag()){
+					if (getPasswordReminderFromMyAccount()){
+						showRememberPasswordDialog(true);
+					}
+					else {
+						showRememberPasswordDialog(false);
+					}
+				}
+				else if (getPasswordReminderFromMyAccount()){
+					if (aC == null){
+						aC = new AccountController(this);
+					}
+					aC.logout(this, megaApi);
+				}
+			}
+			setPasswordReminderFromMyAccount(false);
 		}
 		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
@@ -15548,5 +15573,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public boolean getPasswordReminderFromMyAccount() {
+		return passwordReminderFromMyAccount;
+	}
 
+	public void setPasswordReminderFromMyAccount(boolean passwordReminderFromMyAccount) {
+		this.passwordReminderFromMyAccount = passwordReminderFromMyAccount;
+	}
 }
