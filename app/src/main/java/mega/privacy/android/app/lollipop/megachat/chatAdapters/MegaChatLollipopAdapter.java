@@ -3494,28 +3494,41 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat)holder).newMessagesLayout.getLayoutParams();
 
-                if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
-                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
-                }
-                else{
-                    params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
+                if((message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (message.getType()==MegaChatMessage.TYPE_PRIV_CHANGE)){
+                    if(message.getHandleOfAction()==myUserHandle){
+                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
+                        ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
+                    }else{
+                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
+                        ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
+                    }
+
+                }else{
+                    if(message.getUserHandle()==megaChatApi.getMyUserHandle()){
+                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_own_message_layout);
+                        ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
+                    }else{
+                        params.addRule(RelativeLayout.BELOW, R.id.message_chat_contact_message_layout);
+                        ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
+                    }
                 }
 
                 String numberString;
                 long unreadMessages = Math.abs(((ChatActivityLollipop)context).generalUnreadCount);
                 if(((ChatActivityLollipop)context).generalUnreadCount<0){
-                    numberString = "+"+((ChatActivityLollipop)context).generalUnreadCount;
+                    numberString = "+"+unreadMessages;
                 }
                 else{
-                    numberString = ((ChatActivityLollipop)context).generalUnreadCount+"";
+                    numberString = unreadMessages+"";
                 }
 
                 String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int)unreadMessages, numberString);
                 ((ViewHolderMessageChat)holder).newMessagesText.setText(contentUnreadText);
 
-                ((ViewHolderMessageChat)holder).newMessagesLayout.setLayoutParams(params);
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.VISIBLE);
-                ((ChatActivityLollipop)context).showJumpMessage();
+//                ((ChatActivityLollipop)context).showJumpMessage();
+                ((ChatActivityLollipop)context).setNewVisibility(true);
+
             }
             else{
                 ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
@@ -3524,6 +3537,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
         else{
             ((ViewHolderMessageChat)holder).newMessagesLayout.setVisibility(View.GONE);
+
         }
     }
 

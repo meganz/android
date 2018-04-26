@@ -1800,7 +1800,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 
 						if(fullNameAction.trim().length()<=0){
-							fullNameAction = cC.getFullName(lastMsgSender, chat.getChatId());
+							fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
 						}
 
 						if(fullNameAction.trim().length()<=0){

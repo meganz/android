@@ -67,12 +67,23 @@ public class ChatController {
     public ChatController(Context context){
         log("ChatController created");
         this.context = context;
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if(context instanceof  MegaApplication){
+            if (megaApi == null){
+                megaApi = ((MegaApplication)context).getMegaApi();
+            }
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication)context).getMegaChatApi();
+            }
         }
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        else{
+            if (megaApi == null){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
         }
+
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
         }
