@@ -1828,5 +1828,5 @@
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
-    <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file you try to open is corrupted or does not exist.</string>
+    <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 </resources>
