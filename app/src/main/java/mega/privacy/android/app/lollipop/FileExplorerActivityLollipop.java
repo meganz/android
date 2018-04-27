@@ -381,6 +381,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
 		tabLayoutExplorer =  (TabLayout) findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);
+		viewPagerExplorer.setOffscreenPageLimit(3);
 		
 		//Layout for login if needed
 		loginLoggingIn = (LinearLayout) findViewById(R.id.file_logging_in_layout);
