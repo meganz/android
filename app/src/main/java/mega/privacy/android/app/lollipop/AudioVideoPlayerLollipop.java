@@ -487,6 +487,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     }
 
     void showErrorDialog(){
+        log("showErrorDialog: Error open video file");
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
