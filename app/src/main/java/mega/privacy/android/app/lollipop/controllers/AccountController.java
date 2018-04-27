@@ -443,6 +443,8 @@ public class AccountController implements View.OnClickListener{
         dbH.clearCompletedTransfers();
 
         dbH.clearPendingMessage();
+
+        dbH.clearAttributes();
     }
 
     static public void logoutConfirmed(Context context){

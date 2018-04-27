@@ -155,7 +155,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
+        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
