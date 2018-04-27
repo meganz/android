@@ -161,7 +161,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.contactInitialLetter.setText("");
 
 		MegaChatListItem chat = (MegaChatListItem) getItem(position);
-//		log("ChatRoom handle: "+chat.getChatId() +"****"+ MegaApiAndroid.userHandleToBase64(chat.getChatId())+ " title "+chat.getTitle());
+		//log("ChatRoom handle: "+chat.getChatId() +"****"+ MegaApiAndroid.userHandleToBase64(chat.getChatId())+ " title "+chat.getTitle());
 
 		setTitle(position, holder);
 
