@@ -247,6 +247,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					clearSelections();
 					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_share_link_remove:{
