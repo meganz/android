@@ -163,6 +163,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
+    private int numErrors = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -450,9 +452,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
             @Override
             public void onPlayerError(ExoPlaybackException error) {
                 log("onPlayerError");
+                numErrors++;
                 player.stop();
-                player.prepare(loopingMediaSource);
-                player.setPlayWhenReady(true);
+                if (numErrors<=2){
+                    player.prepare(loopingMediaSource);
+                    player.setPlayWhenReady(true);
+                }
+                else {
+                    showErrorDialog();
+                }
             }
 
             @Override
@@ -470,11 +478,32 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
                 log("onSeekProcessed");
             }
         });
+        numErrors = 0;
         player.setPlayWhenReady(true);
         player.seekTo(currentPosition);
         player.setVideoDebugListener(this);
         player.setAudioDebugListener(this);
         simpleExoPlayerView.showController();
+    }
+
+    void showErrorDialog(){
+        log("showErrorDialog: Error open video file");
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setCancelable(false);
+        String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
+        builder.setMessage(R.string.corrupt_video_dialog_text)
+                .setPositiveButton(accept, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
+        numErrors = 0;
     }
 
     @Override
