@@ -1315,11 +1315,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         containerAudioVideoPlayer.setBackgroundColor(TRANSPARENT);
-        containerAudioVideoPlayer.setElevation(0);
         playerLayout.setBackgroundColor(TRANSPARENT);
-        playerLayout.setElevation(0);
         appBarLayout.setBackgroundColor(TRANSPARENT);
-        appBarLayout.setElevation(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            containerAudioVideoPlayer.setElevation(0);
+            playerLayout.setElevation(0);
+            appBarLayout.setElevation(0);
+
+        }
+
 
         simpleExoPlayerView.setPivotX(0);
         simpleExoPlayerView.setPivotY(0);
@@ -2977,13 +2981,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 simpleExoPlayerView.hideController();
             }
             containerAudioVideoPlayer.setBackgroundColor(TRANSPARENT);
-            containerAudioVideoPlayer.setElevation(0);
+
             playerLayout.setBackgroundColor(TRANSPARENT);
-            playerLayout.setElevation(0);
             appBarLayout.setBackgroundColor(TRANSPARENT);
-            appBarLayout.setElevation(0);
             draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
             setImageDragVisibility(View.GONE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                containerAudioVideoPlayer.setElevation(0);
+                playerLayout.setElevation(0);
+                appBarLayout.setElevation(0);
+            }
         }
         else {
             handler.postDelayed(new Runnable() {
