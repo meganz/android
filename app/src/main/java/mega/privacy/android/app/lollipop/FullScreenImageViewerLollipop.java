@@ -1410,10 +1410,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 
 		fragmentContainer.setBackgroundColor(TRANSPARENT);
-		fragmentContainer.setElevation(0);
 		relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
-		relativeImageViewerLayout.setElevation(0);
 		appBarLayout.setBackgroundColor(TRANSPARENT);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			fragmentContainer.setElevation(0);
+			relativeImageViewerLayout.setElevation(0);
+			appBarLayout.setElevation(0);
+
+		}
 
 		viewPager.setPivotX(0);
 		viewPager.setPivotY(0);
@@ -3078,11 +3082,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 			fragmentContainer.setBackgroundColor(TRANSPARENT);
-			fragmentContainer.setElevation(0);
 			relativeImageViewerLayout.setBackgroundColor(TRANSPARENT);
-			relativeImageViewerLayout.setElevation(0);
 			appBarLayout.setBackgroundColor(TRANSPARENT);
-			appBarLayout.setElevation(0);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fragmentContainer.setElevation(0);
+				relativeImageViewerLayout.setElevation(0);
+				appBarLayout.setElevation(0);
+
+			}
+
 			if (adapterType == Constants.OFFLINE_ADAPTER){
 				adapterOffline.getVisibleImage(positionG).resetZoom();
 				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
