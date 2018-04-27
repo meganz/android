@@ -3,11 +3,12 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
@@ -19,21 +20,24 @@ import nz.mega.sdk.MegaError;
 public class ChatNonContactNameListener implements MegaChatRequestListenerInterface {
 
     Context context;
-    MegaChatLollipopAdapter.ViewHolderMessageChat holder;
-    MegaChatLollipopAdapter adapter;
+    RecyclerView.ViewHolder holder;
+    RecyclerView.Adapter adapter;
     boolean isUserHandle;
     DatabaseHandler dbH;
     String firstName;
     String lastName;
-    String fullName;
+    String mail;
     long userHandle;
     boolean receivedFirstName = false;
     boolean receivedLastName = false;
+    boolean receivedEmail = false;
     MegaApiAndroid megaApi;
 
-    public ChatNonContactNameListener(Context context, MegaChatLollipopAdapter.ViewHolderMessageChat holder, MegaChatLollipopAdapter adapter, long userHandle) {
+    public ChatNonContactNameListener(Context context, RecyclerView.ViewHolder holder, RecyclerView.Adapter adapter, long userHandle) {
         this.context = context;
         this.holder = holder;
+        //MegaChatLollipopAdapter.ViewHolderMessageChat holder
+        //MegaChatLollipopAdapter adapter
         this.adapter = adapter;
         this.isUserHandle = true;
         this.userHandle = userHandle;
@@ -71,68 +75,82 @@ public class ChatNonContactNameListener implements MegaChatRequestListenerInterf
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         log("onRequestFinish()");
 
-        if(context instanceof ManagerActivityLollipop){
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
-                    log("ManagerActivityLollipop->First name received");
-                    firstName = request.getText();
-                    dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
+        if (e.getErrorCode() == MegaError.API_OK){
+            if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
+                log("->First name received");
+                firstName = request.getText();
+                receivedFirstName = true;
+                if(firstName!=null){
+                    if(!firstName.trim().isEmpty()){
+                        dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
+                    }
                 }
-                else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
-                    log("ManagerActivityLollipop->Last name received");
-                    lastName = request.getText();
-                    dbH.setNonContactLastName(lastName, request.getUserHandle()+"");
+                if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
+                    updateAdapter(((MegaListChatLollipopAdapter.ViewHolderChatList)holder).currentPosition);
+                }
+                else if(holder instanceof MegaChatLollipopAdapter.ViewHolderMessageChat){
+                    log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
+                    updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
                 }
             }
-            else{
-                log("ManagerActivityLollipop->From REcentChatsFragment Error asking for name!");
+            else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
+                log("->Last name received");
+                lastName = request.getText();
+                receivedLastName = true;
+                if(lastName!=null){
+                    if(!lastName.trim().isEmpty()){
+                        dbH.setNonContactFirstName(lastName, request.getUserHandle()+"");
+                    }
+                }
+
+                if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
+                    updateAdapter(((MegaListChatLollipopAdapter.ViewHolderChatList)holder).currentPosition);
+                }
+                else if(holder instanceof MegaChatLollipopAdapter.ViewHolderMessageChat){
+                    log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
+                    updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
+                }
+            }
+            else if(request.getType()==MegaChatRequest.TYPE_GET_EMAIL){
+                log("->Email received");
+                mail = request.getText();
+                receivedEmail = true;
+                if(mail!=null){
+                    if(!mail.trim().isEmpty()){
+                        dbH.setNonContactEmail(mail, request.getUserHandle()+"");
+                    }
+                }
+                if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
+                    updateAdapter(((MegaListChatLollipopAdapter.ViewHolderChatList)holder).currentPosition);
+                }
+                else if(holder instanceof MegaChatLollipopAdapter.ViewHolderMessageChat){
+                    log("Update holder: "+((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getUserHandle());
+                    updateAdapter(((MegaChatLollipopAdapter.ViewHolderMessageChat) holder).getCurrentPosition());
+                }
             }
         }
         else{
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(request.getType()==MegaChatRequest.TYPE_GET_FIRSTNAME){
-                    log("MEgaChatAdapter->First name received");
-                    if(userHandle==request.getUserHandle()){
-                        log("Match!");
-                        firstName = request.getText();
-                        receivedFirstName = true;
-                        dbH.setNonContactFirstName(firstName, request.getUserHandle()+"");
-                        log("Update holder: "+holder.getUserHandle());
-                        updateAdapter(holder.getCurrentPosition());
-                    }
-                }
-                else if(request.getType()==MegaChatRequest.TYPE_GET_LASTNAME){
-                    log("MEgaChatAdapter->Update lastname: "+holder.getCurrentPosition());
-
-                    if(userHandle==request.getUserHandle()) {
-                        log("MEgaChatAdapter->Match!");
-                        lastName = request.getText();
-                        receivedLastName = true;
-                        dbH.setNonContactLastName(lastName, request.getUserHandle()+"");
-                        log("Update holder: "+holder.getUserHandle());
-                        updateAdapter(holder.getCurrentPosition());
-                    }
-                }
-            }
-            else{
-                log("Error asking for name!");
-            }
+            log("ERROR: requesting: "+request.getRequestString());
         }
-
-    }
-
-    public void addToDB(long userHandle){
-        log("addTODB: "+userHandle);
-
     }
 
     public void updateAdapter(int position) {
         log("updateAdapter: "+position);
-        if(receivedFirstName&&receivedLastName){
+        if(receivedFirstName&&receivedLastName&&receivedEmail){
 
-            adapter.notifyItemChanged(position);
+            if(adapter instanceof MegaChatLollipopAdapter){
+                ((MegaChatLollipopAdapter)adapter).notifyItemChanged(position);
+            }
+            else if(adapter instanceof MegaListChatLollipopAdapter){
+                ((MegaListChatLollipopAdapter)adapter).updateNonContactName(position, this.userHandle);
+            }
+
             receivedFirstName = false;
             receivedLastName = false;
+            receivedEmail = false;
+        }
+        else{
+            log("NOT updateAdapter:"+receivedFirstName+":"+receivedLastName+":"+receivedEmail);
         }
     }
 

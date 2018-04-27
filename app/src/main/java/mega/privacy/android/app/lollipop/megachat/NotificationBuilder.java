@@ -178,7 +178,8 @@ public final class NotificationBuilder {
                     notificationBuilder.setVibrate(new long[] {0, 1000});
                 }
             }
-            String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
+
+            String textToShow = context.getResources().getQuantityString(R.plurals.plural_number_messages_chat_notification, (int)unreadChats.size(), unreadChats.size());
             inboxStyle.setBigContentTitle(textToShow);
 
             notificationBuilder.setContentTitle(textToShow);

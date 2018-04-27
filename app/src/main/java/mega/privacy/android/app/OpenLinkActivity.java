@@ -1,5 +1,6 @@
 package mega.privacy.android.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -448,6 +450,28 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			startActivity(handleIntent);
 			finish();
 			return;
+		}
+
+		//Contact link
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) { //https://mega.nz/C!
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			}
+			if (dbH != null) {
+				if (dbH.getCredentials() != null) {
+					String[] s = url.split("C!");
+					long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
+					Intent inviteContact = new Intent(this, ManagerActivityLollipop.class);
+					inviteContact.setAction(Constants.ACTION_INVITE_CONTACT);
+					inviteContact.putExtra("handle", handle);
+					startActivity(inviteContact);
+					finish();
+				} else {
+					log("Not logged");
+					setError(getString(R.string.alert_not_logged_in));
+				}
+				return;
+			}
 		}
 
 		log("wrong url: " + url);

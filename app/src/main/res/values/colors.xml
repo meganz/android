@@ -140,4 +140,14 @@
     <color name="pass_good">#FF13E03C</color>
 
     <color name="color_background_versions">#FFF2F2F2</color>
+
+    <color name="turn_on_notifications_background">#FF00A38C</color>
+    <color name="turn_on_notifications_statusbar">#FF008270</color>
+    <color name="turn_on_notifications_text">#B3000000</color>
+
+    <color name="color_background_jump_to_least">#80000000</color>
+
+    <color name="color_background_new_messages">#FFF7F7F7</color>
+    <color name="color_text_new_messages">#B3000000</color>
+
 </resources>

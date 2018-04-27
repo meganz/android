@@ -67,12 +67,23 @@ public class ChatController {
     public ChatController(Context context){
         log("ChatController created");
         this.context = context;
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if(context instanceof  MegaApplication){
+            if (megaApi == null){
+                megaApi = ((MegaApplication)context).getMegaApi();
+            }
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication)context).getMegaChatApi();
+            }
         }
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        else{
+            if (megaApi == null){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
         }
+
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
         }
@@ -644,16 +655,10 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     log("Message type TRUNCATE");
 
-                    if (chatRoom.isGroup()) {
-                        String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
-                        builder.append(textToShow);
-                        return builder.toString();
+                    String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
+                    builder.append(textToShow);
+                    return builder.toString();
 
-                    } else {
-                        String textToShow = context.getString(R.string.history_cleared_message);
-                        builder.append(textToShow);
-                        return builder.toString();
-                    }
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
                     log("Message type CHANGE TITLE " + message.getContent());
 
@@ -1453,8 +1458,6 @@ public class ChatController {
                             File pdfFile = new File(localPath);
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             pdfIntent.putExtra("APP", true);
                             pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

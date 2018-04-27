@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.controllers;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -111,16 +112,23 @@ public class AccountController {
         String myEmail = myContact.getEmail();
         if(myEmail!=null){
             File avatar = null;
+            File qrFile = null;
             if (context.getExternalCacheDir() != null){
                 avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             else{
                 avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
             }
 
             if (avatar.exists()) {
                 log("avatar to delete: " + avatar.getAbsolutePath());
                 avatar.delete();
+            }
+
+            if (qrFile.exists()){
+                qrFile.delete();
             }
         }
 
@@ -164,8 +172,10 @@ public class AccountController {
 
         }catch (FileNotFoundException e) {
             e.printStackTrace();
+            log("ERROR: " + e.getMessage());
         }catch (IOException e) {
             e.printStackTrace();
+            log("ERROR: " + e.getMessage());
         }
     }
 
@@ -246,6 +256,15 @@ public class AccountController {
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
         log("logout");
+
+        try {
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.cancelAll();
+        }
+        catch(Exception e){
+            log("EXCEPTION removing all the notifications");
+        }
 
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -340,6 +359,8 @@ public class AccountController {
         dbH.clearCompletedTransfers();
 
         dbH.clearPendingMessage();
+
+        dbH.clearAttributes();
     }
 
     static public void logoutConfirmed(Context context){

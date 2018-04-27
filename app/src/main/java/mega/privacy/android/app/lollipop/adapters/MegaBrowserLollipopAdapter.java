@@ -393,6 +393,20 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		return nodes;
 	}
 
+	public ArrayList<MegaNode> getArrayListSelectedNodes() {
+		ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (selectedItems.valueAt(i) == true) {
+				MegaNode document = getNodeAt(selectedItems.keyAt(i));
+				if (document != null){
+					nodes.add(document);
+				}
+			}
+		}
+		return nodes;
+	}
+
 	public MegaBrowserLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView recyclerView, ActionBar aB, int type, int adapterType) {
 		this.context = _context;
 		this.nodes = _nodes;
