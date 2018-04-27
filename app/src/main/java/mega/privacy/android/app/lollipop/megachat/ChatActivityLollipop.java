@@ -3353,8 +3353,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     String userTyping =  getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
 
-                    userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                    userTyping = userTyping.replace("[/A]", "</font></small>");
+                    userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                    userTyping = userTyping.replace("[/A]", "</font>");
 
                     Spanned result = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -3411,8 +3411,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             case 1:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
 
-                                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                                userTyping = userTyping.replace("[/A]", "</font></small>");
+                                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                                userTyping = userTyping.replace("[/A]", "</font>");
 
                                 Spanned result = null;
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -3427,8 +3427,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             case 2:{
                                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
 
-                                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                                userTyping = userTyping.replace("[/A]", "</font></small>");
+                                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                                userTyping = userTyping.replace("[/A]", "</font>");
 
                                 Spanned result = null;
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -3444,8 +3444,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
                                 String userTyping = String.format(getString(R.string.more_users_typing), names);
 
-                                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                                userTyping = userTyping.replace("[/A]", "</font></small>");
+                                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                                userTyping = userTyping.replace("[/A]", "</font>");
 
                                 Spanned result = null;
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -3520,8 +3520,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case 1:{
                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 1, usersTypingSync.get(0).getParticipantTyping().getFirstName());
-                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                userTyping = userTyping.replace("[/A]", "</font></small>");
+                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                userTyping = userTyping.replace("[/A]", "</font>");
 
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -3535,8 +3535,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case 2:{
                 String userTyping = getResources().getQuantityString(R.plurals.user_typing, 2, usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName());
-                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                userTyping = userTyping.replace("[/A]", "</font></small>");
+                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                userTyping = userTyping.replace("[/A]", "</font>");
 
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -3552,8 +3552,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 String names = usersTypingSync.get(0).getParticipantTyping().getFirstName()+", "+usersTypingSync.get(1).getParticipantTyping().getFirstName();
                 String userTyping = String.format(getString(R.string.more_users_typing), names);
 
-                userTyping = userTyping.replace("[A]", "<small><font color=\'#8d8d94\'>");
-                userTyping = userTyping.replace("[/A]", "</font></small>");
+                userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
+                userTyping = userTyping.replace("[/A]", "</font>");
 
                 Spanned result = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
