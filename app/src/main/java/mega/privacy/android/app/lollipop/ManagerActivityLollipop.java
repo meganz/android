@@ -1902,6 +1902,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Open after LauncherFileExplorerActivityLollipop ");
 						boolean locationFileInfo = getIntent().getBooleanExtra("locationFileInfo", false);
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+
 						if (locationFileInfo){
 							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
 							if (offlineAdapter){
@@ -1913,6 +1914,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 							else {
 								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
+
 								if (fragmentHandle == megaApi.getRootNode().getHandle()){
 									drawerItem = DrawerItem.CLOUD_DRIVE;
 									indexCloud = 0;
