@@ -30,10 +30,10 @@ public class Constants {
 	public static int REQUEST_ADD_PARTICIPANTS = 1019;
 	public static int ENABLE_CHAT = 1020;
 	public static int REQUEST_SEND_CONTACTS = 1021;
-
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
 	public static int ACTION_SEARCH_BY_DATE = 1024;
+	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -137,6 +137,7 @@ public class Constants {
 	public static String ACTION_OPEN_FILE_LINK_ROOTNODES_NULL = "ACTION_OPEN_FILE_LINK_ROOTNODES_NULL";
 	public static String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
 	public static String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
+	public static String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
 
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
@@ -147,6 +148,8 @@ public class Constants {
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
 
 	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
+
+	public static String ACTION_INVITE_CONTACT = "ACTION_INVITE_CONTACT";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -196,6 +199,7 @@ public class Constants {
 	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
 	public static int NOTIFICATION_MISSED_CALL = 12;
 	public static int NOTIFICATION_PRE_N_CHAT = 13;
+	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
 	public static String CHAT_FOLDER = "My chat files";
 

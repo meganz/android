@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -162,6 +163,42 @@ public class NodeController {
 
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
             }
+        }
+    }
+
+    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
+        log("selectChatsToSendNodes");
+
+        int size = nodes.size();
+        long[] longArray = new long[size];
+
+        for(int i=0;i<nodes.size();i++){
+            longArray[i] = nodes.get(i).getHandle();
+        }
+
+        selectChatsToSendNodes(longArray);
+    }
+
+    public void selectChatsToSendNode(MegaNode node){
+        log("selectChatsToSendNode");
+
+        long[] longArray = new long[1];
+        longArray[0] = node.getHandle();
+
+        selectChatsToSendNodes(longArray);
+    }
+
+    public void selectChatsToSendNodes(long[] longArray){
+        log("selectChatsToSendNodes");
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("NODE_HANDLES", longArray);
+
+        if(context instanceof FullScreenImageViewerLollipop){
+            ((FullScreenImageViewerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+        else if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 
@@ -361,6 +398,12 @@ public class NodeController {
                     else if(context instanceof ContactFileListActivityLollipop){
                         ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                     }
+                    else if(context instanceof PdfViewerActivityLollipop){
+                        ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
+                    else if(context instanceof AudioVideoPlayerLollipop){
+                        ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
                 }
                 else{
                     Dialog downloadLocationDialog;
@@ -398,6 +441,12 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                                     }
+                                    else if(context instanceof PdfViewerActivityLollipop){
+                                        ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    }
+                                    else if(context instanceof AudioVideoPlayerLollipop){
+                                        ((AudioVideoPlayerLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                    }
                                     break;
                                 }
                                 case 1:{
@@ -417,6 +466,12 @@ public class NodeController {
                                         }
                                         else if(context instanceof ContactFileListActivityLollipop){
                                             ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        }
+                                        else if(context instanceof PdfViewerActivityLollipop){
+                                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                        }
+                                        else if(context instanceof AudioVideoPlayerLollipop){
+                                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         checkSizeBeforeDownload(path, null, sizeFinal, hashesFinal);
                                     }
@@ -454,6 +509,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop)  context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                 }
             }
         }
@@ -531,6 +592,12 @@ public class NodeController {
                     else if(context instanceof ContactFileListActivityLollipop){
                         ((ContactFileListActivityLollipop) context).openAdvancedDevices(hashes[0]);
                     }
+                    else if(context instanceof PdfViewerActivityLollipop){
+                        ((PdfViewerActivityLollipop) context).openAdvancedDevices(hashes[0]);
+                    }
+                    else if(context instanceof AudioVideoPlayerLollipop){
+                        ((AudioVideoPlayerLollipop) context).openAdvancedDevices(hashes[0]);
+                    }
                 }
                 else
                 {
@@ -557,6 +624,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+                else if (context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop)  context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
                 }
             }
         }
@@ -606,7 +679,7 @@ public class NodeController {
         catch(Exception ex){}
 
         log("availableFreeSpace: " + availableFreeSpace + "__ sizeToDownload: " + sizeC);
-//        ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
+//        ((FileInfoActivityLollipop) context).showSnackbarNotSpace();
 
         if(availableFreeSpace < sizeC) {
 
@@ -621,6 +694,12 @@ public class NodeController {
             }
             else if(context instanceof ContactFileListActivityLollipop){
                 ((ContactFileListActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if(context instanceof PdfViewerActivityLollipop){
+                ((PdfViewerActivityLollipop) context).showSnackbarNotSpace();
+            }
+            else if (context instanceof AudioVideoPlayerLollipop){
+                ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
             }
 
             log("Not enough space");
@@ -660,6 +739,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
                 }
             }
             else{
@@ -742,6 +827,12 @@ public class NodeController {
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
                 }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
             }
             else{
                 download(parentPathC, urlC, sizeC, hashesC);
@@ -768,6 +859,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ActivityCompat.requestPermissions(((ContactFileListActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ActivityCompat.requestPermissions(((PdfViewerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 }
             }
         }
@@ -834,8 +931,6 @@ public class NodeController {
                             File pdfFile = new File(localPath);
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             pdfIntent.putExtra("APP", true);
                             pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -845,6 +940,9 @@ public class NodeController {
                                 pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            pdfIntent.putExtra("inside", true);
+                            pdfIntent.putExtra("isUrl", false);
                             context.startActivity(pdfIntent);
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
@@ -860,6 +958,7 @@ public class NodeController {
                                 videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             context.startActivity(videoIntent);
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
@@ -875,6 +974,7 @@ public class NodeController {
                                 audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             context.startActivity(audioIntent);
                         }
                         else {
@@ -916,6 +1016,12 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
+                                    else if(context instanceof PdfViewerActivityLollipop){
+                                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
+                                    else if(context instanceof AudioVideoPlayerLollipop){
+                                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                             catch (Exception e){
@@ -930,6 +1036,12 @@ public class NodeController {
                                 }
                                 else if(context instanceof ContactFileListActivityLollipop){
                                     ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof PdfViewerActivityLollipop){
+                                    ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                }
+                                else if(context instanceof AudioVideoPlayerLollipop){
+                                    ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
@@ -1023,6 +1135,12 @@ public class NodeController {
                 }
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof PdfViewerActivityLollipop){
+                    ((PdfViewerActivityLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof AudioVideoPlayerLollipop){
+                    ((AudioVideoPlayerLollipop) context).showSnackbar(msg);
                 }
             }
         }
