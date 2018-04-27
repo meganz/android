@@ -363,7 +363,7 @@
                         android:ellipsize="middle"
                         android:singleLine="true"
                         android:textColor="@color/name_my_account"
-                        android:textSize="14sp"/>
+                        android:textSize="10sp"/>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -372,7 +372,7 @@
                     android:layout_height="36dp"
                     android:layout_centerHorizontal="true"
                     android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginBottom="22dp"
                     android:animateLayoutChanges="true"
                     android:background="@drawable/dark_rounded_jump_to_latest">
                     <LinearLayout

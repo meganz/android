@@ -1321,6 +1321,7 @@ public class NodeController {
 
         Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
         intent.setClass(context, AddContactActivityLollipop.class);
+        intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 
         long[] handles=new long[handleList.size()];
         int j=0;
@@ -1340,6 +1341,7 @@ public class NodeController {
 
         Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
         intent.setClass(context, AddContactActivityLollipop.class);
+        intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
         intent.putExtra("SEND_FILE",0);

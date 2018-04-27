@@ -247,6 +247,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
 					clearSelections();
 					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_share_link_remove:{
@@ -788,7 +789,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					contentText.setVisibility(View.VISIBLE);
 					setContentText();
 				}
-				transfersOverViewLayout.setVisibility(View.GONE);
+				if(transfersOverViewLayout!=null){
+					transfersOverViewLayout.setVisibility(View.GONE);
+				}
 				dotsOptionsTransfersLayout.setOnClickListener(null);
 				actionLayout.setOnClickListener(null);
 
