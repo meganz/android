@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.StatFs;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -41,6 +42,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
@@ -144,6 +146,7 @@ import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CreditCardFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -159,6 +162,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -306,6 +310,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	boolean tranfersPaused = false;
     Toolbar tB;
     ActionBar aB;
+    AppBarLayout abL;
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
@@ -349,7 +354,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-
+	public boolean turnOnNotifications = false;
 
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
@@ -476,6 +481,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private CameraUploadFragmentLollipop cuFL;
 
 	private RecentChatsFragmentLollipop rChatFL;
+
+	private TurnOnNotificationsFragment tonF;
+	private ExportRecoveryKeyFragment eRKeyF;
 
 	ProgressDialog statusDialog;
 
@@ -1405,6 +1413,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		long num = 11179220468180L;
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
+		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
+
 		tB = (Toolbar) findViewById(R.id.toolbar);
 		if(tB==null){
 			log("Tb is Null");
@@ -1560,6 +1570,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		//TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
+		viewPagerContacts.setOffscreenPageLimit(3);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
@@ -1896,7 +1907,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			        if (getIntent().getAction().equals(Constants.ACTION_EXPORT_MASTER_KEY)){
 			        	log("Intent to export Master Key - im logged in!");
 						drawerItem=DrawerItem.ACCOUNT;
-						mkLayoutVisible = true;
+						showMKLayout();
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 						return;
@@ -1925,6 +1936,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Open after LauncherFileExplorerActivityLollipop ");
 						boolean locationFileInfo = getIntent().getBooleanExtra("locationFileInfo", false);
 						long handleIntent = getIntent().getLongExtra("PARENT_HANDLE", -1);
+
 						if (locationFileInfo){
 							boolean offlineAdapter = getIntent().getBooleanExtra("offline_adapter", false);
 							if (offlineAdapter){
@@ -1936,6 +1948,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							}
 							else {
 								long fragmentHandle = getIntent().getLongExtra("fragmentHandle", -1);
+
 								if (fragmentHandle == megaApi.getRootNode().getHandle()){
 									drawerItem = DrawerItem.CLOUD_DRIVE;
 									indexCloud = 0;
@@ -2046,12 +2059,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)){
 						log("Chat notitificacion received");
-
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
 						if(chatId!=-1){
 							openChat(chatId);
 						}
-
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
 						setIntent(null);
@@ -2448,6 +2461,109 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	protected void onResume(){
 		log("onResume");
 		super.onResume();
+
+//		dbH.setShowNotifOff(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			queryIfNotificationsAreOn();
+		}
+	}
+
+	void queryIfNotificationsAreOn(){
+		log("queryIfNotificationsAreOn");
+
+		if (dbH == null){
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+
+		if (megaChatApi == null){
+			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+		}
+
+		NotificationManagerCompat nf = NotificationManagerCompat.from(this);
+		log ("NotificationsEnabled: "+nf.areNotificationsEnabled());
+		if (!nf.areNotificationsEnabled()){
+			log("off");
+			if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
+				if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
+					setTurnOnNotificationsFragment();
+				}
+			}
+		}
+	}
+
+	public void deleteTurnOnNotificationsFragment(){
+		log("deleteTurnOnNotificationsFragment");
+		turnOnNotifications = false;
+
+		tB.setVisibility(View.VISIBLE);
+		abL.setVisibility(View.VISIBLE);
+
+ 		tonF = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+//			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//			window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			window.setStatusBarColor(0);
+		}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		supportInvalidateOptionsMenu();
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	void setTurnOnNotificationsFragment(){
+		log("setTurnOnNotificationsFragment");
+		aB.setSubtitle(null);
+		tB.setVisibility(View.GONE);
+
+		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		if (currentFragment != null){
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+		}
+
+		if (tonF == null){
+			tonF = new TurnOnNotificationsFragment();
+		}
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, tonF, "tonF");
+		ft.commitNowAllowingStateLoss();
+
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutCloud.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
+		abL.setVisibility(View.GONE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
+		}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+
+		fragmentContainer.setVisibility(View.VISIBLE);
+		drawerLayout.closeDrawer(Gravity.LEFT);
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		supportInvalidateOptionsMenu();
+		hideFabButton();
 	}
 
 	@Override
@@ -4571,14 +4687,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.fragment_container, rChatFL, "rChat");
 			ft.commitNow();
-//			maFLol.setMyEmail(megaApi.getMyUser().getEmail());
-//			if(myAccountInfo==null){
-//				log("Not possibleeeeeee!!");
-//			}
-//			else{
-//				maFLol.setMyAccountInfo(myAccountInfo);
-//			}
-//			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		else{
 			log("REcentChatFragment is not null");
@@ -4587,15 +4695,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			ft.commitNow();
 			rChatFL.setChats();
 			rChatFL.setStatus();
-//			rChatFL.setMyEmail(megaApi.getMyUser().getEmail());
-//			if(myAccountInfo==null){
-//				log("Not possibleeeeeee!!");
-//			}
-//			else{
-//				maFLol.setMyAccountInfo(myAccountInfo);
-//			}
-//
-//			maFLol.setMKLayoutVisible(mkLayoutVisible);
 		}
 		log("show chats");
 		drawerLayout.closeDrawer(Gravity.LEFT);
@@ -4829,7 +4928,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			break;
     		}
     		case SHARED_ITEMS:{
-
 				selectDrawerItemSharedItems();
 				if (openFolderFromSearch){
 					onNodesSharedUpdate();
@@ -4891,8 +4989,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
     		}
     		case SEARCH:{
-
-    			tB.setVisibility(View.VISIBLE);
 
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -6049,7 +6145,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						upgradeAccountMenuItem.setVisible(true);
 						changePass.setVisible(true);
 						logoutMenuItem.setVisible(true);
-						forgotPassMenuItem.setVisible(true);
+						forgotPassMenuItem.setVisible(false);
 						searchMenuItem.setVisible(false);
 
 						int index = viewPagerMyAccount.getCurrentItem();
@@ -7870,11 +7966,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        }
 	        case R.id.action_menu_export_MK:{
 	        	log("export MK option selected");
-				String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-				maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-				if(maFLol!=null){
-					showMKLayout(false);
-				}
+
+				showMKLayout();
 	        	return true;
 	        }
 	        case R.id.action_menu_logout:{
@@ -7919,20 +8012,78 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-	public void showMKLayout(boolean fromFragment){
+	public void hideMKLayout(){
+		log("hideMKLayout");
+		mkLayoutVisible= false;
 
-		tabLayoutMyAccount.setVisibility(View.GONE);
-		mkLayoutVisible=true;
-		aB.hide();
-		if(!fromFragment){
-			maFLol.showMKLayout();
+		tB.setVisibility(View.VISIBLE);
+		abL.setVisibility(View.VISIBLE);
+
+		eRKeyF = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+//			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//			window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			window.setStatusBarColor(0);
 		}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		supportInvalidateOptionsMenu();
+		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void hideMKLayout(){
-		tabLayoutMyAccount.setVisibility(View.VISIBLE);
-		mkLayoutVisible= false;
-		aB.show();
+	public void showMKLayout(){
+		log("showMKLayout");
+
+		mkLayoutVisible=true;
+
+		aB.setSubtitle(null);
+		tB.setVisibility(View.GONE);
+
+		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		if (currentFragment != null){
+			getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+		}
+
+		if (eRKeyF == null){
+			eRKeyF = new ExportRecoveryKeyFragment();
+		}
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, eRKeyF, "eRKeyF");
+		ft.commitNowAllowingStateLoss();
+
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutCloud.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
+		abL.setVisibility(View.GONE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+
+		fragmentContainer.setVisibility(View.VISIBLE);
+		drawerLayout.closeDrawer(Gravity.LEFT);
+		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		supportInvalidateOptionsMenu();
+		hideFabButton();
 	}
 
 	public void refreshAfterMovingToRubbish(){
@@ -8127,6 +8278,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		catch (Exception ex) {}
 
 		log("DRAWERITEM: " + drawerItem);
+
+		if (turnOnNotifications){
+			deleteTurnOnNotificationsFragment();
+			return;
+		}
+
+		if (mkLayoutVisible){
+			hideMKLayout();
+			return;
+		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 

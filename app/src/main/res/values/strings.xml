@@ -3,9 +3,9 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.4 (190)</string>
+    <string name="app_version" context="Not translate">3.3.4 (191)</string>
     <string name="sdk_version" context="Not translate">bc84c77</string>
-    <string name="karere_version" context="Not translate">837f19d</string>
+    <string name="karere_version" context="Not translate">4cbc737</string>
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users\' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
@@ -1730,7 +1730,7 @@
     <string name="pass_medium" context="Password medium">Medium</string>
     <string name="pass_good" context="Password good">Good</string>
     <string name="pass_strong" context="Password strong">Strong</string>
-    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Wrong password</string>
+    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Wrong password, choose another </string>
 
     <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Call in progress</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
@@ -1787,6 +1787,13 @@
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
 
+    <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
+    <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone</string>
+    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Apps &amp; notifications</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">App notifications</string>
+    <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">Switch to On and select your preferences</string>
+
     <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
         <item context="version item" quantity="one">File sent</item>
         <item context="version items" quantity="other">Files sent</item>
@@ -1823,6 +1830,17 @@
         <item context="unread messages" quantity="other">%1$s unread messages</item>
     </plurals>
 
+    <plurals name="plural_number_messages_chat_notification" context="Notification title to show the number of unread chats">
+        <item context="unread message" quantity="one">%1$d unread chat</item>
+        <item context="unread messages" quantity="other">%1$d unread chats</item>
+    </plurals>
+
+    <string name="chat_loading_messages" context="Message shown when a chat is opened and the messages are being recovered">[A]Loading[/A] [B]Messages...[/B]</string>
+
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
+
+    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security options</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
+    <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
 </resources>
