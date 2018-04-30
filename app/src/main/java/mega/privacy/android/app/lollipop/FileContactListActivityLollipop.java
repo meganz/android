@@ -422,7 +422,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 
 			tempListContacts = megaApi.getPendingOutShares(node);
+
 			if(tempListContacts!=null && !tempListContacts.isEmpty()){
+				log("Size of pending out shares: "+tempListContacts);
 				listContacts.addAll(megaApi.getPendingOutShares(node));
 			}
 
