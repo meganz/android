@@ -1273,84 +1273,25 @@ public final class AdvancedNotificationBuilder {
         log("showChatNotification: "+beep);
 
         if(beep){
+
             ChatSettings chatSettings = dbH.getChatSettings();
-
             if (chatSettings != null) {
-                if (chatSettings.getNotificationsEnabled().equals("true")) {
-                    log("Notifications ON for all chats");
+                if (chatSettings.getNotificationsEnabled()==null){
+                    log("getNotificationsEnabled NULL --> Notifications ON");
 
-                    ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(chatid));
-
-                    if (chatItemPreferences == null) {
-                        log("No preferences for this item");
-
-                        if (chatSettings.getNotificationsSound() == null){
-                            log("Notification sound is NULL");
-                            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-                            sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-
-                        }
-                        else if(chatSettings.getNotificationsSound().equals("-1")){
-                            log("Silent notification Notification sound -1");
-                            sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                        }
-                        else{
-                            String soundString = chatSettings.getNotificationsSound();
-                            Uri uri = Uri.parse(soundString);
-                            log("Uri: " + uri);
-
-                            if (soundString.equals("true") || soundString.equals("")) {
-
-                                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-                                sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                            } else if (soundString.equals("-1")) {
-                                log("Silent notification");
-                                sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                            } else {
-                                Ringtone sound = RingtoneManager.getRingtone(context, uri);
-                                if (sound == null) {
-                                    log("Sound is null");
-                                    sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                                } else {
-                                    sendBundledNotification(uri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                                }
-                            }
-                        }
-                        return true;
-                    } else {
-                        log("Preferences FOUND for this item");
-                        if (chatItemPreferences.getNotificationsEnabled().equals("true")) {
-                            log("Notifications ON for this chat");
-                            String soundString = chatItemPreferences.getNotificationsSound();
-
-                            if (soundString.equals("true")||soundString.isEmpty()) {
-                                Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                                sendBundledNotification(defaultSoundUri2, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                            } else if (soundString.equals("-1")) {
-                                log("Silent notification");
-                                sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                            } else {
-                                Uri uri = Uri.parse(soundString);
-                                log("Uri: " + uri);
-                                Ringtone sound = RingtoneManager.getRingtone(context, uri);
-                                if (sound == null) {
-                                    log("Sound is null");
-                                    sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-                                } else {
-                                    sendBundledNotification(uri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
-
-                                }
-                            }
-                            return true;
-                        } else {
-                            log("Notifications OFF for this chat");
-                            return false;
-                        }
-                    }
-                } else {
-                    log("Notifications OFF");
-                    return false;
+                    return checkNotificationsSound(chatid, handleListUnread, beep);
                 }
+                else{
+                    if (chatSettings.getNotificationsEnabled().equals("true")) {
+                        log("Notifications ON for all chats");
+
+                        return checkNotificationsSound(chatid, handleListUnread, beep);
+                    } else {
+                        log("Notifications OFF");
+                        return false;
+                    }
+                }
+
             } else {
                 log("Notifications DEFAULT ON");
 
@@ -1362,6 +1303,80 @@ public final class AdvancedNotificationBuilder {
         else{
             sendBundledNotification(null, "false", chatid, handleListUnread);
             return true;
+        }
+    }
+
+    public boolean checkNotificationsSound(long chatid, MegaHandleList handleListUnread, boolean beep){
+        log("checkNotificationsSound: "+beep);
+
+        ChatSettings chatSettings = dbH.getChatSettings();
+        ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(chatid));
+
+        if (chatItemPreferences == null) {
+            log("No preferences for this item");
+
+            if (chatSettings.getNotificationsSound() == null){
+                log("Notification sound is NULL");
+                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+                sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+
+            }
+            else if(chatSettings.getNotificationsSound().equals("-1")){
+                log("Silent notification Notification sound -1");
+                sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+            }
+            else{
+                String soundString = chatSettings.getNotificationsSound();
+                Uri uri = Uri.parse(soundString);
+                log("Uri: " + uri);
+
+                if (soundString.equals("true") || soundString.equals("")) {
+
+                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
+                    sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                } else if (soundString.equals("-1")) {
+                    log("Silent notification");
+                    sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                } else {
+                    Ringtone sound = RingtoneManager.getRingtone(context, uri);
+                    if (sound == null) {
+                        log("Sound is null");
+                        sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                    } else {
+                        sendBundledNotification(uri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                    }
+                }
+            }
+            return true;
+        } else {
+            log("Preferences FOUND for this item");
+            if (chatItemPreferences.getNotificationsEnabled().equals("true")) {
+                log("Notifications ON for this chat");
+                String soundString = chatItemPreferences.getNotificationsSound();
+
+                if (soundString.equals("true")||soundString.isEmpty()) {
+                    Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    sendBundledNotification(defaultSoundUri2, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                } else if (soundString.equals("-1")) {
+                    log("Silent notification");
+                    sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                } else {
+                    Uri uri = Uri.parse(soundString);
+                    log("Uri: " + uri);
+                    Ringtone sound = RingtoneManager.getRingtone(context, uri);
+                    if (sound == null) {
+                        log("Sound is null");
+                        sendBundledNotification(null, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+                    } else {
+                        sendBundledNotification(uri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+
+                    }
+                }
+                return true;
+            } else {
+                log("Notifications OFF for this chat");
+                return false;
+            }
         }
     }
 

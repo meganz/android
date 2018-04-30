@@ -11552,7 +11552,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
 					}
 				}
-
 			}
 			else if(countChat>1){
 
