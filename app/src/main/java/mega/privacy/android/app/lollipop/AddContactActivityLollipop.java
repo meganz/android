@@ -588,6 +588,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                                     addContactEditText.getText().clear();
                                     inputString = "";
                                 }
+                                else {
+                                    showSnackbar(getResources().getString(R.string.max_add_contact));
+                                    addContactEditText.getText().clear();
+                                    inputString = "";
+                                }
                             }
                             else {
                                 setError();
@@ -1780,6 +1785,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 else if (addedContacts.get(i).getPhoneContactInfo()){
                     contactEmail = addedContacts.get(i).getEmail();
                     if (contactEmail != null) {
+                        contactsSelected.add(contactEmail);
+                    }
+                }
+                else {
+                    contactEmail = addedContacts.get(i).getEmail();
+                    if (contactEmail != null){
                         contactsSelected.add(contactEmail);
                     }
                 }
