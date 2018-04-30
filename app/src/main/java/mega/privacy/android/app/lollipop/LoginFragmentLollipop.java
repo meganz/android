@@ -1905,6 +1905,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //
 //		}
+        final MegaError error = e;
         try{
             timer = new CountDownTimer(10000, 2000) {
 
@@ -1915,6 +1916,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 public void onFinish() {
                     log("the timer finished, message shown");
                     serversBusyText.setVisibility(View.VISIBLE);
+                    if(error.getErrorCode()==MegaError.API_EAGAIN){
+                        if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
+                            serversBusyText.setText(getString(R.string.login_connectivity_issues));
+                        }
+                        else if(error.getValue() == MegaApiJava.RETRY_SERVERS_BUSY){
+                            serversBusyText.setText(getString(R.string.login_servers_busy));
+                        }
+                        else if(error.getValue() == MegaApiJava.RETRY_API_LOCK){
+                            serversBusyText.setText(getString(R.string.login_API_lock));
+                        }
+                        else if(error.getValue() == MegaApiJava.RETRY_RATE_LIMIT){
+                            serversBusyText.setText(getString(R.string.login_API_rate));
+                        }
+                        else{
+                            serversBusyText.setText(getString(R.string.servers_busy));
+                        }
+                    }
+                    else{
+                        serversBusyText.setText(getString(R.string.servers_busy));
+                    }
+
                 }
             }.start();
         }catch (Exception exception){
