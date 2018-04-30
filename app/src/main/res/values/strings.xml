@@ -1835,4 +1835,6 @@
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
+    <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(Pending)</string>
+
 </resources>
