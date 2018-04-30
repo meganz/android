@@ -1,12 +1,8 @@
 package mega.privacy.android.app.utils;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
 
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -17,7 +13,6 @@ import java.util.regex.Pattern;
 
 import mega.privacy.android.app.components.CustomTypefaceSpan;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 
 public class RTFFormatter {
 
@@ -49,7 +44,7 @@ public class RTFFormatter {
 
     public SimpleSpanBuilder setRTFFormat(){
 
-        log("setRTFFormat: "+messageContent);
+        log("setRTFFormat");
         formatted = false;
 
         if(!messageContent.isEmpty()) {
@@ -411,7 +406,6 @@ public class RTFFormatter {
             }
         }
 
-        log("Message content: "+messageContent);
         end = messageContent.indexOf("``` ");
         if(end==-1){
             end = messageContent.lastIndexOf("```");
@@ -420,8 +414,6 @@ public class RTFFormatter {
             StringBuilder sb = new StringBuilder(messageContent);
             sb.delete(end, end+3);
             messageContent = sb.toString();
-
-            log("Message content: "+messageContent);
 
             substring = messageContent.substring(0, end);
 
@@ -458,7 +450,6 @@ public class RTFFormatter {
             sb.delete(end, end+3);
             messageContent = sb.toString();
 
-            log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
             sb = new StringBuilder(messageContent);
@@ -483,8 +474,6 @@ public class RTFFormatter {
 
                 messageContent = "";
             }
-
-            log("Message content T: "+messageContent);
         }
 
         setRTFFormat();
@@ -609,7 +598,6 @@ public class RTFFormatter {
             }
         }
 
-        log("Message content: "+messageContent);
         end = messageContent.indexOf("` ");
         if(end==-1){
             end = messageContent.indexOf("`\n");
@@ -622,8 +610,6 @@ public class RTFFormatter {
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
-
-                    log("Message content: "+messageContent);
 
                     substring = messageContent.substring(0, end);
 
@@ -640,7 +626,6 @@ public class RTFFormatter {
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
 
-                    log("Message content B: "+messageContent);
                     substring = messageContent.substring(0, end);
 
                     ssb.append(substring, new CustomTypefaceSpan("", font));
@@ -656,8 +641,6 @@ public class RTFFormatter {
 
                         messageContent = "";
                     }
-
-                    log("Message content T: "+messageContent);
 
                     Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
                     if (mMultiQuote != null && mMultiQuote.find()){
@@ -681,7 +664,6 @@ public class RTFFormatter {
                         sb.delete(0, start);
                         messageContent = sb.toString();
 
-                        log("Message content C: "+messageContent);
                         end = messageContent.indexOf("` ");
                         if(end==-1){
                             end = messageContent.lastIndexOf("`");
@@ -705,7 +687,6 @@ public class RTFFormatter {
                             sb = new StringBuilder(messageContent);
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
-                            log("Message content D: "+messageContent);
 
                             substring = messageContent.substring(0, end);
                             ssb.append(substring, new CustomTypefaceSpan("", font));
@@ -725,7 +706,6 @@ public class RTFFormatter {
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
 
-                log("Message content B: "+messageContent);
                 substring = messageContent.substring(0, end);
 
                 ssb.append(substring, new CustomTypefaceSpan("", font));
@@ -733,8 +713,6 @@ public class RTFFormatter {
                 sb = new StringBuilder(messageContent);
                 sb.delete(0, end);
                 messageContent = sb.toString();
-
-                log("Message content T: "+messageContent);
 
                 Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
                 if (mMultiQuote != null && mMultiQuote.find()){
@@ -758,7 +736,6 @@ public class RTFFormatter {
                     sb.delete(0, start);
                     messageContent = sb.toString();
 
-                    log("Message content C: "+messageContent);
                     end = messageContent.indexOf("` ");
                     if(end==-1){
                         end = messageContent.lastIndexOf("`");
@@ -782,7 +759,6 @@ public class RTFFormatter {
                         sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
-                        log("Message content D: "+messageContent);
 
                         substring = messageContent.substring(0, end);
                         ssb.append(substring, new CustomTypefaceSpan("", font));
@@ -802,7 +778,6 @@ public class RTFFormatter {
             sb.deleteCharAt(end);
             messageContent = sb.toString();
 
-            log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
             ssb.append(substring, new CustomTypefaceSpan("", font));
@@ -810,8 +785,6 @@ public class RTFFormatter {
             sb = new StringBuilder(messageContent);
             sb.delete(0, end);
             messageContent = sb.toString();
-
-            log("Message content T: "+messageContent);
 
             Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
             if (mMultiQuote != null && mMultiQuote.find()){
@@ -835,7 +808,6 @@ public class RTFFormatter {
                 sb.delete(0, start);
                 messageContent = sb.toString();
 
-                log("Message content C: "+messageContent);
                 end = messageContent.indexOf("` ");
                 if(end==-1){
                     end = messageContent.lastIndexOf("`");
@@ -859,7 +831,6 @@ public class RTFFormatter {
                     sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
-                    log("Message content D: "+messageContent);
 
                     substring = messageContent.substring(0, end);
                     ssb.append(substring, new CustomTypefaceSpan("", font));
@@ -1035,7 +1006,6 @@ public class RTFFormatter {
             }
         }
 
-        log("Message content: "+messageContent);
         end = messageContent.indexOf("_ ");
         if (messageContentInitial.equals(messageContent) && end != -1){
             end = messageContent.indexOf("_");
@@ -1069,8 +1039,6 @@ public class RTFFormatter {
                     StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
-
-                    log("Message content: "+messageContent);
 
                     substring = messageContent.substring(0, end);
 
@@ -1119,7 +1087,6 @@ public class RTFFormatter {
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
 
-                    log("Message content B: "+messageContent);
                     substring = messageContent.substring(0, end);
 
                     Matcher mBold = pBold.matcher(substring);
@@ -1152,8 +1119,6 @@ public class RTFFormatter {
                     sb.delete(0, end);
                     messageContent = sb.toString();
 
-                    log("Message content T: "+messageContent);
-
                     start = messageContent.indexOf(" _");
                     while(start!=-1) {
 
@@ -1171,7 +1136,6 @@ public class RTFFormatter {
                         sb.delete(0, start);
                         messageContent = sb.toString();
 
-                        log("Message content C: " + messageContent);
                         end = messageContent.indexOf("_ ");
                         if (end == -1) {
                             end = messageContent.lastIndexOf("_");
@@ -1194,7 +1158,6 @@ public class RTFFormatter {
                             sb = new StringBuilder(messageContent);
                             sb.deleteCharAt(end);
                             messageContent = sb.toString();
-                            log("Message content D: " + messageContent);
 
                             substring = messageContent.substring(0, end);
                             ssb.append(substring, new StyleSpan(Typeface.ITALIC));
@@ -1214,7 +1177,6 @@ public class RTFFormatter {
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
 
-                log("Message content B: "+messageContent);
                 substring = messageContent.substring(0, end);
 
                 Matcher mBold = pBold.matcher(substring);
@@ -1247,8 +1209,6 @@ public class RTFFormatter {
                 sb.delete(0, end);
                 messageContent = sb.toString();
 
-                log("Message content T: "+messageContent);
-
                 start = messageContent.indexOf(" _");
                 while(start!=-1){
 
@@ -1266,7 +1226,6 @@ public class RTFFormatter {
                     sb.delete(0, start);
                     messageContent = sb.toString();
 
-                    log("Message content C: "+messageContent);
                     end = messageContent.indexOf("_ ");
                     if(end==-1){
                         end = messageContent.lastIndexOf("_");
@@ -1290,7 +1249,6 @@ public class RTFFormatter {
                         sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
-                        log("Message content D: "+messageContent);
 
                         substring = messageContent.substring(0, end);
                         ssb.append(substring, new StyleSpan(Typeface.ITALIC));
@@ -1339,14 +1297,12 @@ public class RTFFormatter {
             startB = subMessageContent.indexOf(" *");
             startB++;
             substringB = subMessageContent.substring(0, startB);
-            log("SubstringB is: "+substringB);
             ssb.append(substringB, new StyleSpan(Typeface.ITALIC));
 
             startB++;
             StringBuilder sb = new StringBuilder(subMessageContent);
             sb.delete(0, startB);
             subMessageContent = sb.toString();
-            log("(8) messageContent: "+subMessageContent);
         }
 
         endB = subMessageContent.indexOf("* ");
@@ -1358,11 +1314,8 @@ public class RTFFormatter {
             sbB.deleteCharAt(endB);
             subMessageContent = sbB.toString();
 
-            log("(9) messageContent: "+subMessageContent);
-
             substringB = subMessageContent.substring(0, endB);
 
-            log("SubstringB is: "+substringB);
 
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
@@ -1388,7 +1341,7 @@ public class RTFFormatter {
         }
         else{
             log("endB position: "+endB);
-            log("(10) Message content B: "+subMessageContent);
+
             substringB = subMessageContent.substring(0, endB);
 
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
@@ -1413,7 +1366,6 @@ public class RTFFormatter {
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB);
             subMessageContent = sbB.toString();
-            log("(11) Message content B: "+subMessageContent);
 
             startB = subMessageContent.indexOf(" *");
             while(startB!=-1){
@@ -1432,7 +1384,6 @@ public class RTFFormatter {
                 sbB.delete(0, startB);
                 subMessageContent = sbB.toString();
 
-                log("Message content C: "+subMessageContent);
                 endB = subMessageContent.indexOf("* ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("*");
@@ -1473,7 +1424,6 @@ public class RTFFormatter {
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
-                    log("Message content D: "+subMessageContent);
 
                     substringB = subMessageContent.substring(0, endB);
 
@@ -1535,14 +1485,13 @@ public class RTFFormatter {
             startB = subMessageContent.indexOf(" `");
             startB++;
             substringB = subMessageContent.substring(0, startB);
-            log("SubstringB is: "+substringB);
+
             ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             startB++;
             StringBuilder sb = new StringBuilder(subMessageContent);
             sb.delete(0, startB);
             subMessageContent = sb.toString();
-            log("(8) messageContent: "+subMessageContent);
         }
 
         endB = subMessageContent.indexOf("` ");
@@ -1554,11 +1503,8 @@ public class RTFFormatter {
             sbB.deleteCharAt(endB);
             subMessageContent = sbB.toString();
 
-            log("(9) messageContent: "+subMessageContent);
-
             substringB = subMessageContent.substring(0, endB);
 
-            log("SubstringB is: "+substringB);
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             sbB = new StringBuilder(subMessageContent);
@@ -1567,7 +1513,7 @@ public class RTFFormatter {
         }
         else{
             log("endB position: "+endB);
-            log("(10) Message content B: "+subMessageContent);
+
             substringB = subMessageContent.substring(0, endB);
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
@@ -1575,7 +1521,6 @@ public class RTFFormatter {
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB);
             subMessageContent = sbB.toString();
-            log("(11) Message content B: "+subMessageContent);
 
             startB = subMessageContent.indexOf(" `");
             while(startB!=-1){
@@ -1594,7 +1539,6 @@ public class RTFFormatter {
                 sbB.delete(0, startB);
                 subMessageContent = sbB.toString();
 
-                log("Message content C: "+subMessageContent);
                 endB = subMessageContent.indexOf("* ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("`");
@@ -1618,7 +1562,6 @@ public class RTFFormatter {
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
-                    log("Message content D: "+subMessageContent);
 
                     substringB = subMessageContent.substring(0, endB);
                     ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
@@ -1663,14 +1606,13 @@ public class RTFFormatter {
             startB = subMessageContent.indexOf(" `");
             startB++;
             substringB = subMessageContent.substring(0, startB);
-            log("SubstringB is: "+substringB);
+
             ssb.append(substringB, new StyleSpan(format));
 
             startB++;
             StringBuilder sb = new StringBuilder(subMessageContent);
             sb.delete(0, startB);
             subMessageContent = sb.toString();
-            log("(8) messageContent: "+subMessageContent);
         }
 
         endB = subMessageContent.indexOf("` ");
@@ -1682,11 +1624,8 @@ public class RTFFormatter {
             sbB.deleteCharAt(endB);
             subMessageContent = sbB.toString();
 
-            log("(9) messageContent: "+subMessageContent);
-
             substringB = subMessageContent.substring(0, endB);
 
-            log("SubstringB is: "+substringB);
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
             sbB = new StringBuilder(subMessageContent);
@@ -1695,7 +1634,7 @@ public class RTFFormatter {
         }
         else{
             log("endB position: "+endB);
-            log("(10) Message content B: "+subMessageContent);
+
             substringB = subMessageContent.substring(0, endB);
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
@@ -1703,7 +1642,6 @@ public class RTFFormatter {
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB);
             subMessageContent = sbB.toString();
-            log("(11) Message content B: "+subMessageContent);
 
             startB = subMessageContent.indexOf(" `");
             while(startB!=-1){
@@ -1722,7 +1660,6 @@ public class RTFFormatter {
                 sbB.delete(0, startB);
                 subMessageContent = sbB.toString();
 
-                log("Message content C: "+subMessageContent);
                 endB = subMessageContent.indexOf("* ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("`");
@@ -1746,7 +1683,6 @@ public class RTFFormatter {
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
-                    log("Message content D: "+subMessageContent);
 
                     substringB = subMessageContent.substring(0, endB);
                     ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
@@ -1792,14 +1728,13 @@ public class RTFFormatter {
             startB = subMessageContent.indexOf(" ```");
             startB=startB+1;
             substringB = subMessageContent.substring(0, startB);
-            log("SubstringB is: "+substringB);
+
             ssb.append(substringB, new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             StringBuilder sb = new StringBuilder(subMessageContent);
             sb.delete(0, startB+3);
             sb.insert(0, '\n');
             subMessageContent = sb.toString();
-            log("(8) messageContent: "+subMessageContent);
         }
 
         endB = subMessageContent.indexOf("``` ");
@@ -1812,10 +1747,8 @@ public class RTFFormatter {
 
             subMessageContent = sbB.toString();
 
-            log("(9) messageContent: "+subMessageContent);
-
             substringB = subMessageContent.substring(0, endB);
-            log("SubstringB is: "+substringB);
+
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
 
             sbB = new StringBuilder(subMessageContent);
@@ -1824,7 +1757,7 @@ public class RTFFormatter {
         }
         else{
             log("endB position: "+endB);
-            log("(10) Message content B: "+subMessageContent);
+
             substringB = subMessageContent.substring(0, endB);
 
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(Typeface.BOLD), new StyleSpan(Typeface.ITALIC));
@@ -1832,7 +1765,6 @@ public class RTFFormatter {
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB+3);
             subMessageContent = sbB.toString();
-            log("(11) Message content B: "+subMessageContent);
         }
 
         if(!subMessageContent.isEmpty()){
@@ -1870,14 +1802,12 @@ public class RTFFormatter {
             startB = subMessageContent.indexOf(" ```");
             startB=startB+1;
             substringB = subMessageContent.substring(0, startB);
-            log("SubstringB is: "+substringB);
             ssb.append(substringB, new StyleSpan(format));
 
             StringBuilder sb = new StringBuilder(subMessageContent);
             sb.delete(0, startB+3);
             sb.insert(0, '\n');
             subMessageContent = sb.toString();
-            log("(8) messageContent: "+subMessageContent);
         }
 
         endB = subMessageContent.indexOf("``` ");
@@ -1890,10 +1820,8 @@ public class RTFFormatter {
 
             subMessageContent = sbB.toString();
 
-            log("(9) messageContent: "+subMessageContent);
-
             substringB = subMessageContent.substring(0, endB);
-            log("SubstringB is: "+substringB);
+
             ssb.append(substringB, new CustomTypefaceSpan("", font), new StyleSpan(format));
 
             sbB = new StringBuilder(subMessageContent);
@@ -1902,7 +1830,7 @@ public class RTFFormatter {
         }
         else{
             log("endB position: "+endB);
-            log("(10) Message content B: "+subMessageContent);
+
             substringB = subMessageContent.substring(0, endB);
 //            ssb.append(substringB, new StyleSpan(typeFace.getStyle()), new StyleSpan(Typeface.ITALIC));
 
@@ -1911,7 +1839,6 @@ public class RTFFormatter {
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB+3);
             subMessageContent = sbB.toString();
-            log("(11) Message content B: "+subMessageContent);
         }
 
         if(!subMessageContent.isEmpty()){
@@ -1927,7 +1854,7 @@ public class RTFFormatter {
     }
 
     public void applyBoldFormat(){
-        log("applyBoldFormat messageContent: '"+messageContent+"'");
+        log("applyBoldFormat");
         char a = messageContent.charAt(0);
         int start;
         int end;
@@ -2075,7 +2002,6 @@ public class RTFFormatter {
             }
         }
 
-        log("Message content: "+messageContent);
         end = messageContent.indexOf("* ");
         if(end==-1){
             end = messageContent.indexOf("*\n");
@@ -2086,8 +2012,6 @@ public class RTFFormatter {
                 StringBuilder sb = new StringBuilder(messageContent);
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
-
-                log("Message content: "+messageContent);
 
                 substring = messageContent.substring(0, end);
 
@@ -2134,7 +2058,6 @@ public class RTFFormatter {
                 sb.deleteCharAt(end);
                 messageContent = sb.toString();
 
-                log("Message content B: "+messageContent);
                 substring = messageContent.substring(0, end);
 
                 String noEmojisContent = EmojiParser.removeAllEmojis(substring);
@@ -2168,8 +2091,6 @@ public class RTFFormatter {
                 sb.delete(0, end);
                 messageContent = sb.toString();
 
-                log("Message content T: "+messageContent);
-
                 start = messageContent.indexOf(" *");
                 while(start!=-1){
 
@@ -2187,7 +2108,6 @@ public class RTFFormatter {
                     sb.delete(0, start);
                     messageContent = sb.toString();
 
-                    log("Message content C: "+messageContent);
                     end = messageContent.indexOf("* ");
                     if(end==-1){
                         end = messageContent.lastIndexOf("*");
@@ -2211,7 +2131,6 @@ public class RTFFormatter {
                         sb = new StringBuilder(messageContent);
                         sb.deleteCharAt(end);
                         messageContent = sb.toString();
-                        log("Message content D: "+messageContent);
 
                         substring = messageContent.substring(0, end);
                         ssb.append(substring, new StyleSpan(Typeface.BOLD));
@@ -2231,7 +2150,6 @@ public class RTFFormatter {
             sb.deleteCharAt(end);
             messageContent = sb.toString();
 
-            log("Message content B: "+messageContent);
             substring = messageContent.substring(0, end);
 
             String noEmojisContent = EmojiParser.removeAllEmojis(substring);
@@ -2265,8 +2183,6 @@ public class RTFFormatter {
             sb.delete(0, end);
             messageContent = sb.toString();
 
-            log("Message content T: "+messageContent);
-
             start = messageContent.indexOf(" *");
             while(start!=-1){
 
@@ -2284,7 +2200,6 @@ public class RTFFormatter {
                 sb.delete(0, start);
                 messageContent = sb.toString();
 
-                log("Message content C: "+messageContent);
                 end = messageContent.indexOf("* ");
                 if(end==-1){
                     end = messageContent.lastIndexOf("*");
@@ -2308,7 +2223,6 @@ public class RTFFormatter {
                     sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
-                    log("Message content D: "+messageContent);
 
                     substring = messageContent.substring(0, end);
                     ssb.append(substring, new StyleSpan(Typeface.BOLD));
@@ -2334,7 +2248,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyBoldItalicFormat(String subMessageContent){
-        log("applyBoldItalicFormat: "+subMessageContent);
+        log("applyBoldItalicFormat");
 
         char b = subMessageContent.charAt(0);
         int startB;
@@ -2355,14 +2269,13 @@ public class RTFFormatter {
             startB = subMessageContent.indexOf(" _");
             startB++;
             substringB = subMessageContent.substring(0, startB);
-            log("SubstringB is: "+substringB);
+
             ssb.append(substringB, new StyleSpan(Typeface.BOLD));
 
             startB++;
             StringBuilder sb = new StringBuilder(subMessageContent);
             sb.delete(0, startB);
             subMessageContent = sb.toString();
-            log("(8) messageContent: "+subMessageContent);
         }
 
         endB = subMessageContent.indexOf("_ ");
@@ -2374,11 +2287,8 @@ public class RTFFormatter {
             sbB.deleteCharAt(endB);
             subMessageContent = sbB.toString();
 
-            log("(9) messageContent: "+subMessageContent);
-
             substringB = subMessageContent.substring(0, endB);
 
-            log("SubstringB is: "+substringB);
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
@@ -2403,7 +2313,7 @@ public class RTFFormatter {
         }
         else{
             log("endB position: "+endB);
-            log("(10) Message content B: "+subMessageContent);
+
             substringB = subMessageContent.substring(0, endB);
 
             Matcher mMultiQuote = pMultiQuote.matcher(substringB);
@@ -2428,7 +2338,6 @@ public class RTFFormatter {
             StringBuilder sbB = new StringBuilder(subMessageContent);
             sbB.delete(0, endB);
             subMessageContent = sbB.toString();
-            log("(11) Message content B: "+subMessageContent);
 
             startB = subMessageContent.indexOf(" _");
             while(startB!=-1){
@@ -2447,7 +2356,6 @@ public class RTFFormatter {
                 sbB.delete(0, startB);
                 subMessageContent = sbB.toString();
 
-                log("Message content C: "+subMessageContent);
                 endB = subMessageContent.indexOf("_ ");
                 if(endB==-1){
                     endB = subMessageContent.lastIndexOf("_");
@@ -2488,7 +2396,6 @@ public class RTFFormatter {
                     sbB = new StringBuilder(subMessageContent);
                     sbB.deleteCharAt(endB);
                     subMessageContent = sbB.toString();
-                    log("Message content D: "+subMessageContent);
 
                     substringB = subMessageContent.substring(0, endB);
 
