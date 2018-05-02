@@ -109,7 +109,10 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onDestroy() {
         log("onDestroyFCM");
-        megaApi.removeGlobalListener(this);
+        if((!remoteMessageType.equals("1")) && (!remoteMessageType.equals("3"))){
+            megaApi.removeGlobalListener(this);
+        }
+
         super.onDestroy();
     }
 
@@ -159,6 +162,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("RootNode = null");
                         performLoginProccess(gSession);
                     }
+                    else{
+                        log("Awaiting info on listener");
+                    }
                 }
                 else if(remoteMessageType.equals("3")){
                     log("show ContactRequest Notification");
@@ -170,6 +176,9 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     if (megaApi.getRootNode() == null) {
                         log("RootNode = null");
                         performLoginProccess(gSession);
+                    }
+                    else{
+                        log("Awaiting info on listener");
                     }
                 }
                 else if(remoteMessageType.equals("4")) {
@@ -679,6 +688,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             else{
                 log("Updated nodes is NULL");
             }
+
+            megaApi.removeGlobalListener(this);
         }
     }
 
@@ -721,6 +732,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             } catch (Exception e) {
                 log("Exception when showing IPC request: " + e.getMessage());
             }
+
+            megaApi.removeGlobalListener(this);
         }
     }
 }

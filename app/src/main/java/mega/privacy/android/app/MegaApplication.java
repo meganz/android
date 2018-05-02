@@ -580,6 +580,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	public static void setRecentChatVisible(boolean recentChatVisible) {
+		log("setRecentChatVisible: "+recentChatVisible);
 		MegaApplication.recentChatVisible = recentChatVisible;
 	}
 
@@ -891,7 +892,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
 							log("New TRUNCATE message");
 //							showChatNotification(chatid, msg);
-							megaChatApi.pushReceived(true);
+							megaChatApi.pushReceived(false);
 						}
 					}
 					else{
