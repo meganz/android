@@ -157,14 +157,14 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
                 log("Copy Master Key button");
                 ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
-                aC.copyMK();
+                aC.copyMK(false);
                 break;
             }
             case R.id.save_MK_button:{
                 log("Save Master Key button");
                 ((ManagerActivityLollipop)context).hideMKLayout();
                 AccountController aC = new AccountController(context);
-                aC.exportMK();
+                aC.exportMK(null);
                 break;
             }
         }
