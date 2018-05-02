@@ -290,12 +290,17 @@ public final class AdvancedNotificationBuilder {
         ArrayList<MegaChatListItem> chats = new ArrayList<>();
         for(int i=0; i<chatHandleList.size(); i++){
             MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
-            chats.add(chat);
+            if(chat!=null){
+                chats.add(chat);
+            }
+            else{
+                log("ERROR:chatNotRecovered:NULL");
+            }
         }
 
         PendingIntent pendingIntent = null;
 
-        if(chatHandleList.size()>1){
+        if(chats.size()>1){
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Constants.ACTION_CHAT_SUMMARY);
@@ -314,12 +319,15 @@ public final class AdvancedNotificationBuilder {
                 }
             });
         }
-        else{
+        else if (chats.size()==1){
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
             intent.putExtra("CHAT_ID", chats.get(0).getChatId());
             pendingIntent = PendingIntent.getActivity(context, (int)chats.get(0).getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
+        }
+        else {
+            log("ERROR:chatSIZE=0");
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
