@@ -3902,6 +3902,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             if(messageJumpLayout.getVisibility() != View.VISIBLE){
+                messageJumpText.setText(getResources().getString(R.string.message_new_messages));
                 messageJumpLayout.setVisibility(View.VISIBLE);
             }
         }
