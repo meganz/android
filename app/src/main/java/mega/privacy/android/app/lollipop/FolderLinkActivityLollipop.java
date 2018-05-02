@@ -1891,6 +1891,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		switch(v.getId()){
 			case R.id.folder_link_file_link_button_download:
 			case R.id.folder_link_button_download:{
+				if (adapterList == null) {
+					log("No elements on list:adapterLIST is NULL");
+					return;
+				}
+
 				if(adapterList.isMultipleSelect()){
 
 					List<MegaNode> documents = adapterList.getSelectedNodes();
