@@ -3909,7 +3909,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 //        mLayoutManager.setStackFromEnd(true);
 //        mLayoutManager.scrollToPosition(0);
-        log("------------------------------------------");
     }
 
     @Override
