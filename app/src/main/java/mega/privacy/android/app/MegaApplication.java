@@ -403,9 +403,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
-				megaChatApi.addChatRequestListener(this);
-				megaChatApi.addChatNotificationListener(this);
-				megaChatApi.addChatCallListener(this);
+                log("Add listeners of megaChatApi");
+                megaChatApi.addChatRequestListener(this);
+                megaChatApi.addChatNotificationListener(this);
+                megaChatApi.addChatCallListener(this);
 			}
 		}
 
