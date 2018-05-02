@@ -604,7 +604,6 @@ public final class AdvancedNotificationBuilder {
 
         Bitmap largeIcon = setUserAvatar(chat);
         if(largeIcon!=null){
-            log("There is avatar!");
             notificationBuilder.setLargeIcon(largeIcon);
         }
 
@@ -704,7 +703,6 @@ public final class AdvancedNotificationBuilder {
 
                 if(!firstLetter.equals("(")){
 
-                    log("Draw letter: "+firstLetter);
                     Rect bounds = new Rect();
 
                     paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
