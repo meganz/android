@@ -69,6 +69,24 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	final static private String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
+	private static boolean activityVisible = false;
+	private static boolean isLoggingIn = false;
+	private static boolean firstConnect = true;
+
+	private static boolean showInfoChatMessages = false;
+
+	private static boolean showPinScreen = true;
+
+	private static long openChatId = -1;
+
+	private static long openCallChatId = -1;
+
+	private static boolean recentChatVisible = false;
+	private static boolean chatNotificationReceived = false;
+
+	private static String urlConfirmationLink = null;
+
+	private static boolean registeredChatListeners = false;
 
 	MegaChatApiAndroid megaChatApi = null;
 
@@ -403,10 +421,16 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else{
 				megaChatApi = new MegaChatApiAndroid(megaApi);
-                log("Add listeners of megaChatApi");
-                megaChatApi.addChatRequestListener(this);
-                megaChatApi.addChatNotificationListener(this);
-                megaChatApi.addChatCallListener(this);
+			}
+		}
+
+		if(megaChatApi!=null) {
+			if (!registeredChatListeners) {
+				log("Add listeners of megaChatApi");
+				megaChatApi.addChatRequestListener(this);
+				megaChatApi.addChatNotificationListener(this);
+				megaChatApi.addChatCallListener(this);
+				registeredChatListeners = true;
 			}
 		}
 
@@ -419,6 +443,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				megaChatApi.removeChatRequestListener(this);
 				megaChatApi.removeChatNotificationListener(this);
 				megaChatApi.removeChatCallListener(this);
+				registeredChatListeners = false;
 			}
 		}
 		catch (Exception e){}
@@ -533,23 +558,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public static void setUrlConfirmationLink(String urlConfirmationLink) {
 		MegaApplication.urlConfirmationLink = urlConfirmationLink;
 	}
-
-	private static boolean activityVisible = false;
-	private static boolean isLoggingIn = false;
-	private static boolean firstConnect = true;
-
-	private static boolean showInfoChatMessages = false;
-
-	private static boolean showPinScreen = true;
-
-	private static long openChatId = -1;
-
-	private static long openCallChatId = -1;
-
-	private static boolean recentChatVisible = false;
-	private static boolean chatNotificationReceived = false;
-
-	private static String urlConfirmationLink = null;
 
 	public static boolean isLoggingIn() {
 		return isLoggingIn;
@@ -746,6 +754,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					megaChatApi.removeChatRequestListener(this);
 					megaChatApi.removeChatNotificationListener(this);
 					megaChatApi.removeChatCallListener(this);
+					registeredChatListeners = false;
 				}
 			}
 			catch (Exception exc){}
