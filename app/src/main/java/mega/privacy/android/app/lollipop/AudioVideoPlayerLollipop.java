@@ -587,8 +587,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vid
         }
 
         propertiesIcon = menu.findItem(R.id.full_video_viewer_properties);
-
         chatIcon = menu.findItem(R.id.full_video_viewer_chat);
+
+        if (isOffline){
+            chatIcon.setVisible(false);
+        }
+        else {
+            if (mega.privacy.android.app.utils.Util.isChatEnabled()){
+                chatIcon.setVisible(true);
+            }
+            else {
+                chatIcon.setVisible(false);
+            }
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
