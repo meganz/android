@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,6 +14,7 @@ import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +46,8 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	DatabaseHandler dbH = null;
+	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
+	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
 
 	private class ContactPicture extends AsyncTask<Void, Void, Long> {
 
@@ -220,6 +224,16 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 		holder.contactLayout = (RelativeLayout) rowView.findViewById(R.id.contact_list_item_layout);
 		holder.contactNameTextView = (TextView) rowView.findViewById(R.id.contact_explorer_name);
+
+		if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics());
+			holder.contactNameTextView.setMaxWidth((int) width);
+		}
+		else{
+			float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics());
+			holder.contactNameTextView.setMaxWidth((int) width);
+		}
+
 		holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
 //		holder.phoneEmailTextView.setVisibility(View.GONE);
 		holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
