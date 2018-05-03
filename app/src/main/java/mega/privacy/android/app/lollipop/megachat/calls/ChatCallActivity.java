@@ -75,7 +75,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -131,7 +130,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     boolean flagContactAvatar;
 
     long chatId;
-    boolean callInitiator;
     MegaChatRoom chat;
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
@@ -342,7 +340,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 chatId = newChatId;
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
-                callInitiator = false;
 
                 setCallInfo();
                 updateScreenStatusInProgress();
@@ -550,8 +547,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
-            callInitiator = extras.getBoolean("callInitiator", false);
-            log("Chat handle to call: " + chatId+ " initiator: "+callInitiator);
+            log("Chat handle to call: " + chatId);
             if (chatId != -1) {
                 chat = megaChatApi.getChatRoom(chatId);
                 callChat = megaChatApi.getChatCall(chatId);
@@ -1114,16 +1110,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                         rtcAudioManager.stop();
                         MegaApplication.activityPaused();
-
-                        try{
-                            if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT) && (!callInitiator)){
-                                AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-                                notificationBuilder.showMissedCallNotification(call);
-                            }
-                        }
-                        catch(Exception e){
-                            log("EXCEPTION when showing missed call notification: "+e.getMessage());
-                        }
 
                         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             super.finishAndRemoveTask();

@@ -1088,7 +1088,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 copyMenuItem.setVisible(false);
                 moveToTrashMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
-                chatMenuItem.setVisible(true);
+                chatMenuItem.setVisible(false);
             }
             else if(type == Constants.SEARCH_ADAPTER){
                 MegaNode node = megaApi.getNodeByHandle(handle);

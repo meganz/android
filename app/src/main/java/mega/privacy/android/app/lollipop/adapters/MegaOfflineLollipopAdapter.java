@@ -450,7 +450,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
-		
+
 			holder.itemLayout.setOnClickListener(this);
 			holder.itemLayout.setOnLongClickListener(this);
 			holder.itemLayout.setTag(holder);
@@ -526,7 +526,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		if(currentNode.getHandle().equals("0")){
 			//The node is the MasterKey File
-			holder.currentPosition = position;
 			holder.textViewFileName.setText(currentNode.getName());
 			
 			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
@@ -539,6 +538,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
 			holder.iconView.setVisibility(View.VISIBLE);
 			holder.imageView.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setOnClickListener(this);
+			holder.imageButtonThreeDots.setTag(holder);
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			return;
 		}
@@ -565,8 +566,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();
-		holder.currentPosition = position;
-		
+
 		holder.textViewFileName.setText(currentNode.getName());
 		
 		int folders=0;
@@ -654,13 +654,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	    float scaleH = Util.getScaleH(outMetrics, density);
 	    
 		holder.currentPosition = position;
-
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
 		
 		if(currentNode.getHandle().equals("0")){
 			//The node is the MasterKey File
-			holder.currentPosition = position;
 			holder.textViewFileName.setText(currentNode.getName());
 			
 			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
@@ -699,8 +697,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentHandle = currentNode.getHandle();
-		holder.currentPosition = position;
-		
+
 		holder.textViewFileName.setText(currentNode.getName());
 		
 		int folders=0;
