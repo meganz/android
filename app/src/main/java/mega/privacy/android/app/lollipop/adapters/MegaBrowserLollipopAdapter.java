@@ -133,6 +133,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
 			selectedItems.delete(pos);
+
 		}
 		else {
 			log("PUT pos: "+pos);

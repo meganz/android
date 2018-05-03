@@ -582,8 +582,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         long participantsLabel = participantsCount+1; //Add one to include me
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
-        ChatController chatC = new ChatController(groupChatInfoActivity);
-        String myFullName = chatC.getMyFullName();
+        String myFullName =  megaChatApi.getMyFullname();
+        if(myFullName!=null){
+            if(myFullName.trim().isEmpty()){
+                myFullName =  megaChatApi.getMyEmail();
+            }
+        }
+        else{
+            myFullName =  megaChatApi.getMyEmail();
+        }
 
         MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
 

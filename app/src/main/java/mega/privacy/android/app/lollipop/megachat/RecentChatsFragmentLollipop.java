@@ -155,7 +155,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewParams2.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
-        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_chat);
+        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
@@ -812,7 +812,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     public void itemClick(int position) {
-        log("itemClick");
+        log("itemClick: "+position);
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
@@ -825,7 +825,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             }
         }
         else{
-            log("open chat");
+            log("open chat: position: "+position+" chatID: "+chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
             intent.putExtra("CHAT_ID", chats.get(position).getChatId());

@@ -547,7 +547,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     void showInviteDialog (){
         if (inviteAlertDialog != null){
             contactName.setText(contactNameContent);
-            contactMail.setText(myEmail);
             if (isContact){
                 contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
                 invite.setVisibility(View.GONE);
@@ -571,19 +570,21 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             view = (Button) v.findViewById(R.id.view_contact);
             view.setOnClickListener(this);
 
-            if (isContact){
-                invite.setVisibility(View.GONE);
-                view.setVisibility(View.VISIBLE);
-            }
-            else {
-                invite.setVisibility(View.VISIBLE);
-                view.setVisibility(View.GONE);
-            }
             avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
             initialLetter = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
             contactName = (TextView) v.findViewById(R.id.accept_contact_name);
             contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
 
+            if (isContact){
+                contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
+                invite.setVisibility(View.GONE);
+                view.setVisibility(View.VISIBLE);
+            }
+            else {
+                contactMail.setText(myEmail);
+                invite.setVisibility(View.VISIBLE);
+                view.setVisibility(View.GONE);
+            }
             inviteAlertDialog = builder.create();
             inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -594,7 +595,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 }
             });
             contactName.setText(contactNameContent);
-            contactMail.setText(myEmail);
             setAvatar();
         }
         codeScanner.releaseResources();

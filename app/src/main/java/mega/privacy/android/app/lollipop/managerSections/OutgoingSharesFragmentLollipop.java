@@ -462,7 +462,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);

@@ -266,6 +266,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private ImageButton nextButton;
     private ImageButton previousButton;
     private ImageButton playList;
+    private int numErrors = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -305,15 +306,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 handle = bundle.getLong("HANDLE");
                 fileName = bundle.getString("FILENAME");
             }
-            if (!renamed) {
-                uri = intent.getData();
-                if (uri == null) {
-                    log("uri null");
-                    finish();
-                    return;
-                }
-            }
             currentPosition = intent.getIntExtra("position", 0);
+        }
+        if (!renamed) {
+            uri = intent.getData();
+            if (uri == null) {
+                log("uri null");
+                finish();
+                return;
+            }
         }
         isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
         fromShared = intent.getBooleanExtra("fromShared", false);
@@ -903,14 +904,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             @Override
             public void onPlayerError(ExoPlaybackException error) {
                 log("onPlayerError");
+                numErrors++;
                 player.stop();
-                if (isPlayList && size > 1){
-                    player.prepare(finalLoopingMediaSource);
+                if (numErrors <= 2){
+                    if (isPlayList && size > 1){
+                        player.prepare(finalLoopingMediaSource);
+                    }
+                    else {
+                        player.prepare(finalMediaSource);
+                    }
+                    player.setPlayWhenReady(true);
                 }
                 else {
-                    player.prepare(finalMediaSource);
+                    showErrorDialog();
                 }
-                player.setPlayWhenReady(true);
+
             }
 
             @Override
@@ -928,6 +936,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 log("onSeekProcessed");
             }
         });
+        numErrors = 0;
         player.setPlayWhenReady(true);
         player.seekTo(currentTime);
         player.setVideoDebugListener(this);
@@ -965,6 +974,26 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             });
         }
+    }
+
+    void showErrorDialog() {
+        log("showErrorDialog: Error open video file");
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setCancelable(false);
+        String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
+        builder.setMessage(R.string.corrupt_video_dialog_text)
+                .setPositiveButton(accept, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
+        numErrors = 0;
     }
 
     public void updateCurrentImage(){
@@ -1610,7 +1639,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             copyMenuItem.setVisible(false);
             moveToTrashMenuItem.setVisible(false);
             removeMenuItem.setVisible(false);
-            chatMenuItem.setVisible(true);
+            chatMenuItem.setVisible(false);
         }
         else if(adapterType == Constants.SEARCH_ADAPTER){
             MegaNode node = megaApi.getNodeByHandle(handle);
