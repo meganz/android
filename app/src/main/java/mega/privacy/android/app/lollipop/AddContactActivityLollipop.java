@@ -41,7 +41,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,7 +54,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
 import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
@@ -1712,7 +1710,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
-
+        log("contacts selected: "+contactsSelected.size());
         Intent intent = new Intent();
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contactsSelected);
 
