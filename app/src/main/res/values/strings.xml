@@ -1853,4 +1853,8 @@
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
+    <string name="context_option_print" context="Menu option to print the recovery key from Offline section">Print</string>
+
+    <string name="save_MK_confirmation" context="Message when the recovery key has been successfully saved on the filesystem">The Recovery Key has been successfully saved</string>
+
 </resources>

@@ -8,7 +8,7 @@
 
     <!-- Title -->
     <LinearLayout
-        android:id="@+id/qr_code_title_layout"
+        android:id="@+id/recovery_key_title_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center_vertical"
@@ -76,7 +76,7 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_b_pick_file_system"
+            android:src="@drawable/ic_pick_file_system"
             android:visibility="visible" />
 
         <TextView

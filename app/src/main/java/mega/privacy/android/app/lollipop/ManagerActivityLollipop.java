@@ -28,7 +28,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
@@ -95,11 +94,8 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -224,11 +220,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
-
-	final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
-	final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
-	final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
-	private static int REQUEST_DOWNLOAD_FOLDER = 1111;
 
 	public int accountFragment;
 
@@ -2454,11 +2445,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		megaApi.passwordReminderDialogSkipped(this);
 	}
 
-	public void copyMK () {
-		AccountController ac = new AccountController(this);
-		ac.copyMK(true);
-	}
-
 	@Override
 	protected void onResume(){
 		log("onResume");
@@ -2803,20 +2789,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Error, no handle");
 					}
 				}
-				else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_EXPORTED)){
+				else if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
 					exportRecoveryKey();
 				}
-				else if (getIntent().getAction().equals(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
+				else if (getIntent().getAction().equals(Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
 					String parentPath = intent.getStringExtra("parentPath");
 					if (parentPath != null){
 						log("path to download: "+parentPath);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath);
+						ac.exportMK(parentPath, false);
 					}
 				}
-				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
-					copyMK();
+				else  if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
+					AccountController ac = new AccountController(this);
+					ac.copyMK(true);
 				}
 
     			intent.setAction(null);
@@ -11427,7 +11414,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	void exportRecoveryKey (){
 		AccountController aC = new AccountController(this);
-		aC.exportMK(null);
+		aC.exportMK(null, false);
 	}
 
 	public void showConfirmationRemoveMK(){
@@ -12353,14 +12340,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }
 		}
-		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
 				String[] split = Util.rKFile.split("/");
 				String path = parentPath+"/"+split[split.length-1];
-				log("path to download: "+path);
+				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
-				ac.exportMK(path);
+				ac.exportMK(path, false);
+			}
+		}
+		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
+			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			if (parentPath != null){
+				String[] split = Util.rKFile.split("/");
+				String path = parentPath+"/"+split[split.length-1];
+				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
+				AccountController ac = new AccountController(this);
+				ac.exportMK(path, true);
 			}
 		}
 		else{

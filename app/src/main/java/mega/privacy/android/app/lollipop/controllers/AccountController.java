@@ -20,12 +20,9 @@ import android.widget.Button;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
@@ -35,6 +32,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
@@ -153,7 +151,7 @@ public class AccountController implements View.OnClickListener{
         megaApi.setAvatar(null, (ManagerActivityLollipop)context);
     }
 
-    public void exportMK(String path){
+    public void exportMK(String path, boolean fromOffline){
         log("exportMK");
         if (!Util.isOnline(context)){
             ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
@@ -217,7 +215,12 @@ public class AccountController implements View.OnClickListener{
                 showConfirmationExportedDialog();
             }
             else {
-                showConfirmDialogRecoveryKeySaved();
+                if(fromOffline){
+                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.save_MK_confirmation));
+                }
+                else{
+                    showConfirmDialogRecoveryKeySaved();
+                }
             }
 //            Util.showAlert(((ManagerActivityLollipop) context), message, null);
 
@@ -292,6 +295,38 @@ public class AccountController implements View.OnClickListener{
         }
         else {
             Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+        }
+    }
+
+    public void saveRkToFileSystem (boolean fromOffline) {
+        log("saveRkToFileSystem");
+        Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+        intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+        intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+        if (context instanceof TestPasswordActivity){
+            ((TestPasswordActivity) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
+        }
+        else if (context instanceof ManagerActivityLollipop){
+            if(fromOffline){
+                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_SAVE_MK_FROM_OFFLINE);
+            }
+            else{
+                ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
+            }
+        }
+    }
+
+    public void copyRkToClipboard () {
+        log("copyRkToClipboard");
+        if (context instanceof  ManagerActivityLollipop) {
+            copyMK(false);
+        }
+        else if (context instanceof TestPasswordActivity) {
+            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            context.startActivity(intent);
+            ((TestPasswordActivity) context).finish();
         }
     }
 
