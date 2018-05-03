@@ -333,24 +333,26 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             log("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        File qrCodeFile = myCodeFragment.queryIfQRExists();
-        if (qrCodeFile != null && qrCodeFile.exists()){
-            Intent share = new Intent(android.content.Intent.ACTION_SEND);
-            share.setType("image/*");
+        if (myCodeFragment!= null && myCodeFragment.isAdded()){
+            File qrCodeFile = myCodeFragment.queryIfQRExists();
+            if (qrCodeFile != null && qrCodeFile.exists()){
+                Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                share.setType("image/*");
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                log("Use provider to share");
-                Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",qrCodeFile);
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
-                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    log("Use provider to share");
+                    Uri uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider",qrCodeFile);
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri.toString()));
+                    share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                else{
+                    share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + qrCodeFile));
+                }
+                startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
-            else{
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + qrCodeFile));
+            else {
+                showSnackbar(getString(R.string.error_share_qr));
             }
-            startActivity(Intent.createChooser(share, getString(R.string.context_share)));
-        }
-        else {
-            showSnackbar(getString(R.string.error_share_qr));
         }
     }
 
@@ -361,7 +363,9 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             log("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        myCodeFragment.resetQRCode();
+        if (myCodeFragment != null && myCodeFragment.isAdded()) {
+            myCodeFragment.resetQRCode();
+        }
     }
 
     public void deleteQR () {
@@ -371,7 +375,9 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             log("MyCodeFragment is NULL");
             myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
         }
-        myCodeFragment.deleteQRCode();
+        if (myCodeFragment != null && myCodeFragment.isAdded()){
+            myCodeFragment.deleteQRCode();
+        }
     }
 
     public void resetSuccessfully (boolean success) {
@@ -410,34 +416,28 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
         if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
-            scanCodeFragment.myEmail = request.getEmail();
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("OK INVITE CONTACT: "+request.getEmail());
-                if (scanCodeFragment == null) {
-                    log("MyCodeFragment is NULL");
-                    scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
-                }
-                scanCodeFragment.dialogTitleContent = R.string.invite_sent;
-                scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
-                scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+            if (scanCodeFragment == null) {
+                log("ScanCodeFragment is NULL");
+                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
             }
-            else if (e.getErrorCode() == MegaError.API_EACCESS){
-                if (scanCodeFragment == null) {
-                    log("MyCodeFragment is NULL");
-                    scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+            if (scanCodeFragment != null && scanCodeFragment.isAdded()){
+                scanCodeFragment.myEmail = request.getEmail();
+                if (e.getErrorCode() == MegaError.API_OK){
+                    log("OK INVITE CONTACT: "+request.getEmail());
+                    scanCodeFragment.dialogTitleContent = R.string.invite_sent;
+                    scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
                 }
-                scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
-                scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_error;
-                scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, false);
-            }
-            else if (e.getErrorCode() == MegaError.API_EEXIST){
-                if (scanCodeFragment == null) {
-                    log("MyCodeFragment is NULL");
-                    scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+                else if (e.getErrorCode() == MegaError.API_EACCESS){
+                    scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
+                    scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_error;
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, false);
                 }
-                scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
-                scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
-                scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                else if (e.getErrorCode() == MegaError.API_EEXIST){
+                    scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
+                    scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                }
             }
         }
     }

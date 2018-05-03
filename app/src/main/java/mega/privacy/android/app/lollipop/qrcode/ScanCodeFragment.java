@@ -28,6 +28,7 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.google.zxing.Result;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -101,6 +102,10 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     private boolean isContact = false;
 
+    private Bitmap avatarSave;
+    private String initialLetterSave;
+    private boolean contentAvatar = false;
+
     public static ScanCodeFragment newInstance() {
         log("newInstance");
         ScanCodeFragment fragment = new ScanCodeFragment();
@@ -123,6 +128,15 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             myEmail = savedInstanceState.getString("myEmail");
             success = savedInstanceState.getBoolean("success", true);
             handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
+
+            byte[] avatarByteArray = savedInstanceState.getByteArray("avatar");
+            if (avatarByteArray != null){
+                avatarSave = BitmapFactory.decodeByteArray(avatarByteArray, 0, avatarByteArray.length);
+                contentAvatar = savedInstanceState.getBoolean("contentAvatar", false);
+                if (!contentAvatar){
+                    initialLetterSave = savedInstanceState.getString("initialLetter");
+                }
+            }
         }
 
         if (megaApi == null){
@@ -195,9 +209,23 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             outState.putInt("dialogTitleContent", dialogTitleContent);
             outState.putInt("dialogTextContent", dialogTextContent);
         }
-        outState.putString("myEmail", myEmail);
-        outState.putBoolean("success", success);
-        outState.putLong("handleContactLink", handleContactLink);
+        if (dialogshown || inviteShown){
+            outState.putString("myEmail", myEmail);
+            outState.putBoolean("success", success);
+            outState.putLong("handleContactLink", handleContactLink);
+
+            avatarImage.buildDrawingCache(true);
+            Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
+
+            ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+            avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+            byte[] avatarByteArray = avatarOutputStream.toByteArray();
+            outState.putByteArray("avatar", avatarByteArray);
+            outState.putBoolean("contentAvatar", contentAvatar);
+            if (!contentAvatar){
+                outState.putString("initialLetter", initialLetter.getText().toString());
+            }
+        }
     }
 
     @Override
@@ -451,6 +479,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                     log("Show my avatar");
                     avatarImage.setImageBitmap(imBitmap);
                     initialLetter.setVisibility(View.GONE);
+                    contentAvatar = true;
                 }
             }
         }else{
@@ -507,6 +536,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         initialLetter.setTextSize(30);
         initialLetter.setTextColor(WHITE);
         initialLetter.setVisibility(View.VISIBLE);
+        contentAvatar = false;
     }
 
     private int getAvatarTextSize (float density){
@@ -575,6 +605,27 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             contactName = (TextView) v.findViewById(R.id.accept_contact_name);
             contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
 
+            if (avatarSave != null){
+                avatarImage.setImageBitmap(avatarSave);
+                if (contentAvatar){
+                    initialLetter.setVisibility(View.GONE);
+                }
+                else {
+                    if (initialLetterSave != null) {
+                        initialLetter.setText(initialLetterSave);
+                        initialLetter.setTextSize(30);
+                        initialLetter.setTextColor(WHITE);
+                        initialLetter.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        setAvatar();
+                    }
+                }
+            }
+            else {
+                setAvatar();
+            }
+
             if (isContact){
                 contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
                 invite.setVisibility(View.GONE);
@@ -595,7 +646,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 }
             });
             contactName.setText(contactNameContent);
-            setAvatar();
+//            setAvatar();
         }
         codeScanner.releaseResources();
         inviteAlertDialog.show();
