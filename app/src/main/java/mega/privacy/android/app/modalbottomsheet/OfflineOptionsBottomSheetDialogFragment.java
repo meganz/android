@@ -1,7 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -23,24 +22,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -56,6 +50,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     TextView nodeInfo;
     LinearLayout optionDeleteOffline;
     private LinearLayout optionOpenWith;
+    LinearLayout optionPrint;
+    LinearLayout copyClip;
+    LinearLayout saveFilesystem;
 
     DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -112,6 +109,13 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteOffline = (LinearLayout) contentView.findViewById(R.id.option_delete_offline_layout);
         optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
 
+        optionPrint = (LinearLayout) contentView.findViewById(R.id.option_print_offline_layout);
+        copyClip = (LinearLayout) contentView.findViewById(R.id.option_copy_offline_layout);
+        saveFilesystem = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
+
+        optionPrint.setOnClickListener(this);
+        copyClip.setOnClickListener(this);
+        saveFilesystem.setOnClickListener(this);
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
@@ -140,8 +144,16 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
                     nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
                 }
+
+                optionPrint.setVisibility(View.VISIBLE);
+                copyClip.setVisibility(View.VISIBLE);
+                saveFilesystem.setVisibility(View.VISIBLE);
             }
             else{
+
+                optionPrint.setVisibility(View.GONE);
+                copyClip.setVisibility(View.GONE);
+                saveFilesystem.setVisibility(View.GONE);
 
                 log("Set node info");
                 String path=null;
@@ -256,6 +268,23 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             case R.id.option_open_with_layout:{
                 log("Open with");
                 openWith();
+                break;
+            }
+            case R.id.option_print_offline_layout:{
+                log("Option print rK");
+
+                break;
+            }
+            case R.id.option_save_offline_layout:{
+                log("Option save on filesystem");
+                AccountController aC = new AccountController(getContext());
+                aC.saveRkToFileSystem(true);
+                break;
+            }
+            case R.id.option_copy_offline_layout:{
+                log("Option copy to clipboard");
+                AccountController aC = new AccountController(getContext());
+                aC.copyMK(false);
                 break;
             }
         }
