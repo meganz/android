@@ -897,11 +897,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 			if(cDriveExplorer!=null){
 				if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
-					log("3**Change title");
 					aB.setTitle(getString(R.string.section_cloud_drive));
 				}
 				else{
-					log("4**Change title");
 					aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
 				}
 			}
@@ -919,11 +917,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				if(cDriveExplorer!=null){
 					if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
-						log("3**Change title");
 						aB.setTitle(getString(R.string.section_cloud_drive));
 					}
 					else{
-						log("4**Change title");
 						aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
 					}
 				}
@@ -939,11 +935,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				if(iSharesExplorer!=null){
 					if(iSharesExplorer.getDeepBrowserTree()==0){
-						log("5**Change title");
 						aB.setTitle(getString(R.string.title_incoming_shares_explorer));
 					}
 					else{
-						log("6**Change title");
 						aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.parentHandle).getName());
 					}
 				}
@@ -959,7 +953,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				chatExplorer = (ChatExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 				if(chatExplorer!=null){
-					log("7**Change title");
 					aB.setTitle(getString(R.string.section_chat));
 				}
 
@@ -1163,13 +1156,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
 							}
 
-							ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
-							nodeAttachments.add(nodeAttachment);
-							PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+							PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
 //							AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
 //							sendMessageUploading(newNodeAttachmentMsg);
 
-							intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+							intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
 							intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
 							startService(intent);

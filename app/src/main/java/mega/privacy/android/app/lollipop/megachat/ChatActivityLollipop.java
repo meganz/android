@@ -8,19 +8,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GestureDetectorCompat;
@@ -44,18 +40,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -64,9 +56,7 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -90,17 +80,17 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
-import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -129,9 +119,6 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-
-
-
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
@@ -145,6 +132,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private AlertDialog errorOpenChatDialog;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog overquotaDialog;
 
     boolean sendOriginalAttachments = false;
 
@@ -178,6 +166,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public long idChat;
 
     boolean noMoreNoSentMessages = false;
+
+    private BadgeDrawerArrowDrawable badgeDrawable;
 
     ChatController chatC;
     boolean scrollingUp = false;
@@ -389,7 +379,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(token!=null){
                 messageToShow.append("FCM TOKEN: " +token);
             }
-            messageToShow.append("\nCHAT ID: " + MegaApiJava.handleToBase64(idChat));
+            messageToShow.append("\nCHAT ID: " + MegaApiJava.userHandleToBase64(idChat));
             messageToShow.append("\nMY USER HANDLE: " +MegaApiJava.userHandleToBase64(megaChatApi.getMyUserHandle()));
             if(androidM!=null){
                 MegaChatMessage m = androidM.getMessage();
@@ -397,8 +387,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     messageToShow.append("\nMESSAGE TYPE: " +m.getType());
                     messageToShow.append("\nMESSAGE TIMESTAMP: " +m.getTimestamp());
                     messageToShow.append("\nMESSAGE USERHANDLE: " +MegaApiJava.userHandleToBase64(m.getUserHandle()));
-                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.handleToBase64(m.getMsgId()));
-                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.handleToBase64(m.getTempId()));
+                    messageToShow.append("\nMESSAGE ID: " +MegaApiJava.userHandleToBase64(m.getMsgId()));
+                    messageToShow.append("\nMESSAGE TEMP ID: " +MegaApiJava.userHandleToBase64(m.getTempId()));
                 }
             }
 
@@ -474,19 +464,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
 
-        tB.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                showGroupInfoActivity();
-            }
-        });
+        tB.setOnClickListener(this);
+
+        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
         display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        updateNavigationToolbarIcon();
 
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_chat);
 
@@ -808,11 +795,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     log("Recover chat with id: " + idChat);
                     chatRoom = megaChatApi.getChatRoom(idChat);
                     if(chatRoom==null){
-                        log("Chatroom is NULL - finisg activity!!");
+                        log("Chatroom is NULL - finish activity!!");
                         finish();
                     }
 
-                    log("Call to open chat");
+                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                    if(prefs!=null){
+                        String written = prefs.getWrittenText();
+                        if(written!=null && (!written.isEmpty())){
+                            textChat.setText(written);
+                        }
+                    }
+                    else{
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "", "");
+                        dbH.setChatItemPreferences(prefs);
+                    }
+
+                    log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
+
                     boolean result = megaChatApi.openChatRoom(idChat, this);
 
                     if(!result){
@@ -843,7 +843,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             setAsRead=false;
                         }
 
-                        MegaApplication.setOpenChatId(idChat);
                         messages = new ArrayList<AndroidMegaChatMessage>();
                         bufferMessages = new ArrayList<AndroidMegaChatMessage>();
                         bufferManualSending = new ArrayList<AndroidMegaChatMessage>();
@@ -879,6 +878,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("INTENT is NULL");
         }
+        log("FINISH on Create");
     }
 
     public void loadHistory(){
@@ -922,10 +922,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
             aB.setSubtitle(getString(R.string.invalid_connection_state));
+            tB.setOnClickListener(this);
         }
         else{
             int permission = chatRoom.getOwnPrivilege();
             if (chatRoom.isGroup()) {
+                tB.setOnClickListener(this);
+
                 log("Check permissions group chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
                     log("Permission RO");
@@ -968,6 +971,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("Check permissions one to one chat");
                 if(permission==MegaChatRoom.PRIV_RO) {
                     log("Permission RO");
+
+                    if(megaApi!=null){
+                       if(megaApi.getRootNode()!=null){
+                           long chatHandle = chatRoom.getChatId();
+                           MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+                           long userHandle = chat.getPeerHandle(0);
+                           String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                           MegaUser user = megaApi.getContact(userHandleEncoded);
+
+                           if(user!=null){
+                               if(user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                                   tB.setOnClickListener(this);
+                               }else{
+                                   tB.setOnClickListener(null);
+                               }
+                           }
+                       }
+                    }else{
+                        tB.setOnClickListener(null);
+                    }
+
                     writingContainerLayout.setVisibility(View.GONE);
 
                     mediaButton.setVisibility(View.GONE);
@@ -979,6 +1003,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                 }
                 else if(permission==MegaChatRoom.PRIV_RM) {
+                    tB.setOnClickListener(this);
+
                     log("Permission RM");
                     writingContainerLayout.setVisibility(View.GONE);
 
@@ -991,6 +1017,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     aB.setSubtitle(null);
                 }
                 else{
+                    tB.setOnClickListener(this);
+
                     long userHandle = chatRoom.getPeerHandle(0);
                     setStatus(userHandle);
                     writingContainerLayout.setVisibility(View.VISIBLE);
@@ -1595,6 +1623,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         MegaApplication.setShowPinScreen(false);
     }
 
+    public void showProgressForwarding(){
+        log("showProgressForwarding");
+
+        statusDialog = new ProgressDialog(this);
+        statusDialog.setMessage(getString(R.string.general_forwarding));
+        statusDialog.show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         log("onActivityResult, resultCode: " + resultCode);
@@ -1751,13 +1787,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 return;
             }
 
+            showProgressForwarding();
+
             long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
             log("Send to "+chatHandles.length+" chats");
 
             long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
             log("Send "+idMessages.length+" messages");
 
-            for(int k=0;k<chatHandles.length;k++){
+            MultipleForwardChatListener listener = null;
+            if(chatHandles.length==1){
                 for(int i=0;i<idMessages.length;i++){
                     MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
                     if(messageToForward!=null){
@@ -1766,7 +1805,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         switch(type){
                             case MegaChatMessage.TYPE_NORMAL:{
                                 String text = messageToForward.getContent();
-                                megaChatApi.sendMessage(chatHandles[k], text);
+                                megaChatApi.sendMessage(chatHandles[0], text);
                                 break;
                             }
                             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
@@ -1783,16 +1822,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     }
                                 }
 
-                                megaChatApi.attachContacts(chatHandles[k], handleList);
+                                megaChatApi.attachContacts(chatHandles[0], handleList);
                                 break;
                             }
                             case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-
+                                if(listener == null){
+                                    listener = new MultipleForwardChatListener (this, chatHandles[0]);
+                                }
                                 MegaNodeList nodeList = messageToForward.getMegaNodeList();
                                 if(nodeList != null) {
                                     for (int j = 0; j < nodeList.size(); j++) {
                                         MegaNode temp = nodeList.get(j);
-                                        megaChatApi.attachNode(chatHandles[k], temp.getHandle(), null);
+                                        megaChatApi.attachNode(chatHandles[0], temp.getHandle(), listener);
                                     }
                                 }
                                 break;
@@ -1804,21 +1845,66 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
             }
-
-            if(chatHandles.length==1){
-                log("Open chat to forward messages");
-
-                Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
-                intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentOpenChat.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-                intentOpenChat.putExtra("CHAT_ID", chatHandles[0]);
-                startActivity(intentOpenChat);
-                finish();
-            }
             else{
-                log("Send messages to no of chats: "+chatHandles.length);
-                clearSelections();
-                hideMultipleSelect();
+
+                for(int k=0;k<chatHandles.length;k++){
+                    for(int i=0;i<idMessages.length;i++){
+                        MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
+                        if(messageToForward!=null){
+                            int type = messageToForward.getType();
+                            log("Type of message to forward: "+type);
+                            switch(type){
+                                case MegaChatMessage.TYPE_NORMAL:{
+                                    String text = messageToForward.getContent();
+                                    megaChatApi.sendMessage(chatHandles[k], text);
+                                    break;
+                                }
+                                case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
+
+                                    MegaHandleList handleList = MegaHandleList.createInstance();
+                                    long userCount  = messageToForward.getUsersCount();
+                                    for(int j=0; j<userCount;j++){
+                                        MegaUser user = megaApi.getContact(messageToForward.getUserEmail(j));
+                                        if (user != null) {
+                                            handleList.addMegaHandle(user.getHandle());
+                                        }
+                                        else{
+                                            log("The user in not contact - cannot be forwarded");
+                                        }
+                                    }
+
+                                    megaChatApi.attachContacts(chatHandles[k], handleList);
+                                    break;
+                                }
+                                case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
+                                    if(listener == null){
+                                        listener = new MultipleForwardChatListener (this, -1);
+                                    }
+                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
+                                    if(nodeList != null) {
+                                        for (int j = 0; j < nodeList.size(); j++) {
+                                            MegaNode temp = nodeList.get(j);
+                                            megaChatApi.attachNode(chatHandles[k], temp.getHandle(), listener);
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        else{
+                            log("ERROR -> message is null on forwarding");
+                        }
+                    }
+                }
+            }
+
+            if(listener==null){
+                if(chatHandles.length==1){
+                    openChatAfterForward(chatHandles[0]);
+                }
+                else{
+                    openChatAfterForward(-1);
+                }
             }
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
@@ -2202,6 +2288,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 break;
             }
+            case R.id.toolbar_chat:{
+                showGroupInfoActivity();
+                break;
+            }
 		}
     }
 
@@ -2259,7 +2349,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void sendMessageUploading(AndroidMegaChatMessage androidMsgSent){
         log("sendMessageUploading");
 
-        log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getNames().get(0));
+        log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getName());
 
         int index = messages.size();
         if(androidMsgSent!=null){
@@ -4654,6 +4744,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         snackbar.show();
     }
 
+    public void showSnackbarNotSpace(){
+        log("showSnackbarNotSpace");
+        Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+        mySnackbar.show();
+    }
+
     public void startConversation(long handle){
         log("startConversation");
         MegaChatRoom chat = megaChatApi.getChatRoomByUser(handle);
@@ -4668,8 +4765,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
             intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-            finish();
             this.startActivity(intentOpenChat);
+            finish();
         }
     }
 
@@ -4714,7 +4811,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        log("onRequestFinish");
+        log("onRequestFinish: "+request.getRequestString()+" "+request.getType());
 
         if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
             log("Truncate history request finish!!!");
@@ -4798,8 +4895,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
                 intent.setAction(Constants.ACTION_NEW_CHAT);
                 intent.putExtra("CHAT_ID", request.getChatHandle());
-                finish();
                 this.startActivity(intent);
+                finish();
             }
             else{
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
@@ -4814,14 +4911,35 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     @Override
+    protected void onStop() {
+        log("onStop()");
+
+        try{
+            if(textChat!=null){
+                String written = textChat.getText().toString();
+                if(written!=null){
+                    dbH.setWrittenTextItem(Long.toString(idChat), textChat.getText().toString());
+                }
+            }
+            else{
+                log("textChat is NULL");
+            }
+
+        }
+        catch (Exception e){
+            log("Written message not stored on DB");
+        }
+
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy(){
         log("onDestroy()");
 
         megaChatApi.closeChatRoom(idChat, this);
         log("removeChatListener");
         megaChatApi.removeChatListener(this);
-
-        MegaApplication.setOpenChatId(-1);
 
         super.onDestroy();
     }
@@ -4870,6 +4988,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     else{
                         log("Error. The idPendMsg is -1");
                     }
+
+                    boolean isOverquota = intent.getBooleanExtra("IS_OVERQUOTA", false);
+                    if(isOverquota){
+                        showOverquotaAlert();
+                    }
+
                     return;
                 }
                 else if(intent.getAction().equals(Constants.ACTION_NEW_CHAT)){
@@ -5085,7 +5209,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             dbH.setMsgNode(idPendingMsg, idNode);
 
                             nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
-
                         }
                         else{
                             File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -5129,16 +5252,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         nodeAttachment = new PendingNodeAttachment(info.getFileAbsolutePath(), fingerprint, info.getTitle());
                     }
 
-                    ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
-                    nodeAttachments.add(nodeAttachment);
-                    PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+                    PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
                     AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
                     sendMessageUploading(newNodeAttachmentMsg);
 
 //                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
 //                filePaths.add("/home/jfjf.jpg");
 
-                    intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+                    intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
                     startService(intent);
@@ -5171,11 +5292,35 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
     }
 
+    public void openChatAfterForward(long chatHandle){
+        log("openChatAfterForward");
+        try{
+            statusDialog.dismiss();
+        } catch(Exception ex) {};
+
+        if(chatHandle!=-1){
+            log("Open chat to forward messages");
+
+            Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
+            intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intentOpenChat.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+            intentOpenChat.putExtra("CHAT_ID", chatHandle);
+            startActivity(intentOpenChat);
+            finish();
+        }
+        else{
+            clearSelections();
+            hideMultipleSelect();
+            showSnackbar(getString(R.string.messages_forwarded_success));
+        }
+    }
+
    @Override
     protected void onResume(){
         super.onResume();
 
         MegaApplication.setShowPinScreen(true);
+        MegaApplication.setOpenChatId(idChat);
 
         activityVisible = true;
         setLastMessageSeen();
@@ -5220,12 +5365,42 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         super.onPause();
 
         activityVisible = false;
+        MegaApplication.setOpenChatId(-1);
     }
 
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+            updateNavigationToolbarIcon();
+        }
+    }
 
+    public void updateNavigationToolbarIcon(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int numberUnread = megaChatApi.getUnreadChats();
+
+            if(numberUnread==0){
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            }
+            else{
+
+                badgeDrawable.setProgress(1.0f);
+
+                if(numberUnread>9){
+                    badgeDrawable.setText("9+");
+                }
+                else{
+                    badgeDrawable.setText(numberUnread+"");
+                }
+
+                aB.setHomeAsUpIndicator(badgeDrawable);
+            }
+        }
+        else{
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        }
     }
 
     @Override
@@ -5342,13 +5517,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
 
-        ArrayList<PendingNodeAttachment> nodeAttachments = new ArrayList<>();
-        nodeAttachments.add(nodeAttachment);
-        PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachments, timestamp, PendingMessage.STATE_SENDING);
+        PendingMessage newPendingMsg = new PendingMessage(idPendingMsg, idChat, nodeAttachment, timestamp, PendingMessage.STATE_SENDING);
         AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
         sendMessageUploading(newNodeAttachmentMsg);
 
-        intent.putStringArrayListExtra(ChatUploadService.EXTRA_FILEPATHS, newPendingMsg.getFilePaths());
+        intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
         startService(intent);
@@ -5385,5 +5558,44 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private void showOverquotaAlert(){
+        log("showOverquotaAlert");
+        dbH.setCamSyncEnabled(false);
 
+        if(overquotaDialog==null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.overquota_alert_title));
+            builder.setMessage(getString(R.string.overquota_alert_text));
+
+            builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showUpgradeAccount();
+                }
+            });
+            builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    overquotaDialog=null;
+                }
+            });
+
+            overquotaDialog = builder.create();
+            overquotaDialog.setCanceledOnTouchOutside(false);
+            overquotaDialog.show();
+        }
+        else{
+            overquotaDialog.show();
+        }
+    }
+
+    public void showUpgradeAccount(){
+        log("showUpgradeAccount");
+        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        upgradeIntent.setAction(Constants.ACTION_SHOW_UPGRADE_ACCOUNT);
+        startActivity(upgradeIntent);
+    }
 }

@@ -28,9 +28,9 @@ public class RTFFormatter {
     boolean recursive = false;
     Typeface font;
     Pattern pMultiQuote = Pattern.compile("(?<=[\\W\\d]|^)(```)(.*?)(```)(?=[\\W\\d]|$)");
-    Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)(.*?)(`)(?=[\\W\\d]|$)");
-    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?)(\\_)(?=[\\W\\d]|$)");
-    Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?|[^*\\n]*?[^\\s])(\\*)(?=[\\W\\d]|$)");
+    Pattern pQuote = Pattern.compile("(?<=[\\W\\d]|^)(`)([^`]+?.*?[^\\n.]*?[^\\n]*?.*?[^`]+?)(`)(?=[\\W\\d]|$)");
+    Pattern pItalic = Pattern.compile("(?<=[\\W\\d]|^)(\\_)([^_\\n]*?.*?)(\\_)(?=[\\W\\d]|$)");
+    Pattern pBold = Pattern.compile("(?<=[\\W\\d]|^)(\\*)([^\\s][^*\\n]*?.*?|[^*\\n]*?[^\\s].*?)(\\*)(?=[\\W\\d]|$)");
 
     public boolean isFormatted() {
         return formatted;
@@ -54,12 +54,17 @@ public class RTFFormatter {
 
         if(!messageContent.isEmpty()) {
 
+            if (messageContent.lastIndexOf(" ") == (messageContent.length()-1)){
+                messageContent = messageContent.substring(0,messageContent.length()-1);
+            }
+
             font = Typeface.createFromAsset(context.getAssets(), "font/RobotoMono-Regular.ttf");
+
+            queryIfMultiQuoteFormat();
 
             Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
 
             if (mMultiQuote != null && mMultiQuote.find()) {
-
                 log("Multiquote found!");
 
                 int startBold = -1;
@@ -142,7 +147,12 @@ public class RTFFormatter {
                         startItalic = messageContent.indexOf(("_"));
                         startQuote = messageContent.indexOf(("`"));
                         if (startQuote < startItalic) {
-                            applyQuoteFormat();
+                            if (bold){
+                                applyBoldFormat();
+                            }
+                            else {
+                                applyQuoteFormat();
+                            }
                             formatted = true;
                             return ssb;
                         }
@@ -161,7 +171,7 @@ public class RTFFormatter {
 
             if(mItalic!=null) {
                 if(mItalic.find()){
-
+                    log("Find Italic!");
                     Matcher mBold = pBold.matcher(messageContent);
 
                     int startBold = -1;
@@ -204,7 +214,7 @@ public class RTFFormatter {
                 }
             }
 
-            Pattern pQuote2 = Pattern.compile("(?<=[\\W\\d]|^)(`)(.*?)(`)(?=[\\W\\d]|$)");
+            Pattern pQuote2 = Pattern.compile("(?<=[\\W\\d]|^)(`)([^`]+?.*?[^\\n.]*?[^\\n]*?.*?[^`]+?)(`)(?=[\\W\\d]|$)");
 
             Matcher mQuote2 = pQuote2.matcher(messageContent);
 
@@ -220,6 +230,128 @@ public class RTFFormatter {
 
         formatted = false;
         return ssb;
+    }
+
+    public void queryIfMultiQuoteFormat(){
+        log("queryIfMultiQuoteFormat");
+
+        String a = messageContent.substring(0,3);
+        String message = messageContent;
+        int start;
+        int end;
+        boolean bold = false;
+        boolean italic = false;
+        int startBold;
+        int startMultiquote;
+        String substring;
+
+        if (message.contains("```")){
+            log("Check if there is emoji at the beginning of the string");
+            start = messageContent.indexOf("```");
+            String emoji = messageContent.substring(0, start);
+            if(EmojiManager.isEmoji(emoji)){
+                log("The first element is emoji");
+                substring = messageContent.substring(0, start);
+                if(ssb==null){
+                    ssb = new SimpleSpanBuilder();
+                }
+                ssb.append(substring+'\n');
+
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.delete(0, start);
+                messageContent = sb.toString();
+                queryIfMultiQuoteFormat();
+            }
+            else {
+                if (a.equals("```")){
+                    StringBuilder sb = new StringBuilder(message);
+                    sb.delete(0,3);
+                    message = sb.toString();
+
+                    if (message.contains("```")){
+                        Matcher mBold = pBold.matcher(messageContent);
+
+                        if(mBold!=null){
+                            if(mBold.find()) {
+                                bold = true;
+                                startBold = messageContent.indexOf(("*"));
+                                startMultiquote = messageContent.indexOf(("```"));
+                                if (startMultiquote < startBold) {
+                                    applyMultiQuoteFormat();
+                                    formatted = true;
+                                }
+                            }
+                        }
+
+                        int startItalic = -1;
+
+                        Matcher mItalic = pItalic.matcher(messageContent);
+
+                        if(mItalic!=null) {
+                            if(mItalic.find()) {
+                                italic = true;
+                                startItalic = messageContent.indexOf(("_"));
+                                startMultiquote = messageContent.indexOf(("```"));
+                                if (startMultiquote < startItalic) {
+                                    applyMultiQuoteFormat();
+                                    formatted = true;
+                                }
+                            }
+                        }
+
+                        if(!bold && !italic){
+                            applyMultiQuoteFormat();
+                            formatted = true;
+                        }
+                    }
+                }
+                else {
+                    start = message.indexOf(" ```");
+                    if (start != -1){
+                        StringBuilder sb = new StringBuilder(message);
+                        sb.delete(start, start+3);
+                        message = sb.toString();
+
+                        if (message.contains("```")){
+                            Matcher mBold = pBold.matcher(messageContent);
+
+                            if(mBold!=null){
+                                if(mBold.find()) {
+                                    bold = true;
+                                    startBold = messageContent.indexOf(("*"));
+                                    startMultiquote = messageContent.indexOf(("```"));
+                                    if (startMultiquote < startBold) {
+                                        applyMultiQuoteFormat();
+                                        formatted = true;
+                                    }
+                                }
+                            }
+
+                            int startItalic = -1;
+
+                            Matcher mItalic = pItalic.matcher(messageContent);
+
+                            if(mItalic!=null) {
+                                if(mItalic.find()) {
+                                    italic = true;
+                                    startItalic = messageContent.indexOf(("_"));
+                                    startMultiquote = messageContent.indexOf(("```"));
+                                    if (startMultiquote < startItalic) {
+                                        applyMultiQuoteFormat();
+                                        formatted = true;
+                                    }
+                                }
+                            }
+
+                            if(!bold && !italic){
+                                applyMultiQuoteFormat();
+                                formatted = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static void log(String log) {
@@ -307,6 +439,14 @@ public class RTFFormatter {
             else{
                 ssb.append(substring, new CustomTypefaceSpan("", font));
             }
+
+            String emoji = messageContent;
+            if(EmojiManager.isEmoji(emoji)){
+                log("The last element is emoji");
+                ssb.append(emoji);
+
+                messageContent = "";
+            }
         }
         else{
             log("End position: "+end);
@@ -330,6 +470,14 @@ public class RTFFormatter {
             }
             else{
                 ssb.append(substring, new CustomTypefaceSpan("", font));
+            }
+
+            String emoji = messageContent;
+            if(EmojiManager.isEmoji(emoji)){
+                log("The last element is emoji");
+                ssb.append(emoji);
+
+                messageContent = "";
             }
 
             log("Message content T: "+messageContent);
@@ -361,7 +509,6 @@ public class RTFFormatter {
         }
 
         String substring = null;
-
         if(a =='`'){
 
             StringBuilder sb = new StringBuilder(messageContent);
@@ -369,47 +516,72 @@ public class RTFFormatter {
             messageContent = sb.toString();
         }
         else{
+
             start = messageContent.indexOf(" `");
 
             if(start==-1){
-                log("Check if there is emoji at the beginning of the string");
-                start = messageContent.indexOf("`");
-                String emoji = messageContent.substring(0, start);
-                if(EmojiManager.isEmoji(emoji)){
-                    log("The first element is emoji");
-                    substring = messageContent.substring(0, start);
-                    ssb.append(substring);
+                start = messageContent.indexOf("\n`");
+                if (start == -1){
+                    log("Check if there is emoji at the beginning of the string");
+                    start = messageContent.indexOf("`");
+                    String emoji = messageContent.substring(0, start);
+                    if(EmojiManager.isEmoji(emoji)){
+                        log("The first element is emoji");
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
 
-                    StringBuilder sb = new StringBuilder(messageContent);
-                    sb.delete(0, start+1);
-                    messageContent = sb.toString();
-                }
-                else {
-                    List<String> emojiList = EmojiParser.extractEmojis(emoji);
-                    if (emojiList != null) {
-                        if (!emojiList.isEmpty()) {
-                            substring = messageContent.substring(0, start);
-                            int lastSpace = substring.lastIndexOf(" ");
-                            if(lastSpace!=-1){
-                                String checkEmoji = substring.substring(lastSpace+1, start);
-                                if(EmojiManager.isEmoji(checkEmoji)){
-                                    ssb.append(substring);
+                        StringBuilder sb = new StringBuilder(messageContent);
+                        sb.delete(0, start+1);
+                        messageContent = sb.toString();
+                    }
+                    else {
+                        List<String> emojiList = EmojiParser.extractEmojis(emoji);
+                        if (emojiList != null) {
+                            if (!emojiList.isEmpty()) {
+                                substring = messageContent.substring(0, start);
+                                int lastSpace = substring.lastIndexOf(" ");
+                                if(lastSpace!=-1){
+                                    String checkEmoji = substring.substring(lastSpace+1, start);
+                                    if(EmojiManager.isEmoji(checkEmoji)){
+                                        ssb.append(substring);
 
-                                    StringBuilder sb = new StringBuilder(messageContent);
-                                    sb.delete(0, start+1);
-                                    messageContent = sb.toString();
+                                        StringBuilder sb = new StringBuilder(messageContent);
+                                        sb.delete(0, start+1);
+                                        messageContent = sb.toString();
+                                    }
                                 }
                             }
                         }
                     }
+                }
+                else {
+                    int startPrevious = messageContent.indexOf("`");
+                    if(startPrevious<start){
+                        String emoji = messageContent.substring(0, startPrevious);
+                        if(EmojiManager.isEmoji(emoji)){
+                            log("The first element is emoji");
+                            substring = messageContent.substring(0, startPrevious);
+                            ssb.append(substring);
 
+                            StringBuilder sb = new StringBuilder(messageContent);
+                            sb.delete(0, startPrevious+1);
+                            messageContent = sb.toString();
+                        }
+                    }
+                    else{
+                        start++;
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
+
+                        StringBuilder sb = new StringBuilder(messageContent);
+                        sb.delete(0, start+1);
+                        messageContent = sb.toString();
+                    }
                 }
             }
             else{
-
                 int startPrevious = messageContent.indexOf("`");
-                if(startPrevious<start)
-                {
+                if(startPrevious<start){
                     String emoji = messageContent.substring(0, startPrevious);
                     if(EmojiManager.isEmoji(emoji)){
                         log("The first element is emoji");
@@ -436,23 +608,189 @@ public class RTFFormatter {
         log("Message content: "+messageContent);
         end = messageContent.indexOf("` ");
         if(end==-1){
-            end = messageContent.lastIndexOf("`");
-            log("FINISH End position: "+end);
+            end = messageContent.indexOf("`\n");
+            if (end == -1){
+                end = messageContent.indexOf("`");
+                if (end == -1){
+                    end = messageContent.lastIndexOf("`");
+                    log("FINISH End position: "+end);
 
-            StringBuilder sb = new StringBuilder(messageContent);
-            sb.deleteCharAt(end);
-            messageContent = sb.toString();
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(end);
+                    messageContent = sb.toString();
 
-            log("Message content: "+messageContent);
+                    log("Message content: "+messageContent);
 
-            substring = messageContent.substring(0, end);
+                    substring = messageContent.substring(0, end);
 
-            ssb.append(substring, new CustomTypefaceSpan("", font));
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
 
-            sb = new StringBuilder(messageContent);
-            sb.delete(0, end);
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, end);
 //            sb.insert(0, '\n');
-            messageContent = sb.toString();
+                    messageContent = sb.toString();
+                }
+                else {
+                    log("End position: "+end);
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(end);
+                    messageContent = sb.toString();
+
+                    log("Message content B: "+messageContent);
+                    substring = messageContent.substring(0, end);
+
+                    ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, end);
+                    messageContent = sb.toString();
+
+                    String emoji = messageContent;
+                    if(EmojiManager.isEmoji(emoji)){
+                        log("The last element is emoji");
+                        ssb.append(emoji);
+
+                        messageContent = "";
+                    }
+
+                    log("Message content T: "+messageContent);
+
+                    Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
+                    if (mMultiQuote != null && mMultiQuote.find()){
+                        setRTFFormat();
+                    }
+
+                    start = messageContent.indexOf(" `");
+                    while(start!=-1){
+
+                        start = start +1;
+
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(start);
+                        messageContent = sb.toString();
+
+                        log("(B) Start position: "+start);
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, start);
+                        messageContent = sb.toString();
+
+                        log("Message content C: "+messageContent);
+                        end = messageContent.indexOf("` ");
+                        if(end==-1){
+                            end = messageContent.lastIndexOf("`");
+
+                            sb = new StringBuilder(messageContent);
+                            sb.deleteCharAt(end);
+                            messageContent = sb.toString();
+
+                            log("(B)FINISH End position: "+end);
+                            substring = messageContent.substring(0, end);
+                            ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                            sb = new StringBuilder(messageContent);
+                            sb.delete(0, end);
+                            messageContent = sb.toString();
+
+                            break;
+                        }
+                        else{
+                            log("End position: "+end);
+                            sb = new StringBuilder(messageContent);
+                            sb.deleteCharAt(end);
+                            messageContent = sb.toString();
+                            log("Message content D: "+messageContent);
+
+                            substring = messageContent.substring(0, end);
+                            ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                            sb = new StringBuilder(messageContent);
+                            sb.delete(0, end);
+                            messageContent = sb.toString();
+
+                            start = messageContent.indexOf(" `");
+                        }
+                    }
+                }
+            }
+            else {
+                log("End position: "+end);
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.deleteCharAt(end);
+                messageContent = sb.toString();
+
+                log("Message content B: "+messageContent);
+                substring = messageContent.substring(0, end);
+
+                ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                sb = new StringBuilder(messageContent);
+                sb.delete(0, end);
+                messageContent = sb.toString();
+
+                log("Message content T: "+messageContent);
+
+                Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
+                if (mMultiQuote != null && mMultiQuote.find()){
+                    setRTFFormat();
+                }
+
+                start = messageContent.indexOf(" `");
+                while(start!=-1){
+
+                    start = start +1;
+
+                    sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(start);
+                    messageContent = sb.toString();
+
+                    log("(B) Start position: "+start);
+                    substring = messageContent.substring(0, start);
+                    ssb.append(substring);
+
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, start);
+                    messageContent = sb.toString();
+
+                    log("Message content C: "+messageContent);
+                    end = messageContent.indexOf("` ");
+                    if(end==-1){
+                        end = messageContent.lastIndexOf("`");
+
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
+
+                        log("(B)FINISH End position: "+end);
+                        substring = messageContent.substring(0, end);
+                        ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, end);
+                        messageContent = sb.toString();
+
+                        break;
+                    }
+                    else{
+                        log("End position: "+end);
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
+                        log("Message content D: "+messageContent);
+
+                        substring = messageContent.substring(0, end);
+                        ssb.append(substring, new CustomTypefaceSpan("", font));
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, end);
+                        messageContent = sb.toString();
+
+                        start = messageContent.indexOf(" `");
+                    }
+                }
+            }
         }
         else{
             log("End position: "+end);
@@ -470,6 +808,11 @@ public class RTFFormatter {
             messageContent = sb.toString();
 
             log("Message content T: "+messageContent);
+
+            Matcher mMultiQuote = pMultiQuote.matcher(messageContent);
+            if (mMultiQuote != null && mMultiQuote.find()){
+                setRTFFormat();
+            }
 
             start = messageContent.indexOf(" `");
             while(start!=-1){
@@ -538,9 +881,11 @@ public class RTFFormatter {
     }
 
     public void applyItalicFormat(){
+        log("applyItalicFormat");
         char a = messageContent.charAt(0);
         int start;
         int end;
+        String messageContentInitial = messageContent;
 
         if(ssb==null){
             ssb = new SimpleSpanBuilder();
@@ -598,37 +943,65 @@ public class RTFFormatter {
             start = messageContent.indexOf(" _");
 
             if(start==-1){
-                log("Check if there is emoji at the beginning of the string");
-                start = messageContent.indexOf("_");
-                String emoji = messageContent.substring(0, start);
-                if(EmojiManager.isEmoji(emoji)){
-                    log("The first element is emoji");
-                    substring = messageContent.substring(0, start);
-                    ssb.append(substring);
+                start = messageContent.indexOf("\n_");
+                if (start == -1){
+                    log("Check if there is emoji at the beginning of the string");
+                    start = messageContent.indexOf("_");
+                    String emoji = messageContent.substring(0, start);
+                    if(EmojiManager.isEmoji(emoji)){
+                        log("The first element is emoji");
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
 
-                    StringBuilder sb = new StringBuilder(messageContent);
-                    sb.delete(0, start+1);
-                    messageContent = sb.toString();
-                }
-                else {
-                    List<String> emojiList = EmojiParser.extractEmojis(emoji);
-                    if (emojiList != null) {
-                        if (!emojiList.isEmpty()) {
-                            substring = messageContent.substring(0, start);
-                            int lastSpace = substring.lastIndexOf(" ");
-                            if(lastSpace!=-1){
-                                String checkEmoji = substring.substring(lastSpace+1, start);
-                                if(EmojiManager.isEmoji(checkEmoji)){
-                                    ssb.append(substring);
+                        StringBuilder sb = new StringBuilder(messageContent);
+                        sb.delete(0, start+1);
+                        messageContent = sb.toString();
+                    }
+                    else {
+                        List<String> emojiList = EmojiParser.extractEmojis(emoji);
+                        if (emojiList != null) {
+                            if (!emojiList.isEmpty()) {
+                                substring = messageContent.substring(0, start);
+                                int lastSpace = substring.lastIndexOf(" ");
+                                if(lastSpace!=-1){
+                                    String checkEmoji = substring.substring(lastSpace+1, start);
+                                    if(EmojiManager.isEmoji(checkEmoji)){
+                                        ssb.append(substring);
 
-                                    StringBuilder sb = new StringBuilder(messageContent);
-                                    sb.delete(0, start+1);
-                                    messageContent = sb.toString();
+                                        StringBuilder sb = new StringBuilder(messageContent);
+                                        sb.delete(0, start+1);
+                                        messageContent = sb.toString();
+                                    }
                                 }
                             }
                         }
-                    }
 
+                    }
+                }
+                else {
+                    int startPrevious = messageContent.indexOf("_");
+                    if(startPrevious<start)
+                    {
+                        String emoji = messageContent.substring(0, startPrevious);
+                        if(EmojiManager.isEmoji(emoji)){
+                            log("The first element is emoji");
+                            substring = messageContent.substring(0, startPrevious);
+                            ssb.append(substring);
+
+                            StringBuilder sb = new StringBuilder(messageContent);
+                            sb.delete(0, startPrevious+1);
+                            messageContent = sb.toString();
+                        }
+                    }
+                    else{
+                        start++;
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
+
+                        StringBuilder sb = new StringBuilder(messageContent);
+                        sb.delete(0, start+1);
+                        messageContent = sb.toString();
+                    }
                 }
             }
             else{
@@ -660,140 +1033,270 @@ public class RTFFormatter {
 
         log("Message content: "+messageContent);
         end = messageContent.indexOf("_ ");
-        if(end==-1){
-            end = messageContent.lastIndexOf("_");
-            log("FINISH End position: "+end);
-
-            StringBuilder sb = new StringBuilder(messageContent);
-            sb.deleteCharAt(end);
-            messageContent = sb.toString();
-
-            log("Message content: "+messageContent);
-
-            substring = messageContent.substring(0, end);
-
-            Matcher mBold = pBold.matcher(substring);
-
-            if(mBold!=null && mBold.find()){
-                applyItalicBoldFormat(substring);
-            }
-            else {
-
-                Matcher mMultiQuote = pMultiQuote.matcher(substring);
-
-                if (mMultiQuote != null && mMultiQuote.find()) {
-                    log("Multiquote");
-                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
-                }
-                else{
-                    Matcher mQuote = pQuote.matcher(substring);
-
-                    if (mQuote != null && mQuote.find()) {
-                        log("Quote");
-                        applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
-                    }
-                    else{
-                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-                    }
-                }
-            }
-
-            sb = new StringBuilder(messageContent);
-            sb.delete(0, end);
-            messageContent = sb.toString();
-        }
-        else{
-            log("End position: "+end);
-            StringBuilder sb = new StringBuilder(messageContent);
-            sb.deleteCharAt(end);
-            messageContent = sb.toString();
-
-            log("Message content B: "+messageContent);
-            substring = messageContent.substring(0, end);
-
-            Matcher mBold = pBold.matcher(substring);
-
-            if(mBold!=null && mBold.find()){
-                applyItalicBoldFormat(substring);
-            }
-            else {
-
-                Matcher mMultiQuote = pMultiQuote.matcher(substring);
-
-                if (mMultiQuote != null && mMultiQuote.find()) {
-                    log("Multiquote");
-                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
-                }
-                else{
-                    Matcher mQuote = pQuote.matcher(substring);
-
-                    if (mQuote != null && mQuote.find()) {
-                        log("Quote");
-                        applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
-                    }
-                    else{
-                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-                    }
-                }
-            }
-
-            sb = new StringBuilder(messageContent);
-            sb.delete(0, end);
-            messageContent = sb.toString();
-
-            log("Message content T: "+messageContent);
-
-            start = messageContent.indexOf(" _");
-            while(start!=-1){
-
-                start = start +1;
-
-                sb = new StringBuilder(messageContent);
-                sb.deleteCharAt(start);
-                messageContent = sb.toString();
-
-                log("(B) Start position: "+start);
-                substring = messageContent.substring(0, start);
+        if (messageContentInitial.equals(messageContent) && end != -1){
+            end = messageContent.indexOf("_");
+            if (end != -1){
+                substring = messageContent.substring(0, end+1);
                 ssb.append(substring);
 
-                sb = new StringBuilder(messageContent);
-                sb.delete(0, start);
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.delete(0, end+1);
                 messageContent = sb.toString();
-
-                log("Message content C: "+messageContent);
+            }
+            else {
                 end = messageContent.indexOf("_ ");
-                if(end==-1){
-                    end = messageContent.lastIndexOf("_");
+                if (end != -1){
+                    substring = messageContent.substring(0, end+1);
+                    ssb.append(substring);
 
-                    sb = new StringBuilder(messageContent);
-                    sb.deleteCharAt(end);
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.delete(0, end+1);
                     messageContent = sb.toString();
-
-                    log("(B)FINISH End position: "+end);
-                    substring = messageContent.substring(0, end);
-                    ssb.append(substring, new StyleSpan(Typeface.ITALIC));
-
-                    sb = new StringBuilder(messageContent);
-                    sb.delete(0, end);
-                    messageContent = sb.toString();
-
-                    break;
                 }
-                else{
-                    log("End position: "+end);
-                    sb = new StringBuilder(messageContent);
+            }
+        }
+        else {
+            if(end==-1){
+                end = messageContent.indexOf("_\n");
+                if (end == -1){
+                    end = messageContent.lastIndexOf("_");
+                    log("FINISH End position: "+end);
+
+                    StringBuilder sb = new StringBuilder(messageContent);
                     sb.deleteCharAt(end);
                     messageContent = sb.toString();
-                    log("Message content D: "+messageContent);
+
+                    log("Message content: "+messageContent);
 
                     substring = messageContent.substring(0, end);
-                    ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+
+                    Matcher mBold = pBold.matcher(substring);
+
+                    if(mBold!=null && mBold.find()){
+                        applyItalicBoldFormat(substring);
+                    }
+                    else {
+
+                        Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                        if (mMultiQuote != null && mMultiQuote.find()) {
+                            log("Multiquote");
+                            applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
+                        }
+                        else{
+                            Matcher mQuote = pQuote.matcher(substring);
+
+                            if (mQuote != null && mQuote.find()) {
+                                log("Quote");
+                                applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
+                            }
+                            else{
+                                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+                            }
+                        }
+                    }
 
                     sb = new StringBuilder(messageContent);
                     sb.delete(0, end);
                     messageContent = sb.toString();
+
+
+                    String emoji = messageContent;
+                    if(EmojiManager.isEmoji(emoji)){
+                        log("The last element is emoji");
+                        ssb.append(emoji);
+
+                        messageContent = "";
+                    }
+                }
+                else {
+                    log("End position: "+end);
+                    StringBuilder sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(end);
+                    messageContent = sb.toString();
+
+                    log("Message content B: "+messageContent);
+                    substring = messageContent.substring(0, end);
+
+                    Matcher mBold = pBold.matcher(substring);
+
+                    if(mBold!=null && mBold.find()){
+                        applyItalicBoldFormat(substring);
+                    }
+                    else {
+
+                        Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                        if (mMultiQuote != null && mMultiQuote.find()) {
+                            log("Multiquote");
+                            applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
+                        }
+                        else{
+                            Matcher mQuote = pQuote.matcher(substring);
+
+                            if (mQuote != null && mQuote.find()) {
+                                log("Quote");
+                                applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
+                            }
+                            else{
+                                ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+                            }
+                        }
+                    }
+
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, end);
+                    messageContent = sb.toString();
+
+                    log("Message content T: "+messageContent);
 
                     start = messageContent.indexOf(" _");
+                    while(start!=-1) {
+
+                        start = start + 1;
+
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(start);
+                        messageContent = sb.toString();
+
+                        log("(B) Start position: " + start);
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, start);
+                        messageContent = sb.toString();
+
+                        log("Message content C: " + messageContent);
+                        end = messageContent.indexOf("_ ");
+                        if (end == -1) {
+                            end = messageContent.lastIndexOf("_");
+
+                            sb = new StringBuilder(messageContent);
+                            sb.deleteCharAt(end);
+                            messageContent = sb.toString();
+
+                            log("(B)FINISH End position: " + end);
+                            substring = messageContent.substring(0, end);
+                            ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+
+                            sb = new StringBuilder(messageContent);
+                            sb.delete(0, end);
+                            messageContent = sb.toString();
+
+                            break;
+                        } else {
+                            log("End position: " + end);
+                            sb = new StringBuilder(messageContent);
+                            sb.deleteCharAt(end);
+                            messageContent = sb.toString();
+                            log("Message content D: " + messageContent);
+
+                            substring = messageContent.substring(0, end);
+                            ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+
+                            sb = new StringBuilder(messageContent);
+                            sb.delete(0, end);
+                            messageContent = sb.toString();
+
+                            start = messageContent.indexOf(" _");
+                        }
+                    }
+                }
+            }
+            else{
+                log("End position: "+end);
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.deleteCharAt(end);
+                messageContent = sb.toString();
+
+                log("Message content B: "+messageContent);
+                substring = messageContent.substring(0, end);
+
+                Matcher mBold = pBold.matcher(substring);
+
+                if(mBold!=null && mBold.find()){
+                    applyItalicBoldFormat(substring);
+                }
+                else {
+
+                    Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                    if (mMultiQuote != null && mMultiQuote.find()) {
+                        log("Multiquote");
+                        applyOneFormatAndMultiQuoteFormat(substring, Typeface.ITALIC);
+                    }
+                    else{
+                        Matcher mQuote = pQuote.matcher(substring);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyOneFormatAndQuoteFormat(substring, Typeface.ITALIC);
+                        }
+                        else{
+                            ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+                        }
+                    }
+                }
+
+                sb = new StringBuilder(messageContent);
+                sb.delete(0, end);
+                messageContent = sb.toString();
+
+                log("Message content T: "+messageContent);
+
+                start = messageContent.indexOf(" _");
+                while(start!=-1){
+
+                    start = start +1;
+
+                    sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(start);
+                    messageContent = sb.toString();
+
+                    log("(B) Start position: "+start);
+                    substring = messageContent.substring(0, start);
+                    ssb.append(substring);
+
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, start);
+                    messageContent = sb.toString();
+
+                    log("Message content C: "+messageContent);
+                    end = messageContent.indexOf("_ ");
+                    if(end==-1){
+                        end = messageContent.lastIndexOf("_");
+
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
+
+                        log("(B)FINISH End position: "+end);
+                        substring = messageContent.substring(0, end);
+                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, end);
+                        messageContent = sb.toString();
+
+                        break;
+                    }
+                    else{
+                        log("End position: "+end);
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
+                        log("Message content D: "+messageContent);
+
+                        substring = messageContent.substring(0, end);
+                        ssb.append(substring, new StyleSpan(Typeface.ITALIC));
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, end);
+                        messageContent = sb.toString();
+
+                        start = messageContent.indexOf(" _");
+                    }
                 }
             }
         }
@@ -1007,7 +1510,7 @@ public class RTFFormatter {
     }
 
     public SimpleSpanBuilder applyTwoFormatsAndQuoteFormat(String subMessageContent){
-        log("applyOneFormatAndQuoteFormat: "+subMessageContent);
+        log("applyTwoFormatAndQuoteFormat: "+subMessageContent);
 
         char b = subMessageContent.charAt(0);
         int startB;
@@ -1420,6 +1923,7 @@ public class RTFFormatter {
     }
 
     public void applyBoldFormat(){
+        log("applyBoldFormat messageContent: '"+messageContent+"'");
         char a = messageContent.charAt(0);
         int start;
         int end;
@@ -1432,7 +1936,6 @@ public class RTFFormatter {
 
         if(a =='*'){
             start = 0;
-
             //Check if the next one is *
             if(messageContent.charAt(1)=='_'){
                 StringBuilder sb = new StringBuilder(messageContent);
@@ -1481,35 +1984,63 @@ public class RTFFormatter {
             start = messageContent.indexOf(" *");
 
             if(start==-1){
-                log("Check if there is emoji at the beginning of the string");
-                start = messageContent.indexOf("*");
-                String emoji = messageContent.substring(0, start);
-                if(EmojiManager.isEmoji(emoji)){
-                    log("The first element is emoji");
-                    substring = messageContent.substring(0, start);
-                    ssb.append(substring);
+                start = messageContent.indexOf("\n*");
+                if (start == -1){
+                    log("Check if there is emoji at the beginning of the string");
+                    start = messageContent.indexOf("*");
+                    String emoji = messageContent.substring(0, start);
+                    if(EmojiManager.isEmoji(emoji)){
+                        log("The first element is emoji");
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
 
-                    StringBuilder sb = new StringBuilder(messageContent);
-                    sb.delete(0, start+1);
-                    messageContent = sb.toString();
-                }
-                else {
-                    List<String> emojiList = EmojiParser.extractEmojis(emoji);
-                    if (emojiList != null) {
-                        if (!emojiList.isEmpty()) {
-                            substring = messageContent.substring(0, start);
-                            int lastSpace = substring.lastIndexOf(" ");
-                            if(lastSpace!=-1){
-                                String checkEmoji = substring.substring(lastSpace+1, start);
-                                if(EmojiManager.isEmoji(checkEmoji)){
-                                    ssb.append(substring);
+                        StringBuilder sb = new StringBuilder(messageContent);
+                        sb.delete(0, start+1);
+                        messageContent = sb.toString();
+                    }
+                    else {
+                        List<String> emojiList = EmojiParser.extractEmojis(emoji);
+                        if (emojiList != null) {
+                            if (!emojiList.isEmpty()) {
+                                substring = messageContent.substring(0, start);
+                                int lastSpace = substring.lastIndexOf(" ");
+                                if(lastSpace!=-1){
+                                    String checkEmoji = substring.substring(lastSpace+1, start);
+                                    if(EmojiManager.isEmoji(checkEmoji)){
+                                        ssb.append(substring);
 
-                                    StringBuilder sb = new StringBuilder(messageContent);
-                                    sb.delete(0, start+1);
-                                    messageContent = sb.toString();
+                                        StringBuilder sb = new StringBuilder(messageContent);
+                                        sb.delete(0, start+1);
+                                        messageContent = sb.toString();
+                                    }
                                 }
                             }
                         }
+                    }
+                }
+                else{
+                    int startPrevious = messageContent.indexOf("*");
+                    if(startPrevious<start)
+                    {
+                        String emoji = messageContent.substring(0, startPrevious);
+                        if(EmojiManager.isEmoji(emoji)){
+                            log("The first element is emoji");
+                            substring = messageContent.substring(0, startPrevious);
+                            ssb.append(substring);
+
+                            StringBuilder sb = new StringBuilder(messageContent);
+                            sb.delete(0, startPrevious+1);
+                            messageContent = sb.toString();
+                        }
+                    }
+                    else{
+                        start++;
+                        substring = messageContent.substring(0, start);
+                        ssb.append(substring);
+
+                        StringBuilder sb = new StringBuilder(messageContent);
+                        sb.delete(0, start+1);
+                        messageContent = sb.toString();
                     }
                 }
             }
@@ -1543,45 +2074,152 @@ public class RTFFormatter {
         log("Message content: "+messageContent);
         end = messageContent.indexOf("* ");
         if(end==-1){
-            end = messageContent.lastIndexOf("*");
-            log("FINISH End position: "+end);
+            end = messageContent.indexOf("*\n");
+            if (end == -1){
+                end = messageContent.lastIndexOf("*");
+                log("FINISH End position: "+end);
 
-            StringBuilder sb = new StringBuilder(messageContent);
-            sb.deleteCharAt(end);
-            messageContent = sb.toString();
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.deleteCharAt(end);
+                messageContent = sb.toString();
 
-            log("Message content: "+messageContent);
+                log("Message content: "+messageContent);
 
-            substring = messageContent.substring(0, end);
+                substring = messageContent.substring(0, end);
 
-            Matcher mItalic = pItalic.matcher(substring);
+                Matcher mItalic = pItalic.matcher(substring);
 
-            if(mItalic!=null && mItalic.find()){
-                applyBoldItalicFormat(substring);
-            }
-            else{
-                Matcher mMultiQuote = pMultiQuote.matcher(substring);
-
-                if (mMultiQuote != null && mMultiQuote.find()) {
-                    log("Multiquote");
-                    applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
+                if(mItalic!=null && mItalic.find()){
+                    applyBoldItalicFormat(substring);
                 }
                 else{
-                    Matcher mQuote = pQuote.matcher(substring);
+                    Matcher mMultiQuote = pMultiQuote.matcher(substring);
 
-                    if (mQuote != null && mQuote.find()) {
-                        log("Quote");
-                        applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
+                    if (mMultiQuote != null && mMultiQuote.find()) {
+                        log("Multiquote");
+                        applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
                     }
                     else{
+                        Matcher mQuote = pQuote.matcher(substring);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
+                        }
+                        else{
+                            ssb.append(substring, new StyleSpan(Typeface.BOLD));
+                        }
+                    }
+                }
+
+                sb = new StringBuilder(messageContent);
+                sb.delete(0, end);
+                messageContent = sb.toString();
+
+                String emoji = messageContent;
+                if(EmojiManager.isEmoji(emoji)){
+                    log("The last element is emoji");
+                    ssb.append(emoji);
+
+                    messageContent = "";
+                }
+            }
+            else {
+                log("End position: "+end);
+                StringBuilder sb = new StringBuilder(messageContent);
+                sb.deleteCharAt(end);
+                messageContent = sb.toString();
+
+                log("Message content B: "+messageContent);
+                substring = messageContent.substring(0, end);
+
+                String noEmojisContent = EmojiParser.removeAllEmojis(substring);
+
+                Matcher mItalic = pItalic.matcher(substring);
+
+                if(mItalic!=null && mItalic.find()){
+                    applyBoldItalicFormat(substring);
+                }
+                else{
+                    Matcher mMultiQuote = pMultiQuote.matcher(substring);
+
+                    if (mMultiQuote != null && mMultiQuote.find()) {
+                        log("Multiquote");
+                        applyOneFormatAndMultiQuoteFormat(substring, Typeface.BOLD);
+                    }
+                    else{
+                        Matcher mQuote = pQuote.matcher(substring);
+
+                        if (mQuote != null && mQuote.find()) {
+                            log("Quote");
+                            applyOneFormatAndQuoteFormat(substring, Typeface.BOLD);
+                        }
+                        else{
+                            ssb.append(substring, new StyleSpan(Typeface.BOLD));
+                        }
+                    }
+                }
+
+                sb = new StringBuilder(messageContent);
+                sb.delete(0, end);
+                messageContent = sb.toString();
+
+                log("Message content T: "+messageContent);
+
+                start = messageContent.indexOf(" *");
+                while(start!=-1){
+
+                    start = start +1;
+
+                    sb = new StringBuilder(messageContent);
+                    sb.deleteCharAt(start);
+                    messageContent = sb.toString();
+
+                    log("(B) Start position: "+start);
+                    substring = messageContent.substring(0, start);
+                    ssb.append(substring);
+
+                    sb = new StringBuilder(messageContent);
+                    sb.delete(0, start);
+                    messageContent = sb.toString();
+
+                    log("Message content C: "+messageContent);
+                    end = messageContent.indexOf("* ");
+                    if(end==-1){
+                        end = messageContent.lastIndexOf("*");
+
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
+
+                        log("(B)FINISH End position: "+end);
+                        substring = messageContent.substring(0, end);
                         ssb.append(substring, new StyleSpan(Typeface.BOLD));
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, end);
+                        messageContent = sb.toString();
+
+                        break;
+                    }
+                    else{
+                        log("End position: "+end);
+                        sb = new StringBuilder(messageContent);
+                        sb.deleteCharAt(end);
+                        messageContent = sb.toString();
+                        log("Message content D: "+messageContent);
+
+                        substring = messageContent.substring(0, end);
+                        ssb.append(substring, new StyleSpan(Typeface.BOLD));
+
+                        sb = new StringBuilder(messageContent);
+                        sb.delete(0, end);
+                        messageContent = sb.toString();
+
+                        start = messageContent.indexOf(" _");
                     }
                 }
             }
-
-            sb = new StringBuilder(messageContent);
-            sb.delete(0, end);
-            messageContent = sb.toString();
         }
         else{
             log("End position: "+end);

@@ -146,14 +146,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public void onBindViewHolder(ViewHolderChatList holder, int position) {
-		log("---------------onBindViewHolder----------------");
+		log("---------------onBindViewHolder---------------- position:"+position);
 
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
 
-		log("Get the ChatRoom: "+position);
 		MegaChatListItem chat = (MegaChatListItem) getItem(position);
-		log("ChatRoom handle: "+chat.getChatId() + "title"+chat.getTitle());
+		log("ChatRoom handle: "+chat.getChatId() +"****"+ MegaApiAndroid.userHandleToBase64(chat.getChatId())+ " title "+chat.getTitle());
 
 		setTitle(position, holder);
 

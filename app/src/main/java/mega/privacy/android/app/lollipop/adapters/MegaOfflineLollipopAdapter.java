@@ -72,9 +72,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     public class ViewHolderOffline extends RecyclerView.ViewHolder{
         public ViewHolderOffline(View v) {
 			super(v);
-			// TODO Auto-generated constructor stub
 		}
 		ImageView imageView;
+        ImageView iconView;
         TextView textViewFileName;
         TextView textViewFileSize;
         RelativeLayout itemLayout;
@@ -156,10 +156,17 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						params1.setMargins(left, 0, 0, 0);
 
 						holder.imageView.setLayoutParams(params1);
+
+					}else if(adapterType == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+						holder.iconView.setVisibility(View.GONE);
+						holder.imageView.setVisibility(View.VISIBLE);
+
 					}
+
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);
+
 				}
 			}
 		}    	
@@ -430,8 +437,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			v.setTag(holder);
 			
 			return holder;
-		}
-		else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+		}else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 			ViewHolderOfflineGrid holder = null;
 			
 			View v = inflater.inflate(R.layout.item_offline_grid, parent, false);	
@@ -439,6 +445,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder = new ViewHolderOfflineGrid(v);
 			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_grid_item_layout);
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+			holder.iconView = (ImageView) v.findViewById(R.id.offline_grid_icon);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_grid_filename);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
@@ -528,12 +535,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			if(file.exists()){
 				nodeSize = file.length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			}			
-			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+			}
+			holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+			holder.iconView.setVisibility(View.VISIBLE);
+			holder.imageView.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			return;
 		}
-		
+
 		String path=null;
 		
 		if(currentNode.getOrigin()==MegaOffline.INCOMING){
@@ -592,8 +601,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			long nodeSize = currentFile.length();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 		}
-		
-		holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+
+		holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+		holder.imageView.setVisibility(View.GONE);
+		holder.iconView.setVisibility(View.VISIBLE);
+
 		if (currentFile.isFile()){
 			log("...........................Busco Thumb");
 			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
@@ -603,6 +615,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
+
+						holder.imageView.setVisibility(View.VISIBLE);
+						holder.iconView.setVisibility(View.GONE);
+
 					}
 					else{
 						try{
@@ -616,7 +632,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 		else{
-			holder.imageView.setImageResource(R.drawable.ic_folder_list);
+			holder.iconView.setImageResource(R.drawable.ic_folder_list);
+
+			holder.imageView.setVisibility(View.GONE);
+			holder.iconView.setVisibility(View.VISIBLE);
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
