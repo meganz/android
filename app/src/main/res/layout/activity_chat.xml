@@ -63,19 +63,19 @@
                         android:id="@+id/writing_linear_layout_chat"
                         android:layout_width="match_parent"
                         android:focusableInTouchMode="true"
-                        android:layout_height="48dp">
+                        android:layout_height="wrap_content">
 
                         <ImageButton
                             android:id="@+id/send_message_icon_chat"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_centerVertical="true"
                             android:background="@null"
                             android:layout_alignBottom="@id/edit_text_chat"
                             android:tint="@color/accentColor"
-                            android:src="@drawable/ic_send_black"
-                            android:layout_marginBottom="3dp"/>
+                            android:src="@drawable/ic_send_black"/>
 
                         <mega.privacy.android.app.components.emojicon.EmojiconEditText
                             android:id="@id/edit_text_chat"
@@ -92,8 +92,8 @@
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
                             emojicon:emojiconSize="16sp"
-                            android:minLines="2"
-                            android:lines="6"
+                            android:minLines="1"
+                            android:maxLines="5"
                             android:textColor="@color/black"/>
 
                         <RelativeLayout
