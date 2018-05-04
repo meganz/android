@@ -335,14 +335,7 @@
                     android:background="@color/transparent_white"/>
 
             </RelativeLayout>
-
-
         </LinearLayout>
-
-
-
-
-
 
         <LinearLayout
             android:id="@+id/separator_buttons"
