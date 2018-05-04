@@ -18,6 +18,7 @@ public class DraggableView extends FrameLayout{
     boolean animate = false;
     int[] screenPosition;
     View currentView;
+    public float normalizedScale;
 
     public static final int DEFAULT_EXIT_DURATION = 150;
 
@@ -70,6 +71,10 @@ public class DraggableView extends FrameLayout{
 
     public void setViewAnimator(@Nullable ViewAnimator viewAnimator) {
         this.viewAnimator = viewAnimator;
+    }
+
+    public void setNormalizedScale (float scale){
+        normalizedScale = scale;
     }
 
     public void animateToOrigin(int duration) {
@@ -233,19 +238,26 @@ public class DraggableView extends FrameLayout{
         log("onInterceptTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
 
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                motionXOrigin = event.getRawX();
-                motionYOrigin = event.getRawY();
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                actionUp();
-                break;
-            case MotionEvent.ACTION_MOVE: {
-                float newMotionX = event.getRawX();
-                float newMotionY = event.getRawY();
-                return (Math.abs(motionYOrigin - newMotionY) > touchInterceptSensibility);
+        if (event.getPointerCount() > 1 || normalizedScale != 1){
+            setDraggable(false);
+            return false;
+        }
+
+        if (draggable){
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    motionXOrigin = event.getRawX();
+                    motionYOrigin = event.getRawY();
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    actionUp();
+                    break;
+                case MotionEvent.ACTION_MOVE: {
+                    float newMotionX = event.getRawX();
+                    float newMotionY = event.getRawY();
+                    return (Math.abs(motionYOrigin - newMotionY) > touchInterceptSensibility);
+                }
             }
         }
         return super.onInterceptTouchEvent(event);
@@ -465,6 +477,15 @@ public class DraggableView extends FrameLayout{
                     }
                 }
                 return animated;
+            }
+
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                if (normalizedScale != 1){
+                    setDraggable(false);
+                }
+                return false;
             }
         });
 
