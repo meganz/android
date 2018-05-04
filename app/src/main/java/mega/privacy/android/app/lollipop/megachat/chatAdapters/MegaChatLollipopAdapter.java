@@ -819,7 +819,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-                holder.nameContactText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
+                holder.nameContactText.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
             }else{
 
                 holder.nameContactText.setMaxWidth(Util.scaleWidthPx(160, outMetrics));
