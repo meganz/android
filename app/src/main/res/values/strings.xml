@@ -1856,5 +1856,8 @@
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
+    <string name="section_playlist" context="Title of the screen Playlist">Playlist</string>
+    <string name="playlist_state_playing" context="Text shown in playlist subtitle item when a file is reproducing">Now playing...</string>
+    <string name="playlist_state_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Paused</string>
 
 </resources>
