@@ -26,6 +26,8 @@ import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.MenuItemCompat;
@@ -275,6 +277,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private FrameLayout fragmentContainer;
     private boolean onPlaylist = false;
+    public LoopingMediaSource loopingMediaSource;
+    PlaylistFragment playlistFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -752,7 +756,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
         MediaSource mediaSource = null;
-        LoopingMediaSource loopingMediaSource = null;
+        loopingMediaSource = null;
 
         if (isPlayList && size > 1) {
             final List<MediaSource> playlist = new ArrayList<>();
@@ -2034,6 +2038,36 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    void releasePlaylist(){
+        onPlaylist = false;
+        playerLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        fragmentContainer.setVisibility(View.GONE);
+        draggableView.setDraggable(true);
+
+        getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent_black));
+        aB.setTitle(" ");
+
+        supportInvalidateOptionsMenu();
+        showActionStatusBar();
+        player.prepare(loopingMediaSource);
+        player.setPlayWhenReady(true);
+        player.seekTo(currentTime);
     }
 
     public void moveToTrash(){
@@ -3416,11 +3450,34 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-//            case R.id.exo_play_list:{
-////                Intent intent = new Intent(AudioVideoPlayerLollipop.this, );
-//                break;
-//            }
+            case R.id.exo_play_list:{
+                instantiatePlaylist();
+                break;
+            }
         }
+    }
+
+    void instantiatePlaylist(){
+        onPlaylist = true;
+        progressBar.setVisibility(View.GONE);
+        playerLayout.setVisibility(View.GONE);
+        fragmentContainer.setVisibility(View.VISIBLE);
+        draggableView.setDraggable(false);
+        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+        aB.setTitle(getString(R.string.section_playlist));
+        supportInvalidateOptionsMenu();
+
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment != null){
+            getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+        }
+        if (playlistFragment == null){
+            playlistFragment = new PlaylistFragment();
+        }
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container, playlistFragment, "playlistFragment");
+        ft.commitNowAllowingStateLoss();
+        player.stop();
     }
 
     public String getPathNavigation() {
