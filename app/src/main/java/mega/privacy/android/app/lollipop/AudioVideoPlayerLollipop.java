@@ -3331,4 +3331,28 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 //            }
         }
     }
+
+    public String getPathNavigation() {
+        return pathNavigation;
+    }
+
+    public int[] getScreenPosition() {
+        return screenPosition;
+    }
+
+    public SimpleExoPlayer getPlayer() {
+        return player;
+    }
+
+    public long getParentNodeHandle() {
+        return parentNodeHandle;
+    }
+
+    public int getAdapterType() {
+        return adapterType;
+    }
+
+    public ArrayList<Long> getMediaHandles() {
+        return mediaHandles;
+    }
 }
