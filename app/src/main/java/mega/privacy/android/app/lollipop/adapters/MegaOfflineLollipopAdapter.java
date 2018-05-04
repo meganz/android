@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -426,7 +427,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_list_filename);
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp(210, outMetrics);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(280, outMetrics));
+			} else{
+				holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
+			}
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
 			holder.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.offline_list_three_dots_layout);
 
@@ -447,6 +453,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
 			holder.iconView = (ImageView) v.findViewById(R.id.offline_grid_icon);
 			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_grid_filename);
+			holder.textViewFileName.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
