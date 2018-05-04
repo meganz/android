@@ -52,6 +52,8 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+
 public class TouchImageView extends ImageView {
 
     private static final String DEBUG = "DEBUG";
@@ -128,6 +130,7 @@ public class TouchImageView extends ImageView {
         prevMatrix = new Matrix();
         m = new float[9];
         normalizedScale = 1;
+        ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
         mScaleType = ScaleType.FIT_CENTER;
         minScale = 1;
         maxScale = 3;
@@ -272,6 +275,13 @@ public class TouchImageView extends ImageView {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             normalizedScale = bundle.getFloat("saveScale");
+            if (normalizedScale == 1){
+                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+            }
+            else {
+                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+            }
+            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
             m = bundle.getFloatArray("matrix");
             prevMatrix.setValues(m);
             prevMatchViewHeight = bundle.getFloat("matchViewHeight");
@@ -339,6 +349,7 @@ public class TouchImageView extends ImageView {
      */
     public void resetZoom() {
         normalizedScale = 1;
+        ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
         fitImageToView();
     }
 
@@ -605,6 +616,7 @@ public class TouchImageView extends ImageView {
             matrix.setScale(scaleX, scaleY);
             matrix.postTranslate(redundantXSpace / 2, redundantYSpace / 2);
             normalizedScale = 1;
+            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
 
         } else {
             prevMatrix.getValues(m);
@@ -890,11 +902,32 @@ public class TouchImageView extends ImageView {
 
         float origScale = normalizedScale;
         normalizedScale *= deltaScale;
+        if (normalizedScale == 1){
+            ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+        }
+        else {
+            ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+        }
+        ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
         if (normalizedScale > upperScale) {
             normalizedScale = upperScale;
+            if (normalizedScale == 1){
+                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+            }
+            else {
+                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+            }
+            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
             deltaScale = upperScale / origScale;
         } else if (normalizedScale < lowerScale) {
             normalizedScale = lowerScale;
+            if (normalizedScale == 1){
+                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(true);
+            }
+            else {
+                ((FullScreenImageViewerLollipop) getContext()).draggableView.setDraggable(false);
+            }
+            ((FullScreenImageViewerLollipop) getContext()).draggableView.setNormalizedScale(normalizedScale);
             deltaScale = lowerScale / origScale;
         }
 

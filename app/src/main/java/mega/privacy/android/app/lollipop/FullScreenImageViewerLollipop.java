@@ -213,7 +213,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	ArrayList<MegaOffline> mOffList;
 	ArrayList<MegaOffline> mOffListImages;
 
-	DraggableView draggableView;
+	public DraggableView draggableView;
 	public static int screenHeight;
 	int screenWidth;
 	RelativeLayout relativeImageViewerLayout;
@@ -1428,7 +1428,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		ivShadow.setAlpha(0);
 
-		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0)/*.setInterpolator(new DecelerateInterpolator())*/.withEndAction(new Runnable() {
+		viewPager.animate().setDuration(duration).scaleX(1).scaleY(1).translationX(0).translationY(0).setInterpolator(new DecelerateInterpolator()).withEndAction(new Runnable() {
 			@Override
 			public void run() {
 				showActionBar();
@@ -3092,11 +3092,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			if (adapterType == Constants.OFFLINE_ADAPTER){
-				adapterOffline.getVisibleImage(positionG).resetZoom();
 				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
 			}
 			else {
-				adapterMega.getVisibleImage(positionG).resetZoom();
 				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
 			}
 			setImageDragVisibility(View.GONE);
@@ -3105,7 +3103,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			handler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					showActionBar();
+//					showActionBar();
 					fragmentContainer.setBackgroundColor(BLACK);
 					relativeImageViewerLayout.setBackgroundColor(BLACK);
 					appBarLayout.setBackgroundColor(BLACK);
