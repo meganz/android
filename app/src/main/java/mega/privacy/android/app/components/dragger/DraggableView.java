@@ -11,6 +11,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class DraggableView extends FrameLayout{
@@ -238,9 +240,11 @@ public class DraggableView extends FrameLayout{
         log("onInterceptTouchEvent");
         final int action = MotionEventCompat.getActionMasked(event);
 
-        if (event.getPointerCount() > 1 || normalizedScale != 1){
-            setDraggable(false);
-            return false;
+        if (getContext() instanceof FullScreenImageViewerLollipop){
+            if (event.getPointerCount() > 1 || normalizedScale != 1){
+                setDraggable(false);
+                return false;
+            }
         }
 
         if (draggable){
@@ -482,9 +486,12 @@ public class DraggableView extends FrameLayout{
 
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                if (normalizedScale != 1){
-                    setDraggable(false);
+                if (getContext() instanceof FullScreenImageViewerLollipop){
+                    if (normalizedScale != 1){
+                        setDraggable(false);
+                    }
                 }
+
                 return false;
             }
         });
