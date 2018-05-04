@@ -2269,7 +2269,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", firstTimeCam);
 						if (firstTimeCam){
 							log("intent firstTimeCam==true");
-							firstTimeCam = true;
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 							setIntent(null);
 						}
@@ -2815,13 +2814,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		switch(drawerItem){
 	    		case CLOUD_DRIVE:{
 	    			log("onPostResume: case CLOUD DRIVE");
-
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
-
 					//Check the tab to shown and the title of the actionBar
 					setToolbarTitle();
 
@@ -2839,11 +2831,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					catch (Exception e){
 						log("Exception NotificationManager - remove contact notification");
 					}
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
 					setToolbarTitle();
 					log("onPostResume: shared tabs visible");
 					tabLayoutShares.setVisibility(View.VISIBLE);
@@ -2852,11 +2839,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    		break;
 	    		}
 				case SETTINGS:{
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
 					setToolbarTitle();
 					break;
 				}
@@ -2871,30 +2853,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Exception NotificationManager - remove contact notification");
 					}
 
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
-
 					setToolbarTitle();
 					break;
 				}
 				case SEARCH:{
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
 					setToolbarTitle();
 					break;
 				}
 				case CHAT:{
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						resetNavigationViewMenu(nVMenu);
@@ -2912,13 +2878,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case ACCOUNT:{
-					if(firstTimeCam){
-						firstTimeCam=false;
-						dbH.setCamSyncEnabled(false);
-						supportInvalidateOptionsMenu();
-					}
 					setToolbarTitle();
-
 					try {
 						NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 						notificationManager.cancel(Constants.NOTIFICATION_STORAGE_OVERQUOTA);
@@ -4787,7 +4747,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case CAMERA_UPLOADS:{
 				tB.setVisibility(View.VISIBLE);
-				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
                     Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
                     if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
@@ -4841,13 +4800,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				                ManagerActivityLollipop.REQUEST_CAMERA);
 //					}
 
-//					if (hasStoragePermission && hasCameraPermission){
-//					if (hasStoragePermission){
-//						firstTimeCam = false;
-//					}
-				}
-				else{
-//					firstTimeCam = false;
 				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
