@@ -160,7 +160,7 @@ public class PlaylistFragment extends Fragment {
             adapter = new PlayListAdapter(context, this, offNodes, parenPath, recyclerView);
         }
         else {
-//            parentHandle = ((AudioVideoPlayerLollipop) context).getParentNodeHandle();
+            parentHandle = ((AudioVideoPlayerLollipop) context).getParentNodeHandle();
             handles = ((AudioVideoPlayerLollipop) context).getMediaHandles();
             contentText.setText(""+handles.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, handles.size()));
             adapter = new PlayListAdapter(context, this, handles, parentHandle, recyclerView);
@@ -177,6 +177,7 @@ public class PlaylistFragment extends Fragment {
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
+        player.setPlayWhenReady(true);
 
         return v;
     }
