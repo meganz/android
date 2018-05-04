@@ -360,7 +360,7 @@ public final class AdvancedNotificationBuilder {
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
         }
 
-        notificationBuilder.setFullScreenIntent(pendingIntent, true);
+//        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
         int unreadCount = 0;
 
