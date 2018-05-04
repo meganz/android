@@ -126,7 +126,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private MegaApiAndroid megaApi;
 
 //	long parentHandle = -1;
-	private boolean firstTimeCam = false;
+//	private boolean firstTimeCam = false;
 
 	private int type = 0;
 
@@ -653,7 +653,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
 
 		if (type == TYPE_CAMERA) {
-			if (firstTimeCam) {
+			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
 
@@ -1213,7 +1213,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setFirstTime(false);
-		dbH.setCamSyncEnabled(false);
+//		dbH.setCamSyncEnabled(false);
 		dbH.setStorageAskAlways(false);
 		File defaultDownloadLocation = null;
 		if (Environment.getExternalStorageDirectory() != null){
@@ -1312,7 +1312,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@SuppressLint("NewApi")
 	private void cameraOnOffFirstTime(){
-		firstTimeCam = false;
+		((ManagerActivityLollipop) context).setFirstTimeCam(false);
+//		firstTimeCam = false;
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setCamSyncEnabled(true);
 		File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -1481,7 +1482,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 //		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 //		        		if (hasCameraPermission){
-		        			if (firstTimeCam){ 
+		        			if (((ManagerActivityLollipop) context).getFirstTimeCam()){
 		        				this.cameraOnOffFirstTime();
 		        			}
 		        			else{		        			
@@ -1563,7 +1564,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				break;
 			}
 			case R.id.cam_sync_button_skip:{
-				firstTimeCam = false;
+				((ManagerActivityLollipop) context).setFirstTimeCam(false);
+				dbH.setCamSyncEnabled(false);
 				((ManagerActivityLollipop)context).setInitialCloudDrive();
 				break;
 			}
@@ -1816,6 +1818,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public int onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
+
+		if(((ManagerActivityLollipop)context).getFirstTimeCam()){
+			((ManagerActivityLollipop) context).setFirstTimeCam(false);
+			dbH.setCamSyncEnabled(false);
+			((ManagerActivityLollipop) context).refreshMenu();
+		}
+
 
 		if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
 			return 0;
@@ -2152,13 +2161,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	public void setFirstTimeCam(boolean firstTimeCam){
-		this.firstTimeCam = firstTimeCam;
-	}
-	
-	public boolean getFirstTimeCam(){
-		return firstTimeCam;
-	}
+//	public void setFirstTimeCam(boolean firstTimeCam){
+//		this.firstTimeCam = firstTimeCam;
+//	}
+//
+//	public boolean getFirstTimeCam(){
+//		return firstTimeCam;
+//	}
 
 	public boolean showSelectMenuItem(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){

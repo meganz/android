@@ -987,9 +987,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
-						if (firstTimeCam){
-							firstTimeCam = false;
-						}
+//						if (firstTimeCam){
+//							firstTimeCam = false;
+//						}
 
 						if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
 							log("TAKE_PICTURE_OPTION");
@@ -1089,6 +1089,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
+		outState.putBoolean("firstTimeCam",firstTimeCam);
 
 		outState.putBoolean("isSearchEnabled", isSearchEnabled);
 		outState.putLongArray("searchDate",searchDate);
@@ -1186,10 +1187,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			isSearchEnabled = savedInstanceState.getBoolean("isSearchEnabled");
 			searchDate = savedInstanceState.getLongArray("searchDate");
-
+			firstTimeCam = savedInstanceState.getBoolean("firstTimeCam");
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
-			log("DrawerItem onCreate = " + drawerItem);
-			log("savedInstanceState -> drawerItem: "+drawerItem);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
 			log("savedInstanceState -> indexShares: "+indexShares);
 			indexCloud = savedInstanceState.getInt("indexCloud", indexCloud);
@@ -1405,10 +1404,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		handler = new Handler();
 
-		Bundle bundle = getIntent().getExtras();
-		if (bundle != null) {
-			drawerItem = (DrawerItem) bundle.getSerializable("drawerItem");
-		}
+//		Bundle bundle = getIntent().getExtras();
+//		if (bundle != null) {
+//			drawerItem = (DrawerItem) bundle.getSerializable("drawerItem");
+//		}
 
 		log("Set view");
 		setContentView(R.layout.activity_manager);
@@ -1671,7 +1670,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		rootNode = megaApi.getRootNode();
 		if (rootNode == null){
-			log("Root node is NULL");
 			 if (getIntent() != null){
 			 	log("Action: "+getIntent().getAction());
 				if (getIntent().getAction() != null){
@@ -1823,7 +1821,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			return;
 		}
 		else{
-			log("rootNode != null");
 			inboxNode = megaApi.getInboxNode();
 			attr = dbH.getAttributes();
 			if (attr != null){
@@ -2145,7 +2142,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									pN = megaApi.getRootNode();
 								}
 								parentHandleBrowser = pN.getHandle();
-
 								drawerItem = DrawerItem.CLOUD_DRIVE;
 								selectDrawerItemLollipop(drawerItem);
 								selectDrawerItemPending = false;
@@ -2217,16 +2213,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			setContactTitleSection();
 
 			if (drawerItem == null) {
-	        	log("DRAWERITEM NULL");
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 	        		if(upgradeAccount){
-	        			log("upgradeAccount true");
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
-						log("accountType: "+accountType);
 						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
 						BitSet paymentBitSet = Util.convertToBitSet(paymentBitSetLong);;
 						switch (accountType){
@@ -2273,8 +2266,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 	        		}
 	        		else{
-						log("upgradeAccount false");
-						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", false);
+						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", firstTimeCam);
 						if (firstTimeCam){
 							log("intent firstTimeCam==true");
 							firstTimeCam = true;
@@ -2285,16 +2277,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	}
 	        }
 	        else{
-	        	log("DRAWERITEM NOT NULL1: " + drawerItem);
+				log("DRAWERITEM NOT NULL1: " + drawerItem);
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
-					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", false);
+					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
 					if(upgradeAccount){
-						log("upgradeAccount true");
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
-						log("accountType: "+accountType);
 						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
 						switch (accountType){
 							case Constants.FREE:{
@@ -2340,7 +2330,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 					else{
-						log("upgradeAccount false");
 						if (firstTimeCam) {
 							log("intent firstTimeCam2==true");
 							if (prefs != null){
@@ -2356,7 +2345,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								firstTimeCam = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 							}
-
 							setIntent(null);
 						}
 					}
@@ -2364,11 +2352,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		if (intentRec.getAction() != null){
 	        			if (intentRec.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
 	        				drawerItem = DrawerItem.TRANSFERS;
-	        				setIntent(null);
+							setIntent(null);
 	        			}
 	        		}
 	        	}
-	        	log("DRAWERITEM NOT NULL2: " + drawerItem);
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}
 
@@ -2828,8 +2815,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		switch(drawerItem){
 	    		case CLOUD_DRIVE:{
 	    			log("onPostResume: case CLOUD DRIVE");
+
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
+
 					//Check the tab to shown and the title of the actionBar
 					setToolbarTitle();
+
 	    			break;
 	    		}
 	    		case SHARED_ITEMS:{
@@ -2844,7 +2839,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					catch (Exception e){
 						log("Exception NotificationManager - remove contact notification");
 					}
-
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
 					setToolbarTitle();
 					log("onPostResume: shared tabs visible");
 					tabLayoutShares.setVisibility(View.VISIBLE);
@@ -2853,6 +2852,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    		break;
 	    		}
 				case SETTINGS:{
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
 					setToolbarTitle();
 					break;
 				}
@@ -2867,15 +2871,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						log("Exception NotificationManager - remove contact notification");
 					}
 
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
+
 					setToolbarTitle();
 					break;
 				}
 				case SEARCH:{
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
 					setToolbarTitle();
 					break;
 				}
 				case CHAT:{
-
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						resetNavigationViewMenu(nVMenu);
@@ -2893,6 +2912,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					break;
 				}
 				case ACCOUNT:{
+					if(firstTimeCam){
+						firstTimeCam=false;
+						dbH.setCamSyncEnabled(false);
+						supportInvalidateOptionsMenu();
+					}
 					setToolbarTitle();
 
 					try {
@@ -4763,21 +4787,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     		case CAMERA_UPLOADS:{
 				tB.setVisibility(View.VISIBLE);
-
 				log("FirstTimeCam: " + firstTimeCam);
     			if (cuFL == null){
                     Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
                     if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
                         cuFL = ((CameraUploadFragmentLollipop) currentFragment);
-                        firstTimeCam = cuFL.getFirstTimeCam();
                     }
                     else{
                         cuFL = new CameraUploadFragmentLollipop();
-                        cuFL.setFirstTimeCam(firstTimeCam);
                     }
-				}
-				else{
-					cuFL.setFirstTimeCam(firstTimeCam);
 				}
 
     			tabLayoutCloud.setVisibility(View.GONE);
@@ -4824,12 +4842,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //					}
 
 //					if (hasStoragePermission && hasCameraPermission){
-					if (hasStoragePermission){
-						firstTimeCam = false;
-					}
+//					if (hasStoragePermission){
+//						firstTimeCam = false;
+//					}
 				}
 				else{
-					firstTimeCam = false;
+//					firstTimeCam = false;
 				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
@@ -4840,7 +4858,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
       			break;
     		}
     		case MEDIA_UPLOADS:{
-
 				tB.setVisibility(View.VISIBLE);
 
 				if (nV != null){
@@ -4991,7 +5008,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
     		}
     		case SEARCH:{
-
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
@@ -5452,7 +5468,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (rubbishBinFLol != null){
 							//Show
 							selectMenuItem.setVisible(true);
-							thumbViewMenuItem.setVisible(true);
+							if(!firstTimeCam){
+								thumbViewMenuItem.setVisible(true);
+							}else{
+								thumbViewMenuItem.setVisible(false);
+							}
+
 							clearRubbishBinMenuitem.setVisible(true);
 							searchMenuItem.setVisible(true);
 
@@ -5508,11 +5529,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							addMenuItem.setVisible(true);
 							log("createFolderMenuItem.setVisible_14");
 							createFolderMenuItem.setVisible(true);
-							thumbViewMenuItem.setVisible(true);
+							if(!firstTimeCam){
+								thumbViewMenuItem.setVisible(true);
+							}else{
+								thumbViewMenuItem.setVisible(false);
+							}
 							rubbishBinMenuItem.setVisible(false);
 							upgradeAccountMenuItem.setVisible(true);
 							importLinkMenuItem.setVisible(true);
-							takePicture.setVisible(true);
+							if(!firstTimeCam){
+								takePicture.setVisible(true);
+							}else{
+								takePicture.setVisible(false);
+							}
 							selectMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 
@@ -5558,8 +5587,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 				if (oFLol != null){
 					//Show
-					thumbViewMenuItem.setVisible(true);
-
+					if(!firstTimeCam){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}
 					if(oFLol.getItemCount()>0){
 						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
@@ -5608,9 +5640,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					takePicture.setVisible(true);
+					if(!firstTimeCam){
+						takePicture.setVisible(true);
+					}else{
+						takePicture.setVisible(false);
+					}
 					if(firstNavigationLevel){
-						searchByDate.setVisible(true);
+						if(!firstTimeCam){
+							searchByDate.setVisible(true);
+						}else{
+							searchByDate.setVisible(false);
+						}
 					}else{
 						searchByDate.setVisible(false);
 					}
@@ -5625,8 +5665,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					addMenuItem.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(true);
-					changePass.setVisible(false);
+					if(!firstTimeCam){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}					changePass.setVisible(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
 					importLinkMenuItem.setVisible(false);
@@ -5655,7 +5698,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						else{
 							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
 						}
-						gridSmallLargeMenuItem.setVisible(true);
+						if(!firstTimeCam) {
+							gridSmallLargeMenuItem.setVisible(true);
+						}else{
+							gridSmallLargeMenuItem.setVisible(false);
+						}
 						searchMenuItem.setVisible(false);
 
 						if(cuFL.getItemCountGrid()>0){
@@ -5674,9 +5721,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					takePicture.setVisible(true);
+					if(!firstTimeCam){
+						takePicture.setVisible(true);
+					}else{
+						takePicture.setVisible(false);
+					}
 					if(firstNavigationLevel){
-						searchByDate.setVisible(true);
+						if(!firstTimeCam){
+							searchByDate.setVisible(true);
+						}else{
+							searchByDate.setVisible(false);
+						}
 					}else{
 						searchByDate.setVisible(false);
 					}
@@ -5691,8 +5746,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					addMenuItem.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(true);
-					changePass.setVisible(false);
+					if(!firstTimeCam){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}					changePass.setVisible(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
 					importLinkMenuItem.setVisible(false);
@@ -5715,13 +5773,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+
 						if (isLargeGridCameraUploads){
 							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
 						}
 						else{
 							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
 						}
-						gridSmallLargeMenuItem.setVisible(true);
+
+						if(!firstTimeCam) {
+							gridSmallLargeMenuItem.setVisible(true);
+						}else{
+							gridSmallLargeMenuItem.setVisible(false);
+						}
 						searchMenuItem.setVisible(false);
 
 						if(muFLol.getItemCountGrid()>0){
@@ -5758,8 +5822,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 
 					searchMenuItem.setVisible(true);
-					thumbViewMenuItem.setVisible(true);
-
+					if(!firstTimeCam){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}
 					//Hide
 					searchByDate.setVisible(false);
 					refreshMenuItem.setVisible(false);
@@ -5793,8 +5860,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(index==0){
 					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
 					if (inSFLol != null){
-						thumbViewMenuItem.setVisible(true);
-
+						if(!firstTimeCam){
+							thumbViewMenuItem.setVisible(true);
+						}else{
+							thumbViewMenuItem.setVisible(false);
+						}
 						addMenuItem.setEnabled(true);
 
 						log("onCreateOptionsMenu parentHandleIncoming: "+parentHandleIncoming);
@@ -5872,8 +5942,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
 					if (outSFLol != null){
 
-						thumbViewMenuItem.setVisible(true);
-
+						if(!firstTimeCam){
+							thumbViewMenuItem.setVisible(true);
+						}else{
+							thumbViewMenuItem.setVisible(false);
+						}
 						log("parentHandleOutgoing: "+parentHandleOutgoing);
 						if(parentHandleOutgoing==-1){
 							addMenuItem.setVisible(false);
@@ -5938,8 +6011,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					addContactMenuItem.setVisible(true);
-					thumbViewMenuItem.setVisible(true);
-					upgradeAccountMenuItem.setVisible(true);
+					if(!firstTimeCam){
+						thumbViewMenuItem.setVisible(true);
+					}else{
+						thumbViewMenuItem.setVisible(false);
+					}					upgradeAccountMenuItem.setVisible(true);
 					searchMenuItem.setVisible(true);
 					scanQRcode.setVisible(true);
 
@@ -6121,8 +6197,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(sFLol.getNodes().size()!=0){
 //							log("size after search: "+sFLol.getNodes().size());
 								selectMenuItem.setVisible(true);
-								thumbViewMenuItem.setVisible(true);
-								if (isList){
+								if(!firstTimeCam){
+									thumbViewMenuItem.setVisible(true);
+								}else{
+									thumbViewMenuItem.setVisible(false);
+								}								if (isList){
 									thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 								}
 								else{
@@ -7115,7 +7194,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			fragTransaction.commitNowAllowingStateLoss();
 
 	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
-	        			if (isLargeGridCameraUploads){
+
+						if (isLargeGridCameraUploads){
 	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
 	        			}
 	        			else{
@@ -7135,7 +7215,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			fragTransaction.commitNowAllowingStateLoss();
 
 	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
-	        			if (isLargeGridCameraUploads){
+
+						if (isLargeGridCameraUploads){
 	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
 	        			}
 	        			else{
@@ -7189,7 +7270,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     					}
     					else{
     						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    						gridSmallLargeMenuItem.setVisible(true);
+							if(!firstTimeCam) {
+								gridSmallLargeMenuItem.setVisible(true);
+							}else{
+								gridSmallLargeMenuItem.setVisible(false);
+							}
     						searchMenuItem.setVisible(false);
 
     	    			}
@@ -8509,7 +8594,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                         if (nV != null){
                             Menu nVMenu = nV.getMenu();
                             MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-                            resetNavigationViewMenu(nVMenu);
+							resetNavigationViewMenu(nVMenu);
                             cloudDrive.setChecked(true);
                             cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
                         }
@@ -8675,7 +8760,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
 	public boolean onNavigationItemSelected(MenuItem menuItem) {
-
+		log("onNavigationItemSelected");
+		if(firstTimeCam){
+			firstTimeCam = false;
+			dbH.setCamSyncEnabled(false);
+		}
 		switch (menuItem.getItemId()){
 			case R.id.navigation_item_cloud_drive:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
@@ -10853,6 +10942,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setInitialCloudDrive (){
 		drawerItem = DrawerItem.CLOUD_DRIVE;
+
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
 			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
@@ -12529,7 +12619,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	void resetNavigationViewMenu(Menu menu){
-		log("resetNavigationViewMenu");
+		log("resetNavigationViewMenu()");
 
 		if(!Util.isOnline(this)){
 			disableNavigationViewMenu(menu);
@@ -14772,6 +14862,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		return isListCameraUploads;
 	}
 
+	public boolean getFirstTimeCam() {
+		return firstTimeCam;
+	}
+	public void setFirstTimeCam(boolean flag){
+		firstTimeCam = flag;
+	}
+
 	public void setListCameraUploads(boolean isListCameraUploads) {
 		this.isListCameraUploads = isListCameraUploads;
 	}
@@ -15769,5 +15866,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void setPasswordReminderFromMyAccount(boolean passwordReminderFromMyAccount) {
 		this.passwordReminderFromMyAccount = passwordReminderFromMyAccount;
+	}
+
+	public void refreshMenu(){
+		log("refreshMenu");
+		supportInvalidateOptionsMenu();
 	}
 }
