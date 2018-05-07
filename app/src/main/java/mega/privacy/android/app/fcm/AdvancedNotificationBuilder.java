@@ -327,7 +327,8 @@ public final class AdvancedNotificationBuilder {
             pendingIntent = PendingIntent.getActivity(context, (int)chats.get(0).getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
         }
         else {
-            log("ERROR:chatSIZE=0");
+            log("ERROR:chatSIZE=0:return");
+            return;
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
@@ -1104,11 +1105,23 @@ public final class AdvancedNotificationBuilder {
         });
 
         //Check if the last chat notification is enabled
-        log("generateChatNotification for: "+chats.size()+" chats");
+
         long lastChatId = -1;
-        if(chats!=null && (!(chats.isEmpty()))){
-            lastChatId = chats.get(0).getChatId();
+        if(chats!=null){
+            if(!(chats.isEmpty())){
+                lastChatId = chats.get(0).getChatId();
+            }
+            else{
+                log("ERROR:chatsEMPTY:return");
+                return;
+            }
         }
+        else{
+            log("ERROR:chatsNULL:return");
+            return;
+        }
+
+        log("generateChatNotification for: "+chats.size()+" chats");
 
         boolean showNotif = false;
 
