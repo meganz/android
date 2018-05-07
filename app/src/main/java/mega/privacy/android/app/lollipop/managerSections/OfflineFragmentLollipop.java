@@ -241,6 +241,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
+			log("ActionBarCallBack::onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 		}
@@ -345,6 +346,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public boolean showSelectMenuItem(){
+		log("showSelectMenuItem");
 		if (adapter != null){
 			return adapter.isMultipleSelect();
 		}
@@ -665,7 +667,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void sortByNameDescending(){
-		
+		log("sortByNameDescending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -809,6 +811,8 @@ public class OfflineFragmentLollipop extends Fragment{
 //	
 
 	public boolean isFolder(String path){
+		log("isFolder");
+
 		MegaNode n = megaApi.getNodeByPath(path);
 		if(n == null)
 		{
@@ -1147,6 +1151,7 @@ public class OfflineFragmentLollipop extends Fragment{
     }
     
     public void openFile (File currentFile){
+		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -1177,6 +1182,8 @@ public class OfflineFragmentLollipop extends Fragment{
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		log("clearSelections");
+
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
@@ -1275,8 +1282,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	}
 	
-	public int
-	onBackPressed(){
+	public int onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1524,6 +1530,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public int getItemCount(){
+		log("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
 		}
@@ -1531,8 +1538,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	private void findPath (String pNav){
-		
-		log("findPath:" + pNav);	
+		log("findPath():" + pNav);
 
 		MegaOffline nodeToShow = null;
 		
@@ -1573,7 +1579,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void setPathNavigation(String _pathNavigation){
-		log("setPathNavigation: "+pathNavigation);
+		log("setPathNavigation(): "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
 		if (adapter != null){	
 //			contentText.setText(getInfoFolder(mOffList));
@@ -1601,6 +1607,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public String getPathNavigation() {
+		log("getPathNavigation");
 		return pathNavigation;
 	}
 }
