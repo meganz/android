@@ -39,6 +39,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -160,9 +161,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					}else if(adapterType == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 						holder.iconView.setVisibility(View.GONE);
 						holder.imageView.setVisibility(View.VISIBLE);
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
 
 					}
-
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);
@@ -614,8 +615,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if (currentFile.exists()){
 					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
+						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
 						holder.imageView.setImageBitmap(thumb);
-
 						holder.imageView.setVisibility(View.VISIBLE);
 						holder.iconView.setVisibility(View.GONE);
 
@@ -633,7 +634,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 		else{
 			holder.iconView.setImageResource(R.drawable.ic_folder_list);
-
 			holder.imageView.setVisibility(View.GONE);
 			holder.iconView.setVisibility(View.VISIBLE);
 		}
