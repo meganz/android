@@ -140,7 +140,6 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 					}
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
@@ -174,7 +173,6 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
@@ -191,7 +189,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
@@ -209,12 +206,12 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -223,7 +220,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}				
@@ -242,7 +238,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			log("ActionBarCallBack::onDestroyActionMode");
-			clearSelections();
+			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
 		}
 
@@ -1274,6 +1270,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	 */
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
+		clearSelections();
 		adapter.setMultipleSelect(false);
 		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
