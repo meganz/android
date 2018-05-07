@@ -327,7 +327,8 @@ public final class AdvancedNotificationBuilder {
             pendingIntent = PendingIntent.getActivity(context, (int)chats.get(0).getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
         }
         else {
-            log("ERROR:chatSIZE=0");
+            log("ERROR:chatSIZE=0:return");
+            return;
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
