@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -13,17 +12,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 
@@ -44,7 +42,9 @@ import nz.mega.sdk.MegaNode;
  * Created by mega on 24/04/18.
  */
 
-public class PlaylistFragment extends Fragment {
+public class PlaylistFragment extends Fragment{
+
+    private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     DisplayMetrics outMetrics;
 
@@ -136,6 +136,8 @@ public class PlaylistFragment extends Fragment {
 
         v.findViewById(R.id.exo_content_frame).setVisibility(View.GONE);
         v.findViewById(R.id.exo_overlay).setVisibility(View.GONE);
+
+        ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
 //        simpleExoPlayerViewPlaylist.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event){
@@ -172,14 +174,56 @@ public class PlaylistFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
+        adapter.setItemChecked(((AudioVideoPlayerLollipop) context).getCurrentWindowIndex());
         recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                log("onScrolled dy: "+dy);
+                if (Math.abs(dy)>40 && player.getPlayWhenReady()){
+                    hideController();
+                }
+            }
+        });
+
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
         player.setPlayWhenReady(true);
 
         return v;
+    }
+
+//    public void changeState(int index, String state, int color, boolean previous){
+//        if (mLayoutManager != null){
+//            View v = mLayoutManager.findViewByPosition(index);
+//            if (v != null){
+//                v.setBackgroundColor(color);
+//                if (previous){
+//                    log("changeState previous: "+index);
+//                    v.findViewById(R.id.file_list_filesize).setVisibility(View.VISIBLE);
+//                    v.findViewById(R.id.file_list_filestate).setVisibility(View.GONE);
+//                }
+//                else {
+//                    log("changeState current: "+index);
+//                    v.findViewById(R.id.file_list_filesize).setVisibility(View.GONE);
+//                    v.findViewById(R.id.file_list_filestate).setVisibility(View.VISIBLE);
+//                    TextView text = (TextView) v.findViewById(R.id.file_list_filestate);
+//                    text.setText(state);
+//                }
+//                mLayoutManager.scrollToPosition(index);
+//            }
+//        }
+//    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(recyclerView.getLayoutManager()!=null){
+            outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+        }
     }
 
     void hideController(){
@@ -192,18 +236,13 @@ public class PlaylistFragment extends Fragment {
     }
 
     public void showController(){
-        containerPlayer.animate().translationY(0).setDuration(400L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                containerPlayer.setVisibility(View.VISIBLE);
-            }
-        }).start();
+        containerPlayer.setVisibility(View.VISIBLE);
+        containerPlayer.animate().translationY(0).setDuration(400L).start();
     }
 
     public void itemClick(int position) {
         log("item click position: " + position);
-
-
+        player.seekTo(position, 0);
     }
 
     public void visibilityFastScroller(){
@@ -217,6 +256,30 @@ public class PlaylistFragment extends Fragment {
             }
         }
 
+    }
+
+    @Override
+    public void onPause() {
+        log("onPause");
+        super.onPause();
+
+        if (player != null){
+            log("currentTime: "+player.getCurrentPosition());
+//            ((AudioVideoPlayerLollipop) context).setCurrentTime(player.getCurrentPosition());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        log("onResume");
+        super.onResume();
+        ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
+    }
+
+    @Override
+    public void onDestroy() {
+        log("onDestroy");
+        super.onDestroy();
     }
 
     @Override
@@ -234,6 +297,10 @@ public class PlaylistFragment extends Fragment {
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
+    }
+
+    public ExoPlayer getPlayer(){
+        return player;
     }
 
     public static void log(String message) {

@@ -681,6 +681,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					} else {
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
+					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());

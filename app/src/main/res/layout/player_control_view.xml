@@ -102,8 +102,8 @@
 
                 <ImageButton
                     android:id="@id/exo_prev"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="80dp"
                     android:src="@drawable/exo_controls_previous"
@@ -123,14 +123,16 @@
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:background="@drawable/ic_fab_default"
-                        android:src="@drawable/ic_w_resume_all_transfers"/>
+                        android:src="@drawable/ic_w_resume_all_transfers"
+                        android:padding="10dp" />
 
                     <ImageButton
                         android:id="@id/exo_pause"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:background="@drawable/ic_fab_default"
-                        android:src="@drawable/ic_pause_white_player"/>
+                        android:src="@drawable/ic_pause_white_player"
+                        android:padding="10dp"/>
 
                 </RelativeLayout>
 
@@ -155,8 +157,8 @@
 
                 <ImageButton
                     android:id="@id/exo_next"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="80dp"
@@ -166,8 +168,8 @@
 
                 <ImageButton
                     android:id="@+id/exo_play_list"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="11dp"

@@ -45,21 +45,19 @@
                 android:id="@+id/container_control_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="14dp"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/exo_duration">
 
                 <ImageButton
                     android:id="@id/exo_prev"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="80dp"
                     android:src="@drawable/exo_controls_previous"
                     android:layout_centerVertical="true"
                     android:background="@android:color/transparent"
-
                     android:tint="@color/black"
                     android:padding="10dp"/>
 
@@ -75,14 +73,16 @@
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_play"/>
+                        android:src="@drawable/ic_play"
+                        android:padding="10dp"/>
 
                     <ImageButton
                         android:id="@id/exo_pause"
                         android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_pause_black"/>
+                        android:src="@drawable/ic_pause_black"
+                        android:padding="10dp"/>
 
                 </RelativeLayout>
 
@@ -107,8 +107,8 @@
 
                 <ImageButton
                     android:id="@id/exo_next"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="80dp"
