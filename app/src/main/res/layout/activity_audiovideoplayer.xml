@@ -62,22 +62,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:layout_below="@id/call_toolbar"
-			app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
-		<RelativeLayout
-			android:id="@+id/player_layout_container"
-			android:layout_width="match_parent"
-			android:layout_height="82dp"
-			android:layout_alignParentBottom="true">
-
-			<com.google.android.exoplayer2.ui.SimpleExoPlayerView
-				android:id="@+id/player_view_playlist"
-				android:focusable="true"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				app:controller_layout_id="@layout/playlist_control_view"/>
-
-		</RelativeLayout>
+			app:layout_behavior="@string/appbar_scrolling_view_behavior"
+			android:clipChildren="false"/>
 
 	</android.support.design.widget.AppBarLayout>
 

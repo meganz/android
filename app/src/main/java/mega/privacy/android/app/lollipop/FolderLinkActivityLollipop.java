@@ -1619,6 +1619,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					else {
 						mediaIntent = new Intent(FolderLinkActivityLollipop.this, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("screenPosition", screenPosition);

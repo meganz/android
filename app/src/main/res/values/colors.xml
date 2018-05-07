@@ -155,6 +155,7 @@
     <color name="color_text_new_messages">#B3000000</color>
 
     <color name="shape_page_number">#E600BFA5</color>
-    <color name="file_playing">#FFF2FCFA</color>
+    <color name="file_playlist_playing">#FFF2FCFA</color>
+    <color name="file_playlist_state">#FF00BFA5</color>
 
 </resources>

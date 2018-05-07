@@ -266,13 +266,13 @@ public class SearchFragmentLollipop extends Fragment{
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setTitle(context.getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 				}
 				else if(selected.size()==1){
 
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setTitle(context.getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 
 					if (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK) {
@@ -286,14 +286,14 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 
 					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+						trashIcon.setTitle(context.getString(R.string.context_move_to_trash));
 					}else{
-						trashIcon.setTitle(getString(R.string.context_remove));
+						trashIcon.setTitle(context.getString(R.string.context_remove));
 					}
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
+					unselect.setTitle(context.getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 
 					for(MegaNode i:selected){
@@ -309,9 +309,9 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 
 					if(!itemsSelected){
-						trashIcon.setTitle(getString(R.string.context_remove));
+						trashIcon.setTitle(context.getString(R.string.context_remove));
 					}else{
-						trashIcon.setTitle(getString(R.string.context_move_to_trash));
+						trashIcon.setTitle(context.getString(R.string.context_move_to_trash));
 					}
 				}
 			}
@@ -570,7 +570,7 @@ public class SearchFragmentLollipop extends Fragment{
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						}
 
-						String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+						String textToShow = String.format(context.getString(R.string.context_empty_inbox), context.getString(R.string.section_cloud_drive));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
@@ -695,7 +695,7 @@ public class SearchFragmentLollipop extends Fragment{
 			  			context.startActivity(mediaIntent);
 			  		}
 			  		else{
-			  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+			  			Toast.makeText(context, context.getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 			  			adapter.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
@@ -760,7 +760,7 @@ public class SearchFragmentLollipop extends Fragment{
 						context.startActivity(pdfIntent);
 					}
 					else{
-						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+						Toast.makeText(context, context.getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -44,6 +45,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     String parentPath;
     RecyclerView recyclerView;
     Fragment fragment;
+
+    int itemChecked;
 
     @Override
     public String getSectionTitle(int position) {
@@ -144,7 +147,22 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText(Util.getSizeString(node.getSize()));
 
-        holder.itemLayout.setBackgroundColor(Color.WHITE);
+        if (position == itemChecked){
+            holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
+            holder.textViewFileSize.setVisibility(View.GONE);
+            holder.textViewState.setVisibility(View.VISIBLE);
+            if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
+                holder.textViewState.setText(context.getString(R.string.playlist_state_playing));
+            }
+            else {
+                holder.textViewState.setText(context.getString(R.string.playlist_state_paused));
+            }
+        }
+        else{
+            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.textViewFileSize.setVisibility(View.VISIBLE);
+            holder.textViewState.setVisibility(View.GONE);
+        }
         holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -245,13 +263,30 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
+        if (itemChecked == currentPosition){
+            if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
+                ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(false);
+            }
+            else {
+                ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(true);
+            }
+            ((PlaylistFragment) fragment).showController();
+        }
+        else {
+            setItemChecked(currentPosition);
 
-        switch (v.getId()){
-            case R.id.file_list_item_layout_playlist:{
-                ((PlaylistFragment) fragment).itemClick(currentPosition);
-                ((PlaylistFragment) fragment).showController();
+            switch (v.getId()){
+                case R.id.file_list_item_layout_playlist:{
+                    ((PlaylistFragment) fragment).itemClick(currentPosition);
+                    ((PlaylistFragment) fragment).showController();
+                }
             }
         }
+        notifyDataSetChanged();
+    }
+
+    public void setItemChecked (int position){
+        this.itemChecked = position;
     }
 
     private static void log(String log) {
