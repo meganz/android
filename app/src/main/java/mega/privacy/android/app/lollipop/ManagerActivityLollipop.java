@@ -5560,7 +5560,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					thumbViewMenuItem.setVisible(true);
 
-					if(oFLol.getItemCount()>0){
+					if(oFLol.getItemCountWithoutRK()>0){
 						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
 					}
@@ -6889,8 +6889,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	return true;
 	        }
 	        case R.id.action_select:{
-	        	//TODO: multiselect
-
         		if (drawerItem == DrawerItem.CLOUD_DRIVE){
         			int index = viewPagerCDrive.getCurrentItem();
         			log("----------------------------------------INDEX: "+index);
@@ -7029,7 +7027,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 	        			else{
-	        				selectMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
 	        			}
 	        		}
@@ -8232,13 +8230,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				cloudPageAdapter.notifyDataSetChanged();
 			}
 		}
+
 		setToolbarTitle();
 	}
 
 	public void refreshAfterRemoving(){
 		log("refreshAfterRemoving");
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-
 			int index = viewPagerCDrive.getCurrentItem();
 			log("----------------------------------------INDEX: "+index);
 			if(index==1){
@@ -11504,9 +11502,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 
@@ -11518,7 +11514,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						String pathNavigation = getPathNavigationOffline();
 						NodeController nC = new NodeController(managerActivity);
-
 						for (int i=0;i<documents.size();i++){
 							nC.deleteOffline(documents.get(i), pathNavigation);
 						}
@@ -12793,10 +12788,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			oFLol.hideMultipleSelect();
 			if(mOff==null){
 				oFLol.refresh();
+
 			}
 			else{
 				oFLol.refreshPaths(mOff);
 			}
+			supportInvalidateOptionsMenu();
 		}
 	}
 
@@ -13729,7 +13726,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-
 			log("requestFinish "+MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (statusDialog != null){
