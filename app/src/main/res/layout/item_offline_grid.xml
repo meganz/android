@@ -9,7 +9,7 @@
 	<RelativeLayout
 		android:id="@+id/file_grid_thumbnail_layout"
 		android:layout_width="match_parent"
-		android:background="@color/new_background_fragment"
+		android:background="@android:color/transparent"
 		android:layout_height="172dp">
 
 		<ImageView

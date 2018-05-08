@@ -66,8 +66,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	ActionBar aB;
 	SparseBooleanArray selectedItems;
 	OfflineFragmentLollipop fragment;
-	//ArrayList<MegaOffline> mOffList;
-	
+
 	boolean multipleSelect;
 	
 	/*public static view holder class*/
@@ -84,7 +83,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         int currentPosition;
         String currentPath;
         String currentHandle;
-		public RelativeLayout thumbLayout;
+		RelativeLayout thumbLayout;
 
 	}
     
@@ -166,8 +165,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						holder.iconView.setVisibility(View.GONE);
 						holder.imageView.setVisibility(View.VISIBLE);
 						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
-						holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
-
 					}
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
@@ -301,7 +298,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 	
 	public void selectAll(){
-		log("selectAll");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
 				toggleSelection(i);
@@ -638,14 +634,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.iconView.setVisibility(View.VISIBLE);
 
 		if (currentFile.isFile()){
-			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
 								
 				if (currentFile.exists()){
 					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
-						holder.thumbLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 						thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, thumb, 3);
 						holder.imageView.setImageBitmap(thumb);
 						holder.imageView.setVisibility(View.VISIBLE);
@@ -664,7 +658,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 		else{
-			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 			holder.iconView.setImageResource(R.drawable.ic_folder_list);
 			holder.imageView.setVisibility(View.GONE);
 			holder.iconView.setVisibility(View.VISIBLE);
@@ -893,7 +886,23 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public int getItemCount() {
 		log("getItemCount");
 		return mOffList.size();
-	} 
+	}
+
+	public int getItemCountWithoutRK(){
+		log("getItemCountWithoutRK");
+
+		ArrayList<MegaOffline> mOffListWithoutRK = new ArrayList<>();
+		for(MegaOffline item: mOffList){
+			if(item.getHandle().equals("0")){
+				//isRecoveryKey
+
+			}else{
+				//notRecoveryKey
+				mOffListWithoutRK.add(item);
+			}
+		}
+		return mOffListWithoutRK.size();
+	}
 	
 	@Override
 	public int getItemViewType(int position) {

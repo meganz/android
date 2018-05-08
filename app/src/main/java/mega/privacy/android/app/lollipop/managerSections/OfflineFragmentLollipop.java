@@ -249,31 +249,24 @@ public class OfflineFragmentLollipop extends Fragment{
 			
 			if (Util.isOnline(context)){
 				if (selected.size() != 0) {
-					
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
-					
-					if(selected.size()==adapter.getItemCount()){
+
+					if(selected.size() == adapter.getItemCountWithoutRK()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}
-					else{
+					}else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-					}	
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					}
+
+				}else{
+
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
-				
-				if (selected.size() == 1) {
-					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				}
-				
+				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 				menu.findItem(R.id.cab_menu_copy).setVisible(false);
 				menu.findItem(R.id.cab_menu_move).setVisible(false);				
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
@@ -283,31 +276,20 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 			else{
 				if (selected.size() != 0) {
-					
 					menu.findItem(R.id.cab_menu_delete).setVisible(true);
 					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-
-					if(selected.size()==adapter.getItemCount()){
+					if(selected.size()==adapter.getItemCountWithoutRK()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
-					}
-					else{
+					}else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
 					}	
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				}else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
-				
-//				if (selected.size() == 1) {
-//					menu.findItem(R.id.cab_menu_rename).setVisible(true);
-//				}
-//				else{
-//					menu.findItem(R.id.cab_menu_rename).setVisible(false);
-//				}
 
 				menu.findItem(R.id.cab_menu_download).setVisible(false);			
 				menu.findItem(R.id.cab_menu_copy).setVisible(false);
@@ -1530,6 +1512,14 @@ public class OfflineFragmentLollipop extends Fragment{
 		log("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
+		}
+		return 0;
+	}
+
+	public int getItemCountWithoutRK(){
+		log("getItemCountWithoutRK");
+		if(adapter != null){
+			return adapter.getItemCountWithoutRK();
 		}
 		return 0;
 	}
