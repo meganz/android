@@ -154,7 +154,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 					@Override
 					public void onAnimationEnd(Animation animation) {
-						log("onAnimationEnd");
+						log("onAnimationEnd: "+selectedItems.size());
 						if (selectedItems.size() <= 0){
 							log("toggleAllSelection: hideMultipleSelect");
 							if(type==Constants.RUBBISH_BIN_ADAPTER){
@@ -297,6 +297,32 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 			else{
 				log("view is null - not animation");
+				if (selectedItems.size() <= 0){
+					if(type==Constants.RUBBISH_BIN_ADAPTER){
+						((RubbishBinFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					else if(type==Constants.INBOX_ADAPTER){
+						((InboxFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					else if(type==Constants.INCOMING_SHARES_ADAPTER){
+						((IncomingSharesFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					else if(type==Constants.OUTGOING_SHARES_ADAPTER){
+						((OutgoingSharesFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					else if(type==Constants.CONTACT_FILE_ADAPTER){
+						((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					else if(type==Constants.FOLDER_LINK_ADAPTER){
+						((FolderLinkActivityLollipop) context).hideMultipleSelect();
+					}
+					else if(type==Constants.SEARCH_ADAPTER){
+						((SearchFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					else{
+						((FileBrowserFragmentLollipop) fragment).hideMultipleSelect();
+					}
+				}
 			}
 		}
 		else{

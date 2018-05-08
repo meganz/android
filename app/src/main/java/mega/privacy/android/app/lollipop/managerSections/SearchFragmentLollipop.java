@@ -66,6 +66,8 @@ import nz.mega.sdk.MegaShare;
 
 public class SearchFragmentLollipop extends Fragment{
 
+	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+
 	public static ImageView imageDrag;
 
 	Context context;
@@ -189,6 +191,7 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_unselect_all:{
 					clearSelections();
+					hideMultipleSelect();
 					break;
 				}				
 			}
@@ -209,6 +212,7 @@ public class SearchFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((ManagerActivityLollipop)context).showFabButton();
 		}
 
 		@Override
@@ -334,6 +338,14 @@ public class SearchFragmentLollipop extends Fragment{
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if(recyclerView.getLayoutManager()!=null){
+			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
 		}
 	}
 	
@@ -790,7 +802,7 @@ public class SearchFragmentLollipop extends Fragment{
 	}
 	
 	private void updateActionModeTitle() {
-		if (actionMode == null || getActivity() == null) {
+		if (actionMode == null || context == null) {
 			return;
 		}
 		List<MegaNode> documents = adapter.getSelectedNodes();
@@ -803,7 +815,7 @@ public class SearchFragmentLollipop extends Fragment{
 				folders++;
 			}
 		}
-		Resources res = getActivity().getResources();
+		Resources res = context.getResources();
 
 		String title;
 		int sum=files+folders;
