@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -56,7 +57,7 @@ public class PlaylistFragment extends Fragment{
     LinearLayoutManager mLayoutManager;
     RecyclerView recyclerView;
     PlayListAdapter adapter;
-    TextView contentText;
+    public TextView contentText;
     private SimpleExoPlayerView simpleExoPlayerViewPlaylist;
     private SimpleExoPlayer player;
     View v;
@@ -70,6 +71,11 @@ public class PlaylistFragment extends Fragment{
     String parenPath;
     ArrayList<MegaOffline> offNodes;
     int adapterType;
+
+    PlaylistFragment playlistFragment;
+
+    boolean searchOpen = false;
+    boolean playWhenReady = true;
 
     public static PlaylistFragment newInstance() {
         log("newInstance");
@@ -87,6 +93,14 @@ public class PlaylistFragment extends Fragment{
         }
 
         player = ((AudioVideoPlayerLollipop) context).getPlayer();
+        playlistFragment = this;
+
+        if (savedInstanceState != null){
+            playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
+        }
+        else {
+            playWhenReady = true;
+        }
     }
 
     @Override
@@ -130,7 +144,7 @@ public class PlaylistFragment extends Fragment{
         simpleExoPlayerViewPlaylist.setUseController(true);
         simpleExoPlayerViewPlaylist.setPlayer(player);
         simpleExoPlayerViewPlaylist.setControllerAutoShow(false);
-        simpleExoPlayerViewPlaylist.setControllerShowTimeoutMs(999999999);
+        simpleExoPlayerViewPlaylist.setControllerShowTimeoutMs(1999999999);
         simpleExoPlayerViewPlaylist.setControllerHideOnTouch(false);
         simpleExoPlayerViewPlaylist.showController();
 
@@ -138,34 +152,21 @@ public class PlaylistFragment extends Fragment{
         v.findViewById(R.id.exo_overlay).setVisibility(View.GONE);
 
         ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
-//        simpleExoPlayerViewPlaylist.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event){
-//
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (aB.isShowing()) {
-//                        ((AudioVideoPlayerLollipop) context).hideActionStatusBar();
-//                    }
-//                    else {
-//                        ((AudioVideoPlayerLollipop) context).showActionStatusBar();
-//                    }
-//                }
-//                return true;
-//            }
-//        });
 
         adapterType = ((AudioVideoPlayerLollipop) context).getAdapterType();
         if (adapterType == Constants.OFFLINE_ADAPTER){
             parenPath = ((AudioVideoPlayerLollipop) context).getPathNavigation();
 //            OFFLINE CODE
-
-            adapter = new PlayListAdapter(context, this, offNodes, parenPath, recyclerView);
+            parenPath = ((AudioVideoPlayerLollipop) context).getPathNavigation();
+            offNodes = ((AudioVideoPlayerLollipop) context).getMediaOffList();
+            contentText.setText(""+offNodes.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodes.size()));
+            adapter = new PlayListAdapter(context, this, offNodes, parenPath, recyclerView, adapterType);
         }
         else {
             parentHandle = ((AudioVideoPlayerLollipop) context).getParentNodeHandle();
             handles = ((AudioVideoPlayerLollipop) context).getMediaHandles();
             contentText.setText(""+handles.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, handles.size()));
-            adapter = new PlayListAdapter(context, this, handles, parentHandle, recyclerView);
+            adapter = new PlayListAdapter(context, this, handles, parentHandle, recyclerView, adapterType);
         }
 
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -178,12 +179,30 @@ public class PlaylistFragment extends Fragment{
         recyclerView.setAdapter(adapter);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                log("onScrolled dy: "+dy);
-                if (Math.abs(dy)>40 && player.getPlayWhenReady()){
-                    hideController();
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                boolean scroll;
+
+
+                switch (newState) {
+                    case RecyclerView.SCROLL_STATE_IDLE:{
+                        if(mLayoutManager.findLastVisibleItemPosition() == adapter.getItemCount()-1){
+                            scroll = true;
+                        }
+                        else {
+                            scroll = false;
+                        }
+                        if (!isSearchOpen()){
+                            showController(scroll);
+                        }
+                        break;
+                    }
+                    case RecyclerView.SCROLL_STATE_DRAGGING:{
+                        hideController();
+                        break;
+                    }
                 }
             }
         });
@@ -191,32 +210,13 @@ public class PlaylistFragment extends Fragment{
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
-        player.setPlayWhenReady(true);
-
+        player.setPlayWhenReady(playWhenReady);
+        if (!((AudioVideoPlayerLollipop) context).querySearch.equals("")){
+            aB.setTitle(getString(R.string.action_search)+": "+((AudioVideoPlayerLollipop) context).querySearch);
+            setNodesSearch(((AudioVideoPlayerLollipop) context).querySearch);
+        }
         return v;
     }
-
-//    public void changeState(int index, String state, int color, boolean previous){
-//        if (mLayoutManager != null){
-//            View v = mLayoutManager.findViewByPosition(index);
-//            if (v != null){
-//                v.setBackgroundColor(color);
-//                if (previous){
-//                    log("changeState previous: "+index);
-//                    v.findViewById(R.id.file_list_filesize).setVisibility(View.VISIBLE);
-//                    v.findViewById(R.id.file_list_filestate).setVisibility(View.GONE);
-//                }
-//                else {
-//                    log("changeState current: "+index);
-//                    v.findViewById(R.id.file_list_filesize).setVisibility(View.GONE);
-//                    v.findViewById(R.id.file_list_filestate).setVisibility(View.VISIBLE);
-//                    TextView text = (TextView) v.findViewById(R.id.file_list_filestate);
-//                    text.setText(state);
-//                }
-//                mLayoutManager.scrollToPosition(index);
-//            }
-//        }
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -224,10 +224,11 @@ public class PlaylistFragment extends Fragment{
         if(recyclerView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
         }
+        outState.putBoolean("playWhenReady", player.getPlayWhenReady());
     }
 
     void hideController(){
-        containerPlayer.animate().translationY(220).setDuration(400L).withEndAction(new Runnable() {
+        containerPlayer.animate().translationY(220).setDuration(200L).withEndAction(new Runnable() {
             @Override
             public void run() {
                 containerPlayer.setVisibility(View.GONE);
@@ -235,9 +236,20 @@ public class PlaylistFragment extends Fragment{
         }).start();
     }
 
-    public void showController(){
+    public void showController(final boolean scroll){
+
         containerPlayer.setVisibility(View.VISIBLE);
-        containerPlayer.animate().translationY(0).setDuration(400L).start();
+        containerPlayer.animate().translationY(0).setDuration(200L).start();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (scroll){
+                    mLayoutManager.scrollToPosition(mLayoutManager.findLastVisibleItemPosition()+1);
+                }
+            }
+        }, 300L);
     }
 
     public void itemClick(int position) {
@@ -258,15 +270,37 @@ public class PlaylistFragment extends Fragment{
 
     }
 
+    public void setNodesSearch(String query){
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            ArrayList<MegaOffline> offNodesSearch = new ArrayList<>();
+            MegaOffline offNode;
+            for (int i=0; i<offNodes.size(); i++){
+                offNode = offNodes.get(i);
+                if (offNode.getName().contains(query)){
+                    offNodesSearch.add(offNode);
+                }
+            }
+            adapter.setOffNodes(offNodesSearch);
+            contentText.setText(""+offNodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodesSearch.size()));
+        }
+        else {
+            ArrayList<MegaNode> nodesSearch = new ArrayList<>();
+            MegaNode node;
+            for (int i=0; i<handles.size(); i++){
+                node = megaApi.getNodeByHandle(handles.get(i));
+                if (node.getName().contains(query)){
+                    nodesSearch.add(node);
+                }
+            }
+            adapter.setNodes(nodesSearch);
+            contentText.setText(""+nodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, nodesSearch.size()));
+        }
+    }
+
     @Override
     public void onPause() {
         log("onPause");
         super.onPause();
-
-        if (player != null){
-            log("currentTime: "+player.getCurrentPosition());
-//            ((AudioVideoPlayerLollipop) context).setCurrentTime(player.getCurrentPosition());
-        }
     }
 
     @Override
@@ -299,8 +333,27 @@ public class PlaylistFragment extends Fragment{
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
+    public void scrollTo(final int position) {
+        Handler handler = new Handler();
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mLayoutManager.scrollToPosition(position);
+            }
+        }, 350L);
+    }
+
     public ExoPlayer getPlayer(){
         return player;
+    }
+
+    public boolean isSearchOpen() {
+        return searchOpen;
+    }
+
+    public void setSearchOpen(boolean searchOpen) {
+        this.searchOpen = searchOpen;
     }
 
     public static void log(String message) {

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -22,7 +24,9 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.PlaylistFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -45,8 +49,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     String parentPath;
     RecyclerView recyclerView;
     Fragment fragment;
+    int adapterType;
 
     int itemChecked;
+    MegaNode nodeChecked;
+    MegaOffline offNodeChecked;
 
     @Override
     public String getSectionTitle(int position) {
@@ -68,16 +75,18 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         public TextView textViewFileSize;
         public TextView textViewState;
         public long document;
+        public String path;
         public RelativeLayout itemLayout;
     }
 
-    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<Long> _handles, long _parentHandle, RecyclerView _recyclerView) {
+    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<Long> _handles, long _parentHandle, RecyclerView _recyclerView, int adapterType) {
 
         this.context = _context;
         this.fragment = _fragment;
         this.handles = _handles;
         this.parentHandle = _parentHandle;
         this.recyclerView = _recyclerView;
+        this.adapterType = adapterType;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -90,17 +99,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         setNodes(nodes);
     }
 
-    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<MegaOffline> _handles, String _parentPath, RecyclerView _recyclerView) {
+    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<MegaOffline> _offNodes, String _parentPath, RecyclerView _recyclerView, int adapterType) {
 
         this.context = _context;
         this.fragment = _fragment;
-        this.offNodes = _handles;
+        this.offNodes =  new ArrayList<>();
         this.parentPath = _parentPath;
         this.recyclerView = _recyclerView;
+        this.adapterType = adapterType;
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
+        setOffNodes(_offNodes);
     }
 
     public void setOffNodes(ArrayList<MegaOffline> nodes) {
@@ -114,8 +122,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         this.nodes = nodes;
         notifyDataSetChanged();
     }
-
-
 
     @Override
     public PlayListAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -140,30 +146,78 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     public void onBindViewHolder(ViewHolderBrowser holder, int position) {
         log("onBindViewHolder");
 
-        MegaNode node = (MegaNode) getItem(position);
-        holder.document = node.getHandle();
+        MegaOffline offNode = null;
+        File mediaFile = null;
+        MegaNode node = null;
+
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            offNode = (MegaOffline) getItem(position);
+            if(offNode.getOrigin()==MegaOffline.INCOMING){
+                String handleString = offNode.getHandleIncoming();
+                mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+offNode.getPath() + "/" + offNode.getName());
+            }
+            else if(offNode.getOrigin()==MegaOffline.INBOX){
+                String handleString = offNode.getHandleIncoming();
+                mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/"+offNode.getPath() + "/" + offNode.getName());
+            }
+            else{
+                mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + offNode.getPath() + "/" + offNode.getName());
+            }
+            holder.path = offNode.getPath();
+        }
+        else {
+            node = (MegaNode) getItem(position);
+            holder.document = node.getHandle();
+        }
+
         Bitmap thumb = null;
 
-        holder.textViewFileName.setText(node.getName());
-        holder.textViewFileSize.setText(Util.getSizeString(node.getSize()));
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            holder.textViewFileName.setText(offNode.getName());
+            holder.textViewFileSize.setText(Util.getSizeString(mediaFile.length()));
 
-        if (position == itemChecked){
-            holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
-            holder.textViewFileSize.setVisibility(View.GONE);
-            holder.textViewState.setVisibility(View.VISIBLE);
-            if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
-                holder.textViewState.setText(context.getString(R.string.playlist_state_playing));
+            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && ((AudioVideoPlayerLollipop) context).querySearch.equals("")
+                    || (((PlaylistFragment) fragment).isSearchOpen() || !((AudioVideoPlayerLollipop) context).querySearch.equals("")) && (offNode.getName().equals(offNodeChecked.getName()))){
+                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
+                holder.textViewFileSize.setVisibility(View.GONE);
+                holder.textViewState.setVisibility(View.VISIBLE);
+                if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
+                    holder.textViewState.setText(context.getString(R.string.playlist_state_playing));
+                }
+                else {
+                    holder.textViewState.setText(context.getString(R.string.playlist_state_paused));
+                }
             }
-            else {
-                holder.textViewState.setText(context.getString(R.string.playlist_state_paused));
+            else{
+                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                holder.textViewFileSize.setVisibility(View.VISIBLE);
+                holder.textViewState.setVisibility(View.GONE);
             }
+            holder.imageView.setImageResource(MimeTypeList.typeForName(offNode.getName()).getIconResourceId());
         }
-        else{
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
-            holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewState.setVisibility(View.GONE);
+        else {
+            holder.textViewFileName.setText(node.getName());
+            holder.textViewFileSize.setText(Util.getSizeString(node.getSize()));
+
+            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && ((AudioVideoPlayerLollipop) context).querySearch.equals("")
+                    || (((PlaylistFragment) fragment).isSearchOpen() || !((AudioVideoPlayerLollipop) context).querySearch.equals("")) && (node.getName().equals(nodeChecked.getName()))){
+                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
+                holder.textViewFileSize.setVisibility(View.GONE);
+                holder.textViewState.setVisibility(View.VISIBLE);
+                if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
+                    holder.textViewState.setText(context.getString(R.string.playlist_state_playing));
+                }
+                else {
+                    holder.textViewState.setText(context.getString(R.string.playlist_state_paused));
+                }
+            }
+            else{
+                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                holder.textViewFileSize.setVisibility(View.VISIBLE);
+                holder.textViewState.setVisibility(View.GONE);
+            }
+            holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
         }
-        holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
         params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -173,42 +227,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         log("Check the thumb");
 
-        if (node.hasThumbnail()) {
-            log("Node has thumbnail");
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-            params1.setMargins(left, 0, 0, 0);
+        if (adapterType == Constants.OFFLINE_ADAPTER){
 
-            holder.imageView.setLayoutParams(params1);
-
-            thumb = ThumbnailUtils.getThumbnailFromCache(node);
-            if (thumb != null) {
-
-                holder.imageView.setImageBitmap(thumb);
-
-            } else {
-                thumb = ThumbnailUtils
-                        .getThumbnailFromFolder(node, context);
-                if (thumb != null) {
-                    holder.imageView.setImageBitmap(thumb);
-
-                } else {
-                    try {
-                        thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                    } catch (Exception e) {
-                    } // Too many AsyncTasks
-
-                    if (thumb != null) {
-                        holder.imageView.setImageBitmap(thumb);
-                    }
-                }
-            }
-        } else {
-            log("Node NOT thumbnail");
-            thumb = ThumbnailUtils.getThumbnailFromCache(node);
-            if (thumb != null) {
+        }
+        else{
+            if (node.hasThumbnail()) {
+                log("Node has thumbnail");
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
                 params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
                 params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -216,11 +240,32 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 params1.setMargins(left, 0, 0, 0);
 
                 holder.imageView.setLayoutParams(params1);
-                holder.imageView.setImageBitmap(thumb);
 
+                thumb = ThumbnailUtils.getThumbnailFromCache(node);
+                if (thumb != null) {
 
+                    holder.imageView.setImageBitmap(thumb);
+
+                } else {
+                    thumb = ThumbnailUtils
+                            .getThumbnailFromFolder(node, context);
+                    if (thumb != null) {
+                        holder.imageView.setImageBitmap(thumb);
+
+                    } else {
+                        try {
+                            thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+                        } catch (Exception e) {
+                        } // Too many AsyncTasks
+
+                        if (thumb != null) {
+                            holder.imageView.setImageBitmap(thumb);
+                        }
+                    }
+                }
             } else {
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                log("Node NOT thumbnail");
+                thumb = ThumbnailUtils.getThumbnailFromCache(node);
                 if (thumb != null) {
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
                     params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
@@ -231,19 +276,41 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     holder.imageView.setLayoutParams(params1);
                     holder.imageView.setImageBitmap(thumb);
 
+
                 } else {
-                    try {
-                        ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
-                    } catch (Exception e) {
-                    } // Too many AsyncTasks
+                    thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+                    if (thumb != null) {
+                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+                        params1.setMargins(left, 0, 0, 0);
+
+                        holder.imageView.setLayoutParams(params1);
+                        holder.imageView.setImageBitmap(thumb);
+
+                    } else {
+                        try {
+                            ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
+                        } catch (Exception e) {
+                        } // Too many AsyncTasks
+                    }
                 }
             }
         }
     }
 
     public Object getItem(int position) {
-        if (nodes != null){
-            return nodes.get(position);
+
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            if (offNodes != null){
+                return offNodes.get(position);
+            }
+        }
+        else {
+            if (nodes != null){
+                return nodes.get(position);
+            }
         }
 
         return null;
@@ -251,10 +318,21 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if (nodes != null){
-            return nodes.size();
-        }else{
-            return 0;
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            if (offNodes != null){
+                return offNodes.size();
+            }
+            else {
+                return 0;
+            }
+        }
+        else{
+            if (nodes != null){
+                return nodes.size();
+            }
+            else{
+                return 0;
+            }
         }
     }
 
@@ -263,30 +341,95 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         ViewHolderBrowser holder = (ViewHolderBrowser) v.getTag();
         int currentPosition = holder.getAdapterPosition();
-        if (itemChecked == currentPosition){
-            if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
-                ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(false);
+
+        if (!((PlaylistFragment) fragment).isSearchOpen()) {
+            if(!((AudioVideoPlayerLollipop) context).querySearch.equals("")) {
+                ((AudioVideoPlayerLollipop) context).onBackPressed();
+            }
+            if (itemChecked == currentPosition) {
+                if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()) {
+                    ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(false);
+                } else {
+                    ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(true);
+                }
+                ((PlaylistFragment) fragment).showController(false);
             }
             else {
-                ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(true);
+                setItemChecked(currentPosition);
+
+                switch (v.getId()) {
+                    case R.id.file_list_item_layout_playlist: {
+                        ((PlaylistFragment) fragment).itemClick(currentPosition);
+                        ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(true);
+                        ((PlaylistFragment) fragment).showController(false);
+                    }
+                }
             }
-            ((PlaylistFragment) fragment).showController();
+
+            notifyDataSetChanged();
         }
         else {
-            setItemChecked(currentPosition);
-
-            switch (v.getId()){
-                case R.id.file_list_item_layout_playlist:{
-                    ((PlaylistFragment) fragment).itemClick(currentPosition);
-                    ((PlaylistFragment) fragment).showController();
+            ((AudioVideoPlayerLollipop) context).searchMenuItem.collapseActionView();
+            String name = holder.textViewFileName.getText().toString();
+            if (adapterType == Constants.OFFLINE_ADAPTER){
+                if (name.equals(offNodeChecked.getName())){
+                    playPauseItem();
+                }
+                else {
+                    for (int i=0; i<offNodes.size(); i++){
+                        if (offNodes.get(i).getName().equals(name)){
+                            changeItem(i);
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                if (name.equals(nodeChecked.getName())){
+                    playPauseItem();
+                }
+                else {
+                    for (int i=0; i<nodes.size(); i++){
+                        if (nodes.get(i).getName().equals(name)){
+                            changeItem(i);
+                            break;
+                        }
+                    }
                 }
             }
         }
-        notifyDataSetChanged();
+    }
+
+    public void playPauseItem(){
+        if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()) {
+            ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(false);
+        } else {
+            ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(true);
+        }
+        ((PlaylistFragment) fragment).showController(false);
+        ((PlaylistFragment) fragment).scrollTo(itemChecked);
+    }
+
+    public void changeItem(int i){
+        setItemChecked(i);
+        ((PlaylistFragment) fragment).itemClick(i);
+        ((PlaylistFragment) fragment).scrollTo(i);
+        ((PlaylistFragment) fragment).showController(false);
+        ((PlaylistFragment) fragment).getPlayer().setPlayWhenReady(true);
     }
 
     public void setItemChecked (int position){
         this.itemChecked = position;
+        if (adapterType == Constants.OFFLINE_ADAPTER){
+            offNodeChecked = offNodes.get(position);
+        }
+        else{
+            nodeChecked = nodes.get(position);
+        }
+    }
+
+    public int getItemChecked (){
+        return itemChecked;
     }
 
     private static void log(String log) {
