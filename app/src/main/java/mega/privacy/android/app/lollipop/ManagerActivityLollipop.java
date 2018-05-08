@@ -431,7 +431,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	private boolean isListOffline = true;
 //	private boolean isListRubbishBin = true;
 	public boolean isListCameraUploads = false;
-	public boolean isLargeGridCameraUploads = true;
+//	public boolean isLargeGridCameraUploads = true;
+	public boolean isSmallGridCameraUploads = false;
 
 	//	private boolean isListInbox = true;
 //	private boolean isListContacts = true;
@@ -1343,13 +1344,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			firstTime = true;
 			isList=true;
 			isListCameraUploads=false;
+			isSmallGridCameraUploads = false;
 		}
 		else{
+
 			if (prefs.getFirstTime() == null){
 				firstTime = true;
 				isListCameraUploads=false;
-			}
-			else{
+			}else{
 				firstTime = Boolean.parseBoolean(prefs.getFirstTime());
 			}
 			if (prefs.getPreferredViewList() == null){
@@ -1364,6 +1366,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				isListCameraUploads = Boolean.parseBoolean(prefs.getPreferredViewListCameraUploads());
 			}
+
+			isSmallGridCameraUploads = dbH.isSmallGridCamera();
 		}
 		log("Preferred View List: "+isList);
 		log("Preferred View List for camera uploads: "+isListCameraUploads);
@@ -5644,12 +5648,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-						if (isLargeGridCameraUploads){
+						if (isSmallGridCameraUploads){
+							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+						}else{
 							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
 						}
-						else{
-							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
-						}
+
+//						if (isLargeGridCameraUploads){
+//							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+//						}
+//						else{
+//							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+//						}
 						if(!firstTimeCam) {
 							gridSmallLargeMenuItem.setVisible(true);
 						}else{
@@ -5725,13 +5735,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-
-						if (isLargeGridCameraUploads){
+						if (isSmallGridCameraUploads){
+							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+						}else{
 							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
 						}
-						else{
-							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
-						}
+
+//						if (isLargeGridCameraUploads){
+//							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+//						}
+//						else{
+//							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+//						}
 
 						if(!firstTimeCam) {
 							gridSmallLargeMenuItem.setVisible(true);
@@ -7138,21 +7153,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	return true;
 	        }
 	        case R.id.action_grid_view_large_small:{
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		if (cuFL != null){
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commitNowAllowingStateLoss();
 
-	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
+	        			isSmallGridCameraUploads = !isSmallGridCameraUploads;
+	        			dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-						if (isLargeGridCameraUploads){
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
-	        			}
-	        			else{
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
-	        			}
+						if (isSmallGridCameraUploads){
+							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+						}else{
+							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+						}
+
+//						isLargeGridCameraUploads = !isLargeGridCameraUploads;
+
+
+//						if (isLargeGridCameraUploads){
+//	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+//	        			}
+//	        			else{
+//	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+//	        			}
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -7166,14 +7191,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commitNowAllowingStateLoss();
 
-	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
+						isSmallGridCameraUploads = !isSmallGridCameraUploads;
+						dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
-						if (isLargeGridCameraUploads){
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
-	        			}
-	        			else{
-	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
-	        			}
+						if (isSmallGridCameraUploads){
+							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+						}else{
+							gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+						}
+
+//	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
+//
+//						if (isLargeGridCameraUploads){
+//	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+//	        			}
+//	        			else{
+//	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+//	        			}
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -14812,6 +14846,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public boolean isListCameraUploads() {
 		return isListCameraUploads;
+	}
+	public boolean isSmallGridCameraUploads() {
+		return isSmallGridCameraUploads;
+	}
+	public void setSmallGridCameraUploads(boolean isSmallGridCameraUploads) {
+		this.isSmallGridCameraUploads = isSmallGridCameraUploads;
 	}
 
 	public boolean getFirstTimeCam() {

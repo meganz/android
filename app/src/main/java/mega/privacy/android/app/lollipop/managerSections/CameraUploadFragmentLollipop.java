@@ -1012,16 +1012,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int realGridWidth = 0;
 			int numberOfCells = 0;
 			int padding = 0;
-			if (((ManagerActivityLollipop) context).isLargeGridCameraUploads) {
-				realGridWidth = totalWidth / GRID_LARGE;
-				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
-				gridWidth = realGridWidth - (padding * 2);
-				numberOfCells = GRID_LARGE;
-			} else {
+			if (((ManagerActivityLollipop) context).isSmallGridCameraUploads) {
 				realGridWidth = totalWidth / GRID_SMALL;
 				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_SMALL;
 				gridWidth = realGridWidth - (padding * 2);
 				numberOfCells = GRID_SMALL;
+			} else {
+				realGridWidth = totalWidth / GRID_LARGE;
+				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
+				gridWidth = realGridWidth - (padding * 2);
+				numberOfCells = GRID_LARGE;
 			}
 
 //		    int numberOfCells = totalWidth / GRID_WIDTH;
@@ -1995,13 +1995,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		    		    
 		    int gridWidth = 0;
 		    int numberOfCells = 0;
-		    if (((ManagerActivityLollipop)context).isLargeGridCameraUploads){
-		    	gridWidth = totalWidth / GRID_LARGE;
-		    	numberOfCells = GRID_LARGE;
-		    }
-		    else{
-		    	gridWidth = totalWidth / GRID_SMALL;
-		    	numberOfCells = GRID_SMALL;
+		    if (((ManagerActivityLollipop)context).isSmallGridCameraUploads){
+				gridWidth = totalWidth / GRID_SMALL;
+				numberOfCells = GRID_SMALL;
+		    }else{
+				gridWidth = totalWidth / GRID_LARGE;
+				numberOfCells = GRID_LARGE;
 		    }
 		    
 			if (monthPics != null){
@@ -2245,7 +2244,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public boolean getIsLargeGrid() {
-		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
+		boolean isSmall = ((ManagerActivityLollipop)context).isSmallGridCameraUploads;
+		boolean isLarge = !isSmall;
+//		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
+		return isLarge;
 	}
 	
 	@Override
@@ -2311,14 +2313,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if(nodes == null){
 			fastScroller.setVisibility(View.GONE);
 		}else{
-			if(((ManagerActivityLollipop)context).isLargeGridCameraUploads){
-				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
+			if(((ManagerActivityLollipop)context).isSmallGridCameraUploads){
+				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
 					fastScroller.setVisibility(View.GONE);
 				} else {
 					fastScroller.setVisibility(View.VISIBLE);
 				}
 			}else {
-				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
+				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
 					fastScroller.setVisibility(View.GONE);
 				} else {
 					fastScroller.setVisibility(View.VISIBLE);
