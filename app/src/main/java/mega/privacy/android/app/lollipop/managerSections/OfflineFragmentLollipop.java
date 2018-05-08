@@ -211,7 +211,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
-					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -1160,10 +1160,16 @@ public class OfflineFragmentLollipop extends Fragment{
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		log("clearSelections");
-
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
+		}else{
+//			if(adapter.getItemCount() == 1 ){
+//				boolean result = adapter.isRecoveryKey(adapter.getItemOff(0));
+//				if(result){
+//
+//					adapter.clearSelections();
+//				}
+//			}
 		}
 	}
 	
@@ -1251,8 +1257,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
-		clearSelections();
 		adapter.setMultipleSelect(false);
 		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 

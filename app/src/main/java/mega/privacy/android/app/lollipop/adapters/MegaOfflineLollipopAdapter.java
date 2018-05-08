@@ -234,7 +234,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 
 	public void toggleAllSelection(int pos) {
-		log("toggleSelection");
 		final int positionToflip = pos;
 
 		//Check if it's the Master Key file
@@ -305,8 +304,18 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 	}
 
+	public boolean isRecoveryKey(MegaOffline currentNode){
+		log("isRecoveryKey");
+
+		//Check if it's the Master Key file
+		if(currentNode.getHandle().equals("0")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	public void clearSelections() {
-		log("clearSelections");
 		for (int i= 0; i<this.getItemCount();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
@@ -881,6 +890,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);
 	}
+
 	
 	@Override
 	public int getItemCount() {
@@ -897,7 +907,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				//isRecoveryKey
 
 			}else{
-				//notRecoveryKey
+				//isnotRecoveryKey
 				mOffListWithoutRK.add(item);
 			}
 		}
@@ -913,6 +923,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
  
 	public Object getItem(int position) {
 		log("getItem");
+
+		return mOffList.get(position);
+	}
+
+	public MegaOffline getItemOff(int position) {
+		log("getItemOff");
 
 		return mOffList.get(position);
 	}
