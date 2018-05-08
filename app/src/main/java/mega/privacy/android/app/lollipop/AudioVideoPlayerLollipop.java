@@ -1100,6 +1100,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
         }
+        else if (adapterType == Constants.SEARCH_ADAPTER){
+            ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
+            for (int i=0; i<listNodes.size(); i++){
+                if (listNodes.get(i).getHandle() == handle){
+                    image = getImageView(i);
+                    break;
+                }
+            }
+        }
         else {
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
             ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
@@ -1267,6 +1276,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if (found){
                         break;
                     }
+                }
+            }
+        }
+        else if (adapterType == Constants.SEARCH_ADAPTER){
+            ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
+
+            for (int i=0; i<listNodes.size(); i++){
+                if (listNodes.get(i).getHandle() == handle){
+                    scrollToPosition(i);
+                    break;
                 }
             }
         }

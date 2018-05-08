@@ -1489,6 +1489,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
+		else if (adapterType == Constants.SEARCH_ADAPTER){
+			Long handle = adapterMega.getImageHandle(positionG);
+			ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
+			for (int i=0; i<listNodes.size(); i++){
+				if (listNodes.get(i).getHandle() == handle){
+					image = getImageView(i);
+					break;
+				}
+			}
+		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
@@ -1658,6 +1668,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (found){
 						break;
 					}
+				}
+			}
+		}
+		else if (adapterType == Constants.SEARCH_ADAPTER){
+			Long handle = adapterMega.getImageHandle(positionG);
+			ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
+
+			for (int i=0; i<listNodes.size(); i++){
+				if (listNodes.get(i).getHandle() == handle){
+					scrollToPosition(i);
+					break;
 				}
 			}
 		}
