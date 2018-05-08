@@ -28,7 +28,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
@@ -95,11 +94,8 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -13379,24 +13375,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
-			if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
-				log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
-				if (request.getFlag()){
-					if (getPasswordReminderFromMyAccount()){
-						showRememberPasswordDialog(true);
+			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
+					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
+					if (request.getFlag()){
+						if (getPasswordReminderFromMyAccount()){
+							showRememberPasswordDialog(true);
+						}
+						else {
+							showRememberPasswordDialog(false);
+						}
 					}
-					else {
-						showRememberPasswordDialog(false);
+					else if (getPasswordReminderFromMyAccount()){
+						if (aC == null){
+							aC = new AccountController(this);
+						}
+						aC.logout(this, megaApi);
 					}
 				}
-				else if (getPasswordReminderFromMyAccount()){
-					if (aC == null){
-						aC = new AccountController(this);
-					}
-					aC.logout(this, megaApi);
-				}
+				setPasswordReminderFromMyAccount(false);
 			}
-			setPasswordReminderFromMyAccount(false);
 		}
 		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
