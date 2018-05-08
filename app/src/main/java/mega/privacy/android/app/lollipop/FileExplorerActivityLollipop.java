@@ -357,8 +357,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		
 		megaApi.addGlobalListener(this);
+
+		if (Util.isChatEnabled()) {
+			if (megaChatApi == null) {
+				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+			}
+		}
 		
 		setContentView(R.layout.activity_file_explorer);
 		
@@ -423,11 +428,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				gSession = credentials.getSession();
 
 				if(Util.isChatEnabled()){
-
 					log("onCreate: Chat is ENABLED");
-					if (megaChatApi == null){
-						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-					}
 
 					int ret = megaChatApi.getInitState();
 
