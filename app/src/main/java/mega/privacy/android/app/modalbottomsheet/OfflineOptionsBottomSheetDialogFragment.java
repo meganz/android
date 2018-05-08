@@ -170,28 +170,32 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 if (file.isDirectory()){
 
                     File[] fList = file.listFiles();
-                    for (File f : fList){
+                    if(fList != null){
+                        for (File f : fList){
 
-                        if (f.isDirectory()){
-                            folders++;
+                            if (f.isDirectory()){
+                                folders++;
+                            }
+                            else{
+                                files++;
+                            }
                         }
-                        else{
-                            files++;
-                        }
-                    }
 
-                    String info = "";
-                    if (folders > 0){
-                        info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-                        if (files > 0){
-                            info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+                        String info = "";
+                        if (folders > 0){
+                            info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+                            if (files > 0){
+                                info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+                            }
                         }
-                    }
-                    else {
-                        info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-                    }
+                        else {
+                            info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+                        }
 
-                    nodeInfo.setText(info);
+                        nodeInfo.setText(info);
+                    }else{
+                        nodeInfo.setText(" ");
+                    }
                 }
                 else{
                     long nodeSize = file.length();
