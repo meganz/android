@@ -1856,4 +1856,6 @@
 
     <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(Pending)</string>
 
+    <string name="option_enable_chat_rich_preview" context="Option in Settings section to enable the rick links previews">Rich URL previews</string>
+
 </resources>
