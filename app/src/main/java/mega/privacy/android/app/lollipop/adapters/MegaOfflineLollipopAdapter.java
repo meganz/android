@@ -610,31 +610,37 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		if (currentFile.isDirectory()){
 			
 			File[] fList = currentFile.listFiles();
-			for (File f : fList){
-				
-				if (f.isDirectory()){
-					folders++;						
+
+			if(fList != null){
+				for (File f : fList){
+
+					if (f.isDirectory()){
+						folders++;
+					}
+					else{
+						files++;
+					}
 				}
-				else{
-					files++;
+
+				String info = "";
+				if (folders > 0){
+					info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+					if (files > 0){
+						info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+					}
 				}
+				else {
+					info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+				}
+				holder.textViewFileSize.setText(info);
+
+			}else{
+				holder.textViewFileSize.setText(" ");
 			}
-			
-			String info = "";
-			if (folders > 0){
-				info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-				if (files > 0){
-					info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-				}
-			}
-			else {
-				info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-			}			
-					
-			holder.textViewFileSize.setText(info);			
 		}
 		else{
 			long nodeSize = currentFile.length();
+
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 		}
 
@@ -747,28 +753,33 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageView.setLayoutParams(params);
 			
 			File[] fList = currentFile.listFiles();
-			for (File f : fList){
-				
-				if (f.isDirectory()){
-					folders++;						
+			if(fList != null){
+				for (File f : fList){
+
+					if (f.isDirectory()){
+						folders++;
+					}
+					else{
+						files++;
+					}
 				}
-				else{
-					files++;
+
+				String info = "";
+				if (folders > 0){
+					info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+					if (files > 0){
+						info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+					}
 				}
+				else {
+					info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+				}
+				holder.textViewFileSize.setText(info);
+			}else{
+				holder.textViewFileSize.setText(" ");
+
 			}
-			
-			String info = "";
-			if (folders > 0){
-				info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-				if (files > 0){
-					info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-				}
-			}
-			else {
-				info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-			}			
-					
-			holder.textViewFileSize.setText(info);
+
 			if (!multipleSelect) {
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
