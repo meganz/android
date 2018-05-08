@@ -509,6 +509,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		if (!multipleSelect) {
 			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 			holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+
 		}
 		else {
 
@@ -786,6 +787,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 			else {
 				if(this.isItemChecked(position)){
+					//MegaOffline nodeTemp = (MegaOffline) getItem(position);
+//					if(isRecoveryKey(nodeTemp)){
+//						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+//					}else{
+//						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+//					}
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -798,6 +805,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				else{
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
+
 				}
 			}
 
@@ -809,6 +817,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 			if (!multipleSelect) {
 				log("Not multiselect");
+
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
 				RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -848,6 +857,16 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			else{
 				log("multiselect ON");
 				if(this.isItemChecked(position)){
+
+//					MegaOffline nodeTemp = (MegaOffline) getItem(position);
+//					if(isRecoveryKey(nodeTemp)){
+//						log("***** is recovery key 1 -> white");
+//						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+//					}else{
+//						log("****** 2 IS multiselect -> isItemChecked -> color");
+//
+//						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+//					}
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1030,12 +1049,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 	
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect: "+multipleSelect);
+		log("setMultipleSelect: " + multipleSelect);
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
-		if(this.multipleSelect)
-		{
+		if (this.multipleSelect) {
 			selectedItems = new SparseBooleanArray();
 		}
 	}
