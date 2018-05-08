@@ -2246,8 +2246,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public boolean getIsLargeGrid() {
 		boolean isSmall = ((ManagerActivityLollipop)context).isSmallGridCameraUploads;
 		boolean isLarge = !isSmall;
-//		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
 		return isLarge;
+		//		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
+
 	}
 	
 	@Override
