@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.ActivityManager;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -15,13 +14,10 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -68,7 +64,6 @@ import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.LoadControl;
@@ -76,7 +71,6 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -150,7 +144,6 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
-import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener{
@@ -201,7 +194,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MenuItem removeMenuItem;
     private MenuItem removelinkMenuItem;
     private MenuItem loopMenuItem;
-    private MenuItem searchMenuItem;
+    public MenuItem searchMenuItem;
 
     private RelativeLayout audioVideoPlayerContainer;
     private RelativeLayout playerLayout;
@@ -275,6 +268,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     PlaylistFragment playlistFragment;
     private ProgressBar playlistProgressBar;
     int currentWindowIndex;
+    boolean onTracksChange = false;
+    public String querySearch = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,6 +303,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             onPlaylist = savedInstanceState.getBoolean("onPlaylist");
             size = savedInstanceState.getInt("size");
             currentWindowIndex = savedInstanceState.getInt("currentWindowIndex");
+            querySearch = savedInstanceState.getString("querySearch");
         }
         else {
             onPlaylist = false;
@@ -872,7 +868,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
         //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
-        player.addListener(new ExoPlayer.EventListener() {
+        player.addListener(new Player.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, Object manifest) {
                 log("onTimelineChanged");
@@ -883,9 +879,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 log("onTracksChanged");
 
                 loading = true;
-
+                int previousIndex = currentWindowIndex;
                 if (size > 1) {
                     currentWindowIndex = player.getCurrentWindowIndex();
+                    if (currentWindowIndex == previousIndex && onTracksChange) {
+                        currentWindowIndex++;
+                    }
+
                     if (isOffLine){
                         MegaOffline n = mediaOffList.get(currentWindowIndex);
                         fileName = n.getName();
@@ -920,16 +920,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 if (onPlaylist) {
                     if (playlistFragment != null && playlistFragment.isAdded()){
-//                        if (previousWindowIndex <= size && previousWindowIndex >= 0){
-//                            playlistFragment.changeState(previousWindowIndex, null, WHITE, true);
-//                        }
-                        if (currentWindowIndex <= size && currentWindowIndex >= 0){
-//                            playlistFragment.changeState(currentWindowIndex, getResources().getString(R.string.playlist_state_playing), ContextCompat.getColor(audioVideoPlayerLollipop, R.color.file_playlist_playing), false);
+                        if (currentWindowIndex < playlistFragment.adapter.getItemCount() && currentWindowIndex >= 0){
                             playlistFragment.adapter.setItemChecked(currentWindowIndex);
+                            playlistFragment.mLayoutManager.scrollToPosition(currentWindowIndex);
                             playlistFragment.adapter.notifyDataSetChanged();
                         }
                     }
                 }
+                onTracksChange = true;
             }
 
             @Override
@@ -960,19 +958,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             playlistProgressBar.setVisibility(View.GONE);
                         }
                         if (playlistFragment != null && playlistFragment.isAdded()){
-//                            if (player.getPlayWhenReady()){
-//                                playlistFragment.changeState(currentWindowIndex, getString(R.string.playlist_state_playing), ContextCompat.getColor(audioVideoPlayerLollipop, R.color.file_playlist_playing), false);
-//                            }
-//                            else {
-//                                playlistFragment.changeState(currentWindowIndex, getString(R.string.playlist_state_paused), ContextCompat.getColor(audioVideoPlayerLollipop, R.color.file_playlist_playing), false);
-//                            }
-                            playlistFragment.adapter.notifyDataSetChanged();
+                            if (playlistFragment.adapter != null){
+                                playlistFragment.adapter.notifyDataSetChanged();
+                            }
                         }
                     }
                     else {
                         progressBar.setVisibility(View.GONE);
                     }
-//                    playPauseButton.setVisibility(View.VISIBLE);
                     if (isVideo) {
                         if ((isMP4 && video) || !isMP4){
                             audioContainer.setVisibility(View.GONE);
@@ -1037,6 +1030,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         player.setPlayWhenReady(true);
         player.seekTo(currentWindowIndex, currentTime);
         player.setVideoDebugListener(this);
+        onTracksChange = false;
     }
 
     void showErrorDialog() {
@@ -1625,6 +1619,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putBoolean("onPlaylist", onPlaylist);
         outState.putInt("currentWindowIndex", currentWindowIndex);
         outState.putInt("size", size);
+        outState.putString("querySearch", querySearch);
     }
 
     public String getFileName(Uri uri) {
@@ -1701,55 +1696,66 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             searchView.setIconifiedByDefault(true);
         }
 
-//        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
-//            @Override
-//            public boolean onMenuItemActionExpand(MenuItem item) {
-//                textsearchQuery = false;
-//                searchQuery = "";
-//                selectDrawerItemLollipop(DrawerItem.SEARCH);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onMenuItemActionCollapse(MenuItem item) {
-//                log("On collapse search menu item");
-//                drawerItem = DrawerItem.CLOUD_DRIVE;
-//                selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
-//                textSubmitted = true;
-//                return true;
-//            }
-//        });
-//        searchView.setMaxWidth(Integer.MAX_VALUE);
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                searchQuery = "" + query;
-//                selectDrawerItemLollipop(DrawerItem.SEARCH);
-//                setToolbarTitle();
-//                supportInvalidateOptionsMenu();
-//                log("Search query: " + query);
-//                textSubmitted = true;
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                log("Searching by text: "+newText);
-//                if(textSubmitted){
-//                    textSubmitted = false;
-//                }
-//                else if (textsearchQuery) {
-//                    selectDrawerItemLollipop(DrawerItem.SEARCH);
-//                }
-//                else{
-//                    searchQuery = newText;
-//                    selectDrawerItemLollipop(DrawerItem.SEARCH);
-//                }
-//                return true;
-//            }
-//
-//        });
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                if (playlistFragment != null && playlistFragment.isAdded()){
+                    playlistFragment.setSearchOpen(true);
+                    playlistFragment.hideController();
+                }
+                loopMenuItem.setVisible(false);
+                querySearch = "";
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                if (playlistFragment != null && playlistFragment.isAdded()){
+                    boolean scroll;
+                    playlistFragment.setSearchOpen(false);
+                    if(playlistFragment.mLayoutManager.findLastVisibleItemPosition() == playlistFragment.adapter.getItemCount()-1){
+                        scroll = true;
+                    }
+                    else {
+                        scroll = false;
+                    }
+                    playlistFragment.showController(scroll);
+                    playlistFragment.adapter.notifyDataSetChanged();
+                    if (isOffLine){
+                        playlistFragment.contentText.setText(""+mediaOffList.size()+" "+getResources().getQuantityString(R.plurals.general_num_files, mediaOffList.size()));
+                    }
+                    else {
+                        playlistFragment.contentText.setText(""+mediaHandles.size()+" "+getResources().getQuantityString(R.plurals.general_num_files, mediaHandles.size()));
+                    }
+                }
+                loopMenuItem.setVisible(true);
+                invalidateOptionsMenu();
+                return true;
+            }
+        });
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (playlistFragment != null && playlistFragment.isAdded()){
+                    playlistFragment.setNodesSearch(query);
+                }
+                querySearch = query;
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                log("Searching by text: "+newText);
+                if (playlistFragment != null && playlistFragment.isAdded()){
+                    playlistFragment.setNodesSearch(newText);
+                }
+                querySearch = newText;
+                return true;
+            }
+
+        });
 
         shareMenuItem = menu.findItem(R.id.full_video_viewer_share);
         downloadMenuItem = menu.findItem(R.id.full_video_viewer_download);
@@ -2029,15 +2035,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         switch (id) {
             case android.R.id.home: {
                 log("onBackPRess");
-                if (!onPlaylist){
-                    if (player != null) {
-                        player.release();
-                    }
-                    onBackPressed();
-                }
-                else {
-                    releasePlaylist();
-                }
+                onBackPressed();
                 break;
             }
             case R.id.full_video_viewer_chat:{
@@ -3100,8 +3098,27 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        setImageDragVisibility(View.VISIBLE);
+        if (!onPlaylist){
+            super.onBackPressed();
+            if (player != null) {
+                player.release();
+            }
+            setImageDragVisibility(View.VISIBLE);
+        }
+        else {
+            if (querySearch.equals("")){
+                releasePlaylist();
+            }
+            else{
+                querySearch  = "";
+                aB.setTitle(getString(R.string.section_playlist));
+                if (playlistFragment != null && playlistFragment.isAdded()){
+                    playlistFragment.setNodesSearch("");
+
+                }
+                invalidateOptionsMenu();
+            }
+        }
     }
 
     public void setImageDragVisibility(int visibility){
@@ -3570,5 +3587,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public int getCurrentWindowIndex (){
         return currentWindowIndex;
+    }
+
+    public ArrayList<MegaOffline> getMediaOffList(){
+        return mediaOffList;
     }
 }
