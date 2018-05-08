@@ -13323,7 +13323,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
 				}
 			}
-			if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
+			else if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
 
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("Avatar changed!!");
@@ -13377,8 +13377,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				}
 			}
+			else if (request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
+
+				if (e.getErrorCode() != MegaError.API_OK){
+					log("ERROR:USER_ATTR_RICH_PREVIEWS");
+					if(sttFLol!=null){
+						if(sttFLol.isAdded()){
+							sttFLol.updateEnabledRichLinks();
+						}
+					}
+				}
+			}
 		}
-		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
@@ -13400,8 +13411,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				setPasswordReminderFromMyAccount(false);
 			}
+            else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
+                if(request.getNumDetails()==1){
+                    log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
+                    if (e.getErrorCode() == MegaError.API_OK){
+                        MegaApplication.setShowRichLinkWarning(request.getFlag());
+                        MegaApplication.setCounterNotNowRichLinkWarning(request.getNumber());
+                    }
+                    else if(e.getErrorCode() == MegaError.API_ENOENT){
+                        MegaApplication.setShowRichLinkWarning(request.getFlag());
+                    }
+                }
+                else if(request.getNumDetails()==0){
+                    log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
+                    MegaApplication.setEnabledRichLinks(request.getFlag());
+
+                    if(sttFLol!=null){
+                        if(sttFLol.isAdded()){
+                            sttFLol.updateEnabledRichLinks();
+                        }
+                    }
+                }
+            }
 		}
-		if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
+		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The change link has been sent");
@@ -13987,30 +14020,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if (e.getErrorCode() != MegaError.API_OK) {
 				showSnackbar(getString(R.string.context_link_action_error));
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-			if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
-				if(request.getNumDetails()==1){
-					log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-					if (e.getErrorCode() == MegaError.API_OK){
-						MegaApplication.setShowRichLinkWarning(request.getFlag());
-						MegaApplication.setCounterNotNowRichLinkWarning(request.getNumber());
-					}
-					else if(e.getErrorCode() == MegaError.API_ENOENT){
-						MegaApplication.setShowRichLinkWarning(request.getFlag());
-					}
-				}
-				else if(request.getNumDetails()==0){
-					log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
-					MegaApplication.setEnabledRichLinks(request.getFlag());
-
-					if(sttFLol!=null){
-						if(sttFLol.isAdded()){
-							sttFLol.updateEnabledRichLinks(request.getFlag());
-						}
-					}
-				}
 			}
 		}
 	}
