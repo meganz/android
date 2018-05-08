@@ -2329,14 +2329,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 	}
 
-	public void updateEnabledRichLinks(boolean value){
-		log("updateEnabledRichLinks: "+value);
+	public void updateEnabledRichLinks(){
+		log("updateEnabledRichLinks");
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			richLinksSwitch.setChecked(value);
+			richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
 		}
 		else{
-			richLinksCheck.setChecked(value);
+			richLinksCheck.setChecked(MegaApplication.isEnabledRichLinks());
 		}
 	}
 

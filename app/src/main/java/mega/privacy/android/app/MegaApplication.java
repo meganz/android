@@ -714,7 +714,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
-		// TODO Auto-generated method stub
+		log("onAccountUpdate");
 	}
 
 	@Override
