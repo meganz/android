@@ -81,6 +81,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private static long openCallChatId = -1;
 
+	private static boolean showRichLinkWarning = false;
+	private static long counterNotNowRichLinkWarning = -1;
+	private static boolean enabledRichLinks = false;
+
 	private static boolean recentChatVisible = false;
 	private static boolean chatNotificationReceived = false;
 
@@ -1086,5 +1090,29 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		catch(Exception e){
 			log("clearIncomingCallNotification:EXCEPTION");
 		}
+	}
+
+	public static boolean isShowRichLinkWarning() {
+		return showRichLinkWarning;
+	}
+
+	public static void setShowRichLinkWarning(boolean showRichLinkWarning) {
+		MegaApplication.showRichLinkWarning = showRichLinkWarning;
+	}
+
+	public static long getCounterNotNowRichLinkWarning() {
+		return counterNotNowRichLinkWarning;
+	}
+
+	public static void setCounterNotNowRichLinkWarning(long counterNotNowRichLinkWarning) {
+		MegaApplication.counterNotNowRichLinkWarning = counterNotNowRichLinkWarning;
+	}
+
+	public static boolean isEnabledRichLinks() {
+		return enabledRichLinks;
+	}
+
+	public static void setEnabledRichLinks(boolean enabledRichLinks) {
+		MegaApplication.enabledRichLinks = enabledRichLinks;
 	}
 }
