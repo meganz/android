@@ -46,7 +46,6 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -77,8 +76,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
 	Handler handler = new Handler();
-	MyAccountInfo myAccountInfo;
-	
+
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
 	private static int REQUEST_CODE_TREE_LOCAL_CAMERA = 1014;
 	private static int REQUEST_CAMERA_FOLDER = 2000;
@@ -102,6 +100,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
 
 	public static String KEY_CHAT_ENABLE = "settings_chat_enable";
+
+	public static String KEY_RICH_LINKS_ENABLE = "settings_rich_links_enable";
 
 	public static String CATEGORY_AUTOAWAY_CHAT = "settings_autoaway_chat";
 	public static String KEY_CHAT_AUTOAWAY = "settings_autoaway_chat_preference";
@@ -176,7 +176,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	SwitchPreference pinLockEnableSwitch;
 	TwoLineCheckPreference pinLockEnableCheck;
 	SwitchPreference chatEnableSwitch;
+	SwitchPreference richLinksSwitch;
 	TwoLineCheckPreference chatEnableCheck;
+	TwoLineCheckPreference richLinksCheck;
 	//New autoaway
 	SwitchPreference autoAwaySwitch;
 	TwoLineCheckPreference autoAwayCheck;
@@ -303,6 +305,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatEnableSwitch = (SwitchPreference) findPreference(KEY_CHAT_ENABLE);
 			chatEnableSwitch.setOnPreferenceClickListener(this);
 
+			richLinksSwitch = (SwitchPreference) findPreference(KEY_RICH_LINKS_ENABLE);
+			richLinksSwitch.setOnPreferenceClickListener(this);
+
 			autoAwaySwitch = (SwitchPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwaySwitch.setOnPreferenceClickListener(this);
 
@@ -315,6 +320,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			chatEnableCheck = (TwoLineCheckPreference) findPreference(KEY_CHAT_ENABLE);
 			chatEnableCheck.setOnPreferenceClickListener(this);
+
+			richLinksCheck = (TwoLineCheckPreference) findPreference(KEY_RICH_LINKS_ENABLE);
+			richLinksCheck.setOnPreferenceClickListener(this);
 
 			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwayCheck.setOnPreferenceClickListener(this);
@@ -842,12 +850,28 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				chatAttachmentsChatListPreference.setValue(0+"");
 			}
 			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+
+			boolean richLinks = MegaApplication.isEnabledRichLinks();
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				richLinksSwitch.setChecked(richLinks);
+			}
+			else{
+				richLinksCheck.setChecked(richLinks);
+			}
 		}
 		else{
 			preferenceScreen.removePreference(chatStatusCategory);
 			preferenceScreen.removePreference(chatNotificationsCategory);
 			preferenceScreen.removePreference(autoawayChatCategory);
 			preferenceScreen.removePreference(persistenceChatCategory);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				preferenceScreen.removePreference(richLinksSwitch);
+			}
+			else{
+				preferenceScreen.removePreference(richLinksCheck);
+			}
+
 			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 		}
 
@@ -1782,6 +1806,34 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
+		else if (preference.getKey().compareTo(KEY_RICH_LINKS_ENABLE) == 0){
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(richLinksSwitch.isChecked()){
+					log("Enable rich links");
+					megaApi.enableRichPreviews(true, (ManagerActivityLollipop)context);
+				}
+				else{
+					log("Disable rich links");
+					megaApi.enableRichPreviews(false, (ManagerActivityLollipop)context);
+				}
+			}
+			else{
+				if(richLinksCheck.isChecked()){
+					log("Enable rich links");
+					megaApi.enableRichPreviews(true, (ManagerActivityLollipop)context);
+				}
+				else{
+					log("Disable rich links");
+					megaApi.enableRichPreviews(false, (ManagerActivityLollipop)context);
+				}
+			}
+		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
@@ -2274,6 +2326,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		if(Util.isChatEnabled()){
 			showPresenceChatConfig();
+		}
+	}
+
+	public void updateEnabledRichLinks(boolean value){
+		log("updateEnabledRichLinks: "+value);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			richLinksSwitch.setChecked(value);
+		}
+		else{
+			richLinksCheck.setChecked(value);
 		}
 	}
 
