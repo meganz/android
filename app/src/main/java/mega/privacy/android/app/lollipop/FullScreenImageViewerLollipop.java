@@ -1327,67 +1327,107 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	public void setImageDragVisibility(int visibility){
 		if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
-			RubbishBinFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (RubbishBinFragmentLollipop.imageDrag != null){
+				RubbishBinFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.INBOX_ADAPTER){
-			InboxFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (InboxFragmentLollipop.imageDrag != null){
+				InboxFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
-			IncomingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (IncomingSharesFragmentLollipop.imageDrag != null) {
+				IncomingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
-			OutgoingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (OutgoingSharesFragmentLollipop.imageDrag != null){
+				OutgoingSharesFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
-			ContactFileListFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (ContactFileListFragmentLollipop.imageDrag != null){
+				ContactFileListFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
-			FolderLinkActivityLollipop.imageDrag.setVisibility(visibility);
+			if (FolderLinkActivityLollipop.imageDrag != null){
+				FolderLinkActivityLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.SEARCH_ADAPTER){
-			SearchFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (SearchFragmentLollipop.imageDrag != null){
+				SearchFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
-			FileBrowserFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (FileBrowserFragmentLollipop.imageDrag != null){
+				FileBrowserFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER ||adapterType == Constants.SEARCH_BY_ADAPTER) {
-			CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (CameraUploadFragmentLollipop.imageDrag != null){
+				CameraUploadFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 		else if (adapterType == Constants.OFFLINE_ADAPTER) {
-			OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
+			if (OfflineFragmentLollipop.imageDrag != null){
+				OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
+			}
 		}
 	}
 
 	void getLocationOnScreen(int[] location){
 		if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
-			RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (RubbishBinFragmentLollipop.imageDrag != null) {
+				RubbishBinFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.INBOX_ADAPTER){
-			InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (InboxFragmentLollipop.imageDrag != null){
+				InboxFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
-			IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (IncomingSharesFragmentLollipop.imageDrag != null) {
+				IncomingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
-			OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (OutgoingSharesFragmentLollipop.imageDrag != null) {
+				OutgoingSharesFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
-			ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (ContactFileListFragmentLollipop.imageDrag != null) {
+				ContactFileListFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
-			FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
+			if (FolderLinkActivityLollipop.imageDrag != null) {
+				FolderLinkActivityLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.SEARCH_ADAPTER){
-			SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (SearchFragmentLollipop.imageDrag != null){
+				SearchFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
-			FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (FileBrowserFragmentLollipop.imageDrag != null){
+				FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
-			CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (CameraUploadFragmentLollipop.imageDrag != null) {
+				CameraUploadFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 		else if (adapterType == Constants.OFFLINE_ADAPTER){
-			OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			if (OfflineFragmentLollipop.imageDrag != null){
+				OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
 		}
 	}
 
@@ -1510,13 +1550,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
                 }
             }
         }
-		int[] position = new int[2];
-		image.getLocationOnScreen(position);
-		screenPosition[0] = (image.getWidth() / 2) + position[0];
-		screenPosition[1] = (image.getHeight() / 2) + position[1];
-		screenPosition[2] = image.getWidth();
-		screenPosition[3] = image.getHeight();
-		draggableView.setScreenPosition(screenPosition);
+        if (image != null){
+			int[] position = new int[2];
+			image.getLocationOnScreen(position);
+			screenPosition[0] = (image.getWidth() / 2) + position[0];
+			screenPosition[1] = (image.getHeight() / 2) + position[1];
+			screenPosition[2] = image.getWidth();
+			screenPosition[3] = image.getHeight();
+			draggableView.setScreenPosition(screenPosition);
+		}
 	}
 
 	public ImageView getImageView (int i) {
@@ -1525,98 +1567,134 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
 			if (RubbishBinFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = RubbishBinFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				RubbishBinFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				if (v != null){
+					RubbishBinFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
 			}
 			else {
 				View v = RubbishBinFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				RubbishBinFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				if (v != null) {
+					RubbishBinFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 			image = RubbishBinFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.INBOX_ADAPTER){
 			if (InboxFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = InboxFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				InboxFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				if (v != null) {
+					InboxFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
 			}
 			else {
 				View v = InboxFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				InboxFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				if (v != null) {
+					InboxFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 			image = InboxFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
 			if (IncomingSharesFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = IncomingSharesFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				IncomingSharesFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				if (v != null) {
+					IncomingSharesFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
 			}
 			else {
 				View v = IncomingSharesFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				IncomingSharesFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				if (v != null) {
+					IncomingSharesFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 			image = IncomingSharesFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
 			if (OutgoingSharesFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = OutgoingSharesFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				OutgoingSharesFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				if (v != null) {
+					OutgoingSharesFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
 			}
 			else {
 				View v = OutgoingSharesFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				OutgoingSharesFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				if (v != null) {
+					OutgoingSharesFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 			image = OutgoingSharesFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
 			View v = ContactFileListFragmentLollipop.mLayoutManager.findViewByPosition(i);
+			if (v != null){
 			ContactFileListFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			}
 			image = ContactFileListFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
 			View v = FolderLinkActivityLollipop.mLayoutManager.findViewByPosition(i);
-			FolderLinkActivityLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			if (v != null) {
+				FolderLinkActivityLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			}
 			image = FolderLinkActivityLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.SEARCH_ADAPTER){
 			if (SearchFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = SearchFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				SearchFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				if (v != null) {
+					SearchFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
 			}
 			else {
 				View v = SearchFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				SearchFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				if (v != null){
+					SearchFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 			image = SearchFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
 			if (FileBrowserFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = FileBrowserFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				FileBrowserFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				if (v != null) {
+					FileBrowserFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
 			}
 			else {
 				View v = FileBrowserFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				FileBrowserFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
+				if (v != null) {
+					FileBrowserFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 			image = FileBrowserFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER){
 			if (CameraUploadFragmentLollipop.adapterList != null){
 				View v = CameraUploadFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				CameraUploadFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+				if (v != null) {
+					CameraUploadFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+				}
 			}
 			else if (CameraUploadFragmentLollipop.adapterGrid != null){
 				View v = CameraUploadFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				CameraUploadFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+				if (v != null) {
+					CameraUploadFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+				}
 			}
 			image = CameraUploadFragmentLollipop.imageDrag;
 		}
 		else if (adapterType == Constants.OFFLINE_ADAPTER){
 			if (OfflineFragmentLollipop.adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 				View v = OfflineFragmentLollipop.mLayoutManager.findViewByPosition(i);
-				OfflineFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+				if (v != null) {
+					OfflineFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+				}
 			}
 			else {
 				View v = OfflineFragmentLollipop.gridLayoutManager.findViewByPosition(i);
-				OfflineFragmentLollipop.imageDrag = (ImageView)v.findViewById(R.id.offline_grid_thumbnail);
+				if (v != null) {
+					OfflineFragmentLollipop.imageDrag = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+				}
 			}
 			image = OfflineFragmentLollipop.imageDrag;
 		}
@@ -1698,68 +1776,104 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	void scrollToPosition (int i) {
 		if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
-			if (RubbishBinFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				RubbishBinFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (RubbishBinFragmentLollipop.adapter != null && RubbishBinFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				if (RubbishBinFragmentLollipop.mLayoutManager != null && RubbishBinFragmentLollipop.adapter.getItem(i) != null){
+					RubbishBinFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				RubbishBinFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (RubbishBinFragmentLollipop.gridLayoutManager != null && RubbishBinFragmentLollipop.adapter.getItem(i) != null) {
+					RubbishBinFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 		else if (adapterType == Constants.INBOX_ADAPTER){
-			if (InboxFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				InboxFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (InboxFragmentLollipop.adapter != null && InboxFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				if (InboxFragmentLollipop.mLayoutManager != null && InboxFragmentLollipop.adapter.getItem(i) != null) {
+					InboxFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				InboxFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (InboxFragmentLollipop.gridLayoutManager != null && InboxFragmentLollipop.adapter.getItem(i) != null) {
+					InboxFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
-			if (IncomingSharesFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				IncomingSharesFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (IncomingSharesFragmentLollipop.adapter != null && IncomingSharesFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				if (IncomingSharesFragmentLollipop.mLayoutManager != null && IncomingSharesFragmentLollipop.adapter.getItem(i) != null){
+					IncomingSharesFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				IncomingSharesFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (IncomingSharesFragmentLollipop.gridLayoutManager != null && IncomingSharesFragmentLollipop.adapter.getItem(i) != null) {
+					IncomingSharesFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 		else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
-			if (OutgoingSharesFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				OutgoingSharesFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (OutgoingSharesFragmentLollipop.adapter != null && OutgoingSharesFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+				if (OutgoingSharesFragmentLollipop.mLayoutManager != null && OutgoingSharesFragmentLollipop.adapter.getItem(i) != null) {
+					OutgoingSharesFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				OutgoingSharesFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (OutgoingSharesFragmentLollipop.gridLayoutManager != null && OutgoingSharesFragmentLollipop.adapter.getItem(i) != null){
+					OutgoingSharesFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 		else if (adapterType == Constants.CONTACT_FILE_ADAPTER){
-			ContactFileListFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (ContactFileListFragmentLollipop.adapter != null && ContactFileListFragmentLollipop.mLayoutManager != null && ContactFileListFragmentLollipop.adapter.getItem(i) != null) {
+				ContactFileListFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			}
 		}
 		else if (adapterType == Constants.FOLDER_LINK_ADAPTER){
-			FolderLinkActivityLollipop.mLayoutManager.scrollToPosition(i);
+			if (FolderLinkActivityLollipop.adapterList != null && FolderLinkActivityLollipop.mLayoutManager != null  && FolderLinkActivityLollipop.adapterList.getItem(i) != null){
+				FolderLinkActivityLollipop.mLayoutManager.scrollToPosition(i);
+			}
 		}
 		else if (adapterType == Constants.SEARCH_ADAPTER){
-			if (SearchFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				SearchFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (SearchFragmentLollipop.adapter != null && SearchFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				if (SearchFragmentLollipop.mLayoutManager != null && SearchFragmentLollipop.adapter.getItem(i) != null) {
+					SearchFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				SearchFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (SearchFragmentLollipop.gridLayoutManager != null && SearchFragmentLollipop.adapter.getItem(i) != null) {
+					SearchFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 		else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
-			if (FileBrowserFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				FileBrowserFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (FileBrowserFragmentLollipop.adapter != null && FileBrowserFragmentLollipop.adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				if (FileBrowserFragmentLollipop.mLayoutManager != null && FileBrowserFragmentLollipop.adapter.getItem(i) != null){
+					FileBrowserFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				FileBrowserFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (FileBrowserFragmentLollipop.gridLayoutManager != null && FileBrowserFragmentLollipop.adapter.getItem(i) != null){
+					FileBrowserFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER) {
-			CameraUploadFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if ((CameraUploadFragmentLollipop.adapterList != null || CameraUploadFragmentLollipop.adapterGrid != null)
+					&& CameraUploadFragmentLollipop.mLayoutManager != null
+					&& (CameraUploadFragmentLollipop.adapterList.getItem(i) != null || CameraUploadFragmentLollipop.adapterGrid.getItem(i) != null)){
+				CameraUploadFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			}
 		}
 		else if (adapterType == Constants.OFFLINE_ADAPTER){
-			if (OfflineFragmentLollipop.adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-				OfflineFragmentLollipop.mLayoutManager.scrollToPosition(i);
+			if (OfflineFragmentLollipop.adapter != null && OfflineFragmentLollipop.adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+				if (OfflineFragmentLollipop.mLayoutManager != null && OfflineFragmentLollipop.adapter.getItem(i) != null) {
+					OfflineFragmentLollipop.mLayoutManager.scrollToPosition(i);
+				}
 			}
 			else {
-				OfflineFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				if (OfflineFragmentLollipop.gridLayoutManager != null && OfflineFragmentLollipop.adapter.getItem(i) != null) {
+					OfflineFragmentLollipop.gridLayoutManager.scrollToPosition(i);
+				}
 			}
 		}
 	}
