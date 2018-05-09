@@ -1151,6 +1151,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (passwordReminderFromMyAccount){
 			outState.putBoolean("passwordReminderFromMyAccount", true);
 		}
+		if (turnOnNotifications){
+			outState.putBoolean("turnOnNotifications", turnOnNotifications);
+		}
 	}
 
 	@Override
@@ -1206,6 +1209,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			passwordReminderDialogBlocked = savedInstanceState.getBoolean("passwordReminderDialogBlocked", false);
 			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
+			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -2475,13 +2479,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 		}
 
-		NotificationManagerCompat nf = NotificationManagerCompat.from(this);
-		log ("NotificationsEnabled: "+nf.areNotificationsEnabled());
-		if (!nf.areNotificationsEnabled()){
-			log("off");
-			if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
-				if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
-					setTurnOnNotificationsFragment();
+		if (turnOnNotifications){
+			setTurnOnNotificationsFragment();
+		}
+		else {
+			NotificationManagerCompat nf = NotificationManagerCompat.from(this);
+			log ("NotificationsEnabled: "+nf.areNotificationsEnabled());
+			if (!nf.areNotificationsEnabled()){
+				log("off");
+				if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
+					if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
+						setTurnOnNotificationsFragment();
+					}
 				}
 			}
 		}
