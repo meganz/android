@@ -367,6 +367,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
 
+			if (currentDir.getAbsolutePath().contains(Util.offlineDIR)){
+				log("currentDir contains offlineDIR");
+				openFile = false;
+			}
+			else {
+				log("currentDir is NOT on offlineDIR: openFile->"+openFile);
+			}
+
 			if (isFolderLink){
 				if (dbH.getCredentials() == null) {
 					megaApiFolder.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
@@ -417,6 +425,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 else{
                     log("IS FILE_:_");
                 }
+
+				if (currentDir.getAbsolutePath().contains(Util.offlineDIR)){
+                	log("currentDir contains offlineDIR");
+					openFile = false;
+				}
+				else {
+					log("currentDir is NOT on offlineDIR: openFile->"+openFile);
+				}
 
                 if (isFolderLink){
 
