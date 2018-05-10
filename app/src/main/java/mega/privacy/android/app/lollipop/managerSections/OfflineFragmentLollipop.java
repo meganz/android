@@ -140,7 +140,6 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 					}
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
@@ -174,7 +173,6 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
@@ -191,7 +189,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
@@ -209,12 +206,12 @@ public class OfflineFragmentLollipop extends Fragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
+
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -223,7 +220,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
-					clearSelections();
 					hideMultipleSelect();
 					break;
 				}				
@@ -241,7 +237,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			clearSelections();
+			log("ActionBarCallBack::onDestroyActionMode");
+			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
 		}
 
@@ -252,31 +249,24 @@ public class OfflineFragmentLollipop extends Fragment{
 			
 			if (Util.isOnline(context)){
 				if (selected.size() != 0) {
-					
 					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_share).setVisible(false);
-					
-					if(selected.size()==adapter.getItemCount()){
+
+					if(selected.size() == adapter.getItemCountWithoutRK()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
-					}
-					else{
+					}else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-					}	
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					}
+
+				}else{
+
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_download).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
-				
-				if (selected.size() == 1) {
-					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				}
-				
+				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 				menu.findItem(R.id.cab_menu_copy).setVisible(false);
 				menu.findItem(R.id.cab_menu_move).setVisible(false);				
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
@@ -286,31 +276,20 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 			else{
 				if (selected.size() != 0) {
-					
 					menu.findItem(R.id.cab_menu_delete).setVisible(true);
 					menu.findItem(R.id.cab_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-
-					if(selected.size()==adapter.getItemCount()){
+					if(selected.size()==adapter.getItemCountWithoutRK()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
-					}
-					else{
+					}else{
 						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
 					}	
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				}else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
-				
-//				if (selected.size() == 1) {
-//					menu.findItem(R.id.cab_menu_rename).setVisible(true);
-//				}
-//				else{
-//					menu.findItem(R.id.cab_menu_rename).setVisible(false);
-//				}
 
 				menu.findItem(R.id.cab_menu_download).setVisible(false);			
 				menu.findItem(R.id.cab_menu_copy).setVisible(false);
@@ -345,6 +324,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public boolean showSelectMenuItem(){
+		log("showSelectMenuItem");
 		if (adapter != null){
 			return adapter.isMultipleSelect();
 		}
@@ -665,7 +645,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void sortByNameDescending(){
-		
+		log("sortByNameDescending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
@@ -809,6 +789,8 @@ public class OfflineFragmentLollipop extends Fragment{
 //	
 
 	public boolean isFolder(String path){
+		log("isFolder");
+
 		MegaNode n = megaApi.getNodeByPath(path);
 		if(n == null)
 		{
@@ -1147,6 +1129,7 @@ public class OfflineFragmentLollipop extends Fragment{
     }
     
     public void openFile (File currentFile){
+		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -1179,6 +1162,14 @@ public class OfflineFragmentLollipop extends Fragment{
 	private void clearSelections() {
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
+		}else{
+//			if(adapter.getItemCount() == 1 ){
+//				boolean result = adapter.isRecoveryKey(adapter.getItemOff(0));
+//				if(result){
+//
+//					adapter.clearSelections();
+//				}
+//			}
 		}
 	}
 	
@@ -1266,7 +1257,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
-		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
 		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
@@ -1275,8 +1265,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	}
 	
-	public int
-	onBackPressed(){
+	public int onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1524,15 +1513,23 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 	
 	public int getItemCount(){
+		log("getItemCount");
 		if(adapter != null){
 			return adapter.getItemCount();
 		}
 		return 0;
 	}
+
+	public int getItemCountWithoutRK(){
+		log("getItemCountWithoutRK");
+		if(adapter != null){
+			return adapter.getItemCountWithoutRK();
+		}
+		return 0;
+	}
 	
 	private void findPath (String pNav){
-		
-		log("findPath:" + pNav);	
+		log("findPath():" + pNav);
 
 		MegaOffline nodeToShow = null;
 		
@@ -1573,7 +1570,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public void setPathNavigation(String _pathNavigation){
-		log("setPathNavigation: "+pathNavigation);
+		log("setPathNavigation(): "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
 		if (adapter != null){	
 //			contentText.setText(getInfoFolder(mOffList));
@@ -1601,6 +1598,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
 
 	public String getPathNavigation() {
+		log("getPathNavigation");
 		return pathNavigation;
 	}
 }
