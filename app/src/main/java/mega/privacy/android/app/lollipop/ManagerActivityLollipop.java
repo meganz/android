@@ -1884,7 +1884,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(Util.isChatEnabled()){
 				megaApi.shouldShowRichLinkWarning(this);
-				megaApi.isRichPreviewsEnabled(this);
+//				megaApi.isRichPreviewsEnabled(this);
 			}
 
 			transferData = megaApi.getTransferData(this);
@@ -13378,7 +13378,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-
+				log("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
 				if (e.getErrorCode() != MegaError.API_OK){
 					log("ERROR:USER_ATTR_RICH_PREVIEWS");
 					if(sttFLol!=null){
@@ -13390,8 +13390,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-			log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+				log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
 					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
 					if (request.getFlag()){
@@ -13412,26 +13412,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				setPasswordReminderFromMyAccount(false);
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
-                if(request.getNumDetails()==1){
-                    log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-                    if (e.getErrorCode() == MegaError.API_OK){
-                        MegaApplication.setShowRichLinkWarning(request.getFlag());
-                        MegaApplication.setCounterNotNowRichLinkWarning(request.getNumber());
-                    }
-                    else if(e.getErrorCode() == MegaError.API_ENOENT){
-                        MegaApplication.setShowRichLinkWarning(request.getFlag());
-                    }
-                }
-                else if(request.getNumDetails()==0){
-                    log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
-                    MegaApplication.setEnabledRichLinks(request.getFlag());
 
-                    if(sttFLol!=null){
-                        if(sttFLol.isAdded()){
-                            sttFLol.updateEnabledRichLinks();
-                        }
-                    }
-                }
+				if (e.getErrorCode() == MegaError.API_OK){
+					if(request.getNumDetails()==1){
+						log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
+						int numDetails = request.getNumDetails();
+						long counter = request.getNumber();
+						boolean flag = request.getFlag();
+
+						MegaApplication.setShowRichLinkWarning(request.getFlag());
+						MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
+					}
+					else if(request.getNumDetails()==0){
+						log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
+						MegaApplication.setEnabledRichLinks(request.getFlag());
+
+//                    if(sttFLol!=null){
+//                        if(sttFLol.isAdded()){
+//                            sttFLol.updateEnabledRichLinks();
+//                        }
+//                    }
+					}
+				}
+				else if(e.getErrorCode() == MegaError.API_ENOENT){
+					int numDetails = request.getNumDetails();
+					long counter = request.getNumber();
+					boolean flag = request.getFlag();
+
+					MegaApplication.setShowRichLinkWarning(request.getFlag());
+
+//					if(request.getNumDetails()==1){
+//						log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
+//						MegaApplication.setShowRichLinkWarning(request.getFlag());
+//
+//					}
+//					else if(request.getNumDetails()==0){
+//						log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
+//						MegaApplication.setEnabledRichLinks(request.getFlag());
+//
+////                    if(sttFLol!=null){
+////                        if(sttFLol.isAdded()){
+////                            sttFLol.updateEnabledRichLinks();
+////                        }
+////                    }
+//					}
+				}
+				else{
+					MegaApplication.setShowRichLinkWarning(request.getFlag());
+					MegaApplication.setEnabledRichLinks(request.getFlag());
+				}
             }
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {

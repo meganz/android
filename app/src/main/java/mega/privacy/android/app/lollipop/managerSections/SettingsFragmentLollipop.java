@@ -866,10 +866,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			preferenceScreen.removePreference(persistenceChatCategory);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				preferenceScreen.removePreference(richLinksSwitch);
+				chatEnabledCategory.removePreference(richLinksSwitch);
 			}
 			else{
-				preferenceScreen.removePreference(richLinksCheck);
+				chatEnabledCategory.removePreference(richLinksCheck);
 			}
 
 			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
@@ -1760,6 +1760,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(chatStatusCategory);
 				preferenceScreen.addPreference(chatAutoAwayPreference);
 				chatEnabledCategory.addPreference(chatAttachmentsChatListPreference);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					chatEnabledCategory.addPreference(richLinksSwitch);
+				}
+				else{
+					chatEnabledCategory.addPreference(richLinksCheck);
+				}
 			}
 			else{
 				log("DISCONNECT CHAT!!!");
@@ -2333,10 +2339,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("updateEnabledRichLinks");
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
+			if(MegaApplication.isEnabledRichLinks()!=richLinksSwitch.isChecked()){
+				richLinksSwitch.setOnPreferenceClickListener(null);
+				richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
+				richLinksSwitch.setOnPreferenceClickListener(this);
+			}
 		}
 		else{
-			richLinksCheck.setChecked(MegaApplication.isEnabledRichLinks());
+			if(MegaApplication.isEnabledRichLinks()!=richLinksCheck.isChecked()) {
+				richLinksCheck.setOnPreferenceClickListener(null);
+				richLinksCheck.setChecked(MegaApplication.isEnabledRichLinks());
+				richLinksCheck.setOnPreferenceClickListener(this);
+			}
 		}
 	}
 
@@ -2437,6 +2451,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		getPreferenceScreen().removePreference(autoawayChatCategory);
 		getPreferenceScreen().removePreference(persistenceChatCategory);
 		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			chatEnabledCategory.removePreference(richLinksSwitch);
+		}
+		else{
+			chatEnabledCategory.removePreference(richLinksCheck);
+		}
 	}
 
 
