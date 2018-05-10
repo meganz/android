@@ -2,8 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +11,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -63,6 +60,7 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.util.SizeF;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -123,7 +121,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
     public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -147,17 +145,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private AlertDialog alertDialogTransferOverquota;
     public ProgressBar progressBar;
 
-    private Notification.Builder mBuilder;
-    private NotificationManager mNotificationManager;
-
     public static boolean loading = true;
     boolean transferOverquota = false;
 
     PDFView pdfView;
 
-    int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-
-    AppBarLayout appBarLayout;
     Toolbar tB;
     public ActionBar aB;
     private String gSession;
@@ -173,8 +165,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     boolean inside = false;
     long handle = -1;
     boolean isFolderLink = false;
-    public static boolean isScrolling = false;
-    public static boolean scroll = false;
     private int currentPage;
     private int type;
     private boolean isOffLine = false;
@@ -207,11 +197,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     static int TYPE_UPLOAD = 0;
     static int TYPE_DOWNLOAD = 1;
 
-    Drawable share;
-    Drawable chat;
-    Drawable properties;
-    Drawable download;
-
     private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
     private String path;
@@ -235,6 +220,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private TextView actualPage;
     private TextView totalPages;
     private RelativeLayout pageNumber;
+
+    boolean toolbarVisible = true;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -398,8 +385,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             isUrl = false;
             loadLocalPDF();
         }
-
-        pdfView.setOnClickListener(this);
 
         setTitle(pdfFileName);
         fileNameTextView.setText(pdfFileName);
@@ -646,7 +631,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             isUrl = false;
             loadLocalPDF();
             pdfFileName = getFileName(uri);
-            pdfView.setOnClickListener(this);
 
             path = uri.getPath();
             setTitle(pdfFileName);
@@ -1001,6 +985,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     public  void setToolbarVisibilityShow () {
         log("setToolbarVisibilityShow");
+        toolbarVisible = true;
         aB.show();
         if(tB != null) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -1018,6 +1003,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     public void setToolbarVisibilityHide () {
         log("setToolbarVisibilityHide");
+        toolbarVisible = false;
         if(tB != null) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
@@ -1036,12 +1022,31 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
+    public boolean isToolbarVisible(){
+        return toolbarVisible;
+    }
+
     public void setToolbarVisibility (){
+
+        int page = pdfView.getCurrentPage();
+
+        if (queryIfPdfIsHorizontal(page) &&  getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !pdfView.isZooming()) {
+            pdfView.jumpTo(page - 1);
+        }
+
         if (aB != null && aB.isShowing()) {
             setToolbarVisibilityHide();
         } else if (aB != null && !aB.isShowing()){
             setToolbarVisibilityShow();
         }
+    }
+
+    boolean queryIfPdfIsHorizontal(int page){
+        SizeF sizeF = pdfView.getPageSize(page);
+        if (sizeF.getWidth() > sizeF.getHeight()){
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -2048,23 +2053,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    public void establishScroll() {
-        if (isScrolling && !scroll) {
-            scroll = true;
-            setToolbarVisibilityHide();
-        }
-        else if (!isScrolling){
-            scroll = false;
-        }
-    }
-
     @Override
     public void onPageChanged(int page, int pageCount) {
         currentPage = page;
         actualPage.setText(""+(currentPage+1));
         setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
-
-        establishScroll();
     }
 
     @Override
@@ -2085,6 +2078,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         log("creationDate = " + meta.getCreationDate());
         log("modDate = " + meta.getModDate());
         printBookmarksTree(pdfView.getTableOfContents(), "-");
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setToolbarVisibilityHide();
+            }
+        }, 2000);
     }
 
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
@@ -2120,13 +2120,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     public static void log(String log) {
         Util.log("PdfViewerActivityLollipop", log);
-    }
-
-    @Override
-    public void onClick(View v) {
-        log("onClick");
-        setToolbarVisibility();
-        defaultScrollHandle.hideDelayed();
     }
 
     @Override
