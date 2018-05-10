@@ -103,6 +103,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatCallListenerInterface;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -179,6 +180,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public long idChat;
 
     boolean noMoreNoSentMessages = false;
+
+    public boolean showRichLinkWarning = true;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
 
@@ -2530,6 +2533,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("sendMessageToUI");
         int infoToShow = -1;
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
+
         int index = messages.size()-1;
         if(msgSent!=null){
             log("Sent message with id temp: "+msgSent.getTempId());
@@ -3144,6 +3148,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     else{
                                         showContactAttachmentBottomSheet(m, position);
                                     }
+                                }
+                            }
+                            else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTAINS_META){
+                                log("open rich link");
+                                MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
+                                if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
+                                    String url = meta.getRichPreview().getUrl();
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                    startActivity(browserIntent);
                                 }
                             }
                         }

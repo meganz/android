@@ -1858,4 +1858,12 @@
 
     <string name="option_enable_chat_rich_preview" context="Option in Settings section to enable the rick links previews">Rich URL previews</string>
 
+    <string name="button_always_rich_links" context="Button to allow the rich links previews on chat">Always allow</string>
+    <string name="button_not_now_rich_links" context="Button do not allow now the rich links previews on chat">Not now</string>
+    <string name="button_never_rich_links" context="Button do not allow the rich links previews on chat">Never</string>
+
+    <string name="title_enable_rich_links" context="Title of the dialog to enable the rich links previews on chat">Enable rich URL previews</string>
+
+    <string name="text_enable_rich_links" context="Text of the dialog to enable the rich links previews on chat">Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.</string>
+
 </resources>
