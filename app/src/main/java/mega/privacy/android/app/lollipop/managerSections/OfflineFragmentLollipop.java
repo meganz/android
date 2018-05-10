@@ -1257,6 +1257,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	 * Disable selection
 	 */
 	public void hideMultipleSelect() {
+		adapter.clearSelections();
 		adapter.setMultipleSelect(false);
 		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 

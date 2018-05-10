@@ -986,9 +986,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("TAKE_PICTURE_OPTION");
 							boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 							if (!hasCameraPermission){
-								ActivityCompat.requestPermissions(this,
-										new String[]{Manifest.permission.CAMERA},
-										Constants.REQUEST_CAMERA);
+								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
 							}
 							else{
 								this.takePicture();
@@ -1042,6 +1040,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						log("No option fromTakePicture: "+fromTakePicture);
+						if(oFLol != null && oFLol.isAdded()){
+							oFLol.notifyDataSetChanged();
+						}
 					}
 				}
 	        	break;
