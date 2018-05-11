@@ -2227,59 +2227,58 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if(MegaChatApi.hasUrl(messageContent)){
 
                     if(MegaApplication.isShowRichLinkWarning()){
-                        log("show link rich warning");
+                        log("SDK - show link rich warning");
+                        if(((ChatActivityLollipop)context).showRichLinkWarning){
+                            log("ANDROID - show link rich warning");
+                            ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setText(messageContent);
 
-                    }
+                            ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setText(context.getString(R.string.title_enable_rich_links));
+                            ((ViewHolderMessageChat)holder).urlOwnMessageDescription.setText(context.getString(R.string.text_enable_rich_links));
 
-                    if(((ChatActivityLollipop)context).showRichLinkWarning){
-                        ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat)holder).urlOwnMessageText.setText(messageContent);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega));
 
-                        ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setText(context.getString(R.string.title_enable_rich_links));
-                        ((ViewHolderMessageChat)holder).urlOwnMessageDescription.setText(context.getString(R.string.text_enable_rich_links));
+                            ((ViewHolderMessageChat)holder).urlOwnMessageIcon.setVisibility(View.GONE);
 
-                        ((ViewHolderMessageChat)holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
-                        ((ViewHolderMessageChat)holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega));
+                            ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setOnClickListener(this);
+                            ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setTag(position);
 
-                        ((ViewHolderMessageChat)holder).urlOwnMessageIcon.setVisibility(View.GONE);
-
-                        ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setOnClickListener(this);
-                        ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setTag(position);
-
-                        ((ViewHolderMessageChat) holder).notNowRichLinkButton.setOnClickListener(this);
-                        ((ViewHolderMessageChat) holder).notNowRichLinkButton.setTag(position);
+                            ((ViewHolderMessageChat) holder).notNowRichLinkButton.setOnClickListener(this);
+                            ((ViewHolderMessageChat) holder).notNowRichLinkButton.setTag(position);
 
 
-                        ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
 
-                        ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbPort.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
 
-                        ((ViewHolderMessageChat) holder).gradientOwnMessageThumbLand.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).gradientOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-                        ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
 
-                        int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
-                        if(notNowCounter>3){
-                            ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(this);
-                            ((ViewHolderMessageChat) holder).neverRichLinkButton.setTag(position);
+                            int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
+                            if(notNowCounter>3){
+                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(this);
+                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setTag(position);
 
+                            }
+                            else{
+                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(null);
+                            }
+
+                            return;
                         }
-                        else{
-                            ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(null);
-                        }
-
-                        return;
                     }
                 }
             }

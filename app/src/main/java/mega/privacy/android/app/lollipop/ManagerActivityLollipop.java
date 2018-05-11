@@ -1884,7 +1884,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			if(Util.isChatEnabled()){
 				megaApi.shouldShowRichLinkWarning(this);
-//				megaApi.isRichPreviewsEnabled(this);
+				megaApi.isRichPreviewsEnabled(this);
 			}
 
 			transferData = megaApi.getTransferData(this);
@@ -3908,7 +3908,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void updateNavigationToolbarIcon(){
 		//Just working on 4.4.+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			if(Util.isChatEnabled()){
+			if(Util.isChatEnabled() && megaChatApi != null){
 				int numberUnread = megaChatApi.getUnreadChats();
 
 				if(numberUnread==0){
@@ -13413,53 +13413,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
 
-				if (e.getErrorCode() == MegaError.API_OK){
-					if(request.getNumDetails()==1){
-						log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-						int numDetails = request.getNumDetails();
-						long counter = request.getNumber();
-						boolean flag = request.getFlag();
+				if(e.getErrorCode() == MegaError.API_ENOENT){
+					log("Attribute USER_ATTR_RICH_PREVIEWS not set");
+				}
 
-						MegaApplication.setShowRichLinkWarning(request.getFlag());
-						MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
-					}
-					else if(request.getNumDetails()==0){
-						log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
-						MegaApplication.setEnabledRichLinks(request.getFlag());
+				if(request.getNumDetails()==1){
+					log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
+
+					long counter = request.getNumber();
+					boolean flag = request.getFlag();
+
+					MegaApplication.setShowRichLinkWarning(request.getFlag());
+					MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
+				}
+				else if(request.getNumDetails()==0){
+					log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
+					boolean flag = request.getFlag();
+
+					MegaApplication.setEnabledRichLinks(request.getFlag());
 
 //                    if(sttFLol!=null){
 //                        if(sttFLol.isAdded()){
 //                            sttFLol.updateEnabledRichLinks();
 //                        }
 //                    }
-					}
-				}
-				else if(e.getErrorCode() == MegaError.API_ENOENT){
-					int numDetails = request.getNumDetails();
-					long counter = request.getNumber();
-					boolean flag = request.getFlag();
-
-					MegaApplication.setShowRichLinkWarning(request.getFlag());
-
-//					if(request.getNumDetails()==1){
-//						log("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-//						MegaApplication.setShowRichLinkWarning(request.getFlag());
-//
-//					}
-//					else if(request.getNumDetails()==0){
-//						log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
-//						MegaApplication.setEnabledRichLinks(request.getFlag());
-//
-////                    if(sttFLol!=null){
-////                        if(sttFLol.isAdded()){
-////                            sttFLol.updateEnabledRichLinks();
-////                        }
-////                    }
-//					}
-				}
-				else{
-					MegaApplication.setShowRichLinkWarning(request.getFlag());
-					MegaApplication.setEnabledRichLinks(request.getFlag());
 				}
             }
 		}
