@@ -2047,24 +2047,17 @@ String mOutputFilePath;
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             if (resultCode == Activity.RESULT_OK) {
-                log("**** onActivityResult() ");
+                log("TAKE_PHOTO_CODE ");
 //                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/picture.jpg";
 //                File imgFile = new File(filePath);
-//
 //                String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
-//                log("Taken picture Name: " + name);
 //                String newPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/" + name;
-//                log("----NEW Name: " + newPath);
 //                File newFile = new File(newPath);
 //                imgFile.renameTo(newFile);
 //                uploadPicture(newPath);
 
-//                log("***** newFile.toString(): "+newFile.toString());
-
-//                galleryAddPic(newFile.toString());
-
                 onCaptureImageResult();
-
+                uploadPicture(mOutputFilePath);
 
             } else {
                 log("TAKE_PHOTO_CODE--->ERROR!");
@@ -5804,9 +5797,8 @@ String mOutputFilePath;
     }
 
     public void takePicture(){
-        log("***** takePicture");
+        log("takePicture");
 
-        //****************ORIGIN****************
 //        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
 //        File newFolder = new File(path);
 //        newFolder.mkdirs();
@@ -5832,21 +5824,29 @@ String mOutputFilePath;
 //        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 //        startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
 
+
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (intent.resolveActivity(getPackageManager()) != null) {
             File photoFile = createImageFile();
-            Uri photoURI = FileProvider.getUriForFile(this,"mega.privacy.android.app.providers.fileprovider", photoFile);
+            Uri photoURI;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                photoURI = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", photoFile);
+            }
+            else{
+                photoURI = Uri.fromFile(photoFile);
+            }
+
+            isTakePicture = false;
             mOutputFilePath = photoFile.getAbsolutePath();
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(intent, Constants.TAKE_PHOTO_CODE);
         }
-
     }
 
     public void uploadPicture(String imagePath){
-        log("uploadPicture");
+        log("uploadPicture - Path: "+imagePath);
         Intent intent = new Intent(this, ChatUploadService.class);
         File selfie = new File(imagePath);
 
