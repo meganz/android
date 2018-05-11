@@ -386,6 +386,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		catch (Exception e){
 			log("EXCEPTION: pathVideoDownsampling not deleted");
 		}
+
+
+		try{
+			File f = getExternalFilesDir(null);
+//			File f = new File(pathSelfie);
+			//Delete recursively all files and folder
+			if (f.exists()) {
+				if (f.isDirectory()) {
+					if(f.list().length<=0){
+						f.delete();
+					}
+				}
+			}
+		}
+		catch (Exception e){
+			log("EXCEPTION: pathSelfie not deleted");
+		}
 	}
 
 	public void updateProgressDownsampling(int percentage, String key){
@@ -576,7 +593,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
 				File f = new File(pathSelfie);
 				//Delete recursively all files and folder
-				if (f.isDirectory()) {
+				if (f.exists()) {
 					if (f.isDirectory()) {
 						if(f.list().length<=0){
 							f.delete();
@@ -1035,6 +1052,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
             requestSent--;
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
