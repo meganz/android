@@ -488,7 +488,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
