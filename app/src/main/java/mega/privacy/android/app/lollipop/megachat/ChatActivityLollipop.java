@@ -59,7 +59,11 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -134,7 +138,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 //    private Uri file;
 //    String mCurrentPhotoPath;
-File file;
+String mOutputFilePath;
+
+    File file;
     File newFile;
     boolean newVisibility = false;
     boolean getMoreHistory=false;
@@ -2053,7 +2059,11 @@ File file;
 //                imgFile.renameTo(newFile);
 //                uploadPicture(newPath);
 
-                galleryAddPic(newFile.toString());
+//                log("***** newFile.toString(): "+newFile.toString());
+
+//                galleryAddPic(newFile.toString());
+
+                onCaptureImageResult();
 
 
             } else {
@@ -5796,9 +5806,7 @@ File file;
     public void takePicture(){
         log("***** takePicture");
 
-
         //****************ORIGIN****************
-
 //        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
 //        File newFolder = new File(path);
 //        newFolder.mkdirs();
@@ -5824,141 +5832,18 @@ File file;
 //        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 //        startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
 
-        //**************OTHER******************
-        //        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        // Ensure that there's a camera activity to handle the intent
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            // Create the File where the photo should go
-//            File photoFile = null;
-//            try {
-//                photoFile = createImageFile();
-//            } catch (IOException ex) {
-//            }
-//            if (photoFile != null) {
-//                Uri photoURI = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-//                takePictureIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                startActivityForResult(takePictureIntent, Constants.TAKE_PHOTO_CODE);
-//            }
-//        }
-
-        //*******************+OTRHER***********
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "picture" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = null;
-        try {
-            image = File.createTempFile(imageFileName,".jpg",storageDir);
-            String mCurrentPhotoPath = image.getAbsolutePath();
-            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            newFile = new File(mCurrentPhotoPath);
-            Uri outputFileUri;
-            log("**** getURiForFile");
-            outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-            mediaScanIntent.setData(outputFileUri);
-            this.sendBroadcast(mediaScanIntent);
-
-            isTakePicture = false;
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-                cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = createImageFile();
+            Uri photoURI = FileProvider.getUriForFile(this,"mega.privacy.android.app.providers.fileprovider", photoFile);
+            mOutputFilePath = photoFile.getAbsolutePath();
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(intent, Constants.TAKE_PHOTO_CODE);
         }
 
-
-
-
-        //**************OTHER******************
-
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "picture" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = null;
-//        try {
-//            image = File.createTempFile(imageFileName,".jpg",storageDir);
-//            mCurrentPhotoPath = image.getAbsolutePath();
-//            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//            File newFile = new File(mCurrentPhotoPath);
-//            Uri outputFileUri;
-////            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                log("**** getURiForFile");
-//                outputFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", newFile);
-////            }
-////            else{
-////                log("**** fromFile");
-////
-////                outputFileUri = Uri.fromFile(newFile);
-////            }
-//            mediaScanIntent.setData(outputFileUri);
-//            this.sendBroadcast(mediaScanIntent);
-//
-//            isTakePicture = false;
-//            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//            if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-//                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-//                cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        //**************OTHER******************
-//        try{
-//            String state = Environment.getExternalStorageState();
-//            if (Environment.MEDIA_MOUNTED.equals(state)) {
-//                log("******* 1");
-//                //To store public files
-//                File directory=new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-//                if(!directory.exists()){
-//                    log("******* 2");
-//                    directory.mkdir();
-//                }
-//
-//                // Create an image file name
-//                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//                String imageFileName = "Img" + timeStamp + ".jpg";
-//                file=new File(directory, imageFileName);
-//                if(!file.exists()) {
-//                    log("******* 3");
-//                    file.createNewFile();
-//                }
-//
-//                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                Uri mImageUri=Uri.fromFile(file);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
-//                startActivityForResult(takePictureIntent, Constants.TAKE_PHOTO_CODE);
-//            }
-//        }catch(Exception e){
-//            e.getCause();
-//        }
-
-
-
-
-
     }
-
-//    //For android version 4 to 6
-//    private File createImageFile() throws IOException {
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + "_";
-//        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = File.createTempFile(imageFileName,".jpg",storageDir);
-//        mCurrentPhotoPath = image.getAbsolutePath();
-//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//        File f = new File(mCurrentPhotoPath);
-//        Uri contentUri = Uri.fromFile(f);
-//        mediaScanIntent.setData(contentUri);
-//        this.sendBroadcast(mediaScanIntent);
-//        return image;
-//    }
 
     public void uploadPicture(String imagePath){
         log("uploadPicture");
@@ -6035,7 +5920,6 @@ File file;
                 sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
             }
         }else if(!flag){
-
             //multiselect off
             if(sendIcon.isEnabled()) {
 
@@ -6047,9 +5931,7 @@ File file;
                     sendIcon.setEnabled(false);
                     sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                 }
-
             }
-
         }
     }
 
@@ -6141,17 +6023,60 @@ File file;
         }
     }
 
-
-    public void galleryAddPic(String file) {
-        log("****** galleryAddPic");
-
-
-        File f = new File(file);
-        Uri contentUri = Uri.fromFile(f);
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,contentUri);
-        sendBroadcast(mediaScanIntent);
+    public File createImageFile() {
+        log("createImageFile");
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "picture" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(null);
+        if (!storageDir.exists()) {
+            storageDir.mkdir();
+        }
+        return new File(storageDir, imageFileName + ".jpg");
     }
 
+    private void onCaptureImageResult() {
+        log("onCaptureImageResult");
+        if (mOutputFilePath != null) {
+            File f = new File(mOutputFilePath);
+            try {
+                File publicFile = copyImageFile(f);
+                Uri finalUri = Uri.fromFile(publicFile);
+                galleryAddPic(finalUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+    public File copyImageFile(File fileToCopy) throws IOException {
+        log("copyImageFile");
+        File storageDir = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
+        if (!storageDir.exists()) {
+            storageDir.mkdir();
+        }
+        File copyFile = new File(storageDir, fileToCopy.getName());
+        copyFile.createNewFile();
+        copy(fileToCopy, copyFile);
+        return copyFile;
+    }
+
+    public static void copy(File src, File dst) throws IOException {
+        log("copy");
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
+    }
+
+    private void galleryAddPic(Uri contentUri) {
+        log("galleryAddPic");
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
+        sendBroadcast(mediaScanIntent);
+    }
 
 }
