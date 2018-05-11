@@ -136,10 +136,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
-//    private Uri file;
-//    String mCurrentPhotoPath;
 String mOutputFilePath;
-
+    Uri finalUri;
     File file;
     File newFile;
     boolean newVisibility = false;
@@ -245,7 +243,6 @@ String mOutputFilePath;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
 
-    //** FloatingActionButton fab;
     FrameLayout emojiKeyboardLayout;
 
     RecyclerView listView;
@@ -2057,7 +2054,7 @@ String mOutputFilePath;
 //                uploadPicture(newPath);
 
                 onCaptureImageResult();
-                uploadPicture(mOutputFilePath);
+//                uploadPicture(finalUri);
 
             } else {
                 log("TAKE_PHOTO_CODE--->ERROR!");
@@ -5799,6 +5796,29 @@ String mOutputFilePath;
     public void takePicture(){
         log("takePicture");
 
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = createImageFile();
+            Uri photoURI;
+            if(photoFile != null){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    photoURI = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", photoFile);
+                }
+                else{
+                    photoURI = Uri.fromFile(photoFile);
+                }
+
+                isTakePicture = false;
+                mOutputFilePath = photoFile.getAbsolutePath();
+                if(mOutputFilePath!=null){
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(intent, Constants.TAKE_PHOTO_CODE);
+                }
+            }
+        }
+
 //        String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
 //        File newFolder = new File(path);
 //        newFolder.mkdirs();
@@ -5823,26 +5843,6 @@ String mOutputFilePath;
 //        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 //        cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 //        startActivityForResult(cameraIntent, Constants.TAKE_PHOTO_CODE);
-
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = createImageFile();
-            Uri photoURI;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                photoURI = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", photoFile);
-            }
-            else{
-                photoURI = Uri.fromFile(photoFile);
-            }
-
-            isTakePicture = false;
-            mOutputFilePath = photoFile.getAbsolutePath();
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-            startActivityForResult(intent, Constants.TAKE_PHOTO_CODE);
-        }
     }
 
     public void uploadPicture(String imagePath){
@@ -6038,19 +6038,36 @@ String mOutputFilePath;
         log("onCaptureImageResult");
         if (mOutputFilePath != null) {
             File f = new File(mOutputFilePath);
-            try {
-                File publicFile = copyImageFile(f);
-                Uri finalUri = Uri.fromFile(publicFile);
-                galleryAddPic(finalUri);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(f!=null){
+                try {
+                    File publicFile = copyImageFile(f);
+                    //Remove mOutputFilePath
+                    if (f.exists()) {
+                        if (f.isDirectory()) {
+                            if(f.list().length <= 0){
+                                f.delete();
+                            }
+                        }else{
+                            f.delete();
+                        }
+                    }
+                    if(publicFile!=null){
+                        Uri finalUri = Uri.fromFile(publicFile);
+                        galleryAddPic(finalUri);
+                        uploadPicture(publicFile.getPath());
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
         }
     }
 
     public File copyImageFile(File fileToCopy) throws IOException {
         log("copyImageFile");
-        File storageDir = new File( Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
         if (!storageDir.exists()) {
             storageDir.mkdir();
         }
@@ -6075,8 +6092,10 @@ String mOutputFilePath;
 
     private void galleryAddPic(Uri contentUri) {
         log("galleryAddPic");
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
-        sendBroadcast(mediaScanIntent);
+        if(contentUri!=null){
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
+            sendBroadcast(mediaScanIntent);
+        }
     }
 
 }
