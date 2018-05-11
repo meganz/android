@@ -88,7 +88,7 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_remove"
+            android:src="@drawable/ic_print"
             android:visibility="visible" />
 
         <TextView

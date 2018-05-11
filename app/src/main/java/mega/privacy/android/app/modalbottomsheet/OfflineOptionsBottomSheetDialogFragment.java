@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.print.PrintHelper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -144,8 +145,12 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
                     nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
                 }
-
-                optionPrint.setVisibility(View.VISIBLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                    optionPrint.setVisibility(View.VISIBLE);
+                }
+                else {
+                    optionPrint.setVisibility(View.GONE);
+                }
                 copyClip.setVisibility(View.VISIBLE);
                 saveFilesystem.setVisibility(View.VISIBLE);
             }
@@ -276,7 +281,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             }
             case R.id.option_print_offline_layout:{
                 log("Option print rK");
-
+                printRK();
                 break;
             }
             case R.id.option_save_offline_layout:{
@@ -295,6 +300,17 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 //        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public void printRK(){
+
+        AccountController aC =  new AccountController(getContext());
+        Bitmap rKBitmap = aC.createRkBitmap();
+        if (rKBitmap != null){
+            PrintHelper printHelper = new PrintHelper(getActivity());
+            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+            printHelper.printBitmap("rKPrint", rKBitmap);
+        }
     }
 
     public void openWith () {

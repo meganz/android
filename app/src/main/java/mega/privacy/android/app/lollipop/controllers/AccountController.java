@@ -8,6 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -21,6 +25,7 @@ import android.widget.Button;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -328,6 +333,29 @@ public class AccountController implements View.OnClickListener{
             context.startActivity(intent);
             ((TestPasswordActivity) context).finish();
         }
+    }
+
+    public Bitmap createRkBitmap (){
+        log("createRkBitmap");
+
+        Bitmap rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
+        String key = megaApi.exportMasterKey();
+        Canvas canvas = new Canvas(rKBitmap);
+        Paint paint = new Paint();
+
+        paint.setTextSize(40);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        float height = paint.measureText("yY");
+        float width = paint.measureText(key);
+        float x = (rKBitmap.getWidth()-width)/2;
+        canvas.drawText(key, x, height+15f, paint);
+
+        if (rKBitmap != null){
+            return rKBitmap;
+        }
+
+        return null;
     }
 
     void showConfirmDialogRecoveryKeySaved(){
