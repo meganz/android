@@ -759,6 +759,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			catch (Exception exc){}
 
+			try{
+				ShortcutBadger.applyCount(getApplicationContext(), 0);
+
+				startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
+			}
+			catch (Exception exc){
+                log("EXCEPTION removing badge indicator");
+            }
+
 			if(megaApi!=null){
 				int loggedState = megaApi.isLoggedIn();
 				log("Login status on "+loggedState);
