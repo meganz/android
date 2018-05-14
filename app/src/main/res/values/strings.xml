@@ -1856,4 +1856,6 @@
 
     <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(Pending)</string>
 
+    <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
+
 </resources>
