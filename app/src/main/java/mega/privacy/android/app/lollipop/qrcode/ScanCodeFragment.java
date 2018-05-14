@@ -40,11 +40,9 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
@@ -55,7 +53,7 @@ import static android.graphics.Color.WHITE;
  * Created by mega on 22/01/18.
  */
 
-public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.ResultHandler, */View.OnClickListener, MegaRequestListenerInterface{
+public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.ResultHandler, */View.OnClickListener{
 
     public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
     public static int WIDTH = 500;
@@ -213,15 +211,16 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             outState.putString("myEmail", myEmail);
             outState.putBoolean("success", success);
             outState.putLong("handleContactLink", handleContactLink);
+            if (avatarImage != null){
+                avatarImage.buildDrawingCache(true);
+                Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
 
-            avatarImage.buildDrawingCache(true);
-            Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
-
-            ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
-            avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
-            byte[] avatarByteArray = avatarOutputStream.toByteArray();
-            outState.putByteArray("avatar", avatarByteArray);
-            outState.putBoolean("contentAvatar", contentAvatar);
+                ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+                avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+                byte[] avatarByteArray = avatarOutputStream.toByteArray();
+                outState.putByteArray("avatar", avatarByteArray);
+                outState.putBoolean("contentAvatar", contentAvatar);
+            }
             if (!contentAvatar){
                 outState.putString("initialLetter", initialLetter.getText().toString());
             }
@@ -321,7 +320,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             if (megaApi == null){
                 megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
             }
-            megaApi.contactLinkQuery(handle, this);
+            megaApi.contactLinkQuery(handle, (QRCodeActivity) context);
 
             View v = inflater.inflate(R.layout.dialog_accept_contact, null);
             builder.setView(v);
@@ -378,6 +377,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.accept_contact_invite: {
+                inviteShown = false;
                 sendInvitation();
                 if (inviteAlertDialog != null){
                     inviteAlertDialog.dismiss();
@@ -385,6 +385,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 break;
             }
             case R.id.dialog_invite_button: {
+                dialogshown = false;
 //                scannerView.stopCamera();
                 codeScanner.releaseResources();
                 if (requestedAlertDialog != null){
@@ -402,6 +403,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 break;
             }
             case R.id.view_contact: {
+                inviteShown = false;
                 codeScanner.releaseResources();
                 if (inviteAlertDialog != null){
                     inviteAlertDialog.dismiss();
@@ -486,7 +488,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             log("my avatar NOT exists!");
             log("Call to getUserAvatar");
             log("DO NOT Retry!");
-            megaApi.getUserAvatar(myEmail, avatar.getPath(), this);
+            megaApi.getUserAvatar(myEmail, avatar.getPath(), (QRCodeActivity) context);
 //            setDefaultAvatar();
         }
     }
@@ -562,16 +564,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         }
 
         return (int)textSize;
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
     }
 
     void showInviteDialog (){
@@ -668,51 +660,25 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         return false;
     }
 
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-//        megaApi.contactLinkQuery(request.getNodeHandle(), this);
-        if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
-
-                this.request = request;
-                myEmail = request.getEmail();
-                handleContactLink = request.getNodeHandle();
-                contactNameContent = request.getName() + " " + request.getText();
-                if (queryIfIsContact()){
-                    isContact = true;
-                }
-                else {
-                    isContact = false;
-                }
-                showInviteDialog();
+    public void initDialogInvite(MegaRequest request, MegaError e){
+        if (e.getErrorCode() == MegaError.API_OK) {
+            log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
+            handleContactLink = request.getNodeHandle();
+            contactNameContent = request.getName() + " " + request.getText();
+            if (queryIfIsContact()) {
+                isContact = true;
+            } else {
+                isContact = false;
             }
-            else if (e.getErrorCode() == MegaError.API_EEXIST){
-                dialogTitleContent = R.string.invite_not_sent;
-                dialogTextContent = R.string.invite_not_sent_text_already_contact;
-                showAlertDialog(dialogTitleContent, dialogTextContent, true);
-            }
-            else {
-                dialogTitleContent = R.string.invite_not_sent;
-                dialogTextContent = R.string.invite_not_sent_text;
-                showAlertDialog(dialogTitleContent, dialogTextContent, false);
-            }
+            showInviteDialog();
+        } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+            dialogTitleContent = R.string.invite_not_sent;
+            dialogTextContent = R.string.invite_not_sent_text_already_contact;
+            showAlertDialog(dialogTitleContent, dialogTextContent, true);
+        } else {
+            dialogTitleContent = R.string.invite_not_sent;
+            dialogTextContent = R.string.invite_not_sent_text;
+            showAlertDialog(dialogTitleContent, dialogTextContent, false);
         }
-        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                log("Get user avatar OK");
-                setAvatar();
-            }
-            else {
-                log("Get user avatar FAIL");
-                setDefaultAvatar();
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
     }
 }

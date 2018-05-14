@@ -2395,6 +2395,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				else{
 					qrCodeAutoAcceptCheck.setChecked(autoAccept);
 				}
+				log("autoacept: "+autoAccept);
 			}
 			else if (e.getErrorCode() == MegaError.API_ENOENT){
 				log("Error getContactLinkOption");
@@ -2416,6 +2417,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				else{
 					qrCodeAutoAcceptCheck.setChecked(autoAccept);
 				}
+				log("autoacept: "+autoAccept);
 			}
 			else{
 				log("Error setContactLinkOption");

@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -191,10 +189,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         settingsMenuItem = menu.findItem(R.id.qr_code_settings);
         resetQRMenuItem = menu.findItem(R.id.qr_code_reset);
         deleteQRMenuItem = menu.findItem(R.id.qr_code_delete);
-
-        Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
-        share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-        shareMenuItem.setIcon(share);
 
         switch (qrCodeFragment) {
             case 0: {
@@ -414,8 +408,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-        if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
+        log("onRequestFinish ");
+        if(request.getType() == MegaRequest.TYPE_INVITE_CONTACT  && request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD){
             if (scanCodeFragment == null) {
                 log("ScanCodeFragment is NULL");
                 scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
@@ -438,6 +432,52 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
                 }
+            }
+        }
+        //        megaApi.contactLinkQuery(request.getNodeHandle(), this);
+        else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
+            if (scanCodeFragment == null) {
+                log("ScanCodeFragment is NULL");
+                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+            }
+            if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
+                scanCodeFragment.myEmail = request.getEmail();
+                scanCodeFragment.initDialogInvite(request, e);
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
+            if (scanCodeFragment == null) {
+                log("ScanCodeFragment is NULL");
+                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+            }
+            if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    log("Get user avatar OK");
+                    scanCodeFragment.setAvatar();
+                } else {
+                    log("Get user avatar FAIL");
+                    scanCodeFragment.setDefaultAvatar();
+                }
+            }
+        }
+//        megaApi.contactLinkCreate(true/false, this);
+        else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
+            if (myCodeFragment == null){
+                log("MyCodeFragment is NULL");
+                myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
+            }
+            if (myCodeFragment != null && myCodeFragment.isAdded()){
+                myCodeFragment.initCreateQR(request, e);
+            }
+        }
+//        megaApi.contactLinkDelete(request.getNodeHandle(), this);
+        else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE){
+            if (myCodeFragment == null){
+                log("MyCodeFragment is NULL");
+                myCodeFragment = (MyCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 0);
+            }
+            if (myCodeFragment != null && myCodeFragment.isAdded()){
+                myCodeFragment.initDeleteQR(request, e);
             }
         }
     }
