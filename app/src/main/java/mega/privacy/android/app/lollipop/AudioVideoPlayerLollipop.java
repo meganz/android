@@ -207,7 +207,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean transferOverquota = false;
 
     private boolean video = false;
-    private boolean loading = true;
     private ProgressDialog statusDialog = null;
     private String fileName = null;
     private long currentTime;
@@ -878,11 +877,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
                 log("onTracksChanged");
 
-                loading = true;
                 int previousIndex = currentWindowIndex;
                 if (size > 1) {
                     currentWindowIndex = player.getCurrentWindowIndex();
-                    if (currentWindowIndex == previousIndex && onTracksChange) {
+                    if (currentWindowIndex == previousIndex && onTracksChange && !loop) {
                         currentWindowIndex++;
                     }
 
@@ -1900,17 +1898,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         removelinkMenuItem = menu.findItem(R.id.full_video_viewer_remove_link);
         loopMenuItem = menu.findItem(R.id.full_video_viewer_loop);
 
+        if (loop){
+            loopMenuItem.setChecked(true);
+            player.setRepeatMode(Player.REPEAT_MODE_ONE);
+        }
+        else {
+            loopMenuItem.setChecked(false);
+            player.setRepeatMode(Player.REPEAT_MODE_OFF);
+        }
 
         if (!onPlaylist){
             searchMenuItem.setVisible(false);
-            if (loop){
-                loopMenuItem.setChecked(true);
-                player.setRepeatMode(Player.REPEAT_MODE_ONE);
-            }
-            else {
-                loopMenuItem.setChecked(false);
-                player.setRepeatMode(Player.REPEAT_MODE_OFF);
-            }
 
             if (adapterType == Constants.OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
@@ -2874,7 +2872,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onVideoEnabled(DecoderCounters counters) {
         log("onVideoEnabled");
         video = true;
-        loading = false;
     }
 
     @Override
