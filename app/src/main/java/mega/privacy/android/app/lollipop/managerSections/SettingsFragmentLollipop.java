@@ -67,6 +67,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION;
+
 
 //import android.support.v4.preference.PreferenceFragment;
 
@@ -2385,7 +2387,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 	log("onRequestFinish  MegaRequest: "+request.getType());
 
-		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER){
+		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == USER_ATTR_CONTACT_LINK_VERIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				autoAccept = request.getFlag();
 				log("OK GET ATTR USER: "+autoAccept);
@@ -2413,7 +2415,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				log("Error getContactLinkOption");
 			}
 		}
-		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER){
+		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == USER_ATTR_CONTACT_LINK_VERIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("OK SET ATTR USER: "+request.getText());
                 setAutoaccept = false;
