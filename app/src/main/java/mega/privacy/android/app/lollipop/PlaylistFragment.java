@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -76,6 +77,9 @@ public class PlaylistFragment extends Fragment{
 
     boolean searchOpen = false;
     boolean playWhenReady = true;
+
+    ImageButton previousButton;
+    ImageButton nextButton;
 
     public static PlaylistFragment newInstance() {
         log("newInstance");
@@ -150,6 +154,11 @@ public class PlaylistFragment extends Fragment{
 
         v.findViewById(R.id.exo_content_frame).setVisibility(View.GONE);
         v.findViewById(R.id.exo_overlay).setVisibility(View.GONE);
+
+        previousButton = (ImageButton) v.findViewById(R.id.exo_prev);
+        previousButton.setOnTouchListener((AudioVideoPlayerLollipop) context);
+        nextButton = (ImageButton) v.findViewById(R.id.exo_next);
+        nextButton.setOnTouchListener((AudioVideoPlayerLollipop) context);
 
         ((AudioVideoPlayerLollipop) context).setPlaylistProgressBar((ProgressBar) v.findViewById(R.id.playlist_progress_bar));
 
