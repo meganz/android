@@ -497,10 +497,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         //Own rich links
         RelativeLayout urlOwnMessageLayout;
-        TextView urlOwnMessageText;
-        Button neverRichLinkButton;
-        Button alwaysAllowRichLinkButton;
-        Button notNowRichLinkButton;
+        WrapEmojiconTextView urlOwnMessageText;
+        TextView neverRichLinkButton;
+        TextView alwaysAllowRichLinkButton;
+        TextView notNowRichLinkButton;
         TextView urlOwnMessageTitle;
         TextView urlOwnMessageDescription;
 
@@ -512,7 +512,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
-        TextView urlContactMessageText;
+        WrapEmojiconTextView urlContactMessageText;
         TextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
 
@@ -585,7 +585,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView videoIconContactMessageThumbPort;
         TextView videoTimecontentContactMessageThumbPort;
 
-        RelativeLayout contentContactMessageFileLayout;
+        RelativeLayout contentContactMessageAttachLayout;
+
+        RelativeLayout contentContactMessageFile;
         ImageView contentContactMessageFileThumb;
         TextView contentContactMessageFileName;
         TextView contentContactMessageFileSize;
@@ -691,10 +693,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
-            holder.urlOwnMessageText = (TextView)  v.findViewById(R.id.url_own_message_text);
-            holder.neverRichLinkButton = (Button) v.findViewById(R.id.url_never_button);
-            holder.alwaysAllowRichLinkButton = (Button) v.findViewById(R.id.url_always_allow_button);
-            holder.notNowRichLinkButton = (Button) v.findViewById(R.id.url_not_now_button);
+            holder.urlOwnMessageText = (WrapEmojiconTextView)  v.findViewById(R.id.url_own_message_text);
+            holder.neverRichLinkButton = (TextView) v.findViewById(R.id.url_never_button);
+            holder.alwaysAllowRichLinkButton = (TextView) v.findViewById(R.id.url_always_allow_button);
+            holder.notNowRichLinkButton = (TextView) v.findViewById(R.id.url_not_now_button);
 
             holder.urlOwnMessageTitle = (TextView)  v.findViewById(R.id.url_own_message_title);
             holder.urlOwnMessageDescription = (TextView)  v.findViewById(R.id.url_own_message_description);
@@ -707,7 +709,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //Contact rich links message
             holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
-            holder.urlContactMessageText = (TextView)  v.findViewById(R.id.url_contact_message_text);
+            holder.urlContactMessageText = (WrapEmojiconTextView)  v.findViewById(R.id.url_contact_message_text);
 
             holder.urlContactMessageTitle = (TextView)  v.findViewById(R.id.url_contact_message_title);
             holder.urlContactMessageDescription = (TextView)  v.findViewById(R.id.url_contact_message_description);
@@ -840,13 +842,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
             holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
-            holder.contentContactMessageFileLayout = (RelativeLayout)  v.findViewById(R.id.content_contact_message_file_layout);
+            holder.contentContactMessageAttachLayout = (RelativeLayout)  v.findViewById(R.id.content_contact_message_attach_layout);
+
+            holder.contentContactMessageFile = (RelativeLayout)  v.findViewById(R.id.content_contact_message_file);
             holder.contentContactMessageFileThumb = (ImageView)  v.findViewById(R.id.content_contact_message_file_thumb);
             holder.contentContactMessageFileName = (TextView)  v.findViewById(R.id.content_contact_message_file_name);
             holder.contentContactMessageFileSize = (TextView)  v.findViewById(R.id.content_contact_message_file_size);
 
             holder.layoutAvatarMessages = (RelativeLayout)v.findViewById(R.id.layout_avatar);
             holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
+//            holder.contentContactMessageContactLayout.setVisibility(View.GONE);
             holder.contentContactMessageContactLayoutAvatar = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout_avatar);
             holder.contentContactMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_contact_message_contact_thumb);
             holder.contentContactMessageContactName = (TextView)  v.findViewById(R.id.content_contact_message_contact_name);
@@ -2141,6 +2146,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentContactMessageFile.setVisibility(View.GONE);
 
                 //Rick link
 
@@ -2655,7 +2662,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).gradientContactMessageThumbLand.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).videoIconContactMessageThumbLand.setVisibility(View.GONE);
@@ -2756,7 +2763,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                        ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
-                ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
                 if (!multipleSelect) {
@@ -2827,7 +2834,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
-                ((ViewHolderMessageChat) holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
 
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactThumb.setVisibility(View.GONE);
@@ -3293,8 +3300,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
-            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.VISIBLE);
-
+            ((ViewHolderMessageChat)holder).contentContactMessageAttachLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFile.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.VISIBLE);
@@ -3378,7 +3385,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 
 //                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
-
+                                ((ViewHolderMessageChat)holder).contentContactMessageFile.setVisibility(View.GONE);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
@@ -3438,6 +3445,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 ((ViewHolderMessageChat) holder).videoIconContactMessageThumbPort.setVisibility(View.GONE);
                                 ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat)holder).contentContactMessageFile.setVisibility(View.GONE);
 
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
                                 ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
@@ -3774,7 +3782,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
-            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFile.setVisibility(View.GONE);
+
             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
@@ -4452,7 +4462,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat)holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
 
-            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFile.setVisibility(View.GONE);
+
             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
@@ -4631,7 +4643,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).videoIconContactMessageThumbPort.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 
-            ((ViewHolderMessageChat)holder).contentContactMessageFileLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat)holder).contentContactMessageFile.setVisibility(View.GONE);
+
             ((ViewHolderMessageChat)holder).contentContactMessageFileThumb.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileName.setVisibility(View.GONE);
             ((ViewHolderMessageChat)holder).contentContactMessageFileSize.setVisibility(View.GONE);
@@ -5282,6 +5296,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 //                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.GONE);
 
+            holder.contentContactMessageFile.setVisibility(View.GONE);
 
             holder.contentContactMessageFileThumb.setVisibility(View.GONE);
             holder.contentContactMessageFileName.setVisibility(View.GONE);
@@ -5341,6 +5356,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
             holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbPortFramework.setVisibility(View.GONE);
+            holder.contentContactMessageFile.setVisibility(View.GONE);
             holder.contentContactMessageFileThumb.setVisibility(View.GONE);
             holder.contentContactMessageFileName.setVisibility(View.GONE);
             holder.contentContactMessageFileSize.setVisibility(View.GONE);
@@ -5529,7 +5545,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.videoTimecontentContactMessageThumbLand.setVisibility(View.GONE);
 
 //                                holder.contentContactMessageThumbLandFramework.setVisibility(View.GONE);
-
+                                holder.contentContactMessageFile.setVisibility(View.GONE);
                                 holder.contentContactMessageFileThumb.setVisibility(View.GONE);
                                 holder.contentContactMessageFileName.setVisibility(View.GONE);
                                 holder.contentContactMessageFileSize.setVisibility(View.GONE);
@@ -5594,7 +5610,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.videoIconContactMessageThumbPort.setVisibility(View.GONE);
                                 holder.videoTimecontentContactMessageThumbPort.setVisibility(View.GONE);
 //                                holder.contentContactMessageThumbPortFramework.setVisibility(View.GONE);
-
+                                holder.contentContactMessageFile.setVisibility(View.GONE);
                                 holder.contentContactMessageFileThumb.setVisibility(View.GONE);
                                 holder.contentContactMessageFileName.setVisibility(View.GONE);
                                 holder.contentContactMessageFileSize.setVisibility(View.GONE);
