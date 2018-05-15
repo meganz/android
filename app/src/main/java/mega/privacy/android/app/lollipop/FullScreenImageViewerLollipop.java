@@ -1858,9 +1858,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER) {
-			if ((CameraUploadFragmentLollipop.adapterList != null || CameraUploadFragmentLollipop.adapterGrid != null)
-					&& CameraUploadFragmentLollipop.mLayoutManager != null
-					&& (CameraUploadFragmentLollipop.adapterList.getItem(i) != null || CameraUploadFragmentLollipop.adapterGrid.getItem(i) != null)){
+			if ((CameraUploadFragmentLollipop.adapterList != null && CameraUploadFragmentLollipop.adapterList.getItem(i) != null)
+					|| (CameraUploadFragmentLollipop.adapterGrid != null && CameraUploadFragmentLollipop.adapterGrid.getItem(i) != null)
+					&& CameraUploadFragmentLollipop.mLayoutManager != null ) {
 				CameraUploadFragmentLollipop.mLayoutManager.scrollToPosition(i);
 			}
 		}
