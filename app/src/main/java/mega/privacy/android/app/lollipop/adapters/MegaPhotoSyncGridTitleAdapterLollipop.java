@@ -952,7 +952,10 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public Object getItem(int position) {
-        return monthPics.get(position);
+        if (monthPics.size() > position){
+            return monthPics.get(position);
+        }
+        return null;
     }
 
     @Override
@@ -1248,29 +1251,31 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
         log("getPath");
         String path = null;
-        File dir = new File(destDir);
-        File [] listFiles = dir.listFiles();
+        if (destDir != null){
+            File dir = new File(destDir);
+            File [] listFiles = dir.listFiles();
 
-        if (listFiles != null){
-            for (int i=0; i<listFiles.length; i++){
-                log("listFiles[]: "+listFiles[i].getAbsolutePath());
-                if (listFiles[i].isDirectory()){
-                    path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
-                    if (path != null) {
-                        log("path number X: "+path);
-                        return path;
+            if (listFiles != null){
+                for (int i=0; i<listFiles.length; i++){
+//                    log("listFiles[]: "+listFiles[i].getAbsolutePath());
+                    if (listFiles[i].isDirectory()){
+                        path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
+                        if (path != null) {
+//                            log("path number X: "+path);
+                            return path;
+                        }
                     }
-                }
-                else {
-                    boolean isOnMegaDownloads = false;
-                    path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-                    File f = new File(downloadLocationDefaultPath, file.getName());
-                    if(f.exists() && (f.length() == file.getSize())){
-                        isOnMegaDownloads = true;
-                    }
-                    if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
-                        log("path number X: "+path);
-                        return path;
+                    else {
+                        boolean isOnMegaDownloads = false;
+                        path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+                        File f = new File(downloadLocationDefaultPath, file.getName());
+                        if(f.exists() && (f.length() == file.getSize())){
+                            isOnMegaDownloads = true;
+                        }
+                        if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
+//                            log("path number X: "+path);
+                            return path;
+                        }
                     }
                 }
             }
