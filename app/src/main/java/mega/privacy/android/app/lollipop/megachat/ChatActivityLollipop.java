@@ -357,7 +357,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         else{
                             adapter.setMultipleSelect(true);
-
                             actionMode = startSupportActionMode(new ActionBarCallBack());
 
                             if(position<1){
@@ -2836,6 +2835,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             else{
                                 menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
+
                             }
                         }
                         else{
@@ -3060,7 +3061,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void itemClick(int positionInAdapter) {
         int position = positionInAdapter-1;
-        log("itemClick: "+position);
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
