@@ -1910,8 +1910,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(meta==null){
             bindNoTypeMessage(holder, androidMessage, position);
         }else if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-
-//            ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
+            //            ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
 
             String url = meta.getRichPreview().getUrl();
 
@@ -2209,7 +2208,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         }
         else{
-            log("Link to bind as a normal message");
+            log("Link to bind as a no type message");
             bindNoTypeMessage(holder, androidMessage, position);
         }
     }
@@ -5126,6 +5125,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public Object getItem(int position) {
+        return messages.get(position-1);
+    }
+
+    public AndroidMegaChatMessage getItemAndroidMegaChatMessage(int position){
         return messages.get(position-1);
     }
 
