@@ -80,7 +80,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public static final String ARG_OBJECT = "object";
 
 	String myEmail;
-	MegaUser myUser;
 	private RoundedImageView avatarImage;
 	private TextView contactName;
 	private TextView contactMail;
@@ -142,6 +141,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	private boolean contentAvatar = false;
 	private boolean success;
 
+	private MegaUser userQuery;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -169,12 +170,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				myEmail = request.getEmail();
 				handleContactLink = request.getNodeHandle();
 				contactNameContent = request.getName() + " " + request.getText();
-				if (queryIfIsContact()){
-					isContact = true;
-				}
-				else {
-					isContact = false;
-				}
+
+				userQuery = queryIfIsContact();
 				showInviteDialog();
 			}
 			else if (e.getErrorCode() == MegaError.API_EEXIST){
@@ -315,7 +312,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		inviteShown = true;
 	}
 
-	boolean queryIfIsContact() {
+	MegaUser queryIfIsContact() {
 
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 
@@ -323,48 +320,55 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 				log("Contact mail[i]="+i+":"+contacts.get(i).getEmail()+" contact mail request: "+myEmail);
 				if (contacts.get(i).getEmail().equals(myEmail)){
-					return true;
+					isContact = true;
+					return contacts.get(i);
 				}
 			}
 		}
-		return false;
+		isContact = false;
+		return null;
 	}
 
 	public void setAvatar(){
 		log("updateAvatar");
-		File avatar = null;
-		if(context!=null){
-			log("context is not null");
-
-			if (context.getExternalCacheDir() != null){
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-			}
-			else{
-				avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-			}
+		if (!isContact){
+			setDefaultAvatar();
 		}
-		else{
-			log("context is null!!!");
-			if(getActivity()!=null){
-				log("getActivity is not null");
-				if (getActivity().getExternalCacheDir() != null){
-					avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		else {
+			File avatar = null;
+			if(context!=null){
+				log("context is not null");
+
+				if (context.getExternalCacheDir() != null){
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
 				}
 				else{
-					avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+					avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
 				}
 			}
 			else{
-				log("getActivity is ALSOOO null");
-				return;
+				log("context is null!!!");
+				if(getActivity()!=null){
+					log("getActivity is not null");
+					if (getActivity().getExternalCacheDir() != null){
+						avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+					}
+					else{
+						avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+					}
+				}
+				else{
+					log("getActivity is ALSOOO null");
+					return;
+				}
 			}
-		}
 
-		if(avatar!=null){
-			setProfileAvatar(avatar);
-		}
-		else{
-			setDefaultAvatar();
+			if(avatar!=null){
+				setProfileAvatar(avatar);
+			}
+			else{
+				setDefaultAvatar();
+			}
 		}
 	}
 
@@ -407,13 +411,18 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 
-		String color = megaApi.getUserAvatarColor(myUser);
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
+		if (isContact && userQuery != null){
+			String color = megaApi.getUserAvatarColor(userQuery);
+			if(color!=null){
+				log("The color to set the avatar is "+color);
+				p.setColor(Color.parseColor(color));
+			}
+			else{
+				log("Default color to the avatar");
+				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			}
 		}
-		else{
-			log("Default color to the avatar");
+		else {
 			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		}
 
