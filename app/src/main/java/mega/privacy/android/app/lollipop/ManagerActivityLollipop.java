@@ -228,7 +228,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public int accountFragment;
 
-	private long handleInviteContact = 0;
+	public long handleInviteContact = 0;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
