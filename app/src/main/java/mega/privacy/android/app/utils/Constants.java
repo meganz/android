@@ -94,6 +94,10 @@ public class Constants {
 	public static final int REQUEST_UPLOAD_CONTACT = 5;
 	public static final int REQUEST_READ_STORAGE = 6;
 
+	public static final int REQUEST_DOWNLOAD_FOLDER = 7;
+
+	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
+
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
 	public static final int PRO_I = 1;
@@ -142,14 +146,15 @@ public class Constants {
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
 	public static String ACTION_CLEAR_CHAT = "CLEAR_CHAT";
-
 	public static String ACTION_UPDATE_ATTACHMENT = "UPDATE_ATTACHMENT";
-
 	public static String ACTION_OVERQUOTA_TRANSFER = "OVERQUOTA_TRANSFER";
-
 	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
-
 	public static String ACTION_INVITE_CONTACT = "ACTION_INVITE_CONTACT";
+
+	public static String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
+
+	public static String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
+	public static String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -170,7 +175,6 @@ public class Constants {
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
-
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
