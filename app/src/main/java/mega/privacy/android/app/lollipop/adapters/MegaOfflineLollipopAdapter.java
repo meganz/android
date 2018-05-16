@@ -316,7 +316,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 //	}
 
 	public void clearSelections() {
-		for (int i= 0; i<this.getItemCount();i++){
+		for (int i= 0; i<this.getItemCountWithoutRK();i++){
 			if(isItemChecked(i)){
 				toggleAllSelection(i);
 			}
