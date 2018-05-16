@@ -1854,9 +1854,14 @@
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
+    <string name="context_option_print" context="Menu option to print the recovery key from Offline section">Print</string>
+
+    <string name="save_MK_confirmation" context="Message when the recovery key has been successfully saved on the filesystem">The Recovery Key has been successfully saved</string>
+
     <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(Pending)</string>
 
     <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
+
 </resources>
