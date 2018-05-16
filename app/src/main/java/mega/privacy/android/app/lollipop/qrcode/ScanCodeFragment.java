@@ -104,6 +104,8 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     private String initialLetterSave;
     private boolean contentAvatar = false;
 
+    private MegaUser userQuery;
+
     public static ScanCodeFragment newInstance() {
         log("newInstance");
         ScanCodeFragment fragment = new ScanCodeFragment();
@@ -424,39 +426,48 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     public void setAvatar(){
         log("updateAvatar");
-        File avatar = null;
-        if(context!=null){
-            log("context is not null");
 
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
+        if (!isContact){
+            log("setAvatar is not Contact");
+            setDefaultAvatar();
         }
-        else{
-            log("context is null!!!");
-            if(getActivity()!=null){
-                log("getActivity is not null");
-                if (getActivity().getExternalCacheDir() != null){
-                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+        else {
+
+            log("setAvatar is Contact");
+            File avatar = null;
+            if(context!=null){
+                log("context is not null");
+
+                if (context.getExternalCacheDir() != null){
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
                 }
                 else{
-                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                    avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
                 }
             }
             else{
-                log("getActivity is ALSOOO null");
-                return;
+                log("context is null!!!");
+                if(getActivity()!=null){
+                    log("getActivity is not null");
+                    if (getActivity().getExternalCacheDir() != null){
+                        avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                    }
+                    else{
+                        avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                    }
+                }
+                else{
+                    log("getActivity is ALSOOO null");
+                    return;
+                }
             }
-        }
 
-        if(avatar!=null){
-            setProfileAvatar(avatar);
-        }
-        else{
-            setDefaultAvatar();
+            if(avatar!=null){
+                setProfileAvatar(avatar);
+            }
+            else{
+                setDefaultAvatar();
+            }
         }
     }
 
@@ -500,13 +511,18 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         Paint p = new Paint();
         p.setAntiAlias(true);
 
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.handleToBase64(handleContactLink).trim());
-        if(color!=null){
-            log("The color to set the avatar is "+color);
-            p.setColor(Color.parseColor(color));
+        if (isContact && userQuery != null){
+            String color = megaApi.getUserAvatarColor(userQuery);
+            if(color!=null){
+                log("The color to set the avatar is "+color);
+                p.setColor(Color.parseColor(color));
+            }
+            else{
+                log("Default color to the avatar");
+                p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            }
         }
-        else{
-            log("Default color to the avatar");
+        else {
             p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
         }
 
@@ -645,7 +661,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         inviteShown = true;
     }
 
-    boolean queryIfIsContact() {
+    MegaUser queryIfIsContact() {
 
         ArrayList<MegaUser> contacts = megaApi.getContacts();
 
@@ -653,11 +669,13 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                 log("Contact mail[i]="+i+":"+contacts.get(i).getEmail()+" contact mail request: "+myEmail);
                 if (contacts.get(i).getEmail().equals(myEmail)){
-                    return true;
+                    isContact = true;
+                    return contacts.get(i);
                 }
             }
         }
-        return false;
+        isContact = false;
+        return null;
     }
 
     public void initDialogInvite(MegaRequest request, MegaError e){
@@ -665,11 +683,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
             handleContactLink = request.getNodeHandle();
             contactNameContent = request.getName() + " " + request.getText();
-            if (queryIfIsContact()) {
-                isContact = true;
-            } else {
-                isContact = false;
-            }
+            userQuery = queryIfIsContact();
             showInviteDialog();
         } else if (e.getErrorCode() == MegaError.API_EEXIST) {
             dialogTitleContent = R.string.invite_not_sent;
