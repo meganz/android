@@ -3906,7 +3906,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(numberUnread==0){
 
 					if(isFirstNavigationLevel()){
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						if (drawerItem == DrawerItem.SEARCH){
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+						else {
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						}
 					}
 					else{
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3914,7 +3919,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					if(isFirstNavigationLevel()){
-						badgeDrawable.setProgress(0.0f);
+						if (drawerItem == DrawerItem.SEARCH){
+							badgeDrawable.setProgress(1.0f);
+						}
+						else {
+							badgeDrawable.setProgress(0.0f);
+						}
 					}
 					else{
 						badgeDrawable.setProgress(1.0f);
@@ -3932,7 +3942,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				if(isFirstNavigationLevel()){
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					if (drawerItem == DrawerItem.SEARCH){
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					}
+					else {
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					}
 				}
 				else{
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3940,7 +3955,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		} else {
 			if(isFirstNavigationLevel()){
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				if (drawerItem == DrawerItem.SEARCH){
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				}
+				else {
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
 			}
 			else{
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -4976,6 +4996,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					hidden.setChecked(true);
 				}
 
+				drawerLayout.closeDrawer(Gravity.LEFT);
+				drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
     			drawerItem = DrawerItem.SEARCH;
 				sFLol = new SearchFragmentLollipop().newInstance();
 
@@ -5286,6 +5309,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				textsearchQuery = false;
 				searchQuery = "";
+				firstNavigationLevel = true;
+				parentHandleSearch = -1;
+				levelsSearch = -1;
+				drawerItem = DrawerItem.SEARCH;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				return true;
 			}
@@ -5293,6 +5320,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				log("On collapse search menu item");
+				drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
 				textSubmitted = true;
@@ -6590,7 +6618,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				if (firstNavigationLevel){
+				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					drawerLayout.openDrawer(nV);
 				}else{
 					log("NOT firstNavigationLevel");
@@ -6677,7 +6705,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
 		    			if (sFLol != null){
-		    				sFLol.onBackPressed();
+//		    				sFLol.onBackPressed();
+							onBackPressed();
 		    				return true;
 		    			}
 		    		}
@@ -8738,6 +8767,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						cloudDrive.setChecked(true);
 						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 					}
+					drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     				selectDrawerItemLollipop(drawerItem);
     				return;
     			}
