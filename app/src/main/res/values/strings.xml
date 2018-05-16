@@ -1858,4 +1858,5 @@
 
     <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
 
+    <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
 </resources>
