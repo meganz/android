@@ -124,7 +124,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -2856,7 +2856,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					try {
 						NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+						notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
 					}
 					catch (Exception e){
 						log("Exception NotificationManager - remove contact notification");
@@ -4274,7 +4274,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			NotificationManager notificationManager =
 					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+			notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
 		}
 		catch (Exception e){
 			log("Exception NotificationManager - remove contact notification");
@@ -4646,8 +4646,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		((MegaApplication)getApplication()).setRecentChatVisible(true);
 
 		try {
-			AdvancedNotificationBuilder notificationBuilder;
-			notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+			ChatAdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
 			notificationBuilder.removeAllChatNotifications();
 		}
