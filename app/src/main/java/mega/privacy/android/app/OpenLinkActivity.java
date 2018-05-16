@@ -433,10 +433,43 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		if (url != null && (url.matches("^https://mega\\.co\\.nz/#sync") || url.matches("^https://mega\\.nz/#sync") || url.matches("^https://mega\\.nz/sync"))) {
 			log("sync link url");
 
-			Intent openHelpIntent = new Intent(this, WebViewActivityLollipop.class);
-			openHelpIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openHelpIntent.setData(Uri.parse(url));
-			startActivity(openHelpIntent);
+			Intent openSyncIntent = new Intent(this, WebViewActivityLollipop.class);
+			openSyncIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openSyncIntent.setData(Uri.parse(url));
+			startActivity(openSyncIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#terms") || url.matches("^https://mega\\.nz/#terms") || url.matches("^https://mega\\.nz/terms"))) {
+			log("terms link url");
+
+			Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+			openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openTermsIntent.setData(Uri.parse(url));
+			startActivity(openTermsIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#privacy") || url.matches("^https://mega\\.nz/#privacy") || url.matches("^https://mega\\.nz/privacy"))) {
+			log("privacy link url");
+
+			Intent openPrivacyIntent = new Intent(this, WebViewActivityLollipop.class);
+			openPrivacyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openPrivacyIntent.setData(Uri.parse(url));
+			startActivity(openPrivacyIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#gdpr") || url.matches("^https://mega\\.nz/#gdpr") || url.matches("^https://mega\\.nz/gdpr"))) {
+			log("gdpr link url");
+
+			Intent openGdprIntent = new Intent(this, WebViewActivityLollipop.class);
+			openGdprIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openGdprIntent.setData(Uri.parse(url));
+			startActivity(openGdprIntent);
 			finish();
 			return;
 		}

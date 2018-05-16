@@ -170,6 +170,9 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         sendButton.setOnClickListener(this);
         copyButton.setOnClickListener(this);
 
+        sendButton.setEnabled(false);
+        copyButton.setEnabled(false);
+
         transparentKeyLayoutExpiry = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_expiry_date);
 
         passwordProtectionLayout = (RelativeLayout) v.findViewById(R.id.password_protection_layout);
@@ -195,10 +198,14 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             linkDecryptionKeyCheck.setChecked(false);
             linkWithKeyCheck.setChecked(true);
             linkText.setText(link);
+            copyButton.setEnabled(true);
+            sendButton.setEnabled(true);
         }
         else{
             nC.exportLink(((GetLinkActivityLollipop)context).selectedNode);
             linkText.setText(getString(R.string.link_request_status));
+            copyButton.setEnabled(false);
+            sendButton.setEnabled(false);
         }
 
 		if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE){
@@ -332,6 +339,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                         urlString = s[0] + "!" + s[1];
                     }
                     linkText.setText(urlString);
+                    copyButton.setEnabled(true);
+                    sendButton.setEnabled(true);
                 }
                 break;
             }
@@ -346,6 +355,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                         keyString = keyString+s[2];
                     }
                     linkText.setText(keyString);
+                    copyButton.setEnabled(true);
+                    sendButton.setEnabled(true);
                 }
                 break;
             }
@@ -418,6 +429,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
     public void processingPass(){
         linkText.setText(getString(R.string.link_request_status));
+        copyButton.setEnabled(false);
+        sendButton.setEnabled(false);
     }
 
     public void requestFinish(MegaRequest request, MegaError e){
@@ -456,6 +469,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                             urlString = s[0] + "!" + s[1];
                         }
                         linkText.setText(urlString);
+                        copyButton.setEnabled(true);
+                        sendButton.setEnabled(true);
                     }
                 }
                 else if(linkDecryptionKeyCheck.isChecked()){
@@ -466,10 +481,14 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                             keyString = keyString+s[2];
                         }
                         linkText.setText(keyString);
+                        copyButton.setEnabled(true);
+                        sendButton.setEnabled(true);
                     }
                 }
                 else{
                     linkText.setText(link);
+                    copyButton.setEnabled(true);
+                    sendButton.setEnabled(true);
                 }
             }
             log("link: " + request.getLink());
@@ -479,6 +498,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         else if(request.getType() == MegaRequest.TYPE_PASSWORD_LINK){
             log("password link request finished");
             linkText.setText(request.getText());
+            copyButton.setEnabled(true);
+            sendButton.setEnabled(true);
             passwordProtectionEditText.setText(request.getPassword());
             passwordProtectionEditText.setVisibility(View.VISIBLE);
             subtitleProOnlyProtection.setVisibility(View.GONE);
@@ -510,6 +531,8 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                 else{
                     log("Remove pass protection");
                     linkText.setText(link);
+                    copyButton.setEnabled(true);
+                    sendButton.setEnabled(true);
                     passwordProtectionEditText.setVisibility(View.GONE);
                     subtitleProOnlyProtection.setVisibility(View.VISIBLE);
                 }

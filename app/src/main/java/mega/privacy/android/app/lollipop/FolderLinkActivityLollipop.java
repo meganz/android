@@ -580,18 +580,22 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();
 						if (value.length() == 0) {
+							log("empty key, ask again!");
+							decryptionIntroduced=false;
+							askForDecryptionKeyDialog();
 							return;
+						}else{
+							if(value.startsWith("!")){
+								log("Decryption key with exclamation!");
+								url=url+value;
+							}
+							else{
+								url=url+"!"+value;
+							}
+							log("Folder link to import: "+url);
+							decryptionIntroduced=true;
+							megaApiFolder.loginToFolder(url, folderLinkActivity);
 						}
-						if(value.startsWith("!")){
-							log("Decryption key with exclamation!");
-							url=url+value;
-						}
-						else{
-							url=url+"!"+value;
-						}
-						log("Folder link to import: "+url);
-						decryptionIntroduced=true;
-						megaApiFolder.loginToFolder(url, folderLinkActivity);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), 

@@ -134,6 +134,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	public static String KEY_ABOUT_GDPR = "settings_about_gdpr";
 	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
 	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
@@ -199,6 +200,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	Preference aboutPrivacy;
 	Preference aboutTOS;
+	Preference aboutGDPR;
 	Preference aboutSDK;
 	Preference aboutKarere;
 	Preference aboutApp;
@@ -436,6 +438,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		aboutTOS = findPreference(KEY_ABOUT_TOS);
 		aboutTOS.setOnPreferenceClickListener(this);
+
+		aboutGDPR = findPreference(KEY_ABOUT_GDPR);
+		aboutGDPR.setOnPreferenceClickListener(this);
 
 		aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
 		aboutApp.setOnPreferenceClickListener(this);
@@ -1927,12 +1932,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setData(Uri.parse("https://mega.nz/mobile_privacy.html"));
+			viewIntent.setData(Uri.parse("https://mega.nz/privacy"));
 			startActivity(viewIntent);
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_TOS) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
+			viewIntent.setData(Uri.parse("https://mega.nz/terms"));
+			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo(KEY_ABOUT_GDPR) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://mega.nz/gdpr"));
 			startActivity(viewIntent);
 		}
 		else if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
