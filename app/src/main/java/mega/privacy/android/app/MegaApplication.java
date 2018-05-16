@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
@@ -59,7 +60,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.3.5_193";
+	static final String USER_AGENT = "MEGAAndroid/3.3.5_195";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -717,6 +718,33 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
 
+		if(requests!=null){
+			for (int i = 0; i < requests.size(); i++) {
+				MegaContactRequest cr = requests.get(i);
+				if (cr != null) {
+					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
+
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+
+						notificationBuilder.removeAllIncomingContactNotifications();
+						notificationBuilder.showIncomingContactRequestNotification();
+
+						log("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+					}
+					else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
+
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+
+						notificationBuilder.removeAllAcceptanceContactNotifications();
+						notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
+
+						log("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+					}
+				}
+			}
+		}
 	}
 
 	public void sendSignalPresenceActivity(){
@@ -758,6 +786,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				}
 			}
 			catch (Exception exc){}
+
+			try{
+				ShortcutBadger.applyCount(getApplicationContext(), 0);
+
+				startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
+			}
+			catch (Exception exc){
+                log("EXCEPTION removing badge indicator");
+            }
 
 			if(megaApi!=null){
 				int loggedState = megaApi.isLoggedIn();
@@ -822,8 +859,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				log("OK:TYPE_PUSH_RECEIVED");
 				chatNotificationReceived = true;
 
-				AdvancedNotificationBuilder notificationBuilder;
-				notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+				ChatAdvancedNotificationBuilder notificationBuilder;
+				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
 				notificationBuilder.removeAllChatNotifications();
 				notificationBuilder.generateChatNotification(request);
@@ -922,8 +959,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 //	public void updateChatNotification(long chatid, MegaChatMessage msg){
-//		AdvancedNotificationBuilder notificationBuilder;
-//		notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+//		ChatAdvancedNotificationBuilder notificationBuilder;
+//		notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 //
 //		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //			notificationBuilder.updateNotification(chatid, msg);
@@ -940,17 +977,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //				}
 //			}
 //			if(shown){
-//				notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//				notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //			}
 //		}
 //		else{
-//			notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//			notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //		}
 //	}
 //
 //	public void removeChatSeenNotification(long chatid, MegaChatMessage msg){
-//		AdvancedNotificationBuilder notificationBuilder;
-//		notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+//		ChatAdvancedNotificationBuilder notificationBuilder;
+//		notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 //
 //		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //			notificationBuilder.removeSeenNotification(chatid, msg);
@@ -967,11 +1004,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //				}
 //			}
 //			if(shown){
-//				notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//				notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //			}
 //		}
 //		else{
-//			notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//			notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //		}
 //	}
 
@@ -1029,7 +1066,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					if(call.isLocalTermCode()==false){
 						log("onChatCallUpdate:localTermCodeNotLocal");
 						try{
-							AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+							ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 							notificationBuilder.showMissedCallNotification(call);
 						}
 						catch(Exception e){
@@ -1048,7 +1085,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		log("checkQueuedCalls");
 
 		try{
-			AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 			notificationBuilder.checkQueuedCalls();
 		}
 		catch (Exception e){

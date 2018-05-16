@@ -511,9 +511,19 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
 //				browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
 //				startActivity(browserIntent);
-                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.co.nz/mobile_privacy.html"));
-                startActivity(viewIntent);
+                try {
+                    String url = "https://mega.nz/terms";
+                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(url));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse("https://mega.nz/terms"));
+                    startActivity(viewIntent);
+                }
+
                 break;
 
             case R.id.toggle_button_passwd:

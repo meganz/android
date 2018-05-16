@@ -3,7 +3,7 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.5 (193)</string>
+    <string name="app_version" context="Not translate">3.3.5 (195)</string>
     <string name="sdk_version" context="Not translate">a6a7e37</string>
     <string name="karere_version" context="Not translate">1229c65</string>
 
@@ -738,6 +738,7 @@
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">About</string>
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
+    <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="Title of the label where the SDK version is shown">MEGA SDK version</string>
     <string name="settings_about_karere_version" context="Title of the label where the MEGAchat SDK version is shown">MEGAchat SDK version</string>
@@ -1856,5 +1857,11 @@
     <string name="context_option_print" context="Menu option to print the recovery key from Offline section">Print</string>
 
     <string name="save_MK_confirmation" context="Message when the recovery key has been successfully saved on the filesystem">The Recovery Key has been successfully saved</string>
+
+    <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(Pending)</string>
+
+    <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
+
+    <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
 
 </resources>

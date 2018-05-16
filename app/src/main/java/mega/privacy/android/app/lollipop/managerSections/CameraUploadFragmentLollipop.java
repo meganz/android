@@ -126,7 +126,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private MegaApiAndroid megaApi;
 
 //	long parentHandle = -1;
-	private boolean firstTimeCam = false;
+//	private boolean firstTimeCam = false;
 
 	private int type = 0;
 
@@ -653,7 +653,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
 
 		if (type == TYPE_CAMERA) {
-			if (firstTimeCam) {
+			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
 
@@ -1012,16 +1012,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			int realGridWidth = 0;
 			int numberOfCells = 0;
 			int padding = 0;
-			if (((ManagerActivityLollipop) context).isLargeGridCameraUploads) {
-				realGridWidth = totalWidth / GRID_LARGE;
-				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
-				gridWidth = realGridWidth - (padding * 2);
-				numberOfCells = GRID_LARGE;
-			} else {
+			if (((ManagerActivityLollipop) context).isSmallGridCameraUploads) {
 				realGridWidth = totalWidth / GRID_SMALL;
 				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_SMALL;
 				gridWidth = realGridWidth - (padding * 2);
 				numberOfCells = GRID_SMALL;
+			} else {
+				realGridWidth = totalWidth / GRID_LARGE;
+				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
+				gridWidth = realGridWidth - (padding * 2);
+				numberOfCells = GRID_LARGE;
 			}
 
 //		    int numberOfCells = totalWidth / GRID_WIDTH;
@@ -1213,7 +1213,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setFirstTime(false);
-		dbH.setCamSyncEnabled(false);
+//		dbH.setCamSyncEnabled(false);
 		dbH.setStorageAskAlways(false);
 		File defaultDownloadLocation = null;
 		if (Environment.getExternalStorageDirectory() != null){
@@ -1312,7 +1312,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@SuppressLint("NewApi")
 	private void cameraOnOffFirstTime(){
-		firstTimeCam = false;
+		((ManagerActivityLollipop) context).setFirstTimeCam(false);
+//		firstTimeCam = false;
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setCamSyncEnabled(true);
 		File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
@@ -1481,7 +1482,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 //		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 //		        		if (hasCameraPermission){
-		        			if (firstTimeCam){ 
+		        			if (((ManagerActivityLollipop) context).getFirstTimeCam()){
 		        				this.cameraOnOffFirstTime();
 		        			}
 		        			else{		        			
@@ -1563,7 +1564,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				break;
 			}
 			case R.id.cam_sync_button_skip:{
-				firstTimeCam = false;
+				((ManagerActivityLollipop) context).setFirstTimeCam(false);
+				dbH.setCamSyncEnabled(false);
 				((ManagerActivityLollipop)context).setInitialCloudDrive();
 				break;
 			}
@@ -1817,6 +1819,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
+		if(((ManagerActivityLollipop)context).getFirstTimeCam()){
+			((ManagerActivityLollipop) context).setFirstTimeCam(false);
+			dbH.setCamSyncEnabled(false);
+			((ManagerActivityLollipop) context).refreshMenu();
+		}
+
+
 		if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
 			return 0;
 		}else{
@@ -1986,13 +1995,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		    		    
 		    int gridWidth = 0;
 		    int numberOfCells = 0;
-		    if (((ManagerActivityLollipop)context).isLargeGridCameraUploads){
-		    	gridWidth = totalWidth / GRID_LARGE;
-		    	numberOfCells = GRID_LARGE;
-		    }
-		    else{
-		    	gridWidth = totalWidth / GRID_SMALL;
-		    	numberOfCells = GRID_SMALL;
+		    if (((ManagerActivityLollipop)context).isSmallGridCameraUploads){
+				gridWidth = totalWidth / GRID_SMALL;
+				numberOfCells = GRID_SMALL;
+		    }else{
+				gridWidth = totalWidth / GRID_LARGE;
+				numberOfCells = GRID_LARGE;
 		    }
 		    
 			if (monthPics != null){
@@ -2152,13 +2160,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 
-	public void setFirstTimeCam(boolean firstTimeCam){
-		this.firstTimeCam = firstTimeCam;
-	}
-	
-	public boolean getFirstTimeCam(){
-		return firstTimeCam;
-	}
+//	public void setFirstTimeCam(boolean firstTimeCam){
+//		this.firstTimeCam = firstTimeCam;
+//	}
+//
+//	public boolean getFirstTimeCam(){
+//		return firstTimeCam;
+//	}
 
 	public boolean showSelectMenuItem(){
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
@@ -2236,7 +2244,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public boolean getIsLargeGrid() {
-		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
+		boolean isSmall = ((ManagerActivityLollipop)context).isSmallGridCameraUploads;
+		boolean isLarge = !isSmall;
+		return isLarge;
+		//		return ((ManagerActivityLollipop)context).isLargeGridCameraUploads;
+
 	}
 	
 	@Override
@@ -2302,14 +2314,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if(nodes == null){
 			fastScroller.setVisibility(View.GONE);
 		}else{
-			if(((ManagerActivityLollipop)context).isLargeGridCameraUploads){
-				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
+			if(((ManagerActivityLollipop)context).isSmallGridCameraUploads){
+				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
 					fastScroller.setVisibility(View.GONE);
 				} else {
 					fastScroller.setVisibility(View.VISIBLE);
 				}
 			}else {
-				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR_GRID) {
+				if (nodes.size() < Constants.MIN_ITEMS_SCROLLBAR) {
 					fastScroller.setVisibility(View.GONE);
 				} else {
 					fastScroller.setVisibility(View.VISIBLE);
