@@ -1794,22 +1794,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						log("Login loin");
 						handleInviteContact = getIntent().getLongExtra("handle", 0);
-						if (handleInviteContact != 0){
-							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("handle", handleInviteContact);
-							intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
-							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							intent.setAction(Constants.ACTION_INVITE_CONTACT);
-							startActivity(intent);
-							finish();
-							return;
-						}
-						else{
-							log("Error, no handle");
-						}
+
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("handle", handleInviteContact);
+						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
+						startActivity(intent);
+						finish();
+						return;
 					}
 				}
 			}
@@ -2175,16 +2171,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						getIntent().setAction(null);
 						setIntent(null);
 					}
-					else if (getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						handleInviteContact = getIntent().getLongExtra("handle", 0);
-						if (handleInviteContact != 0){
-							drawerItem = DrawerItem.CONTACTS;
-							indexContacts = 0;
-							selectDrawerItemLollipop(drawerItem);
-						}
-						else{
-							log("Error, no handle");
-						}
+
+						drawerItem = DrawerItem.CONTACTS;
+						indexContacts = 0;
+						selectDrawerItemLollipop(drawerItem);
 					}
 				}
 	        }
@@ -2777,17 +2769,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					indexShares = 0;
 					selectDrawerItemLollipop(drawerItem);
 				}
-				else if(getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
-					log("onPostResume: ACTION_INVITE_CONTACT");
+				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
+					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
 					handleInviteContact = getIntent().getLongExtra("handle", 0);
-					if (handleInviteContact != 0){
-						drawerItem = DrawerItem.CONTACTS;
-						indexContacts = 0;
-						selectDrawerItemLollipop(drawerItem);
-					}
-					else{
-						log("Error, no handle");
-					}
+
+					drawerItem = DrawerItem.CONTACTS;
+					indexContacts = 0;
+					selectDrawerItemLollipop(drawerItem);
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
