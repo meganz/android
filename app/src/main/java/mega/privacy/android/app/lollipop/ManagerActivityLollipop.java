@@ -15699,8 +15699,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		if (newConfig.orientation != orientationSaved){
 			orientationSaved = newConfig.orientation;
-
-
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 	}
 
