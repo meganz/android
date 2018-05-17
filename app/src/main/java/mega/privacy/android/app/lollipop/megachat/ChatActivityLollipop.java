@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -878,6 +876,7 @@ String mOutputFilePath;
                         finish();
                     }
 
+                    textChat.setHint(getString(R.string.type_message_hint_with_title, chatRoom.getTitle()));
                     ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
                     if(prefs!=null){
                         String written = prefs.getWrittenText();
