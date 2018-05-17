@@ -3310,6 +3310,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onDragActivated(boolean activated) {
         if (activated) {
+            ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
             updateCurrentImage();
             if (aB != null && aB.isShowing()) {
                 if(tB != null) {
@@ -3343,6 +3344,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    ivShadow.setBackgroundColor(TRANSPARENT);
                     showActionStatusBar();
                     containerAudioVideoPlayer.setBackgroundColor(BLACK);
                     playerLayout.setBackgroundColor(BLACK);
