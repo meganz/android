@@ -1870,6 +1870,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                player.setPlayWhenReady(false);
                 if (playlistFragment != null && playlistFragment.isAdded()){
                     playlistFragment.setSearchOpen(true);
                     playlistFragment.hideController();
@@ -2289,6 +2290,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         findSelected();
         onPlaylist = false;
         if (player != null){
+            playWhenReady = player.getPlayWhenReady();
             player.release();
         }
         playerLayout.setVisibility(View.VISIBLE);
@@ -3663,7 +3665,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     void instantiatePlaylist(){
         if (player != null) {
-            player.setPlayWhenReady(false);
+//            player.setPlayWhenReady(false);
+            playWhenReady = player.getPlayWhenReady();
         }
         onPlaylist = true;
         progressBar.setVisibility(View.GONE);
