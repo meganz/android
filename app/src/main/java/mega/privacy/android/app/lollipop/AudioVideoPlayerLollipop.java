@@ -270,6 +270,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean onTracksChange = false;
     public String querySearch = "";
 
+    boolean playWhenReady = true;
+    boolean searchExpand = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -303,6 +306,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             size = savedInstanceState.getInt("size");
             currentWindowIndex = savedInstanceState.getInt("currentWindowIndex");
             querySearch = savedInstanceState.getString("querySearch");
+            playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
         }
         else {
             onPlaylist = false;
@@ -315,6 +319,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 fileName = bundle.getString("FILENAME");
             }
             currentPosition = intent.getIntExtra("position", 0);
+            playWhenReady = true;
         }
         if (!renamed) {
             uri = intent.getData();
@@ -1025,7 +1030,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         });
         numErrors = 0;
-        player.setPlayWhenReady(true);
+        player.setPlayWhenReady(playWhenReady);
         player.seekTo(currentWindowIndex, currentTime);
         player.setVideoDebugListener(this);
         onTracksChange = false;
@@ -1774,7 +1779,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         currentTime = player.getCurrentPosition();
         outState.putLong("currentTime", currentTime);
-        outState.putLong("currentPosition", currentPosition);
+        outState.putInt("currentPosition", currentPosition);
         outState.putLong("handle", handle);
         outState.putString("fileName", fileName);
         outState.putString("uri", uri.toString());
@@ -1784,6 +1789,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putInt("currentWindowIndex", currentWindowIndex);
         outState.putInt("size", size);
         outState.putString("querySearch", querySearch);
+        playWhenReady = player.getPlayWhenReady();
+        outState.putBoolean("playWhenReady", playWhenReady);
     }
 
     public String getFileName(Uri uri) {
@@ -1869,11 +1876,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
                 loopMenuItem.setVisible(false);
                 querySearch = "";
+                searchExpand = true;
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                searchExpand = false;
                 if (playlistFragment != null && playlistFragment.isAdded()){
                     boolean scroll;
                     playlistFragment.setSearchOpen(false);

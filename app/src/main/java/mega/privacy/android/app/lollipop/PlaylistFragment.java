@@ -59,6 +59,7 @@ public class PlaylistFragment extends Fragment{
     RecyclerView recyclerView;
     PlayListAdapter adapter;
     public TextView contentText;
+    RelativeLayout containerContentText;
     private SimpleExoPlayerView simpleExoPlayerViewPlaylist;
     private SimpleExoPlayer player;
     View v;
@@ -76,7 +77,6 @@ public class PlaylistFragment extends Fragment{
     PlaylistFragment playlistFragment;
 
     boolean searchOpen = false;
-    boolean playWhenReady = true;
 
     ImageButton previousButton;
     ImageButton nextButton;
@@ -99,12 +99,6 @@ public class PlaylistFragment extends Fragment{
         player = ((AudioVideoPlayerLollipop) context).getPlayer();
         playlistFragment = this;
 
-        if (savedInstanceState != null){
-            playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
-        }
-        else {
-            playWhenReady = true;
-        }
     }
 
     @Override
@@ -143,6 +137,7 @@ public class PlaylistFragment extends Fragment{
         fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
         contentText = (TextView) v.findViewById(R.id.content_text);
+        containerContentText = (RelativeLayout) v.findViewById(R.id.content_text_layout);
         simpleExoPlayerViewPlaylist = (SimpleExoPlayerView) v.findViewById(R.id.player_view_playlist);
         containerPlayer  =(RelativeLayout) v.findViewById(R.id.player_layout_container);
         simpleExoPlayerViewPlaylist.setUseController(true);
@@ -219,7 +214,7 @@ public class PlaylistFragment extends Fragment{
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
-        player.setPlayWhenReady(playWhenReady);
+        player.setPlayWhenReady(((AudioVideoPlayerLollipop) context).playWhenReady);
         if (!((AudioVideoPlayerLollipop) context).querySearch.equals("")){
             aB.setTitle(getString(R.string.action_search)+": "+((AudioVideoPlayerLollipop) context).querySearch);
             setNodesSearch(((AudioVideoPlayerLollipop) context).querySearch);
@@ -233,7 +228,6 @@ public class PlaylistFragment extends Fragment{
         if(recyclerView.getLayoutManager()!=null){
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
         }
-        outState.putBoolean("playWhenReady", player.getPlayWhenReady());
     }
 
     void hideController(){
@@ -285,24 +279,36 @@ public class PlaylistFragment extends Fragment{
             MegaOffline offNode;
             for (int i=0; i<offNodes.size(); i++){
                 offNode = offNodes.get(i);
-                if (offNode.getName().contains(query)){
+                if (offNode.getName().toLowerCase().contains(query.toLowerCase())){
                     offNodesSearch.add(offNode);
                 }
             }
             adapter.setOffNodes(offNodesSearch);
-            contentText.setText(""+offNodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodesSearch.size()));
+            if (offNodesSearch.size() == 0){
+                containerContentText.setVisibility(View.GONE);
+            }
+            else {
+                containerContentText.setVisibility(View.VISIBLE);
+                contentText.setText(""+offNodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodesSearch.size()));
+            }
         }
         else {
             ArrayList<MegaNode> nodesSearch = new ArrayList<>();
             MegaNode node;
             for (int i=0; i<handles.size(); i++){
                 node = megaApi.getNodeByHandle(handles.get(i));
-                if (node.getName().contains(query)){
+                if (node.getName().toLowerCase().contains(query.toLowerCase())){
                     nodesSearch.add(node);
                 }
             }
             adapter.setNodes(nodesSearch);
-            contentText.setText(""+nodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, nodesSearch.size()));
+            if (nodesSearch.size() == 0){
+                containerContentText.setVisibility(View.GONE);
+            }
+            else {
+                containerContentText.setVisibility(View.VISIBLE);
+                contentText.setText(""+nodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, nodesSearch.size()));
+            }
         }
     }
 
