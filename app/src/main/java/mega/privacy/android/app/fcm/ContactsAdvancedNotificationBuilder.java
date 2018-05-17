@@ -22,8 +22,6 @@ import android.support.v4.content.ContextCompat;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -35,11 +33,8 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -128,22 +123,12 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public void showAcceptanceContactRequestNotification(String email){
         log("showAcceptanceContactRequestNotification");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        this.email = email;
+        counter=0;
+        megaApi.getUserAttribute(email, MegaApiJava.USER_ATTR_FIRSTNAME, this);
+        megaApi.getUserAttribute(email, MegaApiJava.USER_ATTR_LASTNAME, this);
+        megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", this);
 
-            String manufacturer = "xiaomi";
-            if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
-                log("generateChatNotification:POST Android N");
-                newAcceptanceContactRequest(email);
-            }
-            else{
-                log("generateChatNotification:XIAOMI POST Android N");
-//                generateChatNotificationPreN(request);
-            }
-        }
-        else {
-            log("generateChatNotification:PRE Android N");
-//            generateChatNotificationPreN(request);
-        }
     }
 
     public void newIncomingContactRequest(ArrayList<MegaContactRequest> contacts){
@@ -163,13 +148,25 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         }
     }
 
-    public void newAcceptanceContactRequest(String email){
+    public void newAcceptanceContactRequest(){
         log("newAcceptanceContactRequest");
-        this.email = email;
-        counter=0;
-        megaApi.getUserAttribute(email, MegaApiJava.USER_ATTR_FIRSTNAME, this);
-        megaApi.getUserAttribute(email, MegaApiJava.USER_ATTR_LASTNAME, this);
-        megaApi.getUserAvatar(email, context.getCacheDir().getAbsolutePath() + "/" + email + ".jpg", this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+            String manufacturer = "xiaomi";
+            if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
+                log("generateChatNotification:POST Android N");
+                sendBundledNotificationAPC();
+            }
+            else{
+                log("generateChatNotification:XIAOMI POST Android N");
+                showSimpleNotificationAPC();
+            }
+        }
+        else {
+            log("generateChatNotification:PRE Android N");
+            showSimpleNotificationAPC();
+        }
     }
 
     public void sendBundledNotificationIPC(MegaContactRequest crToShow, boolean beep) {
@@ -253,7 +250,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         else{
             notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
         }
-
     }
 
     public void sendBundledNotificationAPC() {
@@ -266,109 +262,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationManager.notify(notificationId, notification);
         Notification summary = buildSummaryAPC(GROUP_KEY_APC);
         notificationManager.notify(Constants.NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT, summary);
-    }
-
-    public void buildNotificationPreN(Uri uriParameter, String vibration, MegaChatRequest request){
-        log("buildNotificationPreN");
-
-        MegaHandleList chatHandleList = request.getMegaHandleList();
-
-        ArrayList<MegaChatListItem> chats = new ArrayList<>();
-        for(int i=0; i<chatHandleList.size(); i++){
-//            MegaChatListItem chat = megaChatApi.getChatListItem(chatHandleList.get(i));
-//            if(chat!=null){
-//                chats.add(chat);
-//            }
-//            else{
-//                log("ERROR:chatNotRecovered:NULL");
-//            }
-        }
-
-        PendingIntent pendingIntent = null;
-
-        if(chats.size()>1){
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setAction(Constants.ACTION_CHAT_SUMMARY);
-            intent.putExtra("CHAT_ID", -1);
-            pendingIntent = PendingIntent.getActivity(context, (int)chats.get(0).getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
-
-            //Order by last interaction
-            Collections.sort(chats, new Comparator<MegaChatListItem> (){
-
-                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
-                    long timestamp1 = c1.getLastTimestamp();
-                    long timestamp2 = c2.getLastTimestamp();
-
-                    long result = timestamp2 - timestamp1;
-                    return (int)result;
-                }
-            });
-        }
-        else if (chats.size()==1){
-            Intent intent = new Intent(context, ManagerActivityLollipop.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
-            intent.putExtra("CHAT_ID", chats.get(0).getChatId());
-            pendingIntent = PendingIntent.getActivity(context, (int)chats.get(0).getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
-        }
-        else {
-            log("ERROR:chatSIZE=0:return");
-            return;
-        }
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
-        notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
-                .setShowWhen(true);
-
-        if(uriParameter!=null){
-            notificationBuilder.setSound(uriParameter);
-        }
-
-        if(vibration!=null){
-            if(vibration.equals("true")){
-                notificationBuilder.setVibrate(new long[] {0, 500});
-            }
-        }
-
-        notificationBuilder.setStyle(inboxStyle);
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        }
-        else{
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-        }
-
-//        notificationBuilder.setFullScreenIntent(pendingIntent, true);
-
-        int unreadCount = 0;
-
-        for(int i=0; i<chats.size(); i++){
-            if(unreadCount<8){
-
-            }
-            else{
-                break;
-            }
-        }
-
-        String textToShow = context.getResources().getQuantityString(R.plurals.plural_number_messages_chat_notification, (int)chats.size(), chats.size());
-
-        notificationBuilder.setContentTitle("MEGA");
-        notificationBuilder.setContentText(textToShow);
-        inboxStyle.setSummaryText(textToShow);
-
-        Notification notif = notificationBuilder.build();
-
-
     }
 
     public Notification buildIPCNotification(MegaContactRequest crToShow, boolean beep) {
@@ -636,6 +529,62 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
 
+    public void showSimpleNotificationAPC(){
+        log("showSimpleNotificationAPC");
+
+        mBuilderCompat = new NotificationCompat.Builder(context);
+
+        if(notificationManager == null){
+            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        }
+
+        String title = context.getString(R.string.title_acceptance_contact_request_notification);
+        String fullName = "";
+
+        if (firstName.trim().length() <= 0){
+            fullName = lastName;
+        }
+        else{
+            fullName = firstName + " " + lastName;
+        }
+
+        if (fullName.trim().length() > 0){
+            title = title + ": "+fullName;
+        }
+
+        Intent intent = new Intent(context, ManagerActivityLollipop.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
+
+        mBuilderCompat
+                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true).setTicker(title)
+                .setColor(ContextCompat.getColor(context,R.color.mega))
+                .setContentTitle(title).setContentText(email)
+                .setOngoing(false);
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        mBuilderCompat.setSound(defaultSoundUri);
+        mBuilderCompat.setVibrate(new long[] {0, 500});
+
+        Bitmap largeIcon = setUserAvatar(email);
+        if(largeIcon!=null){
+            mBuilderCompat.setLargeIcon(largeIcon);
+        }
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
+            //API 25 = Android 7.1
+            mBuilderCompat.setPriority(Notification.PRIORITY_HIGH);
+        }
+        else{
+            mBuilderCompat.setPriority(NotificationManager.IMPORTANCE_HIGH);
+        }
+
+        notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
+    }
+
     public static void log(String message) {
         Util.log("ChatAdvancedNotificationBuilder", message);
     }
@@ -665,7 +614,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             }
         }
         if(counter==3){
-            sendBundledNotificationAPC();
+            newAcceptanceContactRequest();
             counter = 0;
         }
     }
