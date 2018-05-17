@@ -327,6 +327,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openSettingsStorage = false;
 
+    int orientationSaved;
+
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
@@ -1150,6 +1152,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (turnOnNotifications){
 			outState.putBoolean("turnOnNotifications", turnOnNotifications);
 		}
+
+		outState.putInt("orientationSaved", orientationSaved);
 	}
 
 	@Override
@@ -1206,6 +1210,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
+			orientationSaved = savedInstanceState.getInt("orientationSaved");
 		}
 		else{
 			log("Bundle is NULL");
@@ -4997,7 +5002,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
-				drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
     			drawerItem = DrawerItem.SEARCH;
 				sFLol = new SearchFragmentLollipop().newInstance();
@@ -5320,7 +5324,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				log("On collapse search menu item");
-				drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
 				textSubmitted = true;
@@ -8767,7 +8770,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						cloudDrive.setChecked(true);
 						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 					}
-					drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     				selectDrawerItemLollipop(drawerItem);
     				return;
     			}
@@ -15667,24 +15669,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void changeStatusBarColor(int option) {
 
-		if (option == 1) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			final Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+
+			if (option == 2){
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 500);
 			}
+		}
+		if (option == 1){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-
-		} else if (option == 2) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
-			}
+		}
+		else {
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		}
+
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		if (newConfig.orientation != orientationSaved){
+			orientationSaved = newConfig.orientation;
+
+
 		}
 	}
 
