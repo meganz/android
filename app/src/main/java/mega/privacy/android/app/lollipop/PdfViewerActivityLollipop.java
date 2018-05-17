@@ -964,7 +964,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 Intent intent = new Intent(this, UploadService.class);
                 intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
                 intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle()+".pdf");
+                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
                 intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
                 startService(intent);
             }
