@@ -80,7 +80,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     String remoteMessageType = "";
 
-    private ChatAdvancedNotificationBuilder notificationBuilder;
+    private ChatAdvancedNotificationBuilder chatNotificationBuilder;
 
     Handler h;
 
@@ -131,7 +131,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         log("From: " + remoteMessage.getFrom());
 
-        notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
         remoteMessageType = remoteMessage.getData().get("type");
 
         // Check if message contains a data payload.
@@ -258,6 +257,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                             performLoginProccess(gSession);
 
+                            chatNotificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
                             h = new Handler(Looper.getMainLooper());
                             h.postDelayed(
                                     new Runnable() {
@@ -266,7 +267,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                             boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
                                             if(!shown){
                                                 log("Show simple notification - no connection finished");
-                                                notificationBuilder.showSimpleNotification();
+                                                chatNotificationBuilder.showSimpleNotification();
                                             }
                                             else{
                                                 log("Notification already shown");

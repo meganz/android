@@ -1864,4 +1864,10 @@
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
 
+    <plurals name="plural_number_contact_request_notification" context="Notification title to show the number of incoming contact request">
+        <item context="contact request" quantity="one">%1$d pending contact request</item>
+        <item context="contact requests" quantity="other">%1$d pending contact requests</item>
+    </plurals>
+
+    <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
 </resources>
