@@ -2463,6 +2463,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			queryIfNotificationsAreOn();
 		}
+
+		if (getResources().getConfiguration().orientation != orientationSaved) {
+			orientationSaved = getResources().getConfiguration().orientation;
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -15668,7 +15673,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	}
 
 	public void changeStatusBarColor(int option) {
-
+		log("changeStatusBarColor");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			final Window window = this.getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -15691,16 +15696,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-
-		if (newConfig.orientation != orientationSaved){
-			orientationSaved = newConfig.orientation;
-			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-		}
 	}
 
 	public long getParentHandleInbox() {
