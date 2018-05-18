@@ -411,7 +411,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				holder.textViewPermissions.append(pending);
 			}
 		}
-		
+
         holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);
 	}
