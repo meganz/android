@@ -396,21 +396,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			log("Landscape");
-			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(255, outMetrics));
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
 		}else{
 			log("Portrait");
-			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
+			holder.textViewContactName.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
 		}
 
 		holder.textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
-		holder.textViewContent.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
-
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			log("Landscape");
-			holder.textViewContent.setMaxWidth(Util.scaleWidthPx(255, outMetrics));
+			holder.textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
 		}else{
 			log("Portrait");
-			holder.textViewContent.setMaxWidth(Util.scaleWidthPx(185, outMetrics));
+			holder.textViewContent.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
 		}
 		holder.textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);

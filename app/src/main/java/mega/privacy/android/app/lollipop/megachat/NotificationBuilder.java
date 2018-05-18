@@ -102,17 +102,11 @@ public final class NotificationBuilder {
         }
         else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             log("more than Build.VERSION_CODES.LOLLIPOP");
-            Notification notification = buildNotificationPreN(uriParameter, unreadChats, vibration, GROUP_KEY, email);
-            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-            if(notification!=null){
-                notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
-            }
+
         }
         else{
             log("Android 4 - no bundled - no inbox style");
-            Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
-            log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-            notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
+
         }
     }
 
@@ -199,7 +193,7 @@ public final class NotificationBuilder {
     }
 
     public Notification buildNotification(Uri uriParameter, MegaChatListItem item, String vibration, String groupKey, String email) {
-        log("buildNotification");
+        log("buildIPCNotification");
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);

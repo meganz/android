@@ -1857,10 +1857,27 @@
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
 
+
     <string name="section_playlist" context="Title of the screen Playlist">Playlist</string>
     <string name="playlist_state_playing" context="Text shown in playlist subtitle item when a file is reproducing">Now playing...</string>
     <string name="playlist_state_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Paused</string>
 
+    <string name="context_option_print" context="Menu option to print the recovery key from Offline section">Print</string>
+
+    <string name="save_MK_confirmation" context="Message when the recovery key has been successfully saved on the filesystem">The Recovery Key has been successfully saved</string>
+
     <string name="pending_outshare_indicator" context="label to indicate that a share is still pending on outgoing shares of a node">(Pending)</string>
 
+    <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
+
+    <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
+
+    <plurals name="plural_number_contact_request_notification" context="Notification title to show the number of incoming contact request">
+        <item context="contact request" quantity="one">%1$d pending contact request</item>
+        <item context="contact requests" quantity="other">%1$d pending contact requests</item>
+    </plurals>
+
+    <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
+
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen">Write message to \"%s\"&#8230;</string>
 </resources>

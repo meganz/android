@@ -26,7 +26,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 39;
+	private static final int DATABASE_VERSION = 40;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -132,6 +132,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_HANDLE = "transferhandle";
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
+	private static final String KEY_SMALL_GRID_CAMERA = "smallgridcamera";
 
 	private static final String KEY_ID_CHAT = "idchat";
 	private static final String KEY_MSG_TIMESTAMP = "timestamp";
@@ -195,7 +196,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
-				KEY_FIRST_LOGIN_CHAT + " BOOLEAN" +")";
+				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN" + ")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -536,7 +537,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_USE_HTTPS_ONLY + " = '" + encrypt("false") + "';");
 		}
 
-
 		if (oldVersion <= 35){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_SHOW_COPYRIGHT + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_COPYRIGHT + " = '" + encrypt("true") + "';");
@@ -555,6 +555,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 38){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_SHOW_NOTIF_OFF + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_NOTIF_OFF + " = '" + encrypt("true") + "';");
+		}
+
+		if (oldVersion <= 39){
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SMALL_GRID_CAMERA + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + " = '" + encrypt("false") + "';");
 		}
 	}
 	
@@ -1093,6 +1098,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
 		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
+		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -1133,11 +1139,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredSortContacts = decrypt(cursor.getString(27));
 			String preferredSortOthers = decrypt(cursor.getString(28));
 			String firstTimeChat = decrypt(cursor.getString(29));
+			String smallGridCamera = decrypt(cursor.getString(30));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat);
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera);
 		}
 		cursor.close();
 		
@@ -1433,7 +1440,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
-	
+	public void setSmallGridCamera (boolean smallGridCamera){
+		log("setSmallGridCamera");
+
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + "='" + encrypt(smallGridCamera + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_SMALL_GRID_CAMERA, encrypt(smallGridCamera + ""));
+			db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+
+
+	public boolean isSmallGridCamera (){
+		log("isSmallGridCamera");
+
+		String selectQuery = "SELECT " + KEY_SMALL_GRID_CAMERA + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		boolean result = false;
+		if (cursor.moveToFirst()){
+
+			String smallGrid = decrypt(cursor.getString(0));
+
+			if (smallGrid == null){
+				result = false;
+			}
+			else{
+				if(smallGrid.equals("true")){
+					result = true;
+				}
+				else{
+					result = false;
+				}
+			}
+		}
+		cursor.close();
+
+		return result;
+	}
+
 	public void setAttributes (MegaAttributes attr){
 		log("setAttributes");
         ContentValues values = new ContentValues();
