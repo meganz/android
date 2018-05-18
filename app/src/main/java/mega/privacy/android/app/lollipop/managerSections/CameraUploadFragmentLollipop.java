@@ -1665,7 +1665,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							if (localPath != null){
 								File mediaFile = new File(localPath);
 								//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 									mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(psHMegaNode.getName()).getType());
 								}
 								else{
