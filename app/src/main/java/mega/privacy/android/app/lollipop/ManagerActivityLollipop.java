@@ -125,6 +125,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -2834,12 +2835,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				case CONTACTS:{
 
 					try {
-						NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-						notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
+						notificationBuilder.removeAllIncomingContactNotifications();
+						notificationBuilder.removeAllAcceptanceContactNotifications();
 					}
 					catch (Exception e){
-						log("Exception NotificationManager - remove contact notification");
+						log("Exception NotificationManager - remove all CONTACT notifications");
 					}
 
 					setToolbarTitle();
@@ -4251,13 +4254,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tB.setVisibility(View.VISIBLE);
 
 		try {
-			NotificationManager notificationManager =
-					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			ContactsAdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-			notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
+			notificationBuilder.removeAllIncomingContactNotifications();
+			notificationBuilder.removeAllAcceptanceContactNotifications();
 		}
 		catch (Exception e){
-			log("Exception NotificationManager - remove contact notification");
+			log("Exception NotificationManager - remove all CONTACT notifications");
 		}
 
 		if (aB == null){
