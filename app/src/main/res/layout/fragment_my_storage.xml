@@ -41,8 +41,7 @@
 				android:layout_marginLeft="72dp"
 				android:textColor="@color/name_my_account"
 				android:layout_centerVertical="true"
-				android:gravity="center_vertical"
-				android:text="FREE"/>
+				android:gravity="center_vertical"/>
 		</RelativeLayout>
 
 		<!--Progress bar-->
@@ -59,7 +58,7 @@
 				android:id="@+id/my_storage_progress_bar"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:minHeight="8dp"
+				android:minHeight="2dp"
 				style="@style/Widget.AppCompat.ProgressBar.Horizontal"
 				android:indeterminate="false"
 				android:max="100"/>
@@ -72,7 +71,6 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:layout_marginLeft="72dp"
-			android:text="66.05 GB of 200 GB"
 			android:textSize="14sp"
 			android:textColor="@color/name_my_account"
 			android:layout_marginBottom="14dp" />
@@ -101,7 +99,6 @@
 				android:layout_height="wrap_content"
 				android:layout_toRightOf="@+id/my_storage_account_expiration_title"
 				android:textSize="14sp"
-				android:text="2017 10 20 12:48"
 				android:textColor="@color/name_my_account"/>
 		</RelativeLayout>
 
@@ -180,7 +177,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="72dp"
 				android:layout_marginBottom="10dp"
-				android:text="Usage Storage"
+				android:text="@string/title_storage_usage"
 				android:textColor="@color/name_my_account"
 				android:textSize="16sp"/>
 
@@ -190,7 +187,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
-					android:id="@+id/cloud_drive_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="left"
@@ -218,7 +214,6 @@
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"
 						android:textSize="14sp"
-						android:text="45.52 GB"
 						android:textColor="@color/name_my_account"/>
 				</RelativeLayout>
 			</RelativeLayout>
@@ -229,7 +224,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
-					android:id="@+id/inbox_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="left"
@@ -257,7 +251,6 @@
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"
 						android:textSize="14sp"
-						android:text="761 KB"
 						android:textColor="@color/name_my_account"/>
 				</RelativeLayout>
 			</RelativeLayout>
@@ -268,7 +261,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
-					android:id="@+id/incoming_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="left"
@@ -296,7 +288,6 @@
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"
 						android:textSize="14sp"
-						android:text="11.35 GB"
 						android:textColor="@color/name_my_account"/>
 				</RelativeLayout>
 			</RelativeLayout>
@@ -307,7 +298,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
-					android:id="@+id/rubbish_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="left"
@@ -335,7 +325,6 @@
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"
 						android:textSize="14sp"
-						android:text="680.1 MB"
 						android:textColor="@color/name_my_account"/>
 				</RelativeLayout>
 			</RelativeLayout>
@@ -346,7 +335,6 @@
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
-					android:id="@+id/versions_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_gravity="left"
@@ -374,7 +362,6 @@
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"
 						android:textSize="14sp"
-						android:text="1.05 GB"
 						android:textColor="@color/name_my_account"/>
 				</RelativeLayout>
 			</RelativeLayout>

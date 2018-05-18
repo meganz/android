@@ -12,6 +12,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -47,9 +48,12 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 	RelativeLayout expirationAccountLayout;
 
 	TextView typeAccountText;
+	ImageView typeAccountIcon;
+
 	TextView expirationAccountTitle;
 	TextView expirationAccountText;
-	TextView storageAvailableText;
+//	TextView storageAvailableText;
+	ImageView transferQuotaUsedIcon;
 	TextView transferQuotaUsedText;
 
 	TextView totalUsedSpace;
@@ -106,24 +110,35 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.my_storage_parent_linear_layout);
 
+		/* Account plan */
+		typeAccountIcon = (ImageView) v.findViewById(R.id.my_storage_account_plan_icon);
 		typeAccountText = (TextView) v.findViewById(R.id.my_storage_account_plan_text);
-		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
+
+		/* Progress bar */
+		progressBar = (ProgressBar) v.findViewById(R.id.my_storage_progress_bar);
+		progressBar.setProgress(0);
+
+		/* Used space */
+		totalUsedSpace = (TextView) v.findViewById(R.id.my_storage_used_space_result_text);
+
+		/* Expiration */
 		expirationAccountLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_expiration_layout);
 		expirationAccountTitle = (TextView) v.findViewById(R.id.my_storage_account_expiration_title);
 		expirationAccountText = (TextView) v.findViewById(R.id.my_storage_account_expiration_text);
+
+		/* Transfer quota */
+		transferQuotaUsedIcon = (ImageView) v.findViewById(R.id.my_storage_account_transfer_icon);
 		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
 
-		totalUsedSpace = (TextView) v.findViewById(R.id.my_storage_used_space_result_text);
-
+		/* Usage storage */
 		cloudDriveUsedText = (TextView) v.findViewById(R.id.my_storage_account_cloud_storage_text);
 		inboxUsedText = (TextView) v.findViewById(R.id.my_storage_account_inbox_storage_text);
 		incomingUsedText = (TextView) v.findViewById(R.id.my_storage_account_incoming_storage_text);
 		rubbishUsedText = (TextView) v.findViewById(R.id.my_storage_account_rubbish_storage_text);
 		availableSpaceText = (TextView) v.findViewById(R.id.my_storage_account_available_storage_text);
 
-		progressBar = (ProgressBar) v.findViewById(R.id.my_storage_progress_bar);
-		progressBar.setProgress(0);
 
+//		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
 //		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();
 //		bottomParams.setMargins(0, 0, 0, Util.scaleHeightPx(32, outMetrics));
 //		progressBar.setLayoutParams(bottomParams);
@@ -180,10 +195,10 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
 			typeAccountText.setText(getString(R.string.recovering_info));
 			expirationAccountText.setText(getString(R.string.recovering_info));
-			storageAvailableText.setText(getString(R.string.recovering_info));
+//			storageAvailableText.setText(getString(R.string.recovering_info));
 		}
 		else{
-			storageAvailableText.setText(myAccountInfo.getTotalFormatted());
+//			storageAvailableText.setText(myAccountInfo.getTotalFormatted());
 
 			log("ExpirationTime: "+Util.getDateString(myAccountInfo.getAccountInfo().getProExpiration()));
 			log("Subscription cycle: "+myAccountInfo.getAccountInfo().getSubscriptionCycle());
