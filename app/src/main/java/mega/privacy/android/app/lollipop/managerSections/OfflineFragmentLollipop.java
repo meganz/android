@@ -211,7 +211,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
-
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
