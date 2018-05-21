@@ -529,41 +529,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 			}
 		}
-
-
-
-
-//		if (!multipleSelect) {
-////		holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-//
-//			if (positionClicked != -1) {
-//				if (positionClicked == position) {
-//					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-//					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
-//					listFragment.smoothScrollToPosition(positionClicked);
-//				}
-//				else {
-//					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-//					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
-//				}
-//			}
-//			else {
-//				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-//				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
-//			}
-//		}
-//		else {
-////			holder.imageButtonThreeDots.setVisibility(View.GONE);
-//
-//			if(this.isItemChecked(position)){
-//				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
-//				holder.separator.setBackgroundColor(Color.WHITE);
-//			}
-//			else{
-//				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-//				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
-//			}
-//		}
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
 		
@@ -583,6 +548,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.imageView.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setTag(holder);
 			holder.imageButtonThreeDots.setOnClickListener(this);
+
+			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+			holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
 
 //			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			return;
@@ -720,6 +688,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.threeDotsLayout.setVisibility(View.VISIBLE);
 			holder.threeDotsLayout.setTag(holder);
 			holder.threeDotsLayout.setOnClickListener(this);
+			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			return;
 		}
 		
