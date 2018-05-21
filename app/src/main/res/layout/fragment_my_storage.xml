@@ -51,6 +51,7 @@
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:layout_marginLeft="72dp"
+			android:layout_marginRight="16dp"
 			android:gravity="left"
 			android:orientation="horizontal"
 			android:layout_marginBottom="6dp">
@@ -108,6 +109,7 @@
 			android:layout_width="match_parent"
 			android:layout_marginLeft="72dp"
 			android:layout_height="1dp"
+			android:layout_marginRight="16dp"
 			android:background="@color/divider_upgrade_account"
 			android:orientation="horizontal"
 			android:layout_marginBottom="17dp"/>
@@ -162,6 +164,7 @@
 			android:layout_width="match_parent"
 			android:layout_marginLeft="72dp"
 			android:layout_height="1dp"
+			android:layout_marginRight="16dp"
 			android:background="@color/divider_upgrade_account"
 			android:orientation="horizontal"
 			android:layout_marginBottom="18dp"/>
