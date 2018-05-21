@@ -326,7 +326,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	private boolean isItemChecked(int position) {
 		log("isItemChecked");
-        return selectedItems.get(position);
+		if((selectedItems!=null)){
+			return selectedItems.get(position);
+		}else{
+			return false;
+		}
     }
 
 	public int getSelectedItemCount() {
