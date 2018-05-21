@@ -876,7 +876,6 @@ String mOutputFilePath;
                         finish();
                     }
 
-                    textChat.setHint(getString(R.string.type_message_hint_with_title, chatRoom.getTitle()));
                     ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
                     if(prefs!=null){
                         String written = prefs.getWrittenText();
@@ -1120,6 +1119,9 @@ String mOutputFilePath;
                                }else{
                                    tB.setOnClickListener(null);
                                }
+                           }
+                           else{
+                               tB.setOnClickListener(null);
                            }
                        }
                     }else{
@@ -5566,6 +5568,13 @@ String mOutputFilePath;
         }
         else{
             setAsRead=false;
+        }
+
+        if(chatRoom.hasCustomTitle()){
+            textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
+        }
+        else{
+            textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
         }
 
         //Update last seen position if different and there is unread messages
