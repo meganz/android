@@ -29,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -598,26 +599,42 @@ String mOutputFilePath;
                             sendIcon.setEnabled(true);
                             sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
 
-                        }
-                        else{
+                            textChat.setHint(" ");
+                            textChat.setMinLines(1);
+                            textChat.setMaxLines(5);
+
+                        }else{
                             sendIcon.setEnabled(false);
                             sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                             log("textChat:TextChangedListener:onTextChanged:lengthInvalid1:sendStopTypingNotification");
                             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+
+                            textChat.setHint(getString(R.string.type_message_hint_with_title, chatRoom.getTitle()));
+                            textChat.setMinLines(1);
+                            textChat.setMaxLines(1);
+
                         }
-                    }
-                    else {
+                    }else {
                         sendIcon.setEnabled(false);
                         sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                         log("textChat:TextChangedListener:onTextChanged:lengthInvalid2:sendStopTypingNotification");
                         megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+
+                        textChat.setHint(getString(R.string.type_message_hint_with_title, chatRoom.getTitle()));
+                        textChat.setMinLines(1);
+                        textChat.setMaxLines(1);
+
                     }
-                }
-                else{
+                }else{
                     sendIcon.setEnabled(false);
                     sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
                     log("textChat:TextChangedListener:onTextChanged:nullText:sendStopTypingNotification");
                     megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
+
+                    textChat.setHint(getString(R.string.type_message_hint_with_title, chatRoom.getTitle()));
+                    textChat.setMinLines(1);
+                    textChat.setMaxLines(1);
+
                 }
 
                 if(getCurrentFocus() == textChat)
@@ -877,6 +894,9 @@ String mOutputFilePath;
                     }
 
                     textChat.setHint(getString(R.string.type_message_hint_with_title, chatRoom.getTitle()));
+                    textChat.setMinLines(1);
+                    textChat.setMaxLines(1);
+
                     ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
                     if(prefs!=null){
                         String written = prefs.getWrittenText();
@@ -888,8 +908,6 @@ String mOutputFilePath;
                         prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "", "");
                         dbH.setChatItemPreferences(prefs);
                     }
-
-//                    log("Chat handle: "+chatRoom.getChatId()+"****"+MegaApiJava.userHandleToBase64(idChat));
 
                     boolean result = megaChatApi.openChatRoom(idChat, this);
 
