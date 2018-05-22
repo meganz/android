@@ -33,6 +33,7 @@ public class AndroidMegaChatMessage {
     }
 
     public MegaChatMessage getMessage() {
+
         return message;
     }
 
