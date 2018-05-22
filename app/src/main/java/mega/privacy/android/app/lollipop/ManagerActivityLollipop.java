@@ -11278,7 +11278,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("muFLol");
 		if (muFLol != null && muFLol.isAdded()){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(muFLol.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
 			muFLol.setNodes(nodes);
 			muFLol.getRecyclerView().invalidate();
 		}
