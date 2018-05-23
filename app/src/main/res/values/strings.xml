@@ -1866,4 +1866,6 @@
 
     <string name="text_enable_rich_links" context="Text of the dialog to enable the rich links previews on chat">Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.</string>
 
+    <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to write the decryption key</string>
+
 </resources>
