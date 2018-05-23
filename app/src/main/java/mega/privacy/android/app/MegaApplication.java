@@ -59,14 +59,14 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.3.5_195";
+	static final public String USER_AGENT = "MEGAAndroid/3.3.5_195";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
-	final static private String APP_KEY = "6tioyn8ka5l6hty";
+	final static public String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
 	private static boolean activityVisible = false;
