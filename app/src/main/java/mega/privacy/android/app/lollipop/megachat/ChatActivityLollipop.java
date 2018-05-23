@@ -2840,6 +2840,11 @@ String mOutputFilePath;
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+
+                    menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                    menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+
                 }
                 else{
                     log("Chat with permissions");
@@ -2850,6 +2855,10 @@ String mOutputFilePath;
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             log("TYPE_NODE_ATTACHMENT selected");
@@ -2872,6 +2881,10 @@ String mOutputFilePath;
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                             }
+
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
+                            menu.findItem(R.id.chat_cab_menu_import).setVisible(true);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
@@ -2892,6 +2905,10 @@ String mOutputFilePath;
                             else{
                                 menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                             }
+
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
                         }
                         else{
                             MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
@@ -2927,8 +2944,12 @@ String mOutputFilePath;
                             else{
                                 menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
                             }
+
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
                         }
                     }
                     else{
@@ -2936,6 +2957,10 @@ String mOutputFilePath;
                         boolean showDelete = true;
                         boolean showCopy = true;
                         boolean showForward = true;
+
+                        menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                        menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
 
                         for(int i=0; i<selected.size();i++) {
 
