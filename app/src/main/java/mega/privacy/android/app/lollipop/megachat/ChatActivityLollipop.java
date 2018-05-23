@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,7 +30,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -73,6 +73,7 @@ import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -82,6 +83,7 @@ import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
 import mega.privacy.android.app.components.emojicon.EmojiconsFragment;
 import mega.privacy.android.app.components.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -100,6 +102,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttach
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
@@ -3176,6 +3179,124 @@ String mOutputFilePath;
                                         else{
                                             log("Image without preview - show node attachment panel for one node");
                                             showNodeAttachmentBottomSheet(m, position);
+                                        }
+                                    }
+                                    else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio() ){
+                                        log("itemClick:isFile:isVideoReproducibleOrIsAudio");
+
+                                        String mimeType = MimeTypeList.typeForName(node.getName()).getType();
+                                        log("itemClick:FILENAME: " + node.getName() + " TYPE: "+mimeType);
+
+                                        Intent mediaIntent;
+                                        boolean internalIntent;
+                                        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported()){
+                                            mediaIntent = new Intent(Intent.ACTION_VIEW);
+                                            internalIntent=false;
+                                        }
+                                        else {
+                                            log("itemClick:setIntentToAudioVideoPlayer");
+                                            mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+                                            internalIntent=true;
+                                        }
+
+                                        String downloadLocationDefaultPath = null;
+                                        mediaIntent.putExtra("FILENAME", node.getName());
+                                        MegaPreferences prefs = dbH.getPreferences();
+                                        if (prefs != null){
+                                            log("prefs != null");
+                                            if (prefs.getStorageAskAlways() != null){
+                                                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                                                    log("askMe==false");
+                                                    if (prefs.getStorageDownloadLocation() != null){
+                                                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                                                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+                                        if (localPath != null){
+                                            File mediaFile = new File(localPath);
+                                            //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+                                                    && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                                log("itemClick:FileProviderOption");
+                                                Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                                                if(mediaFileUri==null){
+                                                    log("itemClick:ERROR:NULLmediaFileUri");
+                                                    showSnackbar(getString(R.string.email_verification_text_error));
+                                                }
+                                                else{
+                                                    mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                                                }
+                                            }
+                                            else{
+                                                Uri mediaFileUri = Uri.fromFile(mediaFile);
+                                                if(mediaFileUri==null){
+                                                    log("itemClick:ERROR:NULLmediaFileUri");
+                                                    showSnackbar(getString(R.string.email_verification_text_error));
+                                                }
+                                                else{
+                                                    mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                                                }
+                                            }
+                                            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        }
+                                        else {
+                                            log("itemClick:localPathNULL");
+
+                                            if (megaApi.httpServerIsRunning() == 0) {
+                                                megaApi.httpServerStart();
+                                            }
+                                            else{
+                                                log("itemClick:ERROR:httpServerAlreadyRunning");
+                                            }
+
+                                            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                                            ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                                            activityManager.getMemoryInfo(mi);
+
+                                            if(mi.totalMem>Constants.BUFFER_COMP){
+                                                log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
+                                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                                            }
+                                            else{
+                                                log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
+                                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                                            }
+
+                                            String url = megaApi.httpServerGetLocalLink(node);
+                                            if(url!=null){
+                                                Uri parsedUri = Uri.parse(url);
+                                                if(parsedUri!=null){
+                                                    mediaIntent.setDataAndType(parsedUri, mimeType);
+                                                }
+                                                else{
+                                                    log("itemClick:ERROR:httpServerGetLocalLink");
+                                                    showSnackbar(getString(R.string.email_verification_text_error));
+                                                }
+                                            }
+                                            else{
+                                                log("itemClick:ERROR:httpServerGetLocalLink");
+                                                showSnackbar(getString(R.string.email_verification_text_error));
+                                            }
+                                        }
+                                        mediaIntent.putExtra("HANDLE", node.getHandle());
+
+                                        if(internalIntent){
+                                            startActivity(mediaIntent);
+                                        }
+                                        else{
+                                            log("itemClick:externalIntent");
+                                            if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
+                                                startActivity(mediaIntent);
+                                            }
+                                            else{
+                                                log("itemClick:noAvailableIntent");
+                                                showNodeAttachmentBottomSheet(m, position);
+                                            }
                                         }
                                     }
                                     else{
