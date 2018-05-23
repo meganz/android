@@ -3,6 +3,27 @@
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/chat_cab_menu_download"
+        android:orderInCategory="105"
+        android:title="@string/forward_menu_item"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_download_white"/>
+
+    <item
+        android:id="@+id/chat_cab_menu_import"
+        android:orderInCategory="105"
+        android:title="@string/forward_menu_item"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_cloud_drive"/>
+
+    <item
+        android:id="@+id/chat_cab_menu_offline"
+        android:orderInCategory="105"
+        android:title="@string/forward_menu_item"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_saved_for_offline"/>
+
+    <item
         android:id="@+id/chat_cab_menu_forward"
         android:orderInCategory="105"
         android:title="@string/forward_menu_item"
