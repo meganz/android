@@ -67,17 +67,19 @@ import nz.mega.sdk.MegaShare;
 
 public class IncomingSharesFragmentLollipop extends Fragment{
 
+	public static ImageView imageDrag;
+
 	Context context;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+	public static MegaBrowserLollipopAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
 
 	RelativeLayout transfersOverViewLayout;
@@ -671,7 +673,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
         context = activity;
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
     	log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -771,7 +773,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					intent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
@@ -786,43 +788,49 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					intent.putExtra("fromShared", true);
-					startActivity(intent);
+					intent.putExtra("screenPosition", screenPosition);
+					context.startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+					mediaIntent.putExtra("position", position);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					mediaIntent.putExtra("screenPosition", screenPosition);
+					mediaIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					mediaIntent.putExtra("fromShared", true);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
+					imageDrag = imageView;
+					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
@@ -835,10 +843,28 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-			  			startActivity(mediaIntent);
+			  			context.startActivity(mediaIntent);
 			  		}
 			  		else{
 			  			Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -848,34 +874,28 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					pdfIntent.putExtra("APP", true);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					pdfIntent.putExtra("fromShared", true);
+					pdfIntent.putExtra("inside", true);
+					pdfIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
+					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
 								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -887,9 +907,29 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
 						startActivity(pdfIntent);
 					}
@@ -901,6 +941,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else{
 					adapter.notifyDataSetChanged();
