@@ -1201,6 +1201,7 @@ public class ChatController {
             Intent service = new Intent(context, DownloadService.class);
             String serializeString = document.serialize();
             log("serializeString: "+serializeString);
+            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
