@@ -942,14 +942,8 @@
         android:gravity="center"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        android:background="@color/color_background_new_messages"
+        android:background="@drawable/border"
         android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/message_background"/>
-
         <TextView
             android:id="@+id/message_chat_new_text"
             android:layout_width="wrap_content"
@@ -958,13 +952,6 @@
             android:gravity="center"
             android:textSize="14sp"
             android:textColor="@color/color_text_new_messages"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/message_background"/>
-
     </LinearLayout>
-
 
 </RelativeLayout>
