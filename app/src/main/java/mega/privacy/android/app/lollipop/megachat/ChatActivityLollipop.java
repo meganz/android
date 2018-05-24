@@ -9,6 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -139,12 +142,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
-String mOutputFilePath;
+    String mOutputFilePath;
     Uri finalUri;
     File file;
     File newFile;
     boolean newVisibility = false;
     boolean getMoreHistory=false;
+
+    MenuItem importIcon;
 
     private AlertDialog errorOpenChatDialog;
 
@@ -1846,7 +1851,7 @@ String mOutputFilePath;
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if(!Util.isOnline(this)) {
+            if(!Util.isOnline(this) || megaApi==null) {
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
@@ -2870,6 +2875,16 @@ String mOutputFilePath;
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
+
+            importIcon = menu.findItem(R.id.chat_cab_menu_import);
+            Drawable drawable = importIcon.getIcon();
+            if (drawable != null) {
+                // If we don't mutate the drawable, then all drawable's with this id will have a color
+                // filter applied to it.
+                drawable.mutate();
+                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                drawable.setAlpha(255);
+            }
             return true;
         }
 
@@ -2910,7 +2925,7 @@ String mOutputFilePath;
 
                     menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                    importIcon.setVisible(false);
 
                 }
                 else{
@@ -2925,7 +2940,7 @@ String mOutputFilePath;
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             log("TYPE_NODE_ATTACHMENT selected");
@@ -2951,7 +2966,7 @@ String mOutputFilePath;
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(true);
+                            importIcon.setVisible(true);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
@@ -2975,7 +2990,7 @@ String mOutputFilePath;
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
                         else{
                             MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
@@ -3011,12 +3026,12 @@ String mOutputFilePath;
                             else{
                                 menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                                importIcon.setVisible(false);
                             }
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
                     }
                     else{
@@ -3069,12 +3084,12 @@ String mOutputFilePath;
                         if(allNodeAttachments){
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(true);
+                            importIcon.setVisible(true);
                         }
                         else{
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
 
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
