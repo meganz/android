@@ -62,14 +62,16 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 public class OfflineFragmentLollipop extends Fragment{
+
+	public static ImageView imageDrag;
 	
 	MegaPreferences prefs;
 	
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	LinearLayoutManager mLayoutManager;
-	CustomizedGridLayoutManager gridLayoutManager;
+	public static LinearLayoutManager mLayoutManager;
+	public static CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -77,10 +79,10 @@ public class OfflineFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaOfflineLollipopAdapter adapter;
+	public static MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
-	ArrayList<MegaOffline> mOffList= null;
+	public static ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
 	boolean isList = true;
@@ -211,7 +213,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
-
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -885,7 +887,7 @@ public class OfflineFragmentLollipop extends Fragment{
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1054,63 +1056,73 @@ public class OfflineFragmentLollipop extends Fragment{
 						intent.putExtra("offlinePathDirectory", currentFile.getParent());
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
-
+						intent.putExtra("screenPosition", screenPosition);
 						if (context instanceof ManagerActivityLollipop){
 							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 							if(accountInfo!=null){
 								intent.putExtra("typeAccount", accountInfo.getAccountType());
 							}
 						}
-
 						startActivity(intent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
 						log("Video file");
 
-						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-						videoIntent.putExtra("FILENAME", currentNode.getName());
-						videoIntent.putExtra("path", currentFile.getAbsolutePath());
-						videoIntent.putExtra("pathNavigation", pathNavigation);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						Intent mediaIntent;
+						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported()) {
+							mediaIntent = new Intent(Intent.ACTION_VIEW);
 						}
-						else{
-							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						else {
+							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						}
-						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						startActivity(videoIntent);
-					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						log("Audio file");
+						if (context instanceof ManagerActivityLollipop) {
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
+							if (accountInfo != null) {
+								mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
+						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						mediaIntent.putExtra("FILENAME", currentNode.getName());
+						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
+						mediaIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						mediaIntent.putExtra("position", position);
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+						mediaIntent.putExtra("offlinePathDirectory", currentFile.getParent());
+						mediaIntent.putExtra("pathNavigation", pathNavigation);
+						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
+						mediaIntent.putExtra("screenPosition", screenPosition);
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
-						audioIntent.putExtra("FILENAME", currentNode.getName());
-						audioIntent.putExtra("path", currentFile.getAbsolutePath());
-						audioIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
-							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						startActivity(audioIntent);
-          			}
+						startActivity(mediaIntent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
+					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-						pdfIntent.putExtra("APP", true);
+						if (context instanceof ManagerActivityLollipop) {
+							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
+							if (accountInfo != null) {
+								pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+							}
+						}
+						pdfIntent.putExtra("inside", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
 						pdfIntent.putExtra("pathNavigation", pathNavigation);
+						pdfIntent.putExtra("screenPosition", screenPosition);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1119,11 +1131,13 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						context.startActivity(pdfIntent);
+						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+						imageDrag = imageView;
 					}
 					else{
 						openFile(currentFile);
-					}					
-				}					
+					}
+				}
 			}
 		}
     }
@@ -1446,15 +1460,15 @@ public class OfflineFragmentLollipop extends Fragment{
 				result = Html.fromHtml(textToShow);
 			}
 			emptyTextViewFirst.setText(result);
-		}
-		else{
+			onBackPressed();
+
+		}else{
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			contentText.setText(getInfoFolder(mOffList));
 		}
-
 		setPositionClicked(-1);
 		notifyDataSetChanged();
 	}

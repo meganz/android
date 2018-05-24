@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="195"
-    android:versionName="3.3.5 (195)" >
+    android:versionCode="196"
+    android:versionName="3.3.5 (196)" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -140,7 +140,8 @@
             android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:theme="@style/Theme.Swipe.Back">
         </activity>
 
         <activity
@@ -374,7 +375,8 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Swipe.Back">
         </activity>
 
         <activity

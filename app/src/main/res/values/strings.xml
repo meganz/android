@@ -3,7 +3,7 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.5 (195)</string>
+    <string name="app_version" context="Not translate">3.3.5 (196)</string>
     <string name="sdk_version" context="Not translate">a6a7e37</string>
     <string name="karere_version" context="Not translate">1229c65</string>
 
@@ -1843,6 +1843,9 @@
 
     <string name="general_error_internal_node_not_found" context="Error message shown when opening a file link which doesn't exist">File or folder not found. Are you logged in with a different account in your browser? You can only access files or folders from the account you are currently logged in with in the app</string>
 
+
+    <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
+
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security options</string>
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
@@ -1853,6 +1856,11 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit ">Too many requests. Please wait.</string>
 
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
+
+
+    <string name="section_playlist" context="Title of the screen Playlist">Playlist</string>
+    <string name="playlist_state_playing" context="Text shown in playlist subtitle item when a file is reproducing">Now playing...</string>
+    <string name="playlist_state_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Paused</string>
 
     <string name="context_option_print" context="Menu option to print the recovery key from Offline section">Print</string>
 
@@ -1876,6 +1884,10 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]No completed[/B][A] Transfers[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Empty[/B][A] Folder[/A][B].[/B]</string>
 
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Write message to \"%s\"&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
 
+    <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>
+    <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d files were not shared</string>
 
 </resources>
