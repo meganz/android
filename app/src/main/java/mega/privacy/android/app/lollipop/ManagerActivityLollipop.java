@@ -125,6 +125,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -390,7 +391,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	public String searchQuery = null;
+	public static String searchQuery = null;
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -2834,12 +2835,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				case CONTACTS:{
 
 					try {
-						NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-						notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
+						notificationBuilder.removeAllIncomingContactNotifications();
+						notificationBuilder.removeAllAcceptanceContactNotifications();
 					}
 					catch (Exception e){
-						log("Exception NotificationManager - remove contact notification");
+						log("Exception NotificationManager - remove all CONTACT notifications");
 					}
 
 					setToolbarTitle();
@@ -4251,13 +4254,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tB.setVisibility(View.VISIBLE);
 
 		try {
-			NotificationManager notificationManager =
-					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			ContactsAdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-			notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_INCOMING_CONTACT);
+			notificationBuilder.removeAllIncomingContactNotifications();
+			notificationBuilder.removeAllAcceptanceContactNotifications();
 		}
 		catch (Exception e){
-			log("Exception NotificationManager - remove contact notification");
+			log("Exception NotificationManager - remove all CONTACT notifications");
 		}
 
 		if (aB == null){
@@ -4989,11 +4993,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				tabLayoutTransfers.setVisibility(View.GONE);
 				viewPagerTransfers.setVisibility(View.GONE);
 
-				fragmentContainer.setVisibility(View.VISIBLE);
-
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
     			ft.commitNowAllowingStateLoss();
+
+				fragmentContainer.setVisibility(View.VISIBLE);
 
 				showFabButton();
     			break;
@@ -6134,7 +6138,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
 				log("createOptions search");
-				if (sFLol != null){
+				if (sFLol != null && sFLol.isAdded()){
 					if (createFolderMenuItem != null){
 
 						//Hide
@@ -6676,7 +6680,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
-		    			if (sFLol != null){
+		    			if (sFLol != null && sFLol.isAdded()){
 		    				sFLol.onBackPressed();
 		    				return true;
 		    			}
@@ -7112,7 +7116,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		}
     			}
 	        	if (drawerItem == DrawerItem.SEARCH){
-	        		if (sFLol != null){
+	        		if (sFLol != null && sFLol.isAdded()){
 	        			sFLol.selectAll();
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -8726,7 +8730,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     	}
 		else if (drawerItem == DrawerItem.SEARCH){
-    		if (sFLol != null){
+    		if (sFLol != null && sFLol.isAdded()){
     			if (sFLol.onBackPressed() == 0){
     				drawerItem = DrawerItem.CLOUD_DRIVE;
     				if (nV != null){
@@ -12113,7 +12117,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
-				if(sFLol!=null)
+				if(sFLol!=null && sFLol.isAdded())
 				{
 					parentHandleUpload = sFLol.getParentHandle();
 				}
@@ -14365,7 +14369,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		onNodesCloudDriveUpdate();
 
-		if (sFLol != null){
+		if (sFLol != null && sFLol.isAdded()){
 			sFLol.refresh();
 		}
 
@@ -15179,7 +15183,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case SEARCH:{
-				if(sFLol!=null){
+				if(sFLol!=null && sFLol.isAdded()){
 					log("parentHandleSearch: "+parentHandleSearch);
 
 					if(levelsSearch<0){

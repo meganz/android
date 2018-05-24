@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -376,7 +378,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
 
                     if(context instanceof ChatActivityLollipop){
-                        ((ChatActivityLollipop)context).importNode();
+                        ((ChatActivityLollipop)context).importNode(messageId);
                     }
                     else if(context instanceof NodeAttachmentActivityLollipop){
                         ((NodeAttachmentActivityLollipop)context).importNode();
@@ -403,7 +405,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     if(context instanceof ChatActivityLollipop){
 
                         if(message!=null){
-                            chatC.saveForOffline(message.getMessage());
+                            ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+                            messages.add(message);
+                            chatC.saveForOfflineWithMessages(messages);
                         }
                         else{
                             log("Message is NULL");
