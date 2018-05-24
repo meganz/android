@@ -1067,8 +1067,14 @@ public class ChatController {
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
-    public void saveForOffline(MegaChatMessage message){
-        log("saveForOffline - message");
+    public void saveForOfflineWithMessages(ArrayList<AndroidMegaChatMessage> messages){
+        log("saveForOffline - multiple messages");
+        for(int i=0; i<messages.size();i++){
+            saveForOffline(messages.get(i).getMessage().getMegaNodeList());
+        }
+    }
+
+    public void saveForOffline(MegaNodeList nodeList){
 
         File destination = null;
 
@@ -1081,7 +1087,6 @@ public class ChatController {
             }
         }
 
-        MegaNodeList nodeList = message.getMegaNodeList();
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         for (int i = 0; i < nodeList.size(); i++) {
 
@@ -1137,6 +1142,7 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
         }
+
     }
 
     public void saveForOffline(MegaNode node){
