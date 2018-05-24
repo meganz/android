@@ -34,11 +34,12 @@
             android:paddingTop="3dp"
             android:textColor="@color/white"
             android:textSize="14sp" />
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:gravity="center_horizontal">
+            android:layout_gravity="center_horizontal|center_vertical">
 
             <ImageView
                 android:id="@+id/folder_link_list_empty_image"
@@ -53,9 +54,8 @@
                 android:layout_below="@id/folder_link_list_empty_image"
                 android:layout_centerHorizontal="true"
                 android:textColor="@color/text_secondary"
-                android:textSize="16sp" />
+                android:textSize="18sp" />
             </RelativeLayout>
-
 
         <LinearLayout
             android:id="@+id/options_folder_link_layout"
