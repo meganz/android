@@ -213,7 +213,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				case R.id.cab_menu_delete:{
 					((ManagerActivityLollipop) context).showConfirmationRemoveSomeFromOffline(documents);
-
+					hideMultipleSelect();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -1460,15 +1460,15 @@ public class OfflineFragmentLollipop extends Fragment{
 				result = Html.fromHtml(textToShow);
 			}
 			emptyTextViewFirst.setText(result);
-		}
-		else{
+			onBackPressed();
+
+		}else{
 			recyclerView.setVisibility(View.VISIBLE);
 			contentTextLayout.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			contentText.setText(getInfoFolder(mOffList));
 		}
-
 		setPositionClicked(-1);
 		notifyDataSetChanged();
 	}
