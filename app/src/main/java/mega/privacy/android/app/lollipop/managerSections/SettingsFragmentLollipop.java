@@ -67,6 +67,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION;
+
 
 //import android.support.v4.preference.PreferenceFragment;
 
@@ -232,7 +234,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
-	boolean autoAccept;
+	boolean autoAccept = false;
 	
 	DatabaseHandler dbH;
 	
@@ -262,6 +264,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public int numberOfClicksKarere = 0;
 	public int numberOfClicksAppVersion = 0;
 	ListView listView;
+
+	boolean setAutoaccept = false;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1039,6 +1043,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
+		setAutoaccept = false;
+		autoAccept = false;
 		megaApi.getContactLinksOption(this);
 	}
 
@@ -1955,12 +1961,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
-			if (autoAccept){
-				megaApi.setContactLinksOption(true, this);
-			}
-			else {
-				megaApi.setContactLinksOption(false, this);
-			}
+			setAutoaccept = true;
+			megaApi.getContactLinksOption(this);
 		}
 		else if (preference.getKey().compareTo(KEY_RECOVERY_KEY) == 0){
 			log("Export Recovery Key");
@@ -2395,24 +2397,38 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 	log("onRequestFinish  MegaRequest: "+request.getType());
 
-		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER){
+		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == USER_ATTR_CONTACT_LINK_VERIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				autoAccept = request.getFlag();
 				log("OK GET ATTR USER: "+autoAccept);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				if (setAutoaccept){
+				    if (autoAccept){
+				    	log("setAutoaccept false");
+                        megaApi.setContactLinksOption(true, this);
+                    }
+                    else {
+						log("setAutoaccept true");
+                        megaApi.setContactLinksOption(false, this);
+                    }
 				}
-				else{
-					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				else {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+					}
+					else{
+						qrCodeAutoAcceptCheck.setChecked(autoAccept);
+					}
 				}
+				log("autoacept: "+autoAccept);
 			}
 			else if (e.getErrorCode() == MegaError.API_ENOENT){
 				log("Error getContactLinkOption");
 			}
 		}
-		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER){
+		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == USER_ATTR_CONTACT_LINK_VERIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("OK SET ATTR USER: "+request.getText());
+                setAutoaccept = false;
 
 				if (autoAccept){
 					autoAccept = false;
@@ -2426,6 +2442,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				else{
 					qrCodeAutoAcceptCheck.setChecked(autoAccept);
 				}
+				log("autoacept: "+autoAccept);
 			}
 			else{
 				log("Error setContactLinkOption");

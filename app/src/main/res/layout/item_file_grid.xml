@@ -124,7 +124,10 @@
         android:ellipsize="end"
         android:maxLines="1"/>
 
-</RelativeLayout><!--
+</RelativeLayout>
+
+
+    <!--
     <RelativeLayout
         android:id="@+id/file_grid_options1"
         android:layout_width="match_parent"

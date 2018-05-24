@@ -74,13 +74,14 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         if (!onTapHandled && !linkTapped) {
             ScrollHandle ps = pdfView.getScrollHandle();
             if (ps != null && !pdfView.documentFitsView()) {
-                if (!ps.shown()) {
+//                if (!ps.shown()) {
                     ps.show();
-                } else {
-                    ps.hide();
-                }
+//                } else {
+//                    ps.hide();
+//                }
             }
         }
+        ((PdfViewerActivityLollipop) pdfView.getContext()).setToolbarVisibility();
         pdfView.performClick();
         return true;
     }
@@ -150,7 +151,10 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         scrolling = true;
-        PdfViewerActivityLollipop.isScrolling = true;
+
+        if (((PdfViewerActivityLollipop) pdfView.getContext()).isToolbarVisible()){
+            ((PdfViewerActivityLollipop) pdfView.getContext()).setToolbarVisibilityHide();
+        }
 
         if (pdfView.isZooming() || pdfView.isSwipeEnabled()) {
             pdfView.moveRelativeTo(-distanceX, -distanceY);
@@ -235,14 +239,10 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             case MotionEvent.ACTION_POINTER_DOWN:
             case MotionEvent.ACTION_SCROLL:
             case MotionEvent.ACTION_MOVE:
-                if (scrolling) {
-                    PdfViewerActivityLollipop.scroll = false;
-                }
                 break;
             case MotionEvent.ACTION_UP:
                 if (scrolling) {
                     scrolling = false;
-                    PdfViewerActivityLollipop.isScrolling = false;
                     onScrollEnd(event);
                 }
                 break;
