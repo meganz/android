@@ -210,7 +210,7 @@
                                 android:textColor="@color/mail_my_account"
                                 android:textSize="14sp"
                                 android:layout_marginBottom="12dp"
-                                android:layout_gravity="center_horizontal|center_vertical"/>
+                                android:layout_gravity="left"/>
 
                         </LinearLayout>
 
@@ -926,7 +926,7 @@
                                 android:text="@string/text_enable_rich_links"
                                 android:textSize="14sp"
                                 android:layout_marginBottom="12dp"
-                                android:layout_gravity="center_horizontal|center_vertical"/>
+                                android:layout_gravity="left"/>
 
                         </LinearLayout>
 
