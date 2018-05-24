@@ -737,7 +737,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 						ContactsAdvancedNotificationBuilder notificationBuilder;
 						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-						notificationBuilder.removeAllAcceptanceContactNotifications();
 						notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
 
 						log("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());

@@ -92,7 +92,8 @@
                             android:inputType="textMultiLine|textCapSentences"
                             emojicon:emojiconSize="16sp"
                             android:minLines="1"
-                            android:maxLines="5"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:textColor="@color/black"/>
 
                         <RelativeLayout

@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,7 +15,6 @@ import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -42,12 +40,10 @@ import nz.mega.sdk.MegaUser;
 public final class ContactsAdvancedNotificationBuilder implements MegaRequestListenerInterface {
 
     private static final String GROUP_KEY_IPC = "IPCNotificationBuilder";
-
     private static final String GROUP_KEY_APC = "APCNotificationBuilder";
 
     private final Context context;
     private NotificationManager notificationManager;
-    private final SharedPreferences sharedPreferences;
     DatabaseHandler dbH;
     MegaApiAndroid megaApi;
     private int counter = 0;
@@ -64,14 +60,13 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             safeContext = appContext;
         }
         NotificationManager notificationManager = (NotificationManager) safeContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(safeContext);
-        return new ContactsAdvancedNotificationBuilder(safeContext, notificationManager, sharedPreferences, megaApi);
+
+        return new ContactsAdvancedNotificationBuilder(safeContext, notificationManager, megaApi);
     }
 
-    public ContactsAdvancedNotificationBuilder(Context context, NotificationManager notificationManager, SharedPreferences sharedPreferences, MegaApiAndroid megaApi) {
+    public ContactsAdvancedNotificationBuilder(Context context, NotificationManager notificationManager, MegaApiAndroid megaApi) {
         this.context = context.getApplicationContext();
         this.notificationManager = notificationManager;
-        this.sharedPreferences = sharedPreferences;
         dbH = DatabaseHandler.getDbHandler(context);
         this.megaApi = megaApi;
     }

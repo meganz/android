@@ -27,6 +27,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -252,6 +254,18 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		contacts = megaApi.getOutgoingContactRequests();
 		if(contacts!=null) {
 			log("Sent requests: "+contacts.size());
+			//Order by last interaction
+			Collections.sort(contacts, new Comparator<MegaContactRequest>() {
+
+				public int compare(MegaContactRequest c1, MegaContactRequest c2) {
+					long timestamp1 = c1.getModificationTime();
+					long timestamp2 = c2.getModificationTime();
+
+					long result = timestamp2 - timestamp1;
+					return (int) result;
+				}
+			});
+
 			if (adapterList == null) {
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 				listView.setAdapter(adapterList);
@@ -312,19 +326,19 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	    density  = getResources().getDisplayMetrics().density;
     	
     	contacts = megaApi.getOutgoingContactRequests();
-    	if(contacts!=null)
-    	{
-    		log("Number of requests: "+contacts.size());
-    		for(int i=0;i<contacts.size();i++)
-    		{
-    			log("-----------------REQUEST: "+i);
-    			MegaContactRequest contactRequest = contacts.get(i);
-    			log("user sent: "+contactRequest.getSourceEmail());
-    		}
-    	}
-    	else{
-    		log("Number of requests: NULL");
-    	}
+		if(contacts!=null) {
+			//Order by last interaction
+			Collections.sort(contacts, new Comparator<MegaContactRequest>() {
+
+				public int compare(MegaContactRequest c1, MegaContactRequest c2) {
+					long timestamp1 = c1.getModificationTime();
+					long timestamp2 = c2.getModificationTime();
+
+					long result = timestamp2 - timestamp1;
+					return (int) result;
+				}
+			});
+		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
     	
