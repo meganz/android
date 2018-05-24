@@ -1067,8 +1067,14 @@ public class ChatController {
         ((ChatActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
     }
 
-    public void saveForOffline(MegaChatMessage message){
-        log("saveForOffline - message");
+    public void saveForOfflineWithMessages(ArrayList<AndroidMegaChatMessage> messages){
+        log("saveForOffline - multiple messages");
+        for(int i=0; i<messages.size();i++){
+            saveForOffline(messages.get(i).getMessage().getMegaNodeList());
+        }
+    }
+
+    public void saveForOffline(MegaNodeList nodeList){
 
         File destination = null;
 
@@ -1081,7 +1087,6 @@ public class ChatController {
             }
         }
 
-        MegaNodeList nodeList = message.getMegaNodeList();
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         for (int i = 0; i < nodeList.size(); i++) {
 
@@ -1137,6 +1142,7 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
         }
+
     }
 
     public void saveForOffline(MegaNode node){
@@ -1201,6 +1207,7 @@ public class ChatController {
             Intent service = new Intent(context, DownloadService.class);
             String serializeString = document.serialize();
             log("serializeString: "+serializeString);
+            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
@@ -1423,42 +1430,34 @@ public class ChatController {
                             context.startActivity(intentZip);
 
                         }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
-                            log("Video file");
-                            File videoFile = new File(localPath);
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                            log("Video/Audio file");
+                            File mediaFile = new File(localPath);
 
-                            Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            videoIntent.putExtra("HANDLE", tempNode.getHandle());
+                            Intent mediaIntent;
+                            if (MimeTypeList.typeForName(tempNode.getName()).isVideoNotSupported()){
+                                mediaIntent = new Intent(Intent.ACTION_VIEW);
+                            }
+                            else {
+                                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            }
+                            mediaIntent.putExtra("isPlayList", false);
+                            mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
                             else{
-                                videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }
-                            videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            context.startActivity(videoIntent);
-                        }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            log("Audio file");
-                            File audioFile = new File(localPath);
-
-                            Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            audioIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            else{
-                                audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            context.startActivity(audioIntent);
+                            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            context.startActivity(mediaIntent);
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
                             log("Pdf file");
                             File pdfFile = new File(localPath);
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                            pdfIntent.putExtra("APP", true);
+                            pdfIntent.putExtra("inside", true);
                             pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());

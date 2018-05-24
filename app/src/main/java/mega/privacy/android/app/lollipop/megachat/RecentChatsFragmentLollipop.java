@@ -42,7 +42,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -1423,8 +1423,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         lastFirstVisiblePosition=0;
 
         try {
-            AdvancedNotificationBuilder notificationBuilder;
-            notificationBuilder =  AdvancedNotificationBuilder.newInstance(context, megaApi, megaChatApi);
+            ChatAdvancedNotificationBuilder notificationBuilder;
+            notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(context, megaApi, megaChatApi);
 
             notificationBuilder.removeAllChatNotifications();
         }

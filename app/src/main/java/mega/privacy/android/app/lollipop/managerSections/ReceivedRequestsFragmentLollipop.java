@@ -27,6 +27,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -277,19 +279,19 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		density  = getResources().getDisplayMetrics().density;
 
 		contacts = megaApi.getIncomingContactRequests();
-    	if(contacts!=null)
-    	{
-    		log("Number of requests: "+contacts.size());
-    		for(int i=0;i<contacts.size();i++)
-    		{
-    			log("-----------------REQUEST: "+i);
-    			MegaContactRequest contactRequest = contacts.get(i);
-    			log("user sent: "+contactRequest.getSourceEmail());
-    		}
-    	}
-    	else{
-    		log("Number of requests: NULL");
-    	}
+		if(contacts!=null) {
+			//Order by last interaction
+			Collections.sort(contacts, new Comparator<MegaContactRequest>() {
+
+				public int compare(MegaContactRequest c1, MegaContactRequest c2) {
+					long timestamp1 = c1.getModificationTime();
+					long timestamp2 = c2.getModificationTime();
+
+					long result = timestamp2 - timestamp1;
+					return (int) result;
+				}
+			});
+		}
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
     	if (isList){
@@ -377,6 +379,20 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 
 	public void updateView(){
 		contacts = megaApi.getIncomingContactRequests();
+		if(contacts!=null){
+			//Order by last interaction
+			Collections.sort(contacts, new Comparator<MegaContactRequest>(){
+
+				public int compare(MegaContactRequest c1, MegaContactRequest c2) {
+					long timestamp1 = c1.getModificationTime();
+					long timestamp2 = c2.getModificationTime();
+
+					long result = timestamp2 - timestamp1;
+					return (int)result;
+				}
+			});
+		}
+
 		if (adapterList == null){
 			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
 			listView.setAdapter(adapterList);
@@ -454,65 +470,6 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		}
 	}
 	
-	public void setContactRequests()
-	{
-		log("setContactRequests");
-		contacts = megaApi.getIncomingContactRequests();
-    	if(contacts!=null)
-    	{
-    		if(adapterList!=null)
-    		{
-    			adapterList.setContacts(contacts);
-        		adapterList.notifyDataSetChanged();
-
-				if (contacts.size() > 0) {
-					contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
-				}
-    		}
-    		else
-    		{
-    			log("adapter==NULL");
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.INCOMING_REQUEST_ADAPTER);
-    		}
-    		
-    		if (adapterList.getItemCount() == 0){				
-				log("adapterList.getCount() == 0");
-				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					emptyImageView.setImageResource(R.drawable.received_empty_landscape);
-				}else{
-					emptyImageView.setImageResource(R.drawable.received_requests_empty);
-				}
-				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.tab_received_requests));
-				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
-				}
-				catch (Exception e){}
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				emptyTextViewFirst.setText(result);
-			}
-			else{
-				log("adapterList.getCount() NOT = 0");
-				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}
-		}
-	}
-
 	public int getItemCount(){
 		if(adapterList!=null){
 			return adapterList.getItemCount();

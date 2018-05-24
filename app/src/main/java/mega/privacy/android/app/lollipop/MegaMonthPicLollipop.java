@@ -47,6 +47,10 @@ public class MegaMonthPicLollipop {
 		return nodesSite.get(node);
 	}
 
+	public ArrayList<Long> getNodeHandles(){
+		return nodeHandles;
+	}
+
 	private static void log(String txt){
 		Util.log("MegaMonthPicLollipop", txt);
 	}

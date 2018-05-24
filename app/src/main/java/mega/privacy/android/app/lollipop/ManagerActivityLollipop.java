@@ -124,7 +124,8 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.adapters.CloudDrivePagerAdapter;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
 import mega.privacy.android.app.lollipop.adapters.MyAccountPageAdapter;
@@ -221,14 +222,9 @@ import nz.mega.sdk.MegaUtilsAndroid;
 public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
-	final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
-	final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
-	final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
-	private static int REQUEST_DOWNLOAD_FOLDER = 1111;
-
 	public int accountFragment;
 
-	private long handleInviteContact = 0;
+	public long handleInviteContact = 0;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -397,7 +393,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	public String searchQuery = null;
+	public static String searchQuery = null;
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -994,9 +990,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("TAKE_PICTURE_OPTION");
 							boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
 							if (!hasCameraPermission){
-								ActivityCompat.requestPermissions(this,
-										new String[]{Manifest.permission.CAMERA},
-										Constants.REQUEST_CAMERA);
+								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constants.REQUEST_CAMERA);
 							}
 							else{
 								this.takePicture();
@@ -1050,6 +1044,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						log("No option fromTakePicture: "+fromTakePicture);
+						if(oFLol != null && oFLol.isAdded()){
+							oFLol.notifyDataSetChanged();
+						}
 					}
 				}
 	        	break;
@@ -1803,22 +1800,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						finish();
 						return;
 					}
-					else if (getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						log("Login loin");
 						handleInviteContact = getIntent().getLongExtra("handle", 0);
-						if (handleInviteContact != 0){
-							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("handle", handleInviteContact);
-							intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
-							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							intent.setAction(Constants.ACTION_INVITE_CONTACT);
-							startActivity(intent);
-							finish();
-							return;
-						}
-						else{
-							log("Error, no handle");
-						}
+
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+						intent.putExtra("handle", handleInviteContact);
+						intent.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
+						startActivity(intent);
+						finish();
+						return;
 					}
 				}
 			}
@@ -2184,16 +2177,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						getIntent().setAction(null);
 						setIntent(null);
 					}
-					else if (getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
+					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 						handleInviteContact = getIntent().getLongExtra("handle", 0);
-						if (handleInviteContact != 0){
-							drawerItem = DrawerItem.CONTACTS;
-							indexContacts = 0;
-							selectDrawerItemLollipop(drawerItem);
-						}
-						else{
-							log("Error, no handle");
-						}
+
+						drawerItem = DrawerItem.CONTACTS;
+						indexContacts = 0;
+						selectDrawerItemLollipop(drawerItem);
 					}
 				}
 	        }
@@ -2447,11 +2436,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	void passwordReminderDialogSkiped(){
 		megaApi.passwordReminderDialogSkipped(this);
-	}
-
-	public void copyMK () {
-		AccountController ac = new AccountController(this);
-		ac.copyMK(true);
 	}
 
 	@Override
@@ -2796,32 +2780,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					indexShares = 0;
 					selectDrawerItemLollipop(drawerItem);
 				}
-				else if(getIntent().getAction().equals(Constants.ACTION_INVITE_CONTACT)){
-					log("onPostResume: ACTION_INVITE_CONTACT");
+				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
+					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
 					handleInviteContact = getIntent().getLongExtra("handle", 0);
-					if (handleInviteContact != 0){
-						drawerItem = DrawerItem.CONTACTS;
-						indexContacts = 0;
-						selectDrawerItemLollipop(drawerItem);
-					}
-					else{
-						log("Error, no handle");
-					}
+
+					drawerItem = DrawerItem.CONTACTS;
+					indexContacts = 0;
+					selectDrawerItemLollipop(drawerItem);
 				}
-				else if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_EXPORTED)){
+				else if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_EXPORTED)){
 					log("onPostResume: ACTION_RECOVERY_KEY_EXPORTED");
 					exportRecoveryKey();
 				}
-				else if (getIntent().getAction().equals(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
+				else if (getIntent().getAction().equals(Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT)){
 					String parentPath = intent.getStringExtra("parentPath");
 					if (parentPath != null){
 						log("path to download: "+parentPath);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath);
+						ac.exportMK(parentPath, false);
 					}
 				}
-				else  if (getIntent().getAction().equals(ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
-					copyMK();
+				else  if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
+					AccountController ac = new AccountController(this);
+					ac.copyMK(true);
 				}
 
     			intent.setAction(null);
@@ -2864,12 +2845,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				case CONTACTS:{
 
 					try {
-						NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-						notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+						notificationBuilder.removeAllIncomingContactNotifications();
+						notificationBuilder.removeAllAcceptanceContactNotifications();
 					}
 					catch (Exception e){
-						log("Exception NotificationManager - remove contact notification");
+						log("Exception NotificationManager - remove all CONTACT notifications");
 					}
 
 					setToolbarTitle();
@@ -4301,13 +4284,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		tB.setVisibility(View.VISIBLE);
 
 		try {
-			NotificationManager notificationManager =
-					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			ContactsAdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
 
-			notificationManager.cancel(Constants.NOTIFICATION_PUSH_CONTACT);
+			notificationBuilder.removeAllIncomingContactNotifications();
+			notificationBuilder.removeAllAcceptanceContactNotifications();
 		}
 		catch (Exception e){
-			log("Exception NotificationManager - remove contact notification");
+			log("Exception NotificationManager - remove all CONTACT notifications");
 		}
 
 		if (aB == null){
@@ -4676,8 +4660,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		((MegaApplication)getApplication()).setRecentChatVisible(true);
 
 		try {
-			AdvancedNotificationBuilder notificationBuilder;
-			notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+			ChatAdvancedNotificationBuilder notificationBuilder;
+			notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
 			notificationBuilder.removeAllChatNotifications();
 		}
@@ -4776,6 +4760,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, oFLol, "oFLol");
     			ft.commitNow();
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+					if (!hasStoragePermission) {
+						ActivityCompat.requestPermissions(this,
+								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+								Constants.REQUEST_WRITE_STORAGE);
+					}
+
+//					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+//					if (!hasCameraPermission) {
+//						ActivityCompat.requestPermissions(this,
+//				                new String[]{Manifest.permission.CAMERA},
+//				                ManagerActivityLollipop.REQUEST_CAMERA);
+//					}
+
+//					if (hasStoragePermission && hasCameraPermission){
+				}
+
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -5022,11 +5025,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				tabLayoutTransfers.setVisibility(View.GONE);
 				viewPagerTransfers.setVisibility(View.GONE);
 
-				fragmentContainer.setVisibility(View.VISIBLE);
-
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sFLol, "sFLol");
     			ft.commitNowAllowingStateLoss();
+
+				fragmentContainer.setVisibility(View.VISIBLE);
 
 				showFabButton();
     			break;
@@ -5589,7 +5592,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}else{
 						thumbViewMenuItem.setVisible(false);
 					}
-					if(oFLol.getItemCount()>0){
+
+					if(oFLol.getItemCountWithoutRK()>0){
 						sortByMenuItem.setVisible(true);
 						selectMenuItem.setVisible(true);
 					}
@@ -6170,7 +6174,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
 				log("createOptions search");
-				if (sFLol != null){
+				if (sFLol != null && sFLol.isAdded()){
 					if (createFolderMenuItem != null){
 
 						//Hide
@@ -6712,9 +6716,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
-		    			if (sFLol != null){
+
+		    			if (sFLol != null && sFLol.isAdded()){
 //		    				sFLol.onBackPressed();
-							onBackPressed();
+		    				onBackPressed();
 		    				return true;
 		    			}
 		    		}
@@ -6977,8 +6982,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	return true;
 	        }
 	        case R.id.action_select:{
-	        	//TODO: multiselect
-
         		if (drawerItem == DrawerItem.CLOUD_DRIVE){
         			int index = viewPagerCDrive.getCurrentItem();
         			log("----------------------------------------INDEX: "+index);
@@ -7117,7 +7120,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 						}
 	        			else{
-	        				selectMenuItem.setVisible(false);
+							selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
 	        			}
 	        		}
@@ -7151,7 +7154,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		}
     			}
 	        	if (drawerItem == DrawerItem.SEARCH){
-	        		if (sFLol != null){
+	        		if (sFLol != null && sFLol.isAdded()){
 	        			sFLol.selectAll();
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -8345,13 +8348,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				cloudPageAdapter.notifyDataSetChanged();
 			}
 		}
+
 		setToolbarTitle();
 	}
 
 	public void refreshAfterRemoving(){
 		log("refreshAfterRemoving");
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-
 			int index = viewPagerCDrive.getCurrentItem();
 			log("----------------------------------------INDEX: "+index);
 			if(index==1){
@@ -8765,7 +8768,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     	}
 		else if (drawerItem == DrawerItem.SEARCH){
-    		if (sFLol != null){
+    		if (sFLol != null && sFLol.isAdded()){
     			if (sFLol.onBackPressed() == 0){
     				drawerItem = DrawerItem.CLOUD_DRIVE;
     				if (nV != null){
@@ -11545,7 +11548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	void exportRecoveryKey (){
 		AccountController aC = new AccountController(this);
-		aC.exportMK(null);
+		aC.exportMK(null, false);
 	}
 
 	public void showConfirmationRemoveMK(){
@@ -11622,9 +11625,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
 			}
 		}
 
@@ -11636,7 +11637,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 						String pathNavigation = getPathNavigationOffline();
 						NodeController nC = new NodeController(managerActivity);
-
 						for (int i=0;i<documents.size();i++){
 							nC.deleteOffline(documents.get(i), pathNavigation);
 						}
@@ -12155,7 +12155,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 			else if (drawerItem == DrawerItem.SEARCH){
-				if(sFLol!=null)
+				if(sFLol!=null && sFLol.isAdded())
 				{
 					parentHandleUpload = sFLol.getParentHandle();
 				}
@@ -12471,14 +12471,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }
 		}
-		else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			if (parentPath != null){
 				String[] split = Util.rKFile.split("/");
 				String path = parentPath+"/"+split[split.length-1];
-				log("path to download: "+path);
+				log("REQUEST_DOWNLOAD_FOLDER:path to download: "+path);
 				AccountController ac = new AccountController(this);
-				ac.exportMK(path);
+				ac.exportMK(path, false);
+			}
+		}
+		else if (requestCode == Constants.REQUEST_SAVE_MK_FROM_OFFLINE && resultCode == RESULT_OK){
+			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			if (parentPath != null){
+				String[] split = Util.rKFile.split("/");
+				String path = parentPath+"/"+split[split.length-1];
+				log("REQUEST_SAVE_MK_FROM_OFFLINE:path to download: "+path);
+				AccountController ac = new AccountController(this);
+				ac.exportMK(path, true);
 			}
 		}
 		else{
@@ -12911,10 +12921,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			oFLol.hideMultipleSelect();
 			if(mOff==null){
 				oFLol.refresh();
+
 			}
 			else{
 				oFLol.refreshPaths(mOff);
 			}
+			supportInvalidateOptionsMenu();
 		}
 	}
 
@@ -13849,7 +13861,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-
 			log("requestFinish "+MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (statusDialog != null){
@@ -14396,7 +14407,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		onNodesCloudDriveUpdate();
 
-		if (sFLol != null){
+		if (sFLol != null && sFLol.isAdded()){
 			sFLol.refresh();
 		}
 
@@ -15210,7 +15221,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
 			case SEARCH:{
-				if(sFLol!=null){
+				if(sFLol!=null && sFLol.isAdded()){
 					log("parentHandleSearch: "+parentHandleSearch);
 
 					if(levelsSearch<0){
