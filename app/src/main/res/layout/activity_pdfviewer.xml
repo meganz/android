@@ -4,22 +4,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/pdf_viewer_container"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black">
 
         <com.github.barteksc.pdfviewer.PDFView
             android:id="@+id/pdfView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/black">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_pdf_viewer"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/white"
-                app:titleTextColor="@color/black"
+                android:layout_height="wrap_content"
                 android:elevation="4dp"
+                android:background="@color/transparent_black"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                android:fitsSystemWindows="true"/>
+
+            <RelativeLayout
+                android:id="@+id/pdf_viewer_page_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="24dp"
+                android:layout_marginBottom="24dp"
+                android:padding="8dp"
+                android:background="@drawable/shape_page_number">
+
+                <TextView
+                    android:id="@+id/pdf_viewer_actual_page_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/pdf_viewer_of_page_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/pdf_viewer_actual_page_number"
+                    android:text=" of "/>
+
+                <TextView
+                    android:id="@+id/pdf_viewer_total_page_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/pdf_viewer_of_page_number"/>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -43,7 +83,7 @@
                         android:layout_centerVertical="true"/>
 
                     <TextView
-                        android:id="@+id/full_image_viewer_file_name"
+                        android:id="@+id/pdf_viewer_save_to_cloud"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
@@ -57,6 +97,37 @@
                 </RelativeLayout>
 
             </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:id="@+id/pdf_viewer_layout_bottom"
+                android:background="@color/transparent_black"
+                android:layout_alignParentBottom="true">
+
+                <TextView
+                    android:id="@+id/pdf_viewer_file_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:singleLine="true"
+                    android:fontFamily="Roboto"
+                    android:ellipsize="middle"/>
+
+            </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/pdf_viewer_progress_bar"
+                style="?android:attr/progressBarStyleLargeInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="30dp" />
 
         </com.github.barteksc.pdfviewer.PDFView>
 

@@ -17,20 +17,20 @@
 
 		<RelativeLayout
 			android:layout_width="match_parent"
-			android:layout_height="match_parent">
+			android:layout_height="wrap_content">
 
 			<RelativeLayout
 				android:id="@+id/player_layout"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent"
+				android:layout_height="wrap_content"
 				android:background="@color/black">
 
 				<com.google.android.exoplayer2.ui.SimpleExoPlayerView
 					android:id="@+id/player_view"
 					android:focusable="true"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"/>
-
+					android:layout_height="match_parent"
+					app:controller_layout_id="@layout/player_control_view"/>
 
 			</RelativeLayout>
 
@@ -39,39 +39,32 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@color/transparent_black"
+				android:minHeight="?attr/actionBarSize"
 				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
 				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 				android:fitsSystemWindows="true"/>
 
-			<RelativeLayout
-				android:id="@+id/audio_container"
+			<ProgressBar
+				android:id="@+id/full_video_viewer_progress_bar"
+				style="?android:attr/progressBarStyleLargeInverse"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerHorizontal="true"
-				android:layout_centerVertical="true">
-
-
-				<ImageView
-					android:id="@+id/audio_imageview"
-					android:layout_width="100dp"
-					android:layout_height="100dp"
-					android:layout_centerHorizontal="true"
-					android:src="@drawable/ic_audiotrack_white"/>
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_below="@id/audio_imageview"
-					android:text="@string/audio_play"
-					android:textStyle="bold"
-					android:textSize="30sp"
-					android:layout_margin="20dp"
-					android:textColor="@color/white"
-					android:layout_centerHorizontal="true"/>
-
-			</RelativeLayout>
+				android:layout_centerVertical="true"
+				android:layout_centerInParent="true"
+				android:layout_marginTop="30dp" />
 
 		</RelativeLayout>
+
+
+
+		<FrameLayout
+			android:id="@+id/fragment_container"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_below="@id/call_toolbar"
+			app:layout_behavior="@string/appbar_scrolling_view_behavior"
+			android:clipChildren="false"/>
 
 	</android.support.design.widget.AppBarLayout>
 

@@ -158,6 +158,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	private long[] moveFromHandles;
 	private long[] copyFromHandles;
+	private long[] importChatHandles;
 	private ArrayList<String> selectedContacts;
 	private String imagePath;
 	private boolean folderSelected = false;
@@ -691,6 +692,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
 					mode = IMPORT;
+
+					importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
@@ -1391,6 +1394,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			Intent intent = new Intent();
 			intent.putExtra("IMPORT_TO", parentNode.getHandle());
 			intent.putExtra("fragmentH",fragmentHandle);
+
+
+			if(importChatHandles!=null){
+				intent.putExtra("HANDLES_IMPORT_CHAT", importChatHandles);
+			}
 
 			setResult(RESULT_OK, intent);
 			log("finish!");
