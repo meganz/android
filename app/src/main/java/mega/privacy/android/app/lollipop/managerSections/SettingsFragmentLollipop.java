@@ -97,8 +97,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 	public static String CATEGORY_QR_CODE = "settings_qrcode";
 	public static String CATEGORY_SECURITY = "settings_security";
+	public static String CATEGORY_2FA = "settings_2fa";
 
 	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
+	public static String KEY_2FA = "settings_2fa_activated";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -161,6 +163,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory qrCodeCategory;
 	SwitchPreference qrCodeAutoAcceptSwitch;
 	TwoLineCheckPreference qrCodeAutoAcceptCheck;
+
+	PreferenceCategory twoFACategory;
+	SwitchPreference twoFASwitch;
+	TwoLineCheckPreference twoFACheck;
 
 	PreferenceScreen preferenceScreen;
 
@@ -299,6 +305,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
 		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
 		securityCategory = (PreferenceCategory) findPreference(CATEGORY_SECURITY);
+		twoFACategory = (PreferenceCategory) findPreference(CATEGORY_2FA);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -312,6 +319,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			qrCodeAutoAcceptSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
 			qrCodeAutoAcceptSwitch.setOnPreferenceClickListener(this);
+
+			twoFASwitch = (SwitchPreference) findPreference(KEY_2FA);
+			twoFASwitch.setOnPreferenceClickListener(this);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -325,6 +335,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			qrCodeAutoAcceptCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
 			qrCodeAutoAcceptCheck.setOnPreferenceClickListener(this);
+
+			twoFACheck = (TwoLineCheckPreference) findPreference(KEY_2FA);
+			twoFACheck.setOnPreferenceClickListener(this);
 		}
 
 		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
@@ -1972,6 +1985,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			log("Change password");
 			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
 			startActivity(intent);
+		}
+		else if (preference.getKey().compareTo(KEY_2FA) == 0){
+//			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 		}
 		
 		return true;

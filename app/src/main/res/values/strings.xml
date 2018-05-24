@@ -1881,4 +1881,9 @@
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Write message to \"%s\"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
+
+    <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Two-Factor Authentication</string>
+    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication">Two-Factor Authentication helps to keep your account more secure.</string>
+    <string name="see_recovery_key" context="Preference on Two-Factor Authentication setting that permits see the Recovery Key">SEE RECOVERY KEY</string>
+    <string name="reset_authentication_app" context="Preference on Two-Factor Authentication setting that permits reset the Authentication app">Reset Authentication App</string>
 </resources>
