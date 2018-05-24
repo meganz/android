@@ -286,6 +286,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             megaChatApi.pushReceived(beep);
                             beep = false;
 
+                            chatNotificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
                             h = new Handler(Looper.getMainLooper());
                             h.postDelayed(
                                     new Runnable() {
@@ -294,7 +296,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                             boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
                                             if(!shown){
                                                 log("Show simple notification - no connection finished");
-                                                notificationBuilder.showSimpleNotification();
+                                                chatNotificationBuilder.showSimpleNotification();
                                             }
                                             else{
                                                 log("Notification already shown");
