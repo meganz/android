@@ -36,26 +36,33 @@
             android:textSize="14sp" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center_horizontal|center_vertical">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/options_explorer_layout">
 
-            <ImageView
-                android:id="@+id/folder_link_list_empty_image"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_horizontal|center_vertical">
 
-            <TextView
-                android:id="@+id/folder_link_list_empty_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/folder_link_list_empty_image"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/text_secondary"
-                android:textSize="18sp" />
+                <ImageView
+                    android:id="@+id/folder_link_list_empty_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/folder_link_list_empty_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/folder_link_list_empty_image"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="18sp" />
             </RelativeLayout>
+
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/options_folder_link_layout"
