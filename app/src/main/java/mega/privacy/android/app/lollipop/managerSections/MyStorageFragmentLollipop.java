@@ -195,6 +195,7 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
 			typeAccountText.setText(getString(R.string.recovering_info));
 			expirationAccountText.setText(getString(R.string.recovering_info));
+			typeAccountIcon.setVisibility(View.GONE);
 //			storageAvailableText.setText(getString(R.string.recovering_info));
 		}
 		else{
@@ -208,11 +209,15 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 
 				case 0:{
 					typeAccountText.setText(R.string.free_account);
+					typeAccountIcon.setVisibility(View.VISIBLE);
+					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_free_crest));
 					expirationAccountLayout.setVisibility(View.GONE);
 					break;
 				}
 				case 1:{
 					typeAccountText.setText(getString(R.string.pro1_account));
+					typeAccountIcon.setVisibility(View.VISIBLE);
+					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_1_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -225,6 +230,8 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 				}
 				case 2:{
 					typeAccountText.setText(getString(R.string.pro2_account));
+					typeAccountIcon.setVisibility(View.VISIBLE);
+					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_2_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -237,6 +244,8 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 				}
 				case 3:{
 					typeAccountText.setText(getString(R.string.pro3_account));
+					typeAccountIcon.setVisibility(View.VISIBLE);
+					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_3_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -249,6 +258,8 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 				}
 				case 4:{
 					typeAccountText.setText(getString(R.string.prolite_account));
+					typeAccountIcon.setVisibility(View.VISIBLE);
+					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_lite_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
