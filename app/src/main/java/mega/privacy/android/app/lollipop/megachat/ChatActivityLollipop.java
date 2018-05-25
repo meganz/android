@@ -823,7 +823,6 @@ String mOutputFilePath;
 
                 @Override
                 public void onGlobalLayout() {
-                    log("onGlobalLayout");
                     InputMethodManager imm = (InputMethodManager) ChatActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 
                     if (firstSize == -1){
@@ -1431,7 +1430,7 @@ String mOutputFilePath;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenuLollipop");
+//        log("onCreateOptionsMenuLollipop");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
@@ -1449,7 +1448,7 @@ String mOutputFilePath;
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        log("onPrepareOptionsMenu");
+//        log("onPrepareOptionsMenu");
         if(chatRoom!=null){
 
             if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
@@ -4100,8 +4099,13 @@ String mOutputFilePath;
                             positionLastMessage = positionLastMessage + 1;
                             message = messages.get(positionLastMessage);
                         }
+//                        if(isTurn){
+//                            scrollToMessage(-1);
+//
+//                        }else{
+                            scrollToMessage(lastIdMsgSeen);
 
-                        scrollToMessage(lastIdMsgSeen);
+//                        }
                     }
                     else{
                         log("Error, the position to scroll is more than size of messages");
@@ -4196,7 +4200,7 @@ String mOutputFilePath;
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageUpdate!: "+ msg.getMsgId());
+//        log("onMessageUpdate!: "+ msg.getMsgId());
 
         int resultModify = -1;
         if(msg.isDeleted()){
@@ -5636,6 +5640,7 @@ String mOutputFilePath;
 
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState){
         log("onSaveInstanceState");
@@ -5644,6 +5649,7 @@ String mOutputFilePath;
         outState.putLong("selectedMessageId", selectedMessageId);
         outState.putInt("selectedPosition", selectedPosition);
         outState.putInt("typeMessageJump",typeMessageJump);
+
         if(messageJumpLayout.getVisibility() == View.VISIBLE){
             visibilityMessageJump = true;
         }else{
@@ -5878,9 +5884,8 @@ String mOutputFilePath;
        //If the chat is being opened do not update, onLoad will do that
 
         if(!isOpeningChat) {
-           if(lastSeenReceived == true){
+            if(lastSeenReceived == true){
                long unreadCount = chatRoom.getUnreadCount();
-
                if (unreadCount != 0) {
                    lastIdMsgSeen = megaChatApi.getLastMessageSeenId(idChat);
 
@@ -5890,7 +5895,6 @@ String mOutputFilePath;
                        AndroidMegaChatMessage androidMessage = messages.get(i);
 
                        if (!androidMessage.isUploading()) {
-
                            MegaChatMessage msg = androidMessage.getMessage();
                            if (msg.getMsgId() == lastIdMsgSeen) {
                                positionLastMessage = i;
@@ -5910,12 +5914,11 @@ String mOutputFilePath;
                    }
 
                    generalUnreadCount = unreadCount;
-
                    scrollToMessage(lastIdMsgSeen);
                }
                else{
                    if(generalUnreadCount!=0){
-                       scrollToMessage(lastIdMsgSeen);
+                       scrollToMessage(-1);
                    }
                }
            }
@@ -5949,8 +5952,6 @@ String mOutputFilePath;
     }
 
     public void scrollToMessage(long lastId){
-        log("scrollToMessage");
-
         for(int i=messages.size()-1; i>=0;i--) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
 
@@ -6082,7 +6083,7 @@ String mOutputFilePath;
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-        log("onChatConnectionStateUpdate: "+newState);
+//        log("onChatConnectionStateUpdate: "+newState);
 
         supportInvalidateOptionsMenu();
 
