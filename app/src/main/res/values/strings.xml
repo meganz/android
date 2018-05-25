@@ -1883,7 +1883,10 @@
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Two-Factor Authentication</string>
-    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication">Two-Factor Authentication helps to keep your account more secure.</string>
+    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Two-Factor Authentication helps to keep your account more secure.</string>
     <string name="see_recovery_key" context="Preference on Two-Factor Authentication setting that permits see the Recovery Key">SEE RECOVERY KEY</string>
     <string name="reset_authentication_app" context="Preference on Two-Factor Authentication setting that permits reset the Authentication app">Reset Authentication App</string>
+    <string name="peference_enable_sms_2fa" context="Preference on Two-Factor Authentication setting that permits enable sms token authentication">Enable SMS Token authentication</string>
+    <string name="summary_preference_2fa_enable_sms" context="Subtitle of preference Enable sms token authentication">A six code will be sent to your mobile number.</string>
+    <string name="setting_subtitle_2fa_enabled" context="Subtitle of setting Two-Factor Authentication when the preference is enabled">To disable or reset two-factor authentication you need the 22-digit code in your <b>RecoveryKey.txt</b></string>
 </resources>
