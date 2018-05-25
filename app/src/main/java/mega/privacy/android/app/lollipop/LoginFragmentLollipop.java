@@ -585,9 +585,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                 intent.setData(uriData);
                             }
-                            else  if (action.equals(Constants.ACTION_INVITE_CONTACT)){
+                            else  if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = Constants.ACTION_INVITE_CONTACT;
+                                action = Constants.ACTION_OPEN_CONTACTS_SECTION;
                                 if(intentReceived.getLongExtra("handle", 0) != 0){
                                     intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
                                 }
@@ -644,7 +644,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                             intent.setData(uriData);
                         }
-                        else if (action.equals(Constants.ACTION_INVITE_CONTACT)){
+                        else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             if(intentReceived.getLongExtra("handle", 0) != 0){
                                 intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
@@ -1581,9 +1581,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                     action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                     intent.setData(uriData);
                                 }
-                                else if (action.equals(Constants.ACTION_INVITE_CONTACT)){
+                                else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                                     intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
-                                    action = Constants.ACTION_INVITE_CONTACT;
+                                    action = Constants.ACTION_OPEN_CONTACTS_SECTION;
                                 }
                                 intent.setAction(action);
                                 if (url != null){
