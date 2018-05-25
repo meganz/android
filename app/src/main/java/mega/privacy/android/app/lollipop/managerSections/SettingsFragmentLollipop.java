@@ -2006,37 +2006,33 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				if (twoFASwitch.isChecked()){
 					log("2FA is Checked");
-					twoFASwitch.setChecked(false);
-					twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa));
-					twoFASeeRK.setShouldDisableView(true);
-					twoFaResetAuthenticationApp.setShouldDisableView(true);
-					twoFAEnableSms.setShouldDisableView(true);
+                    twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
+                    twoFACategory.addPreference(twoFASeeRK);
+                    twoFACategory.addPreference(twoFaResetAuthenticationApp);
+                    twoFACategory.addPreference(twoFAEnableSms);
 				}
 				else {
 					log("2FA is NOT Checked");
-					twoFASwitch.setChecked(true);
-					twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
-					twoFASeeRK.setShouldDisableView(false);
-					twoFaResetAuthenticationApp.setShouldDisableView(false);
-					twoFAEnableSms.setShouldDisableView(false);
+                    twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa));
+					twoFACategory.removePreference(twoFASeeRK);
+					twoFACategory.removePreference(twoFaResetAuthenticationApp);
+					twoFACategory.removePreference(twoFAEnableSms);
 				}
 			}
 			else{
 				if (twoFACheck.isChecked()){
 					log("2FA is Checked");
-					twoFACheck.setChecked(false);
-					twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa));
-					twoFASeeRK.setShouldDisableView(true);
-					twoFaResetAuthenticationApp.setShouldDisableView(true);
-					twoFAEnableSms.setShouldDisableView(true);
+                    twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
+					twoFACategory.addPreference(twoFASeeRK);
+					twoFACategory.addPreference(twoFaResetAuthenticationApp);
+					twoFACategory.addPreference(twoFAEnableSms);
 				}
 				else {
 					log("2FA is NOT Checked");
-					twoFACheck.setChecked(true);
-					twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
-					twoFASeeRK.setShouldDisableView(false);
-					twoFaResetAuthenticationApp.setShouldDisableView(false);
-					twoFAEnableSms.setShouldDisableView(false);
+					twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa));
+					twoFACategory.removePreference(twoFASeeRK);
+					twoFACategory.removePreference(twoFaResetAuthenticationApp);
+					twoFACategory.removePreference(twoFAEnableSms);
 				}
 			}
 		}
