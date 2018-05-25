@@ -3,7 +3,7 @@
 <resources>
     <dimen name="width_passwd_shape">62dp</dimen>
 
-    <dimen name="width_qr">42dp</dimen>
+    <!--<dimen name="width_qr">42dp</dimen>
     <dimen name="start_avatar_qr">50.5dp</dimen>
-    <dimen name="end_avatar_qr">92dp</dimen>
+    <dimen name="end_avatar_qr">92dp</dimen>-->
 </resources>

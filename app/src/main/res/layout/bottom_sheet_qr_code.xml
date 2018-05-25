@@ -75,7 +75,7 @@
             android:layout_marginLeft="5dp"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:src="@drawable/ic_b_pick_file_system"
+            android:src="@drawable/ic_pick_file_system"
             android:visibility="visible" />
 
         <TextView

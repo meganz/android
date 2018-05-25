@@ -388,7 +388,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     }
 	
 	public TouchImageView getVisibleImage(int position){
-		return visibleImgs.get(position).imgDisplay;
+		if (visibleImgs.get(position) != null){
+			return visibleImgs.get(position).imgDisplay;
+		}
+		return null;
+	}
+
+	public Long getImageHandle(int position) {
+		return imageHandles.get(position);
 	}
 
 	@Override

@@ -206,6 +206,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
+			}
+			else{
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
+			}
+
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 

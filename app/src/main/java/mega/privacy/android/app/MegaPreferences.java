@@ -33,6 +33,7 @@ public class MegaPreferences{
 	String preferredSortContacts = "";
 	String preferredSortOthers = "";
 	String firstTimeChat = "";
+	String smallGridCamera = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -41,7 +42,7 @@ public class MegaPreferences{
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat){
+			String preferredSortOthers, String firstTimeChat, String smallGridCamera){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -71,6 +72,7 @@ public class MegaPreferences{
 		this.preferredSortContacts = preferredSortContacts;
 		this.preferredSortOthers = preferredSortOthers;
 		this.firstTimeChat = firstTimeChat;
+		this.smallGridCamera = smallGridCamera;
 	}
 
 	public String getFirstTime (){
@@ -314,6 +316,14 @@ public class MegaPreferences{
 
 	public void setFirstTimeChat(String firstTimeChat){
 		this.firstTimeChat = firstTimeChat;
+	}
+
+	public String getSmallGridCamera() {
+		return smallGridCamera;
+	}
+
+	public void setSmallGridCamera(String smallGridCamera) {
+		this.smallGridCamera = smallGridCamera;
 	}
 }
 

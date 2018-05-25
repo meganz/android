@@ -167,7 +167,13 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-        int heightFrag = Util.scaleWidthPx(240, outMetrics);
+        int heightFrag;
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            heightFrag = Util.scaleWidthPx(100, outMetrics);
+        }else{
+            heightFrag = Util.scaleWidthPx(240, outMetrics);
+
+        }
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
