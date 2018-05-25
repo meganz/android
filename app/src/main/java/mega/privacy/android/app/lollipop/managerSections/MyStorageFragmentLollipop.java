@@ -257,7 +257,8 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 					break;
 				}
 				case 4:{
-					typeAccountText.setText(getString(R.string.prolite_account));
+					String textLite = getString(R.string.prolite_account);
+					typeAccountText.setText(textLite.toUpperCase());
 					typeAccountIcon.setVisibility(View.VISIBLE);
 					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_lite_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
