@@ -2736,6 +2736,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 infoToShow = adjustInfoToShow(index);
             }
+
             if (adapter == null){
                 log("adapter NULL");
                 adapter = new MegaChatLollipopAdapter(this, chatRoom, messages, listView);
@@ -4521,6 +4522,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             else if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
                 log("STATUS_SERVER_RECEIVED");
+
+                if(msg.getType()==MegaChatMessage.TYPE_NORMAL){
+                    if(msg.getUserHandle()==megaChatApi.getMyUserHandle()){
+                        checkMegaLink(msg);
+                    }
+                }
+
                 resultModify = modifyMessageReceived(androidMsg, true);
                 log("onMessageUpdate: resultModify: "+resultModify);
             }
