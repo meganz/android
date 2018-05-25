@@ -29,9 +29,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_centerInParent="true"
-					android:layout_gravity="center_horizontal"
-					android:src="@drawable/ic_send_black"
-					android:background="@null"/>
+					android:layout_gravity="center_horizontal"/>
 			</RelativeLayout>
 			<TextView
 				android:id="@+id/my_storage_account_plan_text"
@@ -131,7 +129,7 @@
 					android:layout_height="wrap_content"
 					android:layout_centerInParent="true"
 					android:layout_gravity="center_horizontal"
-					android:src="@drawable/ic_send_black"
+					android:src="@drawable/ic_transfers_quota_storage"
 					android:background="@null"/>
 			</RelativeLayout>
 			<LinearLayout
@@ -195,7 +193,7 @@
 					android:layout_gravity="left"
 					android:layout_marginLeft="28dp"
 					android:layout_centerVertical="true"
-					android:src="@drawable/ic_pick_cloud_drive"
+					android:src="@drawable/ic_b_cd_storage"
 					android:background="@null"/>
 				<RelativeLayout
 					android:layout_width="match_parent"
@@ -232,7 +230,7 @@
 					android:layout_gravity="left"
 					android:layout_marginLeft="28dp"
 					android:layout_centerVertical="true"
-					android:src="@drawable/inbox_grey"
+					android:src="@drawable/ic_b_inbox_storage"
 					android:background="@null"/>
 				<RelativeLayout
 					android:layout_width="match_parent"
@@ -269,7 +267,7 @@
 					android:layout_gravity="left"
 					android:layout_marginLeft="28dp"
 					android:layout_centerVertical="true"
-					android:src="@drawable/shared_items_grey"
+					android:src="@drawable/ic_b_incoming_storage"
 					android:background="@null"/>
 				<RelativeLayout
 					android:layout_width="match_parent"
@@ -306,7 +304,7 @@
 					android:layout_gravity="left"
 					android:layout_marginLeft="28dp"
 					android:layout_centerVertical="true"
-					android:src="@drawable/ic_rubbish_bin"
+					android:src="@drawable/ic_b_rubbish_bin_storage"
 					android:background="@null"/>
 				<RelativeLayout
 					android:layout_width="match_parent"
@@ -343,7 +341,7 @@
 					android:layout_gravity="left"
 					android:layout_marginLeft="28dp"
 					android:layout_centerVertical="true"
-					android:src="@drawable/ic_versions_black"
+					android:src="@drawable/ic_versions_storage"
 					android:background="@null"/>
 				<RelativeLayout
 					android:layout_width="match_parent"
