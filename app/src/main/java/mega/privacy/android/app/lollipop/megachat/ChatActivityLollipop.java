@@ -10,9 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -2999,14 +2996,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             inflater.inflate(R.menu.messages_chat_action, menu);
 
             importIcon = menu.findItem(R.id.chat_cab_menu_import);
-            Drawable drawable = importIcon.getIcon();
-            if (drawable != null) {
-                // If we don't mutate the drawable, then all drawable's with this id will have a color
-                // filter applied to it.
-                drawable.mutate();
-                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                drawable.setAlpha(255);
-            }
+//            Drawable drawable = importIcon.getIcon();
+//            if (drawable != null) {
+//                // If we don't mutate the drawable, then all drawable's with this id will have a color
+//                // filter applied to it.
+//                drawable.mutate();
+//                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+//                drawable.setAlpha(255);
+//            }
             return true;
         }
 
