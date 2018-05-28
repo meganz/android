@@ -1874,6 +1874,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a valid password</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
+    <string name="title_storage_usage" context="title of usage storage section in Storage">Usage Storage</string>
 
     <plurals name="plural_number_contact_request_notification" context="Notification title to show the number of incoming contact request">
         <item context="contact request" quantity="one">%1$d pending contact request</item>
