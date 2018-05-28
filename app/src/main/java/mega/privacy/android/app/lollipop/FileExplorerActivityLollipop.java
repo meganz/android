@@ -140,6 +140,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	MenuItem newChatMenuItem;
 
 	FrameLayout cloudDriveFrameLayout;
+	private long fragmentHandle  = -1;
 
 	private String gSession;
     UserCredentials credentials;
@@ -356,8 +357,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		
 		megaApi.addGlobalListener(this);
+
+		if (Util.isChatEnabled()) {
+			if (megaChatApi == null) {
+				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+			}
+		}
 		
 		setContentView(R.layout.activity_file_explorer);
 		
@@ -381,6 +387,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
 		tabLayoutExplorer =  (TabLayout) findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);
+		viewPagerExplorer.setOffscreenPageLimit(3);
 		
 		//Layout for login if needed
 		loginLoggingIn = (LinearLayout) findViewById(R.id.file_logging_in_layout);
@@ -421,11 +428,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				gSession = credentials.getSession();
 
 				if(Util.isChatEnabled()){
-
 					log("onCreate: Chat is ENABLED");
-					if (megaChatApi == null){
-						megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-					}
 
 					int ret = megaChatApi.getInitState();
 
@@ -488,8 +491,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 	
 	private void afterLoginAndFetch(){
-		log("afterLoginAndFetch");
-		
 		handler = new Handler();
 
 		log("SHOW action bar");
@@ -689,7 +690,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
-					log("action = ACTION_PICK_IMPORT_FOLDER");
 					mode = IMPORT;
 
 					if (mTabsAdapterExplorer == null){
@@ -1376,15 +1376,22 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			this.backToCloud(handle);
 		}
 		else if (mode == IMPORT){
-			log("mode IMPORT");
 			long parentHandle = handle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if(parentNode == null){
 				parentNode = megaApi.getRootNode();
 			}
+
+			if(tabShown==CLOUD_TAB){
+				fragmentHandle= megaApi.getRootNode().getHandle();
+			}else if(tabShown == INCOMING_TAB){
+				fragmentHandle = -1;
+			}
 			
 			Intent intent = new Intent();
 			intent.putExtra("IMPORT_TO", parentNode.getHandle());
+			intent.putExtra("fragmentH",fragmentHandle);
+
 			setResult(RESULT_OK, intent);
 			log("finish!");
 			finishActivity();

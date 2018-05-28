@@ -118,7 +118,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
-
+	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public void activateActionMode(){
@@ -245,6 +245,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
+					clearSelections();
+					hideMultipleSelect();
+
 					break;
 				}
 				case R.id.cab_menu_share_link_remove:{
@@ -255,6 +258,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
+					clearSelections();
+					hideMultipleSelect();
 
 					break;
 				}
@@ -266,10 +271,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
+					clearSelections();
+					hideMultipleSelect();
 					break;
 				}
-
-
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.selectChatsToSendNodes(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -317,6 +331,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			List<MegaNode> selected = adapter.getSelectedNodes();
 
 			boolean showDownload = false;
+			boolean showSendToChat = false;
 			boolean showRename = false;
 			boolean showCopy = false;
 			boolean showMove = false;
@@ -356,6 +371,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				showMove = true;
 				showCopy = true;
 				showShare = true;
+				allFiles = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -364,15 +380,27 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						break;
 					}
 					//if(showShare){
-						if(selected.get(i).isFile()){
-							showShare = false;
-						}else{
-							if(selected.size()==1){
-								showShare=true;
-							}
-
+					if(selected.get(i).isFile()){
+						showShare = false;
+					}else{
+						if(selected.size()==1){
+							showShare=true;
 						}
+					}
 					//}
+				}
+
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
 				}
 
 				MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
@@ -395,6 +423,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 
@@ -569,7 +600,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
@@ -758,7 +789,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					contentText.setVisibility(View.VISIBLE);
 					setContentText();
 				}
-				transfersOverViewLayout.setVisibility(View.GONE);
+				if(transfersOverViewLayout!=null){
+					transfersOverViewLayout.setVisibility(View.GONE);
+				}
 				dotsOptionsTransfersLayout.setOnClickListener(null);
 				actionLayout.setOnClickListener(null);
 
@@ -841,10 +874,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 
     public void itemClick(int position) {
-		log("item click position: " + position);
+		log("itemClick:position: " + position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
-			log("multiselect ON");
+			log("itemClick:multiselectON");
 			adapter.toggleSelection(position);
 
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
@@ -857,6 +890,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //			}
 		}
 		else{
+			log("itemClick:multiselectOFF");
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
 
@@ -878,7 +912,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 			else{
 				//Is file
+				log("itemClick:isFile");
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
+					log("itemClick:isFile:isImage");
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
@@ -898,66 +934,115 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+					log("itemClick:isFile:isVideoReproducibleOrIsAudio");
+
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+					log("itemClick:FILENAME: " + file.getName() + " TYPE: "+mimeType);
 
 					Intent mediaIntent;
+					boolean internalIntent;
 					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
+						internalIntent=false;
 					}
 					else {
+						log("itemClick:setIntentToAudioVideoPlayer");
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						internalIntent=true;
 					}
+
 					mediaIntent.putExtra("FILENAME", file.getName());
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
-							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+							log("itemClick:FileProviderOption");
+							Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+							if(mediaFileUri==null){
+								log("itemClick:ERROR:NULLmediaFileUri");
+								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+							}
+							else{
+								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
+							}
 						}
 						else{
-							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+							Uri mediaFileUri = Uri.fromFile(mediaFile);
+							if(mediaFileUri==null){
+								log("itemClick:ERROR:NULLmediaFileUri");
+								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+							}
+							else{
+								mediaIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(file.getName()).getType());
+							}
 						}
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+						log("itemClick:localPathNULL");
+
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+						else{
+							log("itemClick:ERROR:httpServerAlreadyRunning");
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
+						if(url!=null){
+							Uri parsedUri = Uri.parse(url);
+							if(parsedUri!=null){
+								mediaIntent.setDataAndType(parsedUri, mimeType);
+							}
+							else{
+								log("itemClick:ERROR:httpServerGetLocalLink");
+								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+							}
+						}
+						else{
+							log("itemClick:ERROR:httpServerGetLocalLink");
+							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.email_verification_text_error));
+						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
-					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-						startActivity(mediaIntent);
+
+					if(internalIntent){
+						context.startActivity(mediaIntent);
 					}
 					else{
-						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+						log("itemClick:externalIntent");
+						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+							context.startActivity(mediaIntent);
+						}
+						else{
+							log("itemClick:noAvailableIntent");
+							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
 
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(nodes.get(position).getHandle());
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
+						}
 					}
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					log("itemClick:isFile:isPdf");
 					MegaNode file = nodes.get(position);
 
 					if (megaApi.httpServerIsRunning() == 0) {
@@ -979,7 +1064,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+					log("FILENAME: " + file.getName() + " TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.putExtra("APP", true);
@@ -999,7 +1084,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
-						startActivity(pdfIntent);
+						context.startActivity(pdfIntent);
 					}
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
@@ -1011,6 +1096,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 				}
 				else{
+					log("itemClick:isFile:otherOption");
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
 					NodeController nC = new NodeController(context);
