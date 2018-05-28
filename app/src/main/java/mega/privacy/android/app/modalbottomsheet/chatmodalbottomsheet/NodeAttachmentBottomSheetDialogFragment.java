@@ -67,6 +67,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     LinearLayout optionImport;
     LinearLayout optionSaveOffline;
     LinearLayout optionRemove;
+    LinearLayout optionForwardLayout;
 
     DisplayMetrics outMetrics;
 
@@ -154,6 +155,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionViewText = (TextView) contentView.findViewById(R.id.option_view_text);
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
+        optionForwardLayout = (LinearLayout) contentView.findViewById(R.id.option_forward_layout);
 
         if(message.getMessage()==null){
             return;
@@ -179,6 +181,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionSaveOffline.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
+        optionForwardLayout.setOnClickListener(this);
 
         nodeIconLayout.setVisibility(View.GONE);
 
@@ -355,6 +358,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         else{
             switch(v.getId()){
 
+                case R.id.option_forward_layout: {
+                    if(context instanceof ChatActivityLollipop){
+                        ((ChatActivityLollipop)context).prepareMessageToForward(messageId);
+                    }
+                    break;
+                }
                 case R.id.option_download_layout:{
                     log("Download option");
                     if(node==null){

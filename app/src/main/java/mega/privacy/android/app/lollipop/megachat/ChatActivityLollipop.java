@@ -6068,6 +6068,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void prepareMessageToForward(long idMessage) {
+        log("prepareMessageToForward");
+        ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
+        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
+        AndroidMegaChatMessage aM = new AndroidMegaChatMessage(m);
+        messagesSelected.add(aM);
+
+        prepareMessagesToForward(messagesSelected);
+    }
+
     public void prepareMessagesToForward(ArrayList<AndroidMegaChatMessage> messagesSelected){
         log ("prepareMessagesToForward");
 
