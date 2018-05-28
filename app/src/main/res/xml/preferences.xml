@@ -160,6 +160,22 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory
+		android:key="settings_security"
+		android:title="@string/settings_security_options_title"
+		android:textColor="@color/pressed_mega">
+
+		<Preference
+			android:key="settings_recovery_key"
+			android:title="@string/settings_recovery_key_title"
+			android:summary="@string/settings_recovery_key_summary" />
+
+		<Preference
+			android:key="settings_change_password"
+			android:title="@string/my_account_change_password"/>
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
 		android:key="settings_qrcode"
 		android:title="@string/section_qr_code"
 		android:textColor="@color/pressed_mega">
@@ -220,6 +236,11 @@
             android:key="settings_about_terms_of_service"
         	android:title="@string/settings_about_terms_of_service"
         	android:summary="" />
+
+		<Preference
+			android:key="settings_about_gdpr"
+			android:title="@string/settings_about_gdpr"
+			android:summary="" />
 
 		<Preference
 			android:key="settings_about_code_link"

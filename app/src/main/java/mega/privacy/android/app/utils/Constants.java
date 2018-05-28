@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils;
 
 public class Constants {
-	
+
 	public static String PIN_4 = "4";
 	public static String PIN_6 = "6";
 	public static String PIN_ALPHANUMERIC = "alphanumeric";
@@ -30,10 +30,10 @@ public class Constants {
 	public static int REQUEST_ADD_PARTICIPANTS = 1019;
 	public static int ENABLE_CHAT = 1020;
 	public static int REQUEST_SEND_CONTACTS = 1021;
-
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
 	public static int ACTION_SEARCH_BY_DATE = 1024;
+	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -179,6 +179,7 @@ public class Constants {
 
 	final public static int CONTACT_TYPE_MEGA = 0;
 	final public static int CONTACT_TYPE_DEVICE = 1;
+	final public static int CONTACT_TYPE_BOTH = 2;
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;

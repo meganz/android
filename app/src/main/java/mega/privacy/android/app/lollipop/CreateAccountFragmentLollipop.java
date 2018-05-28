@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -510,9 +511,19 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
 //				browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
 //				startActivity(browserIntent);
-                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.co.nz/mobile_privacy.html"));
-                startActivity(viewIntent);
+                try {
+                    String url = "https://mega.nz/terms";
+                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(url));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse("https://mega.nz/terms"));
+                    startActivity(viewIntent);
+                }
+
                 break;
 
             case R.id.toggle_button_passwd:
@@ -688,47 +699,56 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     public void onRequestFinish(MegaApiJava api, MegaRequest request,
                                 MegaError e) {
         log("onRequestFinish");
-        if (e.getErrorCode() != MegaError.API_OK) {
-            log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
 
-            if (e.getErrorCode() == MegaError.API_EEXIST) {
-                ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_email_registered));
-                createAccountLayout.setVisibility(View.VISIBLE);
-                creatingAccountLayout.setVisibility(View.GONE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                creatingAccountTextView.setVisibility(View.GONE);
-                createAccountProgressBar.setVisibility(View.GONE);
-                return;
+        if (isAdded()) {
+            if (e.getErrorCode() != MegaError.API_OK) {
+                log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
+
+                if (e.getErrorCode() == MegaError.API_EEXIST) {
+                    try {
+                        ((LoginActivityLollipop) context).showSnackbar(getString(R.string.error_email_registered));
+                        createAccountLayout.setVisibility(View.VISIBLE);
+                        creatingAccountLayout.setVisibility(View.GONE);
+                        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
+                        creatingAccountTextView.setVisibility(View.GONE);
+                        createAccountProgressBar.setVisibility(View.GONE);
+                    }
+                    catch(Exception ex){}
+                    return;
+                }
+                else{
+                    try {
+                        String message = e.getErrorString();
+                        ((LoginActivityLollipop) context).showSnackbar(message);
+                        ((LoginActivityLollipop) context).showFragment(Constants.LOGIN_FRAGMENT);
+                        createAccountLayout.setVisibility(View.VISIBLE);
+                        creatingAccountLayout.setVisibility(View.GONE);
+                        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
+                        creatingAccountTextView.setVisibility(View.GONE);
+                        createAccountProgressBar.setVisibility(View.GONE);
+                    }
+                    catch (Exception ex){}
+                    return;
+                }
             }
             else{
-                String message = e.getErrorString();
-                ((LoginActivityLollipop)context).showSnackbar(message);
-                ((LoginActivityLollipop)context).showFragment(Constants.LOGIN_FRAGMENT);
-                createAccountLayout.setVisibility(View.VISIBLE);
-                creatingAccountLayout.setVisibility(View.GONE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                creatingAccountTextView.setVisibility(View.GONE);
-                createAccountProgressBar.setVisibility(View.GONE);
-                return;
+                ((LoginActivityLollipop)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
+                ((LoginActivityLollipop)context).setFirstNameTemp(userName.getText().toString());
+                ((LoginActivityLollipop)context).setPasswdTemp(userPassword.getText().toString());
+                ((LoginActivityLollipop)context).setWaitingForConfirmAccount(true);
+
+                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                if (dbH != null){
+                    dbH.clearEphemeral();
+
+                    log("EphemeralCredentials: (" + request.getEmail() + "," + request.getPassword() + "," + request.getSessionKey() + "," + request.getName() + "," + request.getText() + ")");
+                    EphemeralCredentials ephemeral = new EphemeralCredentials(request.getEmail(), request.getPassword(), request.getSessionKey(), request.getName(), request.getText());
+
+                    dbH.saveEphemeral(ephemeral);
+                }
+
+                ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
             }
-        }
-        else{
-            ((LoginActivityLollipop)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
-            ((LoginActivityLollipop)context).setFirstNameTemp(userName.getText().toString());
-            ((LoginActivityLollipop)context).setPasswdTemp(userPassword.getText().toString());
-            ((LoginActivityLollipop)context).setWaitingForConfirmAccount(true);
-
-            DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-            if (dbH != null){
-                dbH.clearEphemeral();
-
-                log("EphemeralCredentials: (" + request.getEmail() + "," + request.getPassword() + "," + request.getSessionKey() + "," + request.getName() + "," + request.getText() + ")");
-                EphemeralCredentials ephemeral = new EphemeralCredentials(request.getEmail(), request.getPassword(), request.getSessionKey(), request.getName(), request.getText());
-
-                dbH.saveEphemeral(ephemeral);
-            }
-
-            ((LoginActivityLollipop)context).showFragment(Constants.CONFIRM_EMAIL_FRAGMENT);
         }
     }
 

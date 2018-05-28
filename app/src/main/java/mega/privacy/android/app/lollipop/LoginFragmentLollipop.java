@@ -1212,7 +1212,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.button_forgot_pass:{
                 log("click on button_forgot_pass");
-                showForgotPassLayout();
+                try {
+                    String url = "https://mega.nz/recovery";
+                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(url));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    startActivity(viewIntent);
+                }
+//                showForgotPassLayout();
                 break;
             }
             case R.id.yes_MK_button:{
@@ -1905,6 +1917,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //
 //		}
+        final MegaError error = e;
         try{
             timer = new CountDownTimer(10000, 2000) {
 
@@ -1914,7 +1927,31 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 public void onFinish() {
                     log("the timer finished, message shown");
-                    serversBusyText.setVisibility(View.VISIBLE);
+                    try {
+                        serversBusyText.setVisibility(View.VISIBLE);
+                        if(error.getErrorCode()==MegaError.API_EAGAIN){
+                            if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
+                                serversBusyText.setText(getString(R.string.login_connectivity_issues));
+                            }
+                            else if(error.getValue() == MegaApiJava.RETRY_SERVERS_BUSY){
+                                serversBusyText.setText(getString(R.string.login_servers_busy));
+                            }
+                            else if(error.getValue() == MegaApiJava.RETRY_API_LOCK){
+                                serversBusyText.setText(getString(R.string.login_API_lock));
+                            }
+                            else if(error.getValue() == MegaApiJava.RETRY_RATE_LIMIT){
+                                serversBusyText.setText(getString(R.string.login_API_rate));
+                            }
+                            else{
+                                serversBusyText.setText(getString(R.string.servers_busy));
+                            }
+                        }
+                        else{
+                            serversBusyText.setText(getString(R.string.servers_busy));
+                        }
+                    }
+                    catch (Exception e){}
+
                 }
             }.start();
         }catch (Exception exception){

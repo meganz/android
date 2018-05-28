@@ -83,6 +83,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
@@ -139,6 +140,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
     private int type;
     private boolean isOffLine = false;
     int countChat = 0;
+    int errorSent = 0;
+    int successSent = 0;
 
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
@@ -261,7 +264,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 //                return;
 //            }
 //        }
-        setContentView(R.layout.activity_pdfviewer);
 
         tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
         if(tB==null){
@@ -343,6 +345,116 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         });
 
         pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        log("onNewIntent");
+
+        if (intent == null){
+            log("intent null");
+            finish();
+            return;
+        }
+
+        if (intent.getBooleanExtra("inside", false)){
+            setIntent(intent);
+            if (!intent.getBooleanExtra("isUrl", true)){
+                isUrl = false;
+                uri = intent.getData();
+                invalidateOptionsMenu();
+            }
+        }
+        else {
+            currentPage = 0;
+            isFolderLink = false;
+            type = 0;
+            inside = false;
+            isOffLine = false;
+            pathNavigation = null;
+            handle = -1;
+
+            uri = intent.getData();
+            if (uri == null){
+                log("uri null");
+                finish();
+                return;
+            }
+            Intent newIntent = new Intent();
+            newIntent.setDataAndType(uri, "application/pdf");
+            newIntent.setAction(Constants.ACTION_OPEN_FOLDER);
+            setIntent(newIntent);
+            Display display = getWindowManager().getDefaultDisplay();
+            outMetrics = new DisplayMetrics ();
+            display.getMetrics(outMetrics);
+
+            setContentView(R.layout.activity_pdfviewer);
+
+            app = (MegaApplication)getApplication();
+            megaApi = app.getMegaApi();
+
+            if(Util.isChatEnabled()){
+                megaChatApi = app.getMegaChatApi();
+            }
+
+            tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
+            if(tB==null){
+                log("Tb is Null");
+                return;
+            }
+
+            tB.setVisibility(View.VISIBLE);
+            setSupportActionBar(tB);
+            aB = getSupportActionBar();
+            Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black);
+            upArrow.setColorFilter(getResources().getColor(R.color.lollipop_primary_color), PorterDuff.Mode.SRC_ATOP);
+            aB.setHomeAsUpIndicator(upArrow);
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+
+            log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+            if(megaApi.getBandwidthOverquotaDelay()>0){
+                if(alertDialogTransferOverquota==null){
+                    showTransferOverquotaDialog();
+                }
+                else {
+                    if (!(alertDialogTransferOverquota.isShowing())) {
+                        showTransferOverquotaDialog();
+                    }
+                }
+            }
+
+            log("Add transfer listener");
+            megaApi.addTransferListener(this);
+
+            pdfView = (PDFView) findViewById(R.id.pdfView);
+
+            pdfView.setBackgroundColor(Color.LTGRAY);
+            defaultScrollHandle = new DefaultScrollHandle(PdfViewerActivityLollipop.this);
+
+            isUrl = false;
+            loadLocalPDF();
+            pdfFileName = getFileName(uri);
+            pdfView.setOnClickListener(this);
+
+            path = uri.getPath();
+            setTitle(pdfFileName);
+            aB.setTitle(pdfFileName);
+
+            uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
+            uploadContainer.setVisibility(View.VISIBLE);
+            uploadContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    log("onClick uploadContainer");
+                    typeCheckLogin = TYPE_UPLOAD;
+                    checkLogin();
+                }
+            });
+
+            pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+        }
     }
 
     @Override
@@ -601,6 +713,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         log("backToCloud: "+handle);
         Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
         if(handle!=-1){
+            startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startIntent.setAction(Constants.ACTION_OPEN_FOLDER);
             startIntent.putExtra("PARENT_HANDLE", handle);
         }
@@ -683,7 +796,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         if (inside){
             propertiesMenuItem.setVisible(true);
             if(Util.isChatEnabled()){
-                chatMenuItem.setVisible(true);
+                if (isOffLine){
+                    chatMenuItem.setVisible(false);
+                }
+                else{
+                    chatMenuItem.setVisible(true);
+                }
             }
             else{
                 chatMenuItem.setVisible(false);
@@ -722,7 +840,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
 
                 longArray[0] = handle;
 
-                Intent i = new Intent(this, ChatExplorerActivity.class);
+                Intent i = new Intent(PdfViewerActivityLollipop.this, ChatExplorerActivity.class);
                 i.putExtra("NODE_HANDLES", longArray);
                 startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
                 break;
@@ -1148,6 +1266,44 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
                 log("ERROR WHEN CONNECTING " + e.getErrorString());
             }
         }
+        else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                log("File sent correctly");
+                successSent++;
+            }
+            else{
+                log("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
+                errorSent++;
+            }
+
+            if(countChat==errorSent+successSent){
+                if(successSent==countChat){
+                    freeColorFilter();
+                    if(countChat==1){
+                        long handle = request.getChatHandle();
+                        MegaChatListItem chatItem = megaChatApi.getChatListItem(handle);
+                        if(chatItem!=null){
+                            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+                            intent.putExtra("CHAT_ID", handle);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                    else{
+                        showSnackbar(getString(R.string.success_attaching_node_from_cloud_chats, countChat));
+                    }
+                }
+                else if(errorSent==countChat){
+                    showSnackbar(getString(R.string.error_attaching_node_from_cloud));
+                }
+                else{
+                    showSnackbar(getString(R.string.error_attaching_node_from_cloud_chats));
+                }
+            }
+        }
     }
 
     @Override
@@ -1160,6 +1316,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         super.onStop();
         log("onStop");
 
+        freeColorFilter();
+    }
+
+    void freeColorFilter(){
         if (chat != null) {
             chat.setColorFilter(null);
         }
@@ -1214,18 +1374,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements On
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
         }
-        if (chat != null) {
-            chat.setColorFilter(null);
-        }
-        if (download != null){
-            download.setColorFilter(null);
-        }
-        if (properties != null){
-            properties.setColorFilter(null);
-        }
-        if (share != null) {
-            share.setColorFilter(null);
-        }
+        freeColorFilter();
 
         super.onDestroy();
     }

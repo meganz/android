@@ -133,6 +133,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if (selectedItems.get(pos, false)) {
 			log("delete pos: "+pos);
 			selectedItems.delete(pos);
+
 		}
 		else {
 			log("PUT pos: "+pos);
@@ -381,6 +382,20 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public List<MegaNode> getSelectedNodes() {
 		ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
 		
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (selectedItems.valueAt(i) == true) {
+				MegaNode document = getNodeAt(selectedItems.keyAt(i));
+				if (document != null){
+					nodes.add(document);
+				}
+			}
+		}
+		return nodes;
+	}
+
+	public ArrayList<MegaNode> getArrayListSelectedNodes() {
+		ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+
 		for (int i = 0; i < selectedItems.size(); i++) {
 			if (selectedItems.valueAt(i) == true) {
 				MegaNode document = getNodeAt(selectedItems.keyAt(i));

@@ -42,6 +42,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -93,6 +94,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 	public static String CATEGORY_QR_CODE = "settings_qrcode";
+	public static String CATEGORY_SECURITY = "settings_security";
 
 	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
 
@@ -132,12 +134,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	public static String KEY_ABOUT_GDPR = "settings_about_gdpr";
 	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
 	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
 	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 
 	public static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
+
+	public static String KEY_RECOVERY_KEY= "settings_recovery_key";
+	public static String KEY_CHANGE_PASSWORD= "settings_change_password";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -165,6 +171,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory advancedFeaturesCategory;
 	PreferenceCategory autoawayChatCategory;
 	PreferenceCategory persistenceChatCategory;
+	PreferenceCategory securityCategory;
 
 	SwitchPreference pinLockEnableSwitch;
 	TwoLineCheckPreference pinLockEnableCheck;
@@ -193,6 +200,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	Preference aboutPrivacy;
 	Preference aboutTOS;
+	Preference aboutGDPR;
 	Preference aboutSDK;
 	Preference aboutKarere;
 	Preference aboutApp;
@@ -212,6 +220,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference useHttpsOnly;
 
 	MegaChatPresenceConfig statusConfig;
+
+	Preference recoveryKey;
+	Preference changePass;
 	
 	boolean cameraUpload = false;
 	boolean secondaryUpload = false;
@@ -283,6 +294,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
 		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
+		securityCategory = (PreferenceCategory) findPreference(CATEGORY_SECURITY);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -409,6 +421,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesOffline = findPreference(KEY_OFFLINE);
 		advancedFeaturesOffline.setOnPreferenceClickListener(this);
 
+
+		recoveryKey = findPreference(KEY_RECOVERY_KEY);
+		recoveryKey.setOnPreferenceClickListener(this);
+		changePass = findPreference(KEY_CHANGE_PASSWORD);
+		changePass.setOnPreferenceClickListener(this);
+
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
 
@@ -420,6 +438,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		aboutTOS = findPreference(KEY_ABOUT_TOS);
 		aboutTOS.setOnPreferenceClickListener(this);
+
+		aboutGDPR = findPreference(KEY_ABOUT_GDPR);
+		aboutGDPR.setOnPreferenceClickListener(this);
 
 		aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
 		aboutApp.setOnPreferenceClickListener(this);
@@ -1911,12 +1932,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setData(Uri.parse("https://mega.nz/mobile_privacy.html"));
+			viewIntent.setData(Uri.parse("https://mega.nz/privacy"));
 			startActivity(viewIntent);
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_TOS) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
+			viewIntent.setData(Uri.parse("https://mega.nz/terms"));
+			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo(KEY_ABOUT_GDPR) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://mega.nz/gdpr"));
 			startActivity(viewIntent);
 		}
 		else if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
@@ -1935,6 +1961,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else {
 				megaApi.setContactLinksOption(false, this);
 			}
+		}
+		else if (preference.getKey().compareTo(KEY_RECOVERY_KEY) == 0){
+			log("Export Recovery Key");
+			((ManagerActivityLollipop)context).showMKLayout();
+		}
+		else if (preference.getKey().compareTo(KEY_CHANGE_PASSWORD) == 0){
+			log("Change password");
+			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+			startActivity(intent);
 		}
 		
 		return true;
