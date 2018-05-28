@@ -62,6 +62,7 @@ public class Constants {
 
 	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
 	final public static int MULTIPLE_CHAT_IMPORT = MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER+1;
+	final public static int MULTIPLE_FORWARD_MESSAGES = MULTIPLE_CHAT_IMPORT+1;
 
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
