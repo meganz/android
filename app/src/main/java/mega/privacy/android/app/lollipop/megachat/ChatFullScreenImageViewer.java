@@ -7,9 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -144,14 +141,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
 		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
 
-		Drawable drawable = importIcon.getIcon();
-		if (drawable != null) {
-			// If we don't mutate the drawable, then all drawable's with this id will have a color
-			// filter applied to it.
-			drawable.mutate();
-			drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-			drawable.setAlpha(255);
-		}
+//		Drawable drawable = importIcon.getIcon();
+//		if (drawable != null) {
+//			// If we don't mutate the drawable, then all drawable's with this id will have a color
+//			// filter applied to it.
+//			drawable.mutate();
+//			drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+//			drawable.setAlpha(255);
+//		}
 
 		return super.onCreateOptionsMenu(menu);
 	}
