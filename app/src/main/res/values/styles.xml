@@ -233,4 +233,17 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <style name="Theme.Megaactionbar.General" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/lollipop_primary_color</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+
 </resources>
