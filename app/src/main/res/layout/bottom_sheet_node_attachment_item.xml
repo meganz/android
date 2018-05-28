@@ -129,6 +129,36 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/option_forward_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_forward_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_forward_grey"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_forward_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/forward_menu_item"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/option_download_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
