@@ -176,6 +176,7 @@ public class Constants {
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
+	final public static int FROM_CHAT = 2019;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
