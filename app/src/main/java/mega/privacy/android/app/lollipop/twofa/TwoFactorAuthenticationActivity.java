@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop.twofa;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -10,19 +11,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+
+import static android.graphics.Color.WHITE;
 
 /**
  * Created by mega on 28/05/18.
  */
 
-public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener{
+public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface{
 
     private Toolbar tB;
     private ActionBar aB;
@@ -31,6 +51,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private RelativeLayout qrSeedContainer;
     private RelativeLayout confirmContainer;
     private Button setup2FAButton;
+    private ImageView qrImage;
 
     InputMethodManager imm;
     private EditTextPIN firstPin;
@@ -40,8 +61,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private EditTextPIN fifthPin;
     private EditTextPIN sixthPin;
     private Button verifyButton;
+    private StringBuilder sb = new StringBuilder();
 
     private boolean confirm2FAisShown = false;
+
+    MegaApiAndroid megaApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +73,10 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         log("onCreate");
 
         setContentView(R.layout.activity_two_factor_authentication);
+
+        if (megaApi == null) {
+            megaApi = ((MegaApplication) getApplication()).getMegaApi();
+        }
 
         tB = (Toolbar) findViewById(R.id.toolbar);
         if(tB==null){
@@ -76,6 +104,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         setup2FAButton.setOnClickListener(this);
         qrSeedContainer = (RelativeLayout) findViewById(R.id.container_qr_2fa);
         confirmContainer = (RelativeLayout) findViewById(R.id.container_confirm_2fa);
+        qrImage = (ImageView) findViewById(R.id.qr_2fa);
 
         if (confirm2FAisShown){
             scrollContainer2FA.setVisibility(View.GONE);
@@ -249,6 +278,15 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     sixthPin.setCursorVisible(false);
                     verifyButton.setVisibility(View.VISIBLE);
                     hideKeyboard();
+
+                    if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+                        sb.append(firstPin.getText());
+                        sb.append(secondPin.getText());
+                        sb.append(thirdPin.getText());
+                        sb.append(fourthPin.getText());
+                        sb.append(fifthPin.getText());
+                        sb.append(sixthPin.getText());
+                    }
                 }
                 else {
                     verifyButton.setVisibility(View.GONE);
@@ -258,6 +296,42 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         verifyButton = (Button) findViewById(R.id.button_verify_2fa);
         verifyButton.setOnClickListener(this);
+    }
+
+    void generate2FAQR (String seed){
+        log("generate2FAQR");
+
+        Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+
+        BitMatrix bitMatrix = null;
+        String url = null;
+        String myEmail = megaApi.getMyEmail();
+        if (myEmail != null & seed != null){
+            url = getString(R.string.url_qr_2fa, myEmail, seed);
+        }
+        if (url != null){
+            try {
+                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, hints);
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+            int w = bitMatrix.getWidth();
+            int h = bitMatrix.getHeight();
+            int[] pixels = new int[w * h];
+
+            for (int y = 0; y < h; y++) {
+                int offset = y * w;
+                for (int x = 0; x < w; x++) {
+                    pixels[offset + x] = bitMatrix.get(x, y) ? getResources().getColor(R.color.lollipop_primary_color) : WHITE;
+                }
+            }
+
+            Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixels, 0, 500, 0, 0, w, h);
+
+            qrImage.setImageBitmap(bitmap);
+        }
     }
 
     void hideKeyboard(){
@@ -302,6 +376,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 scrollContainer2FA.setVisibility(View.GONE);
                 qrSeedContainer.setVisibility(View.VISIBLE);
                 confirmContainer.setVisibility(View.VISIBLE);
+                megaApi.multiFactorAuthGetCode(this);
                 break;
             }
 
@@ -314,5 +389,37 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
     public static void log(String message) {
         Util.log("TwoFactorAuthenticationActivity", message);
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        log("onRequestFinish");
+        if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET){
+            log("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET");
+            if (e.getErrorCode() == MegaError.API_OK){
+                log("MegaError.API_OK");
+                if (request.getText() != null){
+                    generate2FAQR(request.getText());
+                }
+            }
+            else {
+                log("e.getErrorCode(): " + e.getErrorCode());
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
     }
 }
