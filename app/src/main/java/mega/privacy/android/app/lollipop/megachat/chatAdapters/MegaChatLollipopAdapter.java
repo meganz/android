@@ -3238,9 +3238,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                 }
 
-                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
-                ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
-                Linkify.addLinks(((ViewHolderMessageChat)holder).contentOwnMessageText, Linkify.WEB_URLS);
+                if(Util.isOnline(context)){
+                    ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(true);
+                    ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
+                    Linkify.addLinks(((ViewHolderMessageChat)holder).contentOwnMessageText, Linkify.WEB_URLS);
+                }else{
+                    ((ViewHolderMessageChat)holder).contentOwnMessageText.setLinksClickable(false);
+                }
 
                 if(!multipleSelect) {
                     if (positionClicked != -1){
@@ -3572,8 +3576,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setText(messageContent);
                 }
 
-                ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
-                Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
+                if(Util.isOnline(context)){
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
+                    Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
+                }else{
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
+                }
 
                 if (!multipleSelect) {
                     if (positionClicked != -1){
