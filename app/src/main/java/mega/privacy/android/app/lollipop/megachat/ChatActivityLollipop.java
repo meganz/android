@@ -146,9 +146,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
     String mOutputFilePath;
-    Uri finalUri;
-    File file;
-    File newFile;
+
     boolean newVisibility = false;
     boolean getMoreHistory=false;
 
@@ -171,6 +169,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public long generalUnreadCount = -1;
     boolean lastSeenReceived = false;
     int positionToScroll = -1;
+    public int positionNewMessagesLayout = -1;
 
     boolean isTakePicture = false;
     MegaApiAndroid megaApi;
@@ -2713,10 +2712,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void sendMessageUploading(AndroidMegaChatMessage androidMsgSent){
         log("sendMessageUploading");
 
-        log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getName());
-
         int index = messages.size();
         if(androidMsgSent!=null){
+
+            if(positionNewMessagesLayout!=-1){
+                hideNewMessagesLayout();
+            }
+
+            log("Name of the file uploading: "+androidMsgSent.getPendingMessage().getName());
 
             if(index==0){
                 //First element
@@ -2743,7 +2746,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.addMessage(messages, index+1);
                 final int indexToScroll = index+1;
                 mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
-
             }
         }
         else{
@@ -2751,8 +2753,29 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void hideNewMessagesLayout(){
+        log("hideNewMessagesLayout");
+
+        int position = positionNewMessagesLayout;
+
+        positionNewMessagesLayout = -1;
+        lastIdMsgSeen = -1;
+        generalUnreadCount = -1;
+        lastSeenReceived = true;
+        newVisibility = false;
+
+        if(adapter!=null){
+            adapter.notifyItemChanged(position);
+        }
+    }
+
     public void sendMessageToUI(MegaChatMessage msgSent){
         log("sendMessageToUI");
+
+        if(positionNewMessagesLayout!=-1){
+            hideNewMessagesLayout();
+        }
+
         int infoToShow = -1;
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(msgSent);
 
@@ -4402,6 +4425,50 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(msg.getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED){
             log("onMessageReceived: STATUS_SERVER_REJECTED----- "+msg.getStatus());
+        }
+
+        if(!msg.isManagementMessage()){
+            if(positionNewMessagesLayout!=-1){
+                log("Layout unread messages shown: "+generalUnreadCount);
+                if(generalUnreadCount<0){
+                    generalUnreadCount--;
+                }
+                else{
+                    generalUnreadCount++;
+                }
+
+                if(adapter!=null){
+                    adapter.notifyItemChanged(positionNewMessagesLayout);
+                }
+            }
+        }
+        else {
+            int messageType = msg.getType();
+            log("Message type: " + messageType);
+
+            switch (messageType) {
+                case MegaChatMessage.TYPE_ALTER_PARTICIPANTS:{
+                    if(msg.getUserHandle()==myUserHandle) {
+                        log("me alter participant");
+                        hideNewMessagesLayout();
+                    }
+                    break;
+                }
+                case MegaChatMessage.TYPE_PRIV_CHANGE:{
+                    if(msg.getUserHandle()==myUserHandle){
+                        log("I change a privilege");
+                        hideNewMessagesLayout();
+                    }
+                    break;
+                }
+                case MegaChatMessage.TYPE_CHAT_TITLE:{
+                    if(msg.getUserHandle()==myUserHandle) {
+                        log("I change the title");
+                        hideNewMessagesLayout();
+                    }
+                    break;
+                }
+            }
         }
 
         if(setAsRead){
@@ -6639,6 +6706,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         mLayoutManager.scrollToPositionWithOffset(indexToScroll,Util.scaleHeightPx(20, outMetrics));
         hideMessageJump();
     }
+
     public void setNewVisibility(boolean vis){
         newVisibility = vis;
     }
