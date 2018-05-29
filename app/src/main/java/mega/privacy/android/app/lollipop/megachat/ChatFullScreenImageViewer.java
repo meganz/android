@@ -546,7 +546,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
 		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
-
 	}
 
 	@Override
