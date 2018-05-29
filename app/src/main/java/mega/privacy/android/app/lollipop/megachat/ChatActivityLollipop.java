@@ -91,6 +91,7 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
@@ -3310,7 +3311,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                                         Intent mediaIntent;
                                         boolean internalIntent;
-                                        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported()){
+                                        if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()){
                                             mediaIntent = new Intent(Intent.ACTION_VIEW);
                                             internalIntent=false;
                                         }
@@ -3319,6 +3320,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
                                             internalIntent=true;
                                         }
+                                        mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
+                                        mediaIntent.putExtra("isPlayList", false);
+                                        mediaIntent.putExtra("msgId", m.getMessage().getMsgId());
+                                        mediaIntent.putExtra("chatId", idChat);
 
                                         String downloadLocationDefaultPath = null;
                                         mediaIntent.putExtra("FILENAME", node.getName());
@@ -3336,9 +3341,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 }
                                             }
                                         }
-
                                         String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
-                                        if (localPath != null){
+                                        File f = new File(downloadLocationDefaultPath, node.getName());
+                                        boolean isOnMegaDownloads = false;
+                                        if(f.exists() && (f.length() == node.getSize())){
+                                            isOnMegaDownloads = true;
+                                        }
+                                        log("isOnMegaDownloads: "+isOnMegaDownloads);
+                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
                                             File mediaFile = new File(localPath);
                                             //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
@@ -3367,41 +3377,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                         else {
                                             log("itemClick:localPathNULL");
+                                            if (Util.isOnline(this)){
+                                                if (megaApi.httpServerIsRunning() == 0) {
+                                                    megaApi.httpServerStart();
+                                                }
+                                                else{
+                                                    log("itemClick:ERROR:httpServerAlreadyRunning");
+                                                }
 
-                                            if (megaApi.httpServerIsRunning() == 0) {
-                                                megaApi.httpServerStart();
-                                            }
-                                            else{
-                                                log("itemClick:ERROR:httpServerAlreadyRunning");
-                                            }
+                                                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                                                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                                                activityManager.getMemoryInfo(mi);
 
-                                            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                                            ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-                                            activityManager.getMemoryInfo(mi);
+                                                if(mi.totalMem>Constants.BUFFER_COMP){
+                                                    log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
+                                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                                                }
+                                                else{
+                                                    log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
+                                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                                                }
 
-                                            if(mi.totalMem>Constants.BUFFER_COMP){
-                                                log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
-                                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                                            }
-                                            else{
-                                                log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
-                                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                                            }
-
-                                            String url = megaApi.httpServerGetLocalLink(node);
-                                            if(url!=null){
-                                                Uri parsedUri = Uri.parse(url);
-                                                if(parsedUri!=null){
-                                                    mediaIntent.setDataAndType(parsedUri, mimeType);
+                                                String url = megaApi.httpServerGetLocalLink(node);
+                                                if(url!=null){
+                                                    Uri parsedUri = Uri.parse(url);
+                                                    if(parsedUri!=null){
+                                                        mediaIntent.setDataAndType(parsedUri, mimeType);
+                                                    }
+                                                    else{
+                                                        log("itemClick:ERROR:httpServerGetLocalLink");
+                                                        showSnackbar(getString(R.string.email_verification_text_error));
+                                                    }
                                                 }
                                                 else{
                                                     log("itemClick:ERROR:httpServerGetLocalLink");
                                                     showSnackbar(getString(R.string.email_verification_text_error));
                                                 }
                                             }
-                                            else{
-                                                log("itemClick:ERROR:httpServerGetLocalLink");
-                                                showSnackbar(getString(R.string.email_verification_text_error));
+                                            else {
+                                                showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
                                             }
                                         }
                                         mediaIntent.putExtra("HANDLE", node.getHandle());
@@ -3419,9 +3433,121 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                                 showNodeAttachmentBottomSheet(m, position);
                                             }
                                         }
+                                        overridePendingTransition(0,0);
+                                    }
+                                    else if (MimeTypeList.typeForName(node.getName()).isPdf()){
+                                        log("itemClick:isFile:isPdf");
+                                        String mimeType = MimeTypeList.typeForName(node.getName()).getType();
+                                        log("itemClick:FILENAME: " + node.getName() + " TYPE: "+mimeType);
+                                        Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
+                                        pdfIntent.putExtra("inside", true);
+                                        pdfIntent.putExtra("adapterType", Constants.FROM_CHAT);
+                                        pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
+                                        pdfIntent.putExtra("chatId", idChat);
+
+                                        String downloadLocationDefaultPath = null;
+                                        pdfIntent.putExtra("FILENAME", node.getName());
+                                        MegaPreferences prefs = dbH.getPreferences();
+                                        if (prefs != null){
+                                            log("prefs != null");
+                                            if (prefs.getStorageAskAlways() != null){
+                                                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                                                    log("askMe==false");
+                                                    if (prefs.getStorageDownloadLocation() != null){
+                                                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                                                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        String localPath = Util.getLocalFile(this, node.getName(), node.getSize(), downloadLocationDefaultPath);
+                                        File f = new File(downloadLocationDefaultPath, node.getName());
+                                        boolean isOnMegaDownloads = false;
+                                        if(f.exists() && (f.length() == node.getSize())){
+                                            isOnMegaDownloads = true;
+                                        }
+                                        log("isOnMegaDownloads: "+isOnMegaDownloads);
+                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                                            File mediaFile = new File(localPath);
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+                                                    && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                                log("itemClick:FileProviderOption");
+                                                Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                                                if(mediaFileUri==null){
+                                                    log("itemClick:ERROR:NULLmediaFileUri");
+                                                    showSnackbar(getString(R.string.email_verification_text_error));
+                                                }
+                                                else{
+                                                    pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                                                }
+                                            }
+                                            else{
+                                                Uri mediaFileUri = Uri.fromFile(mediaFile);
+                                                if(mediaFileUri==null){
+                                                    log("itemClick:ERROR:NULLmediaFileUri");
+                                                    showSnackbar(getString(R.string.email_verification_text_error));
+                                                }
+                                                else{
+                                                    pdfIntent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                                                }
+                                            }
+                                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        }
+                                        else {
+                                            log("itemClick:localPathNULL");
+                                            if (Util.isOnline(this)){
+                                                if (megaApi.httpServerIsRunning() == 0) {
+                                                    megaApi.httpServerStart();
+                                                }
+                                                else{
+                                                    log("itemClick:ERROR:httpServerAlreadyRunning");
+                                                }
+                                                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                                                ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+                                                activityManager.getMemoryInfo(mi);
+                                                if(mi.totalMem>Constants.BUFFER_COMP){
+                                                    log("itemClick:total mem: "+mi.totalMem+" allocate 32 MB");
+                                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                                                }
+                                                else{
+                                                    log("itemClick:total mem: "+mi.totalMem+" allocate 16 MB");
+                                                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                                                }
+                                                String url = megaApi.httpServerGetLocalLink(node);
+                                                if(url!=null){
+                                                    Uri parsedUri = Uri.parse(url);
+                                                    if(parsedUri!=null){
+                                                        pdfIntent.setDataAndType(parsedUri, mimeType);
+                                                    }
+                                                    else{
+                                                        log("itemClick:ERROR:httpServerGetLocalLink");
+                                                        showSnackbar(getString(R.string.email_verification_text_error));
+                                                    }
+                                                }
+                                                else{
+                                                    log("itemClick:ERROR:httpServerGetLocalLink");
+                                                    showSnackbar(getString(R.string.email_verification_text_error));
+                                                }
+                                            }
+                                            else {
+                                                showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
+                                            }
+                                        }
+                                        pdfIntent.putExtra("HANDLE", node.getHandle());
+
+                                        if (MegaApiUtils.isIntentAvailable(this, pdfIntent)){
+                                            startActivity(pdfIntent);
+                                        }
+                                        else{
+                                            log("itemClick:noAvailableIntent");
+                                            showNodeAttachmentBottomSheet(m, position);
+                                        }
+                                        overridePendingTransition(0,0);
                                     }
                                     else{
-                                        log("NOT Image - show node attachment panel for one node");
+                                        log("NOT Image, pdf, audio or video - show node attachment panel for one node");
                                         showNodeAttachmentBottomSheet(m, position);
                                     }
                                 }
