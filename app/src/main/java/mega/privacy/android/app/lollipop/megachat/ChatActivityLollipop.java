@@ -3072,7 +3072,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 else{
                     log("Chat with permissions");
-                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                    if(Util.isOnline(chatActivity)){
+                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                    }
+                    else{
+                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                    }
 
                     if (selected.size() == 1) {
 
@@ -3105,9 +3110,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             }
 
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
-                            importIcon.setVisible(true);
+                            if(Util.isOnline(chatActivity)){
+                                menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
+                                menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
+                                importIcon.setVisible(true);
+                            }
+                            else{
+                                menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                                importIcon.setVisible(false);
+                            }
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
@@ -3158,7 +3170,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 }
                                 else{
-                                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                                    if(Util.isOnline(chatActivity)){
+                                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
+                                    }
+                                    else{
+                                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                                    }
                                 }
                             }
                             else{
@@ -3216,9 +3233,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
 
                         if(allNodeAttachments){
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
-                            importIcon.setVisible(true);
+                            if(Util.isOnline(chatActivity)){
+                                menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
+                                menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
+                                importIcon.setVisible(true);
+                            }
+                            else{
+                                menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                                menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                                importIcon.setVisible(false);
+                            }
                         }
                         else{
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
@@ -3229,7 +3253,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete);
-                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(showForward);
+                        if(Util.isOnline(chatActivity)){
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(showForward);
+                        }
+                        else{
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
+                        }
                     }
                 }
             }
@@ -3369,6 +3398,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void itemClick(int positionInAdapter) {
+        log("itemClick");
         int position = positionInAdapter-1;
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -3565,16 +3595,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                                 log("show contact attachment panel");
-                                if (m != null) {
-                                    if (m.getMessage().getUsersCount() == 1) {
-                                        long userHandle = m.getMessage().getUserHandle(0);
-                                        if(userHandle != megaApi.getMyUser().getHandle()){
+                                if (Util.isOnline(this)) {
+                                    if (m != null) {
+                                        if (m.getMessage().getUsersCount() == 1) {
+                                            long userHandle = m.getMessage().getUserHandle(0);
+                                            if(userHandle != megaChatApi.getMyUserHandle()){
+                                                showContactAttachmentBottomSheet(m, position);
+                                            }
+                                        }
+                                        else{
                                             showContactAttachmentBottomSheet(m, position);
                                         }
                                     }
-                                    else{
-                                        showContactAttachmentBottomSheet(m, position);
-                                    }
+                                }
+                                else{
+                                    //No shown - is not possible to know is it already contact or not - megaApi not working
+                                    showSnackbar(getString(R.string.error_server_connection_problem));
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTAINS_META){
