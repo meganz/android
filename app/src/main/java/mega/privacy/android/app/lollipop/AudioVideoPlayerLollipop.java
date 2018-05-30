@@ -278,6 +278,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean playWhenReady = true;
     boolean searchExpand = false;
     boolean fromChat = false;
+    boolean isDeleteDialogShow = false;
 
     ChatController chatC;
     private long msgId = -1;
@@ -321,8 +322,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             querySearch = savedInstanceState.getString("querySearch");
             playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
             accountType = savedInstanceState.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+            isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
         }
         else {
+            isDeleteDialogShow = false;
             onPlaylist = false;
             currentTime = 0;
             currentWindowIndex = 0;
@@ -512,6 +515,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if (msgChat != null){
                             nodeChat = msgChat.getMegaNodeList().get(0);
+                            if (isDeleteDialogShow) {
+                                showConfirmationDeleteNode(chatId, msgChat);
+                            }
                         }
                     }
                     else {
@@ -1075,7 +1081,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         });
         numErrors = 0;
         player.setPlayWhenReady(playWhenReady);
-        player.seekTo(currentWindowIndex, currentTime);
+        if (isPlayList){
+            player.seekTo(currentWindowIndex, currentTime);
+        }
+        else {
+            player.seekTo(currentTime);
+        }
         player.setVideoDebugListener(this);
         onTracksChange = false;
     }
@@ -1654,7 +1665,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void findSelected() {
-//        boolean found = false;
 
         if (isOffLine){
             for (int i=0; i<mediaOffList.size(); i++) {
@@ -1675,59 +1685,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (player != null){
             currentTime = player.getCurrentPosition();
         }
-
-//        if (isOffLine){
-//            ArrayList<MegaOffline> tempOffLine = new ArrayList<>();
-//            ArrayList<MegaOffline> orderOffLine = new ArrayList<>();
-//
-//            for (int i=0; i<mediaOffList.size(); i++){
-//                if (!found) {
-//                    if (handle == Long.parseLong(mediaOffList.get(i).getHandle())) {
-//                        found = true;
-//                        orderOffLine.add(mediaOffList.get(i));
-//                    }
-//                    else {
-//                        tempOffLine.add(mediaOffList.get(i));
-//                    }
-//                }
-//                else {
-//                    orderOffLine.add(mediaOffList.get(i));
-//                }
-//            }
-//            if (tempOffLine.size() > 0) {
-//                for (int i=0; i<tempOffLine.size(); i++) {
-//                    orderOffLine.add(tempOffLine.get(i));
-//                }
-//            }
-//            mediaOffList.clear();
-//            mediaOffList = (ArrayList<MegaOffline>) orderOffLine.clone();
-//        }
-//        else {
-//            ArrayList<Long> tempHandles = new ArrayList<>();
-//            ArrayList<Long> orderHandles = new ArrayList<>();
-//
-//            for (int i=0; i<mediaHandles.size(); i++){
-//                if (!found) {
-//                    if (handle == mediaHandles.get(i)) {
-//                        found = true;
-//                        orderHandles.add(mediaHandles.get(i));
-//                    }
-//                    else {
-//                        tempHandles.add(mediaHandles.get(i));
-//                    }
-//                }
-//                else {
-//                    orderHandles.add(mediaHandles.get(i));
-//                }
-//            }
-//            if (tempHandles.size() > 0) {
-//                for (int i=0; i<tempHandles.size(); i++) {
-//                    orderHandles.add(tempHandles.get(i));
-//                }
-//            }
-//            mediaHandles.clear();
-//            mediaHandles = (ArrayList<Long>) orderHandles.clone();
-//        }
     }
 
     public void sortByNameDescending(){
@@ -1828,6 +1785,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         log("onSaveInstanceState");
+        playWhenReady = player.getPlayWhenReady();
         currentTime = player.getCurrentPosition();
         outState.putLong("currentTime", currentTime);
         outState.putInt("currentPosition", currentPosition);
@@ -1840,9 +1798,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putInt("currentWindowIndex", currentWindowIndex);
         outState.putInt("size", size);
         outState.putString("querySearch", querySearch);
-        playWhenReady = player.getPlayWhenReady();
         outState.putBoolean("playWhenReady", playWhenReady);
         outState.putInt("typeAccount", accountType);
+        outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
     }
 
     public String getFileName(Uri uri) {
@@ -2468,11 +2426,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                              chatC = new ChatController(audioVideoPlayerLollipop);
                          }
                          chatC.deleteMessage(message, chatId);
+                         isDeleteDialogShow = false;
                          finish();
                          break;
             
                      case DialogInterface.BUTTON_NEGATIVE:
                          //No button clicked
+                         isDeleteDialogShow = false;
                          break;
                  }
              }
@@ -2490,6 +2450,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
          builder.setPositiveButton(R.string.context_remove, dialogClickListener)
                  .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+         isDeleteDialogShow = true;
+
+         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+             @Override
+             public void onDismiss(DialogInterface dialog) {
+                 isDeleteDialogShow = false;
+             }
+         });
      }
 
      public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
