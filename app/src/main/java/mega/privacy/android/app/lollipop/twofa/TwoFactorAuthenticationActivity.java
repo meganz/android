@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop.twofa;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -44,7 +46,7 @@ import static android.graphics.Color.WHITE;
  * Created by mega on 28/05/18.
  */
 
-public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface{
+public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener{
 
     private Toolbar tB;
     private ActionBar aB;
@@ -55,6 +57,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private Button setup2FAButton;
     private ImageView qrImage;
     private TextView seedText;
+
+    private String seed = null;
 
     InputMethodManager imm;
     private EditTextPIN firstPin;
@@ -109,6 +113,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         confirmContainer = (RelativeLayout) findViewById(R.id.container_confirm_2fa);
         qrImage = (ImageView) findViewById(R.id.qr_2fa);
         seedText = (TextView) findViewById(R.id.seed_2fa);
+        seedText.setOnLongClickListener(this);
 
         if (confirm2FAisShown){
             scrollContainer2FA.setVisibility(View.GONE);
@@ -302,7 +307,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         verifyButton.setOnClickListener(this);
     }
 
-    void generate2FAQR (String seed){
+    void generate2FAQR (){
         log("generate2FAQR");
 
         Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
@@ -335,7 +340,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         }
         if (url != null){
             try {
-                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 500, 500);
+                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 500, 500, null);
             } catch (WriterException e) {
                 e.printStackTrace();
             }
@@ -431,8 +436,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             log("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET");
             if (e.getErrorCode() == MegaError.API_OK){
                 log("MegaError.API_OK");
-                if (request.getText() != null){
-                    generate2FAQR(request.getText());
+                seed = request.getText();
+                if (seedText != null){
+                    generate2FAQR();
                 }
             }
             else {
@@ -444,5 +450,24 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+
+        switch (v.getId()){
+            case R.id.seed_2fa: {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                String stringClip = seedText.getText().toString();
+                if (stringClip != null) {
+                    ClipData clip = ClipData.newPlainText("seed", stringClip);
+                    if (clip != null){
+                        clipboard.setPrimaryClip(clip);
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }
