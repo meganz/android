@@ -2870,6 +2870,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if(rChatFL.isAdded()){
 							rChatFL.setChats();
 							rChatFL.setStatus();
+
+							try {
+								ChatAdvancedNotificationBuilder notificationBuilder;
+								notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
+								notificationBuilder.removeAllChatNotifications();
+							}
+							catch (Exception e){
+								log("Exception NotificationManager - remove all notifications");
+							}
+
+							MegaApplication.setRecentChatVisible(true);
 						}
 					}
 					break;
