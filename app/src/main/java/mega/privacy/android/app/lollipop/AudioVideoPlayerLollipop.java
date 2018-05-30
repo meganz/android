@@ -417,9 +417,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-
-
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
+
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
+        }
+        else{
+            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
+        }
 
         if (fileName != null) {
             aB.setTitle(" ");

@@ -418,6 +418,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
 
         setTitle(pdfFileName);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+        }
+        else{
+            fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+        }
+
         fileNameTextView.setText(pdfFileName);
 
         uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
@@ -692,6 +700,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             path = uri.getPath();
             setTitle(pdfFileName);
             aB.setTitle(pdfFileName);
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+            }
+            else{
+                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+            }
             fileNameTextView.setText(pdfFileName);
 
             uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
