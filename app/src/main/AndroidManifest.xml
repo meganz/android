@@ -84,8 +84,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:configChanges="orientation">
+            android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
