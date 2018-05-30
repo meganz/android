@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -36,6 +37,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 
 /**
@@ -52,6 +54,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private RelativeLayout confirmContainer;
     private Button setup2FAButton;
     private ImageView qrImage;
+    private TextView seedText;
 
     InputMethodManager imm;
     private EditTextPIN firstPin;
@@ -105,6 +108,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         qrSeedContainer = (RelativeLayout) findViewById(R.id.container_qr_2fa);
         confirmContainer = (RelativeLayout) findViewById(R.id.container_confirm_2fa);
         qrImage = (ImageView) findViewById(R.id.qr_2fa);
+        seedText = (TextView) findViewById(R.id.seed_2fa);
 
         if (confirm2FAisShown){
             scrollContainer2FA.setVisibility(View.GONE);
@@ -309,10 +313,29 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         String myEmail = megaApi.getMyEmail();
         if (myEmail != null & seed != null){
             url = getString(R.string.url_qr_2fa, myEmail, seed);
+            String seed2FA = "";
+            int i = 0;
+            int k = 0;
+            for (int j=0; j<seed.length(); j++){
+                i++;
+                seed2FA += seed.charAt(j);
+                if (i == 4 && j != 32){
+                    k++;
+                    i = 0;
+                    if (k == 4){
+                        k = 0;
+                        seed2FA += "\n";
+                    }
+                    else {
+                        seed2FA += "     ";
+                    }
+                }
+            }
+            seedText.setText(seed2FA.toUpperCase());
         }
         if (url != null){
             try {
-                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, hints);
+                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 500, 500);
             } catch (WriterException e) {
                 e.printStackTrace();
             }
@@ -323,12 +346,12 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             for (int y = 0; y < h; y++) {
                 int offset = y * w;
                 for (int x = 0; x < w; x++) {
-                    pixels[offset + x] = bitMatrix.get(x, y) ? getResources().getColor(R.color.lollipop_primary_color) : WHITE;
+                    pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
                 }
             }
 
             Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            bitmap.setPixels(pixels, 0, 500, 0, 0, w, h);
+            bitmap.setPixels(pixels, 0, w, 0, 0, w, h);
 
             qrImage.setImageBitmap(bitmap);
         }
