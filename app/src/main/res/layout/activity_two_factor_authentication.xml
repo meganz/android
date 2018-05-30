@@ -117,6 +117,7 @@
                 android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/explain_qr_seed_2fa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/explain_qr_seed_2fa"
@@ -130,14 +131,16 @@
                     android:id="@+id/qr_2fa"
                     android:layout_width="160dp"
                     android:layout_height="160dp"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/explain_qr_seed_2fa"/>
 
                 <TextView
                     android:id="@+id/seed_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="XXFR   G56H   JKI8   KP09"
                     android:textSize="16sp"
+                    android:textIsSelectable="true"
+                    android:gravity="center"
                     android:textColor="@color/name_my_account"
                     android:fontFamily="roboto"
                     android:layout_below="@id/qr_2fa"
