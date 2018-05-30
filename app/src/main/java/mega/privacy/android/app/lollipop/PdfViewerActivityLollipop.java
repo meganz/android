@@ -221,6 +221,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     boolean toolbarVisible = true;
     boolean fromChat = false;
+    boolean isDeleteDialogShow = false;
 
     ChatController chatC;
     private long msgId = -1;
@@ -251,10 +252,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             uri = Uri.parse(savedInstanceState.getString("uri"));
             renamed = savedInstanceState.getBoolean("renamed");
             accountType = savedInstanceState.getInt("typeAccount");
+            isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
         }
         else {
             currentPage = 0;
             accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+            isDeleteDialogShow = false;
         }
         fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
@@ -313,6 +316,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         msgChat = megaChatApi.getMessage(chatId, msgId);
                         if (msgChat != null) {
                             nodeChat = msgChat.getMegaNodeList().get(0);
+                            if (isDeleteDialogShow) {
+                                showConfirmationDeleteNode(chatId, msgChat);
+                            }
                         }
                     } else {
                         log("msgId or chatId null");
@@ -751,6 +757,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
         outState.putInt("typeAccount", accountType);
+        outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
     }
 
     @Override
@@ -1434,10 +1441,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             chatC = new ChatController(pdfViewerActivityLollipop);
                         }
                         chatC.deleteMessage(message, chatId);
+                        isDeleteDialogShow = false;
                         finish();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         //No button clicked
+                        isDeleteDialogShow = false;
                         break;
                 }
             }
@@ -1453,6 +1462,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         builder.setMessage(R.string.confirmation_delete_one_attachment);
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+        isDeleteDialogShow = true;
+
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isDeleteDialogShow = false;
+            }
+        });
     }
 
     public void moveToTrash(){
