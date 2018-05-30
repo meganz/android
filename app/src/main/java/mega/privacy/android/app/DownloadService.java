@@ -653,6 +653,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							pdfIntent.putExtra("isUrl", false);
 							startActivity(pdfIntent);
 						}
+						else {
+							log("Show notification 2");
+							mBuilderCompat
+									.setSmallIcon(R.drawable.ic_stat_notify_download)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
 						log("Video/Audio file");
@@ -675,6 +686,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							startActivity(mediaIntent);
+						}
+						else {
+							log("Show notification 2");
+							mBuilderCompat
+									.setSmallIcon(R.drawable.ic_stat_notify_download)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
