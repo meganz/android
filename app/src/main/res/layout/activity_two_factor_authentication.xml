@@ -20,7 +20,8 @@
         android:id="@+id/scroll_container_2fa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar">
+        android:layout_below="@+id/toolbar"
+        android:background="@color/white">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -104,7 +105,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar">
+        android:layout_below="@+id/toolbar"
+        android:background="@color/white">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -139,7 +141,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:textIsSelectable="true"
                     android:gravity="center"
                     android:textColor="@color/name_my_account"
                     android:fontFamily="roboto"
