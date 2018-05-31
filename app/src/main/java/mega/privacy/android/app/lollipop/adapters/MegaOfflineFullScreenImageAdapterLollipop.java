@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -15,9 +16,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +41,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 
 
-public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener {
+public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener{
 	
 	private Activity activity;
 	private MegaOfflineFullScreenImageAdapterLollipop megaFullScreenImageAdapter;
@@ -46,7 +53,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	private boolean zipImage = false;
     Context context;
 
-    private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
+	private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
 		
 		ViewHolderOfflineFullImage holder;
 		String currentPath;
@@ -103,11 +110,13 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	/*view holder class*/
     public class ViewHolderOfflineFullImage {
         TouchImageView imgDisplay;
+        ImageView gifImgDisplay;
         ProgressBar progressBar;
         ProgressBar downloadProgressBar;
         String currentPath;
         long currentHandle;
         int position;
+        boolean isGIF;
     }
 	
 	// constructor
@@ -169,38 +178,79 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		ViewHolderOfflineFullImage holder = new ViewHolderOfflineFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
-		
-		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
-		holder.imgDisplay.setOnClickListener(this);
+
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
 		holder.progressBar.setVisibility(View.GONE);
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		
-		Bitmap preview = null;
-		Bitmap thumb = null;
-		
-		if (zipImage){
-			holder.currentPath = paths.get(position);
-			log("ZIP holder.currentPath: "+holder.currentPath);
-		}
-		else{
+		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
+		holder.imgDisplay.setOnClickListener(this);
+		holder.gifImgDisplay = (ImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
+		holder.gifImgDisplay.setOnClickListener(this);
+
+		if (isGIF(mOffList.get(position).getName())){
+			holder.isGIF = true;
+			holder.imgDisplay.setVisibility(View.GONE);
+			holder.gifImgDisplay.setVisibility(View.VISIBLE);
+			holder.gifImgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
 			holder.currentPath = mOffList.get(position).getPath();
-			log("holder.currentPath: "+holder.currentPath);
-			try{
+
+			try {
 				holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
-				
-				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+				Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
 				if (thumb != null){
-					holder.imgDisplay.setImageBitmap(thumb);
+					holder.gifImgDisplay.setImageBitmap(thumb);
 				}
-				else{
-					preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+			}
+			catch (Exception e){}
+
+			File file = getOfflineFile(position);
+			if (file != null){
+				final ProgressBar pb = holder.progressBar;
+				holder.progressBar.setVisibility(View.VISIBLE);
+
+				Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
+					@Override
+					public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+						return false;
+					}
+
+					@Override
+					public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+						pb.setVisibility(View.GONE);
+						return false;
+					}
+				}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+			}
+		}
+		else {
+			holder.isGIF = false;
+			holder.imgDisplay.setVisibility(View.VISIBLE);
+			holder.gifImgDisplay.setVisibility(View.GONE);
+			holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
+
+			if (zipImage){
+				holder.currentPath = paths.get(position);
+				log("ZIP holder.currentPath: "+holder.currentPath);
+			}
+			else{
+				holder.currentPath = mOffList.get(position).getPath();
+				log("holder.currentPath: "+holder.currentPath);
+				try{
+					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
+
+					Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+					if (thumb != null){
+						holder.imgDisplay.setImageBitmap(thumb);
+
+					}
+
+					Bitmap preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
 					if (preview != null){
 						holder.imgDisplay.setImageBitmap(preview);
 					}
-					
+
 					try{
 						new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
 					}
@@ -208,8 +258,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 						//Too many AsyncTasks
 					}
 				}
+				catch(Exception e){}
 			}
-			catch(Exception e){}
 		}
 		
 		visibleImgs.put(position, holder);
@@ -239,13 +289,19 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
  
     }
 	
-	public TouchImageView getVisibleImage(int position){
-		return visibleImgs.get(position).imgDisplay;
+	public ImageView getVisibleImage(int position){
+    	if (visibleImgs.get(position).isGIF) {
+			return visibleImgs.get(position).gifImgDisplay;
+		}
+		else {
+			return visibleImgs.get(position).imgDisplay;
+		}
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
+			case R.id.full_screen_image_viewer_gif:
 			case R.id.full_screen_image_viewer_image:{
 				
 				Display display = activity.getWindowManager().getDefaultDisplay();
@@ -276,5 +332,56 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	}
 	private static void log(String log) {
 		Util.log("MegaOfflineFullScreenImageAdapterLollipop", log);
+	}
+
+	public boolean isGIF(String name){
+
+		String s[] = name.split("\\.");
+
+		if (s != null){
+			if (s[s.length-1].equals("gif")){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public File getOfflineFile (int position){
+
+		File file = null;
+		MegaOffline checkOffline = mOffList.get(position);
+
+		if(checkOffline.getOrigin()==MegaOffline.INCOMING){
+			log("isIncomingOffline");
+
+			if (Environment.getExternalStorageDirectory() != null){
+				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+				log("offlineDirectory: "+file);
+			}
+			else{
+				file = context.getFilesDir();
+			}
+		}
+		else if(checkOffline.getOrigin()==MegaOffline.INBOX){
+			if (Environment.getExternalStorageDirectory() != null){
+				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
+				log("offlineDirectory: "+file);
+			}
+			else{
+				file = context.getFilesDir();
+			}
+		}
+		else{
+			log("NOT isIncomingOffline");
+			if (Environment.getExternalStorageDirectory() != null){
+				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+			}
+			else{
+				file = context.getFilesDir();
+			}
+		}
+
+		return file;
 	}
 }
