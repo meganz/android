@@ -8,6 +8,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitCenter" />
+
+    <ImageView
+        android:id="@+id/full_screen_image_viewer_gif"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"/>
     
     <ProgressBar
         android:id="@+id/full_screen_image_viewer_progress_bar"

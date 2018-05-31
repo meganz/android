@@ -169,47 +169,47 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	private RelativeLayout bottomLayout;
 	private ExtendedViewPager viewPager;
-	
+
 	static FullScreenImageViewerLollipop fullScreenImageViewer;
     private MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
 	private String offlinePathDirectory;
-    
+
     int adapterType = 0;
     long[] handlesNodesSearched;
 
 	int countChat = 0;
 	int errorSent = 0;
 	int successSent = 0;
-    
+
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
-	
+
 	MegaNode node;
 
 	int typeExport = -1;
 
 	boolean shareIt = true;
 	boolean moveToRubbish = false;
-	
+
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
-	
+
 	private android.support.v7.app.AlertDialog renameDialog;
-	
+
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-	
+
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
-	
+
 	boolean isFolderLink = false;
-	
+
 	ArrayList<Long> handleListM = new ArrayList<Long>();
-	
+
 	ArrayList<MegaOffline> mOffList;
 	ArrayList<MegaOffline> mOffListImages;
 
@@ -222,14 +222,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
-		{	
+		{
 			megaApi.removeRequestListener(this);
 			megaApi.removeGlobalListener(this);
 		}
-		
+
 		super.onDestroy();
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
@@ -813,7 +813,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
-		
+
 		fragmentContainer = (RelativeLayout) findViewById(R.id.full_image_viewer_parent_layout);
 
 		Intent intent = getIntent();
@@ -830,15 +830,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else{
 			megaApi = app.getMegaApi();
 		}
-
-		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-			intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intentLogin);
-			finish();
-			return;
+		if(Util.isOnline(this)) {
+			if (megaApi == null || megaApi.getRootNode() == null) {
+				log("Refresh session - sdk");
+				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+				intentLogin.putExtra("visibleFragment", Constants.LOGIN_FRAGMENT);
+				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intentLogin);
+				finish();
+				return;
+			}
 		}
 
 		if(Util.isChatEnabled()){
@@ -910,7 +911,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			log("PATHNAVIGATION: " + pathNavigation);
 			mOffList=dbH.findByPath(pathNavigation);
 			log ("mOffList.size() = " + mOffList.size());
-			
+
 			for(int i=0; i<mOffList.size();i++){
 				MegaOffline checkOffline = mOffList.get(i);
 				File offlineDirectory = null;
@@ -953,7 +954,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 			}
-			
+
 			if (mOffList != null){
 				if(!mOffList.isEmpty()) {
 					MegaOffline lastItem = mOffList.get(mOffList.size()-1);
@@ -965,7 +966,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
 							mOffList.add(masterKeyFile);
 						}
-					}	
+					}
 				}
 				else{
 					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.oldMKFile;
@@ -977,16 +978,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 				}
 			}
-			
+
 			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 				sortByNameDescending();
 			}
 			else{
 				sortByNameAscending();
 			}
-			
+
 			if (mOffList.size() > 0){
-				
+
 				mOffListImages = new ArrayList<MegaOffline>();
 				int positionImage = -1;
 				for (int i=0;i<mOffList.size();i++){
@@ -998,16 +999,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						}
 					}
 				}
-				
+
 				if (positionG >= mOffListImages.size()){
 					positionG = 0;
 				}
-				
+
 				adapterOffline = new MegaOfflineFullScreenImageAdapterLollipop(this, fullScreenImageViewer, mOffListImages);
 				viewPager.setAdapter(adapterOffline);
-				
+
 				viewPager.setCurrentItem(positionG);
-		
+
 				viewPager.setOnPageChangeListener(this);
 			}
 
@@ -1023,7 +1024,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			currentNode = mOffListImages.get(positionG);
 
 			fileNameTextView.setText(currentNode.getName());
-		}				
+		}
 		else if (adapterType == Constants.ZIP_ADAPTER){
 
 			File offlineDirectory = new File(offlinePathDirectory);
@@ -1107,14 +1108,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			}
-			
+
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
 					if (i == positionG){
-						positionG = imageNumber; 
+						positionG = imageNumber;
 					}
 					imageNumber++;
 				}
@@ -1125,18 +1126,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 				return;
 			}
-			
+
 			if(positionG >= imageHandles.size())
 			{
 				positionG = 0;
 			}
-			
+
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
-			
+
 			viewPager.setAdapter(adapterMega);
-			
+
 			viewPager.setCurrentItem(positionG);
-	
+
 			viewPager.setOnPageChangeListener(this);
 
 			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
@@ -1204,7 +1205,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}else{
 
 			if (parentNodeHandle == -1){
-	
+
 				switch(adapterType){
 					case Constants.FILE_BROWSER_ADAPTER:{
 						parentNode = megaApi.getRootNode();
@@ -1226,13 +1227,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						parentNode = megaApi.getRootNode();
 						break;
 					}
-				} 
-				
+				}
+
 			}
 			else{
 				parentNode = megaApi.getNodeByHandle(parentNodeHandle);
 			}
-			
+
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 //			if (fromShared){
 //				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1248,19 +1249,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
 					if (i == positionG){
-						positionG = imageNumber; 
+						positionG = imageNumber;
 					}
 					imageNumber++;
 				}
 			}
 //			Toast.makeText(this, ""+parentNode.getName() + "_" + imageHandles.size(), Toast.LENGTH_LONG).show();
-				
+
 			if(imageHandles.size() == 0)
 			{
 				finish();
 				return;
 			}
-			
+
 			if(positionG >= imageHandles.size())
 			{
 				positionG = 0;
@@ -1276,11 +1277,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-			
+
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
-			
+
 			viewPager.setAdapter(adapterMega);
-			
+
 			viewPager.setCurrentItem(positionG);
 
 			viewPager.setOnPageChangeListener(this);
@@ -1879,12 +1880,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void sortByNameDescending(){
-		
+
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-		
-		
+
+
 		for(int k = 0; k < mOffList.size() ; k++) {
 			MegaOffline node = mOffList.get(k);
 			if(node.getType().equals("1")){
@@ -1894,8 +1895,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				filesOrder.add(node.getName());
 			}
 		}
-		
-	
+
+
 		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
 		Collections.reverse(foldersOrder);
 		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
@@ -1907,33 +1908,33 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				String nameOffline = mOffList.get(j).getName();
 				if(name.equals(nameOffline)){
 					tempOffline.add(mOffList.get(j));
-				}				
+				}
 			}
-			
+
 		}
-		
+
 		for(int k = 0; k < filesOrder.size() ; k++) {
 			for(int j = 0; j < mOffList.size() ; j++) {
 				String name = filesOrder.get(k);
 				String nameOffline = mOffList.get(j).getName();
 				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));					
-				}				
+					tempOffline.add(mOffList.get(j));
+				}
 			}
-			
+
 		}
-		
+
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 	}
 
-	
+
 	public void sortByNameAscending(){
 		log("sortByNameAscending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
 		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
-				
+
 		for(int k = 0; k < mOffList.size() ; k++) {
 			MegaOffline node = mOffList.get(k);
 			if(node.getType().equals("1")){
@@ -1942,8 +1943,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else{
 				filesOrder.add(node.getName());
 			}
-		}		
-	
+		}
+
 		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
 		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
 
@@ -1953,31 +1954,31 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				String nameOffline = mOffList.get(j).getName();
 				if(name.equals(nameOffline)){
 					tempOffline.add(mOffList.get(j));
-				}				
-			}			
+				}
+			}
 		}
-		
+
 		for(int k = 0; k < filesOrder.size() ; k++) {
 			for(int j = 0; j < mOffList.size() ; j++) {
 				String name = filesOrder.get(k);
 				String nameOffline = mOffList.get(j).getName();
 				if(name.equals(nameOffline)){
 					tempOffline.add(mOffList.get(j));
-				}				
+				}
 			}
-			
+
 		}
-		
+
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 	}
-	
+
 	public ArrayList<MegaNode> sortByNameAscending(ArrayList<MegaNode> nodes){
 		log("sortByNameAscending");
-		
+
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-		
+
 		for (int i=0;i<nodes.size();i++){
 			if (nodes.get(i).isFolder()){
 				folderNodes.add(nodes.get(i));
@@ -1986,7 +1987,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				fileNodes.add(nodes.get(i));
 			}
 		}
-		
+
 		for (int i=0;i<folderNodes.size();i++){
 			for (int j=0;j<folderNodes.size()-1;j++){
 				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) > 0){
@@ -1999,7 +2000,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		
+
 		for (int i=0;i<fileNodes.size();i++){
 			for (int j=0;j<fileNodes.size()-1;j++){
 				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) > 0){
@@ -2012,19 +2013,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		
+
 		nodes.clear();
 		nodes.addAll(folderNodes);
 		nodes.addAll(fileNodes);
-		
+
 		return nodes;
 	}
-	
+
 	public ArrayList<MegaNode> sortByNameDescending(ArrayList<MegaNode> nodes){
-		
+
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
-		
+
 		for (int i=0;i<nodes.size();i++){
 			if (nodes.get(i).isFolder()){
 				folderNodes.add(nodes.get(i));
@@ -2033,7 +2034,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				fileNodes.add(nodes.get(i));
 			}
 		}
-		
+
 		for (int i=0;i<folderNodes.size();i++){
 			for (int j=0;j<folderNodes.size()-1;j++){
 				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) < 0){
@@ -2046,7 +2047,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		
+
 		for (int i=0;i<fileNodes.size();i++){
 			for (int j=0;j<fileNodes.size()-1;j++){
 				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) < 0){
@@ -2059,11 +2060,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		
+
 		nodes.clear();
 		nodes.addAll(folderNodes);
 		nodes.addAll(fileNodes);
-		
+
 		return nodes;
 	}
 
@@ -2094,12 +2095,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onPageSelected(int position) {
 		return;
 	}
-	
+
 	@Override
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 		return;
 	}
-	
+
 	@Override
 	public void onPageScrollStateChanged(int state) {
 		if (state == ViewPager.SCROLL_STATE_IDLE){
@@ -2154,22 +2155,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		savedInstanceState.putInt("adapterType", adapterType);
 		if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
-			
+
 		}
 		else{
 			savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 			savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		}
 	}
-	
+
 	@Override
 	public void onRestoreInstanceState (Bundle savedInstanceState){
 		super.onRestoreInstanceState(savedInstanceState);
-		
+
 		adapterType = savedInstanceState.getInt("adapterType");
-		
+
 		if ((adapterType == Constants.OFFLINE_ADAPTER) || (adapterType == Constants.ZIP_ADAPTER)){
-			
+
 		}
 		else{
 			aBshown = savedInstanceState.getBoolean("aBshown");
@@ -2378,16 +2379,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (newName.equals(node.getName())) {
 			return;
 		}
-		
+
 		if(!Util.isOnline(this)){
 			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
-		
+
 		if (isFinishing()){
 			return;
 		}
-		
+
 		ProgressDialog temp = null;
 		try{
 			temp = new ProgressDialog(this);
@@ -2398,12 +2399,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 		statusDialog = temp;
-		
+
 		log("renaming " + node.getName() + " to " + newName);
-		
+
 		megaApi.renameNode(node, newName, this);
 	}
-	
+
 	public void showMove(){
 		log("showMove");
 
@@ -2411,7 +2412,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(node.getHandle());
-		
+
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -2421,7 +2422,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		intent.putExtra("MOVE_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
-	
+
 	public void showCopy(){
 		log("showCopy");
 
@@ -2429,7 +2430,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(node.getHandle());
-		
+
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -2439,7 +2440,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		intent.putExtra("COPY_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
 	}
-	
+
 	public void moveToTrash(){
 		log("moveToTrash");
 
@@ -2451,32 +2452,32 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
-		
+
 		if(isFinishing()){
-			return;	
+			return;
 		}
-		
+
 		final MegaNode rubbishNode = megaApi.getRubbishNode();
-		
+
 		MegaNode parent = megaApi.getNodeByHandle(handle);
 		while (megaApi.getParentNode(parent) != null){
 			parent = megaApi.getParentNode(parent);
 		}
-		
+
 		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-			moveToRubbish = true;			
+			moveToRubbish = true;
 		}
 		else{
 			moveToRubbish = false;
 		}
-		
+
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
 		        switch (which){
 		        case DialogInterface.BUTTON_POSITIVE:
 		    		//Check if the node is not yet in the rubbish bin (if so, remove it)
-		    		
+
 		    		if (moveToRubbish){
 		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fullScreenImageViewer);
 		    			ProgressDialog temp = null;
@@ -2504,7 +2505,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		    			statusDialog = temp;
 		    		}
 
-		        	
+
 		            break;
 
 		        case DialogInterface.BUTTON_NEGATIVE:
@@ -2513,7 +2514,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		        }
 		    }
 		};
-		
+
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
@@ -2561,30 +2562,30 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		
+
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
-		
+
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_RENAME){
-			
-			try { 
-				statusDialog.dismiss();	
-			} 
+
+			try {
+				statusDialog.dismiss();
+			}
 			catch (Exception ex) {}
-			
+
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
-			}			
+			}
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			try { 
-				statusDialog.dismiss();	
-			} 
+			try {
+				statusDialog.dismiss();
+			}
 			catch (Exception ex) {}
-			
+
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					if(positionToRemove!=-1){
@@ -2626,13 +2627,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-			
-			
+
+
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (statusDialog.isShowing()){
-					try { 
-						statusDialog.dismiss();	
-					} 
+					try {
+						statusDialog.dismiss();
+					}
 					catch (Exception ex) {}
 					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
 				}
@@ -2644,11 +2645,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			log("remove request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
-			try { 
-				statusDialog.dismiss();	
-			} 
+			try {
+				statusDialog.dismiss();
+			}
 			catch (Exception ex) {}
-			
+
 			if (e.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 			}
@@ -2662,9 +2663,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());	
+		log("onRequestTemporaryError: " + request.getRequestString());
 	}
-	
+
 	public static void log(String message) {
 		Util.log("FullScreenImageViewerLollipop", message);
 	}
@@ -2717,14 +2718,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			toast.show();
 		}
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		
+
 		if (intent == null) {
 			return;
 		}
-		
+
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
@@ -2769,19 +2770,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-			
+
 			if(!Util.isOnline(this)){
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
+
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 			final int totalMoves = moveHandles.length;
-			
+
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
-			
+
 			ProgressDialog temp = null;
 			try{
 				temp = new ProgressDialog(this);
@@ -2792,7 +2793,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				return;
 			}
 			statusDialog = temp;
-			
+
 			for(int i=0; i<moveHandles.length;i++){
 				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
 			}
@@ -2802,11 +2803,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
-			
+
 			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
-			
+
 			ProgressDialog temp = null;
 			try{
 				temp = new ProgressDialog(this);
@@ -2817,7 +2818,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				return;
 			}
 			statusDialog = temp;
-			
+
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for(int i=0; i<copyHandles.length;i++){
 				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
@@ -2860,10 +2861,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	// Get list of all child files
 
 	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-		
+
 		if (megaApi.getRootNode() == null)
 			return;
-		
+
 		folder.mkdir();
 		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
 		for(int i=0; i<nodeList.size(); i++){
@@ -2871,7 +2872,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (document.getType() == MegaNode.TYPE_FOLDER) {
 				File subfolder = new File(folder, new String(document.getName()));
 				getDlList(dlFiles, document, subfolder);
-			} 
+			}
 			else {
 				dlFiles.put(document, folder.getAbsolutePath());
 			}
