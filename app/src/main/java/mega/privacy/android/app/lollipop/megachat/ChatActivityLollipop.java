@@ -205,7 +205,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     boolean noMoreNoSentMessages = false;
 
-    public boolean showRichLinkWarning = true;
+    public int showRichLinkWarning = Constants.RICH_WARNING_TRUE;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
 
@@ -2774,10 +2774,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                while(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
+
+                while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
                     index--;
                     msg = messages.get(index);
                 }
+
                 index++;
                 log("Add in position: "+index);
 
