@@ -2893,7 +2893,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     if(MegaApplication.isShowRichLinkWarning()){
                         log("SDK - show link rich warning");
-                        if(((ChatActivityLollipop)context).showRichLinkWarning){
+                        if(((ChatActivityLollipop)context).showRichLinkWarning == Constants.RICH_WARNING_TRUE){
                             log("ANDROID - show link rich warning");
 
                             ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
@@ -6637,7 +6637,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         int position = (Integer) v.getTag();
 
-        ((ChatActivityLollipop)context).showRichLinkWarning = false;
+        ((ChatActivityLollipop)context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
 
         switch(v.getId()) {
 

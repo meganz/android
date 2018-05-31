@@ -213,6 +213,10 @@ public class Constants {
 
 	public static String CHAT_FOLDER = "My chat files";
 
+	public static int RICH_WARNING_TRUE = 1;
+	public static int RICH_WARNING_FALSE= 0;
+	public static int RICH_WARNING_CONFIRMATION = 2;
+
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;
 
