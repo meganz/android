@@ -1909,4 +1909,7 @@
         <item context="one message" quantity="one">Message not forwarded</item>
         <item context="many messages" quantity="other">Messages not forwarded</item>
     </plurals>
+
+    <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
+    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
 </resources>
