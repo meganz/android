@@ -119,6 +119,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
+	HashMap<Long, Integer> typeAccount;
 
 	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
@@ -129,8 +130,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaNode offlineNode;
 
 	boolean isLoggingIn = false;
-
-	int typeAccount;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -148,6 +147,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		storeToAdvacedDevices = new HashMap<Long, Uri>();
 		fromMediaViewers = new HashMap<>();
+		typeAccount = new HashMap<>();
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -224,7 +224,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
-		typeAccount = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+		int intentTypeAccount = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 
         boolean fromMV = intent.getBooleanExtra("fromMV", false);
         log("fromMV: "+fromMV);
@@ -332,6 +332,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		fromMediaViewers.put(currentDocument.getHandle(), fromMV);
+        typeAccount.put(currentDocument.getHandle(), intentTypeAccount);
 
         currentDir = getDir(currentDocument, intent);
         currentDir.mkdirs();
@@ -350,7 +351,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			alreadyDownloaded++;
             if ((megaApi.getNumPendingDownloads() == 0) && (megaApiFolder.getNumPendingDownloads() == 0)){
-                onQueueComplete();
+                onQueueComplete(currentDocument.getHandle());
             }
 
             return;
@@ -471,7 +472,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
     }
 
-	private void onQueueComplete() {
+	private void onQueueComplete(long handle) {
 		log("onQueueComplete");
 
 		if((lock != null) && (lock.isHeld()))
@@ -479,7 +480,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-        showCompleteNotification();
+        showCompleteNotification(handle);
 
 		isForeground = false;
 		stopForeground(true);
@@ -539,7 +540,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	/*
 	 * Show download success notification
 	 */
-	private void showCompleteNotification() {
+	private void showCompleteNotification(long handle) {
 		log("showCompleteNotification");
 		String notificationTitle, size;
 
@@ -630,8 +631,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					boolean fromMV = false;
-					if (fromMediaViewers.containsKey(currentDocument.getHandle())){
-						fromMV = fromMediaViewers.get(currentDocument.getHandle());
+					if (fromMediaViewers.containsKey(handle)){
+						fromMV = fromMediaViewers.get(handle);
+					}
+
+					int intentTypeAccount = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+					if (typeAccount.containsKey(handle)){
+						intentTypeAccount = typeAccount.get(handle);
 					}
 
 					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
@@ -640,8 +646,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (!fromMV) {
 							Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 
-							pdfIntent.putExtra("typeAccount", typeAccount);
-							pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
+							pdfIntent.putExtra("typeAccount", intentTypeAccount);
+							pdfIntent.putExtra("HANDLE", handle);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
@@ -675,9 +681,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							} else {
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
-							mediaIntent.putExtra("typeAccount", typeAccount);
+							mediaIntent.putExtra("typeAccount", intentTypeAccount);
 							mediaIntent.putExtra("isPlayList", false);
-							mediaIntent.putExtra("HANDLE", currentDocument.getHandle());
+							mediaIntent.putExtra("HANDLE", handle);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
@@ -1194,7 +1200,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
-				onQueueComplete();
+				onQueueComplete(transfer.getNodeHandle());
 			}
 		}
 	}
