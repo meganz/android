@@ -2946,12 +2946,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     clearSelections();
                     hideMultipleSelect();
 
+                    ArrayList<MegaNodeList> list = new ArrayList<>();
                     for(int i = 0; i<messagesSelected.size();i++){
 
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
-                        chatC.prepareForChatDownload(megaNodeList);
+                        list.add(megaNodeList);
                     }
-
+                    chatC.prepareForChatDownload(list);
                     break;
                 }
                 case R.id.chat_cab_menu_import:{

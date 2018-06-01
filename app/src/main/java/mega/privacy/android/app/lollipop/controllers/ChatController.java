@@ -1305,6 +1305,24 @@ public class ChatController {
         checkSizeBeforeDownload(downloadLocationDefaultPath, nodeList);
     }
 
+    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
+        ArrayList<MegaNode> nodeList =  new ArrayList<>();
+        MegaNodeList megaNodeList;
+        for (int i= 0; i<list.size(); i++){
+            megaNodeList = list.get(i);
+            for (int j=0; j<megaNodeList.size(); j++){
+                nodeList.add(megaNodeList.get(j));
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            prepareForDownloadLollipop(nodeList);
+        }
+        else{
+            prepareForDownloadPreLollipop(nodeList);
+        }
+    }
+
     public void prepareForChatDownload(MegaNodeList list){
         ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
