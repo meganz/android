@@ -2117,7 +2117,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 					}
 					else{
-						TouchImageView tIV = adapterMega.getVisibleImage(oldPosition);
+						TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
 						if (tIV != null){
 							tIV.setZoom(1);
 						}
