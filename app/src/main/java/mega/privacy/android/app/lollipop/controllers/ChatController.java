@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -257,14 +258,20 @@ public class ChatController {
 
     public String createSingleManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
         log("createSingleManagementString");
-        String text = createManagementString(androidMessage, chatRoom);
-        text = text.substring(text.indexOf(":")+2);
+
+        String text = createManagementString(androidMessage.getMessage(), chatRoom);
+        if((text!=null) && (!text.isEmpty())){
+            text = text.substring(text.indexOf(":")+2);
+        }else{
+            text = "";
+
+        }
         return text;
     }
 
+
     public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
         log("createManagementString");
-
         long userHandle = message.getUserHandle();
 
         if (message.getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) {
@@ -414,7 +421,7 @@ public class ChatController {
                 return builder.toString();
 
             } //END CONTACT MANAGEMENT MESSAGE
-        } else if (message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) {
+        }else if (message.getType() == MegaChatMessage.TYPE_PRIV_CHANGE) {
             log("PRIVILEGE CHANGE message");
             if (message.getHandleOfAction() == megaApi.getMyUser().getHandle()) {
                 log("a moderator change my privilege");
@@ -533,7 +540,8 @@ public class ChatController {
                 builder.append(textToShow);
                 return builder.toString();
             }
-        } else {
+        }else {
+            log("other type of messages");
             //OTHER TYPE OF MESSAGES
             if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                 log("MY message!!:");
@@ -566,7 +574,7 @@ public class ChatController {
                         builder.append(messageContent);
                         return builder.toString();
                     }
-                } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
+                }else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     log("Message type TRUNCATE");
 
                     String textToShow = String.format(context.getString(R.string.history_cleared_by), megaChatApi.getMyFullname());
@@ -585,7 +593,7 @@ public class ChatController {
                     }
                     builder.append(result);
                     return builder.toString();
-                } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
+                }else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
                     log("Message type TITLE CHANGE: " + message.getContent());
 
                     String messageContent = message.getContent();
@@ -593,8 +601,16 @@ public class ChatController {
                     builder.append(textToShow);
                     return builder.toString();
 
-                } else {
-                    log("Type message: " + message.getType());
+                }else if(message.getType() == MegaChatMessage.TYPE_CONTAINS_META){
+                    MegaChatContainsMeta meta = message.getContainsMeta();
+                    if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
+                       String text = meta.getRichPreview().getText();
+                       builder.append(text);
+                       return builder.toString();
+                    }else{
+                       return "";
+                    }
+                }else{
                     return "";
                 }
             } else {
@@ -667,17 +683,27 @@ public class ChatController {
                     String textToShow = String.format(context.getString(R.string.non_format_change_title_messages), fullNameTitle, messageContent);
                     builder.append(textToShow);
                     return builder.toString();
-                } else {
+                }else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
+                    MegaChatContainsMeta meta = message.getContainsMeta();
+                    if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
+                        String text = meta.getRichPreview().getText();
+                        builder.append(text);
+                        return builder.toString();
+                    }else{
+                        return "";
+                    }
+                }else{
                     log("Type message: " + message.getType());
                     log("Content: " + message.getContent());
                     return "";
                 }
+
             }
         }
     }
 
     public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
-        log("createManagementString with AndroidMessage");
+        log("createManagementString");
 
         MegaChatMessage message = androidMessage.getMessage();
         return createManagementString(message, chatRoom);

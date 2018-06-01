@@ -1147,7 +1147,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								}
 								else{
 									File previewDir = PreviewUtils.getPreviewFolder(this);
-									String nameFilePreview = idChat+"_"+info.getTitle();
+									String nameFilePreview = info.getTitle();
 									File preview = new File(previewDir, nameFilePreview);
 
 									boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());

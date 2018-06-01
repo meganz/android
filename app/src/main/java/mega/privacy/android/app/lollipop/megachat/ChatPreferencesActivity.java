@@ -65,12 +65,31 @@ public class ChatPreferencesActivity extends AppCompatActivity {
         ft.commit();
     }
 
-    public void changeSound(){
+    public void changeSound(String soundString){
         log("Change sound");
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+
+        if (soundString == null){
+            log("NULL sound");
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
+        }
+        else if(soundString.equals("-1")){
+            log("Notification sound -1");
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+        }
+        else if(soundString.isEmpty()){
+            log("Empty sound");
+            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
+        }
+        else{
+            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(soundString));
+        }
+
+
         this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
     }
 
