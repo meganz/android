@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ImageView;
 
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -23,6 +24,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
         float scaleX;
         float scaleY;
         TouchImageView touchImageView = null;
+        ImageView imageView;
         SurfaceView surfaceView;
 
         if (currentView instanceof TouchImageView){
@@ -30,6 +32,11 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
             scaleX = ((float)screenPosition[2]) / touchImageView.getImageWidth();
             scaleY = ((float)screenPosition[3]) / touchImageView.getImageHeight();
             log("Scale: "+scaleX+" "+scaleY+" dimensions: "+touchImageView.getImageWidth()+" "+touchImageView.getImageHeight()+ " position: "+screenPosition[0]+" "+screenPosition[1]);
+        }
+        else if (currentView instanceof ImageView){
+            imageView = (ImageView) currentView;
+            scaleX = ((float)screenPosition[2]) / imageView.getWidth();
+            scaleY = ((float)screenPosition[3]) / imageView.getHeight();
         }
         else {
             surfaceView = (SurfaceView) currentView;
