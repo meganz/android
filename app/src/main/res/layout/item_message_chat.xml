@@ -248,58 +248,106 @@
 
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/url_always_allow_button"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/url_own_message_buttons_warning_layout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/accentColor"
-                        android:textSize="16sp"
-                        android:textAllCaps="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
                         android:layout_marginLeft="12dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="@string/button_always_rich_links"
-                        android:background="@android:color/transparent"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical"
                         android:layout_below="@id/url_own_message_enable_layout"
-                        android:elevation="0dp"
-                        android:textStyle="bold"/>
+                        android:background="@android:color/transparent">
+
+                        <Button
+                            android:id="@+id/url_always_allow_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/accentColor"
+                            android:textSize="14sp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/button_always_rich_links"
+                            android:minWidth="0dp"
+                            android:background="@android:color/transparent"
+                            android:elevation="0dp"/>
 
 
-                    <TextView
-                        android:id="@+id/url_not_now_button"
-                        android:layout_width="wrap_content"
+                        <Button
+                            android:id="@+id/url_not_now_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="8dp"
+                            android:minWidth="0dp"
+                            android:text="@string/button_not_now_rich_links"
+                            android:elevation="0dp"
+                            android:background="@android:color/transparent"
+                            android:textColor="@color/accentColor"/>
+
+                        <Button
+                            android:id="@+id/url_never_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:textColor="@color/tour_bar_red"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="8dp"
+                            android:minWidth="0dp"
+                            android:text="@string/button_never_rich_links"
+                            android:background="@android:color/transparent"
+                            android:elevation="0dp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/url_own_message_buttons_disable_layout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:textAllCaps="true"
-                        android:textColor="@color/accentColor"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="12dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:layout_below="@id/url_always_allow_button"
-                        android:text="@string/button_not_now_rich_links"
-                        android:background="@android:color/transparent"
-                        android:elevation="0dp"
-                        android:textStyle="bold"/>
+                        android:gravity="right"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
+                        android:orientation="horizontal"
+                        android:layout_below="@id/url_own_message_enable_layout"
+                        android:background="@android:color/transparent">
+
+                        <Button
+                            android:id="@+id/url_no_disable_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/accentColor"
+                            android:textSize="14sp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/general_no"
+                            android:background="@android:color/transparent"
+                            android:elevation="0dp"/>
 
 
-                    <TextView
-                        android:id="@+id/url_never_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:textAllCaps="true"
-                        android:textColor="@color/tour_bar_red"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="12dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:layout_below="@id/url_not_now_button"
-                        android:text="@string/button_never_rich_links"
-                        android:background="@android:color/transparent"
-                        android:elevation="0dp"
-                        android:textStyle="bold"/>
+                        <Button
+                            android:id="@+id/url_yes_disable_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="24dp"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/general_yes"
+                            android:elevation="0dp"
+                            android:background="@android:color/transparent"
+                            android:textColor="@color/accentColor"/>
+
+                    </LinearLayout>
 
                 </RelativeLayout>
 
