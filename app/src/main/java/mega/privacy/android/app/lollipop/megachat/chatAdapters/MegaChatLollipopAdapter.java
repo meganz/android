@@ -34,6 +34,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -508,11 +509,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RelativeLayout urlOwnMessageLayout;
         RelativeLayout forwardOwnRichLinks;
         WrapEmojiconTextView urlOwnMessageText;
-        TextView neverRichLinkButton;
-        TextView alwaysAllowRichLinkButton;
-        TextView notNowRichLinkButton;
+        LinearLayout urlOwnMessageWarningButtonsLayout;
+        Button neverRichLinkButton;
+        Button alwaysAllowRichLinkButton;
+        Button notNowRichLinkButton;
         TextView urlOwnMessageTitle;
         TextView urlOwnMessageDescription;
+
+        LinearLayout urlOwnMessageDisableButtonsLayout;
+        Button noDisableButton;
+        Button yesDisableButton;
 
         LinearLayout urlOwnMessageIconAndLinkLayout;
         ImageView urlOwnMessageIcon;
@@ -713,9 +719,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
             holder.urlOwnMessageText = (WrapEmojiconTextView)  v.findViewById(R.id.url_own_message_text);
-            holder.neverRichLinkButton = (TextView) v.findViewById(R.id.url_never_button);
-            holder.alwaysAllowRichLinkButton = (TextView) v.findViewById(R.id.url_always_allow_button);
-            holder.notNowRichLinkButton = (TextView) v.findViewById(R.id.url_not_now_button);
+            holder.urlOwnMessageWarningButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_warning_layout);
+            holder.neverRichLinkButton = (Button) v.findViewById(R.id.url_never_button);
+            holder.alwaysAllowRichLinkButton = (Button) v.findViewById(R.id.url_always_allow_button);
+            holder.notNowRichLinkButton = (Button) v.findViewById(R.id.url_not_now_button);
+
+            holder.urlOwnMessageDisableButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_disable_layout);
+            holder.yesDisableButton = (Button) v.findViewById(R.id.url_yes_disable_button);
+            holder.noDisableButton = (Button) v.findViewById(R.id.url_no_disable_button);
 
             holder.urlOwnMessageTitle = (TextView)  v.findViewById(R.id.url_own_message_title);
             holder.urlOwnMessageDescription = (TextView)  v.findViewById(R.id.url_own_message_description);
@@ -2017,12 +2028,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat)holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
 
-                ((ViewHolderMessageChat)holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setOnClickListener(this);
-                ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setTag(position);
-                ((ViewHolderMessageChat) holder).notNowRichLinkButton.setOnClickListener(this);
-                ((ViewHolderMessageChat) holder).notNowRichLinkButton.setTag(position);
-
+//                ((ViewHolderMessageChat)holder).urlContactMessageLayout.setVisibility(View.GONE);
 
                 ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
 //                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -2045,9 +2051,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 //Rick link
 
-                ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).notNowRichLinkButton.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
                 ((ViewHolderMessageChat)holder).urlOwnMessageText.setText(text);
                 ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
@@ -2180,7 +2185,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
 
-
 //                ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.GONE);
 //                ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.GONE);
 //                ((ViewHolderMessageChat)holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.GONE);
@@ -2206,9 +2210,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 //Rick link
 
-                ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).notNowRichLinkButton.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
+                ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
                 ((ViewHolderMessageChat)holder).urlContactMessageText.setText(text);
                 ((ViewHolderMessageChat)holder).urlContactMessageTitle.setVisibility(View.VISIBLE);
@@ -2336,9 +2339,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //MEGA link
 
-            ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).notNowRichLinkButton.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
             if(message.isEdited()){
                 Spannable content = new SpannableString(message.getContent());
@@ -2796,9 +2798,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //MEGA link
 
-            ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).notNowRichLinkButton.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat)holder).urlContactMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat)holder).urlContactMessageLink.setText(androidMessage.getRichLinkMessage().getServer());
@@ -2934,7 +2935,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     if(MegaApplication.isShowRichLinkWarning()){
                         log("SDK - show link rich warning");
-                        if(((ChatActivityLollipop)context).showRichLinkWarning){
+                        if(((ChatActivityLollipop)context).showRichLinkWarning == Constants.RICH_WARNING_TRUE){
                             log("ANDROID - show link rich warning");
 
                             ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
@@ -2956,7 +2957,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).notNowRichLinkButton.setOnClickListener(this);
                             ((ViewHolderMessageChat) holder).notNowRichLinkButton.setTag(position);
 
-
                             ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -2976,6 +2976,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
                             ((ViewHolderMessageChat)holder).forwardOwnContact.setVisibility(View.GONE);
 
+                            ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
+
                             int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
                             if(notNowCounter>3){
                                 ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.VISIBLE);
@@ -2989,6 +2992,46 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }
 
                             return;
+                        }
+                        else if(((ChatActivityLollipop)context).showRichLinkWarning == Constants.RICH_WARNING_CONFIRMATION){
+                            log("ANDROID - show link disable rich link confirmation");
+
+                            ((ViewHolderMessageChat)holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setText(messageContent);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setText(context.getString(R.string.title_confirmation_disable_rich_links));
+                            ((ViewHolderMessageChat)holder).urlOwnMessageDescription.setText(context.getString(R.string.text_confirmation_disable_rich_links));
+
+                            ((ViewHolderMessageChat)holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_install_mega));
+
+                            ((ViewHolderMessageChat)holder).urlOwnMessageIcon.setVisibility(View.GONE);
+
+                            ((ViewHolderMessageChat) holder).noDisableButton.setOnClickListener(this);
+                            ((ViewHolderMessageChat) holder).noDisableButton.setTag(position);
+
+                            ((ViewHolderMessageChat) holder).yesDisableButton.setOnClickListener(this);
+                            ((ViewHolderMessageChat) holder).yesDisableButton.setTag(position);
+
+                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFrameLand.setVisibility(View.GONE);
+//                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat)holder).previewFramePort.setVisibility(View.GONE);
+//                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
+
+//                            ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
+//                            ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbPort.setVisibility(View.GONE);
+//                            ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
+//
+//                            ((ViewHolderMessageChat) holder).gradientOwnMessageThumbLand.setVisibility(View.GONE);
+//                            ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
+//                            ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
+
+                            ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+
+                            ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
+                            ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.VISIBLE);
                         }
                     }
                 }
@@ -6739,15 +6782,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         int position = (Integer) v.getTag();
 
-        ((ChatActivityLollipop)context).showRichLinkWarning = false;
+
 
         switch(v.getId()) {
 
             case R.id.url_always_allow_button:{
+                ((ChatActivityLollipop)context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
                 megaApi.enableRichPreviews(true);
                 break;
             }
+            case R.id.url_no_disable_button:
             case R.id.url_not_now_button:{
+                ((ChatActivityLollipop)context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
                 int counter = MegaApplication.getCounterNotNowRichLinkWarning();
                 if(counter<1){
                     counter = 1;
@@ -6759,6 +6805,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 break;
             }
             case R.id.url_never_button:{
+                ((ChatActivityLollipop)context).showRichLinkWarning = Constants.RICH_WARNING_CONFIRMATION;
+                break;
+            }
+            case R.id.url_yes_disable_button:{
+                ((ChatActivityLollipop)context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
                 megaApi.enableRichPreviews(false);
                 break;
             }
