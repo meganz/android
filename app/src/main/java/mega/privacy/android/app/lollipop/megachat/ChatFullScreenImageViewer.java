@@ -483,7 +483,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				positionG = newPosition;
 
 				try{
-					TouchImageView tIV = adapterMega.getVisibleImage(oldPosition);
+					TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
