@@ -1505,6 +1505,7 @@ public class ChatController {
                                 }
                                 mediaIntent.putExtra("isPlayList", false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
+                                mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
@@ -1526,6 +1527,7 @@ public class ChatController {
                                 Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
                                 pdfIntent.putExtra("inside", true);
                                 pdfIntent.putExtra("HANDLE", tempNode.getHandle());
+                                pdfIntent.putExtra("adapterType", Constants.FROM_CHAT);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                     pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
