@@ -730,6 +730,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             //Contact rich links message
             holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
             holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
+            holder.forwardContactRichLinks.setTag(holder);
+            holder.forwardContactRichLinks.setOnClickListener(this);
             holder.forwardContactRichLinks.setVisibility(View.GONE);
             holder.urlContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_contact_message_text);
 
@@ -774,6 +776,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageFileLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_file_layout);
             holder.forwardOwnFile = (RelativeLayout) v.findViewById(R.id.forward_own_file);
+            holder.forwardOwnFile.setTag(holder);
+            holder.forwardOwnFile.setOnClickListener(this);
             holder.forwardOwnFile.setVisibility(View.GONE);
 
             holder.contentOwnMessageFileThumb = (ImageView) v.findViewById(R.id.content_own_message_file_thumb);
@@ -787,6 +791,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactEmail = (TextView) v.findViewById(R.id.content_own_message_contact_email);
             holder.contentOwnMessageContactInitialLetter = (TextView) v.findViewById(R.id.content_own_message_contact_initial_letter);
             holder.forwardOwnContact = (RelativeLayout) v.findViewById(R.id.forward_own_contact);
+            holder.forwardOwnContact.setTag(holder);
+            holder.forwardOwnContact.setOnClickListener(this);
             holder.forwardOwnContact.setVisibility(View.GONE);
 
             holder.iconOwnTypeDocLandPreview = (ImageView) v.findViewById(R.id.own_attachment_type_icon_lands);
@@ -812,9 +818,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.errorUploadingLandscape.setVisibility(View.GONE);
 
             holder.forwardOwnPortrait = (RelativeLayout) v.findViewById(R.id.forward_own_preview_portrait);
+            holder.forwardOwnPortrait.setTag(holder);
+            holder.forwardOwnPortrait.setOnClickListener(this);
             holder.forwardOwnPortrait.setVisibility(View.GONE);
 
             holder.forwardOwnLandscape = (RelativeLayout) v.findViewById(R.id.forward_own_preview_landscape);
+            holder.forwardOwnLandscape.setTag(holder);
+            holder.forwardOwnLandscape.setOnClickListener(this);
             holder.forwardOwnLandscape.setVisibility(View.GONE);
 
             holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
@@ -852,6 +862,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbLand.setBorderWidth(0);
             holder.contentContactMessageThumbLand.setOval(false);
             holder.forwardContactPreviewLandscape = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_landscape);
+            holder.forwardContactPreviewLandscape.setTag(holder);
+            holder.forwardContactPreviewLandscape.setOnClickListener(this);
             holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
             holder.contentContactMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
@@ -859,6 +871,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbPort.setBorderWidth(0);
             holder.contentContactMessageThumbPort.setOval(false);
             holder.forwardContactPreviewPortrait = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_portrait);
+            holder.forwardContactPreviewPortrait.setTag(holder);
+            holder.forwardContactPreviewPortrait.setOnClickListener(this);
             holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
             holder.gradientContactMessageThumbLand = (RelativeLayout) v.findViewById(R.id.gradient_contact_message_thumb_landscape);
             holder.videoIconContactMessageThumbLand = (ImageView) v.findViewById(R.id.video_icon_contact_message_thumb_landscape);
@@ -880,6 +894,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageFile = (RelativeLayout) v.findViewById(R.id.content_contact_message_file);
             holder.forwardContactFile = (RelativeLayout) v.findViewById(R.id.forward_contact_file);
+            holder.forwardContactFile.setTag(holder);
+            holder.forwardContactFile.setOnClickListener(this);
             holder.forwardContactFile.setVisibility(View.GONE);
             holder.contentContactMessageFileThumb = (ImageView) v.findViewById(R.id.content_contact_message_file_thumb);
             holder.contentContactMessageFileName = (TextView) v.findViewById(R.id.content_contact_message_file_name);
@@ -888,6 +904,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.layoutAvatarMessages = (RelativeLayout) v.findViewById(R.id.layout_avatar);
             holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
             holder.forwardContactContact = (RelativeLayout) v.findViewById(R.id.forward_contact_contact);
+            holder.forwardContactContact.setTag(holder);
+            holder.forwardContactContact.setOnClickListener(this);
             holder.forwardContactContact.setVisibility(View.GONE);
 
 //            holder.contentContactMessageContactLayout.setVisibility(View.GONE);
@@ -6786,7 +6804,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         switch (v.getId()) {
-            case R.id.forward_own_rich_links: {
+            case R.id.forward_own_rich_links:
+            case R.id.forward_own_contact:
+            case R.id.forward_own_file:
+            case R.id.forward_own_preview_portrait:
+            case R.id.forward_own_preview_landscape:
+            case R.id.forward_contact_rich_links:
+            case R.id.forward_contact_contact:
+            case R.id.forward_contact_file:
+            case R.id.forward_contact_preview_portrait:
+            case R.id.forward_contact_preview_landscape:{
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 messageArray.add(messages.get(currentPosition - 1));
                 ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
