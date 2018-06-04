@@ -35,8 +35,8 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
         }
         else if (currentView instanceof ImageView){
             imageView = (ImageView) currentView;
-            scaleX = ((float)screenPosition[2]) / imageView.getWidth();
-            scaleY = ((float)screenPosition[3]) / imageView.getHeight();
+            scaleX = ((float)screenPosition[2]) / imageView.getDrawable().getIntrinsicWidth();
+            scaleY = ((float)screenPosition[3]) / imageView.getDrawable().getIntrinsicHeight();
             log("Scale: "+scaleX+" "+scaleY+" dimensions: "+imageView.getWidth()+" "+imageView.getHeight()+ " position: "+screenPosition[0]+" "+screenPosition[1]);
         }
         else {
