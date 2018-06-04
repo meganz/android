@@ -6722,7 +6722,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         }else{
             File previewDir = PreviewUtils.getPreviewFolder(this);
-            String nameFilePreview = idChat+"_"+selfie.getName();
+            String nameFilePreview = selfie.getName();
             File preview = new File(previewDir, nameFilePreview);
 
             boolean isPreview = megaApi.createPreview(selfie.getAbsolutePath(), preview.getAbsolutePath());
