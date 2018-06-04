@@ -131,8 +131,9 @@
 
                 <ImageView
                     android:id="@+id/qr_2fa"
-                    android:layout_width="160dp"
-                    android:layout_height="160dp"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="20dp"
                     android:layout_centerHorizontal="true"
                     android:layout_below="@+id/explain_qr_seed_2fa"/>
 
@@ -148,6 +149,19 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="22dp"/>
+
+                <Button
+                    android:id="@+id/button_next_2fa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/seed_2fa"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="41dp"
+                    android:background="@drawable/background_button"
+                    android:elevation="8dp"
+                    android:textColor="@color/white"
+                    android:text="@string/general_next"
+                    android:visibility="visible"/>
 
             </RelativeLayout>
 
