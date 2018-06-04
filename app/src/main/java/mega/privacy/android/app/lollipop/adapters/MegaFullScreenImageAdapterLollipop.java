@@ -5,6 +5,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -301,6 +303,22 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		this.megaFullScreenImageAdapter = this;
 		this.context = context;
 
+		dbH = DatabaseHandler.getDbHandler(context);
+
+		prefs = dbH.getPreferences();
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -357,35 +375,12 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
-			holder.gifImgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
 			holder.progressBar.setVisibility(View.VISIBLE);
 
-			thumb = ThumbnailUtils.getThumbnailFromCache(node);
-			if (thumb != null){
-				holder.gifImgDisplay.setImageBitmap(thumb);
-			}
-			else{
-				thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
-				if (thumb != null){
-					holder.gifImgDisplay.setImageBitmap(thumb);
-				}
-			}
-
-			dbH = DatabaseHandler.getDbHandler(context);
-
-			prefs = dbH.getPreferences();
-			if (prefs != null){
-				log("prefs != null");
-				if (prefs.getStorageAskAlways() != null){
-					if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-						log("askMe==false");
-						if (prefs.getStorageDownloadLocation() != null){
-							if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-								downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-							}
-						}
-					}
-				}
+			Bitmap resource = setImageResource(node, holder);
+			Drawable drawable = null;
+			if (resource != null){
+				drawable = new BitmapDrawable(context.getResources(), resource);
 			}
 
 			boolean isOnMegaDownloads = false;
@@ -395,54 +390,38 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 
 				final ProgressBar pb = holder.progressBar;
 
-				Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
-					@Override
-					public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-						return false;
-					}
+				if (drawable != null){
+					Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
+						@Override
+						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+							return false;
+						}
 
-					@Override
-					public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-						pb.setVisibility(View.GONE);
-						return false;
-					}
-				}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+						@Override
+						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+							pb.setVisibility(View.GONE);
+							return false;
+						}
+					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+				}
+				else {
+					Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
+						@Override
+						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+							return false;
+						}
+
+						@Override
+						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+							pb.setVisibility(View.GONE);
+							return false;
+						}
+					}).placeholder(MimeTypeMime.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+				}
 			}
 			else {
 
 				holder.progressBar.setVisibility(View.VISIBLE);
-				if (node.hasPreview()){
-					preview = PreviewUtils.getPreviewFromCache(node);
-					if (preview != null){
-						PreviewUtils.previewCache.put(node.getHandle(), preview);
-						holder.gifImgDisplay.setImageBitmap(preview);
-					}
-					else{
-						try{
-							new PreviewAsyncTask().execute(node.getHandle());
-						}
-						catch(Exception ex){
-							//Too many AsyncTasks
-							log("Too many AsyncTasks");
-						}
-					}
-				}
-				else{
-					preview = PreviewUtils.getPreviewFromCache(node);
-					if (preview != null){
-						PreviewUtils.previewCache.put(node.getHandle(), preview);
-						holder.gifImgDisplay.setImageBitmap(preview);
-					}
-					else{
-						try{
-							new PreviewDownloadAsyncTask().execute(node.getHandle());
-						}
-						catch(Exception ex){
-							//Too many AsyncTasks
-							log("Too many AsyncTasks");
-						}
-					}
-				}
 
 				if (megaApi.httpServerIsRunning() == 0) {
 					megaApi.httpServerStart();
@@ -465,18 +444,34 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				if (url != null){
 					final ProgressBar pb = holder.progressBar;
 
-					Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
-						@Override
-						public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
-							return false;
-						}
+					if (drawable != null){
+						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							@Override
+							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+								return false;
+							}
 
-						@Override
-						public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-							pb.setVisibility(View.GONE);
-							return false;
-						}
-					}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+							@Override
+							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+								pb.setVisibility(View.GONE);
+								return false;
+							}
+						}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}
+					else {
+						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							@Override
+							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+								return false;
+							}
+
+							@Override
+							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+								pb.setVisibility(View.GONE);
+								return false;
+							}
+						}).placeholder(MimeTypeMime.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}
 				}
 			}
 		}
@@ -538,6 +533,38 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
         ((ViewPager) container).addView(viewLayout);
 		
 		return viewLayout;
+	}
+
+	public Bitmap setImageResource(MegaNode node, ViewHolderFullImage holder){
+
+		Bitmap preview;
+		Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(node);
+		if (thumb == null){
+			thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+		}
+
+		if (node.hasPreview()){
+			preview = PreviewUtils.getPreviewFromCache(node);
+			if (preview != null){
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
+			}
+		}
+		else{
+			preview = PreviewUtils.getPreviewFromCache(node);
+			if (preview != null){
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
+			}
+		}
+
+		if (preview != null){
+			return preview;
+		}
+		else if (thumb != null){
+			return thumb;
+		}
+		else {
+			return null;
+		}
 	}
 	
 	@Override

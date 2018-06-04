@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -193,35 +195,59 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
-			holder.gifImgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
 			holder.currentPath = mOffList.get(position).getPath();
+			holder.progressBar.setVisibility(View.VISIBLE);
 
+			Bitmap thumb = null;
+			Bitmap preview = null;
 			try {
 				holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
-				Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
-				if (thumb != null){
-					holder.gifImgDisplay.setImageBitmap(thumb);
-				}
+
+				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+				preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
 			}
 			catch (Exception e){}
+
+			Drawable drawable = null;
+			if (preview != null){
+				drawable = new BitmapDrawable(context.getResources(), preview);
+			}
+			else if (thumb != null){
+				drawable = new BitmapDrawable(context.getResources(), thumb);
+			}
 
 			File file = getOfflineFile(position);
 			if (file != null){
 				final ProgressBar pb = holder.progressBar;
-				holder.progressBar.setVisibility(View.VISIBLE);
 
-				Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
-					@Override
-					public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-						return false;
-					}
+				if (drawable != null){
+					Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
+						@Override
+						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+							return false;
+						}
 
-					@Override
-					public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-						pb.setVisibility(View.GONE);
-						return false;
-					}
-				}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+						@Override
+						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+							pb.setVisibility(View.GONE);
+							return false;
+						}
+					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+				}
+				else {
+					Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
+						@Override
+						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
+							return false;
+						}
+
+						@Override
+						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+							pb.setVisibility(View.GONE);
+							return false;
+						}
+					}).placeholder(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+				}
 			}
 		}
 		else {
