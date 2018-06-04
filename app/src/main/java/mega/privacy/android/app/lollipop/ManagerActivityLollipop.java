@@ -2460,10 +2460,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 
-		if (megaChatApi == null){
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
 		if (turnOnNotifications){
 			setTurnOnNotificationsFragment();
 		}
@@ -2473,8 +2469,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (!nf.areNotificationsEnabled()){
 				log("off");
 				if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
-					if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
-						setTurnOnNotificationsFragment();
+					if (Util.isChatEnabled()){
+						if (megaChatApi == null){
+							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+						}
+						if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
+							setTurnOnNotificationsFragment();
+						}
+					}
+					else {
+						if ((megaApi.getContacts().size() >= 1)){
+							setTurnOnNotificationsFragment();
+						}
 					}
 				}
 			}

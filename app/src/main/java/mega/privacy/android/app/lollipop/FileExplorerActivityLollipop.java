@@ -99,6 +99,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
+	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
 
 	public static int UPLOAD = 0;
 	public static int MOVE = 1;
@@ -727,6 +728,33 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							}
 						}
 					}
+				}
+				else if ((intent.getAction().equals(ACTION_UPLOAD_TO_CLOUD))){
+					log("action = UPLOAD to Cloud Drive");
+					mode = UPLOAD;
+					selectFile = false;
+
+					cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+
+					if(cDriveExplorer==null){
+						cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
+					}
+
+					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+					ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
+					ft.commitNow();
+
+					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+
+					if(fileExplorerSectionLayout!=null){
+						fileExplorerSectionLayout.setVisibility(View.GONE);
+					}
+					else{
+						fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
+						fileExplorerSectionLayout.setVisibility(View.GONE);
+					}
+
+					tabShown=NO_TABS;
 				}
 				else{
 					log("action = UPLOAD");
@@ -1524,6 +1552,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}	
 			}
 		}
+		else if (tabShown == NO_TABS){
+			if (cDriveExplorer != null){
+				parentHandle = cDriveExplorer.getParentHandle();
+				log("1)cDriveExplorer != null: " + parentHandle);
+			}
+			else{
+				String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+				if (cDriveExplorer != null){
+					parentHandle = cDriveExplorer.getParentHandle();
+					log("2)cDriveExplorer != null: " + parentHandle);
+				}
+			}
+		}
+
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		
 		if (parentNode != null){
@@ -1629,7 +1672,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (error.getErrorCode() == MegaError.API_OK){
 
 				if(tabShown==CLOUD_TAB){
-
 					String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (cDriveExplorer != null){
@@ -1637,6 +1679,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						parentHandleCloud = request.getNodeHandle();
 						log("The handle of the created folder is: "+parentHandleCloud);
 					}						
+				}
+				else if (tabShown == NO_TABS){
+					if (cDriveExplorer != null){
+						cDriveExplorer.navigateToFolder(request.getNodeHandle());
+						parentHandleCloud = request.getNodeHandle();
+					}
+					else{
+						String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+						cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+						if (cDriveExplorer != null){
+							cDriveExplorer.navigateToFolder(request.getNodeHandle());
+							parentHandleCloud = request.getNodeHandle();
+						}
+					}
+					log("The handle of the created folder is: "+parentHandleCloud);
 				}
 				else{
 
