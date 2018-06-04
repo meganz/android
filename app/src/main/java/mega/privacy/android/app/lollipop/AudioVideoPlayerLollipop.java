@@ -3867,7 +3867,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
+        log("onRequestTemporaryError");
     }
 
     @Override
