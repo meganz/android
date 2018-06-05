@@ -2786,8 +2786,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String parentPath = intent.getStringExtra("parentPath");
 					if (parentPath != null){
 						log("path to download: "+parentPath);
+						boolean fromOffline = getIntent().getBooleanExtra("fromOffline", false);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath, false);
+						ac.exportMK(parentPath, fromOffline);
 					}
 				}
 				else  if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){

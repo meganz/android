@@ -42,6 +42,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.twofa.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -318,6 +319,9 @@ public class AccountController implements View.OnClickListener{
             else{
                 ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
             }
+        }
+        else if (context instanceof TwoFactorAuthenticationActivity){
+            ((TwoFactorAuthenticationActivity) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
         }
     }
 

@@ -1896,4 +1896,10 @@
     <string name="general_verify" context="button">Verify</string>
     <string name="general_next" context="button">Next</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
+    <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">An error occurred generating the seed or QR, please try again.</string>
+    <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Great!\nTwo-Factor Authentication enabled</string>
+    <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Next time you login to your account you will be asked to enter a 6-digit code provided by your authentication app.</string>
+    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">Consider exporting your Recovery Key in case you lose access to your app or want to disable Two-Factor Authentication</string>
+    <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Invalid code!</string>
+
 </resources>
