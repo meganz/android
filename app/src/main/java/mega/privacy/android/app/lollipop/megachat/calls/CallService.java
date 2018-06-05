@@ -115,7 +115,7 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 , intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
                 .setColor(ContextCompat.getColor(this,R.color.mega))
