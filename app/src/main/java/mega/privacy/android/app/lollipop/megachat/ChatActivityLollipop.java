@@ -1823,6 +1823,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     Intent in = new Intent(this, AddContactActivityLollipop.class);
                     in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
+                    in.putExtra("chatId", idChat);
                     startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
                 }
             }
@@ -6325,7 +6326,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             for(int j=0; j<messagesToImport.size();j++){
-                AndroidMegaChatMessage message = messagesSelected.get(j);
+                AndroidMegaChatMessage message = messagesToImport.get(j);
 
                 if(message!=null){
 
