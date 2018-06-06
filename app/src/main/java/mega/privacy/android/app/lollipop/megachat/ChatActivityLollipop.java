@@ -200,7 +200,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
     public long selectedMessageId = -1;
-
     MegaChatRoom chatRoom;
 
     public long idChat;
@@ -894,7 +893,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 @Override
                 public void onGlobalLayout() {
-                    log("onGlobalLayout");
                     InputMethodManager imm = (InputMethodManager) ChatActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 
                     if (firstSize == -1){
@@ -1506,7 +1504,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        log("onCreateOptionsMenuLollipop");
+//        log("onCreateOptionsMenuLollipop");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
@@ -1524,7 +1522,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        log("onPrepareOptionsMenu");
+//        log("onPrepareOptionsMenu");
         if(chatRoom!=null){
 
             if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
@@ -2816,8 +2814,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.addMessage(messages, index);
                 if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
                     mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
-                }
-                else{
+                }else{
                     mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(20, outMetrics));
                 }
             }
@@ -4579,7 +4576,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             message = messages.get(positionLastMessage);
                         }
 
-                        scrollToMessage(lastIdMsgSeen);
+                        if(isTurn){
+                            scrollToMessage(-1);
+
+                        }else{
+                            scrollToMessage(lastIdMsgSeen);
+
+                        }
+
                     }
                     else{
                         log("Error, the position to scroll is more than size of messages");
@@ -4693,6 +4697,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(mLayoutManager.findLastCompletelyVisibleItemPosition()==messages.size()-1){
             log("Do scroll to end");
+
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
@@ -4720,7 +4725,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
-        log("onMessageUpdate!: "+ msg.getMsgId());
+//        log("onMessageUpdate!: "+ msg.getMsgId());
 
         int resultModify = -1;
         if(msg.isDeleted()){
@@ -4978,6 +4983,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Removed index: "+indexToChange);
             log("modifyAttachmentReceived: messages size: "+messages.size());
             adapter.removeMessage(indexToChange+1, messages);
+
             int scrollToP = appendMessagePosition(msg);
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
@@ -6170,6 +6176,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState){
         log("onSaveInstanceState");
@@ -6178,6 +6185,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putLong("selectedMessageId", selectedMessageId);
         outState.putInt("selectedPosition", selectedPosition);
         outState.putInt("typeMessageJump",typeMessageJump);
+
         if(messageJumpLayout.getVisibility() == View.VISIBLE){
             visibilityMessageJump = true;
         }else{
@@ -6481,9 +6489,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
        //If the chat is being opened do not update, onLoad will do that
 
         if(!isOpeningChat) {
-           if(lastSeenReceived == true){
+            if(lastSeenReceived == true){
                long unreadCount = chatRoom.getUnreadCount();
-
                if (unreadCount != 0) {
                    lastIdMsgSeen = megaChatApi.getLastMessageSeenId(idChat);
 
@@ -6493,7 +6500,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                        AndroidMegaChatMessage androidMessage = messages.get(i);
 
                        if (!androidMessage.isUploading()) {
-
                            MegaChatMessage msg = androidMessage.getMessage();
                            if (msg.getMsgId() == lastIdMsgSeen) {
                                positionLastMessage = i;
@@ -6518,7 +6524,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                }
                else{
                    if(generalUnreadCount!=0){
-                       scrollToMessage(lastIdMsgSeen);
+                       scrollToMessage(-1);
                    }
                }
            }
@@ -6552,8 +6558,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void scrollToMessage(long lastId){
-        log("scrollToMessage");
-
         for(int i=messages.size()-1; i>=0;i--) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
 
@@ -6685,7 +6689,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-        log("onChatConnectionStateUpdate: "+newState);
+//        log("onChatConnectionStateUpdate: "+newState);
 
         supportInvalidateOptionsMenu();
 
