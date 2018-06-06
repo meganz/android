@@ -188,6 +188,7 @@ String mOutputFilePath;
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
     public long selectedMessageId = -1;
+    int samePosition = -1;
 
     MegaChatRoom chatRoom;
 
@@ -2676,8 +2677,7 @@ String mOutputFilePath;
                 adapter.addMessage(messages, index);
                 if(infoToShow== AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL){
                     mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(50, outMetrics));
-                }
-                else{
+                }else{
                     mLayoutManager.scrollToPositionWithOffset(index, Util.scaleHeightPx(20, outMetrics));
                 }
             }
@@ -4099,13 +4099,15 @@ String mOutputFilePath;
                             positionLastMessage = positionLastMessage + 1;
                             message = messages.get(positionLastMessage);
                         }
-//                        if(isTurn){
-//                            scrollToMessage(-1);
-//
-//                        }else{
+
+                        if(isTurn){
+                            scrollToMessage(-1);
+
+                        }else{
                             scrollToMessage(lastIdMsgSeen);
 
-//                        }
+                        }
+
                     }
                     else{
                         log("Error, the position to scroll is more than size of messages");
@@ -4175,6 +4177,7 @@ String mOutputFilePath;
 
         if(mLayoutManager.findLastCompletelyVisibleItemPosition()==messages.size()-1){
             log("Do scroll to end");
+
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
@@ -4448,6 +4451,7 @@ String mOutputFilePath;
             log("Removed index: "+indexToChange);
             log("modifyAttachmentReceived: messages size: "+messages.size());
             adapter.removeMessage(indexToChange+1, messages);
+
             int scrollToP = appendMessagePosition(msg);
             if(scrollToP!=-1){
                 if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_RECEIVED){
@@ -5914,6 +5918,7 @@ String mOutputFilePath;
                    }
 
                    generalUnreadCount = unreadCount;
+
                    scrollToMessage(lastIdMsgSeen);
                }
                else{
