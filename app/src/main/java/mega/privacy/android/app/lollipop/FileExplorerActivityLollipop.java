@@ -2176,25 +2176,94 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		this.chatListItems = chatListItems;
 
-		if (filePreparedInfos == null){
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(getIntent());
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
-				temp.show();
+		if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
+			if ("text/plain".equals(intent.getType())) {
+				log("Handle intent of text plain");
+				Bundle extras = intent.getExtras();
+				if (extras != null) {
+					if (!extras.containsKey(Intent.EXTRA_STREAM)) {
+						StringBuilder body = new StringBuilder();
+						String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+						if (sharedText2 != null) {
+							body.append(getString(R.string.new_file_subject_when_uploading) + ": ");
+							body.append(sharedText2);
+						}
+						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+						if (sharedText != null) {
+							body.append("\n");
+							body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+							body.append(sharedText);
+						}
+						String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
+						if (sharedText3 != null) {
+							body.append("\n");
+							body.append(getString(R.string.new_file_email_when_uploading) + ": ");
+							body.append(sharedText3);
+						}
+
+						for(int i=0; i < chatListItems.size();i++){
+							megaChatApi.sendMessage(chatListItems.get(i).getChatId(), body.toString());
+						}
+
+						if(chatListItems.size()==1){
+							MegaChatListItem chatItem = chatListItems.get(0);
+							long idChat = chatItem.getChatId();
+							if(chatItem!=null){
+								Intent intent = new Intent(this, ManagerActivityLollipop.class);
+								intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+								intent.putExtra("CHAT_ID", idChat);
+								startActivity(intent);
+							}
+						}
+						else{
+							Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
+							chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
+							startActivity(chatIntent);
+						}
+					}
+				}
 			}
-			catch(Exception e){
-				return;
+			else{
+				if (filePreparedInfos == null){
+					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+					filePrepareTask.execute(getIntent());
+					ProgressDialog temp = null;
+					try{
+						temp = new ProgressDialog(this);
+						temp.setMessage(getString(R.string.upload_prepare));
+						temp.show();
+					}
+					catch(Exception e){
+						return;
+					}
+					statusDialog = temp;
+				}
+				else{
+//			onIntentProcessed();
+				}
 			}
-			statusDialog = temp;
 		}
 		else{
+			if (filePreparedInfos == null){
+				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+				filePrepareTask.execute(getIntent());
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.upload_prepare));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
+			}
+			else{
 //			onIntentProcessed();
+			}
 		}
 	}
-
 
 	public void showNewFileDialog(final MegaNode parentNode, final String data){
 		log("showNewFileDialog");
