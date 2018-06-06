@@ -210,6 +210,43 @@ public final class ChatAdvancedNotificationBuilder {
                             MegaChatMessage message = megaChatApi.getMessage(chats.get(i).getChatId(), handleListUnread.get(j));
                             if(message!=null){
 
+                                String messageContent = "";
+
+                                if(message.getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
+
+                                    MegaNodeList nodeList = message.getMegaNodeList();
+                                    if(nodeList != null) {
+                                        if (nodeList.size() == 1) {
+                                            MegaNode node = nodeList.get(0);
+                                            log("Node Name: " + node.getName());
+                                            messageContent = node.getName();
+                                        }
+                                    }
+                                }
+                                else if(message.getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
+
+                                    long userCount  = message.getUsersCount();
+
+                                    if(userCount==1) {
+                                        String name = "";
+                                        name = message.getUserName(0);
+                                        if (name.trim().isEmpty()) {
+                                            name = message.getUserEmail(0);
+                                        }
+                                        String email = message.getUserEmail(0);
+                                        log("Contact EMail: " + name);
+                                        messageContent = email;
+                                    }
+
+                                }
+                                else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
+                                    log("Type TRUNCATE message");
+                                    messageContent = context.getString(R.string.history_cleared_message);
+                                }
+                                else{
+                                    messageContent = message.getContent();
+                                }
+
                                 CharSequence cs = " ";
                                 String title = chats.get(i).getTitle();
                                 if(chats.get(i).isGroup()){
@@ -226,10 +263,10 @@ public final class ChatAdvancedNotificationBuilder {
                                         nameAction = cC.getFirstName(lastMsgSender, chatRoom);
                                     }
 
-                                    cs = nameAction + " @ " + title + ": " + message.getContent();
+                                    cs = nameAction + " @ " + title + ": " + messageContent;
                                 }
                                 else{
-                                    cs = title +": " + message.getContent();
+                                    cs = title +": " + messageContent;
                                 }
 
                                 inboxStyle.addLine(cs);
