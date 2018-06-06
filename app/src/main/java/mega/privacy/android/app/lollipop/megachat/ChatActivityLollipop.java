@@ -188,7 +188,6 @@ String mOutputFilePath;
 //    AndroidMegaChatMessage selectedMessage;
     int selectedPosition;
     public long selectedMessageId = -1;
-
     MegaChatRoom chatRoom;
 
     public long idChat;
