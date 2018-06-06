@@ -18,6 +18,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
@@ -36,7 +37,6 @@ import java.util.Map;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
@@ -577,7 +577,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			log("Show notification 1");
 			mBuilderCompat
-			.setSmallIcon(R.drawable.ic_stat_notify_download)
+			.setSmallIcon(R.drawable.ic_stat_notify)
+			.setColor(ContextCompat.getColor(this,R.color.mega))
 			.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 			.setAutoCancel(true).setTicker(notificationTitle)
 			.setContentTitle(notificationTitle).setContentText(size)
@@ -655,7 +656,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							log("Show notification 2");
 							mBuilderCompat
-									.setSmallIcon(R.drawable.ic_stat_notify_download)
+									.setSmallIcon(R.drawable.ic_stat_notify)
 									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
@@ -689,7 +690,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							log("Show notification 2");
 							mBuilderCompat
-									.setSmallIcon(R.drawable.ic_stat_notify_download)
+									.setSmallIcon(R.drawable.ic_stat_notify)
 									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
@@ -758,7 +759,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else {
 							log("Show notification 2");
 							mBuilderCompat
-									.setSmallIcon(R.drawable.ic_stat_notify_download)
+									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setColor(ContextCompat.getColor(this,R.color.mega))
 									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
@@ -801,7 +803,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						log("Show notification 2");
 						mBuilderCompat
-								.setSmallIcon(R.drawable.ic_stat_notify_download)
+								.setSmallIcon(R.drawable.ic_stat_notify)
+								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
@@ -816,7 +819,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					log("Show notification 3");
 					mBuilderCompat
-							.setSmallIcon(R.drawable.ic_stat_notify_download)
+							.setSmallIcon(R.drawable.ic_stat_notify)
+							.setColor(ContextCompat.getColor(this,R.color.mega))
 							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
@@ -832,7 +836,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				log("Show notification 4");
 				mBuilderCompat
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
@@ -911,7 +916,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -922,7 +928,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			{
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
@@ -932,11 +939,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else
 			{
-				notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+				notification = new Notification(R.drawable.ic_stat_notify, null, 1);
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
 				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 				notification.contentView.setTextViewText(R.id.status_text, message);
 				notification.contentView.setTextViewText(R.id.progress_text, info);
 				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
@@ -991,7 +998,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			mBuilder
-					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setColor(ContextCompat.getColor(this,R.color.mega))
 					.setProgress(100, progressPercent, false)
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -1002,7 +1010,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
 			mBuilder
-					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setColor(ContextCompat.getColor(this,R.color.mega))
 					.setProgress(100, progressPercent, false)
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message).setContentInfo(info)
@@ -1012,11 +1021,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else
 		{
-			notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+			notification = new Notification(R.drawable.ic_stat_notify, null, 1);
 			notification.flags |= Notification.FLAG_ONGOING_EVENT;
 			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 			notification.contentIntent = pendingIntent;
-			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 			notification.contentView.setTextViewText(R.id.status_text, message);
 			notification.contentView.setTextViewText(R.id.progress_text, info);
 			notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);

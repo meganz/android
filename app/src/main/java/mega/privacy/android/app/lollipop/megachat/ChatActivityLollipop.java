@@ -1161,12 +1161,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setChatPermissions(){
         log("setChatPermissions");
-        if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
+        if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED||megaChatApi.getChatConnectionState(idChat)!=MegaChatApi.CHAT_CONNECTION_ONLINE){
             log("Chat not connected");
             aB.setSubtitle(getString(R.string.invalid_connection_state));
             tB.setOnClickListener(this);
         }
         else{
+            log("karere connection state: "+megaChatApi.getConnectionState());
+            log("chat connection state: "+megaChatApi.getChatConnectionState(idChat));
             int permission = chatRoom.getOwnPrivilege();
             if (chatRoom.isGroup()) {
                 tB.setOnClickListener(this);
