@@ -166,7 +166,7 @@ public final class ChatAdvancedNotificationBuilder {
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
@@ -349,7 +349,7 @@ public final class ChatAdvancedNotificationBuilder {
 //        Spanned notificationContent;
 
         Notification.Builder notificationBuilder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
                 .setShowWhen(true)
@@ -596,7 +596,7 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
@@ -627,7 +627,7 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true).setTicker("Chat activity")
                 .setColor(ContextCompat.getColor(context,R.color.mega))
@@ -676,7 +676,7 @@ public final class ChatAdvancedNotificationBuilder {
 
             //No sound just vibration
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(chatToAnswer.getPeerFullname(0))
                     .setContentText(context.getString(R.string.notification_subtitle_incoming))
                     .setAutoCancel(false)
@@ -832,7 +832,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentTitle(context.getString(R.string.missed_call_notification_title))
                 .setContentText(notificationContent)
                 .setAutoCancel(true)
