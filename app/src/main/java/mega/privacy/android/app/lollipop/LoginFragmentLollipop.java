@@ -27,6 +27,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -37,6 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
 
 import java.util.Locale;
 
@@ -48,6 +50,7 @@ import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.OldUserCredentials;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -68,6 +71,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface {
@@ -164,6 +169,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private ImageView toggleButton;
     private boolean passwdVisibility;
+
+    Toolbar tB;
+    LinearLayout loginVerificationLayout;
+    InputMethodManager imm;
+    private EditTextPIN firstPin;
+    private EditTextPIN secondPin;
+    private EditTextPIN thirdPin;
+    private EditTextPIN fourthPin;
+    private EditTextPIN fifthPin;
+    private EditTextPIN sixthPin;
+    private StringBuilder sb = new StringBuilder();
+    private String pin = null;
+    private TextView pinError;
+    private RelativeLayout lostYourDeviceButton;
+    private Button verifyButton;
+
+    private boolean isFirstTime = true;
+    private boolean isErrorShown = false;
+    private boolean is2FAEnabled = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -443,6 +467,234 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkButtonParams.setMargins(0, Util.scaleHeightPx(25, outMetrics),  Util.scaleWidthPx(24, outMetrics), 0);
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
+
+        tB  =(Toolbar) v.findViewById(R.id.toolbar);
+        loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
+        loginVerificationLayout.setVisibility(View.GONE);
+        lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
+        lostYourDeviceButton.setOnClickListener(this);
+        verifyButton = (Button) v.findViewById(R.id.button_verify_2fa);
+        verifyButton.setOnClickListener(this);
+        pinError = (TextView) v.findViewById(R.id.pin_2fa_error_login);
+        pinError.setVisibility(View.GONE);
+
+        imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
+
+        firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_login);
+        imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
+        firstPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(firstPin.length() != 0){
+                    secondPin.requestFocus();
+                    secondPin.setCursorVisible(true);
+
+                    if (isFirstTime){
+                        secondPin.setText("");
+                        thirdPin.setText("");
+                        fourthPin.setText("");
+                        fifthPin.setText("");
+                        sixthPin.setText("");
+                    }
+                    else  {
+                        permitVerify();
+                    }
+                }
+                else {
+                    if (isErrorShown){
+                        verifyQuitError();
+                    }
+                    verifyButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_login);
+        imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
+        secondPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (secondPin.length() != 0){
+                    thirdPin.requestFocus();
+                    thirdPin.setCursorVisible(true);
+
+                    if (isFirstTime) {
+                        thirdPin.setText("");
+                        fourthPin.setText("");
+                        fifthPin.setText("");
+                        sixthPin.setText("");
+                    }
+                    else  {
+                        permitVerify();
+                    }
+                }
+                else {
+                    if (isErrorShown){
+                        verifyQuitError();
+                    }
+                    verifyButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_login);
+        imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
+        thirdPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (thirdPin.length()!= 0){
+                    fourthPin.requestFocus();
+                    fourthPin.setCursorVisible(true);
+
+                    if (isFirstTime) {
+                        fourthPin.setText("");
+                        fifthPin.setText("");
+                        sixthPin.setText("");
+                    }
+                    else  {
+                        permitVerify();
+                    }
+                }
+                else {
+                    if (isErrorShown){
+                        verifyQuitError();
+                    }
+                    verifyButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_login);
+        imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
+        fourthPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (fourthPin.length()!=0){
+                    fifthPin.requestFocus();
+                    fifthPin.setCursorVisible(true);
+
+                    if (isFirstTime) {
+                        fifthPin.setText("");
+                        sixthPin.setText("");
+                    }
+                    else  {
+                        permitVerify();
+                    }
+                }
+                else {
+                    if (isErrorShown){
+                        verifyQuitError();
+                    }
+                    verifyButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_login);
+        imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
+        fifthPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (fifthPin.length()!=0){
+                    sixthPin.requestFocus();
+                    sixthPin.setCursorVisible(true);
+
+                    if (isFirstTime) {
+                        sixthPin.setText("");
+                    }
+                    else  {
+                        permitVerify();
+                    }
+                }
+                else {
+                    if (isErrorShown){
+                        verifyQuitError();
+                    }
+                    verifyButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_login);
+        imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
+        sixthPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (sixthPin.length()!=0){
+                    sixthPin.setCursorVisible(true);
+                    hideKeyboard();
+
+                    permitVerify();
+                }
+                else {
+                    if (isErrorShown){
+                        verifyQuitError();
+                    }
+                    verifyButton.setVisibility(View.GONE);
+                }
+            }
+        });
+        ((LoginActivityLollipop) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         intentReceived = ((LoginActivityLollipop) context).getIntent();
         if(intentReceived!=null){
@@ -724,6 +976,77 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         return v;
     }
 
+    void returnToLogin() {
+
+        ((LoginActivityLollipop) context).hideAB();
+
+        loginVerificationLayout.setVisibility(View.GONE);
+
+        loginLoggingIn.setVisibility(View.GONE);
+        loginLogin.setVisibility(View.VISIBLE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+        loginCreateAccount.setVisibility(View.VISIBLE);
+        queryingSignupLinkText.setVisibility(View.GONE);
+        confirmingAccountText.setVisibility(View.GONE);
+        generatingKeysText.setVisibility(View.GONE);
+        loggingInText.setVisibility(View.GONE);
+        fetchingNodesText.setVisibility(View.GONE);
+        prepareNodesText.setVisibility(View.GONE);
+        serversBusyText.setVisibility(View.GONE);
+    }
+
+    void verifyQuitError(){
+        isErrorShown = false;
+        pinError.setVisibility(View.GONE);
+        firstPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+        secondPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+    }
+
+    void verifyShowError(){
+        isFirstTime = false;
+        isErrorShown = true;
+        verifyButton.setVisibility(View.GONE);
+        pinError.setVisibility(View.VISIBLE);
+        firstPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        secondPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+    }
+
+    void permitVerify(){
+        if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+            if (!isErrorShown) {
+                verifyButton.setVisibility(View.VISIBLE);
+            }
+            hideKeyboard();
+            if (sb.length()>0) {
+                sb.delete(0, sb.length());
+            }
+            sb.append(firstPin.getText());
+            sb.append(secondPin.getText());
+            sb.append(thirdPin.getText());
+            sb.append(fourthPin.getText());
+            sb.append(fifthPin.getText());
+            sb.append(sixthPin.getText());
+            pin = sb.toString();
+            log("PIN: "+pin);
+        }
+    }
+
+    void hideKeyboard(){
+
+        View v = ((LoginActivityLollipop) context).getCurrentFocus();
+        if (v != null){
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
+
     public void showHidePassword () {
         if(!passwdVisibility){
             et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -952,7 +1275,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //        this.emailTemp = null;
 //        this.passwdTemp = null;
 
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
         if(!Util.isOnline(context))
@@ -994,7 +1316,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return;
         }
 
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
         if(!Util.isOnline(context))
@@ -1015,23 +1336,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return;
         }
 
-        loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        loginCreateAccount.setVisibility(View.GONE);
-        loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-        generatingKeysText.setVisibility(View.VISIBLE);
-        loginProgressBar.setVisibility(View.VISIBLE);
-        loginFetchNodesProgressBar.setVisibility(View.GONE);
-        queryingSignupLinkText.setVisibility(View.GONE);
-        confirmingAccountText.setVisibility(View.GONE);
+//        loginLogin.setVisibility(View.GONE);
+//        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+//        loginCreateAccount.setVisibility(View.GONE);
+//        loginLoggingIn.setVisibility(View.VISIBLE);
+//        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+//        generatingKeysText.setVisibility(View.VISIBLE);
+//        loginProgressBar.setVisibility(View.VISIBLE);
+//        loginFetchNodesProgressBar.setVisibility(View.GONE);
+//        queryingSignupLinkText.setVisibility(View.GONE);
+//        confirmingAccountText.setVisibility(View.GONE);
 
         lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
         lastPassword = et_password.getText().toString();
 
         log("generating keys");
 
-        new HashTask().execute(lastEmail, lastPassword);
+//        new HashTask().execute(lastEmail, lastPassword);
+
+        megaApi.multiFactorAuthCheck(lastEmail, this);
     }
 
     private void onKeysGenerated(String privateKey, String publicKey) {
@@ -1313,6 +1636,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
                     passwdVisibility = true;
                     showHidePassword();
+                }
+                break;
+            }
+            case R.id.lost_authentication_device: {
+
+                break;
+            }
+            case R.id.button_verify_2fa: {
+                hideKeyboard();
+                if (pin != null){
+                    megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
                 }
                 break;
             }
@@ -1703,30 +2037,45 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     dbH.setEnabledChat(true + "");
                 }
 
-                loginLoggingIn.setVisibility(View.GONE);
-                loginLogin.setVisibility(View.VISIBLE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
-                loginCreateAccount.setVisibility(View.VISIBLE);
-                queryingSignupLinkText.setVisibility(View.GONE);
-                confirmingAccountText.setVisibility(View.GONE);
-                generatingKeysText.setVisibility(View.GONE);
-                loggingInText.setVisibility(View.GONE);
-                fetchingNodesText.setVisibility(View.GONE);
-                prepareNodesText.setVisibility(View.GONE);
-                serversBusyText.setVisibility(View.GONE);
+                if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED){
+                    verifyShowError();
+                }
+                else {
+                    if (is2FAEnabled){
+                        loginVerificationLayout.setVisibility(View.GONE);
+                    }
+                    loginLoggingIn.setVisibility(View.GONE);
+                    loginLogin.setVisibility(View.VISIBLE);
+                    scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                    loginCreateAccount.setVisibility(View.VISIBLE);
+                    queryingSignupLinkText.setVisibility(View.GONE);
+                    confirmingAccountText.setVisibility(View.GONE);
+                    generatingKeysText.setVisibility(View.GONE);
+                    loggingInText.setVisibility(View.GONE);
+                    fetchingNodesText.setVisibility(View.GONE);
+                    prepareNodesText.setVisibility(View.GONE);
+                    serversBusyText.setVisibility(View.GONE);
 
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
 
 //				DatabaseHandler dbH = new DatabaseHandler(this);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                dbH.clearCredentials();
-                dbH.clearEphemeral();
-                if (dbH.getPreferences() != null){
-                    ((LoginActivityLollipop)context).stopCameraSyncService();
+                    DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
+                    dbH.clearCredentials();
+                    dbH.clearEphemeral();
+                    if (dbH.getPreferences() != null){
+                        ((LoginActivityLollipop)context).stopCameraSyncService();
+                    }
                 }
             }
             else{
+                if (is2FAEnabled){
+                    loginVerificationLayout.setVisibility(View.GONE);
+                    ((LoginActivityLollipop) context).hideAB();
+                }
 
+                scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+                loginLogin.setVisibility(View.GONE);
+                loginLoggingIn.setVisibility(View.VISIBLE);
                 loginProgressBar.setVisibility(View.VISIBLE);
                 loginFetchNodesProgressBar.setVisibility(View.GONE);
                 loggingInText.setVisibility(View.VISIBLE);
@@ -1901,6 +2250,49 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
+                }
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
+            if (error.getErrorCode() == MegaError.API_OK){
+                if (request.getFlag()){
+                    is2FAEnabled = true;
+
+                    ((LoginActivityLollipop) context).showAB(tB);
+
+                    loginLogin.setVisibility(View.GONE);
+                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+                    loginCreateAccount.setVisibility(View.GONE);
+                    loginLoggingIn.setVisibility(View.GONE);
+                    generatingKeysText.setVisibility(View.GONE);
+                    loginProgressBar.setVisibility(View.GONE);
+                    loginFetchNodesProgressBar.setVisibility(View.GONE);
+                    queryingSignupLinkText.setVisibility(View.GONE);
+                    confirmingAccountText.setVisibility(View.GONE);
+                    fetchingNodesText.setVisibility(View.GONE);
+                    prepareNodesText.setVisibility(View.GONE);
+                    serversBusyText.setVisibility(View.GONE);
+                    loginVerificationLayout.setVisibility(View.VISIBLE);
+                    firstPin.requestFocus();
+                    firstPin.setCursorVisible(true);
+                }
+                else {
+                    is2FAEnabled = false;
+                    loginVerificationLayout.setVisibility(View.GONE);
+
+                    loginLogin.setVisibility(View.GONE);
+                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+                    loginCreateAccount.setVisibility(View.GONE);
+                    loginLoggingIn.setVisibility(View.VISIBLE);
+                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+                    generatingKeysText.setVisibility(View.VISIBLE);
+                    loginProgressBar.setVisibility(View.VISIBLE);
+                    loginFetchNodesProgressBar.setVisibility(View.GONE);
+                    queryingSignupLinkText.setVisibility(View.GONE);
+                    confirmingAccountText.setVisibility(View.GONE);
+
+                    log("generating keys");
+                    new HashTask().execute(lastEmail, lastPassword);
                 }
             }
         }
@@ -2130,8 +2522,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void onDismiss(DialogInterface dialog) {
                 View view = ((LoginActivityLollipop) context).getCurrentFocus();
                 if (view != null) {
-                    InputMethodManager inputManager = (InputMethodManager) ((LoginActivityLollipop) context).getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 }
             }
         });
@@ -2181,7 +2572,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 50);
@@ -2192,7 +2582,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm.isActive()) {
                     imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 }
@@ -2296,8 +2685,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void onDismiss(DialogInterface dialog) {
                 View view = ((LoginActivityLollipop) context).getCurrentFocus();
                 if (view != null) {
-                    InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 }
             }
         });
