@@ -41,10 +41,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -274,8 +276,44 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			holder.muteIcon.setVisibility(View.GONE);
 		}
 
-		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);
+		if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
+
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chat.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
+				holder.imageView.setAlpha(.4f);
+
+				holder.itemLayout.setOnClickListener(null);
+				holder.itemLayout.setOnLongClickListener(null);
+
+				holder.layoutPendingMessages.setAlpha(.4f);
+
+				holder.textViewContent.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewDate.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+			}
+			else{
+				holder.imageView.setAlpha(1.0f);
+
+				holder.imageButtonThreeDots.setTag(holder);
+
+				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnLongClickListener(null);
+
+				holder.layoutPendingMessages.setAlpha(1.0f);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+			}
+		}
+		else{
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+
+			holder.imageButtonThreeDots.setTag(holder);
+
+			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setOnLongClickListener(this);
+		}
 	}
 
 	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
@@ -425,9 +463,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
-
-		holder.itemLayout.setOnClickListener(this);
-		holder.itemLayout.setOnLongClickListener(this);
 
 		v.setTag(holder);
 
