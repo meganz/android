@@ -802,7 +802,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		if (!validateForm(false) || !passwdValid) {
+		if (!validateForm(false)) {
 			return;
 		}
 
@@ -812,12 +812,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
 
-		if (!newPassword1.equals(newPassword2)){
-			log("no new password repeat");
-//			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
-			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
-			return;
-		}
+//		if (!newPassword1.equals(newPassword2)){
+//			log("no new password repeat");
+////			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
+//			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
+//			return;
+//		}
 
 		final String newPassword = newPassword1;
 
@@ -841,7 +841,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			return;
 		}
 
-		if (!validateForm(true) || !passwdValid) {
+		if (!validateForm(true)) {
 			return;
 		}
 
@@ -852,12 +852,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
 
-		if (!newPassword1.equals(newPassword2)){
-			log("no new password repeat");
-//			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
-			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
-			return;
-		}
+//		if (!newPassword1.equals(newPassword2)){
+//			log("no new password repeat");
+////			newPassword2View.setError(getString(R.string.my_account_change_password_dont_match));
+//			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
+//			return;
+//		}
+		
 		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 //		changePassword(newPassword1);
 	}
@@ -935,6 +936,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_password);
 		}
+		else if (!passwdValid){
+			containerPasswdElements.setVisibility(View.GONE);
+			return getString(R.string.error_password);
+		}
 		return null;
 	}
 	
@@ -943,8 +948,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	 */
 	private String getNewPassword2Error() {
 		String value = newPassword2View.getText().toString();
+		String confirm = newPassword1View.getText().toString();
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_password);
+		}
+		else if (!value.equals(confirm)) {
+			return getString(R.string.error_passwords_dont_match);
 		}
 		return null;
 	}

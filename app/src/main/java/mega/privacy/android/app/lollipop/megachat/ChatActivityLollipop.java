@@ -9,6 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -92,6 +95,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
@@ -138,12 +142,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
-String mOutputFilePath;
+    String mOutputFilePath;
     Uri finalUri;
     File file;
     File newFile;
     boolean newVisibility = false;
     boolean getMoreHistory=false;
+
+    MenuItem importIcon;
 
     private AlertDialog errorOpenChatDialog;
 
@@ -1845,7 +1851,7 @@ String mOutputFilePath;
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
-            if(!Util.isOnline(this)) {
+            if(!Util.isOnline(this) || megaApi==null) {
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
@@ -1854,7 +1860,13 @@ String mOutputFilePath;
                 return;
             }
 
+            statusDialog = new ProgressDialog(this);
+            statusDialog.setMessage(getString(R.string.general_importing));
+            statusDialog.show();
+
             final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
+
+            final long[] importMessagesHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
             MegaNode target = null;
             target = megaApi.getNodeByHandle(toHandle);
@@ -1863,35 +1875,70 @@ String mOutputFilePath;
             }
             log("TARGET: " + target.getName() + "and handle: " + target.getHandle());
 
-            MegaChatMessage message = megaChatApi.getMessage(idChat, selectedMessageId);
-            if(message!=null){
-                statusDialog = new ProgressDialog(this);
-                statusDialog.setMessage(getString(R.string.general_importing));
-                statusDialog.show();
+            if(importMessagesHandles.length==1){
+                for (int k = 0; k < importMessagesHandles.length; k++){
+                    MegaChatMessage message = megaChatApi.getMessage(idChat, importMessagesHandles[k]);
+                    if(message!=null){
 
-                MegaNodeList nodeList = message.getMegaNodeList();
-                for(int i=0;i<nodeList.size();i++){
-                    MegaNode document = nodeList.get(i);
-                    if (document != null) {
-                        log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
-                        if (target != null) {
+                        MegaNodeList nodeList = message.getMegaNodeList();
+
+                        for(int i=0;i<nodeList.size();i++){
+                            MegaNode document = nodeList.get(i);
+                            if (document != null) {
+                                log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+                                if (target != null) {
 //                            MegaNode autNode = megaApi.authorizeNode(document);
 
-                            megaApi.copyNode(document, target, this);
-                        } else {
-                            log("TARGET: null");
-                            Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                                    megaApi.copyNode(document, target, this);
+                                } else {
+                                    log("TARGET: null");
+                                    Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+                            else{
+                                log("DOCUMENT: null");
+                                Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                            }
                         }
+
                     }
                     else{
-                        log("DOCUMENT: null");
+                        log("MESSAGE is null");
                         Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
                     }
                 }
             }
-            else{
-                log("MESSAGE is null");
-                Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+            else {
+                MultipleRequestListener listener = new MultipleRequestListener(Constants.MULTIPLE_CHAT_IMPORT, this);
+
+                for (int k = 0; k < importMessagesHandles.length; k++){
+                    MegaChatMessage message = megaChatApi.getMessage(idChat, importMessagesHandles[k]);
+                    if(message!=null){
+
+                        MegaNodeList nodeList = message.getMegaNodeList();
+
+                        for(int i=0;i<nodeList.size();i++){
+                            MegaNode document = nodeList.get(i);
+                            if (document != null) {
+                                log("DOCUMENT: " + document.getName() + "_" + document.getHandle());
+                                if (target != null) {
+//                            MegaNode autNode = megaApi.authorizeNode(document);
+
+                                    megaApi.copyNode(document, target, listener);
+                                } else {
+                                    log("TARGET: null");
+                                }
+                            }
+                            else{
+                                log("DOCUMENT: null");
+                            }
+                        }
+                    }
+                    else{
+                        log("MESSAGE is null");
+                        Snackbar.make(fragmentContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                    }
+                }
             }
         }
         else if (requestCode == Constants.REQUEST_SEND_CONTACTS && resultCode == RESULT_OK) {
@@ -2778,6 +2825,31 @@ String mOutputFilePath;
                     showConfirmationDeleteMessages(messagesSelected, chatRoom);
                     break;
                 }
+                case R.id.chat_cab_menu_download:{
+                    clearSelections();
+                    hideMultipleSelect();
+
+                    for(int i = 0; i<messagesSelected.size();i++){
+
+                        MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
+                        chatC.prepareForChatDownload(megaNodeList);
+                    }
+
+                    break;
+                }
+                case R.id.chat_cab_menu_import:{
+                    clearSelections();
+                    hideMultipleSelect();
+
+                    importNodes(messagesSelected);
+                    break;
+                }
+                case R.id.chat_cab_menu_offline:{
+                    clearSelections();
+                    hideMultipleSelect();
+                    chatC.saveForOfflineWithMessages(messagesSelected);
+                    break;
+                }
             }
             return false;
         }
@@ -2803,6 +2875,16 @@ String mOutputFilePath;
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
+
+            importIcon = menu.findItem(R.id.chat_cab_menu_import);
+            Drawable drawable = importIcon.getIcon();
+            if (drawable != null) {
+                // If we don't mutate the drawable, then all drawable's with this id will have a color
+                // filter applied to it.
+                drawable.mutate();
+                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                drawable.setAlpha(255);
+            }
             return true;
         }
 
@@ -2843,7 +2925,7 @@ String mOutputFilePath;
 
                     menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                    menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                    importIcon.setVisible(false);
 
                 }
                 else{
@@ -2858,7 +2940,7 @@ String mOutputFilePath;
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
                             log("TYPE_NODE_ATTACHMENT selected");
@@ -2884,7 +2966,7 @@ String mOutputFilePath;
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(true);
+                            importIcon.setVisible(true);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
@@ -2908,7 +2990,7 @@ String mOutputFilePath;
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
                         else{
                             MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
@@ -2944,12 +3026,12 @@ String mOutputFilePath;
                             else{
                                 menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                                importIcon.setVisible(false);
                             }
 
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                            importIcon.setVisible(false);
                         }
                     }
                     else{
@@ -2957,10 +3039,7 @@ String mOutputFilePath;
                         boolean showDelete = true;
                         boolean showCopy = true;
                         boolean showForward = true;
-
-                        menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                        menu.findItem(R.id.chat_cab_menu_import).setVisible(false);
+                        boolean allNodeAttachments = true;
 
                         for(int i=0; i<selected.size();i++) {
 
@@ -2994,6 +3073,23 @@ String mOutputFilePath;
                                     showForward = false;
                                 }
                             }
+
+                            if (allNodeAttachments) {
+                                if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                                    allNodeAttachments = false;
+                                }
+                            }
+                        }
+
+                        if(allNodeAttachments){
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
+                            importIcon.setVisible(true);
+                        }
+                        else{
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
+                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                            importIcon.setVisible(false);
                         }
 
                         menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -5441,12 +5537,41 @@ String mOutputFilePath;
         this.chatRoom = chatRoom;
     }
 
-    public void importNode(){
+    public void importNode(long idMessage) {
         log("importNode");
+        ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+        MegaChatMessage m = megaChatApi.getMessage(idChat, idMessage);
+
+        if(m!=null){
+            AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
+            messages.add(aMessage);
+            importNodes(messages);
+        }
+        else{
+            log("Message cannot be recovered - null");
+        }
+    }
+
+    public void importNodes(ArrayList<AndroidMegaChatMessage> messages){
+        log("importNodes");
 
         Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+
+        long[] longArray = new long[messages.size()];
+        for (int i = 0; i < messages.size(); i++) {
+            longArray[i] = messages.get(i).getMessage().getMsgId();
+        }
+        intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
+
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+
+    }
+
+    public void removeRequestDialog(){
+        try{
+            statusDialog.dismiss();
+        } catch(Exception ex){};
 
     }
 
@@ -5467,9 +5592,7 @@ String mOutputFilePath;
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        try{
-            statusDialog.dismiss();
-        } catch(Exception ex){};
+        removeRequestDialog();
 
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
             log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());

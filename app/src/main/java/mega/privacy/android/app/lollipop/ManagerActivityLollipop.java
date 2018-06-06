@@ -1549,7 +1549,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				supportInvalidateOptionsMenu();
 
 				if(position == 0){
-					if (rubbishBinFLol != null){
+					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 						if(rubbishBinFLol.isMultipleselect()){
 							rubbishBinFLol.actionMode.finish();
 						}
@@ -1558,7 +1558,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				else if(position == 1){
 
 					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null){
+					if (fbFLol != null && fbFLol.isAdded()){
 						if(fbFLol.isMultipleselect()){
 							fbFLol.actionMode.finish();
 						}
@@ -1595,14 +1595,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("selectDrawerItemSharedItems: TabId :"+ position);
 				supportInvalidateOptionsMenu();
 				if(position == 1){
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 						if(inSFLol.isMultipleselect()){
 							inSFLol.actionMode.finish();
 						}
 					}
 				}
 				else if(position == 0){
-					if (outSFLol != null){
+					if (outSFLol != null && outSFLol.isAdded()){
 						if(outSFLol.isMultipleselect()){
 							outSFLol.actionMode.finish();
 						}
@@ -4372,22 +4372,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public void onPageSelected(int position) {
 				log("onPageSelected");
 				indexContacts = position;
-
 				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(cFLol!=null){
+				if(cFLol!=null && cFLol.isAdded()){
 					cFLol.hideMultipleSelect();
 					cFLol.clearSelectionsNoAnimations();
 				}
 				cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
 				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(sRFLol!=null){
+				if(sRFLol!=null && sRFLol.isAdded()){
 					sRFLol.clearSelections();
 					sRFLol.hideMultipleSelect();
 				}
 				cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
 				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if(rRFLol!=null){
+				if(rRFLol!=null && rRFLol.isAdded()){
 					rRFLol.clearSelections();
 					rRFLol.hideMultipleSelect();
 				}
@@ -4952,7 +4951,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
     			}
 
-    			if (sttFLol != null){
+    			if (sttFLol != null && sttFLol.isAdded()){
 					if (openSettingsStorage){
 						sttFLol.goToCategoryStorage();
 					}
@@ -5430,7 +5429,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(cloudPageAdapter!=null){
 					if(viewPagerCDrive.getCurrentItem()==1){
 						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-						if (rubbishBinFLol != null){
+						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 							//Show
 							selectMenuItem.setVisible(true);
 							if(!firstTimeCam){
@@ -5486,7 +5485,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-						if (fbFLol!=null){
+						if (fbFLol!=null && fbFLol.isAdded()){
 							log("onCreateOptionsMenuLollipop: in Cloud");
 
 							//Show
@@ -5550,7 +5549,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-				if (oFLol != null){
+				if (oFLol != null && oFLol.isAdded()){
 					//Show
 					if(!firstTimeCam){
 						thumbViewMenuItem.setVisible(true);
@@ -5602,7 +5601,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-				if (cuFL != null){
+				if (cuFL != null && cuFL.isAdded()){
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
@@ -5689,7 +5688,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				setStatusMenuItem.setVisible(false);
 			}
 			else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-				if (muFLol != null){
+				if (muFLol != null && muFLol.isAdded()){
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
@@ -5778,7 +5777,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 			else if (drawerItem == DrawerItem.INBOX){
-				if (iFLol != null){
+				if (iFLol != null && iFLol.isAdded()){
 					//Show
 					if(iFLol.getItemCount()>0){
 						selectMenuItem.setVisible(true);
@@ -5836,7 +5835,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				int index = viewPagerShares.getCurrentItem();
 				if(index==0){
 					inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 						if(!firstTimeCam){
 							thumbViewMenuItem.setVisible(true);
 						}else{
@@ -5917,7 +5916,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else if(index==1){
 					outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-					if (outSFLol != null){
+					if (outSFLol != null && outSFLol.isAdded()){
 
 						if(!firstTimeCam){
 							thumbViewMenuItem.setVisible(true);
@@ -5996,7 +5995,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					searchMenuItem.setVisible(true);
 					scanQRcode.setVisible(true);
 
-					if (cFLol != null) {
+					if (cFLol != null && cFLol.isAdded()) {
 						if(cFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
 							sortByMenuItem.setVisible(true);
@@ -6055,7 +6054,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					upgradeAccountMenuItem.setVisible(true);
 					scanQRcode.setVisible(true);
 
-					if (sRFLol != null) {
+					if (sRFLol != null && sRFLol.isAdded()) {
 						if(sRFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
 						}
@@ -6099,7 +6098,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
 
-					if (rRFLol != null) {
+					if (rRFLol != null && rRFLol.isAdded()) {
 						if(rRFLol.getItemCount()>0){
 							selectMenuItem.setVisible(true);
 						}
@@ -6382,7 +6381,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				ChatController chatController = new ChatController(this);
 				if(Util.isChatEnabled()){
 
-					if (rChatFL != null){
+					if (rChatFL != null && rChatFL.isAdded()){
 
 						if(Util.isOnline(this)){
 							newChatMenuItem.setVisible(true);
@@ -6604,7 +6603,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    			if(index==1){
 		    				//Rubbish Bin
 		    				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-		    				if (rubbishBinFLol != null){
+		    				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 		    					rubbishBinFLol.onBackPressed();
 		    					return true;
 		    				}
@@ -6612,7 +6611,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    			else{
 		    				//Cloud Drive
 		    				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-		    				if (fbFLol != null){
+		    				if (fbFLol != null && fbFLol.isAdded()){
 		    					fbFLol.onBackPressed();
 		    				}
 		    			}
@@ -6622,14 +6621,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		    			if(index==1){
 		    				//OUTGOING
 		    				outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-		    				if (outSFLol != null){
+		    				if (outSFLol != null && outSFLol.isAdded()){
 		    					outSFLol.onBackPressed();
 		    				}
 		    			}
 		    			else{
 		    				//InCOMING
 		    				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-							if (inSFLol != null){
+							if (inSFLol != null && inSFLol.isAdded()){
 		    					inSFLol.onBackPressed();
 		    				}
 
@@ -6669,13 +6668,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-		    			if (oFLol != null){
+		    			if (oFLol != null && oFLol.isAdded()){
 		    				oFLol.onBackPressed();
 		    				return true;
 		    			}
 		    		}
 					else if (drawerItem == DrawerItem.INBOX){
-						if (iFLol != null){
+						if (iFLol != null && iFLol.isAdded()){
 							iFLol.onBackPressed();
 							return true;
 						}
@@ -6727,7 +6726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								return true;
 							}
 							case Constants.MONTHLY_YEARLY_FRAGMENT:{
-								if (myFL != null){
+								if (myFL != null && myFL.isAdded()){
 									myFL.onBackPressed();
 								}
 								return true;
@@ -6951,7 +6950,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         			if(index==1){
         				//Rubbish bin
         				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-        				if (rubbishBinFLol != null){
+        				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
             				rubbishBinFLol.selectAll();
             				if (rubbishBinFLol.showSelectMenuItem()){
             					selectMenuItem.setVisible(true);
@@ -6967,7 +6966,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         			else{
         				//Cloud Drive
         				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-        				if (fbFLol != null){
+        				if (fbFLol != null && fbFLol.isAdded()){
         					fbFLol.selectAll();
                 			if (fbFLol.showSelectMenuItem()){
                 				selectMenuItem.setVisible(true);
@@ -6990,7 +6989,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						case 0:{
 							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-							if (cFLol != null){
+							if (cFLol != null && cFLol.isAdded()){
 								cFLol.selectAll();
 								if (cFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
@@ -7007,7 +7006,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						case 1:{
 							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);
 							sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-							if (sRFLol != null){
+							if (sRFLol != null && sRFLol.isAdded()){
 								sRFLol.selectAll();
 								if (sRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
@@ -7024,7 +7023,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						case 2:{
 							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);
 							rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-							if (rRFLol != null){
+							if (rRFLol != null && rRFLol.isAdded()){
 								rRFLol.selectAll();
 								if (rRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
@@ -7044,7 +7043,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 	        		if (viewPagerShares.getCurrentItem()==0){
 						inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-		        		if (inSFLol != null){
+		        		if (inSFLol != null && inSFLol.isAdded()){
 		        			inSFLol.selectAll();
 		        			if (inSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
@@ -7059,7 +7058,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		}
 	        		else if (viewPagerShares.getCurrentItem()==1){
 						outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-		        		if (outSFLol != null){
+		        		if (outSFLol != null && outSFLol.isAdded()){
 		        			outSFLol.selectAll();
 		        			if (outSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
@@ -7075,7 +7074,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         			return true;
 	        	}
 	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-	        		if (oFLol != null){
+	        		if (oFLol != null && oFLol.isAdded()){
 	    				oFLol.selectAll();
 	    				if (oFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -7089,7 +7088,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		}
     			}
 				if (drawerItem == DrawerItem.CHAT){
-					if (rChatFL != null){
+					if (rChatFL != null && rChatFL.isAdded()){
 						rChatFL.selectAll();
 						if (rChatFL.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
@@ -7103,7 +7102,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 	        	if (drawerItem == DrawerItem.INBOX){
-	        		if (iFLol != null){
+	        		if (iFLol != null && iFLol.isAdded()){
 	        			iFLol.selectAll();
 	    				if (iFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -7131,7 +7130,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		}
     			}
 	        	if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-	        		if (muFLol != null){
+	        		if (muFLol != null && muFLol.isAdded()){
 	        			muFLol.selectAll();
 	        			if (muFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -7145,7 +7144,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		}
 	        	}
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-	        		if (cuFL != null){
+	        		if (cuFL != null && cuFL.isAdded()){
 	        			cuFL.selectAll();
 	        			if (cuFL.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -7318,7 +7317,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		        		}
 	    			}
 	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-	    				if (oFLol != null){
+	    				if (oFLol != null && oFLol.isAdded()){
 	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
 	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        				fragTransaction.detach(currentFragment);
@@ -8201,8 +8200,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX){
-			iFLol.hideMultipleSelect();
-			iFLol.refresh();
+			if (iFLol != null && iFLol.isAdded()) {
+				iFLol.hideMultipleSelect();
+				iFLol.refresh();
+			}
 
 			//Refresh Rubbish Fragment
 			if(cloudPageAdapter!=null){
@@ -8265,8 +8266,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX) {
-			iFLol.hideMultipleSelect();
-			iFLol.refresh();
+			if (iFLol != null && iFLol.isAdded()) {
+				iFLol.hideMultipleSelect();
+				iFLol.refresh();
+			}
 
 			if(cloudPageAdapter!=null){
 				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
@@ -8294,14 +8297,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if(drawerItem == DrawerItem.SHARED_ITEMS) {
 			inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-			if (inSFLol != null){
+			if (inSFLol != null && inSFLol.isAdded()){
 
 				inSFLol.hideMultipleSelect();
 				inSFLol.getRecyclerView().invalidate();
 			}
 
 			outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-			if (outSFLol != null){
+			if (outSFLol != null && outSFLol.isAdded()){
 				outSFLol.hideMultipleSelect();
 				outSFLol.refresh();
 			}
@@ -8323,7 +8326,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(index==1){
 				//Rubbish bin
 				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-				if (rubbishBinFLol != null){
+				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 					rubbishBinFLol.hideMultipleSelect();
 
 					if (isClearRubbishBin){
@@ -8352,7 +8355,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX){
-			if (iFLol != null){
+			if (iFLol != null && iFLol.isAdded()){
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iFLol.getParentHandle()), orderGetChildren);
 //							rubbishBinFLol.setNodes(nodes);
 				iFLol.hideMultipleSelect();
@@ -8402,7 +8405,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				//Rubbish Bin
 				if (cloudPageAdapter != null) {
 					rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-					if (rubbishBinFLol != null) {
+					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()) {
 						if (rubbishBinFLol.onBackPressed() == 0) {
 							viewPagerCDrive.setCurrentItem(0);
 						}
@@ -8414,7 +8417,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				//Cloud Drive
 				if (cloudPageAdapter != null) {
 					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null) {
+					if (fbFLol != null && fbFLol.isAdded()) {
 						if (fbFLol.onBackPressed() == 0) {
 							super.onBackPressed();
 						}
@@ -8440,7 +8443,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     	}
 		else if (drawerItem == DrawerItem.INBOX){
-			if (iFLol != null){
+			if (iFLol != null && iFLol.isAdded()){
 				if (iFLol.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					if (nV != null){
@@ -8479,7 +8482,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(index==1){
 				//OUTGOING
 				outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-				if (outSFLol != null){
+				if (outSFLol != null && outSFLol.isAdded()){
 					if (outSFLol.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						if (nV != null){
@@ -8497,7 +8500,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				//InCOMING
 				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-				if (inSFLol != null){
+				if (inSFLol != null && inSFLol.isAdded()){
 					if (inSFLol.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						if (nV != null){
@@ -8514,7 +8517,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-			if (oFLol != null){
+			if (oFLol != null && oFLol.isAdded()){
 				if (oFLol.onBackPressed() == 0){
 
 					if (!Util.isOnline(this)){
@@ -8564,7 +8567,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					//CONTACTS FRAGMENT
 		    		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		    		if (cFLol != null){
+		    		if (cFLol != null && cFLol.isAdded()){
 		    			if (cFLol.onBackPressed() == 0){
 		    				drawerItem = DrawerItem.CLOUD_DRIVE;
 		    				if (nV != null){
@@ -8623,7 +8626,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		switch(accountFragment){
 
 	    		case Constants.MY_ACCOUNT_FRAGMENT:{
-	    			if (maFLol != null){
+	    			if (maFLol != null && maFLol.isAdded()){
 	    				if (maFLol.onBackPressed() == 0){
 		    				drawerItem = DrawerItem.CLOUD_DRIVE;
 		    				if (nV != null){
@@ -8676,7 +8679,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	    			return;
 	    		}
 	    		case Constants.MONTHLY_YEARLY_FRAGMENT:{
-	    			if (myFL != null){
+	    			if (myFL != null && myFL.isAdded()){
 	    				myFL.onBackPressed();
 	    			}
 	    			return;
@@ -8697,7 +8700,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     	}
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			if (cuFL != null){
+			if (cuFL != null && cuFL.isAdded()){
     			if (cuFL.onBackPressed() == 0){
 					visibilitySearch(false);
     				drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -8714,7 +8717,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     		}
     	}
 		else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
-			if (muFLol != null){
+			if (muFLol != null && muFLol.isAdded()){
     			if (muFLol.onBackPressed() == 0){
 					visibilitySearch(false);
 					drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -10165,8 +10168,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showClearRubbishBinDialog(String editText){
 		log("showClearRubbishBinDialog");
 
-		if (rubbishBinFLol.isVisible()){
-			rubbishBinFLol.notifyDataSetChanged();
+		if (rubbishBinFLol != null) {
+			if (rubbishBinFLol.isVisible()) {
+				rubbishBinFLol.notifyDataSetChanged();
+			}
 		}
 
 		String text;
@@ -10256,21 +10261,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				switch(item) {
 					case 0:{
 						dbH.setPinLockType(Constants.PIN_4);
-						if(sttFLol!=null){
+						if(sttFLol!=null && sttFLol.isAdded()){
 							sttFLol.intentToPinLock();
 						}
 						break;
 					}
 					case 1:{
 						dbH.setPinLockType(Constants.PIN_6);
-						if(sttFLol!=null){
+						if(sttFLol!=null && sttFLol.isAdded()){
 							sttFLol.intentToPinLock();
 						}
 						break;
 					}
 					case 2:{
 						dbH.setPinLockType(Constants.PIN_ALPHANUMERIC);
-						if(sttFLol!=null){
+						if(sttFLol!=null && sttFLol.isAdded()){
 							sttFLol.intentToPinLock();
 						}
 						break;
@@ -10376,7 +10381,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cFLol != null){
+		if (cFLol != null && cFLol.isAdded()){
 			if (drawerItem == DrawerItem.CONTACTS){
 				cFLol.setPositionClicked(-1);
 				cFLol.notifyDataSetChanged();
@@ -10858,7 +10863,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case DialogInterface.BUTTON_POSITIVE: {
 						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
 						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-						if(maFLol!=null){
+						if(maFLol!=null && maFLol.isAdded()){
 							maFLol.resetPass();
 						}
 						break;
@@ -11189,7 +11194,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.setOrderContacts(orderContacts);
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cFLol != null){
+		if (cFLol != null && cFLol.isAdded()){
 			cFLol.setOrder(orderContacts);
 			cFLol.sortBy(orderContacts);
 			cFLol.updateOrder();
@@ -11201,7 +11206,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
-		if (oFLol != null){
+		if (oFLol != null && oFLol.isAdded()){
 			oFLol.setOrder(orderOthers);
 			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
 				oFLol.sortByNameAscending();
@@ -11217,7 +11222,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
-		if (inSFLol != null){
+		if (inSFLol != null && inSFLol.isAdded()){
 			inSFLol.setOrderNodes();
 		}
 	}
@@ -11227,7 +11232,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		this.orderOthers = _orderOthers;
 		this.setOrderOthers(orderOthers);
-		if (outSFLol != null){
+		if (outSFLol != null && outSFLol.isAdded()){
 			if (orderOthers == MegaApiJava.ORDER_DEFAULT_ASC){
 				outSFLol.sortByNameAscending();
 			}
@@ -11253,7 +11258,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		MegaNode inboxNode = megaApi.getInboxNode();
 		if(inboxNode!=null){
 			ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, orderCloud);
-			if (iFLol != null){
+			if (iFLol != null && iFLol.isAdded()){
 				iFLol.setNodes(nodes);
 				iFLol.getRecyclerView().invalidate();
 			}
@@ -11266,15 +11271,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.orderCamera = orderCamera;
 
 		cuFL = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cuFLol");
-		if (cuFL != null){
+		if (cuFL != null && cuFL.isAdded()){
 			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
 			cuFL.setNodes(nodes);
 			cuFL.getRecyclerView().invalidate();
 		}
 
 		muFLol = (CameraUploadFragmentLollipop) getSupportFragmentManager().findFragmentByTag("muFLol");
-		if (muFLol != null){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(cuFL.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
+		if (muFLol != null && muFLol.isAdded()){
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(muFLol.getPhotoSyncHandle()), MegaApiJava.ORDER_MODIFICATION_DESC);
 			muFLol.setNodes(nodes);
 			muFLol.getRecyclerView().invalidate();
 		}
@@ -12196,14 +12201,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 				if (parentNode != null){
-					if (fbFLol != null){
+					if (fbFLol != null && fbFLol.isAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
 					}
 				}
 				else{
-					if (fbFLol != null){
+					if (fbFLol != null && fbFLol.isAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
@@ -12232,7 +12237,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
 				if (parentNode != null){
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSFLol.setNodes(nodes);
@@ -12240,7 +12245,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else{
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSFLol.setNodes(nodes);
@@ -12321,14 +12326,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 				if (parentNode != null){
-					if (fbFLol != null){
+					if (fbFLol != null && fbFLol.isAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
 					}
 				}
 				else{
-					if (fbFLol != null){
+					if (fbFLol != null && fbFLol.isAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
@@ -12357,7 +12362,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
 				if (parentNode != null){
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSFLol.setNodes(nodes);
@@ -12365,7 +12370,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else{
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 						inSFLol.getRecyclerView().invalidate();
 					}
@@ -12880,7 +12885,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void updateOfflineView(MegaOffline mOff){
 		log("updateOfflineView");
-		if(oFLol!=null){
+		if(oFLol!=null && oFLol.isAdded()){
 			oFLol.hideMultipleSelect();
 			if(mOff==null){
 				oFLol.refresh();
@@ -12900,7 +12905,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Update Contacts Fragment");
 			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 			cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-			if (cFLol != null){
+			if (cFLol != null && cFLol.isAdded()){
 				cFLol.hideMultipleSelect();
 				cFLol.updateView();
 			}
@@ -12910,7 +12915,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Update SentRequests Fragment");
 			String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);
 			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
-			if (sRFLol != null){
+			if (sRFLol != null && sRFLol.isAdded()){
 				sRFLol.hideMultipleSelect();
 				sRFLol.updateView();
 			}
@@ -12920,7 +12925,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Update ReceivedRequest Fragment");
 			String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);
 			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
-			if (rRFLol != null){
+			if (rRFLol != null && rRFLol.isAdded()){
 				rRFLol.hideMultipleSelect();
 				rRFLol.updateView();
 			}
@@ -13655,7 +13660,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//Update view to get avatar
 						String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 						cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-						if (cFLol != null){
+						if (cFLol != null && cFLol.isAdded()){
 							cFLol.updateView();
 						}
 					}
@@ -13858,7 +13863,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         			if(index==0){
         		        //Cloud Drive
         				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-        				if (fbFLol != null){
+        				if (fbFLol != null && fbFLol.isAdded()){
 							ArrayList<MegaNode> nodes;
 							if(parentHandleBrowser==-1){
 								nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
@@ -13873,7 +13878,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         			else if(index==1){
 						//Cloud Drive
 						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-						if (rubbishBinFLol != null){
+						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 							ArrayList<MegaNode> nodes;
 							if(parentHandleRubbish==-1){
 								nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
@@ -13888,23 +13893,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else if (drawerItem == DrawerItem.INBOX){
 
-					if (iFLol != null){
+					if (iFLol != null && iFLol.isAdded()){
 						iFLol.getRecyclerView().invalidate();
 					}
 				}
 				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 
-					if (oFLol != null){
+					if (oFLol != null && oFLol.isAdded()){
 						oFLol.getRecyclerView().invalidate();
 					}
 				}
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
     				inSFLol = (IncomingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 0);
-					if (inSFLol != null){
+					if (inSFLol != null && inSFLol.isAdded()){
 						inSFLol.getRecyclerView().invalidate();
 					}
 	        		outSFLol = (OutgoingSharesFragmentLollipop) sharesPageAdapter.instantiateItem(viewPagerShares, 1);
-					if (outSFLol != null){
+					if (outSFLol != null && outSFLol.isAdded()){
 						outSFLol.getRecyclerView().invalidate();
 					}
 				}
@@ -13949,7 +13954,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			if(index==1){
 	        				//Rubbish bin
 	        				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-	        				if (rubbishBinFLol != null){
+	        				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
 								rubbishBinFLol.setNodes(nodes);
 								rubbishBinFLol.getRecyclerView().invalidate();
@@ -13958,7 +13963,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			else{
 	        				//Cloud Drive
 	        				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-	        				if (fbFLol != null){
+	        				if (fbFLol != null && fbFLol.isAdded()){
 								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
 								fbFLol.setNodes(nodes);
 								fbFLol.getRecyclerView().invalidate();
@@ -13966,7 +13971,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        			}
 					}
 					else if (drawerItem == DrawerItem.INBOX){
-						if (iFLol != null){
+						if (iFLol != null && iFLol.isAdded()){
 							iFLol.getRecyclerView().invalidate();
 						}
 					}
@@ -13992,7 +13997,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(getString(R.string.context_folder_created));
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					if (fbFLol != null){
+					if (fbFLol != null && fbFLol.isAdded()){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
 						fbFLol.setNodes(nodes);
 						fbFLol.getRecyclerView().invalidate();
@@ -14165,7 +14170,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("Update de ContactsFragment");
 							String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 							cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-							if (cFLol != null) {
+							if (cFLol != null && cFLol.isAdded()) {
 								if (drawerItem == DrawerItem.CONTACTS) {
 									cFLol.updateView();
 								}
