@@ -413,7 +413,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //
 //        @Override
 //        public boolean onSingleTapUp(MotionEvent e) {
-//            log("*****onSingleTapUp");
 //
 //            if(megaChatApi.isSignalActivityRequired()){
 //                megaChatApi.signalPresenceActivity();
@@ -429,7 +428,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //
 //                AndroidMegaChatMessage messageR = messages.get(position-1);
 //                if(messageR.isUploading()){
-//                    log("***** 1 itemClick("+position+")");
 //
 //                    itemClick(position);
 //                }
@@ -438,7 +436,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                        MegaChatContainsMeta meta = messageR.getMessage().getContainsMeta();
 //                        if(meta==null){
 //                        }else if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-//                            log("***** 2 itemClick("+position+")");
 //                            itemClick(position);
 //
 //                        }else{
@@ -446,7 +443,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                        }
 //                    }
 //                    else{
-//                        log("***** 3 itemClick("+position+")");
 //
 //                        itemClick(position);
 //                    }
@@ -2882,7 +2878,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //    }
 
     public void activateActionMode(){
-        log("******activateActionMode");
+        log("activateActionMode");
         if (!adapter.isMultipleSelect()){
             adapter.setMultipleSelect(true);
             actionMode = startSupportActionMode(new ActionBarCallBack());
@@ -3398,22 +3394,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void itemClick(int positionInAdapter) {
-        log("********itemClick");
+        log("itemClick");
         int position = positionInAdapter-1;
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
 
-
-
-
         if(position<messages.size()){
             AndroidMegaChatMessage m = messages.get(position);
 
-
             if (adapter.isMultipleSelect()) {
-                log("****itemClick:multiselect ON");
-
                 if (!m.isUploading()) {
                     if (m.getMessage() != null) {
                         log("Message id: " + m.getMessage().getMsgId());
@@ -3432,7 +3422,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    }
                 }
             }else{
-                log("****itemClick:multiselect OFF");
                 if(m!=null){
                     if(m.isUploading()){
                         if(m.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
@@ -3455,7 +3444,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         else{
                             if(m.getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT){
-                                log("*** TYPE_NODE_ATTACHMENT");
+                                log("TYPE_NODE_ATTACHMENT");
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if(nodeList.size()==1){
                                     MegaNode node = nodeList.get(0);
@@ -3724,7 +3713,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
-                                log("*** TYPE_CONTACT_ATTACHMENT");
+                                log("TYPE_CONTACT_ATTACHMENT");
 
                                 log("show contact attachment panel");
                                 if (Util.isOnline(this)) {
@@ -3746,12 +3735,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
                             }
                             else if(m.getMessage().getType()==MegaChatMessage.TYPE_CONTAINS_META){
-                                log("*** TYPE_CONTAINS_META");
+                                log("TYPE_CONTAINS_META");
 
                                 log("open rich link");
 
 //                                if(!adapter.getforwardOwnRichLinksB()){
-                                    log("****** go to link");
                                     MegaChatContainsMeta meta = m.getMessage().getContainsMeta();
                                     if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
                                         String url = meta.getRichPreview().getUrl();
@@ -3759,14 +3747,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         startActivity(browserIntent);
                                     }
 //                                }else{
-//                                    log("****** forward link");
+
 //                                    ArrayList<AndroidMegaChatMessage> message = new ArrayList<>();
 //                                    message.add(m);
 //                                    prepareMessagesToForward(message);
 //                                }
 
                             }else if((m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL) && (m.getRichLinkMessage()!=null)){
-                                log("*** TYPE_NORMAL");
+                                log("TYPE_NORMAL");
 
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
                                 String url = richLinkMessage.getUrl();
