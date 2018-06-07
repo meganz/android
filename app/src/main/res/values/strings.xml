@@ -1915,4 +1915,7 @@
 
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
     <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
+
+    <string name="contact_email" context="Indicates that can type a contact email">Contact\'s email</string>
+    <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">Contact not added, is already added.</string>
 </resources>
