@@ -155,6 +155,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private boolean filteredContactsPhoneIsEmpty  = false;
 
+    private boolean fromAchievements = false;
+    private ArrayList<String> mailsFromAchievements;
+
     public class RecyclerViewOnGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         public void onLongPress(MotionEvent e) {
@@ -437,6 +440,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", Constants.CONTACT_TYPE_MEGA);
             chatId = getIntent().getLongExtra("chatId", -1);
+            fromAchievements = getIntent().getBooleanExtra("fromAchievements", false);
+            if (fromAchievements){
+                mailsFromAchievements = getIntent().getStringArrayListExtra(EXTRA_CONTACTS);
+            }
+
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
                 comesFromChat = bundle.getBoolean("chat");
@@ -1911,8 +1919,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             for (int i=0;i<addedContacts.size();i++) {
 //                if (adapterPhone != null) {
                     contactEmail = addedContacts.get(i).getEmail();
-                    if (contactEmail != null) {
-                        contactsSelected.add(contactEmail);
+                    if (fromAchievements){
+                        if (contactEmail != null && !mailsFromAchievements.contains(contactEmail)) {
+                            contactsSelected.add(contactEmail);
+                        }
+                    }
+                    else {
+                        if (contactEmail != null) {
+                            contactsSelected.add(contactEmail);
+                        }
                     }
 //                }
             }
