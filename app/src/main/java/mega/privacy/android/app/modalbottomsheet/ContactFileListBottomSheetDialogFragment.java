@@ -23,8 +23,8 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -340,7 +340,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                     }
                 }
                 else {
-                    i.putExtra("imageId", MimeTypeInfo.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
                 }
                 i.putExtra("name", node.getName());
                 context.startActivity(i);

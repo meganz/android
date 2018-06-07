@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -171,7 +171,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
+		holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
 		holder.progressBar.setVisibility(View.GONE);

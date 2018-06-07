@@ -102,7 +102,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
@@ -2965,7 +2965,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffline){
             i.putExtra("name", fileName);
-            i.putExtra("imageId", MimeTypeMime.typeForName(fileName).getIconResourceId());
+            i.putExtra("imageId", MimeTypeThumbnail.typeForName(fileName).getIconResourceId());
             i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -2982,7 +2982,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+            i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
         }
         startActivity(i);

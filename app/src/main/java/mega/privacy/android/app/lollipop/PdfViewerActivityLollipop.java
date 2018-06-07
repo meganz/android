@@ -77,7 +77,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -1842,7 +1842,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffLine){
             i.putExtra("name", pdfFileName);
-            i.putExtra("imageId", MimeTypeMime.typeForName(pdfFileName).getIconResourceId());
+            i.putExtra("imageId", MimeTypeThumbnail.typeForName(pdfFileName).getIconResourceId());
             i.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
             i.putExtra("path", path);
             if (pathNavigation != null){
@@ -1859,7 +1859,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else {
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
-            i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+            i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
         }
         startActivity(i);
