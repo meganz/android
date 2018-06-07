@@ -674,9 +674,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
             holder = new ViewHolderMessageChat(v);
             holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
-            holder.itemLayout.setTag(holder);
-            holder.itemLayout.setOnClickListener(this);
-            holder.itemLayout.setOnLongClickListener(this);
             holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
             //Margins
             RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams) holder.dateLayout.getLayoutParams();
@@ -980,6 +977,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolderUploading(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderUploading: " + position);
 
+        ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+
+        ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
+        ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
+        ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
+
         ((ViewHolderMessageChat) holder).currentPosition = position;
 
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
@@ -1140,6 +1143,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderMessage: " + position);
 
+        ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+
         ((ViewHolderMessageChat) holder).currentPosition = position;
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).ownTriangleIconContact.setVisibility(View.GONE);
@@ -1173,6 +1178,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         int messageType = message.getType();
         log("Message type: " + messageType);
+
+        if(isKnownMessage(messageType)){
+            ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
+            ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
+            ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
+        }
+        else{
+            ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(null);
+            ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(null);
+        }
 
         switch (messageType) {
 
@@ -1242,7 +1257,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             default: {
                 log("DEFAULT MegaChatMessage");
-                bindNoTypeMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                hideMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
         }
@@ -1302,6 +1317,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         } else {
             ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+        }
+    }
+
+    public boolean isKnownMessage(int messageType){
+        switch (messageType) {
+
+            case MegaChatMessage.TYPE_ALTER_PARTICIPANTS:
+            case MegaChatMessage.TYPE_PRIV_CHANGE:
+            case MegaChatMessage.TYPE_CONTAINS_META:
+            case MegaChatMessage.TYPE_NORMAL:
+            case MegaChatMessage.TYPE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
+            case MegaChatMessage.TYPE_CHAT_TITLE:
+            case MegaChatMessage.TYPE_TRUNCATE:
+            case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CALL_ENDED:
+            case MegaChatMessage.TYPE_INVALID: {
+                return true;
+            }
+            case MegaChatMessage.TYPE_UNKNOWN:
+            default: {
+                return false;
+            }
         }
     }
 
@@ -5911,8 +5949,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void hideMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("hideMessage");
-
-
+        ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.GONE);
     }
 
     public void bindNoTypeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
