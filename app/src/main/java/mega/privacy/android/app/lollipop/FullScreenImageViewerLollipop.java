@@ -67,7 +67,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -688,7 +688,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					Intent i = new Intent(this, FileInfoActivityLollipop.class);
 					i.putExtra("handle", node.getHandle());
-					i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+					i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 					i.putExtra("name", node.getName());
 					startActivity(i);
 					break;

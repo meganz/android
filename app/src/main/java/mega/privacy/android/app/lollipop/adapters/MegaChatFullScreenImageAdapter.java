@@ -21,7 +21,7 @@ import android.widget.RelativeLayout;
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -249,7 +249,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		}
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+		holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
 
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
