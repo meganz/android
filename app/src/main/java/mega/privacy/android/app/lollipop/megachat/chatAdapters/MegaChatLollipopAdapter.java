@@ -1224,6 +1224,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 bindCallEndedMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
+            case MegaChatMessage.TYPE_INVALID: {
+                log("MegaChatMessage.TYPE_INVALID");
+                bindNoTypeMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+            }
+            case MegaChatMessage.TYPE_UNKNOWN: {
+                log("MegaChatMessage.TYPE_UNKNOWN");
+                hideMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+            }
             default: {
                 log("DEFAULT MegaChatMessage");
                 bindNoTypeMessage((ViewHolderMessageChat) holder, androidMessage, position);
@@ -5893,6 +5903,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    public void hideMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        log("hideMessage");
+
+
+    }
+
     public void bindNoTypeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("bindNoTypeMessage");
 
@@ -5931,7 +5947,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-            ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+
+            if(message.getType()==MegaChatMessage.TYPE_INVALID){
+                if(message.getCode()==MegaChatMessage.INVALID_FORMAT){
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_invalid_format));
+                }
+                else if(message.getCode()==MegaChatMessage.INVALID_SIGNATURE){
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_invalid_signature));
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+                }
+            }
+            else{
+                ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+            }
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
@@ -5942,7 +5972,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             params.rightMargin = Util.scaleWidthPx(16, outMetrics);
             params.leftMargin = Util.scaleWidthPx(0, outMetrics);
             ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
-
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
@@ -6044,7 +6073,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-            ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+
+            if(message.getType()==MegaChatMessage.TYPE_INVALID){
+                if(message.getCode()==MegaChatMessage.INVALID_FORMAT){
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_invalid_format));
+                }
+                else if(message.getCode()==MegaChatMessage.INVALID_SIGNATURE){
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_invalid_signature));
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+                }
+            }
+            else{
+                ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+            }
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
             ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);

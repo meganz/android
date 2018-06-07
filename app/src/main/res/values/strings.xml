@@ -1946,4 +1946,7 @@
 
     <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call[/A][B] failed[/B]</string>
 
+    <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
+    <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
+
 </resources>
