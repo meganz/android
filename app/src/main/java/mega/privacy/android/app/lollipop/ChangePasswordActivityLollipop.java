@@ -993,8 +993,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
 				if(e.getErrorCode()!=MegaError.API_OK){
 					log("Error, request: "+e.getErrorString());
-
-					showSnackbar(getString(R.string.email_verification_text_error));
+					if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
+						if (is2FAEnabled){
+							verifyShowError();
+						}
+					}
+					else {
+						showSnackbar(getString(R.string.email_verification_text_error));
+					}
 				}
 				else{
 					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
