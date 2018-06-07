@@ -94,7 +94,12 @@ public class AccountController implements View.OnClickListener{
 
     public void deleteAccount(){
         log("deleteAccount");
-        megaApi.cancelAccount((ManagerActivityLollipop)context);
+        if (((ManagerActivityLollipop) context).is2FAEnabled()){
+            ((ManagerActivityLollipop) context).showVerifyPin2FA(true);
+        }
+        else {
+            megaApi.cancelAccount((ManagerActivityLollipop) context);
+        }
     }
 
     public void confirmDeleteAccount(String link, String pass){
@@ -557,7 +562,13 @@ public class AccountController implements View.OnClickListener{
         }
         if(!oldMail.equals(newMail)){
             log("Changes in mail, new mail: "+newMail);
-            megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
+            if (((ManagerActivityLollipop) context).is2FAEnabled()){
+                ((ManagerActivityLollipop) context).setNewMail(newMail);
+                ((ManagerActivityLollipop) context).showVerifyPin2FA(false);
+            }
+            else {
+                megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
+            }
         }
         log("The number of attributes to change is: "+count);
         return count;
