@@ -700,6 +700,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageText.setTag(holder);
+            holder.contentOwnMessageText.setOnClickListener(this);
+            holder.contentOwnMessageText.setOnLongClickListener(this);
 
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
@@ -858,6 +861,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageText.setTag(holder);
+            holder.contentContactMessageText.setOnClickListener(this);
+            holder.contentContactMessageText.setOnLongClickListener(this);
 
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
@@ -6405,13 +6411,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void toggleSelection(int pos) {
-        log("*****toggleSelection");
+        log("toggleSelection");
 
         if (selectedItems.get(pos, false)) {
-            log("****delete pos: " + pos);
+            log("delete pos: " + pos);
             selectedItems.delete(pos);
         } else {
-            log("*****PUT pos: " + pos);
+            log("PUT pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
@@ -7377,7 +7383,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onClick(View v) {
-        log("*******onClick");
+        log("onClick");
 
         //int position = (Integer) v.getTag();
         log("onClick");
@@ -7408,7 +7414,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
                 break;
             }
-
+            case R.id.content_own_message_text:
+            case R.id.content_contact_message_text:
             case R.id.message_chat_item_layout:{
                 ((ChatActivityLollipop) context).itemClick(currentPosition);
                 break;
@@ -7448,7 +7455,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public boolean onLongClick(View view) {
-        log("*******OnLongCLick");
+        log("OnLongCLick");
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -7457,45 +7464,37 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         int currentPosition = holder.getAdapterPosition();
 
         if (!isMultipleSelect()){
-            log("**** OnLongCLick -> not multiselect");
             if(currentPosition<1){
-                log("****Position not valid: "+currentPosition);
+                log("Position not valid: "+currentPosition);
             }else{
-                log("****Position valid: "+currentPosition);
+                log("Position valid: "+currentPosition);
 
                 if(!messages.get(currentPosition-1).isUploading()){
-                    log("****message not uploading ");
-
                     if(MegaApplication.isShowInfoChatMessages()){
-                        log("****isShowInfoChatMessages ");
-
                         ((ChatActivityLollipop) context).showMessageInfo(currentPosition);
-
                     }else{
-                        log("****is NOT ShowInfoChatMessages ");
-
                         AndroidMegaChatMessage messageR = messages.get(currentPosition-1);
                         if(messageR.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META){
-                            log("****TYPE_CONTAINS_META ");
+                            log("TYPE_CONTAINS_META ");
 
                             MegaChatContainsMeta meta = messageR.getMessage().getContainsMeta();
                             if(meta==null){
                             }else if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
 //                                setMultipleSelect(true);
                                 ((ChatActivityLollipop) context).activateActionMode();
-//
+                                ((ChatActivityLollipop) context).itemClick(currentPosition);
+
 //
 //                                if(currentPosition<1){
 //                                    log("Position not valid");
 //                                }else{
-                                    ((ChatActivityLollipop) context).itemClick(currentPosition);
 //
 //                                }
                             }else{
                                 log("CONTAINS_META_INVALID");
                             }
                         }else{
-                            log("****OTHER TYPE ");
+                            log("OTHER TYPE ");
 
  //                           setMultipleSelect(true);
                             ((ChatActivityLollipop) context).activateActionMode();
@@ -7510,7 +7509,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
                     }
                 }else{
-                    log("****message uploading ");
+                    log("message uploading ");
 
                 }
             }
