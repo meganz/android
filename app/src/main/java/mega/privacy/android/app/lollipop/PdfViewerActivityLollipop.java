@@ -16,10 +16,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.provider.OpenableColumns;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -84,6 +83,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -93,7 +93,6 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -105,6 +104,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
@@ -122,10 +122,6 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
-
-    public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
-    public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
-    public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 
     int[] screenPosition;
     int mLeftDelta;
@@ -188,11 +184,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private MenuItem moveToTrashMenuItem;
     private MenuItem removeMenuItem;
     private MenuItem removelinkMenuItem;
+    private MenuItem importMenuItem;
+    private MenuItem saveForOfflineMenuItem;
+    private MenuItem chatRemoveMenuItem;
 
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
-
-    int typeCheckLogin = -1;
 
     static int TYPE_UPLOAD = 0;
     static int TYPE_DOWNLOAD = 1;
@@ -222,6 +219,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private RelativeLayout pageNumber;
 
     boolean toolbarVisible = true;
+    boolean fromChat = false;
+    boolean isDeleteDialogShow = false;
+
+    ChatController chatC;
+    private long msgId = -1;
+    private long chatId = -1;
+    MegaNode nodeChat;
+    MegaChatMessage msgChat;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -231,7 +236,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         pdfViewerActivityLollipop = this;
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         if (intent == null){
             log("intent null");
             finish();
@@ -246,10 +251,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             uri = Uri.parse(savedInstanceState.getString("uri"));
             renamed = savedInstanceState.getBoolean("renamed");
             accountType = savedInstanceState.getInt("typeAccount");
+            isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
         }
         else {
             currentPage = 0;
             accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+            isDeleteDialogShow = false;
         }
         fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
@@ -274,6 +281,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else {
             isOffLine = false;
             pathNavigation = null;
+            if (type == Constants.FROM_CHAT){
+                fromChat = true;
+                chatC = new ChatController(this);
+                msgId = intent.getLongExtra("msgId", -1);
+                chatId = intent.getLongExtra("chatId", -1);
+            }
+            else {
+                fromChat = false;
+            }
         }
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -288,17 +304,43 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
+        if (!isOffLine) {
+            app = (MegaApplication) getApplication();
+            megaApi = app.getMegaApi();
 
-        app = (MegaApplication)getApplication();
-        megaApi = app.getMegaApi();
+            if (Util.isChatEnabled()) {
+                megaChatApi = app.getMegaChatApi();
+                if (megaChatApi != null) {
+                    if (msgId != -1 && chatId != -1) {
+                        msgChat = megaChatApi.getMessage(chatId, msgId);
+                        if (msgChat != null) {
+                            nodeChat = msgChat.getMegaNodeList().get(0);
+                            if (isDeleteDialogShow) {
+                                showConfirmationDeleteNode(chatId, msgChat);
+                            }
+                        }
+                    } else {
+                        log("msgId or chatId null");
+                    }
+                }
+            }
 
-        if(Util.isChatEnabled()){
-            megaChatApi = app.getMegaChatApi();
+            log("Add transfer listener");
+            megaApi.addTransferListener(this);
+            megaApi.addGlobalListener(this);
+
+            log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+            if(megaApi.getBandwidthOverquotaDelay()>0){
+                if(alertDialogTransferOverquota==null){
+                    showTransferOverquotaDialog();
+                }
+                else {
+                    if (!(alertDialogTransferOverquota.isShowing())) {
+                        showTransferOverquotaDialog();
+                    }
+                }
+            }
         }
-
-        log("Add transfer listener");
-        megaApi.addTransferListener(this);
-        megaApi.addGlobalListener(this);
 
 //        if(megaApi==null||megaApi.getRootNode()==null){
 //            log("Refresh session - sdk");
@@ -358,18 +400,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
         progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
-        log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
-        if(megaApi.getBandwidthOverquotaDelay()>0){
-            if(alertDialogTransferOverquota==null){
-                showTransferOverquotaDialog();
-            }
-            else {
-                if (!(alertDialogTransferOverquota.isShowing())) {
-                    showTransferOverquotaDialog();
-                }
-            }
-        }
-
         pdfView = (PDFView) findViewById(R.id.pdfView);
 
         pdfView.setBackgroundColor(Color.LTGRAY);
@@ -387,6 +417,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
 
         setTitle(pdfFileName);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+        }
+        else{
+            fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+        }
+
         fileNameTextView.setText(pdfFileName);
 
         uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
@@ -407,8 +445,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             @Override
             public void onClick(View v) {
                 log("onClick uploadContainer");
-                typeCheckLogin = TYPE_UPLOAD;
-                checkLogin();
+                Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
+                intent1.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent1.setDataAndType(uri, "application/pdf");
+                startActivity(intent1);
+                finish();
             }
         });
 
@@ -534,6 +576,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else {
+            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 0;
@@ -545,6 +588,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             else {
                 isOffLine = false;
                 pathNavigation = null;
+                if (type == Constants.FROM_CHAT){
+                    fromChat = true;
+                    chatC = new ChatController(this);
+                    msgId = intent.getLongExtra("msgId", -1);
+                    chatId = intent.getLongExtra("chatId", -1);
+                }
+                else {
+                    fromChat = false;
+                }
             }
             handle = getIntent().getLongExtra("HANDLE", -1);
 
@@ -566,17 +618,41 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             setContentView(R.layout.activity_pdfviewer);
 
-            app = (MegaApplication)getApplication();
-            megaApi = app.getMegaApi();
+            if (!isOffLine){
+                app = (MegaApplication)getApplication();
+                megaApi = app.getMegaApi();
 
-            if(Util.isChatEnabled()){
-                megaChatApi = app.getMegaChatApi();
+                if(Util.isChatEnabled()){
+                    megaChatApi = app.getMegaChatApi();
+                    if (megaChatApi != null){
+                        if (msgId != -1 && chatId != -1){
+                            msgChat = megaChatApi.getMessage(chatId, msgId);
+                            if (msgChat != null){
+                                nodeChat = msgChat.getMegaNodeList().get(0);
+                            }
+                        }
+                        else {
+                            log("msgId or chatId null");
+                        }
+                    }
+                }
+
+                log("Add transfer listener");
+                megaApi.addTransferListener(this);
+                megaApi.addGlobalListener(this);
+
+                log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+                if(megaApi.getBandwidthOverquotaDelay()>0){
+                    if(alertDialogTransferOverquota==null){
+                        showTransferOverquotaDialog();
+                    }
+                    else {
+                        if (!(alertDialogTransferOverquota.isShowing())) {
+                            showTransferOverquotaDialog();
+                        }
+                    }
+                }
             }
-
-
-            log("Add transfer listener");
-            megaApi.addTransferListener(this);
-            megaApi.addGlobalListener(this);
 
             tB = (Toolbar) findViewById(R.id.toolbar_pdf_viewer);
             if(tB==null){
@@ -611,18 +687,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             pageNumber.animate().translationY(-150).start();
             progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
-            log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
-            if(megaApi.getBandwidthOverquotaDelay()>0){
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
-                }
-            }
-
             pdfView = (PDFView) findViewById(R.id.pdfView);
 
             pdfView.setBackgroundColor(Color.LTGRAY);
@@ -635,6 +699,13 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             path = uri.getPath();
             setTitle(pdfFileName);
             aB.setTitle(pdfFileName);
+
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+            }
+            else{
+                fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+            }
             fileNameTextView.setText(pdfFileName);
 
             uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
@@ -644,8 +715,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 @Override
                 public void onClick(View v) {
                     log("onClick uploadContainer");
-                    typeCheckLogin = TYPE_UPLOAD;
-                    checkLogin();
+                    Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
+                    intent1.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent1.setDataAndType(uri, "application/pdf");
+                    startActivity(intent1);
+                    finish();
                 }
             });
 
@@ -696,6 +771,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
         outState.putInt("typeAccount", accountType);
+        outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
     }
 
     @Override
@@ -798,125 +874,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     .load();
         } catch (Exception e) {
 
-        }
-    }
-
-    public void checkLogin(){
-        log("checkLogin");
-
-        if (typeCheckLogin == TYPE_UPLOAD) {
-            uploadContainer.setVisibility(View.GONE);
-        }
-
-        dbH = DatabaseHandler.getDbHandler(this);
-        credentials = dbH.getCredentials();
-        //Start login process
-        if (credentials == null){
-            log("No credential to login");
-            if (typeCheckLogin == TYPE_UPLOAD) {
-                Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
-                uploadContainer.setVisibility(View.VISIBLE);
-                typeCheckLogin = -1;
-            }
-        }
-        else{
-            if (megaApi.getRootNode() == null) {
-                if (!MegaApplication.isLoggingIn()) {
-
-                    MegaApplication.setLoggingIn(true);
-                    gSession = credentials.getSession();
-
-                    if (Util.isChatEnabled()) {
-
-                        log("onCreate: Chat is ENABLED");
-                        if (megaChatApi == null) {
-                            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-                        }
-
-                        int ret = megaChatApi.getInitState();
-
-                        if(ret==0||ret==MegaChatApi.INIT_ERROR){
-                            ret = megaChatApi.init(gSession);
-                            log("onCreate: result of init ---> " + ret);
-                            chatSettings = dbH.getChatSettings();
-                            if (ret == MegaChatApi.INIT_NO_CACHE) {
-                                log("onCreate: condition ret == MegaChatApi.INIT_NO_CACHE");
-                            } else if (ret == MegaChatApi.INIT_ERROR) {
-
-                                log("onCreate: condition ret == MegaChatApi.INIT_ERROR");
-                                if (chatSettings == null) {
-
-                                    log("1 - onCreate: ERROR----> Switch OFF chat");
-                                    chatSettings = new ChatSettings();
-                                    chatSettings.setEnabled(false+"");
-                                    dbH.setChatSettings(chatSettings);
-                                } else {
-
-                                    log("2 - onCreate: ERROR----> Switch OFF chat");
-                                    dbH.setEnabledChat(false + "");
-                                }
-                                megaChatApi.logout(this);
-                            } else {
-
-                                log("onCreate: Chat correctly initialized");
-                            }
-                        }
-                    }
-
-                    log("SESSION: " + gSession);
-                    megaApi.fastLogin(gSession, this);
-                }
-                else{
-                    log("Another login is processing");
-                }
-            }
-            else{
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-                if (typeCheckLogin == TYPE_UPLOAD) {
-                    typeCheckLogin = -1;
-
-                    uploadToCloud();
-                }
-                else if (typeCheckLogin == TYPE_DOWNLOAD){
-                    typeCheckLogin = -1;
-
-                    downloadFromCloud();
-                }
-            }
-        }
-    }
-
-    public void uploadToCloud(){
-        log("uploadToCloud");
-
-        if (filePreparedInfos == null){
-
-            ProgressDialog temp = null;
-            try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.upload_prepare));
-                temp.show();
-            }
-            catch(Exception e){
-                return;
-            }
-            statusDialog = temp;
-
-            FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-            filePrepareTask.execute(getIntent());
-
-        }
-        else{
-            onIntentProcessed(filePreparedInfos);
-        }
-
-        if(megaApi.getRootNode()!=null){
-            this.backToCloud(megaApi.getRootNode().getHandle());
-        }
-        else{
-            log("Error on logging");
-            Util.showAlert(this, getString(R.string.alert_not_logged_in), null);
-            uploadContainer.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1067,6 +1024,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash);
         removeMenuItem = menu.findItem(R.id.pdf_viewer_remove);
         removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
+        importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
+        saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
+        chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
         if (!inside){
             propertiesMenuItem.setVisible(false);
@@ -1080,6 +1040,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             moveToTrashMenuItem.setVisible(false);
             removeMenuItem.setVisible(false);
             removelinkMenuItem.setVisible(false);
+            importMenuItem.setVisible(false);
+            saveForOfflineMenuItem.setVisible(false);
+            chatRemoveMenuItem.setVisible(false);
         }
         else {
             if (type == Constants.OFFLINE_ADAPTER){
@@ -1094,6 +1057,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 moveToTrashMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
             }
             else if(type == Constants.SEARCH_ADAPTER){
                 MegaNode node = megaApi.getNodeByHandle(handle);
@@ -1139,7 +1105,72 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     moveToTrashMenuItem.setVisible(false);
                     removeMenuItem.setVisible(true);
                 }
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+            }
+            else if (type == Constants.FROM_CHAT){
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                shareMenuItem.setVisible(false);
+                propertiesMenuItem.setVisible(false);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                chatMenuItem.setVisible(false);
 
+                if(megaApi==null || !Util.isOnline(this)) {
+                    downloadMenuItem.setVisible(false);
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+
+                    if (MegaApiJava.userHandleToBase64(msgChat.getUserHandle()).equals(megaChatApi.getMyUserHandle())) {
+                        if (msgChat.isDeletable()){
+                            chatRemoveMenuItem.setVisible(true);
+                        }
+                        else {
+                            chatRemoveMenuItem.setVisible(false);
+                        }
+                    }
+                    else {
+                        log("The message is not mine");
+                        chatRemoveMenuItem.setVisible(false);
+                    }
+                }
+                else {
+                    if (nodeChat != null){
+                        downloadMenuItem.setVisible(true);
+                        importMenuItem.setVisible(true);
+                        saveForOfflineMenuItem.setVisible(true);
+
+                        if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()) {
+                            if((megaApi.getNodeByHandle(nodeChat.getHandle()))==null){
+                                log("The node is not mine");
+                                chatRemoveMenuItem.setVisible(false);
+                            }
+                            else{
+                                if(msgChat.isDeletable()){
+                                    chatRemoveMenuItem.setVisible(true);
+                                }
+                                else{
+                                    chatRemoveMenuItem.setVisible(false);
+                                }
+                            }
+                        }
+                        else {
+                            log("The message is not mine");
+                            chatRemoveMenuItem.setVisible(false);
+                        }
+                    }
+                    else {
+                        downloadMenuItem.setVisible(false);
+                        importMenuItem.setVisible(false);
+                        saveForOfflineMenuItem.setVisible(false);
+                        chatRemoveMenuItem.setVisible(false);
+                    }
+                }
             }
             else {
                 shareMenuItem.setVisible(true);
@@ -1298,6 +1329,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         shareMenuItem.setVisible(true);
                     }
                 }
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
             }
         }
 
@@ -1321,7 +1355,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 break;
             }
             case R.id.pdf_viewer_download: {
-                downloadFile();
+                if (fromChat){
+                    if (chatC == null){
+                        chatC = new ChatController(this);
+                    }
+                    if (nodeChat != null){
+                        chatC.prepareForChatDownload(nodeChat);
+                    }
+                }
+                else {
+                    downloadFromCloud();
+                }
                 break;
             }
             case R.id.pdf_viewer_chat: {
@@ -1367,8 +1411,80 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 moveToTrash();
                 break;
             }
+            case R.id.chat_pdf_viewer_import:{
+                if (nodeChat != null){
+                    importNode();
+                }
+                break;
+            }
+            case R.id.chat_pdf_viewer_save_for_offline:{
+                if (chatC == null){
+                    chatC = new ChatController(this);
+                }
+                if (msgChat != null){
+                    chatC.saveForOffline(msgChat.getMegaNodeList());
+                }
+                break;
+            }
+            case R.id.chat_pdf_viewer_remove:{
+                if (msgChat != null && chatId != -1){
+                    showConfirmationDeleteNode(chatId, msgChat);
+                }
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void importNode(){
+        log("importNode");
+
+        Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+        intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+    }
+
+    public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
+        log("showConfirmationDeleteNode");
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        if (chatC == null){
+                            chatC = new ChatController(pdfViewerActivityLollipop);
+                        }
+                        chatC.deleteMessage(message, chatId);
+                        isDeleteDialogShow = false;
+                        finish();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        isDeleteDialogShow = false;
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        }
+        else{
+            builder = new android.support.v7.app.AlertDialog.Builder(this);
+        }
+        builder.setMessage(R.string.confirmation_delete_one_attachment);
+        builder.setPositiveButton(R.string.context_remove, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+        isDeleteDialogShow = true;
+
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isDeleteDialogShow = false;
+            }
+        });
     }
 
     public void moveToTrash(){
@@ -1470,7 +1586,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("COPY_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_COPY_FOLDER);
     }
 
     public void showMove(){
@@ -1486,7 +1602,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             longArray[i] = handleList.get(i);
         }
         intent.putExtra("MOVE_FROM", longArray);
-        startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_MOVE_FOLDER);
     }
 
     private void showKeyboardDelayed(final View view) {
@@ -1839,12 +1955,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    public void downloadFile() {
-
-        typeCheckLogin = TYPE_DOWNLOAD;
-        checkLogin();
-    }
-
     public void updateFile (){
         MegaNode file = null;
         if (pdfFileName != null && handle != -1 ) {
@@ -1971,7 +2081,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 log("megaChatApi is Null - cannot attach nodes");
             }
         }
-        else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
@@ -1984,7 +2094,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
             nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
         }
-        else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
             if(!Util.isOnline(this)){
                 Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
@@ -2013,7 +2123,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
             }
         }
-        else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
             if(!Util.isOnline(this)){
                 Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
                 return;
@@ -2049,6 +2159,38 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                     catch (Exception ex) {}
                 }
+            }
+        }
+        else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+            log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
+
+            if(!Util.isOnline(this)||megaApi==null) {
+                try{
+                    statusDialog.dismiss();
+                } catch(Exception ex) {};
+                Snackbar.make(pdfviewerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                return;
+            }
+
+            final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
+            MegaNode target = null;
+            target = megaApi.getNodeByHandle(toHandle);
+            if(target == null){
+                target = megaApi.getRootNode();
+            }
+            log("TARGET: " + target.getName() + "and handle: " + target.getHandle());
+            if (nodeChat != null) {
+                log("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
+                if (target != null) {
+                    megaApi.copyNode(nodeChat, target, this);
+                } else {
+                    log("TARGET: null");
+                    Snackbar.make(pdfviewerContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                }
+            }
+            else{
+                log("DOCUMENT: null");
+                Snackbar.make(pdfviewerContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -2150,7 +2292,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     dbH.clearPreferences();
                     dbH.setFirstTime(false);
                 }
-                typeCheckLogin = -1;
             }
             else{
                 //LOGIN OK
@@ -2206,40 +2347,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             log("Not launch connect: "+megaChatApi.getInitState());
                         }
                         MegaApplication.setLoggingIn(false);
-                        if (typeCheckLogin == TYPE_UPLOAD){
-                            typeCheckLogin = -1;
-                            uploadToCloud();
-                        }
-                        else if (typeCheckLogin == TYPE_DOWNLOAD){
-                            typeCheckLogin = -1;
-                            downloadFromCloud();
-                        }
+                        downloadFromCloud();
                     }
                     else{
 
                         log("Chat NOT enabled - readyToManager");
                         MegaApplication.setLoggingIn(false);
-                        if (typeCheckLogin == TYPE_UPLOAD){
-                            typeCheckLogin = -1;
-                            uploadToCloud();
-                        }
-                        else if (typeCheckLogin == TYPE_DOWNLOAD){
-                            typeCheckLogin = -1;
-                            downloadFromCloud();
-                        }
+                        downloadFromCloud();
                     }
                 }
                 else{
                     log("chatSettings NULL - readyToManager");
                     MegaApplication.setLoggingIn(false);
-                    if (typeCheckLogin == TYPE_UPLOAD){
-                        typeCheckLogin = -1;
-                        uploadToCloud();
-                    }
-                    else if (typeCheckLogin == TYPE_DOWNLOAD){
-                        typeCheckLogin = -1;
-                        downloadFromCloud();
-                    }
+                    downloadFromCloud();
                 }
             }
         }
@@ -2321,7 +2441,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
+        log("onRequestTemporaryError");
     }
 
     @Override
@@ -2407,10 +2527,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     protected void onResume() {
         super.onResume();
         log("onResume");
-        if (megaApi.getNodeByHandle(handle) == null && inside){
-            finish();
+        if (!isOffLine && !fromChat){
+            if (megaApi.getNodeByHandle(handle) == null && inside){
+                finish();
+            }
+            updateFile();
         }
-        updateFile();
     }
 
     @Override
@@ -2591,6 +2713,50 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         mySnackbar.show();
     }
 
+    public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
+        log("askSizeConfirmationBeforeChatDownload");
+
+        final String parentPathC = parentPath;
+        final ArrayList<MegaNode> nodeListC = nodeList;
+        final long sizeC = size;
+        final ChatController chatC = new ChatController(this);
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        final CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+        confirmationLayout.addView(dontShowAgain, params);
+
+        builder.setView(confirmationLayout);
+
+        builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+        builder.setPositiveButton(getString(R.string.general_download),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if(dontShowAgain.isChecked()){
+                            dbH.setAttrAskSizeDownload("false");
+                        }
+                        chatC.download(parentPathC, nodeListC);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if(dontShowAgain.isChecked()){
+                    dbH.setAttrAskSizeDownload("false");
+                }
+            }
+        });
+
+        downloadConfirmationDialog = builder.create();
+        downloadConfirmationDialog.show();
+    }
+
     public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
         log("askSizeConfirmationBeforeDownload");
 
@@ -2685,5 +2851,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
+    }
+
+    public int getAccountType() {
+        return accountType;
     }
 }

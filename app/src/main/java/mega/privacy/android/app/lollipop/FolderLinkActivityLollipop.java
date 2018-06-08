@@ -1889,7 +1889,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		if (adapterList != null){
 			log("onBackPressed: adapter !=null");
 			parentHandle = adapterList.getParentHandle();
-			
 
 			MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
 			if (parentNode != null){

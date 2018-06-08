@@ -13,7 +13,7 @@
     <item
         android:id="@+id/chat_full_image_viewer_import"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_cloud_drive_black"
+        android:icon="@drawable/ic_import_to_cloud_white"
         android:title="@string/add_to_cloud"
         MEGA:showAsAction="always"
         android:visible="true"/>
