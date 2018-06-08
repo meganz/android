@@ -24,7 +24,7 @@ public class MimeTypeThumbnail {
 		resources = new SparseArray<String[]>();
 		resources.put(R.drawable.ic_3d_thumbnail, new String[] {"3ds", "3dm", "max", "obj", });
 		resources.put(R.drawable.ic_aftereffects_thumbnail, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
-		resources.put(R.drawable.ic_audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", });
+		resources.put(R.drawable.ic_audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", });
 		resources.put(R.drawable.ic_cad_thumbnail, new String[] {"dwg", "dxf", });
 		resources.put(R.drawable.ic_compressed_thumbnail, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
 		resources.put(R.drawable.database_thumbnail, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
@@ -36,10 +36,9 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.flash_thumbnail, new String[] {"fla", });
 		resources.put(R.drawable.ic_font_thumbnail, new String[] {"fnt", "fon", "otf", "ttf", });
 		resources.put(R.drawable.gis_thumbnail, new String[] {"gpx", "kml", "kmz", });
-		resources.put(R.drawable.ic_image_thumbnail, new String[] {"tga", "tif", "tiff", "bmp", "gif", "png", });
 		resources.put(R.drawable.html_thumbnail, new String[] {"dhtml", "htm", "html", "shtml", "xhtml", });
 		resources.put(R.drawable.ic_illustrator_thumbnail, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
-		resources.put(R.drawable.ic_image_thumbnail, new String[] {"jpg", "jpeg", });
+		resources.put(R.drawable.ic_image_thumbnail, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png",});
 		resources.put(R.drawable.ic_indesign_thumbnail, new String[] {"indd", });
 		resources.put(R.drawable.java_thumbnail, new String[] {"class", "jar", "java", });
 		resources.put(R.drawable.midi_thumbnail, new String[] {"mid", "midi", });
