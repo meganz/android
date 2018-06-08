@@ -2100,26 +2100,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 break;
                             }
                             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
-
-                                MegaHandleList handleList = MegaHandleList.createInstance();
-                                long userCount  = messageToForward.getUsersCount();
-                                for(int j=0; j<userCount;j++){
-                                    MegaUser user = megaApi.getContact(messageToForward.getUserEmail(j));
-                                    if (user != null) {
-                                        handleList.addMegaHandle(user.getHandle());
-                                    }
-                                    else{
-                                        log("The user in not contact - cannot be forwarded");
-                                    }
-                                }
-
-                                if(handleList.size()>0){
-                                    megaChatApi.attachContacts(chatHandles[0], handleList);
-                                }
-                                else{
-                                    showSnackbar("Non contacts cannot be forwarded. Please, add to your contacts");
-                                }
-
+                                megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[0]);
                                 break;
                             }
                             case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
@@ -2190,19 +2171,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
                                 case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
 
-                                    MegaHandleList handleList = MegaHandleList.createInstance();
-                                    long userCount  = messageToForward.getUsersCount();
-                                    for(int j=0; j<userCount;j++){
-                                        MegaUser user = megaApi.getContact(messageToForward.getUserEmail(j));
-                                        if (user != null) {
-                                            handleList.addMegaHandle(user.getHandle());
-                                        }
-                                        else{
-                                            log("The user in not contact - cannot be forwarded");
-                                        }
-                                    }
-
-                                    megaChatApi.attachContacts(chatHandles[k], handleList);
+                                    megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[k]);
                                     break;
                                 }
                                 case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
