@@ -221,7 +221,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 			if(inviteAction){
 				log("NOT my message, show INVITE button");
-				actionButton.setText(R.string.contact_invite);
+				actionButton.setText(R.string.menu_add_contact);
 			}
 			else{
 				log("NOT my message, show START CONVERSATION button");

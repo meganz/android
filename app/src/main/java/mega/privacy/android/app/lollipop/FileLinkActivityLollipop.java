@@ -261,7 +261,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		downloadButton.setLayoutParams(cancelTextParams);
 		
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
+		importButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 //		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();
 //		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
