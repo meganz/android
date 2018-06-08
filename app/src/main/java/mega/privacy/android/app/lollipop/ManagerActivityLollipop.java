@@ -323,6 +323,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openSettingsStorage = false;
 
+    int orientationSaved;
+
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
@@ -1147,6 +1149,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (turnOnNotifications){
 			outState.putBoolean("turnOnNotifications", turnOnNotifications);
 		}
+
+		outState.putInt("orientationSaved", orientationSaved);
 	}
 
 	@Override
@@ -1203,6 +1207,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
+			orientationSaved = savedInstanceState.getInt("orientationSaved");
 		}
 		else{
 			log("Bundle is NULL");
@@ -2446,6 +2451,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		dbH.setShowNotifOff(true);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			queryIfNotificationsAreOn();
+		}
+
+		if (getResources().getConfiguration().orientation != orientationSaved) {
+			orientationSaved = getResources().getConfiguration().orientation;
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 	}
 
@@ -3912,7 +3922,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(numberUnread==0){
 
 					if(isFirstNavigationLevel()){
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						if (drawerItem == DrawerItem.SEARCH){
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+						else {
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						}
 					}
 					else{
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3920,7 +3935,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					if(isFirstNavigationLevel()){
-						badgeDrawable.setProgress(0.0f);
+						if (drawerItem == DrawerItem.SEARCH){
+							badgeDrawable.setProgress(1.0f);
+						}
+						else {
+							badgeDrawable.setProgress(0.0f);
+						}
 					}
 					else{
 						badgeDrawable.setProgress(1.0f);
@@ -3938,7 +3958,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				if(isFirstNavigationLevel()){
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					if (drawerItem == DrawerItem.SEARCH){
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					}
+					else {
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					}
 				}
 				else{
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3946,7 +3971,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		} else {
 			if(isFirstNavigationLevel()){
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				if (drawerItem == DrawerItem.SEARCH){
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				}
+				else {
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
 			}
 			else{
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -5001,6 +5031,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					hidden.setChecked(true);
 				}
 
+				drawerLayout.closeDrawer(Gravity.LEFT);
+
     			drawerItem = DrawerItem.SEARCH;
 				sFLol = new SearchFragmentLollipop().newInstance();
 
@@ -5311,6 +5343,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				textsearchQuery = false;
 				searchQuery = "";
+				firstNavigationLevel = true;
+				parentHandleSearch = -1;
+				levelsSearch = -1;
+				drawerItem = DrawerItem.SEARCH;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				return true;
 			}
@@ -6616,7 +6652,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				if (firstNavigationLevel){
+				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					drawerLayout.openDrawer(nV);
 				}else{
 					log("NOT firstNavigationLevel");
@@ -6702,8 +6738,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
+
 		    			if (sFLol != null && sFLol.isAdded()){
-		    				sFLol.onBackPressed();
+//		    				sFLol.onBackPressed();
+		    				onBackPressed();
 		    				return true;
 		    			}
 		    		}
@@ -15721,26 +15759,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	}
 
 	public void changeStatusBarColor(int option) {
+		log("changeStatusBarColor");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			final Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
-		if (option == 1) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			if (option == 2){
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 500);
 			}
+		}
+		if (option == 1){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-
-		} else if (option == 2) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
-			}
+		}
+		else {
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
+
 	}
 
 	public long getParentHandleInbox() {
