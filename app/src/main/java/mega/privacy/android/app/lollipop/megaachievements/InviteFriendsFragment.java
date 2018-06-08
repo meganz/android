@@ -259,6 +259,15 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			adapter.setNames(mails);
 		}
 
+		if(mails.isEmpty()){
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			inviteButton.setOnClickListener(null);
+		}
+		else{
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+			inviteButton.setOnClickListener(this);
+		}
+
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
