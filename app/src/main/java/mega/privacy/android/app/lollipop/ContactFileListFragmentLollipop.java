@@ -658,7 +658,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					intent.putExtra("screenPosition", screenPosition);
 					((ContactFileListActivityLollipop)context).startActivity(intent);
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				} 
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
@@ -798,7 +798,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else {
 					adapter.notifyDataSetChanged();
