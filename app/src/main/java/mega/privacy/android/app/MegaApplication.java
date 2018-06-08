@@ -192,30 +192,39 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private final int interval = 3000;
 	private Handler keepAliveHandler = new Handler();
+	int backgroundStatus = -1;
 
 	private Runnable keepAliveRunnable = new Runnable() {
 		@Override
 		public void run() {
+
 			try {
 
 				if (activityVisible) {
-					log("SEND KEEPALIVE");
+					log("KEEPALIVE: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
-						megaChatApi.setBackgroundStatus(false);
+						backgroundStatus = megaChatApi.getBackgroundStatus();
+						log("backgroundStatus_activityVisible: " + backgroundStatus);
+						if (backgroundStatus != -1){
+							if (backgroundStatus != 0){
+								megaChatApi.setBackgroundStatus(false);
+							}
+						}
 					}
 
 				} else {
-					log("SEND KEEPALIVEAWAY");
+					log("KEEPALIVEAWAY: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
-						megaChatApi.setBackgroundStatus(true);
+						backgroundStatus = megaChatApi.getBackgroundStatus();
+						log("backgroundStatus_!activityVisible: " + backgroundStatus);
+						if (backgroundStatus != -1){
+							if (backgroundStatus != 1){
+								megaChatApi.setBackgroundStatus(true);
+							}
+						}
 					}
 				}
 
-				if (activityVisible) {
-					log("Handler KEEPALIVE: " + System.currentTimeMillis());
-				} else {
-					log("Handler KEEPALIVEAWAY: " + System.currentTimeMillis());
-				}
 				keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
 				keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 			}
