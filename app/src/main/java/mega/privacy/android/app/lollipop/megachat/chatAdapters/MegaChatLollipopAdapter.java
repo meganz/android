@@ -153,31 +153,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (param == 0) {
                 log("Preview recovered from folder");
                 int position = holder.getCurrentPosition();
+                if(position<=messages.size()){
+                    AndroidMegaChatMessage message = messages.get(position - 1);
+                    if (message.getMessage() != null) {
+                        if (message.getMessage().getMegaNodeList() != null) {
+                            if (message.getMessage().getMegaNodeList().get(0) != null) {
+                                long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
 
-                AndroidMegaChatMessage message = messages.get(position - 1);
-
-                if (message.getMessage() != null) {
-                    if (message.getMessage().getMegaNodeList() != null) {
-                        if (message.getMessage().getMegaNodeList().get(0) != null) {
-                            long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
-
-                            if (nodeMessageHandle == node.getHandle()) {
-                                if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
-                                    setOwnPreview(holder, preview, node);
-                                    int status = message.getMessage().getStatus();
-                                    if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
-                                        setErrorStateOnPreview(holder, preview);
+                                if (nodeMessageHandle == node.getHandle()) {
+                                    if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
+                                        setOwnPreview(holder, preview, node);
+                                        int status = message.getMessage().getStatus();
+                                        if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                                            setErrorStateOnPreview(holder, preview);
+                                        }
+                                    } else {
+                                        setContactPreview(holder, preview, node);
                                     }
-                                } else {
-                                    setContactPreview(holder, preview, node);
-                                }
 
-                            } else {
-                                log("The nodeHandles are not equal!");
+                                } else {
+                                    log("The nodeHandles are not equal!");
+                                }
                             }
                         }
                     }
+                }else{
+                    log("messages removed");
                 }
+
+
             } else if (param == 2) {
                 File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
                 log("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());

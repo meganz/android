@@ -26,7 +26,7 @@ public class MimeTypeList {
 		resources = new SparseArray<String[]>();
 		resources.put(R.drawable.ic_3d_list, new String[] {"3ds", "3dm", "max", "obj", });
 		resources.put(R.drawable.ic_aftereffects_list, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
-		resources.put(R.drawable.ic_audio_list, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", });
+		resources.put(R.drawable.ic_audio_list, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus",});
 		resources.put(R.drawable.ic_cad_list, new String[] {"dwg", "dxf", });
 		resources.put(R.drawable.ic_compressed_list, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
 		resources.put(R.drawable.ic_database_list, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
@@ -38,10 +38,9 @@ public class MimeTypeList {
 		resources.put(R.drawable.ic_flash_list, new String[] {"fla", });
 		resources.put(R.drawable.ic_font_list, new String[] {"fnt", "fon", "otf", "ttf", });
 		resources.put(R.drawable.ic_gis_list, new String[] {"gpx", "kml", "kmz", });
-		resources.put(R.drawable.ic_image_list, new String[] {"tga", "tif", "tiff", "bmp", "gif", "png", });
 		resources.put(R.drawable.ic_html_list, new String[] {"dhtml", "htm", "html", "shtml", "xhtml", });
 		resources.put(R.drawable.ic_illustrator_list, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
-		resources.put(R.drawable.ic_image_list, new String[] {"jpg", "jpeg", });
+		resources.put(R.drawable.ic_image_list, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png", });
 		resources.put(R.drawable.ic_indesign_list, new String[] {"indd", });
 		resources.put(R.drawable.ic_java_list, new String[] {"class", "jar", "java", });
 		resources.put(R.drawable.ic_midi_list, new String[] {"mid", "midi", });
@@ -218,7 +217,7 @@ public class MimeTypeList {
 		if (resId == -1) {
 			if (resourcesCache.containsKey(extension)) {
 				resId = resourcesCache.get(extension);
-			} else {
+			}else {
 				for (int i = 0, len = resources.size(); i < len; i++) {
 					int keyResId = resources.keyAt(i);
 					for (String valueExtension : resources.get(keyResId)) {
