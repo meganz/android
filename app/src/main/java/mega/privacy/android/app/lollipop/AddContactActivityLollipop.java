@@ -430,6 +430,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean("fromAchievements", fromAchievements);
+        outState.putStringArrayList("mailsFromAchievements", mailsFromAchievements);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
 

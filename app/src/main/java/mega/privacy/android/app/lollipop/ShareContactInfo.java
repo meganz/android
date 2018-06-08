@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import mega.privacy.android.app.MegaContactAdapter;
@@ -10,7 +12,7 @@ import nz.mega.sdk.MegaUser;
  * Created by mega on 20/02/18.
  */
 
-public class ShareContactInfo{
+public class ShareContactInfo implements Parcelable{
 
     long id;
     String name;
@@ -94,4 +96,46 @@ public class ShareContactInfo{
     public void setMegaContactAdapter(boolean megaContactAdapter) {
         this.megaContactAdapter = megaContactAdapter;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeString(phoneNumber);
+
+        dest.writeParcelable(megaContactDB, flags);
+        dest.writeString(fullName);
+        dest.writeByte((byte) (phoneContactInfo ? 1 : 0));
+        dest.writeByte((byte) (megaContactAdapter ? 1 : 0));
+    }
+
+
+    protected ShareContactInfo(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+        email = in.readString();
+        phoneNumber = in.readString();
+
+        fullName = in.readString();
+        phoneContactInfo = in.readByte() != 0;
+        megaContactAdapter = in.readByte() != 0;
+    }
+
+    public static final Creator<ShareContactInfo> CREATOR = new Creator<ShareContactInfo>() {
+        @Override
+        public ShareContactInfo createFromParcel(Parcel in) {
+            return new ShareContactInfo(in);
+        }
+
+        @Override
+        public ShareContactInfo[] newArray(int size) {
+            return new ShareContactInfo[size];
+        }
+    };
 }
