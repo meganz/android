@@ -75,14 +75,14 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	CoordinatorLayout mainLayout;
 
 	RecyclerView listView;
-	public static LinearLayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 
 	MegaUser contact;
 	ArrayList<MegaNode> contactNodes;
 
-	public static MegaBrowserLollipopAdapter adapter;
+	MegaBrowserLollipopAdapter adapter;
 
 	FloatingActionButton fab;
 
@@ -113,6 +113,25 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (mLayoutManager != null && adapter.getItem(position) != null){
+			mLayoutManager.scrollToPosition(position);
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+
+		View v = mLayoutManager.findViewByPosition(position);
+		if (v != null){
+			return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		}
+
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {

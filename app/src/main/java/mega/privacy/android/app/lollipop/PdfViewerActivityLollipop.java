@@ -306,7 +306,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         if (!isOffLine) {
             app = (MegaApplication) getApplication();
-            megaApi = app.getMegaApi();
+            if (isFolderLink){
+                megaApi = app.getMegaApiFolder();
+            }
+            else {
+                megaApi = app.getMegaApi();
+            }
 
             if (Util.isChatEnabled()) {
                 megaChatApi = app.getMegaChatApi();
@@ -620,7 +625,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             if (!isOffLine){
                 app = (MegaApplication)getApplication();
-                megaApi = app.getMegaApi();
+                if (isFolderLink){
+                    megaApi = app.getMegaApiFolder();
+                }
+                else {
+                    megaApi = app.getMegaApi();
+                }
 
                 if(Util.isChatEnabled()){
                     megaChatApi = app.getMegaChatApi();
@@ -2527,7 +2537,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     protected void onResume() {
         super.onResume();
         log("onResume");
-        if (!isOffLine && !fromChat){
+        if (!isOffLine && !fromChat && !isFolderLink){
             if (megaApi.getNodeByHandle(handle) == null && inside){
                 finish();
             }
