@@ -72,15 +72,15 @@ public class SearchFragmentLollipop extends Fragment{
 
 	Context context;
 	RecyclerView recyclerView;
-	public static LinearLayoutManager mLayoutManager;
-	public static CustomizedGridLayoutManager gridLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	public static MegaBrowserLollipopAdapter adapter;
+	MegaBrowserLollipopAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -111,6 +111,39 @@ public class SearchFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null && adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			if (mLayoutManager != null && adapter.getItem(position) != null){
+				mLayoutManager.scrollToPosition(position);
+			}
+		}
+		else {
+			if (gridLayoutManager != null && adapter.getItem(position) != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			View v = mLayoutManager.findViewByPosition(position);
+			if (v != null){
+				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			}
+		}
+		else {
+			View v = gridLayoutManager.findViewByPosition(position);
+			if (v != null) {
+				return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+			}
+		}
+
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {

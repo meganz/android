@@ -199,7 +199,9 @@ public class MimeTypeList {
 	}
 
 	public boolean isAudioNotSupported() {
-		return extension.equals("flac");
+		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
+				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")
+				|| extension.equals("3ga");
 	}
 
 	/*

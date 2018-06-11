@@ -6,9 +6,11 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -23,6 +25,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -111,7 +114,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	String folderKey;
 	String folderSubHandle;
 	RecyclerView listView;
-	public static LinearLayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	MegaNode selectedNode;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -125,7 +128,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	DisplayMetrics outMetrics;
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
-	public static MegaBrowserLollipopAdapter adapterList;
+	MegaBrowserLollipopAdapter adapterList;
 
 	ImageView fileLinkIconView;
 	TextView fileLinkNameView;
@@ -277,6 +280,73 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		return super.onOptionsItemSelected(item);
     }
 
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapterList != null){
+			if (mLayoutManager != null){
+				mLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		View v = mLayoutManager.findViewByPosition(position);
+		if (v != null){
+			return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		}
+
+		return null;
+	}
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int position;
+			int adapterType;
+			int actionType;
+			ImageView imageDrag = null;
+
+			if (intent != null) {
+				position = intent.getIntExtra("position", -1);
+				adapterType = intent.getIntExtra("adapterType", 0);
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if (position != -1) {
+					if (adapterType == Constants.FOLDER_LINK_ADAPTER) {
+						if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+							imageDrag = getImageDrag(position);
+							if (imageDrag != null) {
+								imageDrag.setVisibility(View.VISIBLE);
+							}
+							if (imageDrag != null) {
+								folderLinkActivity.imageDrag = imageDrag;
+								folderLinkActivity.imageDrag.setVisibility(View.GONE);
+							}
+						} else if (actionType == Constants.SCROLL_TO_POSITION) {
+							updateScrollPosition(position);
+						}
+					}
+				}
+
+				if (imageDrag != null){
+					int[] positionDrag = new int[2];
+					int[] screenPosition = new int[4];
+					imageDrag.getLocationOnScreen(positionDrag);
+
+					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
+					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
+					screenPosition[2] = imageDrag.getWidth();
+					screenPosition[3] = imageDrag.getHeight();
+
+					Intent intent1 =  new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					intent1.putExtra("screenPosition", screenPosition);
+					LocalBroadcastManager.getInstance(folderLinkActivity).sendBroadcast(intent1);
+				}
+			}
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
     	log("onCreate()");
@@ -302,6 +372,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 
@@ -661,6 +733,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			megaApiFolder.removeRequestListener(this);
 //			megaApiFolder.logout();
 		}
+
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+
 		super.onDestroy();
 	}
 
@@ -1662,13 +1737,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
 						mediaIntent = new Intent(FolderLinkActivityLollipop.this, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
+					mediaIntent.putExtra("isFolderLink", true);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("screenPosition", screenPosition);
