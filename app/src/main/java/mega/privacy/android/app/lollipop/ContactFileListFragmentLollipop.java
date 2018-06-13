@@ -117,7 +117,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
-		if (mLayoutManager != null && adapter.getItem(position) != null){
+		if (adapter != null && mLayoutManager != null){
 			mLayoutManager.scrollToPosition(position);
 		}
 	}
@@ -125,10 +125,11 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
-
-		View v = mLayoutManager.findViewByPosition(position);
-		if (v != null){
-			return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		if (adapter != null && mLayoutManager != null) {
+			View v = mLayoutManager.findViewByPosition(position);
+			if (v != null) {
+				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			}
 		}
 
 		return null;

@@ -664,7 +664,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     mediaOffList = new ArrayList<>();
                     int mediaPosition = -1;
                     for (int i=0;i<offList.size();i++){
-                        if ((MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported())|| MimeTypeList.typeForName(offList.get(i).getName()).isAudio()){
+                        if ((MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported())
+                                || (MimeTypeList.typeForName(offList.get(i).getName()).isAudio() && MimeTypeList.typeForName(offList.get(i).getName()).isAudioNotSupported())){
                             mediaOffList.add(offList.get(i));
                             mediaPosition++;
                             if (i == currentPosition){
@@ -696,7 +697,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 int mediaNumber = 0;
                 for (int i=0;i<nodes.size();i++){
                     MegaNode n = nodes.get(i);
-                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) || MimeTypeList.typeForName(n.getName()).isAudio()){
+                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
+                            || (MimeTypeList.typeForName(n.getName()).isAudio() && MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
                         mediaHandles.add(n.getHandle());
                         if (i == currentPosition){
                             currentPosition = mediaNumber;
@@ -754,7 +756,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 int mediaNumber = 0;
                 for (int i=0;i<nodes.size();i++){
                     MegaNode n = nodes.get(i);
-                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) || MimeTypeList.typeForName(n.getName()).isAudio()){
+                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
+                            || (MimeTypeList.typeForName(n.getName()).isAudio() && MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
                         mediaHandles.add(n.getHandle());
                         if (i == currentPosition){
                             currentPosition = mediaNumber;
@@ -2949,7 +2952,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     protected void onResume() {
         super.onResume();
         log("onResume");
-        if (!isOffline && !fromChat) {
+        if (!isOffline && !fromChat && !isFolderLink) {
             if (megaApi.getNodeByHandle(handle) == null) {
                 finish();
             }
@@ -3022,7 +3025,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     else {
                         if (megaApi == null){
                             MegaApplication app = (MegaApplication)getApplication();
-                            megaApi = app.getMegaApiFolder();
+                            megaApi = app.getMegaApi();
                             megaApi.addTransferListener(this);
                             megaApi.addGlobalListener(this);
                         }

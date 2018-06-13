@@ -115,13 +115,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
-		if (adapter != null && adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			if (mLayoutManager != null && adapter.getItem(position) != null){
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
 				mLayoutManager.scrollToPosition(position);
 			}
-		}
-		else {
-			if (gridLayoutManager != null && adapter.getItem(position) != null) {
+			else if (gridLayoutManager != null) {
 				gridLayoutManager.scrollToPosition(position);
 			}
 		}
@@ -130,19 +128,20 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
-		if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null){
-				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
 			}
 		}
-		else {
-			View v = gridLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-			}
-		}
-
 		return null;
 	}
 	
