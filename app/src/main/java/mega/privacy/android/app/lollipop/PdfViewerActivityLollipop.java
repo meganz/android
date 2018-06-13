@@ -2558,6 +2558,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
+            megaApi.httpServerStop();
         }
 
         super.onDestroy();

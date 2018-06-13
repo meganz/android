@@ -2973,6 +2973,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
+            megaApi.httpServerStop();
         }
         if (player != null){
             player.release();
