@@ -316,8 +316,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if (adapterType == Constants.FOLDER_LINK_ADAPTER) {
 						if (actionType == Constants.UPDATE_IMAGE_DRAG) {
 							imageDrag = getImageDrag(position);
-							if (imageDrag != null) {
-								imageDrag.setVisibility(View.VISIBLE);
+							if (folderLinkActivity.imageDrag != null) {
+								folderLinkActivity.imageDrag.setVisibility(View.VISIBLE);
 							}
 							if (imageDrag != null) {
 								folderLinkActivity.imageDrag = imageDrag;
