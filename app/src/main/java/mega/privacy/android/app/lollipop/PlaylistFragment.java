@@ -93,7 +93,12 @@ public class PlaylistFragment extends Fragment{
         super.onCreate(savedInstanceState);
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            if (((AudioVideoPlayerLollipop) context).isFolderLink()){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+            }
+            else {
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
         }
 
         player = ((AudioVideoPlayerLollipop) context).getPlayer();
@@ -109,7 +114,12 @@ public class PlaylistFragment extends Fragment{
         ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            if (((AudioVideoPlayerLollipop) context).isFolderLink()){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+            }
+            else {
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
         }
 
         if (aB == null){

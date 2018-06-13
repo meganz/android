@@ -1505,13 +1505,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (adapterType == Constants.SEARCH_ADAPTER){
 			Long handle = adapterMega.getImageHandle(positionG);
-			ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
-			for (int i=0; i<listNodes.size(); i++){
-				if (listNodes.get(i).getHandle() == handle){
-					getImageView(i, -1);
-					break;
-				}
-			}
+			getImageView(0, handle);
 		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);
@@ -1563,14 +1557,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else if (adapterType == Constants.SEARCH_ADAPTER){
 			Long handle = adapterMega.getImageHandle(positionG);
-			ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
-
-			for (int i=0; i<listNodes.size(); i++){
-				if (listNodes.get(i).getHandle() == handle){
-					scrollToPosition(i, -1);
-					break;
-				}
-			}
+			scrollToPosition(0, handle);
 		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);

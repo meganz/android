@@ -393,7 +393,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	public static String searchQuery = null;
+	public String searchQuery = null;
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -628,7 +628,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 					else if (adapterType == Constants.SEARCH_ADAPTER){
+						Long handle = intent.getLongExtra("handle", -1);
 						if (sFLol != null && sFLol.isAdded()){
+							ArrayList<MegaNode> listNodes = sFLol.getNodes();
+							for (int i=0; i<listNodes.size(); i++){
+								if (listNodes.get(i).getHandle() == handle){
+									position = i;
+									break;
+								}
+							}
+
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
 								imageDrag = sFLol.getImageDrag(position);
 								if (sFLol.imageDrag != null){
