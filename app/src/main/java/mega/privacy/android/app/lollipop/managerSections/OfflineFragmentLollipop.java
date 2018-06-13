@@ -108,13 +108,11 @@ public class OfflineFragmentLollipop extends Fragment{
 
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
-		if (adapter != null && adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			if (mLayoutManager != null){
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
-		}
-		else {
-			if (gridLayoutManager != null) {
+			else if (gridLayoutManager != null) {
 				gridLayoutManager.scrollToPosition(position);
 			}
 		}
@@ -123,16 +121,18 @@ public class OfflineFragmentLollipop extends Fragment{
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
-		if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
-			View v = mLayoutManager.findViewByPosition(position);
-			if (v != null){
-				return (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+				}
 			}
-		}
-		else {
-			View v = gridLayoutManager.findViewByPosition(position);
-			if (v != null) {
-				return (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+				}
 			}
 		}
 
@@ -1104,7 +1104,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						log("Video file");
 
 						Intent mediaIntent;
-						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported()) {
+						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(currentFile.getName()).isAudioNotSupported()) {
 							mediaIntent = new Intent(Intent.ACTION_VIEW);
 						}
 						else {

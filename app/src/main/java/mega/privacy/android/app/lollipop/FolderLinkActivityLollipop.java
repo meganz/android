@@ -282,18 +282,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
-		if (adapterList != null){
-			if (mLayoutManager != null){
-				mLayoutManager.scrollToPosition(position);
-			}
+		if (adapterList != null && mLayoutManager != null){
+			mLayoutManager.scrollToPosition(position);
 		}
 	}
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
-		View v = mLayoutManager.findViewByPosition(position);
-		if (v != null){
-			return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		if (adapterList != null && mLayoutManager != null){
+			View v = mLayoutManager.findViewByPosition(position);
+			if (v != null){
+				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			}
 		}
 
 		return null;
@@ -1768,8 +1768,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
+						if (megaApiFolder.httpServerIsRunning() == 0) {
+							megaApiFolder.httpServerStart();
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -1778,14 +1778,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 						if(mi.totalMem>Constants.BUFFER_COMP){
 							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 						}
 						else{
 							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 						}
 
-						String url = megaApi.httpServerGetLocalLink(file);
+						String url = megaApiFolder.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 			  		if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
@@ -1815,7 +1815,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -1826,8 +1826,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApi.httpServerIsRunning() == 0) {
-							megaApi.httpServerStart();
+						if (megaApiFolder.httpServerIsRunning() == 0) {
+							megaApiFolder.httpServerStart();
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -1836,14 +1836,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 						if(mi.totalMem>Constants.BUFFER_COMP){
 							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 						}
 						else{
 							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 						}
 
-						String url = megaApi.httpServerGetLocalLink(file);
+						String url = megaApiFolder.httpServerGetLocalLink(file);
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
