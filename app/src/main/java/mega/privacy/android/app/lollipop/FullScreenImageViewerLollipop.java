@@ -222,6 +222,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onDestroy(){
+
+		setImageDragVisibility(View.VISIBLE);
+
 		if(megaApi != null){
 			megaApi.removeRequestListener(this);
 			megaApi.removeGlobalListener(this);

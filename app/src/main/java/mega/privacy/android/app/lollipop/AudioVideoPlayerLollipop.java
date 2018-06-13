@@ -395,16 +395,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
         parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 
-
-        log("uri: "+uri);
-
-        if (uri.toString().contains("http://")){
-            isUrl = true;
-        }
-        else {
-            isUrl = false;
-        }
-
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -539,6 +529,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
 
+                if (savedInstanceState != null && uri.toString().contains("http://")){
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+                    if (node != null){
+                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                    }
+                }
+
                 if (megaChatApi != null){
                     if (msgId != -1 && chatId != -1){
                         msgChat = megaChatApi.getMessage(chatId, msgId);
@@ -566,6 +563,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                 }
             }
+        }
+        log("uri: "+uri);
+
+        if (uri.toString().contains("http://")){
+            isUrl = true;
+        }
+        else {
+            isUrl = false;
         }
 
         if (dbH == null){
@@ -2969,6 +2974,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     protected void onDestroy() {
         log("onDestroy()");
+
+        setImageDragVisibility(View.VISIBLE);
 
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
