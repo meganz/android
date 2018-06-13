@@ -10,8 +10,6 @@
     android:background="@color/white"
     tools:context=".lollipop.ContactInfoActivityLollipop">
 
-
-
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
@@ -64,6 +62,17 @@
                         android:adjustViewBounds="true"
                         android:fitsSystemWindows="true"
                         android:scaleType="centerCrop" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="112dp"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/gradient_shape" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@drawable/actionbar_gradient_dark" />
                 </RelativeLayout>
 
 

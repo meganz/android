@@ -103,6 +103,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	MenuItem shareMenuItem;
 
 	File previewFile = null;
+	Bitmap preview = null;
 
 	long toHandle = 0;
 	long fragmentHandle = -1;
@@ -503,11 +504,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					importButton.setVisibility(View.VISIBLE);
 				}
 
-				Bitmap preview = null;
 				preview = PreviewUtils.getPreviewFromCache(document);
 				if (preview != null){
-					log("***hasPreview 1");
-
 					PreviewUtils.previewCache.put(document.getHandle(), preview);
 					imageView.setImageBitmap(preview);
 					imageViewLayout.setVisibility(View.VISIBLE);
@@ -515,10 +513,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					buttonPreviewContent.setVisibility(View.VISIBLE);
 
 				}else{
+
 					preview = PreviewUtils.getPreviewFromFolder(document, this);
 					if (preview != null){
-						log("***hasPreview 2");
-
 						PreviewUtils.previewCache.put(document.getHandle(), preview);
 						imageView.setImageBitmap(preview);
 						imageViewLayout.setVisibility(View.VISIBLE);
@@ -526,14 +523,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						buttonPreviewContent.setVisibility(View.VISIBLE);
 
 					}else{
+
 						if (document.hasPreview()) {
-							log("***hasPreview 3");
 							previewFile = new File(PreviewUtils.getPreviewFolder(this), document.getBase64Handle() + ".jpg");
 							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
-
+							buttonPreviewContent.setVisibility(View.VISIBLE);
 						}else{
-							log("***hasNOTPreview 4");
-
 							buttonPreviewContent.setVisibility(View.GONE);
 							imageViewLayout.setVisibility(View.GONE);
 							iconViewLayout.setVisibility(View.VISIBLE);
@@ -697,24 +692,53 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public void showFile(){
+		log("**** showFile() ");
+		if(MimeTypeList.typeForName(document.getName()).isImage()){
+			log("is a image");
 
-		log("**** show file");
+			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
+			intent.putExtra("position", 0);
+			intent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+			intent.putExtra("parentNodeHandle", -1L);
+
+			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+			intent.putExtra("isFileLink", true);
+
+			if(previewFile == null) {
+				log("****documentHandle: "+document.getHandle());
+				intent.putExtra("documentHandle", document.getHandle());
+				intent.putExtra("isFileLink", true);
+				intent.putExtra("nameFileLink", document.getName());
+
+				/********************************************/
 
 
-		Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-		intent.putExtra("position", 0);
-		intent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
-		intent.putExtra("parentNodeHandle", -1L);
 
-		intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
-		intent.putExtra("isFolderLink", false);
-		if(previewFile != null){
-			log("****** previewFile.getAbsolutePath(): "+previewFile.getAbsolutePath());
-			intent.putExtra("previewFilePath", previewFile.getAbsolutePath());
+					/*****************************************/
+			}else{
+				log("**previewPath: "+previewFile.getAbsolutePath());
+				intent.putExtra("previewFilePath", previewFile.getAbsolutePath());
+				intent.putExtra("documentHandle", document.getHandle());
+
+			}
+
+			startActivity(intent);
+			overridePendingTransition(0,0);
+
+		}else if(MimeTypeList.typeForName(document.getName()).isVideo()){
+			log("is a video");
+
+		}else if(MimeTypeList.typeForName(document.getName()).isPdf()){
+			log("is a pdf");
+
+		}else{
+			log("is none");
+
+
+
 		}
 
-		startActivity(intent);
-		overridePendingTransition(0,0);
+
 	}
 	
 	String urlM;
