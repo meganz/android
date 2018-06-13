@@ -1166,13 +1166,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             getImageView(0, handle);
         }
         else if (adapterType == Constants.SEARCH_ADAPTER){
-            ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
-            for (int i=0; i<listNodes.size(); i++){
-                if (listNodes.get(i).getHandle() == handle){
-                    getImageView(i, -1);
-                    break;
-                }
-            }
+            getImageView(0, handle);
         }
         else {
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
@@ -1209,14 +1203,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             scrollToPosition(0, handle);
         }
         else if (adapterType == Constants.SEARCH_ADAPTER){
-            ArrayList<MegaNode> listNodes = megaApi.search(ManagerActivityLollipop.searchQuery);
-
-            for (int i=0; i<listNodes.size(); i++){
-                if (listNodes.get(i).getHandle() == handle){
-                    scrollToPosition(i, -1);
-                    break;
-                }
-            }
+            scrollToPosition(0, handle);
         }
         else {
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
@@ -3684,8 +3671,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         ft.replace(R.id.fragment_container, playlistFragment, "playlistFragment");
         ft.commitNowAllowingStateLoss();
 
-        playlistProgressBar.setVisibility(View.GONE);
-        progressBar.setVisibility(View.GONE);
+        if (playlistProgressBar != null){
+            playlistProgressBar.setVisibility(View.GONE);
+        }
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     public String getPathNavigation() {
@@ -3740,4 +3731,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         return accountType;
     }
 
+    public boolean isFolderLink (){
+        return isFolderLink;
+    }
 }

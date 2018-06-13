@@ -566,7 +566,6 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 		else{
 			((ManagerActivityLollipop)context).textSubmitted = true;
-			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
