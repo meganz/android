@@ -372,6 +372,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
+		megaApi.httpServerStop();
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
 
