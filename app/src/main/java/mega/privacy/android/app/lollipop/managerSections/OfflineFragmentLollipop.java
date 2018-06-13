@@ -82,7 +82,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
-	public static ArrayList<MegaOffline> mOffList= null;
+	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
 	boolean isList = true;
