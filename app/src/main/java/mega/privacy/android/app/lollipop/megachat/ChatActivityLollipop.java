@@ -998,6 +998,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
 
                     boolean result = megaChatApi.openChatRoom(idChat, this);
+                    if(result){
+                        MegaApplication.setClosedChat(false);
+                    }
 
                     if(!result){
                         log("----Error on openChatRoom");
@@ -5922,6 +5925,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("onDestroy()");
 
         megaChatApi.closeChatRoom(idChat, this);
+        MegaApplication.setClosedChat(true);
         log("removeChatListener");
         megaChatApi.removeChatListener(this);
         megaChatApi.removeChatCallListener(this);

@@ -472,8 +472,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				
 				if (document == null){
 					log("documment==null --> Intent to ManagerActivityLollipop");
-					Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
-	    			startActivity(backIntent);
+					boolean closedChat = MegaApplication.isClosedChat();
+					if(closedChat){
+						Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
+						startActivity(backIntent);
+					}
+
 	    			finish();
 					return;
 				}
@@ -564,8 +568,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
-									Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-									startActivity(backIntent);
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+										startActivity(backIntent);
+									}
+
 									finish();
 								}
 							});
@@ -687,8 +695,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-			    			startActivity(backIntent);
+							boolean closedChat = MegaApplication.isClosedChat();
+							if(closedChat){
+								Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+								startActivity(backIntent);
+							}
+
 			    			finish();
 						}
 					});

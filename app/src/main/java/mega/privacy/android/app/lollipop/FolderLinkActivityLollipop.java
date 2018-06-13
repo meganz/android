@@ -1187,12 +1187,16 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
 									Intent backIntent;
-									if(folderLinkActivity != null)
-										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-									else
-										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										if(folderLinkActivity != null)
+											backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										else
+											backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
 
-									startActivity(backIntent);
+										startActivity(backIntent);
+									}
+
 									finish();
 								}
 							});
@@ -1218,12 +1222,15 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.dismiss();
 								Intent backIntent;
-								if(folderLinkActivity != null)
-									backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-								else
-									backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+								boolean closedChat = MegaApplication.isClosedChat();
+								if(closedChat){
+									if(folderLinkActivity != null)
+										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+									else
+										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+									startActivity(backIntent);
+								}
 
-								startActivity(backIntent);
 								finish();
 							}
 						});
@@ -1277,8 +1284,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 										@Override
 										public void onClick(DialogInterface dialog, int which) {
 											dialog.dismiss();
-											Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-											startActivity(backIntent);
+											boolean closedChat = MegaApplication.isClosedChat();
+											if(closedChat){
+												Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+												startActivity(backIntent);
+											}
+
 											finish();
 										}
 									});
@@ -1413,8 +1424,12 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
-									Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-					    			startActivity(backIntent);
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										startActivity(backIntent);
+									}
+
 					    			finish();
 								}
 							});
@@ -1446,14 +1461,18 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						builder.setTitle(getString(R.string.general_error_word));
 					}
 
+
 					builder.setPositiveButton(
 							getString(android.R.string.ok),
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
-									Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-									startActivity(backIntent);
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										startActivity(backIntent);
+									}
 									finish();
 								}
 							});

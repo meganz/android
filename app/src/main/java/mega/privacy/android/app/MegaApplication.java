@@ -81,6 +81,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private static long openChatId = -1;
 
+	private static boolean closedChat = true;
+
 	private static long openCallChatId = -1;
 
 	private static boolean showRichLinkWarning = false;
@@ -1160,5 +1162,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public static void setEnabledRichLinks(boolean enabledRichLinks) {
 		MegaApplication.enabledRichLinks = enabledRichLinks;
+	}
+
+	public static boolean isClosedChat() {
+		return closedChat;
+	}
+
+	public static void setClosedChat(boolean closedChat) {
+		MegaApplication.closedChat = closedChat;
 	}
 }
