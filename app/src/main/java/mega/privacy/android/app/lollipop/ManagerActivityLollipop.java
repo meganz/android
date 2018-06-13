@@ -96,12 +96,15 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,6 +193,7 @@ import mega.privacy.android.app.utils.billing.IabResult;
 import mega.privacy.android.app.utils.billing.Inventory;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
+import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -210,6 +214,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -1861,10 +1866,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				megaApi.getUserData(this);
 				log("getUserAttribute FirstName");
 				myAccountInfo.setFirstName(false);
-				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
 				log("getUserAttribute LastName");
 				myAccountInfo.setLastName(false);
-				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
 				this.setDefaultAvatar();
 
@@ -1872,13 +1877,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 
 
-			if(myAccountInfo==null){
-				myAccountInfo=new MyAccountInfo(this);
-			}
-			megaApi.getPaymentMethods(myAccountInfo);
-			megaApi.getAccountDetails(myAccountInfo);
-			megaApi.getPricing(myAccountInfo);
-			megaApi.creditCardQuerySubscriptions(myAccountInfo);
+			megaApi.getPaymentMethods(this);
+			megaApi.getAccountDetails(this);
+			megaApi.getPricing(this);
+			megaApi.creditCardQuerySubscriptions(this);
 			dbH.resetExtendedAccountDetailsTimestamp();
 
 			initGooglePlayPayments();
@@ -2976,10 +2978,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (imBitmap == null) {
 					avatar.delete();
 					if (getExternalCacheDir() != null){
-						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 					}
 					else{
-						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 					}
 				}
 				else{
@@ -3003,19 +3005,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				if (getExternalCacheDir() != null){
-					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 				}
 				else{
-					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 				}
 			}
 		}
 		else{
 			if (getExternalCacheDir() != null){
-				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 			}
 			else{
-				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 			}
 		}
 	}
@@ -12253,9 +12255,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				myAccountInfo = new MyAccountInfo(this);
 			}
 
-			megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
-			megaApi.getPaymentMethods(myAccountInfo);
-			megaApi.getPricing(myAccountInfo);
+			megaApi.getExtendedAccountDetails(true, false, false, this);
+			megaApi.getPaymentMethods(this);
+			megaApi.getPricing(this);
 
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
@@ -13371,7 +13373,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
 			}
-			megaApi.creditCardQuerySubscriptions(myAccountInfo);
+			megaApi.creditCardQuerySubscriptions(this);
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("onRequestFinish: " + MegaRequest.TYPE_LOGOUT);
@@ -13548,6 +13550,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+				//Listener from logout menu
 				log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
 					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
@@ -13567,6 +13570,118 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				setPasswordReminderFromMyAccount(false);
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
+				log("(0)request avatar");
+				if (e.getErrorCode() == MegaError.API_OK){
+					setProfileAvatar();
+					//refresh MyAccountFragment if visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.updateAvatar(false);
+					}
+				}
+				else{
+					if(e.getErrorCode()==MegaError.API_ENOENT) {
+						setDefaultAvatar();
+					}
+
+					if(e.getErrorCode()==MegaError.API_EARGS){
+						log("Error changing avatar: ");
+						if(request.getFile()!=null){
+							log("DESTINATION FILE: "+request.getFile());
+						}
+						if(request.getEmail()!=null){
+							log("email: "+request.getEmail());
+						}
+					}
+
+					//refresh MyAccountFragment if visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.updateAvatar(false);
+					}
+				}
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("(1)request.getText(): "+request.getText());
+					if(myAccountInfo!=null){
+						myAccountInfo.setFirstNameText(request.getText());
+						myAccountInfo.setFirstName(true);
+					}
+					dbH.saveMyFirstName(request.getText());
+				}
+				else{
+					log("ERROR - (1)request.getText(): "+request.getText());
+					if(myAccountInfo!=null){
+						myAccountInfo.setFirstNameText("");
+						myAccountInfo.setFirstName(true);
+					}
+				}
+
+				if(myAccountInfo!=null){
+					if(myAccountInfo.isFirstName() && myAccountInfo.isLastName()){
+						log("Name and First Name received!");
+
+						myAccountInfo.setFullName();
+						updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+
+						myAccountInfo.setFirstName(false);
+						myAccountInfo.setLastName(false);
+
+						//refresh MyAccountFragment if visible
+						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						if(maFLol!=null && maFLol.isAdded()){
+							log("Update the account fragment");
+							maFLol.updateNameView(myAccountInfo.getFullName());
+						}
+					}
+				}
+
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("(2)request.getText(): "+request.getText());
+					if(myAccountInfo!=null){
+						myAccountInfo.setLastNameText(request.getText());
+						myAccountInfo.setLastName(true);
+					}
+
+					dbH.saveMyLastName(request.getText());
+				}
+				else{
+					log("ERROR - (2)request.getText(): "+request.getText());
+					if(myAccountInfo!=null){
+						myAccountInfo.setLastNameText("");
+						myAccountInfo.setLastName(true);
+					}
+				}
+
+				if(myAccountInfo!=null){
+					if(myAccountInfo.isFirstName() && myAccountInfo.isLastName()){
+						log("Name and First Name received!");
+
+						myAccountInfo.setFullName();
+						updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+
+						myAccountInfo.setFirstName(false);
+						myAccountInfo.setLastName(false);
+
+						//refresh MyAccountFragment if visible
+						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						if(maFLol!=null && maFLol.isAdded()){
+							log("Update the account fragment");
+							maFLol.updateNameView(myAccountInfo.getFullName());
+						}
+					}
+				}
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
 
@@ -14184,6 +14299,118 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				showSnackbar(getString(R.string.context_link_action_error));
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+			if (e.getErrorCode() == MegaError.API_OK) {
+				MegaPricing p = request.getPricing();
+
+				dbH.setPricingTimestamp();
+
+				if(myAccountInfo!=null){
+					myAccountInfo.setProductAccounts(p);
+				}
+
+				//UPGRADE_ACCOUNT_FRAGMENT
+				if(upAFL!=null && upAFL.isAdded()){
+					upAFL.setPricing();
+				}
+
+				//MONTHLY_YEARLY_FRAGMENT
+				if(myFL!=null && myFL.isAdded()){
+					myFL.setPricing();
+				}
+
+				//CENTILI_FRAGMENT
+				if(ctFL!=null && ctFL.isAdded()){
+					ctFL.getPaymentId();
+				}
+
+				//FORTUMO_FRAGMENT
+				if(fFL!=null && fFL.isAdded()){
+					fFL.getPaymentId();
+				}
+			}
+			else{
+				log("Error TYPE_GET_PRICING: "+e.getErrorCode());
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+			log ("payment methods request");
+			if(myAccountInfo!=null){
+				myAccountInfo.setGetPaymentMethodsBoolean(true);
+			}
+
+			if (e.getErrorCode() == MegaError.API_OK){
+				dbH.setPaymentMethodsTimeStamp();
+				if(myAccountInfo!=null){
+					myAccountInfo.setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
+				}
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				if(myAccountInfo!=null){
+					myAccountInfo.setNumberOfSubscriptions(request.getNumber());
+					log("NUMBER OF SUBS: " + myAccountInfo.getNumberOfSubscriptions());
+				}
+
+				updateCancelSubscriptions();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+			log ("account_details request");
+			if (e.getErrorCode() == MegaError.API_OK){
+
+				dbH.setAccountDetailsTimeStamp();
+
+				if(myAccountInfo!=null && request.getMegaAccountDetails()!=null){
+					myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
+					myAccountInfo.setAccountDetails();
+
+					MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
+
+					if(megaAccountSession!=null){
+						log("getMegaAccountSESSION not Null");
+						dbH.setExtendedAccountDetailsTimestamp();
+						long mostRecentSession = megaAccountSession.getMostRecentUsage();
+						log("The last session: "+mostRecentSession);
+						java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
+						Date date = new Date(mostRecentSession * 1000);
+						Calendar cal = Calendar.getInstance();
+						TimeZone tz = cal.getTimeZone();
+						df.setTimeZone(tz);
+						myAccountInfo.setLastSessionFormattedDate(df.format(date));
+						myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
+					}
+				}
+
+
+				if(!isFinishing()){
+
+					updateAccountDetailsVisibleInfo();
+
+					//Check if myAccount section is visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.setAccountDetails();
+					}
+
+					String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
+					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+					if(mStorageFLol!=null && mStorageFLol.isAdded()){
+						log("Update the account fragment");
+						mStorageFLol.setAccountDetails();
+					}
+
+					if(upAFL!=null && upAFL.isAdded()){
+						upAFL.showAvailableAccount();
+					}
+				}
+
+				log("onRequest TYPE_ACCOUNT_DETAILS: "+getUsedPerc());
+			}
+		}
 	}
 
 	@Override
@@ -14220,7 +14447,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my first name");
 								myAccountInfo.setFirstName(false);
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
 							}
 							else{
 								myAccountInfo.setFirstName(false);
@@ -14232,7 +14459,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my last name");
 								myAccountInfo.setLastName(false);
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
 							}
 							else{
 								myAccountInfo.setLastName(false);
@@ -14261,7 +14488,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
 									if(destinationPath!=null){
 										log("The destination of the avatar is: "+destinationPath);
-										megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+										megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, this);
 									}
 									else{
 										log("ERROR! Destination PATH is NULL");
@@ -14269,7 +14496,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								}
 								else{
 									log("getExternalCacheDir() is NULL");
-									megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+									megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", this);
 								}
 							}
 							else {
@@ -14568,10 +14795,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(myAccountInfo==null){
 			myAccountInfo=new MyAccountInfo(this);
 		}
-		megaApi.getPaymentMethods(myAccountInfo);
-		megaApi.getAccountDetails(myAccountInfo);
-		megaApi.getPricing(myAccountInfo);
-		megaApi.creditCardQuerySubscriptions(myAccountInfo);
+		megaApi.getPaymentMethods(this);
+		megaApi.getAccountDetails(this);
+		megaApi.getPricing(this);
+		megaApi.creditCardQuerySubscriptions(this);
 		dbH.resetExtendedAccountDetailsTimestamp();
 	}
 

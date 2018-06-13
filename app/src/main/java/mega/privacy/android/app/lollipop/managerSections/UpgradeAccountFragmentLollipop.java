@@ -572,13 +572,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		log("Check the last call to callToPricing");
 		if(DBUtil.callToPricing(context)){
 			log("megaApi.getPricing SEND");
-			megaApi.getPricing(myAccountInfo);
+			megaApi.getPricing((ManagerActivityLollipop) context);
 		}
 
 		log("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			log("megaApi.getPaymentMethods SEND");
-			megaApi.getPaymentMethods(myAccountInfo);
+			megaApi.getPaymentMethods((ManagerActivityLollipop)context);
 		}
 	}
 
@@ -592,7 +592,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			if (productAccounts == null){
 				log("productAccounts == null");
-				megaApi.getPricing(myAccountInfo);
+				megaApi.getPricing((ManagerActivityLollipop) context);
 				return;
 			}
 
@@ -1117,7 +1117,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		if (accounts == null){
 			log("accounts == null");
-			megaApi.getPricing(myAccountInfo);
+			megaApi.getPricing((ManagerActivityLollipop) context);
 			return;
 		}
 

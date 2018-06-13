@@ -28,15 +28,11 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MyStorageFragmentLollipop extends Fragment implements MegaRequestListenerInterface{
+public class MyStorageFragmentLollipop extends Fragment {
 
 	Context context;
 	MyAccountInfo myAccountInfo;
@@ -79,15 +75,6 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		}
 
 		super.onCreate(savedInstanceState);
-	}
-	
-	public void onDestroy()
-	{
-		if(megaApi != null)
-		{	
-			megaApi.removeRequestListener(this);
-		}
-		super.onDestroy();
 	}
 
 	@Override
@@ -170,17 +157,17 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		log("Check the last call to getAccountDetails");
 		if(DBUtil.callToAccountDetails(context)){
 			log("megaApi.getAccountDetails SEND");
-			megaApi.getAccountDetails(myAccountInfo);
+			megaApi.getAccountDetails((ManagerActivityLollipop)context);
 		}
 		log("Check the last call to getExtendedAccountDetails");
 		if(DBUtil.callToExtendedAccountDetails(context)){
 			log("megaApi.getExtendedAccountDetails SEND");
-			megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
+			megaApi.getExtendedAccountDetails(true, false, false, (ManagerActivityLollipop)context);
 		}
 		log("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			log("megaApi.getPaymentMethods SEND");
-			megaApi.getPaymentMethods(myAccountInfo);
+			megaApi.getPaymentMethods((ManagerActivityLollipop)context);
 		}
 	}
 
@@ -432,34 +419,8 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		return info;
 	}
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
-
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestTemporaryError");
-	}
-
 	public static void log(String log) {
 		Util.log("MyStorageFragmentLollipop", log);
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-	}
-
-	public MyAccountInfo getMyAccountInfo() {
-		return myAccountInfo;
 	}
 
 }

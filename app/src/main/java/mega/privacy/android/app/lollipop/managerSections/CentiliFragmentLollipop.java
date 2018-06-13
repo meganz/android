@@ -102,7 +102,7 @@ WebView myWebView;
 
 		if(DBUtil.callToPricing(context)){
 			log("megaApi.getPricing SEND");
-			megaApi.getPricing(myAccountInfo);
+			megaApi.getPricing((ManagerActivityLollipop) context);
 		}else{
 			getPaymentId();
 		}
