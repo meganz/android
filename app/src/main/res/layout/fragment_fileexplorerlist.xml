@@ -117,6 +117,7 @@
              android:textColor="@color/accentColor"
 			 android:stateListAnimator="@null"
 			 android:background="@color/participants_layout"
+			 android:layout_marginRight="10dp"
              android:gravity="center_vertical|center_horizontal"/>
      </LinearLayout>
      
