@@ -257,22 +257,31 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             currentPage = 0;
             accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = false;
-        }
-        fromShared = intent.getBooleanExtra("fromShared", false);
-        inside = intent.getBooleanExtra("inside", false);
-        handle = intent.getLongExtra("HANDLE", -1);
-        isFolderLink = intent.getBooleanExtra("isFolderLink", false);
-        type = intent.getIntExtra("adapterType", 0);
-        path = intent.getStringExtra("path");
-
-        if (!renamed){
+            handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
+            log("URI pdf: "+uri);
             if (uri == null){
                 log("uri null");
                 finish();
                 return;
             }
         }
+        fromShared = intent.getBooleanExtra("fromShared", false);
+        inside = intent.getBooleanExtra("inside", false);
+//        handle = intent.getLongExtra("HANDLE", -1);
+        isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+        type = intent.getIntExtra("adapterType", 0);
+        path = intent.getStringExtra("path");
+
+//        if (!renamed){
+//            uri = intent.getData();
+//            log("URI pdf: "+uri);
+//            if (uri == null){
+//                log("uri null");
+//                finish();
+//                return;
+//            }
+//        }
 
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
@@ -306,7 +315,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         if (!isOffLine) {
             app = (MegaApplication) getApplication();
-            megaApi = app.getMegaApi();
+            if (isFolderLink){
+                megaApi = app.getMegaApiFolder();
+            }
+            else {
+                megaApi = app.getMegaApi();
+            }
 
             if (Util.isChatEnabled()) {
                 megaChatApi = app.getMegaChatApi();
@@ -328,6 +342,29 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             log("Add transfer listener");
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
+
+            if (savedInstanceState != null && uri.toString().contains("http://")){
+                if (megaApi.httpServerIsRunning() == 0) {
+                    megaApi.httpServerStart();
+                }
+
+                ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                activityManager.getMemoryInfo(mi);
+
+                if(mi.totalMem>Constants.BUFFER_COMP){
+                    log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                }
+                else{
+                    log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                    megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                }
+                    MegaNode node = megaApi.getNodeByHandle(handle);
+                    if (node != null){
+                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                    }
+                }
 
             log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -620,7 +657,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             if (!isOffLine){
                 app = (MegaApplication)getApplication();
-                megaApi = app.getMegaApi();
+                if (isFolderLink){
+                    megaApi = app.getMegaApiFolder();
+                }
+                else {
+                    megaApi = app.getMegaApi();
+                }
 
                 if(Util.isChatEnabled()){
                     megaChatApi = app.getMegaChatApi();
@@ -2527,7 +2569,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     protected void onResume() {
         super.onResume();
         log("onResume");
-        if (!isOffLine && !fromChat){
+        if (!isOffLine && !fromChat && !isFolderLink){
             if (megaApi.getNodeByHandle(handle) == null && inside){
                 finish();
             }
@@ -2548,6 +2590,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (megaApi != null) {
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
+            megaApi.httpServerStop();
         }
 
         super.onDestroy();
