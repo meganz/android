@@ -2406,15 +2406,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordDialogText.setText(R.string.recovery_key_exported_dialog_text_logout);
 			recoveryKeyButton.setText(R.string.option_export_recovery_key);
 			dismissButton.setText(R.string.option_logout_anyway);
-			params.setMargins(0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
 		else {
 			rememberPasswordDialogText.setText(R.string.remember_pwd_dialog_text);
 			recoveryKeyButton.setText(R.string.action_export_master_key);
 			dismissButton.setText(R.string.general_dismiss);
-			params.setMargins(0, 0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
-		dismissButton.setLayoutParams(params);
 
 		rememberPasswordDialog = builder.create();
 		rememberPasswordDialog.setCancelable(false);
