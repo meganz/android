@@ -6544,15 +6544,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public ArrayList<AndroidMegaChatMessage> getSelectedMessages() {
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<AndroidMegaChatMessage>();
 
-        for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i) == true) {
+        if(selectedItems!=null){
+            for (int i = 0; i < selectedItems.size(); i++) {
+                if (selectedItems.valueAt(i) == true) {
 
-                AndroidMegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
-                if (m != null) {
-                    messages.add(m);
+                    AndroidMegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
+                    if (m != null) {
+                        messages.add(m);
+                    }
                 }
             }
         }
+
         return messages;
     }
 
