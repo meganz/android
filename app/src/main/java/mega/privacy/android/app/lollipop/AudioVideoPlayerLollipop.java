@@ -670,7 +670,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     int mediaPosition = -1;
                     for (int i=0;i<offList.size();i++){
                         if ((MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported())
-                                || (MimeTypeList.typeForName(offList.get(i).getName()).isAudio() && MimeTypeList.typeForName(offList.get(i).getName()).isAudioNotSupported())){
+                                || (MimeTypeList.typeForName(offList.get(i).getName()).isAudio() && !MimeTypeList.typeForName(offList.get(i).getName()).isAudioNotSupported())){
                             mediaOffList.add(offList.get(i));
                             mediaPosition++;
                             if (i == currentPosition){
@@ -703,7 +703,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 for (int i=0;i<nodes.size();i++){
                     MegaNode n = nodes.get(i);
                     if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
-                            || (MimeTypeList.typeForName(n.getName()).isAudio() && MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
+                            || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
                         mediaHandles.add(n.getHandle());
                         if (i == currentPosition){
                             currentPosition = mediaNumber;
@@ -762,7 +762,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 for (int i=0;i<nodes.size();i++){
                     MegaNode n = nodes.get(i);
                     if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
-                            || (MimeTypeList.typeForName(n.getName()).isAudio() && MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
+                            || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())){
                         mediaHandles.add(n.getHandle());
                         if (i == currentPosition){
                             currentPosition = mediaNumber;
