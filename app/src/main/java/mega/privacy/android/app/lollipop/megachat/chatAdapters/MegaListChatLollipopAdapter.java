@@ -453,9 +453,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(context instanceof ManagerActivityLollipop){
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			holder.imageButtonThreeDots.setOnClickListener(this);
 		}
 		else{
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setOnClickListener(null);
 		}
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
