@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,7 +25,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -292,8 +298,13 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             }
             case R.id.option_copy_offline_layout:{
                 log("Option copy to clipboard");
-                AccountController aC = new AccountController(getContext());
-                aC.copyMK(false);
+                if (Util.isOnline(context)){
+                    AccountController aC = new AccountController(getContext());
+                    aC.copyMK(false);
+                }
+                else {
+                    copyFromFile();
+                }
                 break;
             }
         }
@@ -302,10 +313,70 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
-    public void printRK(){
+    public String readRKFromFile (){
+        String line = null;
+        if (nodeOffline != null && nodeOffline.getPath() != null){
+            File file = new File(nodeOffline.getPath());
+            StringBuilder sb = new StringBuilder();
 
-        AccountController aC =  new AccountController(getContext());
-        Bitmap rKBitmap = aC.createRkBitmap();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                line = br.readLine();
+            }
+            catch (IOException e) {
+                log("IOException: " + e.getMessage());
+            }
+            return line;
+        }
+
+
+        return null;
+    }
+
+    public void copyFromFile () {
+        String key = readRKFromFile();
+        if (key != null) {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
+            clipboard.setPrimaryClip(clip);
+            if (clipboard.getPrimaryClip() != null) {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+            }
+            else {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            }
+        }
+        else {
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+        }
+    }
+
+    public void printRK(){
+        Bitmap rKBitmap = null;
+        if (Util.isOnline(context)) {
+            AccountController aC = new AccountController(getContext());
+            rKBitmap = aC.createRkBitmap();
+        }
+        else {
+            rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
+            String key =  readRKFromFile();
+            if (key != null){
+                Canvas canvas = new Canvas(rKBitmap);
+                Paint paint = new Paint();
+
+                paint.setTextSize(40);
+                paint.setColor(Color.BLACK);
+                paint.setStyle(Paint.Style.FILL);
+                float height = paint.measureText("yY");
+                float width = paint.measureText(key);
+                float x = (rKBitmap.getWidth()-width)/2;
+                canvas.drawText(key, x, height+15f, paint);
+            }
+            else {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            }
+
+        }
         if (rKBitmap != null){
             PrintHelper printHelper = new PrintHelper(getActivity());
             printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
