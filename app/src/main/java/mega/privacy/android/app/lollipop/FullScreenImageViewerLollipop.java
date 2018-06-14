@@ -730,6 +730,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 					if(imageHandles.size() == 0){
 						log("**** 1º");
+						downloadNode();
 						break;
 
 
@@ -3370,9 +3371,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 
+
+//	String urlM;
+//	long sizeM;
+//	long [] hashesM;
+//	MegaNode documentM;
+//
+//	@SuppressLint("NewApi")
 //	public void downloadNode(){
 //
-//		if(imageHandles.isEmpty()){
+//		if (document == null){
 //			try{
 //				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 //				dialogBuilder.setTitle(getString(R.string.general_error_word));
@@ -3383,7 +3391,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 //							@Override
 //							public void onClick(DialogInterface dialog, int which) {
 //								dialog.dismiss();
-//								Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+//								Intent backIntent = new Intent(FullScreenImageViewerLollipop, ManagerActivityLollipop.class);
 //								startActivity(backIntent);
 //								finish();
 //							}
@@ -3396,11 +3404,222 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 //				Snackbar.make(fragmentContainer, getString(R.string.general_error_file_not_found), Snackbar.LENGTH_LONG).show();
 //			}
 //
+//			return;
+//		}
+//
+//		long[] hashes = new long[1];
+//		hashes[0]=document.getHandle();
+//		long size = document.getSize();
+//
+//
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+//			if (!hasStoragePermission) {
+//				ActivityCompat.requestPermissions(this,
+//						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//						Constants.REQUEST_WRITE_STORAGE);
+//				this.urlM = url;
+//				this.sizeM = size;
+//				this.hashesM = new long[hashes.length];
+//				for (int i=0; i< hashes.length; i++){
+//					this.hashesM[i] = hashes[i];
+//				}
+//				this.documentM = document;
+//
+//				return;
+//			}
 //		}
 //
 //
+//		if (dbH == null){
+//			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//		}
+//
+//		if (dbH.getCredentials() == null || dbH.getPreferences() == null){
+//			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//				File[] fs = getExternalFilesDirs(null);
+//				if (fs.length > 1){
+//					if (fs[1] == null){
+//						Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//						intent.setClass(this, FileStorageActivityLollipop.class);
+//						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//					}
+//					else{
+//						Dialog downloadLocationDialog;
+//						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+//						AlertDialog.Builder b=new AlertDialog.Builder(this);
+//
+//						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+//						final long sizeFinal = size;
+//						final long[] hashesFinal = new long[hashes.length];
+//						for (int i=0; i< hashes.length; i++){
+//							hashesFinal[i] = hashes[i];
+//						}
+//
+//						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+//
+//							@Override
+//							public void onClick(DialogInterface dialog, int which) {
+//								switch(which){
+//									case 0:{
+//										Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+//										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//										break;
+//									}
+//									case 1:{
+//										File[] fs = getExternalFilesDirs(null);
+//										if (fs.length > 1){
+//											String path = fs[1].getAbsolutePath();
+//											File defaultPathF = new File(path);
+//											defaultPathF.mkdirs();
+//											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+//											downloadTo(path, url, sizeFinal, hashesFinal);
+//										}
+//										break;
+//									}
+//								}
+//							}
+//						});
+//						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+//
+//							@Override
+//							public void onClick(DialogInterface dialog, int which) {
+//								dialog.cancel();
+//							}
+//						});
+//						downloadLocationDialog = b.create();
+//						downloadLocationDialog.show();
+//					}
+//				}
+//				else{
+//					Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//					intent.setClass(this, FileStorageActivityLollipop.class);
+//					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//				}
+//			}
+//			else{
+//				Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//				intent.setClass(this, FileStorageActivityLollipop.class);
+//				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//			}
+//			return;
+//		}
+//
+//		boolean askMe = true;
+//		String downloadLocationDefaultPath = "";
+//		prefs = dbH.getPreferences();
+//		if (prefs != null){
+//			if (prefs.getStorageAskAlways() != null){
+//				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+//					if (prefs.getStorageDownloadLocation() != null){
+//						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+//							askMe = false;
+//							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+//						}
+//					}
+//				}
+//			}
+//		}
+//
+//		if (askMe){
+//			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//				File[] fs = getExternalFilesDirs(null);
+//				if (fs.length > 1){
+//					if (fs[1] == null){
+//						Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//						intent.setClass(this, FileStorageActivityLollipop.class);
+//						intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//						startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//					}
+//					else{
+//						Dialog downloadLocationDialog;
+//						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+//						AlertDialog.Builder b=new AlertDialog.Builder(this);
+//
+//						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+//						final long sizeFinal = size;
+//						final long[] hashesFinal = new long[hashes.length];
+//						for (int i=0; i< hashes.length; i++){
+//							hashesFinal[i] = hashes[i];
+//						}
+//
+//						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+//
+//							@Override
+//							public void onClick(DialogInterface dialog, int which) {
+//								switch(which){
+//									case 0:{
+//										Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+//										intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//										startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//										break;
+//									}
+//									case 1:{
+//										File[] fs = getExternalFilesDirs(null);
+//										if (fs.length > 1){
+//											String path = fs[1].getAbsolutePath();
+//											File defaultPathF = new File(path);
+//											defaultPathF.mkdirs();
+//											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+//											downloadTo(path, url, sizeFinal, hashesFinal);
+//										}
+//										break;
+//									}
+//								}
+//							}
+//						});
+//						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+//
+//							@Override
+//							public void onClick(DialogInterface dialog, int which) {
+//								dialog.cancel();
+//							}
+//						});
+//						downloadLocationDialog = b.create();
+//						downloadLocationDialog.show();
+//					}
+//				}
+//				else{
+//					Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//					intent.setClass(this, FileStorageActivityLollipop.class);
+//					intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//					startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//				}
+//			}
+//			else{
+//				Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+//				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+//				intent.setClass(this, FileStorageActivityLollipop.class);
+//				intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, url);
+//				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, document.getSize());
+//				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+//			}
+//		}
+//		else{
+//			downloadTo(downloadLocationDefaultPath, url, size, hashes);
+//		}
 //	}
+//
 
 
-
-	}
+}
