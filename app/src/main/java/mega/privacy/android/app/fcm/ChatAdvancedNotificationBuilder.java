@@ -172,8 +172,11 @@ public final class ChatAdvancedNotificationBuilder {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
-        notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
-                .setShowWhen(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+
+        notificationBuilder.setShowWhen(true);
 
         if(uriParameter!=null){
             notificationBuilder.setSound(uriParameter);
@@ -350,10 +353,13 @@ public final class ChatAdvancedNotificationBuilder {
 
         Notification.Builder notificationBuilder = new Notification.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_notify)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
                 .setShowWhen(true)
                 .setGroup(groupKey);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         Notification.MessagingStyle messagingStyleContent = new Notification.MessagingStyle(chat.getTitle());
 
@@ -595,15 +601,20 @@ public final class ChatAdvancedNotificationBuilder {
         intent.putExtra("CHAT_ID", -1);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+
+        notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build();
+                .setContentIntent(pendingIntent);
+
+        return notificationBuilder.build();
     }
 
     public void removeAllChatNotifications(){
@@ -630,9 +641,12 @@ public final class ChatAdvancedNotificationBuilder {
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true).setTicker("Chat activity")
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            mBuilderCompat.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
@@ -681,9 +695,12 @@ public final class ChatAdvancedNotificationBuilder {
                     .setContentText(context.getString(R.string.notification_subtitle_incoming))
                     .setAutoCancel(false)
                     .setVibrate(pattern)
-                    .setColor(ContextCompat.getColor(context,R.color.mega))
                     .addAction(actionIgnore)
                     .addAction(actionAnswer);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+            }
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
                 //API 25 = Android 7.1
@@ -838,8 +855,11 @@ public final class ChatAdvancedNotificationBuilder {
                 .setAutoCancel(true)
                 .setVibrate(pattern)
                 .setSound(defaultSoundUri)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
             //API 25 = Android 7.1

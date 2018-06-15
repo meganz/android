@@ -446,12 +446,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this, R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(getString(R.string.download_touch_to_show))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 			}
 			else
