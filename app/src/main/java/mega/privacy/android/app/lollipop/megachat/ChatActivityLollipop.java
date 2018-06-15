@@ -469,7 +469,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showMessageInfo(int positionInAdapter){
-
         int position = positionInAdapter-1;
 
         if(position<messages.size()) {
@@ -1288,7 +1287,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void setStatus(long userHandle){
-
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
             aB.setSubtitle(getString(R.string.invalid_connection_state));
@@ -1324,7 +1322,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareTime(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
-
         if(previous!=null){
 
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
@@ -1343,7 +1340,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareTime(long timeStamp, AndroidMegaChatMessage previous){
-
         if(previous!=null){
 
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
@@ -1362,7 +1358,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareTime(long timeStamp, long previous){
-
         if(previous!=-1){
 
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
@@ -1381,7 +1376,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareDate(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
-
         if(previous!=null){
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
             Calendar previousCal =  Util.calculateDateFromTimestamp(previous.getMessage().getTimestamp());
@@ -1399,6 +1393,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareDate(long timeStamp, AndroidMegaChatMessage previous){
+        log("compareDate");
 
         if(previous!=null){
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
@@ -1417,6 +1412,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareDate(long timeStamp, long previous){
+        log("compareDate");
 
         if(previous!=-1){
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
@@ -1502,7 +1498,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 //        log("onCreateOptionsMenuLollipop");
-
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.chat_action, menu);
@@ -1705,8 +1700,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean checkPermissionsCall(){
-        log("checkPermissionsCall");
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -1749,6 +1742,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean checkPermissionsReadStorage(){
+        log("checkPermissionsReadStorage");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -2719,7 +2713,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void attachFromFileStorage(){
-
         if (isFirstTimeStorage) {
             fileStorageF = ChatFileStorageFragment.newInstance();
 
@@ -3819,8 +3812,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
             }
-        }
-        else{
+        }else{
             log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
         }
     }
@@ -4752,7 +4744,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
 //        log("onMessageUpdate!: "+ msg.getMsgId());
-
         int resultModify = -1;
         if(msg.isDeleted()){
             log("The message has been deleted");
