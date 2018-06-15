@@ -469,6 +469,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showMessageInfo(int positionInAdapter){
+        log("showMessageInfo");
 
         int position = positionInAdapter-1;
 
@@ -1288,6 +1289,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void setStatus(long userHandle){
+        log("setStatus");
 
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
@@ -1324,6 +1326,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareTime(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
+        log("compareTime");
 
         if(previous!=null){
 
@@ -1343,6 +1346,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareTime(long timeStamp, AndroidMegaChatMessage previous){
+        log("compareTime");
 
         if(previous!=null){
 
@@ -1362,6 +1366,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareTime(long timeStamp, long previous){
+        log("compareTime");
 
         if(previous!=-1){
 
@@ -1381,6 +1386,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareDate(AndroidMegaChatMessage message, AndroidMegaChatMessage previous){
+        log("compareDate");
 
         if(previous!=null){
             Calendar cal = Util.calculateDateFromTimestamp(message.getMessage().getTimestamp());
@@ -1399,6 +1405,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareDate(long timeStamp, AndroidMegaChatMessage previous){
+        log("compareDate");
 
         if(previous!=null){
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
@@ -1417,6 +1424,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public int compareDate(long timeStamp, long previous){
+        log("compareDate");
 
         if(previous!=-1){
             Calendar cal = Util.calculateDateFromTimestamp(timeStamp);
@@ -1502,6 +1510,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 //        log("onCreateOptionsMenuLollipop");
+        log("onCreateOptionsMenu");
 
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
@@ -1519,6 +1528,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
+        log("onPrepareOptionsMenu");
+
 //        log("onPrepareOptionsMenu");
         if(chatRoom!=null){
 
@@ -1694,6 +1705,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void startCall(){
+        log("startCall");
+
         if(startVideo){
             log("Start video call");
             megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
@@ -1749,6 +1762,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean checkPermissionsReadStorage(){
+        log("checkPermissionsReadStorage");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -2339,6 +2353,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void retryNodeAttachment(long nodeHandle){
+        log("retryNodeAttachment");
+
         megaChatApi.attachNode(idChat, nodeHandle, this);
     }
 
@@ -2719,6 +2735,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void attachFromFileStorage(){
+        log("attachFromFileStorage");
 
         if (isFirstTimeStorage) {
             fileStorageF = ChatFileStorageFragment.newInstance();
@@ -2907,6 +2924,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void showUploadPanel(){
+        log("showUploadPanel");
+
         AttachmentUploadBottomSheetDialogFragment bottomSheetDialogFragment = new AttachmentUploadBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
@@ -2933,6 +2952,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            log("onActionItemClicked");
+
             ArrayList<AndroidMegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
             if(megaChatApi.isSignalActivityRequired()){
@@ -3050,6 +3071,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            log("onCreateActionMode");
+
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
 
@@ -3303,6 +3326,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean showSelectMenuItem(){
+        log("showSelectMenuItem");
+
         if (adapter != null){
             return adapter.isMultipleSelect();
         }
@@ -3384,6 +3409,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * Clear all selected items
      */
     private void clearSelections() {
+        log("clearSelections");
+
         if(adapter.isMultipleSelect()){
             adapter.clearSelections();
         }
@@ -3391,6 +3418,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     private void updateActionModeTitle() {
+        log("updateActionModeTitle");
+
 //        if (actionMode == null || getActivity() == null) {
 //            return;
 //        }
@@ -3417,6 +3446,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void selectAll() {
+        log("selectAll");
+
         if (adapter != null) {
             if (adapter.isMultipleSelect()) {
                 adapter.selectAll();
@@ -3819,8 +3850,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
             }
-        }
-        else{
+        }else{
             log("DO NOTHING: Position ("+position+") is more than size in messages (size: "+messages.size()+")");
         }
     }
@@ -4312,6 +4342,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void checkMegaLink(MegaChatMessage msg){
+        log("checkMegaLink");
+
         //Check if it is a MEGA link
         if(msg.getType()==MegaChatMessage.TYPE_NORMAL){
             if(msg.getContent()!=null){
@@ -4752,6 +4784,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
 //        log("onMessageUpdate!: "+ msg.getMsgId());
+        log("onMessageUpdate");
 
         int resultModify = -1;
         if(msg.isDeleted()){
@@ -6603,6 +6636,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void scrollToMessage(long lastId){
+        log("scrollToMessage");
+
         for(int i=messages.size()-1; i>=0;i--) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
 
@@ -6684,12 +6719,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+        log("onChatListItemUpdate");
+
         if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
             updateNavigationToolbarIcon();
         }
     }
 
     public void updateNavigationToolbarIcon(){
+        log("updateNavigationToolbarIcon");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             int numberUnread = megaChatApi.getUnreadChats();
@@ -6867,6 +6905,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void multiselectActivated(boolean flag){
+        log("multiselectActivated");
+
         String text = textChat.getText().toString();
 
         if(flag){
