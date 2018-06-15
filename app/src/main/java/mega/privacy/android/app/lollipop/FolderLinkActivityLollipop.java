@@ -1868,6 +1868,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("isFolderLink", true);
+					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("screenPosition", screenPosition);
 					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(FolderLinkActivityLollipop.this, pdfIntent)){
