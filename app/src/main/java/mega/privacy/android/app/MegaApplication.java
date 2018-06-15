@@ -143,7 +143,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if (e.getErrorCode() == MegaError.API_OK){
 					if (megaApi != null){
 						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption ");
-						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption - Session: " + megaApi.dumpSession());
 //						megaApi.enableTransferResumption();
 					}
 				}
