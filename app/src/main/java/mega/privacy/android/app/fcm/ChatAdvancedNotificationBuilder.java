@@ -234,13 +234,20 @@ public final class ChatAdvancedNotificationBuilder {
                                         String name = "";
                                         name = message.getUserName(0);
                                         if (name.trim().isEmpty()) {
-                                            name = message.getUserEmail(0);
+                                            name = message.getUserName(0);
                                         }
-                                        String email = message.getUserEmail(0);
-                                        log("Contact EMail: " + name);
+                                        String email = message.getUserName(0);
+                                        log("Contact Name: " + name);
                                         messageContent = email;
                                     }
-
+                                    else{
+                                        StringBuilder name = new StringBuilder("");
+                                        name.append(message.getUserName(0));
+                                        for (int k = 1; k < userCount; k++) {
+                                            name.append(", " + message.getUserName(k));
+                                        }
+                                        messageContent = name.toString();
+                                    }
                                 }
                                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                                     log("Type TRUNCATE message");
@@ -389,13 +396,20 @@ public final class ChatAdvancedNotificationBuilder {
                         String name = "";
                         name = msg.getUserName(0);
                         if (name.trim().isEmpty()) {
-                            name = msg.getUserEmail(0);
+                            name = msg.getUserName(0);
                         }
-                        String email = msg.getUserEmail(0);
+                        String email = msg.getUserName(0);
                         log("Contact EMail: " + name);
                         messageContent = email;
                     }
-
+                    else{
+                        StringBuilder name = new StringBuilder("");
+                        name.append(msg.getUserName(0));
+                        for (int j = 1; j < userCount; j++) {
+                            name.append(", " + msg.getUserName(j));
+                        }
+                        messageContent = name.toString();
+                    }
                 }
                 else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                     log("Type TRUNCATE message");
