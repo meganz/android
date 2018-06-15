@@ -1346,6 +1346,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }).start();
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        simpleExoPlayerView.hideController();
+                    }
+                }).start();
             } else {
                 aB.hide();
             }
@@ -1374,6 +1380,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             @Override
             public void run() {
                 showActionStatusBar();
+                simpleExoPlayerView.showController();
+                containerControls.animate().translationY(0).setDuration(400L).start();
                 containerAudioVideoPlayer.setBackgroundColor(BLACK);
                 playerLayout.setBackgroundColor(BLACK);
                 appBarLayout.setBackgroundColor(BLACK);
