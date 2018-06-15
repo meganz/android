@@ -467,7 +467,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 
-				log("SESSION: " + gSession);
 				megaApi.fastLogin(gSession, this);
 			}
 			else{
@@ -1764,7 +1763,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
 				
-				log("Logged in: " + gSession);
+				log("Logged in with session");
 
 				megaApi.fetchNodes(this);
 			}

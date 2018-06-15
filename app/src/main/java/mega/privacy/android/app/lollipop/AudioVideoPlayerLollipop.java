@@ -94,7 +94,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -1346,12 +1345,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }).start();
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        simpleExoPlayerView.hideController();
-                    }
-                }).start();
+                try{
+                    containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            simpleExoPlayerView.hideController();
+                        }
+                    }).start();
+                }
+                catch(Exception e){
+                    log("Exception: "+e.getMessage());
+                }
+
             } else {
                 aB.hide();
             }

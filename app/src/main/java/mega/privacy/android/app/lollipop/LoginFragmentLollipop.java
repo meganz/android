@@ -1736,7 +1736,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
 
-                log("Logged in: " + gSession);
+                log("Logged in with session");
 
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();

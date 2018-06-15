@@ -2347,7 +2347,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
                 dbH.clearCredentials();
 
-                log("Logged in: " + gSession);
+                log("Logged in with session");
 
                 megaApi.fetchNodes(this);
             }
