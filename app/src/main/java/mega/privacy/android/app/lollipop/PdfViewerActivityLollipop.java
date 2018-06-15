@@ -540,6 +540,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             }
                         }).start();
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                bottomLayout.animate().translationY(220).setDuration(0).start();
+                uploadContainer.animate().translationY(220).setDuration(0).start();
+                pageNumber.animate().translationY(0).setDuration(0).start();
             } else {
                 aB.hide();
             }
