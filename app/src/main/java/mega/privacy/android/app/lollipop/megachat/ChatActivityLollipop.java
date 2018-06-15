@@ -3078,7 +3078,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             log("onPrepareActionMode");
             List<AndroidMegaChatMessage> selected = adapter.getSelectedMessages();
-
             if (selected.size() !=0) {
 //                MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
@@ -3092,7 +3091,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
                         }
                     }
-
                     menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_copy).setVisible(showCopy);
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
