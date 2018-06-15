@@ -5932,11 +5932,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+					takePicture.setVisible(false);
+
 					if(firstNavigationLevel){
 						if(!firstTimeCam){
 							searchByDate.setVisible(true);
@@ -6019,11 +6016,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+
+					takePicture.setVisible(false);
+
 					if(firstNavigationLevel){
 						if(!firstTimeCam){
 							searchByDate.setVisible(true);
