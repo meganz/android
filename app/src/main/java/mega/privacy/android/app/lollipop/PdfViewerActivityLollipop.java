@@ -228,6 +228,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     MegaNode nodeChat;
     MegaChatMessage msgChat;
 
+    boolean notChangePage = false;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -254,7 +256,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
         }
         else {
-            currentPage = 0;
+            currentPage = 1;
             accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
@@ -360,11 +362,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     log("Total mem: "+mi.totalMem+" allocate 16 MB");
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
-                    MegaNode node = megaApi.getNodeByHandle(handle);
-                    if (node != null){
-                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
-                    }
+
+                MegaNode node = null;
+                if (fromChat) {
+                    node = nodeChat;
                 }
+                else {
+                    node = megaApi.getNodeByHandle(handle);
+                }
+                if (node != null){
+                    uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                }
+            }
 
             log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -619,7 +628,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
-            currentPage = 0;
+            currentPage = 1;
             inside = false;
             if (type == Constants.OFFLINE_ADAPTER){
                 isOffLine = true;
@@ -880,7 +889,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             log("onPostExecute");
             try {
                 pdfView.fromStream(inputStream)
-                        .defaultPage(currentPage)
+                        .defaultPage(currentPage-1)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
                         .onLoad(PdfViewerActivityLollipop.this)
@@ -909,7 +918,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         progressBar.setVisibility(View.VISIBLE);
         try {
             pdfView.fromUri(uri)
-                    .defaultPage(currentPage)
+                    .defaultPage(currentPage-1)
                     .onPageChange(this)
                     .enableAnnotationRendering(true)
                     .onLoad(this)
@@ -1033,6 +1042,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         int page = pdfView.getCurrentPage();
 
         if (queryIfPdfIsHorizontal(page) &&  getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !pdfView.isZooming()) {
+            notChangePage = true;
             pdfView.jumpTo(page - 1);
         }
 
@@ -2242,9 +2252,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onPageChanged(int page, int pageCount) {
-        currentPage = page;
-        actualPage.setText(""+(currentPage+1));
-        setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+        log("page: "+page);
+        if (!notChangePage) {
+            currentPage = page+1;
+            actualPage.setText(String.valueOf(currentPage));
+            setTitle(String.format("%s %s / %s", pdfFileName, currentPage, pageCount));
+        }
+        else {
+            notChangePage = false;
+        }
     }
 
     @Override
