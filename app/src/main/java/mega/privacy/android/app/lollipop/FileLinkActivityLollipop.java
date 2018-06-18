@@ -70,6 +70,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.PreviewCache;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
@@ -242,6 +243,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		sizeTextView = (TextView) findViewById(R.id.file_link_size);
 		buttonPreviewContent = (Button) findViewById(R.id.button_preview_content);
 		buttonPreviewContent.setOnClickListener(this);
+		buttonPreviewContent.setEnabled(false);
+
 		buttonPreviewContent.setVisibility(View.GONE);
 
 		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
@@ -511,6 +514,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					imageViewLayout.setVisibility(View.VISIBLE);
 					iconViewLayout.setVisibility(View.GONE);
 					buttonPreviewContent.setVisibility(View.VISIBLE);
+					buttonPreviewContent.setEnabled(true);
 
 				}else{
 
@@ -521,6 +525,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						imageViewLayout.setVisibility(View.VISIBLE);
 						iconViewLayout.setVisibility(View.GONE);
 						buttonPreviewContent.setVisibility(View.VISIBLE);
+						buttonPreviewContent.setEnabled(true);
 
 					}else{
 
@@ -529,7 +534,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
 							buttonPreviewContent.setVisibility(View.VISIBLE);
 						}else{
+							buttonPreviewContent.setEnabled(false);
 							buttonPreviewContent.setVisibility(View.GONE);
+
 							imageViewLayout.setVisibility(View.GONE);
 							iconViewLayout.setVisibility(View.VISIBLE);
 						}
@@ -613,6 +620,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							PreviewUtils.previewCache.put(document.getHandle(), bitmap);
 							if (iconView != null) {
 								imageView.setImageBitmap(bitmap);
+								buttonPreviewContent.setEnabled(true);
 								imageViewLayout.setVisibility(View.VISIBLE);
 								iconViewLayout.setVisibility(View.GONE);
 							}
@@ -692,53 +700,29 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public void showFile(){
-		log("**** showFile() ");
+		log("showFile() ");
 		if(MimeTypeList.typeForName(document.getName()).isImage()){
-			log("is a image");
-
+			log("image");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
+			String serializeString = document.serialize();
+			intent.putExtra(FullScreenImageViewerLollipop.EXTRA_SERIALIZE_STRING, serializeString);
 			intent.putExtra("position", 0);
+			intent.putExtra("urlFileLink",url);
 			intent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
 			intent.putExtra("parentNodeHandle", -1L);
-
 			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 			intent.putExtra("isFileLink", true);
-
-			if(previewFile == null) {
-				log("****documentHandle: "+document.getHandle());
-				intent.putExtra("documentHandle", document.getHandle());
-				intent.putExtra("isFileLink", true);
-				intent.putExtra("nameFileLink", document.getName());
-
-				/********************************************/
-
-
-
-					/*****************************************/
-			}else{
-				log("**previewPath: "+previewFile.getAbsolutePath());
-				intent.putExtra("previewFilePath", previewFile.getAbsolutePath());
-				intent.putExtra("documentHandle", document.getHandle());
-
-			}
-
 			startActivity(intent);
-			overridePendingTransition(0,0);
 
 		}else if(MimeTypeList.typeForName(document.getName()).isVideo()){
-			log("is a video");
+			log("video");
 
 		}else if(MimeTypeList.typeForName(document.getName()).isPdf()){
-			log("is a pdf");
+			log("pdf");
 
 		}else{
-			log("is none");
-
-
-
+			log("none");
 		}
-
-
 	}
 	
 	String urlM;
