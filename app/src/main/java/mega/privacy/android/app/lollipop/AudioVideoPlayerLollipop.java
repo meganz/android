@@ -528,13 +528,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
 
-                if (savedInstanceState != null && uri.toString().contains("http://")){
-                    MegaNode node = megaApi.getNodeByHandle(handle);
-                    if (node != null){
-                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
-                    }
-                }
-
                 if (megaChatApi != null){
                     if (msgId != -1 && chatId != -1){
                         msgChat = megaChatApi.getMessage(chatId, msgId);
@@ -547,6 +540,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                     else {
                         log("msgId or chatId null");
+                    }
+                }
+
+                if (savedInstanceState != null && uri.toString().contains("http://")){
+                    MegaNode node = null;
+                    if (fromChat) {
+                        node = nodeChat;
+                    }
+                    else {
+                        node = megaApi.getNodeByHandle(handle);
+                    }
+                    if (node != null){
+                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
                     }
                 }
             }
