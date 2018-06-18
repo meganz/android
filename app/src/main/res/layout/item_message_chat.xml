@@ -1223,7 +1223,7 @@
                             android:layout_alignParentLeft="true"/>
 
                     </RelativeLayout>
-                    <!--forward file-->
+                    <!--forward preview portrait-->
                     <RelativeLayout
                         android:id="@+id/forward_contact_preview_portrait"
                         android:layout_width="wrap_content"
@@ -1304,7 +1304,7 @@
 
                     </RelativeLayout>
 
-                    <!--forward file-->
+                    <!--forward preview landscape-->
                     <RelativeLayout
                         android:id="@+id/forward_contact_preview_landscape"
                         android:layout_width="wrap_content"
