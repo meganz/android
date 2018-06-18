@@ -72,7 +72,7 @@ import static nz.mega.sdk.MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION;
 //import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener, MegaRequestListenerInterface{
+public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -236,7 +236,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
-	boolean autoAccept = false;
+	boolean autoAccept = true;
 	
 	DatabaseHandler dbH;
 	
@@ -1068,8 +1068,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
 
 		setAutoaccept = false;
-		autoAccept = false;
-		megaApi.getContactLinksOption(this);
+		autoAccept = true;
+		megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 	}
 
 	@Override
@@ -1080,6 +1080,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryStorage();
 		}
+		else if (((ManagerActivityLollipop) context).openSettingsQR){
+			listView = (ListView) view.findViewById(android.R.id.list);
+			goToCategoryQR();
+		}
 	}
 
 	public void goToCategoryStorage(){
@@ -1088,16 +1092,39 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			String key = getPreferenceScreen().getPreference(i).getKey();
 			if (key.equals(storageCategory.getKey())){
 				((ManagerActivityLollipop) context).openSettingsStorage = false;
-				listView.clearFocus();
-				final int finalI = i;
-				listView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
+				if (listView != null){
+					listView.clearFocus();
+					final int finalI = i;
+					listView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
 //						listView.requestFocusFromTouch();
-						listView.setSelection(finalI+8);
+							listView.setSelection(finalI+8);
 //						listView.requestFocus();
-					}
-				}, 200);
+						}
+					}, 200);
+				}
+				break;
+			}
+		}
+	}
+
+	public void goToCategoryQR(){
+		log("goToCategoryQR");
+		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
+			String key = getPreferenceScreen().getPreference(i).getKey();
+			if (key.equals(qrCodeCategory.getKey())){
+				((ManagerActivityLollipop) context).openSettingsQR = false;
+				if (listView != null) {
+					listView.clearFocus();
+					final int finalI = i;
+					listView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							listView.setSelection(finalI+13);
+						}
+					}, 200);
+				}
 				break;
 			}
 		}
@@ -2019,8 +2046,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
 		}
 		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
+//			First query if QR auto-accept is enabled or not, then change the value
 			setAutoaccept = true;
-			megaApi.getContactLinksOption(this);
+			megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		}
 		else if (preference.getKey().compareTo(KEY_RECOVERY_KEY) == 0){
 			log("Export Recovery Key");
@@ -2466,75 +2494,28 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		Util.log("SettingsFragmentLollipop", log);
 	}
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-	log("onRequestFinish  MegaRequest: "+request.getType());
-
-		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == USER_ATTR_CONTACT_LINK_VERIFICATION){
-			if (e.getErrorCode() == MegaError.API_OK){
-				autoAccept = request.getFlag();
-				log("OK GET ATTR USER: "+autoAccept);
-				if (setAutoaccept){
-				    if (autoAccept){
-				    	log("setAutoaccept false");
-                        megaApi.setContactLinksOption(true, this);
-                    }
-                    else {
-						log("setAutoaccept true");
-                        megaApi.setContactLinksOption(false, this);
-                    }
-				}
-				else {
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						qrCodeAutoAcceptSwitch.setChecked(autoAccept);
-					}
-					else{
-						qrCodeAutoAcceptCheck.setChecked(autoAccept);
-					}
-				}
-				log("autoacept: "+autoAccept);
-			}
-			else if (e.getErrorCode() == MegaError.API_ENOENT){
-				log("Error getContactLinkOption");
-			}
+	public void setValueOfAutoaccept (boolean autoAccept) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			qrCodeAutoAcceptSwitch.setChecked(autoAccept);
 		}
-		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == USER_ATTR_CONTACT_LINK_VERIFICATION){
-			if (e.getErrorCode() == MegaError.API_OK){
-				log("OK SET ATTR USER: "+request.getText());
-                setAutoaccept = false;
-
-				if (autoAccept){
-					autoAccept = false;
-				}
-				else{
-					autoAccept = true;
-				}
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
-				}
-				else{
-					qrCodeAutoAcceptCheck.setChecked(autoAccept);
-				}
-				log("autoacept: "+autoAccept);
-			}
-			else{
-				log("Error setContactLinkOption");
-			}
+		else{
+			qrCodeAutoAcceptCheck.setChecked(autoAccept);
 		}
 	}
 
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+	public void setSetAutoaccept (boolean autoAccept) {
+		this.setAutoaccept = autoAccept;
+	}
 
+	public boolean getSetAutoaccept () {
+		return setAutoaccept;
+	}
+
+	public void setAutoacceptSetting (boolean autoAccept) {
+		this.autoAccept  = autoAccept;
+	}
+
+	public boolean getAutoacceptSetting () {
+		return autoAccept;
 	}
 }
