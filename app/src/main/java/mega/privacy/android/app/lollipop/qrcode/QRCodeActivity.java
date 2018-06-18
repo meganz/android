@@ -241,8 +241,10 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
             case R.id.qr_code_settings: {
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("drawerItem", ManagerActivityLollipop.DrawerItem.SETTINGS);
+                bundle.putSerializable("drawerItemQR", ManagerActivityLollipop.DrawerItem.SETTINGS);
                 intent.putExtras(bundle);
+                intent.putExtra("fromQR", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 this.finish();
                 break;
