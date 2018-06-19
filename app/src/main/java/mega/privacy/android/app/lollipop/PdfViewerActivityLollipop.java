@@ -363,15 +363,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
 
-                MegaNode node = null;
-                if (fromChat) {
-                    node = nodeChat;
-                }
-                else {
-                    node = megaApi.getNodeByHandle(handle);
-                }
-                if (node != null){
-                    uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                if (savedInstanceState != null && uri.toString().contains("http://")){
+                    MegaNode node = null;
+                    if (fromChat) {
+                        node = nodeChat;
+                    }
+                    else {
+                        node = megaApi.getNodeByHandle(handle);
+                    }
+                    if (node != null){
+                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                    }
+                    else {
+                        showSnackbar(getString(R.string.error_streaming));
+                    }
                 }
             }
 
