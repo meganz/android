@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -11,16 +10,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.managerSections.MonthlyAnnualyFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaUser;
 
 public class MyAccountInfo {
 
@@ -58,7 +53,6 @@ public class MyAccountInfo {
 
     DatabaseHandler dbH;
     Context context;
-    MegaUser myUser = null;
 
     public ArrayList<Product> productAccounts;
 
@@ -71,13 +65,15 @@ public class MyAccountInfo {
     Purchase proIIIMonthly = null;
     Purchase proIIIYearly = null;
 
+    MegaPricing pricing;
+
     public MyAccountInfo(Context context){
         log("MyAccountInfo created");
 
         this.context = context;
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = ((MegaApplication) context).getMegaApi();
         }
 
         if (dbH == null){
@@ -303,21 +299,6 @@ public class MyAccountInfo {
 
     public void setInventoryFinished(boolean inventoryFinished) {
         this.inventoryFinished = inventoryFinished;
-
-        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-        if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT) {
-            if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.UPGRADE_ACCOUNT_FRAGMENT) {
-                UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
-                if (upAFL != null) {
-                    upAFL.setPricing();
-                }
-            } else if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.MONTHLY_YEARLY_FRAGMENT) {
-                MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
-                if (myFL != null) {
-                    myFL.setPricing();
-                }
-            }
-        }
     }
 
     public String getLastSessionFormattedDate() {
@@ -344,7 +325,7 @@ public class MyAccountInfo {
 
         if (fullName.trim().length() <= 0){
             log("Put email as fullname");
-            String email = myUser.getEmail();
+            String email = megaApi.getMyUser().getEmail();
             String[] splitEmail = email.split("[@._]");
             fullName = splitEmail[0];
         }
@@ -418,15 +399,6 @@ public class MyAccountInfo {
         this.lastNameText = lastNameText;
         setFullName();
     }
-
-    public MegaUser getMyUser() {
-        return myUser;
-    }
-
-    public void setMyUser(MegaUser myUser) {
-        this.myUser = myUser;
-    }
-
 
     public String getFullName() {
         return fullName;
@@ -563,5 +535,13 @@ public class MyAccountInfo {
     public void setCreateSessionTimeStamp(long createSessionTimeStamp) {
         log("setCreateSessionTimeStamp: " + createSessionTimeStamp);
         this.createSessionTimeStamp = createSessionTimeStamp;
+    }
+
+    public MegaPricing getPricing() {
+        return pricing;
+    }
+
+    public void setPricing(MegaPricing pricing) {
+        this.pricing = pricing;
     }
 }

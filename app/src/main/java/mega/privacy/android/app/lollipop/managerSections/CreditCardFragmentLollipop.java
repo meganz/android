@@ -708,10 +708,13 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 ////		}
 	}
 	
-	public void setInfo (int _type, MyAccountInfo _myAccountInfo, int _paymentMonth){
+	public void setInfo (int _type, int _paymentMonth){
 		this.parameterType = _type;
-		this.myAccountInfo = _myAccountInfo;
 		this.paymentMonth = _paymentMonth;
+
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
 	}
 
 	public int getParameterType(){

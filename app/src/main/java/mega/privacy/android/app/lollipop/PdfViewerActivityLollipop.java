@@ -250,12 +250,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             pdfFileName = savedInstanceState.getString("pdfFileName");
             uri = Uri.parse(savedInstanceState.getString("uri"));
             renamed = savedInstanceState.getBoolean("renamed");
-            accountType = savedInstanceState.getInt("typeAccount");
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
         }
         else {
             currentPage = 0;
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
@@ -272,6 +270,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
+
+        MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+        if(accountInfo!=null){
+            accountType = accountInfo.getAccountType();
+            if(accountType==-1){
+                accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            }
+        }
+        else{
+            accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+        }
 
 //        if (!renamed){
 //            uri = intent.getData();
@@ -616,7 +625,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else {
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
+            MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+            if(accountInfo!=null){
+                accountType = accountInfo.getAccountType();
+                if(accountType==-1){
+                    accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+                }
+            }
+            else{
+                accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            }
+
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 0;
@@ -1972,7 +1992,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         log("showGetLinkActivity");
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
-        linkIntent.putExtra("account", accountType);
         startActivity(linkIntent);
     }
 
@@ -2897,9 +2916,5 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
-    }
-
-    public int getAccountType() {
-        return accountType;
     }
 }

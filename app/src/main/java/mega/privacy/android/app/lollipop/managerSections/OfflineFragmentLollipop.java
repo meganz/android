@@ -50,7 +50,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -1090,12 +1089,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						intent.putExtra("screenPosition", screenPosition);
-						if (context instanceof ManagerActivityLollipop){
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-							if(accountInfo!=null){
-								intent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
-						}
+
 						startActivity(intent);
 						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 						imageDrag = imageView;
@@ -1110,12 +1104,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						else {
 							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						}
-						if (context instanceof ManagerActivityLollipop) {
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
-							if (accountInfo != null) {
-								mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
-						}
+
 						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						mediaIntent.putExtra("FILENAME", currentNode.getName());
 						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
@@ -1144,12 +1133,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-						if (context instanceof ManagerActivityLollipop) {
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
-							if (accountInfo != null) {
-								pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
-						}
+
 						pdfIntent.putExtra("inside", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);

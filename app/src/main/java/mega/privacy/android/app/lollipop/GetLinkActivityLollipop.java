@@ -37,6 +37,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -137,10 +138,20 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				finish();
 			}
-			accountType = intentReceived.getIntExtra("account", 0);
 		}
 		else{
 			finish();
+		}
+
+		MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+		if(accountInfo!=null){
+			accountType = accountInfo.getAccountType();
+			if(accountType==-1){
+				accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+			}
+		}
+		else{
+			accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
 		}
 
 		setContentView(R.layout.get_link_activity_layout);

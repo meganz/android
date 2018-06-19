@@ -22,7 +22,6 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
@@ -132,7 +131,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
@@ -157,17 +156,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		log("Check the last call to getAccountDetails");
 		if(DBUtil.callToAccountDetails(context)){
 			log("megaApi.getAccountDetails SEND");
-			megaApi.getAccountDetails((ManagerActivityLollipop)context);
-		}
-		log("Check the last call to getExtendedAccountDetails");
-		if(DBUtil.callToExtendedAccountDetails(context)){
-			log("megaApi.getExtendedAccountDetails SEND");
-			megaApi.getExtendedAccountDetails(true, false, false, (ManagerActivityLollipop)context);
-		}
-		log("Check the last call to callToPaymentMethods");
-		if(DBUtil.callToPaymentMethods(context)){
-			log("megaApi.getPaymentMethods SEND");
-			megaApi.getPaymentMethods((ManagerActivityLollipop)context);
+			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
 	}
 
