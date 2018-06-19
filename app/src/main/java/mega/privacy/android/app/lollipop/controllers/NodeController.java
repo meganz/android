@@ -973,7 +973,7 @@ public class NodeController {
                                 File mediaFile = new File(localPath);
 
                                 Intent mediaIntent;
-                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported()) {
+                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(mediaFile.getName()).isAudioNotSupported()) {
                                     mediaIntent = new Intent(Intent.ACTION_VIEW);
 
                                 } else {
