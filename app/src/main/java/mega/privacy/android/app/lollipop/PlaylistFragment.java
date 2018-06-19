@@ -220,11 +220,12 @@ public class PlaylistFragment extends Fragment{
                 }
             }
         });
-
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
-        player.setPlayWhenReady(((AudioVideoPlayerLollipop) context).playWhenReady);
+        if (player != null) {
+            player.setPlayWhenReady(((AudioVideoPlayerLollipop) context).playWhenReady);
+        }
         if (!((AudioVideoPlayerLollipop) context).querySearch.equals("")){
             aB.setTitle(getString(R.string.action_search)+": "+((AudioVideoPlayerLollipop) context).querySearch);
             setNodesSearch(((AudioVideoPlayerLollipop) context).querySearch);
@@ -267,7 +268,9 @@ public class PlaylistFragment extends Fragment{
 
     public void itemClick(int position) {
         log("item click position: " + position);
-        player.seekTo(position, 0);
+        if (player != null) {
+            player.seekTo(position, 0);
+        }
     }
 
     public void visibilityFastScroller(){
