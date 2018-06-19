@@ -76,7 +76,7 @@
 		<!--Expiration-->
 		<RelativeLayout
 			android:id="@+id/my_storage_account_expiration_layout"
-			android:layout_width="fill_parent"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:layout_marginLeft="72dp"
