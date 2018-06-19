@@ -864,7 +864,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
 		accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 		adapterType = intent.getIntExtra("adapterType", 0);
-		log("onCreate->adapterType: "+adapterType);
+
 		MegaApplication app = (MegaApplication)getApplication();
 		if (isFolderLink ){
 			megaApi = app.getMegaApiFolder();
