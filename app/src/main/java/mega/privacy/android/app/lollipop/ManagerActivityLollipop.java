@@ -11908,8 +11908,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case DialogInterface.BUTTON_POSITIVE: {
 						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
+
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
+
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
