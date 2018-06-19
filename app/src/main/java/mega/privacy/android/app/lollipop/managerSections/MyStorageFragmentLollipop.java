@@ -299,8 +299,7 @@ public class MyStorageFragmentLollipop extends Fragment implements MegaRequestLi
 		}
 		else{
 
-			String totalSpace = " "+myAccountInfo.getTotalFormatted();
-			String usedSpaceString = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedFormatted(), totalSpace);
+			String usedSpaceString = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
 			try{
 				usedSpaceString = usedSpaceString.replace("[A]", "<font color=\'#777777\'>");
 				usedSpaceString = usedSpaceString.replace("[/A]", "</font>");
