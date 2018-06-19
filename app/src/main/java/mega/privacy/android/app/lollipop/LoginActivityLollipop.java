@@ -3,8 +3,11 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -90,10 +94,34 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     String firstNameTemp = null;
     String lastNameTemp = null;
 
+    private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            int actionType;
+
+            if (intent != null){
+                actionType = intent.getIntExtra("actionType", -1);
+
+                if(actionType == Constants.UPDATE_GET_PRICING){
+                    log("BROADCAST TO UPDATE AFTER GET PRICING");
+                    //UPGRADE_ACCOUNT_FRAGMENT
+
+                    if(chooseAccountFragment!=null && chooseAccountFragment.isAdded()){
+                        chooseAccountFragment.setPricingInfo();
+                    }
+                }
+                else if(actionType == Constants.UPDATE_PAYMENT_METHODS){
+                    log("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
+                }
+            }
+        }
+    };
 
     @Override
     protected void onDestroy() {
         log("onDestroy");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
         megaApi.removeGlobalListener(this);
         super.onDestroy();
     }
@@ -161,6 +189,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
             megaApi.resumeCreateAccount(sessionTemp, this);
         }
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
         showFragment(visibleFragment);
     }

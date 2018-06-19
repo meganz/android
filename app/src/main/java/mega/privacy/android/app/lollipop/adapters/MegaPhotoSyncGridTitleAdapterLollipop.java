@@ -45,8 +45,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -1094,10 +1092,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             intent.putExtra("handlesNodesSearch",arrayHandles);
                         }
 
-                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                        if(accountInfo!=null){
-                            intent.putExtra("typeAccount", accountInfo.getAccountType());
-                        }
                         log("Position in nodes: "+positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             intent.putExtra("parentNodeHandle", -1L);
@@ -1123,10 +1117,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         else {
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         }
-                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                        if(accountInfo!=null){
-                            mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-                        }
+
                         mediaIntent.putExtra("position", positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             mediaIntent.putExtra("parentNodeHandle", -1L);

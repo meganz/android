@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -56,7 +55,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -961,10 +959,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
 					context.startActivity(intent);
@@ -1000,10 +995,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					mediaIntent.putExtra("screenPosition", screenPosition);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					mediaIntent.putExtra("FILENAME", file.getName());
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
@@ -1107,10 +1099,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					log("FILENAME: " + file.getName() + " TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					boolean isOnMegaDownloads = false;

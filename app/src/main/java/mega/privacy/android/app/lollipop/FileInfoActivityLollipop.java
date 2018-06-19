@@ -555,7 +555,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if(from==FROM_INCOMING_SHARES){
                     firstIncomingLevel = extras.getBoolean("firstLevel");
                 }
-                accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
+                MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
+                if(accountInfo!=null){
+                    accountType = accountInfo.getAccountType();
+                    if(accountType==-1){
+                        accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+                    }
+                }
+                else{
+                    accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
+                }
+
                 long handleNode = extras.getLong("handle", -1);
                 log("Handle of the selected node: "+handleNode);
                 node = megaApi.getNodeByHandle(handleNode);
@@ -2250,7 +2261,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("showGetLinkActivity");
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
-		linkIntent.putExtra("account", accountType);
 		startActivity(linkIntent);
 	}
 

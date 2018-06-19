@@ -223,8 +223,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
 
 		if(myAccountInfo==null){
-			log("MyAccountInfo is NULL");
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		if(myAccountInfo!=null){
@@ -328,17 +327,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("Check the last call to getAccountDetails");
 		if(DBUtil.callToAccountDetails(context)){
 			log("megaApi.getAccountDetails SEND");
-			megaApi.getAccountDetails((ManagerActivityLollipop)context);
+			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
 		}
 		log("Check the last call to getExtendedAccountDetails");
 		if(DBUtil.callToExtendedAccountDetails(context)){
 			log("megaApi.getExtendedAccountDetails SEND");
-			megaApi.getExtendedAccountDetails(true, false, false, (ManagerActivityLollipop)context);
+			((MegaApplication) ((Activity)context).getApplication()).askForExtendedAccountDetails();
 		}
 		log("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			log("megaApi.getPaymentMethods SEND");
-			megaApi.getPaymentMethods((ManagerActivityLollipop)context);
+			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}
 	}
 
@@ -746,14 +745,4 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}
 	}
-
-	public MyAccountInfo getMyAccountInfo() {
-		return myAccountInfo;
-	}
-
-	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
-		log("setMyAccountInfo");
-		this.myAccountInfo = myAccountInfo;
-	}
-
 }
