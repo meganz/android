@@ -339,7 +339,6 @@ public class NodeController {
         }
     }
 
-
     //Old onFileClick
     public void prepareForDownloadLollipop(ArrayList<Long> handleList){
         log("prepareForDownload: "+handleList.size()+" files to download");
@@ -535,7 +534,7 @@ public class NodeController {
 
     //Old onFileClick
     public void prepareForDownloadPreLollipop(ArrayList<Long> handleList){
-        log("**** prepareForDownloadPreLollipop: "+handleList.size()+" files to download");
+        log("prepareForDownloadPreLollipop: "+handleList.size()+" files to download");
         long size = 0;
         long[] hashes = new long[handleList.size()];
         for (int i=0;i<handleList.size();i++){
@@ -652,7 +651,7 @@ public class NodeController {
     //Old downloadTo
     public void checkSizeBeforeDownload(String parentPath, String url, long size, long [] hashes){
         //Variable size is incorrect for folders, it is always -1 -> sizeTemp calculates the correct size
-        log("*******checkSizeBeforeDownload - parentPath: "+parentPath+ " url: "+url+" size: "+size);
+        log("checkSizeBeforeDownload - parentPath: "+parentPath+ " url: "+url+" size: "+size);
         log("files to download: "+hashes.length);
         log("SIZE to download before calculating: "+size);
 

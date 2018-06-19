@@ -118,10 +118,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	RelativeLayout iconViewLayout;
 	RelativeLayout imageViewLayout;
 
-//	TextView nameView;
 	ScrollView scrollView;
 	TextView sizeTextView;
-//	TextView sizeTitleView;
 	TextView importButton;
 	TextView downloadButton;
 	Button buttonPreviewContent;
@@ -165,7 +163,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
@@ -1556,16 +1553,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, link);
 		startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-	}
-
-	// A method to find height of the status bar
-	public int getStatusBarHeight() {
-		int result = 0;
-		int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-		if (resourceId > 0) {
-			result = getResources().getDimensionPixelSize(resourceId);
-		}
-		return result;
 	}
 
 }

@@ -313,7 +313,6 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
         log ("instantiateItem POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
-		log("********************** nodee: "+node);
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
