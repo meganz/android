@@ -175,7 +175,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     Runnable runnableActionStatusBar = new Runnable() {
         @Override
         public void run() {
-            hideActionStatusBar();
+            hideActionStatusBar(400L);
         }
     };
     boolean isFolderLink = false;
@@ -286,6 +286,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean searchExpand = false;
     boolean fromChat = false;
     boolean isDeleteDialogShow = false;
+    boolean isAbHide = false;
 
     ChatController chatC;
     private long msgId = -1;
@@ -343,6 +344,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
             accountType = savedInstanceState.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+            isAbHide = savedInstanceState.getBoolean("isAbHide", false);
         }
         else {
             isDeleteDialogShow = false;
@@ -562,10 +564,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(alertDialogTransferOverquota==null){
                     showTransferOverquotaDialog();
                 }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
+                else if (!(alertDialogTransferOverquota.isShowing())) {
+                    showTransferOverquotaDialog();
                 }
             }
         }
@@ -809,6 +809,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         createPlayer();
 
+        if (isAbHide) {
+            hideActionStatusBar(0);
+        }
+
         if (savedInstanceState == null){
             ViewTreeObserver observer = simpleExoPlayerView.getViewTreeObserver();
             observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -862,278 +866,311 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         simpleExoPlayerView.requestFocus();
 
         //Bind the player to the view
-        simpleExoPlayerView.setPlayer(player);
-        simpleExoPlayerView.setControllerAutoShow(false);
-        simpleExoPlayerView.setControllerShowTimeoutMs(999999999);
-        simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event){
+        if (player != null) {
+            simpleExoPlayerView.setPlayer(player);
+            simpleExoPlayerView.setControllerAutoShow(false);
+            simpleExoPlayerView.setControllerShowTimeoutMs(999999999);
+            simpleExoPlayerView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
 
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (aB.isShowing()) {
-                        hideActionStatusBar();
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        if (aB.isShowing()) {
+                            hideActionStatusBar(400L);
+                        }
+                        else {
+                            showActionStatusBar();
+                        }
                     }
-                    else {
-                        showActionStatusBar();
-                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
 
-        //Measures bandwidth during playback. Can be null if not required.
-        DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
-        //Produces DataSource instances through which meida data is loaded
-        //DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "android2"), defaultBandwidthMeter);
-        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "android2"), defaultBandwidthMeter);
-        //Produces Extractor instances for parsing the media data
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+            //Measures bandwidth during playback. Can be null if not required.
+            DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
+            //Produces DataSource instances through which meida data is loaded
+            //DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "android2"), defaultBandwidthMeter);
+            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "android2"), defaultBandwidthMeter);
+            //Produces Extractor instances for parsing the media data
+            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        MediaSource mediaSource = null;
-//        loopingMediaSource = null;
+            MediaSource mediaSource = null;
+            //        loopingMediaSource = null;
 
-        if (isPlayList && size > 1) {
-            final List<MediaSource> playlist = new ArrayList<>();
-            MediaSource mSource = null;
-            String localPath;
-            Uri mediaUri;
-            File mediaFile;
-            mediaUris = new ArrayList<>();
-            if (isOffLine){
-                for(int i=0; i<mediaOffList.size(); i++){
-                    MegaOffline currentNode = mediaOffList.get(i);
-                    if(currentNode.getOrigin()==MegaOffline.INCOMING){
-                        String handleString = currentNode.getHandleIncoming();
-                        mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
-                    }
-                    else if(currentNode.getOrigin()==MegaOffline.INBOX){
-                        String handleString = currentNode.getHandleIncoming();
-                        mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/"+currentNode.getPath() + "/" + currentNode.getName());
-                    }
-                    else{
-                        mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
-                    }
-                    mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
-                    mediaUris.add(mediaUri);
-                    mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
-                    playlist.add(mSource);
-                }
-            }
-            else {
-                MegaNode n;
-                for(int i=0; i<mediaHandles.size(); i++){
-                    n = megaApi.getNodeByHandle(mediaHandles.get(i));
-                    boolean isOnMegaDownloads = false;
-                    localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, n.getName(), n.getSize(), downloadLocationDefaultPath);
-                    File f = new File(downloadLocationDefaultPath, n.getName());
-                    if(f.exists() && (f.length() == n.getSize())){
-                        isOnMegaDownloads = true;
-                    }
-                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(n).equals(megaApi.getFingerprint(localPath))))){
-                        mediaFile = new File(localPath);
-                        mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+            if (isPlayList && size > 1) {
+                final List<MediaSource> playlist = new ArrayList<>();
+                MediaSource mSource = null;
+                String localPath;
+                Uri mediaUri;
+                File mediaFile;
+                mediaUris = new ArrayList<>();
+                if (isOffLine) {
+                    for (int i = 0; i < mediaOffList.size(); i++) {
+                        MegaOffline currentNode = mediaOffList.get(i);
+                        if (currentNode.getOrigin() == MegaOffline.INCOMING) {
+                            String handleString = currentNode.getHandleIncoming();
+                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/" + currentNode.getPath() + "/" + currentNode.getName());
+                        }
+                        else if (currentNode.getOrigin() == MegaOffline.INBOX) {
+                            String handleString = currentNode.getHandleIncoming();
+                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/in/" + currentNode.getPath() + "/" + currentNode.getName());
+                        }
+                        else {
+                            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+                                && currentNode.getPath().contains(Environment.getExternalStorageDirectory().getPath())) {
+                            mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                        }
+                        else{
+                            mediaUri = Uri.fromFile(mediaFile);
+                        }
                         mediaUris.add(mediaUri);
                         mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
-                    }
-                    else {
-                        String url = megaApi.httpServerGetLocalLink(n);
-                        if (url != null){
-                            mediaUri = Uri.parse(url);
-                            mediaUris.add(mediaUri);
-                            mSource = new ExtractorMediaSource (mediaUri, dataSourceFactory, extractorsFactory, null, null);
-                        }
-                    }
-                    playlist.add(mSource);
-                }
-            }
-
-            concatenatingMediaSource = new ConcatenatingMediaSource(playlist.toArray(new MediaSource[playlist.size()]));
-            player.prepare(concatenatingMediaSource);
-//            loopingMediaSource = new LoopingMediaSource(concatenatingMediaSource);
-//            player.prepare(loopingMediaSource);
-
-
-        }
-        else {
-            mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
-            player.prepare(mediaSource);
-        }
-
-//        final LoopingMediaSource finalLoopingMediaSource = loopingMediaSource;
-        final ConcatenatingMediaSource finalConcatenatingMediaSource = concatenatingMediaSource;
-        final MediaSource finalMediaSource = mediaSource;
-        //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
-        //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
-
-        player.addListener(new Player.EventListener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-                log("onTimelineChanged");
-            }
-
-            @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-                log("onTracksChanged");
-
-                int previousIndex = currentWindowIndex;
-                if (size > 1) {
-                    currentWindowIndex = player.getCurrentWindowIndex();
-                    if (currentWindowIndex == previousIndex && onTracksChange && !loop) {
-                        currentWindowIndex++;
-                    }
-
-                    if (isOffLine){
-                        MegaOffline n = mediaOffList.get(currentWindowIndex);
-                        fileName = n.getName();
-                        handle = Long.parseLong(n.getHandle());
-                    }
-                    else {
-                        MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(currentWindowIndex));
-                        fileName = n.getName();
-                        handle = n.getHandle();
-                    }
-
-                    isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
-                    String extension = fileName.substring(fileName.length()-3, fileName.length());
-                    log("Extension: "+extension);
-                    if (extension.equals("mp4")){
-                        isMP4 = true;
-                    }
-                    else {
-                        isMP4 = false;
-                    }
-                    exoPlayerName.setText(fileName);
-                    uri = mediaUris.get(currentWindowIndex);
-                    if (uri.toString().contains("http://")){
-                        isUrl = true;
-                    }
-                    else {
-                        isUrl = false;
-                    }
-                    supportInvalidateOptionsMenu();
-                }
-                updateScrollPosition();
-
-                if (onPlaylist) {
-                    if (playlistFragment != null && playlistFragment.isAdded()){
-                        if (currentWindowIndex < playlistFragment.adapter.getItemCount() && currentWindowIndex >= 0){
-                            playlistFragment.adapter.setItemChecked(currentWindowIndex);
-                            playlistFragment.mLayoutManager.scrollToPosition(currentWindowIndex);
-                            playlistFragment.adapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-                onTracksChange = true;
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-                log("onLoadingChanged");
-
-                if (video){
-                    audioContainer.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                log("onPlayerStateChanged: "+playbackState);
-
-                if (playbackState == Player.STATE_BUFFERING){
-                    audioContainer.setVisibility(View.GONE);
-                    if (onPlaylist){
-                        playlistProgressBar.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
-                    }
-                    else {
-                        progressBar.setVisibility(View.VISIBLE);
+                        playlist.add(mSource);
                     }
                 }
                 else {
-                    if (onPlaylist){
-                        progressBar.setVisibility(View.GONE);
-                        if (playlistProgressBar != null){
-                            playlistProgressBar.setVisibility(View.GONE);
+                    MegaNode n;
+                    for (int i = 0; i < mediaHandles.size(); i++) {
+                        n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                        boolean isOnMegaDownloads = false;
+                        localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, n.getName(), n.getSize(), downloadLocationDefaultPath);
+                        File f = new File(downloadLocationDefaultPath, n.getName());
+                        if (f.exists() && (f.length() == n.getSize())) {
+                            isOnMegaDownloads = true;
                         }
-                        if (playlistFragment != null && playlistFragment.isAdded()){
-                            if (playlistFragment.adapter != null){
+                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(n).equals(megaApi.getFingerprint(localPath))))) {
+                            mediaFile = new File(localPath);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+                                    && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                mediaUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                            }
+                            else{
+                                mediaUri = Uri.fromFile(mediaFile);
+                            }
+                            mediaUris.add(mediaUri);
+                            mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                        }
+                        else {
+                            String url = megaApi.httpServerGetLocalLink(n);
+                            if (url != null) {
+                                mediaUri = Uri.parse(url);
+                                mediaUris.add(mediaUri);
+                                mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
+                            }
+                        }
+                        playlist.add(mSource);
+                    }
+                }
+
+                concatenatingMediaSource = new ConcatenatingMediaSource(playlist.toArray(new MediaSource[playlist.size()]));
+                player.prepare(concatenatingMediaSource);
+                //            loopingMediaSource = new LoopingMediaSource(concatenatingMediaSource);
+                //            player.prepare(loopingMediaSource);
+
+
+            }
+            else {
+                mediaSource = new ExtractorMediaSource(uri, dataSourceFactory, extractorsFactory, null, null);
+                player.prepare(mediaSource);
+            }
+
+            //        final LoopingMediaSource finalLoopingMediaSource = loopingMediaSource;
+            final ConcatenatingMediaSource finalConcatenatingMediaSource = concatenatingMediaSource;
+            final MediaSource finalMediaSource = mediaSource;
+            //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
+            //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
+
+            player.addListener(new Player.EventListener() {
+                @Override
+                public void onTimelineChanged(Timeline timeline, Object manifest) {
+                    log("onTimelineChanged");
+                }
+
+                @Override
+                public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+                    log("onTracksChanged");
+
+                    int previousIndex = currentWindowIndex;
+                    if (size > 1) {
+                        currentWindowIndex = player.getCurrentWindowIndex();
+                        if (currentWindowIndex == previousIndex && onTracksChange && !loop) {
+                            currentWindowIndex++;
+                        }
+
+                        if (isOffLine) {
+                            MegaOffline n = mediaOffList.get(currentWindowIndex);
+                            fileName = n.getName();
+                            handle = Long.parseLong(n.getHandle());
+                        }
+                        else {
+                            MegaNode n = megaApi.getNodeByHandle(mediaHandles.get(currentWindowIndex));
+                            fileName = n.getName();
+                            handle = n.getHandle();
+                        }
+
+                        isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
+                        String extension = fileName.substring(fileName.length() - 3, fileName.length());
+                        log("Extension: " + extension);
+                        if (extension.equals("mp4")) {
+                            isMP4 = true;
+                        }
+                        else {
+                            isMP4 = false;
+                        }
+                        exoPlayerName.setText(fileName);
+                        uri = mediaUris.get(currentWindowIndex);
+                        if (uri.toString().contains("http://")) {
+                            isUrl = true;
+                        }
+                        else {
+                            isUrl = false;
+                        }
+                        supportInvalidateOptionsMenu();
+                    }
+                    updateScrollPosition();
+
+                    if (onPlaylist) {
+                        if (playlistFragment != null && playlistFragment.isAdded()) {
+                            if (currentWindowIndex < playlistFragment.adapter.getItemCount() && currentWindowIndex >= 0) {
+                                playlistFragment.adapter.setItemChecked(currentWindowIndex);
+                                playlistFragment.mLayoutManager.scrollToPosition(currentWindowIndex);
                                 playlistFragment.adapter.notifyDataSetChanged();
                             }
                         }
                     }
-                    else {
-                        progressBar.setVisibility(View.GONE);
+                    onTracksChange = true;
+                }
+
+                @Override
+                public void onLoadingChanged(boolean isLoading) {
+                    log("onLoadingChanged");
+
+                    if (video) {
+                        audioContainer.setVisibility(View.GONE);
+                        if (isAbHide){
+                            containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    simpleExoPlayerView.hideController();
+                                }
+                            }).start();
+                        }
                     }
-                    if (isVideo) {
-                        if ((isMP4 && video) || !isMP4){
-                            audioContainer.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                    log("onPlayerStateChanged: " + playbackState);
+
+                    if (playbackState == Player.STATE_BUFFERING) {
+                        audioContainer.setVisibility(View.GONE);
+                        if (onPlaylist) {
+                            playlistProgressBar.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        else {
+                            progressBar.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    else if (playbackState == Player.STATE_ENDED && !loop && !onPlaylist) {
+                        showActionStatusBar();
+                    }
+                    else {
+                        if (onPlaylist) {
+                            progressBar.setVisibility(View.GONE);
+                            if (playlistProgressBar != null) {
+                                playlistProgressBar.setVisibility(View.GONE);
+                            }
+                            if (playlistFragment != null && playlistFragment.isAdded()) {
+                                if (playlistFragment.adapter != null) {
+                                    playlistFragment.adapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                        else {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        if (isVideo) {
+                            if ((isMP4 && video) || !isMP4) {
+                                audioContainer.setVisibility(View.GONE);
+                                if (isAbHide){
+                                    containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            simpleExoPlayerView.hideController();
+                                        }
+                                    }).start();
+                                }
+                            }
+                            else {
+                                audioContainer.setVisibility(View.VISIBLE);
+                            }
                         }
                         else {
                             audioContainer.setVisibility(View.VISIBLE);
                         }
                     }
+                }
+
+                @Override
+                public void onRepeatModeChanged(int repeatMode) {
+                    log("onRepeatModeChanged");
+                }
+
+                @Override
+                public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+                    log("onShuffleModeEnabledChanged");
+                }
+
+                @Override
+                public void onPlayerError(ExoPlaybackException error) {
+                    log("onPlayerError");
+                    numErrors++;
+                    player.stop();
+                    if (numErrors <= 2) {
+                        if (isPlayList && size > 1) {
+                            //player.prepare(finalLoopingMediaSource);
+                            player.prepare(finalConcatenatingMediaSource);
+                        }
+                        else {
+                            player.prepare(finalMediaSource);
+                        }
+                        player.setPlayWhenReady(true);
+                    }
                     else {
-                        audioContainer.setVisibility(View.VISIBLE);
+                        showErrorDialog();
                     }
-                }
-            }
 
-            @Override
-            public void onRepeatModeChanged(int repeatMode) {
-                log("onRepeatModeChanged");
-            }
-
-            @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-                log("onShuffleModeEnabledChanged");
-            }
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-                log("onPlayerError");
-                numErrors++;
-                player.stop();
-                if (numErrors <= 2){
-                    if (isPlayList && size > 1){
-//                        player.prepare(finalLoopingMediaSource);
-                        player.prepare(finalConcatenatingMediaSource);
-                    }
-                    else {
-                        player.prepare(finalMediaSource);
-                    }
-                    player.setPlayWhenReady(true);
-                }
-                else {
-                    showErrorDialog();
                 }
 
-            }
+                @Override
+                public void onPositionDiscontinuity(int reason) {
+                    log("onPositionDiscontinuity");
+                }
 
-            @Override
-            public void onPositionDiscontinuity(int reason) {
-                log("onPositionDiscontinuity");
-            }
+                @Override
+                public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+                    log("onPlaybackParametersChanged");
+                }
 
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-                log("onPlaybackParametersChanged");
+                @Override
+                public void onSeekProcessed() {
+                    log("onSeekProcessed");
+                }
+            });
+            numErrors = 0;
+            player.setPlayWhenReady(playWhenReady);
+            if (isPlayList) {
+                player.seekTo(currentWindowIndex, currentTime);
             }
-
-            @Override
-            public void onSeekProcessed() {
-                log("onSeekProcessed");
+            else {
+                player.seekTo(currentTime);
             }
-        });
-        numErrors = 0;
-        player.setPlayWhenReady(playWhenReady);
-        if (isPlayList){
-            player.seekTo(currentWindowIndex, currentTime);
+            player.setVideoDebugListener(this);
+            onTracksChange = false;
         }
-        else {
-            player.seekTo(currentTime);
-        }
-        player.setVideoDebugListener(this);
-        onTracksChange = false;
     }
 
     void showErrorDialog() {
@@ -1141,7 +1178,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        } else {
+        }
+        else {
             builder = new AlertDialog.Builder(this);
         }
         builder.setCancelable(false);
@@ -1363,7 +1401,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     log("Exception: "+e.getMessage());
                 }
 
-            } else {
+            }
+            else {
                 aB.hide();
             }
         }
@@ -1541,6 +1580,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putBoolean("playWhenReady", playWhenReady);
         outState.putInt("typeAccount", accountType);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
+        outState.putBoolean("isAbHide", isAbHide);
     }
 
     public String getFileName(Uri uri) {
@@ -1563,10 +1603,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         return result;
     }
 
-    protected void hideActionStatusBar(){
+    protected void hideActionStatusBar(long duration){
+        isAbHide = true;
         if (aB != null && aB.isShowing()) {
             if(tB != null) {
-                tB.animate().translationY(-220).setDuration(400L)
+                tB.animate().translationY(-220).setDuration(duration)
                         .withEndAction(new Runnable() {
                             @Override
                             public void run() {
@@ -1579,7 +1620,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 aB.hide();
             }
             if (video){
-                containerControls.animate().translationY(400).setDuration(400L).withEndAction(new Runnable() {
+                containerControls.animate().translationY(400).setDuration(duration).withEndAction(new Runnable() {
                     @Override
                     public void run() {
                         simpleExoPlayerView.hideController();
@@ -1589,6 +1630,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
     protected void showActionStatusBar(){
+        isAbHide = false;
         if (aB != null && !aB.isShowing()) {
             aB.show();
             if(tB != null) {
@@ -3029,7 +3071,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                     if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+                                && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                         }
                         else{
@@ -3357,7 +3400,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void run() {
                     ivShadow.setBackgroundColor(TRANSPARENT);
-                    showActionStatusBar();
+                    if (!isAbHide) {
+                        showActionStatusBar();
+                    }
                     containerAudioVideoPlayer.setBackgroundColor(BLACK);
                     playerLayout.setBackgroundColor(BLACK);
                     appBarLayout.setBackgroundColor(BLACK);
