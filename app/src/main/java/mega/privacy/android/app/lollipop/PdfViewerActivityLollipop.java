@@ -360,11 +360,23 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     log("Total mem: "+mi.totalMem+" allocate 16 MB");
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
-                    MegaNode node = megaApi.getNodeByHandle(handle);
+
+                if (savedInstanceState != null && uri.toString().contains("http://")){
+                    MegaNode node = null;
+                    if (fromChat) {
+                        node = nodeChat;
+                    }
+                    else {
+                        node = megaApi.getNodeByHandle(handle);
+                    }
                     if (node != null){
                         uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
                     }
+                    else {
+                        showSnackbar(getString(R.string.error_streaming));
+                    }
                 }
+            }
 
             log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
