@@ -3,14 +3,9 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.ExifInterface;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils.TruncateAt;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -18,17 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -36,14 +25,10 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
@@ -385,22 +370,27 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	public void updateProgress(int position, MegaTransfer transfer) {
 		log("updateProgress");
 
-		ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
+		try{
+			ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
 
-		if(holder!=null){
-			if(holder.transferProgressBar.getVisibility()==View.GONE){
-				holder.transferProgressBar.setVisibility(View.VISIBLE);
-				holder.textViewCompleted.setVisibility(View.GONE);
-				holder.imageViewCompleted.setVisibility(View.GONE);
+			if(holder!=null){
+				if(holder.transferProgressBar.getVisibility()==View.GONE){
+					holder.transferProgressBar.setVisibility(View.VISIBLE);
+					holder.textViewCompleted.setVisibility(View.GONE);
+					holder.imageViewCompleted.setVisibility(View.GONE);
+				}
+				double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
+				log("Progress Value: "+ progressValue);
+				holder.transferProgressBar.setProgress((int)progressValue);
+
 			}
-			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
-			log("Progress Value: "+ progressValue);
-			holder.transferProgressBar.setProgress((int)progressValue);
-
+			else{
+				log("Holder is NULL: "+position);
+				notifyItemChanged(position);
+			}
 		}
-		else{
-			log("Holder is NULL: "+position);
-			notifyItemChanged(position);
+		catch(IndexOutOfBoundsException e){
+			log("EXCEPTION:updateProgress: "+e.getMessage());
 		}
 	}
 	

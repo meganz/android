@@ -198,22 +198,26 @@ public class TransfersFragmentLollipop extends Fragment {
 
 	public void transferUpdate(MegaTransfer transfer){
         log("transferUpdate");
-
-		ListIterator li = tL.listIterator();
-		int index = 0;
-		while(li.hasNext()) {
-			MegaTransfer next = (MegaTransfer) li.next();
-			if(next!=null){
-				if(next.getTag() == transfer.getTag()){
-					index=li.previousIndex();
-					break;
+        try{
+			ListIterator li = tL.listIterator();
+			int index = 0;
+			while(li.hasNext()) {
+				MegaTransfer next = (MegaTransfer) li.next();
+				if(next!=null){
+					if(next.getTag() == transfer.getTag()){
+						index=li.previousIndex();
+						break;
+					}
 				}
 			}
-		}
-		tL.set(index, transfer);
-		log("Update the transfer with index : "+index +", left: "+tL.size());
+			tL.set(index, transfer);
+			log("Update the transfer with index : "+index +", left: "+tL.size());
 
-		adapter.updateProgress(index, transfer);
+			adapter.updateProgress(index, transfer);
+		}
+        catch(IndexOutOfBoundsException e){
+			log("EXCEPTION:transferUpdate: "+e.getMessage());
+		}
     }
 
 	public void changeStatusButton(int tag){
