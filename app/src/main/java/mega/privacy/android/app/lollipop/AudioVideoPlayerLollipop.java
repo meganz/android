@@ -1050,23 +1050,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     onTracksChange = true;
+                    updateContainers();
                 }
 
                 @Override
                 public void onLoadingChanged(boolean isLoading) {
                     log("onLoadingChanged");
 
-                    if (video) {
-                        audioContainer.setVisibility(View.GONE);
-                        if (isAbHide){
-                            containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
-                                @Override
-                                public void run() {
-                                    simpleExoPlayerView.hideController();
-                                }
-                            }).start();
-                        }
-                    }
+                    updateContainers();
                 }
 
                 @Override
@@ -1101,25 +1092,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         else {
                             progressBar.setVisibility(View.GONE);
                         }
-                        if (isVideo) {
-                            if ((isMP4 && video) || !isMP4) {
-                                audioContainer.setVisibility(View.GONE);
-                                if (isAbHide){
-                                    containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            simpleExoPlayerView.hideController();
-                                        }
-                                    }).start();
-                                }
-                            }
-                            else {
-                                audioContainer.setVisibility(View.VISIBLE);
-                            }
-                        }
-                        else {
-                            audioContainer.setVisibility(View.VISIBLE);
-                        }
+                        updateContainers();
                     }
                 }
 
@@ -1205,6 +1178,28 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 })
                 .show();
         numErrors = 0;
+    }
+
+    void updateContainers() {
+        if (isVideo) {
+            if ((isMP4 && video) || !isMP4) {
+                audioContainer.setVisibility(View.GONE);
+                if (isAbHide){
+                    containerControls.animate().translationY(400).setDuration(0).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            simpleExoPlayerView.hideController();
+                        }
+                    }).start();
+                }
+            }
+            else {
+                audioContainer.setVisibility(View.VISIBLE);
+            }
+        }
+        else {
+            audioContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     public void updateCurrentImage(){
@@ -2980,17 +2975,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onVideoEnabled(DecoderCounters counters) {
         log("onVideoEnabled");
         video = true;
+        updateContainers();
     }
 
     @Override
     public void onVideoDecoderInitialized(String decoderName, long initializedTimestampMs, long initializationDurationMs) {
         log("onVideoDecoderInitialized");
         video = true;
+        updateContainers();
     }
 
     @Override
     public void onVideoInputFormatChanged(Format format) {
         log("onVideoInputFormatChanged");
+        video = true;
+        updateContainers();
     }
 
     @Override
@@ -3001,17 +3000,22 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
         log("onVideoSizeChanged");
+        video = true;
+        updateContainers();
     }
 
     @Override
     public void onRenderedFirstFrame(Surface surface) {
         log("onRenderedFirstFrame");
+        video = true;
+        updateContainers();
     }
 
     @Override
     public void onVideoDisabled(DecoderCounters counters) {
         log("onVideoDisabled");
         video = false;
+        updateContainers();
     }
 
     @Override
