@@ -62,6 +62,7 @@ public class Constants {
 
 	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
 	final public static int MULTIPLE_CHAT_IMPORT = MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER+1;
+	final public static int MULTIPLE_FORWARD_MESSAGES = MULTIPLE_CHAT_IMPORT+1;
 
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -87,6 +88,9 @@ public class Constants {
 	final public static int BONUSES_FRAGMENT = 8001;
 	final public static int INVITE_FRIENDS_FRAGMENT = 8002;
 	final public static int INFO_ACHIEVEMENTS_FRAGMENT = 8003;
+
+	final public static int SCROLL_TO_POSITION = 9000;
+	final public static int UPDATE_IMAGE_DRAG = 9001;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
@@ -157,6 +161,9 @@ public class Constants {
 	public static String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
 	public static String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
 
+	public static String ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
+	public static String ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
+
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
@@ -176,8 +183,10 @@ public class Constants {
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
+
 	final public static int FILE_LINK_ADAPTER = 2019;
 
+	final public static int FROM_CHAT = 2019;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -213,6 +222,10 @@ public class Constants {
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
 	public static String CHAT_FOLDER = "My chat files";
+
+	public static int RICH_WARNING_TRUE = 1;
+	public static int RICH_WARNING_FALSE= 0;
+	public static int RICH_WARNING_CONFIRMATION = 2;
 
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;

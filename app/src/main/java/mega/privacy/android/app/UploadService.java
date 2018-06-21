@@ -19,6 +19,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 
@@ -381,7 +382,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
 
 			mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify_upload)
+					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 					.setAutoCancel(true).setTicker(notificationTitle)
 					.setContentTitle(notificationTitle).setContentText(size)
@@ -429,10 +430,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
 			Notification notification = null;
-			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this, R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -440,29 +442,33 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						.setOnlyAlertOnce(true);
 				notification = mBuilder.build();
 			}
-			else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
+			else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
 
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
+						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(getString(R.string.download_touch_to_show))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 			}
 			else
 			{
-				notification = new Notification(R.drawable.ic_stat_notify_upload, null, 1);
+				notification = new Notification(R.drawable.ic_stat_notify, null, 1);
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
 				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_upload);
+				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 				notification.contentView.setTextViewText(R.id.status_text, message);
 				notification.contentView.setTextViewText(R.id.progress_text, info);
 				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
 			}
-
 
 			if (!isForeground) {
 				log("starting foreground");
@@ -772,7 +778,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 
 		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify_upload)
+				.setSmallIcon(R.drawable.ic_stat_notify)
 				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 				.setAutoCancel(true).setTicker(contentText)
 				.setContentTitle(message).setContentText(contentText)

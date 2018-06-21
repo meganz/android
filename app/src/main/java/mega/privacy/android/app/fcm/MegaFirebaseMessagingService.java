@@ -522,15 +522,18 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(getString(R.string.title_incoming_folder_notification))
                     .setContentText(notificationContent)
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(notificationContent))
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
                     .setContentIntent(pendingIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                notificationBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            }
 
             Drawable d;
 

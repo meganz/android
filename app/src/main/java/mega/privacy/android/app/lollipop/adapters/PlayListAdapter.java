@@ -89,7 +89,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         this.adapterType = adapterType;
 
         if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            if (((AudioVideoPlayerLollipop) context).isFolderLink()){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+            }
+            else {
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
         }
 
         nodes = new ArrayList<>();

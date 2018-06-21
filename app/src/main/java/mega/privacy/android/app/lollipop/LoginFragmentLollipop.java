@@ -1736,7 +1736,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
 
-                log("Logged in: " + gSession);
+                log("Logged in with session");
 
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
@@ -1930,6 +1930,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     try {
                         serversBusyText.setVisibility(View.VISIBLE);
                         if(error.getErrorCode()==MegaError.API_EAGAIN){
+                            log("onRequestTemporaryError:onFinish:API_EAGAIN: :value: "+error.getValue());
                             if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
                                 serversBusyText.setText(getString(R.string.login_connectivity_issues));
                             }
