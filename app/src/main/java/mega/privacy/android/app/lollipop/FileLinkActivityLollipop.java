@@ -252,7 +252,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
 		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
 		importButton.setOnClickListener(this);
-		importButton.setVisibility(View.INVISIBLE);
+		importButton.setVisibility(View.GONE);
 
 		try{
 			statusDialog.dismiss();
@@ -498,7 +498,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				downloadButton.setVisibility(View.VISIBLE);
 
 				if(dbH.getCredentials() == null){
-					importButton.setVisibility(View.INVISIBLE);
+					importButton.setVisibility(View.GONE);
 				}
 				else{
 					importButton.setVisibility(View.VISIBLE);
