@@ -218,6 +218,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     float scaleH, scaleW;
     float density;
+    int screenDensity;
     DisplayMetrics outMetrics;
     Display display;
 
@@ -7075,6 +7076,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public int getGroupPermission(){
         int permission = chatRoom.getOwnPrivilege();
         return permission;
+    }
+
+    public int getDeviceDensity(){
+        String deviceDensity = "";
+        int screen = 0;
+        switch (getResources().getDisplayMetrics().densityDpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                deviceDensity =  0.75 + " ldpi";
+                screen = 1;
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                deviceDensity =  1.0 + " mdpi";
+                screen = 1;
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                deviceDensity =  1.5 + " hdpi";
+                screen = 1;
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                deviceDensity =  2.0 + " xhdpi";
+                screen = 0;
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                deviceDensity =  3.0 + " xxhdpi";
+                screen = 0;
+                break;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                deviceDensity =  4.0 + " xxxhdpi";
+                screen = 0;
+                break;
+            default:
+                deviceDensity = "Not found";
+                screen = 0;
+        }
+        return screen;
     }
 
 }
