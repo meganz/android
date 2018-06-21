@@ -250,7 +250,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		downloadButton.setVisibility(View.INVISIBLE);
 
 		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
+		importButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
 
@@ -482,8 +482,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				
 				if (document == null){
 					log("documment==null --> Intent to ManagerActivityLollipop");
-					Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
-	    			startActivity(backIntent);
+					boolean closedChat = MegaApplication.isClosedChat();
+					if(closedChat){
+						Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
+						startActivity(backIntent);
+					}
+
 	    			finish();
 					return;
 				}
@@ -590,8 +594,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
-									Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-									startActivity(backIntent);
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+										startActivity(backIntent);
+									}
+
 									finish();
 								}
 							});
@@ -741,8 +749,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-			    			startActivity(backIntent);
+							boolean closedChat = MegaApplication.isClosedChat();
+							if(closedChat){
+								Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+								startActivity(backIntent);
+							}
+
 			    			finish();
 						}
 					});

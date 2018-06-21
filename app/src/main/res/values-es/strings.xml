@@ -827,8 +827,8 @@
     <string name="six_pin_lock" context="PIN with 6 digits">Código de 6 dígitos</string>
     <string name="AN_pin_lock" context="PIN alphanumeric">Código alfanumérico</string>
 
-    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs desactivados</string>
-    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs activados</string>
+    <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs activados</string>
+    <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs desactivados</string>
 
     <string name="search_open_location" context="Option in the sliding panel to open the folder which contains the file selected after performing a search">Abrir ubicación</string>
     <string name="servers_busy" context="message when a request cannot be performed because the servers are busy">This process is taking longer than expected. Please wait.</string>
@@ -1271,7 +1271,7 @@
 
     <string name="no_bylling_cycle" context="Label in section the storage tab when the account is Free">Sin ciclo de facturación</string>
 
-    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of%2$s[/A]</string>
+    <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
 
     <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">¿Eliminar desde Sin conexión?</string>
 
@@ -1691,7 +1691,7 @@
     <string name="recent_chat_empty_enable_chat" context="Message shown when the user has no recent chats">[C]Activa [/C][B]el Chat[/B][A][C] y disfruta de nuestra plataforma cifrada de manera privada y segura.[/C]</string>
 
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No hay elementos [/B][A] en Camera Uploads[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Papelera[/A][B]vacía[/B][B].[/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Papelera [/A][B]vacía[/B][B].[/B]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in Cloud Drive or Inbox">[B]No hay elementos en tu [/B][A]%1$s[/A][B].[/B]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No hay elementos [/B][A]%1$s[/A][B].[/B]</string>

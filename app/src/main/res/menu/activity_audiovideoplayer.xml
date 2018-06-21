@@ -100,5 +100,27 @@
         android:title="@string/context_remove"
         MEGA:showAsAction="never"
         android:visible="false"/>
+    
+    <item
+        android:id="@+id/chat_full_video_viewer_import"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_import_to_cloud_white"
+        android:title="@string/add_to_cloud"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/chat_full_video_viewer_save_for_offline"
+        android:orderInCategory="110"
+        android:title="@string/save_for_offline"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/chat_full_video_viewer_remove"
+        android:orderInCategory="115"
+        android:title="@string/context_remove"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
 
 </menu>

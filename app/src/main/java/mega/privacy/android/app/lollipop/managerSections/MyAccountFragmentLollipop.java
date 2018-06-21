@@ -273,6 +273,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public void setMkButtonText(){
+		log("setMkButtonText");
 		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
 		log("Exists MK in: "+path);
 		File file= new File(path);

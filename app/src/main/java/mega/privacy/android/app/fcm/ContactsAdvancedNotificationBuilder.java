@@ -186,14 +186,17 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
-        notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
-                .setShowWhen(true);
+        notificationBuilder.setShowWhen(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationBuilder.setSound(defaultSoundUri);
@@ -277,14 +280,17 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)crToShow.getHandle() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         Notification.Builder notificationBuilder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentTitle(context.getString(R.string.title_contact_request_notification))
                 .setContentText(notificationContent)
                 .setStyle(new Notification.BigTextStyle().bigText(notificationContent))
                 .setAutoCancel(true)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentIntent(pendingIntent)
                 .setGroup(GROUP_KEY_IPC);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         if(beep){
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -331,14 +337,16 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         Notification.Builder notificationBuilder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentTitle(title)
                 .setContentText(email)
                 .setAutoCancel(true)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentIntent(pendingIntent)
                 .setGroup(GROUP_KEY_APC);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notificationBuilder.setSound(defaultSoundUri);
@@ -462,15 +470,23 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_IPC);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            builder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+        builder.setSmallIcon(R.drawable.ic_stat_notify)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build();
+                .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            builder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+
+        return builder.build();
     }
 
     public Notification buildSummaryAPC(String groupKey) {
@@ -479,15 +495,20 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 2 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+        builder.setSmallIcon(R.drawable.ic_stat_notify)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build();
+                .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            builder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+
+        return builder.build();
     }
 
     public void removeAllIncomingContactNotifications(){
@@ -514,12 +535,15 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true).setTicker("Chat activity")
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            mBuilderCompat.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
@@ -553,12 +577,15 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true).setTicker(title)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentTitle(title).setContentText(email)
                 .setOngoing(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            mBuilderCompat.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mBuilderCompat.setSound(defaultSoundUri);
