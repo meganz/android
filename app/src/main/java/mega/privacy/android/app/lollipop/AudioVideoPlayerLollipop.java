@@ -1654,6 +1654,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
 
+    public void showToolbar() {
+        if (aB != null && !aB.isShowing()) {
+            aB.show();
+            if(tB != null) {
+                tB.animate().translationY(0).setDuration(0).start();
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         log("onCreateOptionsMenu");

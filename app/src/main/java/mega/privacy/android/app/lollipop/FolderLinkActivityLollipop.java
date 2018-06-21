@@ -1751,7 +1751,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
