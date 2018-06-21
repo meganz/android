@@ -106,6 +106,7 @@
             android:layout_below="@id/separator_3"
             android:gravity="right"
             android:background="@color/camera_uploads_list_view">
+
             <TextView
                 android:id="@+id/file_link_button_download"
                 android:layout_width="wrap_content"
@@ -114,6 +115,7 @@
                 android:textColor="@color/accentColor"
                 android:textSize="14sp"
                 android:background="@null"
+                android:layout_marginRight="16dp"
                 android:gravity="center_vertical"
                 android:visibility="visible"
                 android:text="DOWNLOAD"/>
@@ -127,7 +129,6 @@
                 android:background="@null"
                 android:gravity="center_vertical"
                 android:layout_marginRight="16dp"
-                android:layout_marginLeft="24dp"
                 android:visibility="visible"
                 android:text="IMPORT"/>
         </LinearLayout>
