@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
@@ -747,7 +746,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						}
 					}
 					downloadNode();
-						break;
+					break;
 				}else{
 					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2516,16 +2515,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			log("URL: " + url + "___SIZE: " + size);
-
-			if(nC==null){
-				nC = new NodeController(this);
+			if(adapterType == Constants.FILE_LINK_ADAPTER){
+				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+				downloadTo(parentPath, url, currentDocument.getSize(), currentDocument.getHandle());
 			}
-			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+			else{
+				String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+				String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+				long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+				long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+				log("URL: " + url + "___SIZE: " + size);
+
+				if(nC==null){
+					nC = new NodeController(this);
+				}
+				nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+			}
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
