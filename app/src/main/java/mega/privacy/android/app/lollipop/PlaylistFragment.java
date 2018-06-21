@@ -224,6 +224,7 @@ public class PlaylistFragment extends Fragment{
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
+        ((AudioVideoPlayerLollipop) context).showToolbar();
         if (player != null) {
             player.setPlayWhenReady(((AudioVideoPlayerLollipop) context).playWhenReady);
         }
