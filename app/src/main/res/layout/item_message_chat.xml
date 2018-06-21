@@ -173,14 +173,14 @@
                         android:layout_below="@id/url_own_message_text_rl"
                         android:background="@android:color/transparent">
 
-                        <ImageView
+                        <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/url_own_message_image"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:scaleType="fitXY"
                             android:src="@drawable/ic_rich_link"
                             android:background="@android:color/transparent"
-                            android:layout_gravity="bottom"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginLeft="12dp" />
@@ -194,6 +194,7 @@
                             android:layout_marginRight="12dp"
                             android:layout_marginLeft="12dp"
                             android:layout_marginStart="12dp"
+                            android:layout_gravity="center_vertical"
                             android:orientation="vertical"
                             android:background="@android:color/transparent">
 
@@ -1045,15 +1046,15 @@
                         android:layout_below="@id/url_contact_message_text_rl"
                         android:background="@android:color/transparent">
 
-                        <ImageView
+                        <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/url_contact_message_image"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:scaleType="fitXY"
                             android:src="@drawable/ic_install_mega"
                             android:background="@android:color/transparent"
-                            android:layout_gravity="bottom"
                             android:layout_marginBottom="12dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginTop="12dp"
                             android:layout_marginLeft="12dp" />
 
@@ -1067,6 +1068,7 @@
                             android:layout_marginLeft="12dp"
                             android:layout_marginStart="12dp"
                             android:orientation="vertical"
+                            android:layout_gravity="center_vertical"
                             android:background="@android:color/transparent">
 
                             <TextView
