@@ -487,7 +487,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             megaApi.addGlobalListener(this);
 
             if (mega.privacy.android.app.utils.Util.isOnline(this)){
-                if(megaApi==null||megaApi.getRootNode()==null){
+                if(megaApi==null){
                     log("Refresh session - sdk");
                     Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
                     intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -495,6 +495,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     startActivity(intentLogin);
                     finish();
                     return;
+                }
+                else{
+                    if(megaApi.isLoggedIn()>0){
+                        if(megaApi.getRootNode()==null){
+                            log("Refresh session logged in but no fetch - sdk");
+                            Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
+                            intentLogin.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                            intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intentLogin);
+                            finish();
+                            return;
+                        }
+                    }
                 }
 
                 if(mega.privacy.android.app.utils.Util.isChatEnabled()){
@@ -732,6 +745,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
 
                 size = mediaHandles.size();
+            }
+            else if(adapterType == Constants.FILE_LINK_ADAPTER){
+                log("onCreate:FILE_LINK_ADAPTER");
             }
             else{
                 isOffLine = false;

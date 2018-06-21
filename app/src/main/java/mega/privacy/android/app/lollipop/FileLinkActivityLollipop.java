@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -11,14 +12,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -29,26 +25,21 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -57,7 +48,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -67,11 +57,8 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.PreviewCache;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
@@ -535,11 +522,20 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
 							buttonPreviewContent.setVisibility(View.VISIBLE);
 						}else{
-							buttonPreviewContent.setEnabled(false);
-							buttonPreviewContent.setVisibility(View.GONE);
+							if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() || MimeTypeList.typeForName(document.getName()).isPdf()){
+								imageViewLayout.setVisibility(View.GONE);
+								iconViewLayout.setVisibility(View.VISIBLE);
 
-							imageViewLayout.setVisibility(View.GONE);
-							iconViewLayout.setVisibility(View.VISIBLE);
+								buttonPreviewContent.setVisibility(View.VISIBLE);
+								buttonPreviewContent.setEnabled(true);
+							}
+							else{
+								buttonPreviewContent.setEnabled(false);
+								buttonPreviewContent.setVisibility(View.GONE);
+
+								imageViewLayout.setVisibility(View.GONE);
+								iconViewLayout.setVisibility(View.VISIBLE);
+							}
 						}
 					}
 				}
@@ -705,9 +701,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	public void showFile(){
-		log("showFile() ");
+		log("showFile");
 		if(MimeTypeList.typeForName(document.getName()).isImage()){
-			log("image");
+			log("showFile:image");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 			String serializeString = document.serialize();
 			intent.putExtra(FullScreenImageViewerLollipop.EXTRA_SERIALIZE_STRING, serializeString);
@@ -719,12 +715,129 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			intent.putExtra("isFileLink", true);
 			startActivity(intent);
 
-		}else if(MimeTypeList.typeForName(document.getName()).isVideo()){
-			log("video");
+		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){
+			log("showFile:video");
+
+			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
+			log("showFile:FILENAME: " + document.getName() + " TYPE: " + mimeType);
+
+			Intent mediaIntent;
+			boolean internalIntent;
+			if (MimeTypeList.typeForName(document.getName()).isVideoNotSupported()) {
+				mediaIntent = new Intent(Intent.ACTION_VIEW);
+				internalIntent = false;
+			} else {
+				log("showFile:setIntentToAudioVideoPlayer");
+				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				mediaIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+				internalIntent = true;
+			}
+
+			mediaIntent.putExtra("FILENAME", document.getName());
+
+			if (megaApi.httpServerIsRunning() == 0) {
+				megaApi.httpServerStart();
+			} else {
+				log("showFile:ERROR:httpServerAlreadyRunning");
+			}
+
+			ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+			ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+			activityManager.getMemoryInfo(mi);
+
+			if (mi.totalMem > Constants.BUFFER_COMP) {
+				log("showFile:total mem: " + mi.totalMem + " allocate 32 MB");
+				megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+			} else {
+				log("showFile:total mem: " + mi.totalMem + " allocate 16 MB");
+				megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+			}
+
+			String url = megaApi.httpServerGetLocalLink(document);
+			if (url != null) {
+				Uri parsedUri = Uri.parse(url);
+				if (parsedUri != null) {
+					mediaIntent.setDataAndType(parsedUri, mimeType);
+				} else {
+					log("showFile:ERROR:httpServerGetLocalLink");
+					showSnackbar(getString(R.string.email_verification_text_error));
+				}
+			} else {
+				log("showFile:ERROR:httpServerGetLocalLink");
+				showSnackbar(getString(R.string.email_verification_text_error));
+			}
+
+			mediaIntent.putExtra("HANDLE", document.getHandle());
+
+			if (internalIntent) {
+				startActivity(mediaIntent);
+			} else {
+				log("showFile:externalIntent");
+				if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+					startActivity(mediaIntent);
+				} else {
+					log("showFile:noAvailableIntent");
+					showSnackbar("NoApp available");
+				}
+			}
 
 		}else if(MimeTypeList.typeForName(document.getName()).isPdf()){
-			log("pdf");
+			log("showFile:pdf");
 
+			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
+			log("showFile:FILENAME: " + document.getName() + " TYPE: "+mimeType);
+			Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
+			pdfIntent.putExtra("inside", false);
+			pdfIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+
+			pdfIntent.putExtra("FILENAME", document.getName());
+
+			if (Util.isOnline(this)){
+				if (megaApi.httpServerIsRunning() == 0) {
+					megaApi.httpServerStart();
+				}
+				else{
+					log("showFile:ERROR:httpServerAlreadyRunning");
+				}
+				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+				ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+				activityManager.getMemoryInfo(mi);
+				if(mi.totalMem>Constants.BUFFER_COMP){
+					log("showFile:total mem: "+mi.totalMem+" allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+				}
+				else{
+					log("showFile:total mem: "+mi.totalMem+" allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+				}
+				String url = megaApi.httpServerGetLocalLink(document);
+				if(url!=null){
+					Uri parsedUri = Uri.parse(url);
+					if(parsedUri!=null){
+						pdfIntent.setDataAndType(parsedUri, mimeType);
+					}
+					else{
+						log("showFile:ERROR:httpServerGetLocalLink");
+						showSnackbar(getString(R.string.email_verification_text_error));
+					}
+				}
+				else{
+					log("showFile:ERROR:httpServerGetLocalLink");
+					showSnackbar(getString(R.string.email_verification_text_error));
+				}
+			}
+			else {
+				showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
+			}
+
+			pdfIntent.putExtra("HANDLE", document.getHandle());
+
+			if (MegaApiUtils.isIntentAvailable(this, pdfIntent)){
+				startActivity(pdfIntent);
+			}
+			else{
+				log("showFile:noAvailableIntent");
+			}
 		}else{
 			log("none");
 		}
