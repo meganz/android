@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
+import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -1124,6 +1125,81 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		}else{
 			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
 		}
+	}
+
+	public boolean isCameraUploads(MegaNode n){
+		log("isCameraUploads()");
+		String cameraSyncHandle = null;
+
+		//Check if the item is the Camera Uploads folder
+		if(dbH.getPreferences()!=null){
+			prefs = dbH.getPreferences();
+			if(prefs.getCamSyncHandle()!=null){
+				cameraSyncHandle = prefs.getCamSyncHandle();
+			}else{
+				cameraSyncHandle = null;
+			}
+		}else{
+			prefs=null;
+		}
+
+		if(cameraSyncHandle!=null){
+			if(!(cameraSyncHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+					return true;
+				}
+
+			}else{
+				if(n.getName().equals("Camera Uploads")){
+					if (prefs != null){
+						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					}
+					dbH.setCamSyncHandle(n.getHandle());
+					log("FOUND Camera Uploads!!----> "+n.getHandle());
+					return true;
+				}
+			}
+
+		}else{
+			if(n.getName().equals("Camera Uploads")){
+				if (prefs != null){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				}
+				dbH.setCamSyncHandle(n.getHandle());
+				log("FOUND Camera Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+
+		//Check if the item is the Media Uploads folder
+		String secondaryMediaHandle = null;
+
+		if(prefs!=null){
+			if(prefs.getMegaHandleSecondaryFolder()!=null){
+				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
+			}else{
+				secondaryMediaHandle = null;
+			}
+		}
+
+		if(secondaryMediaHandle!=null){
+			if(!(secondaryMediaHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+					log("Click on Media Uploads");
+					return true;
+				}
+			}
+		}else{
+			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+				if (prefs != null){
+					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				}
+				dbH.setSecondaryFolderHandle(n.getHandle());
+				log("FOUND Media Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
