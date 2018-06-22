@@ -938,6 +938,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				int lastFirstVisiblePosition = 0;
 				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+					log("lastFirstVisiblePosition: "+lastFirstVisiblePosition);
+
 				}
 				else{
 					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
@@ -1200,20 +1202,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				cameraSyncHandle = null;
 			}
-		}
-		else{
+		}else{
 			prefs=null;
 		}
 
 		if(cameraSyncHandle!=null){
-			if(!(cameraSyncHandle.equals("")))
-			{
+			if(!(cameraSyncHandle.equals(""))){
 				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
 					((ManagerActivityLollipop)context).cameraUploadsClicked();
 					return;
 				}
-			}
-			else{
+			}else{
 				if(n.getName().equals("Camera Uploads")){
 					if (prefs != null){
 						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
@@ -1224,9 +1223,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					return;
 				}
 			}
-		}
-		else{
+
+		}else{
 			if(n.getName().equals("Camera Uploads")){
+
 				if (prefs != null){
 					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
 				}
@@ -1244,23 +1244,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if(prefs!=null){
 			if(prefs.getMegaHandleSecondaryFolder()!=null){
 				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
-			}
-			else{
+			}else{
 				secondaryMediaHandle = null;
 			}
 		}
 
 		if(secondaryMediaHandle!=null){
-			if(!(secondaryMediaHandle.equals("")))
-			{
+			if(!(secondaryMediaHandle.equals(""))){
 				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
 					log("Click on Media Uploads");
 					((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
 					return;
 				}
 			}
-		}
-		else{
+		}else{
 			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
@@ -1703,6 +1700,5 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-
 	}
 }
