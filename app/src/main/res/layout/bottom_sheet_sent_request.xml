@@ -81,66 +81,82 @@
         android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
 
-    <LinearLayout
-        android:id="@+id/contact_list_option_reinvite_layout"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:scrollbars="vertical">
 
-        <ImageView
-            android:id="@+id/contact_list_option_reinvite"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:paddingBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_reinvite"
-            android:visibility="visible" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/contact_list_option_reinvite_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:text="@string/contact_reinvite"
-            android:layout_marginLeft="18dp"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/contact_list_option_reinvite_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/contact_list_option_delete_request_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/contact_list_option_reinvite"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_reinvite"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/contact_list_option_delete_request"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_remove"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/contact_list_option_reinvite_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/contact_reinvite"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/contact_list_option_delete_request_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/context_remove"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/contact_list_option_delete_request_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/contact_list_option_delete_request"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_remove"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/contact_list_option_delete_request_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/context_remove"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>

@@ -94,7 +94,8 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,7 +104,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_info_contact_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -134,7 +135,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_start_conversation_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -165,7 +166,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_send_file_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -196,7 +197,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_share_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -227,7 +228,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_remove_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
