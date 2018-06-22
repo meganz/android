@@ -3,7 +3,6 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -34,6 +33,7 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
     MegaNode node = null;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     LinearLayout mainLinearLayout;
     ImageView nodeThumb;
@@ -88,6 +88,7 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_folder_link, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.folder_link_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         nodeThumb = (ImageView) contentView.findViewById(R.id.folder_link_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.folder_link_name_text);
@@ -150,14 +151,16 @@ public class FolderLinkBottomSheetDialogFragment extends BottomSheetDialogFragme
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//        }
+//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//        }
+        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-        }
-        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-        }
     }
 
 

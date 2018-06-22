@@ -26,68 +26,82 @@
             android:textSize="16sp"/>
     </LinearLayout>
 
-    <!-- Options -->
-
-    <LinearLayout
-        android:id="@+id/qr_code_saveTo_cloud_layout"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:scrollbars="vertical">
 
-        <ImageView
-            android:id="@+id/qr_code_saveTo_cloud_photo"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_b_pick_cloud_drive"
-            android:visibility="visible" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/qr_code_saveTo_cloud_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/save_cloud_drive"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <!-- Options -->
+            <LinearLayout
+                android:id="@+id/qr_code_saveTo_cloud_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/qr_code_saveTo_fileSystem_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/qr_code_saveTo_cloud_photo"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_b_pick_cloud_drive"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/qr_code_saveTo_fileSystem_photo"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_pick_file_system"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/qr_code_saveTo_cloud_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/save_cloud_drive"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/qr_code_saveTo_fileSystem_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/save_file_system"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/qr_code_saveTo_fileSystem_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/qr_code_saveTo_fileSystem_photo"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_pick_file_system"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/qr_code_saveTo_fileSystem_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/save_file_system"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>

@@ -38,67 +38,82 @@
                 android:textSize="16sp"/>
         </LinearLayout>
 
-        <!--Retry-->
-        <LinearLayout
-            android:id="@+id/msg_not_sent_retry_layout"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical">
 
-            <ImageView
-                android:id="@+id/msg_not_sent_retry_image"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/items_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:paddingBottom="2dp"
-                android:layout_marginLeft="16dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_replay_black_24dp"
-                android:visibility="visible" />
+                android:orientation="vertical">
+                <!--Retry-->
+                <LinearLayout
+                    android:id="@+id/msg_not_sent_retry_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/msg_not_sent_retry_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="32dp"
-                android:text="@string/message_option_retry"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                    <ImageView
+                        android:id="@+id/msg_not_sent_retry_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:paddingBottom="2dp"
+                        android:layout_marginLeft="16dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_replay_black_24dp"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/msg_not_sent_retry_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="32dp"
+                        android:text="@string/message_option_retry"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
 
-        <!--Delete-->
-        <LinearLayout
-            android:id="@+id/msg_not_sent_delete_layout"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                <!--Delete-->
+                <LinearLayout
+                    android:id="@+id/msg_not_sent_delete_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-            <ImageView
-                android:id="@+id/msg_not_sent_delete_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:layout_marginLeft="16dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_remove"
-                android:visibility="visible" />
+                    <ImageView
+                        android:id="@+id/msg_not_sent_delete_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginLeft="16dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_remove"
+                        android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/msg_not_sent_delete_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="32dp"
-                android:text="@string/context_delete"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/msg_not_sent_delete_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="32dp"
+                        android:text="@string/context_delete"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
+
     </LinearLayout>
 </LinearLayout>
