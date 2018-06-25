@@ -218,6 +218,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     float scaleH, scaleW;
     float density;
+    int screenDensity;
     DisplayMetrics outMetrics;
     Display display;
 
@@ -7077,9 +7078,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return permission;
     }
 
-    public void hideKeyboard(){
-        if(fileStorageLayout.isShown()){
-            if(fileStorageF != null){
+
+    public void hideKeyboard() {
+        if (fileStorageLayout.isShown()) {
+            if (fileStorageF != null) {
                 fileStorageF.clearSelections();
                 fileStorageF.hideMultipleSelect();
             }
@@ -7088,14 +7090,42 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (emojiKeyboardShown) {
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
-        }else if(softKeyboardShown){
+        } else if (softKeyboardShown) {
             InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-            }else{
+            } else {
                 imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
             }
         }
+    }
+
+    public int getDeviceDensity(){
+
+        int screen = 0;
+        switch (getResources().getDisplayMetrics().densityDpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                screen = 1;
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                screen = 1;
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                screen = 1;
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                screen = 0;
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                screen = 0;
+                break;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                screen = 0;
+                break;
+            default:
+                screen = 0;
+        }
+        return screen;
     }
 
 }

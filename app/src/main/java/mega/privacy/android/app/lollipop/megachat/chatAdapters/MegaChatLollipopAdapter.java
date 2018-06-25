@@ -708,6 +708,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
             holder.urlOwnMessageLayout.setVisibility(View.GONE);
+
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                ViewGroup.LayoutParams params=holder.urlOwnMessageLayout.getLayoutParams();
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    params.width=450;
+                }else{
+                    params.width=330;
+                }
+                holder.urlOwnMessageLayout.setLayoutParams(params);
+            }
             holder.forwardOwnRichLinks = (RelativeLayout) v.findViewById(R.id.forward_own_rich_links);
             holder.forwardOwnRichLinks.setTag(holder);
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
@@ -733,6 +743,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             //Contact rich links message
             holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                ViewGroup.LayoutParams params=holder.urlContactMessageLayout.getLayoutParams();
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    params.width=450;
+                }else{
+                    params.width=330;
+                }
+                holder.urlContactMessageLayout.setLayoutParams(params);
+            }
             holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
             holder.forwardContactRichLinks.setTag(holder);
             holder.forwardContactRichLinks.setVisibility(View.GONE);
@@ -791,6 +810,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_own_message_contact_thumb);
             holder.contentOwnMessageContactName = (TextView) v.findViewById(R.id.content_own_message_contact_name);
             holder.contentOwnMessageContactEmail = (TextView) v.findViewById(R.id.content_own_message_contact_email);
+
             holder.contentOwnMessageContactInitialLetter = (TextView) v.findViewById(R.id.content_own_message_contact_initial_letter);
             holder.forwardOwnContact = (RelativeLayout) v.findViewById(R.id.forward_own_contact);
             holder.forwardOwnContact.setTag(holder);
@@ -926,15 +946,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_management_message_text);
             holder.contactManagementMessageIcon = (ImageView) v.findViewById(R.id.contact_management_message_icon);
 
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                MAX_WIDTH_FILENAME_LAND = 290;
+                MAX_WIDTH_FILENAME_PORT = 140;
+            }
+
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-                holder.contentContactMessageFileName.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-                holder.contentContactMessageFileSize.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
+
                 holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
             } else {
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-                holder.contentContactMessageFileName.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-                holder.contentContactMessageFileSize.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
+
                 holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
             }
 
