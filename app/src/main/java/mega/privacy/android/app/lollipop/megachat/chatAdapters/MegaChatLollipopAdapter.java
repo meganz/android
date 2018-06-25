@@ -3561,6 +3561,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.VISIBLE);
+                            ((ChatActivityLollipop) context).hideKeyboard();
                             ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
                             int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
@@ -3621,7 +3622,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if (message.isEdited()) {
-
                 log("MY Message is edited");
                 ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
@@ -3738,6 +3738,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 params.leftMargin = Util.scaleWidthPx(0, outMetrics);
                 ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
 
+                if (Util.isOnline(context)) {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
+                    }else{
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(true);
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).contentOwnMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
+                    }
+                }else{
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
+                }
+
                 if (!multipleSelect) {
                     if (positionClicked != -1) {
                         if (positionClicked == position) {
@@ -3759,7 +3771,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
 
-            } else if (message.isDeleted()) {
+            }else if (message.isDeleted()) {
                 log("Message is deleted");
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
                 holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -4081,6 +4093,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     CharSequence indexedText = TextUtils.concat(messageContent, edited);
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setText(indexedText);
+                }
+
+                if (Util.isOnline(context)) {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
+                    }else {
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
+                    }
+                } else {
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
                 }
 
                 if (!multipleSelect) {

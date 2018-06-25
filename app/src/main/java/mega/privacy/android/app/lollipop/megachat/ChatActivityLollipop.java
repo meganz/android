@@ -7077,4 +7077,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return permission;
     }
 
+    public void hideKeyboard(){
+        if(fileStorageLayout.isShown()){
+            if(fileStorageF != null){
+                fileStorageF.clearSelections();
+                fileStorageF.hideMultipleSelect();
+            }
+            fileStorageLayout.setVisibility(View.GONE);
+        }
+        if (emojiKeyboardShown) {
+            keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
+            removeEmojiconFragment();
+        }else if(softKeyboardShown){
+            InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            }else{
+                imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
+            }
+        }
+    }
+
 }
