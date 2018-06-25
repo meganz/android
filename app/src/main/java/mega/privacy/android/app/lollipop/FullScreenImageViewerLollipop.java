@@ -130,9 +130,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	private DisplayMetrics outMetrics;
 
-	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
-
-
 	private boolean aBshown = true;
 
 	ProgressDialog statusDialog;
@@ -1062,10 +1059,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView.setText(currentNode.getName());
 
 		}else if (adapterType == Constants.FILE_LINK_ADAPTER){
-			draggableView.setDraggable(false);
+//			draggableView.setDraggable(false);
 			isFileLink = intent.getBooleanExtra("isFileLink",false);
 			url = intent.getStringExtra("urlFileLink");
-			String serialize = intent.getStringExtra(EXTRA_SERIALIZE_STRING);
+			String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
 			if(serialize!=null){
 				currentDocument = MegaNode.unserialize(serialize);
 				if(currentDocument != null){
@@ -2559,6 +2556,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					tempDownDirectory.mkdirs();
 				}
 				service.putExtra(DownloadService.EXTRA_PATH, path);
+				service.putExtra("fromMV", true);
 				startService(service);
 			}
 		}
@@ -3264,36 +3262,37 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 				}catch(Exception e) {}
 
-				try {
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-					} else {
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-					}
-					viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-					if (MegaApiUtils.isIntentAvailable(this, viewIntent)){
-						startActivity(viewIntent);
-					}else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						} else {
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						}
-						intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						if (MegaApiUtils.isIntentAvailable(this, intentShare))
-							startActivity(intentShare);
-						String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-						Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
-					}
-				}catch (Exception e){
-					String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-					Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
-				}
-				log("Finish");
-				finish();
-				return;
+//				try {
+//					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+//					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//						viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+//					} else {
+//						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+//					}
+//					viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//					if (MegaApiUtils.isIntentAvailable(this, viewIntent)){
+//						startActivity(viewIntent);
+//					}else{
+//						Intent intentShare = new Intent(Intent.ACTION_SEND);
+//						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//							intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+//						} else {
+//							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+//						}
+//						intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//						if (MegaApiUtils.isIntentAvailable(this, intentShare))
+//							startActivity(intentShare);
+//						String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
+//						Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+//					}
+//				}catch (Exception e){
+//					String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
+//					Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+//				}
+//				log("Finish");
+//				finish();
+//				return;
+				showSnackbar(getString(R.string.general_already_downloaded));
 			}else{
 				log("LocalPath is NULL");
 			}
@@ -3314,9 +3313,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 						Intent service = new Intent(this, DownloadService.class);
 						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
+//						service.putExtra(DownloadService.EXTRA_URL, url);
+						service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
 						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
 						service.putExtra(DownloadService.EXTRA_PATH, path);
+						service.putExtra("fromMV", true);
 						log("intent to DownloadService");
 						startService(service);
 					}
@@ -3327,18 +3328,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 					Intent service = new Intent(this, DownloadService.class);
 					service.putExtra(DownloadService.EXTRA_HASH, hash);
-					service.putExtra(DownloadService.EXTRA_URL, url);
+//					service.putExtra(DownloadService.EXTRA_URL, url);
+					service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
 					service.putExtra(DownloadService.EXTRA_SIZE, size);
 					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+					service.putExtra("fromMV", true);
 					startService(service);
 				}else {
 					log("node not found. Let's try the document");
 				}
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
-			finish();
-		}
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+//			finish();
+//		}
 	}
 
 

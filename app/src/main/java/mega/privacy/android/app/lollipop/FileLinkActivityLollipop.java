@@ -702,11 +702,11 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	public void showFile(){
 		log("showFile");
+		String serializeString = document.serialize();
 		if(MimeTypeList.typeForName(document.getName()).isImage()){
 			log("showFile:image");
 			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-			String serializeString = document.serialize();
-			intent.putExtra(FullScreenImageViewerLollipop.EXTRA_SERIALIZE_STRING, serializeString);
+			intent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
 			intent.putExtra("position", 0);
 			intent.putExtra("urlFileLink",url);
 			intent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
@@ -723,16 +723,16 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 			Intent mediaIntent;
 			boolean internalIntent;
-			if (MimeTypeList.typeForName(document.getName()).isVideoNotSupported()) {
+			if (MimeTypeList.typeForName(document.getName()).isVideoNotSupported() || MimeTypeList.typeForName(document.getName()).isAudioNotSupported()) {
 				mediaIntent = new Intent(Intent.ACTION_VIEW);
 				internalIntent = false;
 			} else {
 				log("showFile:setIntentToAudioVideoPlayer");
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 				mediaIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+				mediaIntent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
 				internalIntent = true;
 			}
-
 			mediaIntent.putExtra("FILENAME", document.getName());
 
 			if (megaApi.httpServerIsRunning() == 0) {
@@ -787,9 +787,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
 			log("showFile:FILENAME: " + document.getName() + " TYPE: "+mimeType);
 			Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
-			pdfIntent.putExtra("inside", false);
 			pdfIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
-
+			pdfIntent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
+			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("FILENAME", document.getName());
 
 			if (Util.isOnline(this)){
@@ -1388,10 +1388,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 			}
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
-			finish();
-		}
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+//			finish();
+//		}
 	}
 
 	public void showSnackbar(String s){
