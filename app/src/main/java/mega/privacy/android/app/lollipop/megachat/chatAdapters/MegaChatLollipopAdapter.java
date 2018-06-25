@@ -48,6 +48,8 @@ import com.vdurmont.emoji.EmojiParser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -2425,7 +2427,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
             //            ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
 
-            String url = meta.getRichPreview().getUrl();
+            String urlString = meta.getRichPreview().getUrl();
+
+            try {
+                URL url = new URL(urlString);
+                urlString = url.getHost();
+
+            } catch (MalformedURLException e) {
+                log("EXCEPTION: "+e.getMessage());
+            }
 
             String title = meta.getRichPreview().getTitle();
             String text = meta.getRichPreview().getText();
@@ -2598,7 +2608,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setText(title);
                 ((ViewHolderMessageChat)holder).urlOwnMessageDescription.setText(description);
                 ((ViewHolderMessageChat)holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat)holder).urlOwnMessageLink.setText(url);
+                ((ViewHolderMessageChat)holder).urlOwnMessageLink.setText(urlString);
 
                 if (bitmapImage != null) {
                     ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageBitmap(bitmapImage);
@@ -2768,7 +2778,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).urlContactMessageTitle.setText(title);
                 ((ViewHolderMessageChat)holder).urlContactMessageDescription.setText(description);
                 ((ViewHolderMessageChat)holder).urlContactMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat)holder).urlContactMessageLink.setText(url);
+                ((ViewHolderMessageChat)holder).urlContactMessageLink.setText(urlString);
 
                 if (EmojiManager.isOnlyEmojis(text)) {
                     log("IS ONLY emoji!!!");
