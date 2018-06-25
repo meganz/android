@@ -365,8 +365,8 @@
                 <!--forward rich links-->
                 <RelativeLayout
                     android:id="@+id/forward_own_rich_links"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
@@ -376,6 +376,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
@@ -496,8 +497,8 @@
                     <!--forward icon with preview portrait-->
                     <RelativeLayout
                         android:id="@+id/forward_own_preview_portrait"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
                         android:layout_marginRight="8dp"
@@ -507,6 +508,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
+                            android:adjustViewBounds="true"
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
@@ -628,8 +630,8 @@
                     <!--forward icon with preview landscape-->
                     <RelativeLayout
                         android:id="@+id/forward_own_preview_landscape"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
                         android:layout_marginRight="8dp"
@@ -639,6 +641,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
+                            android:adjustViewBounds="true"
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
@@ -717,8 +720,8 @@
                 <!--forward file-->
                 <RelativeLayout
                     android:id="@+id/forward_own_file"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
@@ -728,6 +731,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
@@ -743,6 +747,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/dark_rounded_chat_own_message"
                     android:layout_marginRight="16dp"
+                    android:minHeight="56dp"
                     android:gravity="right"
                     android:layout_alignParentRight="true"
                     android:paddingRight="12dp"
@@ -755,7 +760,8 @@
                         android:layout_alignParentLeft="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginRight="12dp">
+                        android:layout_marginRight="12dp"
+                        android:layout_centerVertical="true">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_contact_thumb"
@@ -779,7 +785,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@+id/content_own_message_contact_layout_avatar"
-                        android:layout_centerVertical="true">
+                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true">
 
                         <TextView
                             android:id="@+id/content_own_message_contact_name"
@@ -832,8 +839,8 @@
                 <!--forward contact-->
                 <RelativeLayout
                     android:id="@+id/forward_own_contact"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
@@ -843,6 +850,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:layout_gravity="center"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
@@ -1137,8 +1145,8 @@
                 <!--forward rich links-->
                 <RelativeLayout
                     android:id="@+id/forward_contact_rich_links"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="8dp"
@@ -1147,6 +1155,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
+                        android:adjustViewBounds="true"
                         android:layout_gravity="center"
                         android:scaleType="fitXY"
                         android:background="@null"
@@ -1226,17 +1235,20 @@
                     <!--forward preview portrait-->
                     <RelativeLayout
                         android:id="@+id/forward_contact_preview_portrait"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="8dp"
                         android:layout_toRightOf="@+id/content_contact_message_portrait">
+                        <!--android:background="@drawable/forward_circle"-->
+
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
+                            android:adjustViewBounds="true"
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
@@ -1307,8 +1319,8 @@
                     <!--forward preview landscape-->
                     <RelativeLayout
                         android:id="@+id/forward_contact_preview_landscape"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="8dp"
@@ -1317,6 +1329,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
+                            android:adjustViewBounds="true"
                             android:layout_gravity="center"
                             android:scaleType="fitXY"
                             android:background="@null"
@@ -1383,8 +1396,8 @@
                     <!--forward file-->
                     <RelativeLayout
                         android:id="@+id/forward_contact_file"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="8dp"
@@ -1394,6 +1407,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
+                            android:adjustViewBounds="true"
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
@@ -1407,6 +1421,7 @@
                     android:id="@+id/content_contact_message_contact_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
                     android:layout_marginLeft="48dp"
                     android:gravity="left"
@@ -1421,7 +1436,8 @@
                         android:layout_alignParentLeft="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginRight="12dp">
+                        android:layout_marginRight="12dp"
+                        android:layout_centerVertical="true">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_contact_thumb"
@@ -1445,7 +1461,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@+id/content_contact_message_contact_layout_avatar"
-                        android:layout_centerVertical="true">
+                        android:layout_centerVertical="true"
+                        android:layout_centerInParent="true">
 
                         <TextView
                             android:id="@+id/content_contact_message_contact_name"
@@ -1477,8 +1494,8 @@
                 <!--forward contact-->
                 <RelativeLayout
                     android:id="@+id/forward_contact_contact"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="8dp"
@@ -1487,6 +1504,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
+                        android:adjustViewBounds="true"
                         android:layout_gravity="center"
                         android:scaleType="fitXY"
                         android:background="@null"
