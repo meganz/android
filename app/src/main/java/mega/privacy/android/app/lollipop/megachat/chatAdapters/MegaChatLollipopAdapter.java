@@ -508,7 +508,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView urlOwnMessageIcon;
         TextView urlOwnMessageLink;
 
-        ImageView urlOwnMessageImage;
+        RoundedImageView urlOwnMessageImage;
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
@@ -521,7 +521,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView urlContactMessageIcon;
         TextView urlContactMessageLink;
 
-        ImageView urlContactMessageImage;
+        RoundedImageView urlContactMessageImage;
 
         RoundedImageView contentOwnMessageThumbLand;
         RelativeLayout gradientOwnMessageThumbLand;
@@ -739,7 +739,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageIcon = (ImageView) v.findViewById(R.id.url_own_message_icon);
             holder.urlOwnMessageLink = (TextView) v.findViewById(R.id.url_own_message_link);
 
-            holder.urlOwnMessageImage = (ImageView) v.findViewById(R.id.url_own_message_image);
+            holder.urlOwnMessageImage = (RoundedImageView) v.findViewById(R.id.url_own_message_image);
+            int radiusImageRL = Util.scaleWidthPx(10, outMetrics);
+            holder.urlOwnMessageImage.setCornerRadius(radiusImageRL);
+            holder.urlOwnMessageImage.setBorderWidth(0);
+            holder.urlOwnMessageImage.setOval(false);
 
             //Contact rich links message
             holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
@@ -764,7 +768,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageIcon = (ImageView) v.findViewById(R.id.url_contact_message_icon);
             holder.urlContactMessageLink = (TextView) v.findViewById(R.id.url_contact_message_link);
 
-            holder.urlContactMessageImage = (ImageView) v.findViewById(R.id.url_contact_message_image);
+            holder.urlContactMessageImage = (RoundedImageView) v.findViewById(R.id.url_contact_message_image);
+            holder.urlContactMessageImage.setCornerRadius(radiusImageRL);
+            holder.urlContactMessageImage.setBorderWidth(0);
+            holder.urlContactMessageImage.setOval(false);
 
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             int radius = Util.scaleWidthPx(15, outMetrics);
