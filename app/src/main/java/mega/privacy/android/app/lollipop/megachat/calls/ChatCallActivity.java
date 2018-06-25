@@ -952,6 +952,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaChatApi.removeChatVideoListener(this);
         }
 
+        if (customHandler != null){
+            customHandler.removeCallbacksAndMessages(null);
+        }
+
         stopAudioSignals();
 
         MegaApplication.activityPaused();
@@ -974,6 +978,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
+        }
+
+        if (customHandler != null){
+            customHandler.removeCallbacksAndMessages(null);
         }
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
