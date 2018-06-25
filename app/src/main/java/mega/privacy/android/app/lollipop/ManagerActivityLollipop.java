@@ -3973,7 +3973,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						else{
 							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-							aB.setTitle(node.getName());
+							if(node==null){
+								log("Node NULL - cannot be recovered");
+								aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							}
+							else{
+								aB.setTitle(node.getName());
+							}
+
 							firstNavigationLevel = false;
 						}
 						break;
@@ -3999,7 +4006,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 							if(parentHandleIncoming!=-1){
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-								aB.setTitle(node.getName());
+								if(node==null){
+									log("Node NULL - cannot be recovered");
+									aB.setTitle(getResources().getString(R.string.section_shared_items));
+								}
+								else{
+									aB.setTitle(node.getName());
+								}
+
 								firstNavigationLevel = false;
 							}
 							else{
@@ -11894,8 +11908,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case DialogInterface.BUTTON_POSITIVE: {
 						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
+
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
+
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14708,6 +14724,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdateLollipop");
+
 		try {
 			statusDialog.dismiss();
 		}

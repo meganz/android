@@ -887,15 +887,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void updateTransferButton(){
 		log("updateTransferButton");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			log("show PLAY button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
-			transfersTitleText.setText(getString(R.string.paused_transfers_title));
+
+		if(transfersOverViewLayout.getVisibility()==View.VISIBLE){
+			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+				log("show PLAY button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
+				transfersTitleText.setText(getString(R.string.paused_transfers_title));
+			}
+			else{
+				log("show PAUSE button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			}
 		}
 		else{
-			log("show PAUSE button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
-			transfersTitleText.setText(getString(R.string.section_transfers));
+			log("Transfer panel not visible");
 		}
 	}
 
