@@ -17,6 +17,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -74,7 +76,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
@@ -387,36 +388,9 @@ public class OfflineFragmentLollipop extends Fragment{
 				pathNavigation = pathNavigationOffline;
 			}
 
-			if(pathNavigation!=null){
-
-				log("AFTER PathNavigation is: "+pathNavigation);
-				if (pathNavigation.equals("/")){
-					aB.setTitle(getString(R.string.section_saved_for_offline));
-					log("aB.setHomeAsUpIndicator_30");
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				}
-				else{
-					log("The pathNavigation is: "+pathNavigation);
-					String title = pathNavigation;
-					int index=title.lastIndexOf("/");
-					title=title.substring(0,index);
-					index=title.lastIndexOf("/");
-					title=title.substring(index+1,title.length());
-					aB.setTitle(title);
-					log("aB.setHomeAsUpIndicator_36");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
-			}
-			else{
-				log("PathNavigation is NULL");
-			}
-
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		    isList = ((ManagerActivityLollipop)context).isList();
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
-
 		}
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
@@ -439,8 +413,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.offline_empty_text_second);
-					
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
 
@@ -467,9 +439,21 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_offline);
-					String text = getString(R.string.section_saved_for_offline);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 
 				}
 				else{
@@ -499,8 +483,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text_grid);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.offline_empty_text_grid_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.offline_empty_text_grid_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
@@ -528,9 +510,21 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_offline);
-					String text = getString(R.string.section_saved_for_offline);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -643,9 +637,22 @@ public class OfflineFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_offline);
-				String text = getString(R.string.section_saved_for_offline);
-				emptyTextViewSecond.setText(" "+text+".");
+
+				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -956,16 +963,13 @@ public class OfflineFragmentLollipop extends Fragment{
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				aB.setTitle(currentNode.getName());
-				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
+				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";
 				
 				if (context instanceof ManagerActivityLollipop){
-					log("aB.setHomeAsUpIndicator_31");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				}
+				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
 				if (adapter.getItemCount() == 0){
@@ -1028,9 +1032,21 @@ public class OfflineFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_offline);
-					String text = getString(R.string.section_saved_for_offline);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -1071,6 +1087,10 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						videoIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						videoIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						videoIntent.putExtra("FILENAME", currentNode.getName());
+						videoIntent.putExtra("path", currentFile.getAbsolutePath());
+						videoIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1085,6 +1105,10 @@ public class OfflineFragmentLollipop extends Fragment{
 
 						Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						audioIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						audioIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						audioIntent.putExtra("FILENAME", currentNode.getName());
+						audioIntent.putExtra("path", currentFile.getAbsolutePath());
+						audioIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 							audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
@@ -1093,20 +1117,23 @@ public class OfflineFragmentLollipop extends Fragment{
 						}
 						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						startActivity(audioIntent);
-          }
+          			}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
-						File pdfFile = new File(currentFile.getAbsolutePath());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 						pdfIntent.putExtra("APP", true);
+						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
+						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+						pdfIntent.putExtra("path", currentFile.getAbsolutePath());
+						pdfIntent.putExtra("pathNavigation", pathNavigation);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						else{
-							pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						context.startActivity(pdfIntent);
@@ -1248,7 +1275,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 	}
 	
-	public int onBackPressed(){
+	public int
+	onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -1274,31 +1302,14 @@ public class OfflineFragmentLollipop extends Fragment{
 				
 				if (context instanceof ManagerActivityLollipop){
 					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
-					
-					if (pathNavigation.equals("/")){
-						aB.setTitle(getString(R.string.section_saved_for_offline));
-						log("aB.setHomeAsUpIndicator_32");
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					}
-					else{
-						String title = pathNavigation;
-						index=title.lastIndexOf("/");				
-						title=title.substring(0,index);
-						index=title.lastIndexOf("/");				
-						title=title.substring(index+1,title.length());			
-						aB.setTitle(title);
-						log("aB.setHomeAsUpIndicator_33");
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					}
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+					((ManagerActivityLollipop)context).setToolbarTitle();
 				}
-				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-				mOffListNavigation=dbH.findByPath(pathNavigation);
+
+//				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();
+				mOffList = dbH.findByPath(pathNavigation);
 				
-				contentText.setText(getInfoFolder(mOffListNavigation));
+				contentText.setText(getInfoFolder(mOffList));
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1307,7 +1318,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					sortByNameAscending();
 				}
 
-				setNodes(mOffListNavigation);
+				setNodes(mOffList);
 
 				int lastVisiblePosition = 0;
 				if(!lastPositionStack.empty()){
@@ -1339,44 +1350,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				return 0;
 		}
 	}
-
-	public void setTitle(){
-		log("setTitle");
-
-		if((getActivity() == null) || (!isAdded())){
-			log("Fragment NOT Attached!");
-			return;
-		}
-
-		pathNavigation = ((ManagerActivityLollipop)context).getPathNavigationOffline();
-		if (pathNavigation!=null){
-			if (pathNavigation.equals("/")){
-				aB.setTitle(getString(R.string.section_saved_for_offline));
-				log("aB.setHomeAsUpIndicator_0356");
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			}
-			else{
-				String title = pathNavigation;
-				int index=title.lastIndexOf("/");
-				title=title.substring(0,index);
-				index=title.lastIndexOf("/");
-				title=title.substring(index+1,title.length());
-				aB.setTitle(title);
-				log("aB.setHomeAsUpIndicator_4528");
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			}
-		}
-		else{
-			aB.setTitle(getString(R.string.section_saved_for_offline));
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		}
-	}
 	
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
@@ -1397,9 +1370,21 @@ public class OfflineFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_offline);
-				String text = getString(R.string.section_saved_for_offline);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
@@ -1456,9 +1441,21 @@ public class OfflineFragmentLollipop extends Fragment{
 			}else{
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 			}
-			emptyTextViewFirst.setText(R.string.context_empty_offline);
-			String text = getString(R.string.section_saved_for_offline);
-			emptyTextViewSecond.setText(" "+text+".");
+			String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextViewFirst.setText(result);
 		}
 		else{
 			recyclerView.setVisibility(View.VISIBLE);
@@ -1519,28 +1516,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		else{
 			sortByNameAscending();
 		}
-		
-//		setNodes(mOffList);
-//		pathNavigation=pNav;
-		
-		if(pathNavigation.equals("/")){
-			mOffList=dbH.findByPath("/");
-			aB.setTitle(getString(R.string.section_saved_for_offline));	
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-		}
-		else{
-			log("-------refreshPaths: "+pathNavigation);
-			mOffList=dbH.findByPath(pathNavigation);
-			index=pathNavigation.lastIndexOf("/");	
-			String title = pathNavigation;
-			index=title.lastIndexOf("/");				
-			title=title.substring(0,index);
-			index=title.lastIndexOf("/");				
-			title=title.substring(index+1,title.length());			
-			aB.setTitle(title);			
-		}		
-		
+
+		((ManagerActivityLollipop)context).setToolbarTitle();
 		log("At the end of refreshPaths the path is: "+pathNavigation);
 		contentText.setText(getInfoFolder(mOffList));
 		setNodes(mOffList);

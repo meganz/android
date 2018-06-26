@@ -15,4 +15,19 @@
         android:title="@string/general_download"
         MEGA:showAsAction="always"
         android:visible="true"/>
+
+
+    <item
+        android:id="@+id/pdfviewer_chat"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/pdfviewer_properties"
+        android:orderInCategory="110"
+        android:title="@string/general_file_info"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
 </menu>

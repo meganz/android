@@ -1,10 +1,7 @@
 package mega.privacy.android.app.lollipop.adapters;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,24 +37,16 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
@@ -82,76 +71,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private int adapterType;
 	private SparseBooleanArray selectedContacts;
 	
-	private class UserAvatarListenerList implements MegaRequestListenerInterface{
-
-		Context context;
-		ViewHolderContacts holder;
-		MegaContactsLollipopAdapter adapter;
-		
-		public UserAvatarListenerList(Context context, ViewHolderContacts holder, MegaContactsLollipopAdapter adapter) {
-			this.context = context;
-			this.holder = holder;
-			this.adapter = adapter;
-		}
-		
-		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			log("onRequestStart()");
-		}
-
-		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-			log("onRequestFinish()");
-			if (e.getErrorCode() == MegaError.API_OK){
-				boolean avatarExists = false;
-				
-				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = null;
-					if (context.getExternalCacheDir() != null){
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					else{
-						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					Bitmap bitmap = null;
-					if (avatar.exists()){
-						if (avatar.length() > 0){
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (bitmap == null) {
-								avatar.delete();
-							}
-							else{
-								avatarExists = true;
-//								holder.imageView.setImageBitmap(bitmap);
-								if (holder instanceof ViewHolderContactsGrid){
-									bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
-									((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
-								}
-								else if (holder instanceof ViewHolderContactsList){
-									((ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
-								}
-								holder.contactInitialLetter.setVisibility(View.GONE);
-							}
-						}
-					}					
-				}
-			}
-		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api,
-				MegaRequest request, MegaError e) {
-			log("onRequestTemporaryError");
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		}
-		
-	}
 
 	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaContactAdapter> _contacts, RecyclerView _listView, int adapterType) {
 		this.context = _context;
@@ -177,21 +96,21 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
     public static class ViewHolderContacts extends RecyclerView.ViewHolder{
     	public ViewHolderContacts(View v) {
 			super(v);
-		}   	
-		
-    	TextView contactInitialLetter;
+		}
+
+		public TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
         RelativeLayout itemLayout;
-        String contactMail;
+        public String contactMail;
     }
     
     public class ViewHolderContactsList extends ViewHolderContacts{
     	public ViewHolderContactsList(View v) {
 			super(v);
 		}
-    	RoundedImageView imageView;
+    	public RoundedImageView imageView;
 		ImageView contactStateIcon;
 		RelativeLayout threeDotsLayout;
     }
@@ -200,7 +119,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
     	public ViewHolderContactsGrid(View v) {
 			super(v);
 		}
-    	ImageView imageView;
+		public ImageView imageView;
 		ImageView contactStateIcon;
 		ImageButton imageButtonThreeDots;
     }
@@ -390,7 +309,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		createDefaultAvatar(holder, contact);
 
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+		UserAvatarListener listener = new UserAvatarListener(context, holder);
 
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
@@ -465,7 +384,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		createDefaultAvatar(holder, contact);
 
-		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+		UserAvatarListener listener = new UserAvatarListener(context, holder);
 
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
@@ -586,7 +505,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			createDefaultAvatar(holder, contact);
 
-			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+			UserAvatarListener listener = new UserAvatarListener(context, holder);
 
 			File avatar = null;
 			if (context.getExternalCacheDir() != null){
@@ -645,7 +564,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 				createDefaultAvatar(holder, contact);
 
-				UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+				UserAvatarListener listener = new UserAvatarListener(context, holder);
 
 				File avatar = null;
 				if (context.getExternalCacheDir() != null){
@@ -1057,13 +976,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	@Override
 	public void onClick(View v) {
 		log("onClick _ adapterType: " + adapterType);
-
-		if(!Util.isOnline(context)){
-			if(context instanceof ManagerActivityLollipop){
-				((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-			}
-			return;
-		}
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 

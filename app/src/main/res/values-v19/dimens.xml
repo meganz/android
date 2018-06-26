@@ -3,5 +3,4 @@
 
     <dimen name="elevation_fab_chat">0dp</dimen>
     <dimen name="translationZ_fab_chat">0dp</dimen>
-
 </resources>

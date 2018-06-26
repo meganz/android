@@ -29,6 +29,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -103,10 +105,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private RecyclerView.LayoutManager mLayoutManager;
 	FastScroller fastScroller;
 
+	long[] arrayHandles = null;
+
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
@@ -622,7 +625,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
 		log("onCreateView");		
 		
 		if (megaApi == null){
@@ -647,372 +649,380 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
 
-	    if(type==TYPE_MEDIA){
-			log("Media Uploads");
-	    	aB.setTitle(getString(R.string.section_secondary_media_uploads));
-	    }
-	    else{
-			log("CAMERA Uploads");
-	    	aB.setTitle(getString(R.string.section_photo_sync));
-	    }
-			
-		if(!(((ManagerActivityLollipop)context).getIsSearchEnabled())){
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop) context).setFirstNavigationLevel(true);
-		}else{
-			aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-			((ManagerActivityLollipop) context).setFirstNavigationLevel(false);
+		((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
+		((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+
+		if (type == TYPE_CAMERA) {
+			if (firstTimeCam) {
+				setInitialPreferences();
+				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
+
+				initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
+
+				bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
+				bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
+				switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
+				switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
+
+				bSkip.setText(getString(R.string.cam_sync_skip));
+				bOK.setText(getString(R.string.cam_sync_ok));
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+					bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+				} else {
+					bSkip.setBackgroundResource(R.drawable.black_button_border);
+				}
+
+				bOK.setOnClickListener(this);
+				bSkip.setOnClickListener(this);
+
+				return v;
+			}
 		}
 
-			((ManagerActivityLollipop) context).supportInvalidateOptionsMenu();
-			((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+
+
+		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
+			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+
+			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+
+			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
+			mLayoutManager = new MegaLinearLayoutManager(context);
+			listView.setLayoutManager(mLayoutManager);
+
+			listView.addOnItemTouchListener(this);
+			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
+
+			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			listView.setClipToPadding(false);
+			listView.setHasFixedSize(true);
+
+			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
+			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
+			relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
+			if (type == TYPE_CAMERA) {
+				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
+			} else {
+				turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
+			}
+
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersOverViewLayout.setVisibility(View.GONE);
+
+			boolean camEnabled = false;
+			prefs = dbH.getPreferences();
+			if (prefs != null) {
+				if (prefs.getCamSyncEnabled() != null) {
+					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+						log("Hide option Turn on Camera Uploads");
+						relativeLayoutTurnOnOff.setVisibility(View.GONE);
+						camEnabled = true;
+					} else {
+						log("SHOW option Turn on Camera Uploads");
+						relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
+						camEnabled = false;
+					}
+				}
+			}
+			relativeLayoutTurnOnOff.setOnClickListener(this);
+
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
+			contentTextLayout.setVisibility(View.GONE);
+
+			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
+
+			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			}
+			String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextViewFirst.setText(result);
+
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+
+			if (megaApi.getRootNode() == null) {
+				return v;
+			}
 
 			if (type == TYPE_CAMERA) {
-				if (firstTimeCam) {
-					setInitialPreferences();
-					View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
-
-					initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
-
-					bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
-					bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
-					switchCellularConnection = (SwitchCompat) v.findViewById(R.id.cellular_connection_switch);
-					switchUploadVideos = (SwitchCompat) v.findViewById(R.id.upload_videos_switch);
-
-					bSkip.setText(getString(R.string.cam_sync_skip));
-					bOK.setText(getString(R.string.cam_sync_ok));
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-						bSkip.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-						bOK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+				if (prefs == null) {
+					photosyncHandle = -1;
+				} else {
+					//The "PhotoSync" folder exists?
+					if (prefs.getCamSyncHandle() == null) {
+						photosyncHandle = -1;
 					} else {
-						bSkip.setBackgroundResource(R.drawable.black_button_border);
+						photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+						if (megaApi.getNodeByHandle(photosyncHandle) == null) {
+							photosyncHandle = -1;
+						}
 					}
+				}
 
-					bOK.setOnClickListener(this);
-					bSkip.setOnClickListener(this);
-
-					return v;
+				if (photosyncHandle == -1) {
+					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+					for (int i = 0; i < nl.size(); i++) {
+						if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+							photosyncHandle = nl.get(i).getHandle();
+							dbH.setCamSyncHandle(photosyncHandle);
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+							break;
+						}
+					}
+				}
+			} else {
+				photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+				if (megaApi.getNodeByHandle(photosyncHandle) == null) {
+					photosyncHandle = -1;
 				}
 			}
 
 
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
 
-			if (((ManagerActivityLollipop) context).isListCameraUploads()) {
-				View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+			if (nodesArray != null) {
+				nodesArray.clear();
+			}
 
-				detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+			}
+			else{
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
+				nodes = searchDate(searchByDate,searchNodes);
+			}
 
-				listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
-				fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+			if (megaApi.getNodeByHandle(photosyncHandle) != null) {
 
-				mLayoutManager = new MegaLinearLayoutManager(context);
-				listView.setLayoutManager(mLayoutManager);
-
-				listView.addOnItemTouchListener(this);
-				listView.setItemAnimator(new DefaultItemAnimator());
-				listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
-
-				listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
-				listView.setClipToPadding(false);
-				listView.setHasFixedSize(true);
-
-				final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
-				final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
-				relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
-				if (type == TYPE_CAMERA) {
-					turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
-				} else {
-					turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
-				}
-
-				transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
-				transfersOverViewLayout.setVisibility(View.GONE);
-
-				boolean camEnabled = false;
-				prefs = dbH.getPreferences();
-				if (prefs != null) {
-					if (prefs.getCamSyncEnabled() != null) {
-						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
-							log("Hide option Turn on Camera Uploads");
-							relativeLayoutTurnOnOff.setVisibility(View.GONE);
-							camEnabled = true;
-						} else {
-							log("SHOW option Turn on Camera Uploads");
-							relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
-							camEnabled = false;
-						}
+				int month = 0;
+				int year = 0;
+				for (int i = 0; i < nodes.size(); i++) {
+					if (nodes.get(i).isFolder()) {
+						continue;
 					}
-				}
-				relativeLayoutTurnOnOff.setOnClickListener(this);
 
-				contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-				contentTextLayout.setVisibility(View.GONE);
+					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())) {
+						continue;
+					}
 
-				emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-				emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
-				emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-				emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
-
-				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-					emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
-				}
-				emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
-				String text = getString(R.string.section_photo_sync);
-				emptyTextViewSecond.setText(" " + text + ".");
-
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
-
-				if (megaApi.getRootNode() == null) {
-					return v;
-				}
-
-				if (type == TYPE_CAMERA) {
-					if (prefs == null) {
-						photosyncHandle = -1;
+					PhotoSyncHolder psh = new PhotoSyncHolder();
+					Date d = new Date(nodes.get(i).getModificationTime() * 1000);
+					if ((month == d.getMonth()) && (year == d.getYear())) {
+						psh.isNode = true;
+						psh.handle = nodes.get(i).getHandle();
+						month = d.getMonth();
+						year = d.getYear();
+						psh.nodeDate = getImageDateString(month, year);
+						nodesArray.add(psh);
 					} else {
-						//The "PhotoSync" folder exists?
-						if (prefs.getCamSyncHandle() == null) {
-							photosyncHandle = -1;
-						} else {
-							photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-							if (megaApi.getNodeByHandle(photosyncHandle) == null) {
-								photosyncHandle = -1;
-							}
-						}
-					}
-
-					if (photosyncHandle == -1) {
-						ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-						for (int i = 0; i < nl.size(); i++) {
-							if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-								photosyncHandle = nl.get(i).getHandle();
-								dbH.setCamSyncHandle(photosyncHandle);
-								listView.setVisibility(View.VISIBLE);
-								emptyImageView.setVisibility(View.GONE);
-								emptyTextView.setVisibility(View.GONE);
-								break;
-							}
-						}
-					}
-				} else {
-					photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
-					if (megaApi.getNodeByHandle(photosyncHandle) == null) {
-						photosyncHandle = -1;
+						month = d.getMonth();
+						year = d.getYear();
+						psh.isNode = false;
+						psh.monthYear = getImageDateString(month, year);
+						nodesArray.add(psh);
+						psh = new PhotoSyncHolder();
+						psh.isNode = true;
+						psh.handle = nodes.get(i).getHandle();
+						nodesArray.add(psh);
+						log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
 					}
 				}
 
-
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-
-				if (nodesArray != null) {
-					nodesArray.clear();
-				}
-
-				if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-				}
-				else{
-					searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-					searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
-					nodes = searchDate(searchByDate,searchNodes);
-				}
-
-				if (megaApi.getNodeByHandle(photosyncHandle) != null) {
-
-					int month = 0;
-					int year = 0;
-					for (int i = 0; i < nodes.size(); i++) {
-						if (nodes.get(i).isFolder()) {
-							continue;
-						}
-
-						if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())) {
-							continue;
-						}
-
-						PhotoSyncHolder psh = new PhotoSyncHolder();
-						Date d = new Date(nodes.get(i).getModificationTime() * 1000);
-						if ((month == d.getMonth()) && (year == d.getYear())) {
-							psh.isNode = true;
-							psh.handle = nodes.get(i).getHandle();
-							month = d.getMonth();
-							year = d.getYear();
-							psh.nodeDate = getImageDateString(month, year);
-							nodesArray.add(psh);
-						} else {
-							month = d.getMonth();
-							year = d.getYear();
-							psh.isNode = false;
-							psh.monthYear = getImageDateString(month, year);
-							nodesArray.add(psh);
-							psh = new PhotoSyncHolder();
-							psh.isNode = true;
-							psh.handle = nodes.get(i).getHandle();
-							nodesArray.add(psh);
-							log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
-						}
-					}
-
-					if (nodesArray.size() == 0) {
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-						listView.setVisibility(View.GONE);
-					} else {
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-						listView.setVisibility(View.VISIBLE);
-					}
-
-				}else{
+				if (nodesArray.size() == 0) {
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
-				}
-
-				if (adapterList == null) {
-					adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 				} else {
-					adapterList.setNodes(nodesArray, nodes);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
 				}
 
-				adapterList.setMultipleSelect(false);
+			}else{
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				listView.setVisibility(View.GONE);
+			}
 
-				listView.setAdapter(adapterList);
-				fastScroller.setRecyclerView(listView);
-				visibilityFastScroller();
-
-				return v;
+			if (adapterList == null) {
+				adapterList = new MegaPhotoSyncListAdapterLollipop(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, this, Constants.CAMERA_UPLOAD_ADAPTER);
 			} else {
-				View v = inflater.inflate(R.layout.fragment_filebrowsergrid_camerauploads, container, false);
+				adapterList.setNodes(nodesArray, nodes);
+			}
 
-				detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+			adapterList.setMultipleSelect(false);
 
-				listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
-				fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+			listView.setAdapter(adapterList);
+			fastScroller.setRecyclerView(listView);
+			visibilityFastScroller();
 
-				listView.setDrawingCacheEnabled(true);
-				listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+			return v;
+		} else {
+			View v = inflater.inflate(R.layout.fragment_filebrowsergrid_camerauploads, container, false);
 
-				final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
-				final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
-				relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
-				if (type == TYPE_CAMERA) {
-					turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
-				} else {
-					turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
-				}
+			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+
+			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+
+			listView.setDrawingCacheEnabled(true);
+			listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
+			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
+			relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
+			if (type == TYPE_CAMERA) {
+				turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));
+			} else {
+				turnOnOff.setText(getString(R.string.settings_set_up_automatic_uploads).toUpperCase(Locale.getDefault()));
+			}
 
 //			turnOnOff.setGravity(Gravity.CENTER);
 
-				boolean camEnabled = false;
-				prefs = dbH.getPreferences();
-				if (prefs != null) {
-					if (prefs.getCamSyncEnabled() != null) {
-						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
-							relativeLayoutTurnOnOff.setVisibility(View.GONE);
-							camEnabled = true;
-						} else {
-							camEnabled = false;
-							relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
-						}
+			boolean camEnabled = false;
+			prefs = dbH.getPreferences();
+			if (prefs != null) {
+				if (prefs.getCamSyncEnabled() != null) {
+					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())) {
+						relativeLayoutTurnOnOff.setVisibility(View.GONE);
+						camEnabled = true;
+					} else {
+						camEnabled = false;
+						relativeLayoutTurnOnOff.setVisibility(View.VISIBLE);
 					}
 				}
-				relativeLayoutTurnOnOff.setOnClickListener(this);
+			}
+			relativeLayoutTurnOnOff.setOnClickListener(this);
 
-				contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
-				contentTextLayout.setVisibility(View.GONE);
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
+			contentTextLayout.setVisibility(View.GONE);
 
-				fragmentContainer = (RelativeLayout) v.findViewById(R.id.fragment_container_file_browser_grid);
-				fragmentContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+			fragmentContainer = (RelativeLayout) v.findViewById(R.id.fragment_container_file_browser_grid);
+			fragmentContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
 //			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 //			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
 //			listView.setLayoutParams(p);
 
-				emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-				emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
-				emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-				emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
+			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
+			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
+			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
 
-				if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-					emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
+			if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+				emptyImageView.setImageResource(R.drawable.uploads_empty_landscape);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
+			}
+
+			String textToShow = String.format(context.getString(R.string.context_empty_camera_uploads));
+
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			emptyTextViewFirst.setText(result);
+
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+
+			if (megaApi.getRootNode() == null) {
+				return v;
+			}
+
+			if (type == TYPE_CAMERA) {
+				if (prefs == null) {
+					photosyncHandle = -1;
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_camera_uploads);
-				}
-				emptyTextViewFirst.setText(R.string.context_empty_camera_uploads);
-				String text = getString(R.string.section_photo_sync);
-				emptyTextViewSecond.setText(" " + text + ".");
-
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
-
-				if (megaApi.getRootNode() == null) {
-					return v;
-				}
-
-				if (type == TYPE_CAMERA) {
-					if (prefs == null) {
+					//The "PhotoSync" folder exists?
+					if (prefs.getCamSyncHandle() == null) {
 						photosyncHandle = -1;
 					} else {
-						//The "PhotoSync" folder exists?
-						if (prefs.getCamSyncHandle() == null) {
+						photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+						if (megaApi.getNodeByHandle(photosyncHandle) == null) {
 							photosyncHandle = -1;
-						} else {
-							photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-							if (megaApi.getNodeByHandle(photosyncHandle) == null) {
-								photosyncHandle = -1;
-							}
 						}
-					}
-
-					if (photosyncHandle == -1) {
-						ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-						for (int i = 0; i < nl.size(); i++) {
-							if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
-								photosyncHandle = nl.get(i).getHandle();
-								dbH.setCamSyncHandle(photosyncHandle);
-								listView.setVisibility(View.VISIBLE);
-								emptyImageView.setVisibility(View.GONE);
-								emptyTextView.setVisibility(View.GONE);
-								break;
-							}
-						}
-					}
-				} else {
-					photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
-					if (megaApi.getNodeByHandle(photosyncHandle) == null) {
-						photosyncHandle = -1;
 					}
 				}
 
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-
-				int totalWidth = outMetrics.widthPixels;
-
-				int gridWidth = 0;
-				int realGridWidth = 0;
-				int numberOfCells = 0;
-				int padding = 0;
-				if (((ManagerActivityLollipop) context).isLargeGridCameraUploads) {
-					realGridWidth = totalWidth / GRID_LARGE;
-					padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
-					gridWidth = realGridWidth - (padding * 2);
-					numberOfCells = GRID_LARGE;
-				} else {
-					realGridWidth = totalWidth / GRID_SMALL;
-					padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_SMALL;
-					gridWidth = realGridWidth - (padding * 2);
-					numberOfCells = GRID_SMALL;
+				if (photosyncHandle == -1) {
+					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+					for (int i = 0; i < nl.size(); i++) {
+						if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())) {
+							photosyncHandle = nl.get(i).getHandle();
+							dbH.setCamSyncHandle(photosyncHandle);
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+							break;
+						}
+					}
 				}
+			} else {
+				photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+				if (megaApi.getNodeByHandle(photosyncHandle) == null) {
+					photosyncHandle = -1;
+				}
+			}
+
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+
+			int totalWidth = outMetrics.widthPixels;
+
+			int gridWidth = 0;
+			int realGridWidth = 0;
+			int numberOfCells = 0;
+			int padding = 0;
+			if (((ManagerActivityLollipop) context).isLargeGridCameraUploads) {
+				realGridWidth = totalWidth / GRID_LARGE;
+				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_LARGE;
+				gridWidth = realGridWidth - (padding * 2);
+				numberOfCells = GRID_LARGE;
+			} else {
+				realGridWidth = totalWidth / GRID_SMALL;
+				padding = MegaPhotoSyncGridTitleAdapterLollipop.PADDING_GRID_SMALL;
+				gridWidth = realGridWidth - (padding * 2);
+				numberOfCells = GRID_SMALL;
+			}
 
 //		    int numberOfCells = totalWidth / GRID_WIDTH;
 //		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -1027,145 +1037,145 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 //		    }
 
 
-				if (monthPics != null) {
-					monthPics.clear();
-				}
+			if (monthPics != null) {
+				monthPics.clear();
+			}
 
 
-				List<MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation> itemInformationList = new ArrayList<>();
-				int countTitles = 0;
+			List<MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation> itemInformationList = new ArrayList<>();
+			int countTitles = 0;
 
-				if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
-					nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-				}
-				else{
-					searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-					searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
-					nodes = searchDate(searchByDate,searchNodes);
-				}
-				if (megaApi.getNodeByHandle(photosyncHandle) != null) {
+			if(!((ManagerActivityLollipop)context).getIsSearchEnabled()) {
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+			}
+			else{
+				searchNodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				searchByDate = ((ManagerActivityLollipop)context).getTypeOfSearch();
+				nodes = searchDate(searchByDate,searchNodes);
+			}
+			if (megaApi.getNodeByHandle(photosyncHandle) != null) {
 
 //				MegaChildren children = megaApi.getFileFolderChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 //				nodes = children.getFileList();
-					itemInformationList = new ArrayList<>(this.nodes.size());
-					int month = 0;
-					int year = 0;
-					MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
-					boolean thereAreImages = false;
-					for (int i = 0; i < nodes.size(); i++) {
-						MegaNode n = nodes.get(i);
-						if (n.isFolder()) {
-							continue;
+				itemInformationList = new ArrayList<>(this.nodes.size());
+				int month = 0;
+				int year = 0;
+				MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
+				boolean thereAreImages = false;
+				for (int i = 0; i < nodes.size(); i++) {
+					MegaNode n = nodes.get(i);
+					if (n.isFolder()) {
+						continue;
+					}
+
+					if (!MimeTypeList.typeForName(n.getName()).isImage() && (!MimeTypeList.typeForName(n.getName()).isVideo())) {
+						continue;
+					}
+					thereAreImages = true;
+
+					Date d = new Date(n.getModificationTime() * 1000);
+					if ((month == 0) && (year == 0)) {
+						month = d.getMonth();
+						year = d.getYear();
+						monthPic.monthYearString = getImageDateString(month, year);
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
+						countTitles++;
+						monthPic.nodeHandles.add(n.getHandle());
+						monthPic.setPosition(n, i);
+						if (!Util.isVideoFile(n.getName())) {
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+						} else {
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
 						}
 
-						if (!MimeTypeList.typeForName(n.getName()).isImage() && (!MimeTypeList.typeForName(n.getName()).isVideo())) {
-							continue;
-						}
-						thereAreImages = true;
+					} else if ((month == d.getMonth()) && (year == d.getYear())) {
 
-						Date d = new Date(n.getModificationTime() * 1000);
-						if ((month == 0) && (year == 0)) {
-							month = d.getMonth();
-							year = d.getYear();
-							monthPic.monthYearString = getImageDateString(month, year);
-							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
-							countTitles++;
-							monthPic.nodeHandles.add(n.getHandle());
-							monthPic.setPosition(n, i);
-							if (!Util.isVideoFile(n.getName())) {
-								itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
-							} else {
-								itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
-							}
-
-						} else if ((month == d.getMonth()) && (year == d.getYear())) {
-
-							monthPic.nodeHandles.add(n.getHandle());
-							monthPic.setPosition(n, i);
+						monthPic.nodeHandles.add(n.getHandle());
+						monthPic.setPosition(n, i);
 //						month = d.getMonth();
 //						year = d.getYear();
-							monthPic.monthYearString = getImageDateString(month, year);
+						monthPic.monthYearString = getImageDateString(month, year);
 
-							if (!Util.isVideoFile(n.getName())) {
-								itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
-							} else {
-								itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
-							}
+						if (!Util.isVideoFile(n.getName())) {
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
 						} else {
-							month = d.getMonth();
-							year = d.getYear();
-							monthPics.add(monthPic);
-							monthPic = new MegaMonthPicLollipop();
-							monthPic.monthYearString = getImageDateString(month, year);
-							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
-							countTitles++;
-							monthPic.nodeHandles.add(n.getHandle());
-							monthPic.setPosition(n, i);
-							if (!Util.isVideoFile(n.getName())) {
-								itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
-							} else {
-								itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
-							}
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+						}
+					} else {
+						month = d.getMonth();
+						year = d.getYear();
+						monthPics.add(monthPic);
+						monthPic = new MegaMonthPicLollipop();
+						monthPic.monthYearString = getImageDateString(month, year);
+						itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_TITLE, monthPic.monthYearString, monthPic));
+						countTitles++;
+						monthPic.nodeHandles.add(n.getHandle());
+						monthPic.setPosition(n, i);
+						if (!Util.isVideoFile(n.getName())) {
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_IMAGE, n, monthPic));
+						} else {
+							itemInformationList.add(new MegaPhotoSyncGridTitleAdapterLollipop.ItemInformation(MegaPhotoSyncGridTitleAdapterLollipop.TYPE_ITEM_VIDEO, n, monthPic));
+						}
 //						monthPics.add(monthPic);
 //						monthPic = new MegaMonthPicLollipop();
 //						i--;
-						}
 					}
-					if (nodes.size() > 0) {
-						monthPics.add(monthPic);
-					}
+				}
+				if (nodes.size() > 0) {
+					monthPics.add(monthPic);
+				}
 
-					if (!thereAreImages) {
-						monthPics.clear();
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-						listView.setVisibility(View.GONE);
-					} else {
-
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-						listView.setVisibility(View.VISIBLE);
-					}
-				} else {
+				if (!thereAreImages) {
+					monthPics.clear();
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
+				} else {
+
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
 				}
+			} else {
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				listView.setVisibility(View.GONE);
+			}
 
 //			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && numberOfCells == GRID_SMALL){
 //				log("the device is portrait and the grid is small");
 //				listView.setItemViewCacheSize(numberOfCells * 20);
 //			}
 
-				if (adapterGrid == null) {
-					log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-					adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER, itemInformationList.size(), countTitles, itemInformationList);
-					adapterGrid.setHasStableIds(true);
-				} else {
-					log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
-					adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
-					adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
-				}
+			if (adapterGrid == null) {
+				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
+				adapterGrid = new MegaPhotoSyncGridTitleAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, Constants.CAMERA_UPLOAD_ADAPTER, itemInformationList.size(), countTitles, itemInformationList);
+				adapterGrid.setHasStableIds(true);
+			} else {
+				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
+				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
+				adapterGrid.setNodes(monthPics, nodes, itemInformationList.size(), countTitles, itemInformationList);
+			}
 
 //			mLayoutManager = new StaggeredGridLayoutManager(numberOfCells, StaggeredGridLayoutManager.HORIZONTAL | StaggeredGridLayoutManager.VERTICAL);
 //			listView.setLayoutManager(mLayoutManager);
 
-				mLayoutManager = new GridLayoutManager(context, numberOfCells);
-				((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-					@Override
-					public int getSpanSize(int position) {
-						return adapterGrid.getSpanSizeOfPosition(position);
-					}
-				});
+			mLayoutManager = new GridLayoutManager(context, numberOfCells);
+			((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+				@Override
+				public int getSpanSize(int position) {
+					return adapterGrid.getSpanSizeOfPosition(position);
+				}
+			});
 
 
-				listView.setLayoutManager(mLayoutManager);
+			listView.setLayoutManager(mLayoutManager);
 
-				listView.setAdapter(adapterGrid);
-				fastScroller.setRecyclerView(listView);
-				visibilityFastScroller();
-				return v;
-			}
+			listView.setAdapter(adapterGrid);
+			fastScroller.setRecyclerView(listView);
+			visibilityFastScroller();
+			return v;
+		}
 	}
 	
 	public void selectAll(){
@@ -1199,6 +1209,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void setInitialPreferences(){
+		log("setInitialPreferences");
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.setFirstTime(false);
@@ -1217,6 +1228,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
 		dbH.setPinLockEnabled(false);
 		dbH.setPinLockCode("");
+
+		ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
+		if(nodeLinks==null){
+			log("No public links:showCopyright set true");
+			dbH.setShowCopyright(true);
+		}
+		else{
+			if(nodeLinks.size()==0){
+				log("No public links:showCopyright set true");
+				dbH.setShowCopyright(true);
+			}
+			else{
+				log("ALready public links:showCopyright set false");
+				dbH.setShowCopyright(false);
+			}
+		}
 	}
 	
 	public String getImageDateString(int month, int year){
@@ -1544,6 +1571,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void itemClick(int position) {
+
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		
 		PhotoSyncHolder psHPosition = nodesArray.get(position);
@@ -1575,7 +1603,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							}
 							Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 							intent.putExtra("position", positionInNodes);
-							intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+							if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+								intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+								arrayHandles = null;
+
+							}else{
+								intent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+								arrayHandles = new long[nodes.size()];
+								for(int i = 0; i < nodes.size(); i++) {
+									arrayHandles[i] = nodes.get(i).getHandle();
+								}
+								intent.putExtra("handlesNodesSearch",arrayHandles);
+
+							}
+
 							intent.putExtra("isFolderLink", false);
 							if (megaApi.getParentNode(psHMegaNode).getType() == MegaNode.TYPE_ROOT){
 								intent.putExtra("parentNodeHandle", -1L);
@@ -1784,12 +1825,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (nps != null) {
 				ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 				setNodes(nodes);
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				((ManagerActivityLollipop)context).invalidateOptionsMenu();
 
-				aB.setTitle(getString(R.string.section_photo_sync));
+				((ManagerActivityLollipop)context).invalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setIsSearchEnabled(false);
+				((ManagerActivityLollipop)context).setToolbarTitle();
 				return 1;
 			}
 			return 0;
@@ -1881,6 +1920,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
+
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			this.nodesArray.clear();
 			int month = 0;
@@ -2279,8 +2319,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	public ArrayList<MegaNode> searchDate(long[] searchByDate, ArrayList<MegaNode> nodes ){
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+
+		((ManagerActivityLollipop)context).setIsSearchEnabled(true);
+		((ManagerActivityLollipop)context).setToolbarTitle();
 
 		ArrayList<MegaNode> nodesResult = new ArrayList<>();
 		Calendar cal = Calendar.getInstance();
@@ -2288,9 +2329,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if(searchByDate[0] == 1){
 			log("option day");
+
 			cal.setTimeInMillis(searchByDate[1]);
 			int selectedYear = cal.get(Calendar.YEAR);
-			int selectedMonth = (cal.get(Calendar.MONTH) + 1);
+			int selectedMonth = (cal.get(Calendar.MONTH));
 			int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
 
 			//Title
@@ -2302,15 +2344,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			aB.setTitle(formattedDate);
 
 			int nodeDay, nodeMonth, nodeYear;
-			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
 			for (MegaNode node : nodes){
 				Date d = new Date(node.getModificationTime()*1000);
-				nodeDay = d.getDay();
-				nodeMonth = (d.getMonth() + 1);
-				nodeYear = Integer.parseInt(df.format(d));
+				Calendar calNode = Calendar.getInstance();
+				calNode.setTime(d);
+				nodeDay = calNode.get(Calendar.DAY_OF_MONTH);
+				nodeMonth = calNode.get(Calendar.MONTH);
+				nodeYear = calNode.get(Calendar.YEAR);
 
-				if((selectedYear == nodeYear) && (selectedMonth == nodeMonth) && (selectedDay == nodeDay )){
+				if((selectedYear == nodeYear) && (selectedMonth == nodeMonth) && (selectedDay == nodeDay)){
 					nodesResult.add(node);
 				}
 			}
@@ -2318,51 +2360,44 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}else if(searchByDate[0] == 2){
 
 			if(searchByDate[2] == 1){
-
 				log("option last month");
 				int selectedDay = cal.get(Calendar.DAY_OF_MONTH);
-				int selectedMonth = (cal.get(Calendar.MONTH) + 1);
+				int selectedMonth = cal.get(Calendar.MONTH);
 				int selectedYear = cal.get(Calendar.YEAR);
 
-				if(selectedMonth == 1){
-					selectedMonth = 12;
+				if(selectedMonth == 0){
+					selectedMonth = 11;
 					selectedYear = selectedYear - 1;
 				}else{
 					selectedMonth = selectedMonth - 1;
 				}
 
 				//Title
-				int selectedMonthTitle = selectedMonth;
 				SimpleDateFormat titleFormat = new SimpleDateFormat("MMMM");
 				Calendar calTitle = Calendar.getInstance();
-				if (selectedMonthTitle == 1){
-					selectedMonthTitle = 12;
-
-				}else{
-					selectedMonthTitle = selectedMonthTitle - 1;
-
-				}
-				calTitle.set(selectedYear, selectedMonthTitle, selectedDay);
+				calTitle.set(selectedYear, selectedMonth, selectedDay);
 				Date date = calTitle.getTime();
 				String formattedDate = titleFormat.format(date);
 				aB.setTitle(formattedDate);
 
 				int nodeMonth, nodeYear;
-				SimpleDateFormat df = new SimpleDateFormat("yyyy");
 
 				for (MegaNode node : nodes){
 					Date d = new Date(node.getModificationTime()*1000);
-					nodeMonth = (d.getMonth() + 1);
-					nodeYear = Integer.parseInt(df.format(d));
+					Calendar calNode = Calendar.getInstance();
+					calNode.setTime(d);
+					nodeMonth = calNode.get(Calendar.MONTH);
+					nodeYear = calNode.get(Calendar.YEAR);
 
 					if((selectedYear == nodeYear) && (selectedMonth == nodeMonth)){
 						nodesResult.add(node);
 					}
 				}
 
+
+
 			}else if(searchByDate[2] == 2){
 				log("option last year");
-
 				int selectedYear = (cal.get(Calendar.YEAR) - 1);
 
 				//Title
@@ -2370,11 +2405,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				aB.setTitle(formattedDate);
 
 				int nodeYear;
-				SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
 				for (MegaNode node : nodes){
 					Date d = new Date(node.getModificationTime()*1000);
-					nodeYear = Integer.parseInt(df.format(d));
+					Calendar calNode = Calendar.getInstance();
+					calNode.setTime(d);
+					nodeYear = calNode.get(Calendar.YEAR);
+
 					if(selectedYear == nodeYear){
 						nodesResult.add(node);
 					}
@@ -2386,20 +2422,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			cal.setTimeInMillis(searchByDate[3]);
 			int selectedYearFrom = cal.get(Calendar.YEAR);
-			int selectedMonthFrom = (cal.get(Calendar.MONTH) + 1);
+			int selectedMonthFrom = cal.get(Calendar.MONTH);
 			int selectedDayFrom = cal.get(Calendar.DAY_OF_MONTH);
 
 			calTo.setTimeInMillis(searchByDate[4]);
 			int selectedYearTo = calTo.get(Calendar.YEAR);
-			int selectedMonthTo = (calTo.get(Calendar.MONTH) + 1);
+			int selectedMonthTo = calTo.get(Calendar.MONTH);
 			int selectedDayTo = calTo.get(Calendar.DAY_OF_MONTH);
 
 			//Title
 			SimpleDateFormat titleFormat = new SimpleDateFormat("d MMM");
 			Calendar calTitleFrom = Calendar.getInstance();
 			Calendar calTitleTo = Calendar.getInstance();
-			calTitleFrom.set(selectedYearFrom, cal.get(Calendar.MONTH), selectedDayFrom);
-			calTitleTo.set(selectedYearTo, calTo.get(Calendar.MONTH), selectedDayTo);
+
+			calTitleFrom.set(selectedYearFrom, selectedMonthFrom, selectedDayFrom);
+			calTitleTo.set(selectedYearTo, selectedMonthTo, selectedDayTo);
 			Date dateFrom = calTitleFrom.getTime();
 			Date dateTo = calTitleTo.getTime();
 
@@ -2410,15 +2447,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			aB.setTitle(formattedDate);
 
 			int nodeDay, nodeMonth, nodeYear;
-			SimpleDateFormat df = new SimpleDateFormat("yyyy");
-
 
 			for (MegaNode node : nodes){
 				int period = 0;
 				Date d = new Date(node.getModificationTime()*1000);
-				nodeDay = d.getDay();
-				nodeMonth = (d.getMonth() + 1);
-				nodeYear = Integer.parseInt(df.format(d));
+				Calendar calNode = Calendar.getInstance();
+				calNode.setTime(d);
+				nodeDay = calNode.get(Calendar.DAY_OF_MONTH);
+				nodeMonth = calNode.get(Calendar.MONTH);
+				nodeYear = calNode.get(Calendar.YEAR);
 
 				//Period From
 				if(selectedYearFrom < nodeYear){
@@ -2456,4 +2493,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		return nodesResult;
 		//setNodes(nodesResult);
 	}
+
+
 }

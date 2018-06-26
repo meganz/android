@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils;
 
 public class Constants {
-	
+
 	public static String PIN_4 = "4";
 	public static String PIN_6 = "6";
 	public static String PIN_ALPHANUMERIC = "alphanumeric";
@@ -30,10 +30,10 @@ public class Constants {
 	public static int REQUEST_ADD_PARTICIPANTS = 1019;
 	public static int ENABLE_CHAT = 1020;
 	public static int REQUEST_SEND_CONTACTS = 1021;
-
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
 	public static int ACTION_SEARCH_BY_DATE = 1024;
+	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -92,6 +92,7 @@ public class Constants {
 	public static final int REQUEST_READ_CONTACTS = 3;
 	public static final int RECORD_AUDIO = 4;
 	public static final int REQUEST_UPLOAD_CONTACT = 5;
+	public static final int REQUEST_READ_STORAGE = 6;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -135,6 +136,8 @@ public class Constants {
 	public static String ACTION_OPEN_HANDLE_NODE = "ACTION_OPEN_HANDLE_NODE";
 	public static String ACTION_OPEN_FILE_LINK_ROOTNODES_NULL = "ACTION_OPEN_FILE_LINK_ROOTNODES_NULL";
 	public static String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
+	public static String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
+	public static String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
 
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
@@ -146,10 +149,7 @@ public class Constants {
 
 	public static String ACTION_SHOW_UPGRADE_ACCOUNT = "ACTION_SHOW_UPGRADE_ACCOUNT";
 
-	final public static int CHAT_ADAPTER_SHOW_ALL = 2;
-	final public static int CHAT_ADAPTER_SHOW_TIME = 1;
-	final public static int CHAT_ADAPTER_SHOW_NOTHING = 0;
-	final public static int CHAT_ADAPTER_SHOW_NOTHING_NO_NAME = 3;
+	public static String ACTION_INVITE_CONTACT = "ACTION_INVITE_CONTACT";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -169,6 +169,8 @@ public class Constants {
 	final public static int NODE_ATTACHMENT_ADAPTER = 2015;
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
+	final public static int SEARCH_BY_ADAPTER = 2018;
+
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -177,6 +179,7 @@ public class Constants {
 
 	final public static int CONTACT_TYPE_MEGA = 0;
 	final public static int CONTACT_TYPE_DEVICE = 1;
+	final public static int CONTACT_TYPE_BOTH = 2;
 
 	public static int SELECT_RINGTONE = 2000;
 	public static int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE+1;
@@ -191,9 +194,13 @@ public class Constants {
 	public static int NOTIFICATION_UPLOAD_FINAL = 5;
 	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
-	public static int NOTIFICATION_PUSH_CHAT = 8;
+	public static int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
 	public static int NOTIFICATION_PUSH_CONTACT = 9;
 	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
+	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
+	public static int NOTIFICATION_MISSED_CALL = 12;
+	public static int NOTIFICATION_PRE_N_CHAT = 13;
+	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
 	public static String CHAT_FOLDER = "My chat files";
 

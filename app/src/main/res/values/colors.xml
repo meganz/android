@@ -75,6 +75,7 @@
     
     <color name="accentColor">#00BFA5</color>
     <color name="accentColorTransparent">#5900BFA5</color>
+    <color name="accentColorLight">#9900BFA5</color>
     <color name="textGrey">#6d6f70</color> 
 
     <color name="filePropertiesToolBar">#2284b1</color>
@@ -130,6 +131,23 @@
     <color name="scroll_handle">#90d90007</color>
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
     <color name="transparent_black2">#99000000</color>
+
+    <color name="keyboard_chat_separator">#1F000000</color>
+    <color name="background_chat">#FFFFFFFF</color>
     <color name="disable_fab_chat_call">#CC444444</color>
+
+    <color name="pass_weak">#FFFFD300</color>
+    <color name="pass_good">#FF13E03C</color>
+
+    <color name="color_background_versions">#FFF2F2F2</color>
+
+    <color name="turn_on_notifications_background">#FF00A38C</color>
+    <color name="turn_on_notifications_statusbar">#FF008270</color>
+    <color name="turn_on_notifications_text">#B3000000</color>
+
+    <color name="color_background_jump_to_least">#80000000</color>
+
+    <color name="color_background_new_messages">#FFF7F7F7</color>
+    <color name="color_text_new_messages">#B3000000</color>
 
 </resources>

@@ -29,14 +29,14 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -67,12 +67,23 @@ public class ChatController {
     public ChatController(Context context){
         log("ChatController created");
         this.context = context;
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        if(context instanceof  MegaApplication){
+            if (megaApi == null){
+                megaApi = ((MegaApplication)context).getMegaApi();
+            }
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication)context).getMegaChatApi();
+            }
         }
-        if (megaChatApi == null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+        else{
+            if (megaApi == null){
+                megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            }
+            if (megaChatApi == null){
+                megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+            }
         }
+
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
         }
@@ -644,16 +655,10 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     log("Message type TRUNCATE");
 
-                    if (chatRoom.isGroup()) {
-                        String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
-                        builder.append(textToShow);
-                        return builder.toString();
+                    String textToShow = String.format(context.getString(R.string.non_format_history_cleared_by), fullNameTitle);
+                    builder.append(textToShow);
+                    return builder.toString();
 
-                    } else {
-                        String textToShow = context.getString(R.string.history_cleared_message);
-                        builder.append(textToShow);
-                        return builder.toString();
-                    }
                 } else if (message.getType() == MegaChatMessage.TYPE_CHAT_TITLE) {
                     log("Message type CHANGE TITLE " + message.getContent());
 
@@ -1307,13 +1312,13 @@ public class ChatController {
         if(availableFreeSpace < sizeC) {
 
             if(context instanceof ChatActivityLollipop){
-                ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((ChatActivityLollipop) context).showSnackbarNotSpace();
             }
             else if(context instanceof NodeAttachmentActivityLollipop){
-                ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((NodeAttachmentActivityLollipop) context).showSnackbarNotSpace();
             }
             else if(context instanceof ChatFullScreenImageViewer){
-                ((ChatFullScreenImageViewer) context).showSnackbar(context.getString(R.string.error_not_enough_free_space));
+                ((ChatFullScreenImageViewer) context).showSnackbarNotSpace();
             }
             log("Not enough space");
             return;
@@ -1454,6 +1459,7 @@ public class ChatController {
 
                             Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
                             pdfIntent.putExtra("APP", true);
+                            pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                 pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
                             }

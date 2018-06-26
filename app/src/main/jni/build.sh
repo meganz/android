@@ -68,12 +68,26 @@ LIBUV_SOURCE_FOLDER=libuv-v${LIBUV_VERSION}
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_FILE}
 LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
 
+MEDIAINFO=mediainfo
+MEDIAINFO_VERSION=4ee7f77c087b29055f48d539cd679de8de6f9c48
+MEDIAINFO_SOURCE_FILE=${MEDIAINFO_VERSION}.zip
+MEDIAINFO_SOURCE_FOLDER=MediaInfoLib-${MEDIAINFO_VERSION}
+MEDIAINFO_DOWNLOAD_URL=https://github.com/meganz/MediaInfoLib/archive/${MEDIAINFO_SOURCE_FILE}
+MEDIAINFO_SHA1="30927c761418e807d8d3b64e171a6c9ab9659c2e"
+
+ZENLIB=ZenLib
+ZENLIB_VERSION=6694a744d82d942c4a410f25f916561270381889
+ZENLIB_SOURCE_FILE=${ZENLIB_VERSION}.zip
+ZENLIB_SOURCE_FOLDER=ZenLib-${ZENLIB_VERSION}
+ZENLIB_DOWNLOAD_URL=https://github.com/MediaArea/ZenLib/archive/${ZENLIB_SOURCE_FILE}
+ZENLIB_SHA1="1af04654c9618f54ece624a0bad881a3cfef3692"
+
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=bce3f98f1b2fd3ad5cd18b01cbb1e68dc2be29dd
+LIBWEBSOCKETS_VERSION=91de9a4a69b9b4af38b662c8bd9adbd1b4370ae0
 LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
-LIBWEBSOCKETS_SHA1="6bc1801b397769cf5a37f888eb57ef2499309215"
+LIBWEBSOCKETS_SHA1="ec7b329dfa37452d08d873afd5aaec4ac61e16db"
 
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.8.2
@@ -132,7 +146,7 @@ function createMEGAchatBindings
 {
     echo "* Creating MEGAchat Java bindings"
     mkdir -p ../java/nz/mega/sdk
-    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/megachatapi.i &>> ${LOG_FILE}
+    swig -c++ -Imega/sdk/include -Imegachat/sdk/src/ -java -package nz.mega.sdk -outdir ${JAVA_OUTPUT_PATH}/nz/mega/sdk/ -o bindings/megachat.cpp megachat/sdk/bindings/megachatapi.i &>> ${LOG_FILE}
     pushd megachat/sdk/src &>> ${LOG_FILE}
     cmake -P genDbSchema.cmake
     popd &>> ${LOG_FILE}
@@ -188,6 +202,10 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FOLDER}
     rm -rf ${LIBUV}/${LIBUV}
+    rm -rf ${MEDIAINFO}/${ZENLIB_SOURCE_FOLDER}
+    rm -rf ${MEDIAINFO}/${ZENLIB}
+    rm -rf ${MEDIAINFO}/${MEDIAINFO_SOURCE_FOLDER}
+    rm -rf ${MEDIAINFO}/${MEDIAINFO}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FOLDER}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     rm -rf ${PDFVIEWER}/${PDFVIEWER}
@@ -206,6 +224,10 @@ if [ "$1" == "clean" ]; then
     rm -rf ${SODIUM}/${SODIUM_SOURCE_FILE}.ready
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}
     rm -rf ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
+    rm -rf ${MEDIAINFO}/${ZENLIB_SOURCE_FILE}
+    rm -rf ${MEDIAINFO}/${ZENLIB_SOURCE_FILE}.ready
+    rm -rf ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}
+    rm -rf ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
 
@@ -285,6 +307,23 @@ if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
     touch ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
 fi
 echo "* libuv is ready"
+
+echo "* Setting up ZenLib"
+if [ ! -f ${MEDIAINFO}/${ZENLIB_SOURCE_FILE}.ready ]; then
+    downloadCheckAndUnpack ${ZENLIB_DOWNLOAD_URL} ${MEDIAINFO}/${ZENLIB_SOURCE_FILE} ${ZENLIB_SHA1} ${MEDIAINFO}
+    ln -sf ${ZENLIB_SOURCE_FOLDER} ${MEDIAINFO}/${ZENLIB}
+    cp mega/sdk/include/mega/mega_glob.h ${MEDIAINFO}/${ZENLIB}/Source/ZenLib/glob.h
+    touch ${MEDIAINFO}/${ZENLIB_SOURCE_FILE}.ready
+fi
+echo "* ZenLib is ready"
+
+echo "* Setting up MediaInfo"
+if [ ! -f ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready ]; then
+    downloadCheckAndUnpack ${MEDIAINFO_DOWNLOAD_URL} ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE} ${MEDIAINFO_SHA1} ${MEDIAINFO}
+    ln -sf ${MEDIAINFO_SOURCE_FOLDER} ${MEDIAINFO}/${MEDIAINFO}
+    touch ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready
+fi
+echo "* MediaInfo is ready"
 
 echo "* Setting up OpenSSL"
 if [ ! -f ${OPENSSL}/${OPENSSL_SOURCE_FILE}.ready ]; then

@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -51,7 +50,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
 	Context context;
-	ActionBar aB;
 	MyAccountInfo myAccountInfo;
 
 	RelativeLayout avatarLayout;
@@ -59,7 +57,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	RoundedImageView myAccountImage;
 
 	TextView nameView;
-	boolean mKLayoutVisible;
 
 	String myEmail;
 	MegaUser myUser;
@@ -75,6 +72,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button upgradeButton;
 	Button logoutButton;
 	Button mkButton;
+	Button changePassButton;
 
 	RelativeLayout typeLayout;
 	LinearLayout lastSessionLayout;
@@ -82,17 +80,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	LinearLayout achievementsLayout;
 	LinearLayout achievementsSeparator;
-
-	RelativeLayout exportMKLayout;
-	LinearLayout exportMKButtonsLayout;
-	TextView titleExportMK;
-	TextView subTitleExportMK;
-	TextView firstParExportMK;
-	TextView secondParExportMK;
-	TextView thirdParExportMK;
-	TextView actionExportMK;
-	Button copyMK;
-	Button saveMK;
 
 	LinearLayout parentLinearLayout;
 	
@@ -137,6 +124,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return null;
 		}
 
+		log("My user handle: "+myUser.getHandle()+"****"+MegaApiJava.userHandleToBase64(myUser.getHandle()));
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
 		avatarLayout.setOnClickListener(this);
 
@@ -157,16 +145,23 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+			mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		}
-		else{
-			mkButton.setBackgroundResource(R.drawable.black_button_border);
-//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
+
 		mkButton.setOnClickListener(this);
 		mkButton.setVisibility(View.VISIBLE);
 
 		setMkButtonText();
+
+		changePassButton = (Button) v.findViewById(R.id.change_pass_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			changePassButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
+		}
+		else{
+			changePassButton.setBackgroundResource(R.drawable.black_button_border);
+//			mkButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+		}
+		changePassButton.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			log("onCreate: Landscape configuration");
@@ -226,67 +221,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		logoutButton.setVisibility(View.VISIBLE);
 
 		parentLinearLayout = (LinearLayout) v.findViewById(R.id.parent_linear_layout);
-		exportMKLayout = (RelativeLayout) v.findViewById(R.id.export_mk_full_layout);
-		LinearLayout.LayoutParams exportMKButtonsParams = (LinearLayout.LayoutParams)exportMKLayout.getLayoutParams();
-		exportMKButtonsParams.setMargins(0, 0, 0, Util.scaleHeightPx(10, outMetrics));
-		exportMKLayout.setLayoutParams(exportMKButtonsParams);
-
-		exportMKButtonsLayout = (LinearLayout) v.findViewById(R.id.MK_buttons_layout);
-
-		titleExportMK = (TextView) v.findViewById(R.id.title_export_MK_layout);
-		RelativeLayout.LayoutParams titleExportMKParams = (RelativeLayout.LayoutParams)titleExportMK.getLayoutParams();
-		titleExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(50, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		titleExportMK.setLayoutParams(titleExportMKParams);
-
-		subTitleExportMK = (TextView) v.findViewById(R.id.subtitle_export_MK_layout);
-		RelativeLayout.LayoutParams subTitleExportMKParams = (RelativeLayout.LayoutParams)subTitleExportMK.getLayoutParams();
-		subTitleExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		subTitleExportMK.setLayoutParams(subTitleExportMKParams);
-
-		firstParExportMK = (TextView) v.findViewById(R.id.first_par_export_MK_layout);
-		RelativeLayout.LayoutParams firstParExportMKParams = (RelativeLayout.LayoutParams)firstParExportMK.getLayoutParams();
-		firstParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		firstParExportMK.setLayoutParams(firstParExportMKParams);
-
-		secondParExportMK = (TextView) v.findViewById(R.id.second_par_export_MK_layout);
-		RelativeLayout.LayoutParams secondParExportMKParams = (RelativeLayout.LayoutParams)secondParExportMK.getLayoutParams();
-		secondParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		secondParExportMK.setLayoutParams(secondParExportMKParams);
-
-		thirdParExportMK = (TextView) v.findViewById(R.id.third_par_export_MK_layout);
-		RelativeLayout.LayoutParams thirdParExportMKParams = (RelativeLayout.LayoutParams)thirdParExportMK.getLayoutParams();
-		thirdParExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(24, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		thirdParExportMK.setLayoutParams(thirdParExportMKParams);
-
-		actionExportMK = (TextView) v.findViewById(R.id.action_export_MK_layout);
-		RelativeLayout.LayoutParams actionExportMKParams = (RelativeLayout.LayoutParams)actionExportMK.getLayoutParams();
-		actionExportMKParams.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(24, outMetrics), 0);
-		actionExportMK.setLayoutParams(actionExportMKParams);
-
-		copyMK = (Button) v.findViewById(R.id.copy_MK_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			copyMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-		}
-		LinearLayout.LayoutParams copyMKParams = (LinearLayout.LayoutParams)copyMK.getLayoutParams();
-		copyMKParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
-		copyMK.setLayoutParams(copyMKParams);
-		copyMK.setOnClickListener(this);
-
-		saveMK = (Button) v.findViewById(R.id.save_MK_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			saveMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-		}
-		LinearLayout.LayoutParams saveMKParams = (LinearLayout.LayoutParams)saveMK.getLayoutParams();
-		saveMKParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, 0);
-		saveMK.setLayoutParams(saveMKParams);
-		saveMK.setOnClickListener(this);
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
 			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
 		}
-
-		mKLayoutVisible = ((ManagerActivityLollipop)context).isMkLayoutVisible();
 
 		if(myAccountInfo!=null){
 			log("myAccountInfo!=NULL");
@@ -312,12 +251,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		this.updateAvatar(true);
-
-		if(mKLayoutVisible){
-			log("on Create MK visible");
-			((ManagerActivityLollipop)context).showMKLayout(true);
-			showMKLayout();
-		}
 
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
@@ -522,7 +455,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("onAttach");
 		super.onAttach(activity);
 		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
 
 	@Override
@@ -530,7 +462,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("onAttach context");
 		super.onAttach(context);
 		this.context = context;
-		aB = ((AppCompatActivity)getActivity()).getSupportActionBar();
 	}
 
 	@Override
@@ -541,8 +472,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				log("Logout button");
-				AccountController aC = new AccountController(context);
-				aC.logout(context, megaApi, megaChatApi,false);
+
+				((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
+				megaApi.shouldShowPasswordReminderDialog(true, myAccountInfo);
+//				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
+
+//				AccountController aC = new AccountController(this);
+//				aC.logout(this, megaApi);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -566,24 +502,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					((ManagerActivityLollipop)context).showConfirmationRemoveMK();
 				}
 				else{
-					((ManagerActivityLollipop)context).showMKLayout(true);
-					showMKLayout();
+					((ManagerActivityLollipop)context).showMKLayout();
 				}
 
 				break;
 			}
-			case R.id.copy_MK_button:{
-				log("Copy Master Key button");
-				hideMKLayout();
-				AccountController aC = new AccountController(context);
-				aC.copyMK();
-				break;
-			}
-			case R.id.save_MK_button:{
-				log("Save Master Key button");
-				hideMKLayout();
-				AccountController aC = new AccountController(context);
-				aC.exportMK();
+
+			case R.id.change_pass_button:{
+				log("Change pass button");
+
+				Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+				startActivity(intent);
 				break;
 			}
 			case R.id.my_account_account_type_button:{
@@ -611,12 +540,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public int onBackPressed(){
 		log("onBackPressed");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
-		if(exportMKLayout.getVisibility()==View.VISIBLE){
-			log("Master Key layout is VISIBLE");
-			hideMKLayout();
-			return 1;
-		}
 
 		return 0;
 	}
@@ -691,24 +614,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Util.log("MyAccountFragmentLollipop", log);
 	}
 
-	public void showMKLayout(){
-		log("showMKLayout");
-		parentLinearLayout.setVisibility(View.GONE);
-		exportMKLayout.setVisibility(View.VISIBLE);
-		mKLayoutVisible=false;
-	}
-
 	public void resetPass(){
 		AccountController aC = new AccountController(context);
 		aC.resetPass(myEmail);
-	}
-
-	public void hideMKLayout(){
-		log("hideMKLayout");
-		exportMKLayout.setVisibility(View.GONE);
-		parentLinearLayout.setVisibility(View.VISIBLE);
-		mKLayoutVisible=false;
-		((ManagerActivityLollipop)context).hideMKLayout();
 	}
 
 	public void updateAvatar(boolean retry){

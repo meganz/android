@@ -19,8 +19,16 @@
         android:visible="true"/>
 
     <item
+        android:id="@+id/full_video_viewer_download"
+        android:orderInCategory="110"
+        android:title="@string/context_download"
+        android:icon="@drawable/ic_download_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
         android:id="@+id/full_video_viewer_properties"
-        android:orderInCategory="105"
+        android:orderInCategory="110"
         android:title="@string/general_file_info"
         android:icon="@drawable/info_ic_white"
         MEGA:showAsAction="always"

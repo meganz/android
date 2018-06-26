@@ -6,8 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -74,7 +72,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 	TextView commentText;
 	
-	private ActionBar aB;
 	int selectedSubscription = Constants.PAYMENT_CC_YEAR;
 	int parameterType=-1;	
 	MegaApiAndroid megaApi;
@@ -105,10 +102,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -764,7 +757,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
 	
 	public static void log(String message) {

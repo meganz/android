@@ -33,9 +33,26 @@ public class TimeChatUtils implements Comparator<Calendar> {
     @Override
     public int compare(Calendar c1, Calendar c2) {
         if(type==TIME){
-            if (c1.get(Calendar.HOUR) != c2.get(Calendar.HOUR))
+            if (c1.get(Calendar.HOUR) != c2.get(Calendar.HOUR)){
                 return c1.get(Calendar.HOUR) - c2.get(Calendar.HOUR);
-            return c1.get(Calendar.MINUTE) - c2.get(Calendar.MINUTE);
+            }
+            else{
+                long milliseconds1 = c1.getTimeInMillis();
+                long milliseconds2 = c2.getTimeInMillis();
+
+                long diff = milliseconds2 - milliseconds1;
+//                long diffSeconds = diff / 1000;
+                long diffMinutes = Math.abs(diff / (60 * 1000));
+
+                if(diffMinutes<3){
+                    return 0;
+                }
+                else{
+                    return 1;
+                }
+
+                //            return c1.get(Calendar.MINUTE) - c2.get(Calendar.MINUTE);
+            }
         }
         else if(type==DATE){
             if (c1.get(Calendar.YEAR) != c2.get(Calendar.YEAR))
@@ -109,7 +126,9 @@ public class TimeChatUtils implements Comparator<Calendar> {
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
         }
         else{
-            df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
+            df = new SimpleDateFormat("EEE d MMM");
+
+            //df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());
         }
 
         Calendar cal = Util.calculateDateFromTimestamp(timestamp);

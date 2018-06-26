@@ -208,6 +208,9 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             ChatController chatC = new ChatController(context);
             String myFullName = chatC.getMyFullName();
 
+            if (myFullName == null || myFullName.isEmpty() || myFullName.equals("")) {
+                myFullName = megaChatApi.getMyEmail();
+            }
             titleNameContactChatPanel.setText(myFullName);
 
             titleMailContactChatPanel.setText(megaChatApi.getMyEmail());
@@ -236,7 +239,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             addAvatarParticipantPanel(participantHandle, megaChatApi.getMyEmail(), myFullName);
         }
         else{
-            titleNameContactChatPanel.setText(selectedChat.getPeerFullnameByHandle(participantHandle));
+
+            String fullName = selectedChat.getPeerFullnameByHandle(participantHandle);
+            if (fullName == null || fullName.isEmpty() || fullName.equals("")) {
+                fullName = selectedChat.getPeerEmailByHandle(participantHandle);
+            }
+
+            titleNameContactChatPanel.setText(fullName);
             titleMailContactChatPanel.setText(selectedChat.getPeerEmailByHandle(participantHandle));
 
             int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
@@ -286,7 +295,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
                 optionRemoveParticipantChat.setVisibility(View.GONE);
             }
 
-            addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle), null);
+            addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle), fullName);
         }
 
         dialog.setContentView(contentView);
@@ -302,7 +311,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
     }
 
-    public void addAvatarParticipantPanel(long handle, String email, String myName){
+    public void addAvatarParticipantPanel(long handle, String email, String name){
 
         File avatar = null;
         String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
@@ -395,18 +404,6 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         DisplayMetrics outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
         float density  = getResources().getDisplayMetrics().density;
-
-        String name = null;
-
-        if(handle==megaChatApi.getMyUserHandle()){
-            if(myName!=null){
-                name = myName;
-            }
-        }
-        else{
-            name = selectedChat.getPeerFullnameByHandle(handle);
-
-        }
 
         if(name!=null){
             if(!(name.trim().isEmpty())){
