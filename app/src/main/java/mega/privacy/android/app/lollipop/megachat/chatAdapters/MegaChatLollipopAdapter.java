@@ -48,6 +48,8 @@ import com.vdurmont.emoji.EmojiParser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -153,31 +155,35 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (param == 0) {
                 log("Preview recovered from folder");
                 int position = holder.getCurrentPosition();
+                if(position<=messages.size()){
+                    AndroidMegaChatMessage message = messages.get(position - 1);
+                    if (message.getMessage() != null) {
+                        if (message.getMessage().getMegaNodeList() != null) {
+                            if (message.getMessage().getMegaNodeList().get(0) != null) {
+                                long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
 
-                AndroidMegaChatMessage message = messages.get(position - 1);
-
-                if (message.getMessage() != null) {
-                    if (message.getMessage().getMegaNodeList() != null) {
-                        if (message.getMessage().getMegaNodeList().get(0) != null) {
-                            long nodeMessageHandle = message.getMessage().getMegaNodeList().get(0).getHandle();
-
-                            if (nodeMessageHandle == node.getHandle()) {
-                                if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
-                                    setOwnPreview(holder, preview, node);
-                                    int status = message.getMessage().getStatus();
-                                    if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
-                                        setErrorStateOnPreview(holder, preview);
+                                if (nodeMessageHandle == node.getHandle()) {
+                                    if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
+                                        setOwnPreview(holder, preview, node);
+                                        int status = message.getMessage().getStatus();
+                                        if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
+                                            setErrorStateOnPreview(holder, preview);
+                                        }
+                                    } else {
+                                        setContactPreview(holder, preview, node);
                                     }
-                                } else {
-                                    setContactPreview(holder, preview, node);
-                                }
 
-                            } else {
-                                log("The nodeHandles are not equal!");
+                                } else {
+                                    log("The nodeHandles are not equal!");
+                                }
                             }
                         }
                     }
+                }else{
+                    log("messages removed");
                 }
+
+
             } else if (param == 2) {
                 File previewFile = new File(PreviewUtils.getPreviewFolder(context), node.getBase64Handle() + ".jpg");
                 log("GET PREVIEW OF HANDLE: " + node.getHandle() + " to download here: " + previewFile.getAbsolutePath());
@@ -504,7 +510,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView urlOwnMessageIcon;
         TextView urlOwnMessageLink;
 
-        ImageView urlOwnMessageImage;
+        RoundedImageView urlOwnMessageImage;
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
@@ -517,7 +523,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ImageView urlContactMessageIcon;
         TextView urlContactMessageLink;
 
-        ImageView urlContactMessageImage;
+        RoundedImageView urlContactMessageImage;
 
         RoundedImageView contentOwnMessageThumbLand;
         RelativeLayout gradientOwnMessageThumbLand;
@@ -583,7 +589,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView videoTimecontentContactMessageThumbLand;
         RelativeLayout forwardContactPreviewLandscape;
 
-
         RoundedImageView contentContactMessageThumbPort;
         RelativeLayout gradientContactMessageThumbPort;
         ImageView videoIconContactMessageThumbPort;
@@ -613,8 +618,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         RelativeLayout ownManagementMessageLayout;
         TextView ownManagementMessageText;
+        ImageView ownManagementMessageIcon;
 
         TextView contactManagementMessageText;
+        ImageView contactManagementMessageIcon;
         RelativeLayout contactManagementMessageLayout;
 
         public String filePathUploading;
@@ -673,9 +680,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
             holder = new ViewHolderMessageChat(v);
             holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
-            holder.itemLayout.setTag(holder);
-            holder.itemLayout.setOnClickListener(this);
-            holder.itemLayout.setOnLongClickListener(this);
             holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
             //Margins
             RelativeLayout.LayoutParams dateLayoutParams = (RelativeLayout.LayoutParams) holder.dateLayout.getLayoutParams();
@@ -699,13 +703,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageText.setTag(holder);
+            holder.contentOwnMessageText.setOnClickListener(this);
+            holder.contentOwnMessageText.setOnLongClickListener(this);
 
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
             holder.urlOwnMessageLayout.setVisibility(View.GONE);
+
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                ViewGroup.LayoutParams params=holder.urlOwnMessageLayout.getLayoutParams();
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    params.width=450;
+                }else{
+                    params.width=330;
+                }
+                holder.urlOwnMessageLayout.setLayoutParams(params);
+            }
             holder.forwardOwnRichLinks = (RelativeLayout) v.findViewById(R.id.forward_own_rich_links);
             holder.forwardOwnRichLinks.setTag(holder);
-            holder.forwardOwnRichLinks.setOnClickListener(this);
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
             holder.urlOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_own_message_text);
@@ -725,13 +741,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageIcon = (ImageView) v.findViewById(R.id.url_own_message_icon);
             holder.urlOwnMessageLink = (TextView) v.findViewById(R.id.url_own_message_link);
 
-            holder.urlOwnMessageImage = (ImageView) v.findViewById(R.id.url_own_message_image);
+            holder.urlOwnMessageImage = (RoundedImageView) v.findViewById(R.id.url_own_message_image);
+            int radiusImageRL = Util.scaleWidthPx(10, outMetrics);
+            holder.urlOwnMessageImage.setCornerRadius(radiusImageRL);
+            holder.urlOwnMessageImage.setBorderWidth(0);
+            holder.urlOwnMessageImage.setOval(false);
 
             //Contact rich links message
             holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                ViewGroup.LayoutParams params=holder.urlContactMessageLayout.getLayoutParams();
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    params.width=450;
+                }else{
+                    params.width=330;
+                }
+                holder.urlContactMessageLayout.setLayoutParams(params);
+            }
             holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
             holder.forwardContactRichLinks.setTag(holder);
-            holder.forwardContactRichLinks.setOnClickListener(this);
             holder.forwardContactRichLinks.setVisibility(View.GONE);
             holder.urlContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_contact_message_text);
 
@@ -742,7 +770,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlContactMessageIcon = (ImageView) v.findViewById(R.id.url_contact_message_icon);
             holder.urlContactMessageLink = (TextView) v.findViewById(R.id.url_contact_message_link);
 
-            holder.urlContactMessageImage = (ImageView) v.findViewById(R.id.url_contact_message_image);
+            holder.urlContactMessageImage = (RoundedImageView) v.findViewById(R.id.url_contact_message_image);
+            holder.urlContactMessageImage.setCornerRadius(radiusImageRL);
+            holder.urlContactMessageImage.setBorderWidth(0);
+            holder.urlContactMessageImage.setOval(false);
 
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             int radius = Util.scaleWidthPx(15, outMetrics);
@@ -777,7 +808,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageFileLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_file_layout);
             holder.forwardOwnFile = (RelativeLayout) v.findViewById(R.id.forward_own_file);
             holder.forwardOwnFile.setTag(holder);
-            holder.forwardOwnFile.setOnClickListener(this);
             holder.forwardOwnFile.setVisibility(View.GONE);
 
             holder.contentOwnMessageFileThumb = (ImageView) v.findViewById(R.id.content_own_message_file_thumb);
@@ -789,10 +819,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactThumb = (RoundedImageView) v.findViewById(R.id.content_own_message_contact_thumb);
             holder.contentOwnMessageContactName = (TextView) v.findViewById(R.id.content_own_message_contact_name);
             holder.contentOwnMessageContactEmail = (TextView) v.findViewById(R.id.content_own_message_contact_email);
+
             holder.contentOwnMessageContactInitialLetter = (TextView) v.findViewById(R.id.content_own_message_contact_initial_letter);
             holder.forwardOwnContact = (RelativeLayout) v.findViewById(R.id.forward_own_contact);
             holder.forwardOwnContact.setTag(holder);
-            holder.forwardOwnContact.setOnClickListener(this);
             holder.forwardOwnContact.setVisibility(View.GONE);
 
             holder.iconOwnTypeDocLandPreview = (ImageView) v.findViewById(R.id.own_attachment_type_icon_lands);
@@ -819,12 +849,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.forwardOwnPortrait = (RelativeLayout) v.findViewById(R.id.forward_own_preview_portrait);
             holder.forwardOwnPortrait.setTag(holder);
-            holder.forwardOwnPortrait.setOnClickListener(this);
             holder.forwardOwnPortrait.setVisibility(View.GONE);
 
             holder.forwardOwnLandscape = (RelativeLayout) v.findViewById(R.id.forward_own_preview_landscape);
             holder.forwardOwnLandscape.setTag(holder);
-            holder.forwardOwnLandscape.setOnClickListener(this);
             holder.forwardOwnLandscape.setVisibility(View.GONE);
 
             holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
@@ -835,6 +863,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.ownManagementMessageLayout.setLayoutParams(ownManagementParams);
 
             holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_management_message_text);
+            holder.ownManagementMessageIcon = (ImageView) v.findViewById(R.id.own_management_message_icon);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
@@ -856,6 +885,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
             holder.contentContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageText.setTag(holder);
+            holder.contentContactMessageText.setOnClickListener(this);
+            holder.contentContactMessageText.setOnLongClickListener(this);
 
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
@@ -863,7 +895,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbLand.setOval(false);
             holder.forwardContactPreviewLandscape = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_landscape);
             holder.forwardContactPreviewLandscape.setTag(holder);
-            holder.forwardContactPreviewLandscape.setOnClickListener(this);
             holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
             holder.contentContactMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
@@ -872,7 +903,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbPort.setOval(false);
             holder.forwardContactPreviewPortrait = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_portrait);
             holder.forwardContactPreviewPortrait.setTag(holder);
-            holder.forwardContactPreviewPortrait.setOnClickListener(this);
             holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
             holder.gradientContactMessageThumbLand = (RelativeLayout) v.findViewById(R.id.gradient_contact_message_thumb_landscape);
             holder.videoIconContactMessageThumbLand = (ImageView) v.findViewById(R.id.video_icon_contact_message_thumb_landscape);
@@ -895,7 +925,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageFile = (RelativeLayout) v.findViewById(R.id.content_contact_message_file);
             holder.forwardContactFile = (RelativeLayout) v.findViewById(R.id.forward_contact_file);
             holder.forwardContactFile.setTag(holder);
-            holder.forwardContactFile.setOnClickListener(this);
             holder.forwardContactFile.setVisibility(View.GONE);
             holder.contentContactMessageFileThumb = (ImageView) v.findViewById(R.id.content_contact_message_file_thumb);
             holder.contentContactMessageFileName = (TextView) v.findViewById(R.id.content_contact_message_file_name);
@@ -905,7 +934,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageContactLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_contact_layout);
             holder.forwardContactContact = (RelativeLayout) v.findViewById(R.id.forward_contact_contact);
             holder.forwardContactContact.setTag(holder);
-            holder.forwardContactContact.setOnClickListener(this);
             holder.forwardContactContact.setVisibility(View.GONE);
 
 //            holder.contentContactMessageContactLayout.setVisibility(View.GONE);
@@ -925,16 +953,20 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementMessageLayout.setLayoutParams(contactManagementParams);
 
             holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_management_message_text);
+            holder.contactManagementMessageIcon = (ImageView) v.findViewById(R.id.contact_management_message_icon);
+
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                MAX_WIDTH_FILENAME_LAND = 290;
+                MAX_WIDTH_FILENAME_PORT = 140;
+            }
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-                holder.contentContactMessageFileName.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
-                holder.contentContactMessageFileSize.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
+
                 holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
             } else {
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-                holder.contentContactMessageFileName.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
-                holder.contentContactMessageFileSize.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
+
                 holder.contactManagementMessageText.setMaxWidth(Util.scaleWidthPx(275, outMetrics));
             }
 
@@ -970,6 +1002,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void onBindViewHolderUploading(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderUploading: " + position);
+
+        ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+
+        ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
+        ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
+        ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
 
         ((ViewHolderMessageChat) holder).currentPosition = position;
 
@@ -1131,6 +1169,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void onBindViewHolderMessage(RecyclerView.ViewHolder holder, int position) {
         log("onBindViewHolderMessage: " + position);
 
+        ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+
         ((ViewHolderMessageChat) holder).currentPosition = position;
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
         ((ViewHolderMessageChat) holder).ownTriangleIconContact.setVisibility(View.GONE);
@@ -1164,6 +1204,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         int messageType = message.getType();
         log("Message type: " + messageType);
+
+        if(isKnownMessage(messageType)){
+            ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
+            ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
+            ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
+        }
+        else{
+            ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(null);
+            ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(null);
+        }
 
         switch (messageType) {
 
@@ -1216,9 +1266,24 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 bindRevokeNodeMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
+            case MegaChatMessage.TYPE_CALL_ENDED: {
+                log("MegaChatMessage.TYPE_CALL_ENDED");
+                bindCallEndedMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+            }
+            case MegaChatMessage.TYPE_INVALID: {
+                log("MegaChatMessage.TYPE_INVALID");
+                bindNoTypeMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+            }
+            case MegaChatMessage.TYPE_UNKNOWN: {
+                log("MegaChatMessage.TYPE_UNKNOWN");
+                hideMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+            }
             default: {
                 log("DEFAULT MegaChatMessage");
-                bindNoTypeMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                hideMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
         }
@@ -1280,6 +1345,410 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
         }
     }
+
+    public boolean isKnownMessage(int messageType){
+        switch (messageType) {
+
+            case MegaChatMessage.TYPE_ALTER_PARTICIPANTS:
+            case MegaChatMessage.TYPE_PRIV_CHANGE:
+            case MegaChatMessage.TYPE_CONTAINS_META:
+            case MegaChatMessage.TYPE_NORMAL:
+            case MegaChatMessage.TYPE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:
+            case MegaChatMessage.TYPE_CHAT_TITLE:
+            case MegaChatMessage.TYPE_TRUNCATE:
+            case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CALL_ENDED:
+            case MegaChatMessage.TYPE_INVALID: {
+                return true;
+            }
+            case MegaChatMessage.TYPE_UNKNOWN:
+            default: {
+                return false;
+            }
+        }
+    }
+
+    public void bindCallEndedMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        log("bindCallEndedMessage");
+
+        ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
+        MegaChatMessage message = androidMessage.getMessage();
+
+        if (message.getUserHandle() == myUserHandle) {
+            log("MY message!!");
+            log("MY message handle!!: " + message.getMsgId());
+            if (messages.get(position - 1).getInfoToShow() != -1) {
+                switch (messages.get(position - 1).getInfoToShow()) {
+                    case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
+                        ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        break;
+                    }
+                    case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
+                        log("CHAT_ADAPTER_SHOW_TIME");
+                        ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).timeOwnText.setText(TimeChatUtils.formatTime(message));
+                        break;
+                    }
+                    case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
+                        log("CHAT_ADAPTER_SHOW_NOTHING");
+                        ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).titleOwnMessage.setVisibility(View.GONE);
+                        break;
+                    }
+                }
+            }
+
+            ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
+
+            String textToShow = "";
+
+            switch(message.getTermCode()){
+                case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_made));
+
+                    int minutes = (message.getDuration() % 3600) / 60;
+                    int seconds = message.getDuration() % 60;
+
+                    if(minutes == 0){
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                    }
+                    else{
+                        if(seconds == 0){
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+                        }
+                        else if (seconds == 1){
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+                        }
+                        else{
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                        }
+                    }
+
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+
+                    textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_not_answered));
+
+                    textToShow = String.format(context.getString(R.string.call_not_answered_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+
+                    textToShow = String.format(context.getString(R.string.call_failed_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+
+                    textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+            }
+
+            Spanned result = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                result = Html.fromHtml(textToShow);
+            }
+
+            ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.VISIBLE);
+
+            ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
+            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
+            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
+            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
+
+            if (!multipleSelect) {
+                if (positionClicked != -1) {
+                    if (positionClicked == position) {
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                        listFragment.smoothScrollToPosition(positionClicked);
+                    } else {
+                        holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                }
+            } else {
+                log("Multiselect ON");
+                if (this.isItemChecked(position)) {
+                    holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                } else {
+                    log("NOT selected");
+                    holder.ownManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                }
+            }
+        } else {
+            long userHandle = message.getUserHandle();
+            log("Contact message!!: " + userHandle);
+            if (((ChatActivityLollipop) context).isGroup()) {
+
+                ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
+
+                if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
+                    ((ViewHolderMessageChat) holder).fullNameTitle = "";
+                }
+
+                if (((ViewHolderMessageChat) holder).fullNameTitle.trim().length() <= 0) {
+
+                    log("NOT found in DB - ((ViewHolderMessageChat)holder).fullNameTitle");
+                    ((ViewHolderMessageChat) holder).fullNameTitle = "Unknown name";
+                    if (!(((ViewHolderMessageChat) holder).nameRequestedAction)) {
+                        log("3-Call for nonContactName: " + message.getUserHandle());
+                        ((ViewHolderMessageChat) holder).nameRequestedAction = true;
+                        ChatNonContactNameListener listener = new ChatNonContactNameListener(context, ((ViewHolderMessageChat) holder), this, userHandle);
+                        megaChatApi.getUserFirstname(userHandle, listener);
+                        megaChatApi.getUserLastname(userHandle, listener);
+                        megaChatApi.getUserEmail(userHandle, listener);
+                    } else {
+                        log("4-Name already asked and no name received: " + message.getUserHandle());
+                    }
+                }
+
+                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
+                ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
+            } else {
+
+                ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
+                ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
+            }
+
+            if (messages.get(position - 1).getInfoToShow() != -1) {
+                switch (messages.get(position - 1).getInfoToShow()) {
+                    case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
+                        log("CHAT_ADAPTER_SHOW_ALL");
+                        ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).dateText.setText(TimeChatUtils.formatDate(message.getTimestamp(), TimeChatUtils.DATE_SHORT_FORMAT));
+                        ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME: {
+                        log("CHAT_ADAPTER_SHOW_TIME--");
+                        ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.VISIBLE);
+                        ((ViewHolderMessageChat) holder).timeContactText.setText(TimeChatUtils.formatTime(message));
+                        ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                    case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_NOTHING: {
+                        log("CHAT_ADAPTER_SHOW_NOTHING");
+                        ((ViewHolderMessageChat) holder).dateLayout.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).timeContactText.setVisibility(View.GONE);
+                        ((ViewHolderMessageChat) holder).titleContactMessage.setVisibility(View.GONE);
+                        break;
+                    }
+                }
+            }
+
+            ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
+            ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.VISIBLE);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
+
+            ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
+
+            if (!multipleSelect) {
+                if (positionClicked != -1) {
+                    if (positionClicked == position) {
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                        listFragment.smoothScrollToPosition(positionClicked);
+                    } else {
+                        holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                    }
+                } else {
+                    holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                }
+            } else {
+                log("Multiselect ON");
+                if (this.isItemChecked(position)) {
+                    holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+                } else {
+                    log("NOT selected");
+                    holder.contactManagementMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+                }
+            }
+
+            String textToShow = "";
+
+            switch(message.getTermCode()){
+                case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_received));
+
+                    int minutes = (message.getDuration() % 3600) / 60;
+                    int seconds = message.getDuration() % 60;
+
+                    if(minutes == 0){
+                        textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                    }
+                    else{
+                        if(seconds == 0){
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+                        }
+                        else if (seconds == 1){
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+                        }
+                        else{
+                            textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                        }
+                    }
+
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/C]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+
+                    textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_missed));
+
+                    textToShow = String.format(context.getString(R.string.call_missed_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+
+                    textToShow = String.format(context.getString(R.string.call_failed_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+                case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+
+                    textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+                    try {
+                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[/A]", "</font>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[/B]", "</font>");
+                    } catch (Exception e) {
+                    }
+
+                    break;
+                }
+            }
+
+            Spanned result = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                result = Html.fromHtml(textToShow);
+            }
+
+            ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
+        }
+    }
+
 
     public void bindAlterParticipantsMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("bindAlterParticipantsMessage");
@@ -1387,6 +1856,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 result = Html.fromHtml(textToShow);
             }
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
@@ -1453,6 +1923,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
@@ -1749,6 +2220,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
@@ -1814,6 +2286,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -1954,7 +2427,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
             //            ((ViewHolderMessageChat)holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
 
-            String url = meta.getRichPreview().getUrl();
+            String urlString = meta.getRichPreview().getUrl();
+
+            try {
+                URL url = new URL(urlString);
+                urlString = url.getHost();
+
+            } catch (MalformedURLException e) {
+                log("EXCEPTION: "+e.getMessage());
+            }
 
             String title = meta.getRichPreview().getTitle();
             String text = meta.getRichPreview().getText();
@@ -2037,12 +2518,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).ownManagementMessageLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
-                ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
-                ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
-
                 ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
+                if(isMultipleSelect()){
+                    holder.forwardOwnRichLinks.setOnClickListener(null);
+                }else{
+                    holder.forwardOwnRichLinks.setOnClickListener(this);
+                }
 
                 ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
 //                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -2125,7 +2608,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setText(title);
                 ((ViewHolderMessageChat)holder).urlOwnMessageDescription.setText(description);
                 ((ViewHolderMessageChat)holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat)holder).urlOwnMessageLink.setText(url);
+                ((ViewHolderMessageChat)holder).urlOwnMessageLink.setText(urlString);
 
                 if (bitmapImage != null) {
                     ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageBitmap(bitmapImage);
@@ -2252,7 +2735,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.VISIBLE);
 
                 holder.forwardContactRichLinks.setVisibility(View.VISIBLE);
-
+                if(isMultipleSelect()){
+                    holder.forwardContactRichLinks.setOnClickListener(null);
+                }else{
+                    holder.forwardContactRichLinks.setOnClickListener(this);
+                }
 
                 ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
@@ -2291,7 +2778,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat)holder).urlContactMessageTitle.setText(title);
                 ((ViewHolderMessageChat)holder).urlContactMessageDescription.setText(description);
                 ((ViewHolderMessageChat)holder).urlContactMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
-                ((ViewHolderMessageChat)holder).urlContactMessageLink.setText(url);
+                ((ViewHolderMessageChat)holder).urlContactMessageLink.setText(urlString);
 
                 if (EmojiManager.isOnlyEmojis(text)) {
                     log("IS ONLY emoji!!!");
@@ -2443,6 +2930,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
+            if(isMultipleSelect()){
+                holder.forwardOwnRichLinks.setOnClickListener(null);
+            }else{
+                holder.forwardOwnRichLinks.setOnClickListener(this);
+            }
 
             ((ViewHolderMessageChat) holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.GONE);
 
@@ -2906,6 +3398,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.VISIBLE);
 
             holder.forwardContactRichLinks.setVisibility(View.VISIBLE);
+            if(isMultipleSelect()){
+                holder.forwardContactRichLinks.setOnClickListener(null);
+            }else{
+                holder.forwardContactRichLinks.setOnClickListener(this);
+            }
 
 
             ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
@@ -3061,6 +3558,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
+                            if(isMultipleSelect()){
+                                holder.forwardOwnRichLinks.setOnClickListener(null);
+                            }else{
+                                holder.forwardOwnRichLinks.setOnClickListener(this);
+                            }
 
 
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
@@ -3099,6 +3601,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.GONE);
 
                             ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.VISIBLE);
+                            ((ChatActivityLollipop) context).hideKeyboard();
                             ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
                             int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
@@ -3159,10 +3662,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if (message.isEdited()) {
-
                 log("MY Message is edited");
                 ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
+
                 ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
 //                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
@@ -3275,6 +3778,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 params.leftMargin = Util.scaleWidthPx(0, outMetrics);
                 ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
 
+                if (Util.isOnline(context)) {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
+                    }else{
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(true);
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).contentOwnMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
+                    }
+                }else{
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
+                }
+
                 if (!multipleSelect) {
                     if (positionClicked != -1) {
                         if (positionClicked == position) {
@@ -3296,7 +3811,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
                 }
 
-            } else if (message.isDeleted()) {
+            }else if (message.isDeleted()) {
                 log("Message is deleted");
                 holder.contentOwnMessageLayout.setVisibility(View.GONE);
                 holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
@@ -3338,6 +3853,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
 
                 ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
+
                 ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
 //                ((ViewHolderMessageChat)holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
@@ -3443,10 +3959,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (Util.isOnline(context)) {
-                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(true);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
-                    Linkify.addLinks(((ViewHolderMessageChat) holder).contentOwnMessageText, Linkify.WEB_URLS);
-                } else {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
+                    }else{
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(true);
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).contentOwnMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
+                    }
+                }else {
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
                 }
 
@@ -3613,6 +4133,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     CharSequence indexedText = TextUtils.concat(messageContent, edited);
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setText(indexedText);
+                }
+
+                if (Util.isOnline(context)) {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
+                    }else {
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
+                    }
+                } else {
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
                 }
 
                 if (!multipleSelect) {
@@ -3782,8 +4313,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if (Util.isOnline(context)) {
-                    ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
-                    Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
+                    }else {
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
+                    }
                 } else {
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
                 }
@@ -3880,6 +4415,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
             holder.forwardOwnFile.setVisibility(View.VISIBLE);
+            if(isMultipleSelect()){
+                holder.forwardOwnFile.setOnClickListener(null);
+            }else{
+                holder.forwardOwnFile.setOnClickListener(this);
+            }
 
             ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.GONE);
@@ -4062,7 +4602,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     holder.transparentCoatingPortrait.setVisibility(View.GONE);
                                     holder.retryAlert.setVisibility(View.GONE);
                                     holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
-
+                                    if(isMultipleSelect()){
+                                        holder.forwardOwnPortrait.setOnClickListener(null);
+                                    }else{
+                                        holder.forwardOwnPortrait.setOnClickListener(this);
+                                    }
                                 }
 
                                 ((ViewHolderMessageChat) holder).forwardOwnLandscape.setVisibility(View.GONE);
@@ -4124,6 +4668,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                     ((ViewHolderMessageChat) holder).transparentCoatingLandscape.setVisibility(View.GONE);
                                     ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
                                     holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
+                                    if(isMultipleSelect()){
+                                        holder.forwardOwnLandscape.setOnClickListener(null);
+                                    }else{
+                                        holder.forwardOwnLandscape.setOnClickListener(this);
+                                    }
                                 }
 
                                 ((ViewHolderMessageChat) holder).ownTriangleIconFile.setVisibility(View.GONE);
@@ -4274,6 +4823,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contentContactMessageFile.setVisibility(View.VISIBLE);
             holder.forwardContactFile.setVisibility(View.VISIBLE);
+            if(isMultipleSelect()){
+                holder.forwardContactFile.setOnClickListener(null);
+            }else{
+                holder.forwardContactFile.setOnClickListener(this);
+            }
 
             ((ViewHolderMessageChat) holder).contentContactMessageFileThumb.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contentContactMessageFileName.setVisibility(View.VISIBLE);
@@ -4397,7 +4951,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
 
                                 holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
-
+                                if(isMultipleSelect()){
+                                    holder.forwardContactPreviewPortrait.setOnClickListener(null);
+                                }else{
+                                    holder.forwardContactPreviewPortrait.setOnClickListener(this);
+                                }
 
                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.GONE);
                                 holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
@@ -4462,9 +5020,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setVisibility(View.VISIBLE);
 
-                                    holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
+                                holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
+                                if(isMultipleSelect()){
+                                    holder.forwardContactPreviewLandscape.setOnClickListener(null);
+                                }else{
+                                    holder.forwardContactPreviewLandscape.setOnClickListener(this);
+                                }
 
-//                                            ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
+//                               ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
 
                                 ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setVisibility(View.GONE);
                                 holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
@@ -4635,7 +5198,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).ownTriangleIconContact.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.VISIBLE);
-
+                if(isMultipleSelect()){
+                    ((ViewHolderMessageChat) holder).forwardOwnContact.setOnClickListener(null);
+                }else{
+                    ((ViewHolderMessageChat) holder).forwardOwnContact.setOnClickListener(this);
+                }
             }
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -4659,7 +5226,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     name = message.getUserEmail(0);
                 }
                 String email = message.getUserEmail(0);
-                log("Contact Name: " + name);
+//                log("Contact Name: " + name);
 
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setText(name);
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setText(email);
@@ -4824,6 +5391,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.VISIBLE);
 
             holder.forwardContactContact.setVisibility(View.VISIBLE);
+            if(isMultipleSelect()){
+                holder.forwardContactContact.setOnClickListener(null);
+            }else{
+                holder.forwardContactContact.setOnClickListener(this);
+            }
             ((ViewHolderMessageChat) holder).contentContactMessageContactThumb.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contentContactMessageContactName.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contentContactMessageContactEmail.setVisibility(View.VISIBLE);
@@ -4961,6 +5533,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
 
@@ -5061,6 +5634,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -5163,6 +5737,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
@@ -5260,6 +5835,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -5499,6 +6075,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
+    public void hideMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        log("hideMessage");
+        ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.GONE);
+    }
+
     public void bindNoTypeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("bindNoTypeMessage");
 
@@ -5537,7 +6118,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-            ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+
+            if(message.getType()==MegaChatMessage.TYPE_INVALID){
+                if(message.getCode()==MegaChatMessage.INVALID_FORMAT){
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_invalid_format));
+                }
+                else if(message.getCode()==MegaChatMessage.INVALID_SIGNATURE){
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_invalid_signature));
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+                }
+            }
+            else{
+                ((ViewHolderMessageChat) holder).contentOwnMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+            }
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
@@ -5548,7 +6143,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             params.rightMargin = Util.scaleWidthPx(16, outMetrics);
             params.leftMargin = Util.scaleWidthPx(0, outMetrics);
             ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
-
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
@@ -5650,7 +6244,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
-            ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+
+            if(message.getType()==MegaChatMessage.TYPE_INVALID){
+                if(message.getCode()==MegaChatMessage.INVALID_FORMAT){
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_invalid_format));
+                }
+                else if(message.getCode()==MegaChatMessage.INVALID_SIGNATURE){
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_invalid_signature));
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+                }
+            }
+            else{
+                ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_message_unrecognizable));
+            }
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
             ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
@@ -5968,13 +6576,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void toggleSelection(int pos) {
-        log("*****toggleSelection");
+        log("toggleSelection");
 
         if (selectedItems.get(pos, false)) {
-            log("****delete pos: " + pos);
+            log("delete pos: " + pos);
             selectedItems.delete(pos);
         } else {
-            log("*****PUT pos: " + pos);
+            log("PUT pos: " + pos);
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
@@ -6060,15 +6668,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public ArrayList<AndroidMegaChatMessage> getSelectedMessages() {
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<AndroidMegaChatMessage>();
 
-        for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i) == true) {
+        if(selectedItems!=null){
+            for (int i = 0; i < selectedItems.size(); i++) {
+                if (selectedItems.valueAt(i) == true) {
 
-                AndroidMegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
-                if (m != null) {
-                    messages.add(m);
+                    AndroidMegaChatMessage m = getMessageAt(selectedItems.keyAt(i));
+                    if (m != null) {
+                        messages.add(m);
+                    }
                 }
             }
         }
+
         return messages;
     }
 
@@ -6224,6 +6835,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.previewFramePort.setVisibility(View.VISIBLE);
                 holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                 holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
+                if(isMultipleSelect()){
+                    holder.forwardOwnPortrait.setOnClickListener(null);
+                }else{
+                    holder.forwardOwnPortrait.setOnClickListener(this);
+                }
                 holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                 holder.forwardOwnFile.setVisibility(View.GONE);
                 holder.previewFrameLand.setVisibility(View.GONE);
@@ -6271,6 +6887,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.previewFramePort.setVisibility(View.GONE);
                 holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
                 holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
+                if(isMultipleSelect()){
+                    holder.forwardOwnLandscape.setOnClickListener(null);
+                }else{
+                    holder.forwardOwnLandscape.setOnClickListener(this);
+                }
                 holder.forwardOwnPortrait.setVisibility(View.GONE);
                 holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
                 holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
@@ -6313,7 +6934,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
 
             holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
-
+            if(isMultipleSelect()){
+                holder.forwardContactPreviewPortrait.setOnClickListener(null);
+            }else{
+                holder.forwardContactPreviewPortrait.setOnClickListener(this);
+            }
             holder.contentContactMessageThumbLand.setVisibility(View.GONE);
             holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
@@ -6379,6 +7004,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
 
             holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
+            if(isMultipleSelect()){
+                holder.forwardContactPreviewLandscape.setOnClickListener(null);
+            }else{
+                holder.forwardContactPreviewLandscape.setOnClickListener(this);
+            }
 //                                                ((ViewHolderMessageChat) holder).contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
             holder.contentContactMessageThumbPort.setVisibility(View.GONE);
             holder.forwardContactPreviewPortrait.setVisibility(View.GONE);
@@ -6474,6 +7104,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.previewFramePort.setVisibility(View.VISIBLE);
                                 holder.contentOwnMessageThumbPort.setVisibility(View.VISIBLE);
                                 holder.forwardOwnPortrait.setVisibility(View.VISIBLE);
+                                if(isMultipleSelect()){
+                                    holder.forwardOwnPortrait.setOnClickListener(null);
+                                }else{
+                                    holder.forwardOwnPortrait.setOnClickListener(this);
+                                }
                                 holder.forwardOwnLandscape.setVisibility(View.GONE);
                                 holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                                 holder.forwardOwnFile.setVisibility(View.GONE);
@@ -6525,6 +7160,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.contentOwnMessageThumbPort.setVisibility(View.GONE);
 
                                 holder.forwardOwnLandscape.setVisibility(View.VISIBLE);
+                                if(isMultipleSelect()){
+                                    holder.forwardOwnLandscape.setOnClickListener(null);
+                                }else{
+                                    holder.forwardOwnLandscape.setOnClickListener(this);
+                                }
                                 holder.forwardOwnPortrait.setVisibility(View.GONE);
                                 holder.gradientOwnMessageThumbPort.setVisibility(View.GONE);
                                 holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
@@ -6573,7 +7213,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                                 holder.contentContactMessageThumbPort.setVisibility(View.VISIBLE);
                                 holder.forwardContactPreviewPortrait.setVisibility(View.VISIBLE);
-
+                                if(isMultipleSelect()){
+                                    holder.forwardContactPreviewPortrait.setOnClickListener(null);
+                                }else{
+                                    holder.forwardContactPreviewPortrait.setOnClickListener(this);
+                                }
                                 holder.contentContactMessageThumbLand.setVisibility(View.GONE);
                                 holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
 
@@ -6644,6 +7288,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.contentContactMessageThumbLand.setVisibility(View.VISIBLE);
 
                                 holder.forwardContactPreviewLandscape.setVisibility(View.VISIBLE);
+                                if(isMultipleSelect()){
+                                    holder.forwardContactPreviewLandscape.setOnClickListener(null);
+                                }else{
+                                    holder.forwardContactPreviewLandscape.setOnClickListener(this);
+                                }
 //                                holder.contentContactMessageThumbLandFramework.setVisibility(View.VISIBLE);
 
                                 holder.contentContactMessageThumbPort.setVisibility(View.GONE);
@@ -6940,7 +7589,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onClick(View v) {
-        log("*******onClick");
+        log("onClick");
 
         //int position = (Integer) v.getTag();
         log("onClick");
@@ -6971,7 +7620,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
                 break;
             }
-
+            case R.id.content_own_message_text:
+            case R.id.content_contact_message_text:
             case R.id.message_chat_item_layout:{
                 ((ChatActivityLollipop) context).itemClick(currentPosition);
                 break;
@@ -7011,7 +7661,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public boolean onLongClick(View view) {
-        log("*******OnLongCLick");
+        log("OnLongCLick");
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -7020,45 +7670,37 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         int currentPosition = holder.getAdapterPosition();
 
         if (!isMultipleSelect()){
-            log("**** OnLongCLick -> not multiselect");
             if(currentPosition<1){
-                log("****Position not valid: "+currentPosition);
+                log("Position not valid: "+currentPosition);
             }else{
-                log("****Position valid: "+currentPosition);
+                log("Position valid: "+currentPosition);
 
                 if(!messages.get(currentPosition-1).isUploading()){
-                    log("****message not uploading ");
-
                     if(MegaApplication.isShowInfoChatMessages()){
-                        log("****isShowInfoChatMessages ");
-
                         ((ChatActivityLollipop) context).showMessageInfo(currentPosition);
-
                     }else{
-                        log("****is NOT ShowInfoChatMessages ");
-
                         AndroidMegaChatMessage messageR = messages.get(currentPosition-1);
                         if(messageR.getMessage().getType() == MegaChatMessage.TYPE_CONTAINS_META){
-                            log("****TYPE_CONTAINS_META ");
+                            log("TYPE_CONTAINS_META ");
 
                             MegaChatContainsMeta meta = messageR.getMessage().getContainsMeta();
                             if(meta==null){
                             }else if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
 //                                setMultipleSelect(true);
                                 ((ChatActivityLollipop) context).activateActionMode();
-//
+                                ((ChatActivityLollipop) context).itemClick(currentPosition);
+
 //
 //                                if(currentPosition<1){
 //                                    log("Position not valid");
 //                                }else{
-                                    ((ChatActivityLollipop) context).itemClick(currentPosition);
 //
 //                                }
                             }else{
                                 log("CONTAINS_META_INVALID");
                             }
                         }else{
-                            log("****OTHER TYPE ");
+                            log("OTHER TYPE ");
 
  //                           setMultipleSelect(true);
                             ((ChatActivityLollipop) context).activateActionMode();
@@ -7073,7 +7715,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         }
                     }
                 }else{
-                    log("****message uploading ");
+                    log("message uploading ");
 
                 }
             }

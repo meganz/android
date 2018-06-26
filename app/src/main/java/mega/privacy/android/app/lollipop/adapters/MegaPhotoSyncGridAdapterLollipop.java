@@ -502,12 +502,12 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
 						MegaNode file = n;
 
-						String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+						String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
 						log("FILENAME: " + file.getName());
 				  		
 				  		//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 						Intent mediaIntent;
-						if (MimeTypeList.typeForName(n.getName()).isVideoNotSupported()){
+						if (MimeTypeThumbnail.typeForName(n.getName()).isVideoNotSupported()){
 							mediaIntent = new Intent(Intent.ACTION_VIEW);
 						}
 						else {
@@ -539,10 +539,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							File mediaFile = new File(localPath);
 							//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-								mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+								mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeThumbnail.typeForName(file.getName()).getType());
 							}
 							else{
-								mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+								mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeThumbnail.typeForName(file.getName()).getType());
 							}
 							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 						}

@@ -756,7 +756,7 @@ public class ChatController {
         log("privilege is: "+privilege);
         if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
             log("Not participant any more!");
-            String handleString = megaApi.handleToBase64(userHandle);
+            String handleString = MegaApiJava.userHandleToBase64(userHandle);
             log("The user handle to find is: "+handleString);
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null){

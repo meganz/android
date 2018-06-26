@@ -578,11 +578,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			log("Show notification 1");
 			mBuilderCompat
 			.setSmallIcon(R.drawable.ic_stat_notify)
-			.setColor(ContextCompat.getColor(this,R.color.mega))
 			.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 			.setAutoCancel(true).setTicker(notificationTitle)
 			.setContentTitle(notificationTitle).setContentText(size)
 			.setOngoing(false);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
 
 			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 		}
@@ -649,6 +652,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							pdfIntent.putExtra("fromDownloadService", true);
 							pdfIntent.putExtra("inside", true);
 							pdfIntent.putExtra("isUrl", false);
 							startActivity(pdfIntent);
@@ -678,6 +682,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.putExtra("typeAccount", typeAccount);
 							mediaIntent.putExtra("isPlayList", false);
 							mediaIntent.putExtra("HANDLE", handle);
+							mediaIntent.putExtra("fromDownloadService", true);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
@@ -760,11 +765,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							log("Show notification 2");
 							mBuilderCompat
 									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setColor(ContextCompat.getColor(this,R.color.mega))
 									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 									.setAutoCancel(true).setTicker(notificationTitle)
 									.setContentTitle(notificationTitle).setContentText(size)
 									.setOngoing(false);
+
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+								mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+							}
 
 							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 						}
@@ -804,11 +812,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						log("Show notification 2");
 						mBuilderCompat
 								.setSmallIcon(R.drawable.ic_stat_notify)
-								.setColor(ContextCompat.getColor(this,R.color.mega))
 								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
+
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+							mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+						}
 
 						mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 					}
@@ -820,11 +831,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Show notification 3");
 					mBuilderCompat
 							.setSmallIcon(R.drawable.ic_stat_notify)
-							.setColor(ContextCompat.getColor(this,R.color.mega))
 							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+						mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+					}
 
 					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 				}
@@ -837,11 +851,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Show notification 4");
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
 
 				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 			}
@@ -929,12 +946,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			{
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(contentText)
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 			}
 			else
@@ -1005,18 +1026,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					.setOngoing(true).setContentTitle(message).setSubText(info)
 					.setContentText(contentText)
 					.setOnlyAlertOnce(true);
+
 			notification = mBuilder.build();
 		}
 		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
 			mBuilder
 					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setColor(ContextCompat.getColor(this,R.color.mega))
 					.setProgress(100, progressPercent, false)
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message).setContentInfo(info)
 					.setContentText(contentText)
 					.setOnlyAlertOnce(true);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
+
 			notification = mBuilder.getNotification();
 		}
 		else

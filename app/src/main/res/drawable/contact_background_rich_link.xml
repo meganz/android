@@ -4,7 +4,7 @@
         android:color="@android:color/white">
     </solid>
     <stroke
-        android:color="@color/message_background_2"
+        android:color="@color/message_background_3"
         android:width="1dp">
     </stroke>
 

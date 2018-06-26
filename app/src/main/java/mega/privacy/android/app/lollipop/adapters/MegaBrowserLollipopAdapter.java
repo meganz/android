@@ -34,6 +34,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -746,7 +747,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 
 			holder.imageViewIcon.setVisibility(View.VISIBLE);
-			holder.imageViewIcon.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+			holder.imageViewIcon.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 			holder.imageViewThumb.setVisibility(View.GONE);
 			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 

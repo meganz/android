@@ -11,14 +11,13 @@
     tools:context=".lollipop.ContactInfoActivityLollipop">
 
         <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="216dp"
-        android:background="@color/content_text_background"
-        android:fitsSystemWindows="true">
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="216dp"
+            android:background="@color/content_text_background"
+            android:fitsSystemWindows="true">
 
-
-              <android.support.design.widget.CollapsingToolbarLayout
+            <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/file_info_collapse_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -29,23 +28,23 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText">
 
-              <RelativeLayout
+                <RelativeLayout
                     android:id="@+id/file_info_icon_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="65dp"
+                    android:layout_marginLeft="60dp"
                     android:layout_marginTop="12dp"
+                    android:layout_marginBottom="10dp"
                     android:background="@android:color/transparent"
                     android:layout_gravity="center_vertical|left"
                     app:layout_collapseMode="parallax"
                     android:fitsSystemWindows="true">
-
-                  <ImageView
-                      android:id="@+id/file_info_toolbar_icon"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:adjustViewBounds="true"
-                      android:scaleType="fitCenter" />
+                    <ImageView
+                        android:id="@+id/file_info_toolbar_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter" />
                 </RelativeLayout>
 
                 <RelativeLayout

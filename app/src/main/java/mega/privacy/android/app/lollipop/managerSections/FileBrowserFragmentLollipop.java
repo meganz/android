@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -87,7 +86,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	public static MegaBrowserLollipopAdapter adapter;
+	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -118,8 +117,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ArrayList<MegaNode> nodes;
 	public ActionMode actionMode;
 
-	public static LinearLayoutManager mLayoutManager;
-	public static CustomizedGridLayoutManager gridLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNode selectedNode = null;
 	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
@@ -130,6 +129,39 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null) {
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -507,15 +539,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			return false;
 		}
-
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(recyclerView.getLayoutManager()!=null){
-			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
-		}
 	}
 
 	public static FileBrowserFragmentLollipop newInstance() {
@@ -864,15 +887,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void updateTransferButton(){
 		log("updateTransferButton");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			log("show PLAY button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
-			transfersTitleText.setText(getString(R.string.paused_transfers_title));
+
+		if(transfersOverViewLayout.getVisibility()==View.VISIBLE){
+			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+				log("show PLAY button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
+				transfersTitleText.setText(getString(R.string.paused_transfers_title));
+			}
+			else{
+				log("show PAUSE button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			}
 		}
 		else{
-			log("show PAUSE button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
-			transfersTitleText.setText(getString(R.string.section_transfers));
+			log("Transfer panel not visible");
 		}
 	}
 
