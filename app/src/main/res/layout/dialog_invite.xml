@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:paddingTop="22dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/dialog_invite_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/dialog_invite_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@color/grey_info_menu"
+        android:layout_marginBottom="28dp"/>
+
+    <Button
+        android:id="@+id/dialog_invite_button"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginLeft="-10dp"
+        android:textAlignment="center"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
+        android:textColor="@color/accentColor"
+        android:text="@string/cam_sync_ok"
+        android:textSize="14sp"/>
+
+
+</LinearLayout>

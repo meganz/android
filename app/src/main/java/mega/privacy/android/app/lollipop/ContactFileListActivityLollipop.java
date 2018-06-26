@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,14 +14,13 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -38,6 +36,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -49,12 +48,10 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -62,14 +59,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -77,6 +74,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -98,6 +96,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	AlertDialog permissionsDialog;
 
 	ContactFileListFragmentLollipop cflF;
+
+	NodeController nC;
+	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
 
 	CoordinatorLayout coordinatorLayout;
 	Handler handler;
@@ -123,6 +124,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	MegaPreferences prefs = null;
 
 	MenuItem createFolderMenuItem;
+	MenuItem startConversation;
 	private AlertDialog newFolderDialog;
 	DisplayMetrics outMetrics;
 
@@ -149,6 +151,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		inflater.inflate(R.menu.file_explorer_action, menu);
 
 		createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+		startConversation = menu.findItem(R.id.cab_menu_new_chat);
+		startConversation.setVisible(false);
 
 		if (cflF != null && cflF.isVisible()){
 			if(cflF.getFabVisibility()==View.VISIBLE){
@@ -759,301 +763,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	@SuppressLint("NewApi")
 	public void onFileClick(ArrayList<Long> handleList) {
-		long size = 0;
-		long[] hashes = new long[handleList.size()];
-		for (int i = 0; i < handleList.size(); i++) {
-			hashes[i] = handleList.get(i);
-			size += megaApi.getNodeByHandle(hashes[i]).getSize();
+
+		if(nC==null){
+			nC = new NodeController(this);
 		}
-
-		if (dbH == null) {
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-			//			dbH = new DatabaseHandler(getApplicationContext());
-		}
-
-		((MegaApplication) getApplication()).sendSignalPresenceActivity();
-
-		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();
-		if (prefs != null) {
-			if (prefs.getStorageAskAlways() != null) {
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())) {
-					if (prefs.getStorageDownloadLocation() != null) {
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0) {
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
-
-		if (askMe) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX,getString(R.string.context_download_to));
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-						intent.setClass(this, FileStorageActivityLollipop.class);
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-						startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						final long sizeFinal = size;
-						final long[] hashesFinal = new long[hashes.length];
-						for (int i=0; i< hashes.length; i++){
-							hashesFinal[i] = hashes[i];
-						}
-						
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX,getString(R.string.context_download_to));
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-										startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-											if(coordinatorFragment!=null){
-												showSnackbar(getString(R.string.general_download), coordinatorFragment);
-											}
-											else{
-												showSnackbar(getString(R.string.general_download), fragmentContainer);
-											}
-											downloadTo(path, null, sizeFinal, hashesFinal);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX,getString(R.string.context_download_to));
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-					intent.setClass(this, FileStorageActivityLollipop.class);
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-				}
-			}
-			else{
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX,getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivityLollipop.class);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}
-		} else {
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
-		}
-	}
-
-	public void downloadTo(String parentPath, String url, long size,
-			long[] hashes) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
-		}
-		
-		double availableFreeSpace = Double.MAX_VALUE;
-		try {
-			StatFs stat = new StatFs(parentPath);
-			availableFreeSpace = (double) stat.getAvailableBlocks()
-					* (double) stat.getBlockSize();
-		} catch (Exception ex) {
-		}
-
-		if (hashes == null) {
-			if (url != null) {
-				if (availableFreeSpace < size) {
-					Util.showErrorAlertDialog(
-							getString(R.string.error_not_enough_free_space),
-							false, this);
-					return;
-				}
-
-				Intent service = new Intent(this, DownloadService.class);
-				service.putExtra(DownloadService.EXTRA_URL, url);
-				service.putExtra(DownloadService.EXTRA_SIZE, size);
-				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-				service.putExtra(DownloadService.EXTRA_CONTACT_ACTIVITY, true);
-				startService(service);
-			}
-		} else {
-			if (hashes.length == 1) {
-				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-				if ((tempNode != null)
-						&& tempNode.getType() == MegaNode.TYPE_FILE) {
-					log("ISFILE");
-					String localPath = Util.getLocalFile(this,tempNode.getName(), tempNode.getSize(), parentPath);
-					if (localPath != null) {
-						try {
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
-						}
-						catch (Exception e) {	}
-
-
-						try {
-							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							} else {
-								viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							}
-							viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-								startActivity(viewIntent);
-							else {
-								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-									intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								} else {
-									intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								}
-								intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-								if (MegaApiUtils.isIntentAvailable(this, intentShare))
-									startActivity(intentShare);
-								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-								CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-								if (coordinatorFragment != null) {
-									showSnackbar(toastMessage, coordinatorFragment);
-								} else {
-									showSnackbar(toastMessage, fragmentContainer);
-								}
-							}
-						}
-						catch(Exception e){
-							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-							CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-							if(coordinatorFragment!=null){
-								showSnackbar(toastMessage, coordinatorFragment);
-							}
-							else{
-								showSnackbar(toastMessage, fragmentContainer);
-							}
-						}
-						return;
-					}
-				}
-			}
-
-			int numberOfNodesToDownload = 0;
-			int numberOfNodesAlreadyDownloaded = 0;
-			int numberOfNodesPending = 0;
-
-			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				if (node != null) {
-					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
-						dlFiles.put(node, parentPath);
-					}
-
-					for (MegaNode document : dlFiles.keySet()) {
-
-						String path = dlFiles.get(document);
-
-						if (availableFreeSpace < document.getSize()) {
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space)	+ " (" + new String(document.getName()) + ")", false, this);
-							continue;
-						}
-
-						log("path of the file: "+path);
-						numberOfNodesToDownload++;
-
-						File destDir = new File(path);
-						File destFile;
-						destDir.mkdirs();
-						if (destDir.isDirectory()){
-							destFile = new File(destDir, megaApi.escapeFsIncompatible(document.getName()));
-							log("destDir is Directory. destFile: " + destFile.getAbsolutePath());
-						}
-						else{
-							log("destDir is File");
-							destFile = destDir;
-						}
-
-						if(destFile.exists() && (document.getSize() == destFile.length())){
-							numberOfNodesAlreadyDownloaded++;
-							log(destFile.getAbsolutePath() + " already downloaded");
-						}
-						else {
-							numberOfNodesPending++;
-							log("start service");
-
-							Intent service = new Intent(this, DownloadService.class);
-							service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-							service.putExtra(DownloadService.EXTRA_URL, url);
-							service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-							service.putExtra(DownloadService.EXTRA_PATH, path);
-							service.putExtra(DownloadService.EXTRA_CONTACT_ACTIVITY, true);
-							startService(service);
-						}
-					}
-				} else if (url != null) {
-					if (availableFreeSpace < size) {
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-						continue;
-					}
-
-					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, hash);
-					service.putExtra(DownloadService.EXTRA_URL, url);
-					service.putExtra(DownloadService.EXTRA_SIZE, size);
-					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-					service.putExtra(DownloadService.EXTRA_CONTACT_ACTIVITY, true);
-					startService(service);
-				} else {
-					log("node not found");
-				}
-				log("Total: " + numberOfNodesToDownload + " Already: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-				if (numberOfNodesAlreadyDownloaded > 0){
-					String msg = getString(R.string.already_downloaded_multiple, numberOfNodesAlreadyDownloaded);
-					if (numberOfNodesPending > 0){
-						msg = msg + getString(R.string.pending_multiple, numberOfNodesPending);
-					}
-					showSnackbar(msg);
-				}
-			}
-		}
+		nC.prepareForDownload(handleList);
 	}
 
 	/*
@@ -1360,7 +1074,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
 
-			downloadTo(parentPath, url, size, hashes);
+			if(nC==null){
+				nC = new NodeController(this);
+			}
+			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
 
 //			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
 //			if(coordinatorFragment!=null){
@@ -2114,6 +1831,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		
 	}
 
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
+	}
+
 	public void showOptionsPanel(MegaNode node){
 		log("showOptionsPanel");
 		if(node!=null){
@@ -2199,5 +1921,152 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				}
 			}
 		return -1;
+	}
+
+	public void openAdvancedDevices (long handleToDownload){
+		log("openAdvancedDevices");
+//		handleToDownload = handle;
+		String externalPath = Util.getExternalCardPath();
+
+		if(externalPath!=null){
+			log("ExternalPath for advancedDevices: "+externalPath);
+			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
+			if(node!=null){
+
+//				File newFile =  new File(externalPath+"/"+node.getName());
+				File newFile =  new File(node.getName());
+				log("File: "+newFile.getPath());
+				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+				// Filter to only show results that can be "opened", such as
+				// a file (as opposed to a list of contacts or timezones).
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+				// Create a file with the requested MIME type.
+				String mimeType = MimeTypeList.getMimeType(newFile);
+				log("Mimetype: "+mimeType);
+				intent.setType(mimeType);
+				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
+				intent.putExtra("handleToDownload", handleToDownload);
+				try{
+					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+				}
+				catch(Exception e){
+					log("Exception in External SDCARD");
+					Environment.getExternalStorageDirectory();
+					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+					toast.show();
+				}
+			}
+		}
+		else{
+			log("No external SD card");
+			Environment.getExternalStorageDirectory();
+			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+			toast.show();
+		}
+	}
+
+	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+		log("askSizeConfirmationBeforeDownload");
+
+		final String parentPathC = parentPath;
+		final String urlC = url;
+		final long [] hashesC = hashes;
+		final long sizeC=size;
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		LinearLayout confirmationLayout = new LinearLayout(this);
+		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final CheckBox dontShowAgain =new CheckBox(this);
+		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+		confirmationLayout.addView(dontShowAgain, params);
+
+		builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+
+		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+		builder.setPositiveButton(getString(R.string.general_download),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if(dontShowAgain.isChecked()){
+							dbH.setAttrAskSizeDownload("false");
+						}
+						if(nC==null){
+							nC = new NodeController(contactPropertiesMainActivity);
+						}
+						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				if(dontShowAgain.isChecked()){
+					dbH.setAttrAskSizeDownload("false");
+				}
+			}
+		});
+
+		downloadConfirmationDialog = builder.create();
+		downloadConfirmationDialog.show();
+	}
+
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+		log("askConfirmationNoAppInstaledBeforeDownload");
+
+		final String parentPathC = parentPath;
+		final String urlC = url;
+		final long [] hashesC = hashes;
+		final long sizeC=size;
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		LinearLayout confirmationLayout = new LinearLayout(this);
+		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final CheckBox dontShowAgain =new CheckBox(this);
+		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+		confirmationLayout.addView(dontShowAgain, params);
+
+		builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
+		builder.setPositiveButton(getString(R.string.general_download),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if(dontShowAgain.isChecked()){
+							dbH.setAttrAskNoAppDownload("false");
+						}
+						if(nC==null){
+							nC = new NodeController(contactPropertiesMainActivity);
+						}
+						nC.download(parentPathC, urlC, sizeC, hashesC);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				if(dontShowAgain.isChecked()){
+					dbH.setAttrAskNoAppDownload("false");
+				}
+			}
+		});
+		downloadConfirmationDialog = builder.create();
+		downloadConfirmationDialog.show();
+	}
+
+	public void showSnackbarNotSpace(){
+		log("showSnackbarNotSpace");
+		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+		mySnackbar.show();
 	}
 }

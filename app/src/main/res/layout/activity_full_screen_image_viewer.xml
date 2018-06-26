@@ -61,7 +61,7 @@
 					android:layout_centerHorizontal="true"
 					android:textColor="@color/white"
 					android:textSize="16sp"
-					android:maxLines="1"
+					android:singleLine="true"
 					android:fontFamily="Roboto"
                     android:ellipsize="middle"/>
 

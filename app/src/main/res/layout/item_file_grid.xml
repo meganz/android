@@ -1,17 +1,8 @@
-<!--
- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/file_grid_item_complete_layout"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/white">
--->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/file_grid_item_layout"
-    android:layout_width="172dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentTop="true"
-    android:layout_margin="3dp"
+    android:layout_margin="6dp"
     android:background="@drawable/background_item_grid"
     android:descendantFocusability="blocksDescendants" >
 
@@ -101,7 +92,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@id/file_grid_separator"
-        android:paddingLeft="2dp"
         android:paddingRight="8dp"
         android:paddingTop="22dp"
         android:background="@null"
@@ -125,6 +115,7 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/file_grid_three_dots"
         android:layout_below="@id/file_grid_filename"
         android:layout_marginBottom="7dp"
         android:layout_marginLeft="12dp"

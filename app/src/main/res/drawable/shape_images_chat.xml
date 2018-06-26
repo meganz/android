@@ -4,7 +4,7 @@
         android:color="@android:color/transparent">
     </solid>
     <stroke
-        android:width="4dp"
+        android:width="0dp"
         android:color="#FFFFFFFF">
     </stroke>
 

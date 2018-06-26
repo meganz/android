@@ -18,7 +18,7 @@
         android:fitsSystemWindows="true">
 
 
-                 <android.support.design.widget.CollapsingToolbarLayout
+              <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/file_info_collapse_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -28,7 +28,6 @@
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText">
-
 
               <RelativeLayout
                     android:id="@+id/file_info_icon_layout"
@@ -47,11 +46,7 @@
                       android:layout_height="wrap_content"
                       android:adjustViewBounds="true"
                       android:scaleType="fitCenter" />
-
-
                 </RelativeLayout>
-
-
 
                 <RelativeLayout
                     android:id="@+id/file_info_image_layout"

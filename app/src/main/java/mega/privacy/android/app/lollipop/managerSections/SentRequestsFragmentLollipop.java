@@ -6,12 +6,13 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -46,14 +47,12 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	MegaApiAndroid megaApi;	
 	
 	Context context;
-	ActionBar aB;
 	RecyclerView listView;
 	MegaContactRequestLollipopAdapter adapterList;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -273,9 +272,21 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				}else{
 					emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.tab_sent_requests);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.tab_sent_requests));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 				listView.setVisibility(View.GONE);
 				contentTextLayout.setVisibility(View.GONE);
@@ -331,8 +342,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.empty_text_contacts_requests);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.empty_text_contacts_requests_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.empty_text_contacts_requests_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_requests_list_content_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.contact_requests_list_content_text);
@@ -364,9 +373,21 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				}else{
 					emptyImageView.setImageResource(R.drawable.sent_requests_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.tab_sent_requests);
-				emptyTextViewSecond.setText(" "+text+".");
+				String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.tab_sent_requests));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 				log("adapterList.getItemCount() NOT = 0");
@@ -414,7 +435,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
 	public void itemClick(int position) {

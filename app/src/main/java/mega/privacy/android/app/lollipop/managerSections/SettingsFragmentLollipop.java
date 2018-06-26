@@ -22,6 +22,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
@@ -41,6 +42,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -53,18 +55,23 @@ import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 //import android.support.v4.preference.PreferenceFragment;
 
 @SuppressLint("NewApi")
-public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
+public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener, MegaRequestListenerInterface{
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -86,6 +93,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
+	public static String CATEGORY_QR_CODE = "settings_qrcode";
+	public static String CATEGORY_SECURITY = "settings_security";
+
+	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -123,12 +134,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	public static String KEY_ABOUT_GDPR = "settings_about_gdpr";
 	public static String KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version";
 	public static String KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version";
 	public static String KEY_ABOUT_APP_VERSION = "settings_about_app_version";
 	public static String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
 
 	public static String KEY_HELP_SEND_FEEDBACK= "settings_help_send_feedfack";
+
+	public static String KEY_RECOVERY_KEY= "settings_recovery_key";
+	public static String KEY_CHANGE_PASSWORD= "settings_change_password";
 	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
@@ -139,6 +154,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public final static int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
+
+
+	PreferenceCategory qrCodeCategory;
+	SwitchPreference qrCodeAutoAcceptSwitch;
+	TwoLineCheckPreference qrCodeAutoAcceptCheck;
 
 	PreferenceScreen preferenceScreen;
 
@@ -151,6 +171,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory advancedFeaturesCategory;
 	PreferenceCategory autoawayChatCategory;
 	PreferenceCategory persistenceChatCategory;
+	PreferenceCategory securityCategory;
 
 	SwitchPreference pinLockEnableSwitch;
 	TwoLineCheckPreference pinLockEnableCheck;
@@ -179,6 +200,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	Preference aboutPrivacy;
 	Preference aboutTOS;
+	Preference aboutGDPR;
 	Preference aboutSDK;
 	Preference aboutKarere;
 	Preference aboutApp;
@@ -190,6 +212,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference advancedFeaturesOffline;
 
 	ListPreference statusChatListPreference;
+	ListPreference chatAttachmentsChatListPreference;
 	
 	TwoLineCheckPreference storageAskMeAlways;
 	TwoLineCheckPreference storageAdvancedDevices;
@@ -197,6 +220,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	TwoLineCheckPreference useHttpsOnly;
 
 	MegaChatPresenceConfig statusConfig;
+
+	Preference recoveryKey;
+	Preference changePass;
 	
 	boolean cameraUpload = false;
 	boolean secondaryUpload = false;
@@ -206,6 +232,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	boolean askMe = false;
 	boolean fileNames = false;
 	boolean advancedDevices = false;
+	boolean autoAccept;
 	
 	DatabaseHandler dbH;
 	
@@ -233,6 +260,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public int numberOfClicksSDK = 0;
 	public int numberOfClicksKarere = 0;
+	public int numberOfClicksAppVersion = 0;
+	ListView listView;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -250,8 +279,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		prefs = dbH.getPreferences();
 		chatSettings = dbH.getChatSettings();
 		
-		super.onCreate(savedInstanceState);	
-        
+		super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
 		preferenceScreen = (PreferenceScreen) findPreference("general_preference_screen");
@@ -265,6 +293,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
+		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
+		securityCategory = (PreferenceCategory) findPreference(CATEGORY_SECURITY);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -275,6 +305,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			autoAwaySwitch = (SwitchPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwaySwitch.setOnPreferenceClickListener(this);
+
+			qrCodeAutoAcceptSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
+			qrCodeAutoAcceptSwitch.setOnPreferenceClickListener(this);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -285,7 +318,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			autoAwayCheck = (TwoLineCheckPreference) findPreference(KEY_AUTOAWAY_ENABLE);
 			autoAwayCheck.setOnPreferenceClickListener(this);
+
+			qrCodeAutoAcceptCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
+			qrCodeAutoAcceptCheck.setOnPreferenceClickListener(this);
 		}
+
+		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
+		chatAttachmentsChatListPreference.setOnPreferenceChangeListener(this);
 
 		statusChatListPreference = (ListPreference) findPreference("settings_chat_list_status");
 		statusChatListPreference.setOnPreferenceChangeListener(this);
@@ -382,6 +421,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		advancedFeaturesOffline = findPreference(KEY_OFFLINE);
 		advancedFeaturesOffline.setOnPreferenceClickListener(this);
 
+
+		recoveryKey = findPreference(KEY_RECOVERY_KEY);
+		recoveryKey.setOnPreferenceClickListener(this);
+		changePass = findPreference(KEY_CHANGE_PASSWORD);
+		changePass.setOnPreferenceClickListener(this);
+
 		helpSendFeedback = findPreference(KEY_HELP_SEND_FEEDBACK);
 		helpSendFeedback.setOnPreferenceClickListener(this);
 
@@ -393,6 +438,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		aboutTOS = findPreference(KEY_ABOUT_TOS);
 		aboutTOS.setOnPreferenceClickListener(this);
+
+		aboutGDPR = findPreference(KEY_ABOUT_GDPR);
+		aboutGDPR.setOnPreferenceClickListener(this);
 
 		aboutApp = findPreference(KEY_ABOUT_APP_VERSION);
 		aboutApp.setOnPreferenceClickListener(this);
@@ -785,12 +833,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				waitPresenceConfig();
 			}
+
+			boolean sendOriginalAttachment = DBUtil.isSendOriginalAttachments(context);
+			if(sendOriginalAttachment){
+				chatAttachmentsChatListPreference.setValue(1+"");
+			}
+			else{
+				chatAttachmentsChatListPreference.setValue(0+"");
+			}
+			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 		}
 		else{
 			preferenceScreen.removePreference(chatStatusCategory);
 			preferenceScreen.removePreference(chatNotificationsCategory);
 			preferenceScreen.removePreference(autoawayChatCategory);
 			preferenceScreen.removePreference(persistenceChatCategory);
+			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 		}
 
 		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
@@ -980,6 +1038,39 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("Value of useHttpsOnly: "+useHttpsOnlyValue);
 
 		useHttpsOnly.setChecked(useHttpsOnlyValue);
+
+		megaApi.getContactLinksOption(this);
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		log("onViewCreated");
+		if (((ManagerActivityLollipop) context).openSettingsStorage) {
+			listView = (ListView) view.findViewById(android.R.id.list);
+			goToCategoryStorage();
+		}
+	}
+
+	public void goToCategoryStorage(){
+		log("goToCategoryStorage");
+		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
+			String key = getPreferenceScreen().getPreference(i).getKey();
+			if (key.equals(storageCategory.getKey())){
+				((ManagerActivityLollipop) context).openSettingsStorage = false;
+				listView.clearFocus();
+				final int finalI = i;
+				listView.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+//						listView.requestFocusFromTouch();
+						listView.setSelection(finalI+8);
+//						listView.requestFocus();
+					}
+				}, 200);
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -1111,6 +1202,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			int newStatus= Integer.parseInt((String)newValue);
 			megaChatApi.setOnlineStatus(newStatus, (ManagerActivityLollipop) context);
 		}
+		else if (preference.getKey().compareTo("settings_chat_send_originals") == 0){
+			log("onPreferenceChage: change send originals chat");
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			int newStatus= Integer.parseInt((String)newValue);
+			if(newStatus==0){
+				dbH.setSendOriginalAttachments(false+"");
+				chatAttachmentsChatListPreference.setValue(0+"");
+			}
+			else if(newStatus==1){
+				dbH.setSendOriginalAttachments(true+"");
+				chatAttachmentsChatListPreference.setValue(1+"");
+			}
+			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+//			dbH.setSendOriginalAttachments();
+		}
 		return true;
 	}
 	
@@ -1194,6 +1304,27 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else{
 			numberOfClicksKarere = 0;
+		}
+
+		if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) == 0){
+			log("KEY_ABOUT_APP_VERSION pressed");
+			numberOfClicksAppVersion++;
+			if (numberOfClicksAppVersion == 5){
+
+				if (MegaApplication.isShowInfoChatMessages() == false) {
+					MegaApplication.setShowInfoChatMessages(true);
+					numberOfClicksAppVersion = 0;
+					((ManagerActivityLollipop)context).showSnackbar("Action to show info of chat messages is enabled");
+				}
+				else{
+					MegaApplication.setShowInfoChatMessages(false);
+					numberOfClicksAppVersion = 0;
+					((ManagerActivityLollipop)context).showSnackbar("Action to show info of chat messages is disabled");
+				}
+			}
+		}
+		else{
+			numberOfClicksAppVersion = 0;
 		}
 
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
@@ -1604,6 +1735,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.addPreference(chatNotificationsCategory);
 				preferenceScreen.addPreference(chatStatusCategory);
 				preferenceScreen.addPreference(chatAutoAwayPreference);
+				chatEnabledCategory.addPreference(chatAttachmentsChatListPreference);
 			}
 			else{
 				log("DISCONNECT CHAT!!!");
@@ -1800,12 +1932,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setData(Uri.parse("https://mega.nz/mobile_privacy.html"));
+			viewIntent.setData(Uri.parse("https://mega.nz/privacy"));
 			startActivity(viewIntent);
 		}
 		else if (preference.getKey().compareTo(KEY_ABOUT_TOS) == 0){
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
+			viewIntent.setData(Uri.parse("https://mega.nz/terms"));
+			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo(KEY_ABOUT_GDPR) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://mega.nz/gdpr"));
 			startActivity(viewIntent);
 		}
 		else if(preference.getKey().compareTo(KEY_ABOUT_CODE_LINK) == 0){
@@ -1816,6 +1953,23 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (preference.getKey().compareTo("settings_advanced_features_cancel_account") == 0){
 			log("Cancel account preference");
 			((ManagerActivityLollipop)context).askConfirmationDeleteAccount();
+		}
+		else if (preference.getKey().compareTo(KEY_QR_CODE_AUTO_ACCEPT) == 0){
+			if (autoAccept){
+				megaApi.setContactLinksOption(true, this);
+			}
+			else {
+				megaApi.setContactLinksOption(false, this);
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_RECOVERY_KEY) == 0){
+			log("Export Recovery Key");
+			((ManagerActivityLollipop)context).showMKLayout();
+		}
+		else if (preference.getKey().compareTo(KEY_CHANGE_PASSWORD) == 0){
+			log("Change password");
+			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+			startActivity(intent);
 		}
 		
 		return true;
@@ -2055,12 +2209,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatStatusCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
-
-		if(!Util.isOnline(context)){
-			chatEnabledCategory.setEnabled(false);
-			chatStatusCategory.setEnabled(false);
-			cameraUploadCategory.setEnabled(false);
-		}
 		super.onResume();
 	}
 	
@@ -2225,10 +2373,68 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		getPreferenceScreen().removePreference(chatStatusCategory);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
 		getPreferenceScreen().removePreference(persistenceChatCategory);
+		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 	}
 
 
 	private static void log(String log) {
 		Util.log("SettingsFragmentLollipop", log);
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+	log("onRequestFinish  MegaRequest: "+request.getType());
+
+		if(request.getType()==MegaRequest.TYPE_GET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				autoAccept = request.getFlag();
+				log("OK GET ATTR USER: "+autoAccept);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				}
+				else{
+					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				}
+			}
+			else if (e.getErrorCode() == MegaError.API_ENOENT){
+				log("Error getContactLinkOption");
+			}
+		}
+		if (request.getType()==MegaRequest.TYPE_SET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK SET ATTR USER: "+request.getText());
+
+				if (autoAccept){
+					autoAccept = false;
+				}
+				else{
+					autoAccept = true;
+				}
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					qrCodeAutoAcceptSwitch.setChecked(autoAccept);
+				}
+				else{
+					qrCodeAutoAcceptCheck.setChecked(autoAccept);
+				}
+			}
+			else{
+				log("Error setContactLinkOption");
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+
 	}
 }

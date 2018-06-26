@@ -89,30 +89,23 @@
                 android:textColor="@color/text_secondary"
                 android:fontFamily="sans-serif"
                 android:textSize="18sp"/>
-            <TextView
-                android:id="@+id/file_grid_empty_text_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/black"
-                android:textSize="18sp"/>
         </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/content_grid_text_layout"
         android:layout_above="@id/relative_layout_file_grid_browser_camera_upload_on_off">
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/file_grid_view_browser"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:choiceMode="multipleChoice"
                 android:columnWidth="172dp"/>
 

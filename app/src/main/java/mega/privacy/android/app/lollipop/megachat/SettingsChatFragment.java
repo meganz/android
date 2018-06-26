@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -12,10 +11,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
-import android.provider.OpenableColumns;
-import android.widget.Toast;
-
-import java.io.File;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -285,7 +280,8 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
         }
 
         if(chatSettings==null){
-            chatSettings = new ChatSettings(Boolean.toString(true), Boolean.toString(true), chosenSound, Boolean.toString(true));
+            chatSettings = new ChatSettings();
+            chatSettings.setNotificationsSound(chosenSound);
             dbH.setChatSettings(chatSettings);
         }
         else{

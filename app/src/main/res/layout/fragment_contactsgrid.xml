@@ -28,7 +28,10 @@
         android:choiceMode="multipleChoice"
         android:layout_below="@id/contact_content_grid_text_layout"
         android:layout_centerHorizontal="true"
-        android:columnWidth="174dp"/>
+        android:layout_centerInParent="true"
+        android:columnWidth="172dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -55,13 +58,6 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_secondary"
                 android:fontFamily="sans-serif"
-                android:textSize="18sp"/>
-            <TextView
-                android:id="@+id/contact_grid_empty_text_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/black"
                 android:textSize="18sp"/>
         </LinearLayout>
     </RelativeLayout>

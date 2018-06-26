@@ -11,13 +11,14 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -57,8 +58,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
-
 	TextView contentText;
 
 	int deepBrowserTree = -1;
@@ -226,7 +225,6 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
 		emptyTextView = (LinearLayout) v.findViewById(R.id.provider_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
-		emptyTextViewSecond = (TextView) v.findViewById(R.id.provider_list_empty_text_second);
 
 		if (context instanceof FileProviderActivity){
 			parentHandle = ((FileProviderActivity)context).getIncParentHandle();
@@ -369,7 +367,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 				hashes = new long[1];
 				hashes[0] = n.getHandle();
-				((FileProviderActivity) context).downloadTo(n.getSize(), hashes);
+				((FileProviderActivity) context).downloadAndAttach(n.getSize(), hashes);
 			}
 		}
 	}
@@ -495,14 +493,24 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_contacts);
-					String text = getString(R.string.context_empty_incoming);
-					emptyTextViewSecond.setText(" "+text+".");
-					emptyTextViewSecond.setVisibility(View.VISIBLE);
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					emptyTextViewSecond.setVisibility(View.GONE);
 				}
 			}
 			else{

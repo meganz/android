@@ -1,17 +1,13 @@
 package mega.privacy.android.app.components;
 
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.utils.Util;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+import mega.privacy.android.app.R;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDividerNode;
@@ -40,7 +36,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
         int rightMonth = parent.getWidth() - parent.getPaddingRight();
         int leftMonth= 0;
 
-
         int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View child = parent.getChildAt(i);
@@ -55,7 +50,6 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
             mDividerNode.setBounds(leftNode, topNode, rightNode, bottomNode);
             mDividerMonth.setBounds(leftMonth,topMonth,rightMonth,bottomMonth);
-
 
             int position = parent.getChildAdapterPosition(child);
             int viewType = parent.getAdapter().getItemViewType(position);

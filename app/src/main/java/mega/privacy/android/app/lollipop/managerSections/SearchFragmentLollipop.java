@@ -2,23 +2,23 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -36,8 +36,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -69,7 +67,6 @@ import nz.mega.sdk.MegaShare;
 public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 
 	Context context;
-	ActionBar aB;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
@@ -78,7 +75,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	MegaBrowserLollipopAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
@@ -100,6 +96,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 	DisplayMetrics outMetrics;
 	Display display;
 
+	boolean allFiles = true;
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
@@ -165,6 +162,15 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.selectChatsToSendNodes(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -209,6 +215,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			boolean showDownload = false;
+			boolean showSendToChat = false;
 			boolean showRename = false;
 			boolean showCopy = false;
 			boolean showMove = false;
@@ -232,6 +239,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
+				allFiles = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -240,6 +248,19 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 						break;
 					}
 				}
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
+				}
+
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -298,6 +319,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
@@ -343,11 +368,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-		
+
 		if (megaApi.getRootNode() == null){
 			return null;
 		}
@@ -384,7 +405,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
@@ -401,13 +422,12 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
 
 			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
 			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -435,7 +455,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
@@ -447,14 +467,13 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.file_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.file_grid_empty_text_second);
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, aB, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -475,7 +494,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 
 	@Override
@@ -483,7 +501,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 		log("onAttach");
 		super.onAttach(context);
 		this.context = context;
-		aB = ((AppCompatActivity)context).getSupportActionBar();
 	}
 	
 	@Override
@@ -531,13 +548,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				
 				contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 				
-				aB.setTitle(n.getName());
-				log("aB.setHomeAsUpIndicator_51");
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			
-				((ManagerActivityLollipop)context).setParentHandleSearch(n.getHandle());
+				((ManagerActivityLollipop)context).parentHandleSearch= n.getHandle();
+				((ManagerActivityLollipop)context).setToolbarTitle();
+
 				nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
@@ -558,9 +573,22 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 						}else{
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						}
-						emptyTextViewFirst.setText(R.string.context_empty_inbox);
-						String text = getString(R.string.section_cloud_drive);
-						emptyTextViewSecond.setText(" "+text+".");
+
+						String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 					} else {
 						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
@@ -632,7 +660,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -683,7 +711,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -818,22 +846,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-					aB.setTitle(getString(R.string.section_cloud_drive));
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-					log("aB.setHomeAsUpIndicator_52");
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-				}
-				else{
-					aB.setTitle(parentNode.getName());
-					log("aB.setHomeAsUpIndicator_53");
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				}
 
+				((ManagerActivityLollipop)context).parentHandleSearch=parentNode.getHandle();
+				((ManagerActivityLollipop)context).setToolbarTitle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				((ManagerActivityLollipop)context).setParentHandleSearch(parentNode.getHandle());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 
 				visibilityFastScroller();
@@ -928,10 +945,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 				}
 			}
 			((ManagerActivityLollipop)context).levelsSearch--;
-			aB.setTitle(getString(R.string.action_search)+": "+((ManagerActivityLollipop)context).searchQuery);
-			log("aB.setHomeAsUpIndicator_54");
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+			((ManagerActivityLollipop)context).setToolbarTitle();
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			((ManagerActivityLollipop) context).showFabButton();
 			return 3;
@@ -994,9 +1008,21 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener{
 					}else{
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_inbox);
-					String text = getString(R.string.section_cloud_drive);
-					emptyTextViewSecond.setText(" "+text+".");
+					String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_cloud_drive));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 				else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);

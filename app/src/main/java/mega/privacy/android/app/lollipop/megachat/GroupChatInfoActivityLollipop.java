@@ -582,8 +582,15 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         long participantsLabel = participantsCount+1; //Add one to include me
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
 
-        ChatController chatC = new ChatController(groupChatInfoActivity);
-        String myFullName = chatC.getMyFullName();
+        String myFullName =  megaChatApi.getMyFullname();
+        if(myFullName!=null){
+            if(myFullName.trim().isEmpty()){
+                myFullName =  megaChatApi.getMyEmail();
+            }
+        }
+        else{
+            myFullName =  megaChatApi.getMyEmail();
+        }
 
         MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
 
@@ -630,17 +637,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(fullName!=null){
             if(fullName.isEmpty()){
                 log("1-Put email as fullname");
-                String participantEmail = chat.getPeerEmail(i);
-                String[] splitEmail = participantEmail.split("[@._]");
-                fullName = splitEmail[0];
+                fullName = chat.getPeerEmail(i);
                 return fullName;
             }
             else{
                 if (fullName.trim().length() <= 0){
                     log("2-Put email as fullname");
-                    String participantEmail = chat.getPeerEmail(i);
-                    String[] splitEmail = participantEmail.split("[@._]");
-                    fullName = splitEmail[0];
+                    fullName = chat.getPeerEmail(i);
                     return fullName;
                 }
                 else{
@@ -650,9 +653,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             log("3-Put email as fullname");
-            String participantEmail = chat.getPeerEmail(i);
-            String[] splitEmail = participantEmail.split("[@._]");
-            fullName = splitEmail[0];
+            fullName = chat.getPeerEmail(i);
             return fullName;
         }
     }
@@ -1499,7 +1500,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 if(request.getText()!=null) {
                     log("NEW title: "+request.getText());
                     infoTitleChatText.setText(request.getText());
-                    aB.setTitle(request.getText());
                 }
             }
             else{
@@ -1657,7 +1657,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
                 log("NEW title: "+chat.getTitle());
                 infoTitleChatText.setText(chat.getTitle());
-                aB.setTitle(chat.getTitle());
 
                 if (chat.getTitle().length() > 0){
                     String chatTitle = chat.getTitle().trim();

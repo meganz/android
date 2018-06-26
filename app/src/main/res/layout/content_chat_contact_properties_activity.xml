@@ -87,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/chat_contact_properties_messages_sound_label"
-                    android:text="Probando"
+                    android:text="@string/title_properties_chat_contact_message_sound"
                     android:textColor="@color/mail_my_account"
                     android:textSize="14dp" />
 

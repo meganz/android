@@ -21,10 +21,6 @@ import mega.privacy.android.app.lollipop.PhoneContactInfo;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
-/**
- * Created by mega on 22/11/17.
- */
-
 public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContactsLollipopAdapter.ViewHolderChips> implements View.OnClickListener{
 
     private int positionClicked;

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/qr_code_relative_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="58dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginLeft="60dp"
+            android:layout_above="@+id/qr_code_link">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:id="@+id/qr_code_image"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/qr_code_link"
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            android:layout_above="@+id/qr_code_button_copy_link"
+            android:layout_marginBottom="15dp"
+            android:textSize="16sp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/qr_code_button_copy_link"
+            android:layout_gravity="center"
+            android:elevation="6dp"
+            android:background="@color/white"
+            android:layout_marginBottom="40dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textSize="14sp"
+            android:text="@string/button_copy_link"/>
+
+    </LinearLayout>
+
+</ScrollView>
