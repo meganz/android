@@ -2,12 +2,10 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,19 +31,17 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -76,6 +72,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     static LoginActivityLollipop loginActivity;
 
     Intent intentReceived = null;
+
+    public String accountBlocked = null;
 
     DatabaseHandler dbH;
 
@@ -131,6 +129,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         }
 
         megaApi.addGlobalListener(this);
+        megaApi.addRequestListener(this);
 
         setContentView(R.layout.activity_login);
         relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
@@ -780,6 +779,21 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
     }
 
+
+    @Override
+    public void onEvent(MegaApiJava api, MegaEvent event) {
+        log("onEvent");
+        if(event.getType()==MegaEvent.EVENT_ACCOUNT_BLOCKED){
+            log("Event received: "+event.getText()+"_"+event.getNumber());
+            if(event.getNumber()==200){
+                accountBlocked = getString(R.string.account_suspended_multiple_breaches_ToS);
+            }
+            else if(event.getNumber()==300){
+                accountBlocked = getString(R.string.account_suspended_breache_ToS);
+            }
+        }
+    }
+
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
         log("onRequestStart - " + request.getRequestString());
@@ -794,25 +808,11 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
-        if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
-            try {
-                if (request.getParamType() == 1) {
-                    if (e.getErrorCode() == MegaError.API_OK) {
-                        waitingForConfirmAccount = true;
-                        visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT;
-                        showFragment(visibleFragment);
-
-                    } else {
-                        dbH.clearEphemeral();
-                        waitingForConfirmAccount = false;
-                        visibleFragment = Constants.LOGIN_FRAGMENT;
-                        showFragment(visibleFragment);
-                    }
-                }
+        if(request.getType() == MegaRequest.TYPE_LOGOUT){
+            if(accountBlocked!=null){
+                showSnackbar(accountBlocked);
             }
-            catch (Exception exc){
-                log("ExceptionManager");
-            }
+            accountBlocked=null;
         }
     }
 
@@ -820,7 +820,6 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         log("onRequestTemporaryError - " + request.getRequestString());
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

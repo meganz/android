@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.Util;
 public class CustomizedGridRecyclerView extends RecyclerView {
 
 	private CustomizedGridLayoutManager manager;
-	private int columnWidth = -1;
+	public int columnWidth = -1;
 	private boolean isWrapContent = false;
 	private int widthTotal = 0;
 
@@ -65,6 +65,11 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 			if (columnWidth > 0) {
 				int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
 				manager.setSpanCount(spanCount);
+				if(spanCount == 1){
+					manager.setSpanCount(2);
+				}else{
+					manager.setSpanCount(spanCount);
+				}
 			}
 		}
 		else{
@@ -72,6 +77,11 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 			if (columnWidth > 0) {
 				int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
 				manager.setSpanCount(spanCount);
+				if(spanCount == 1){
+					manager.setSpanCount(2);
+				}else{
+					manager.setSpanCount(spanCount);
+				}
 				params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 				setLayoutParams(params);
 			}

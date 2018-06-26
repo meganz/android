@@ -278,4 +278,4 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
     private static void log(String log) {
         Util.log("MultipleRequestListener", log);
     }
-};
+}

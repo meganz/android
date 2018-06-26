@@ -187,7 +187,7 @@ public class MimeTypeInfo {
                 }
             }
             if (resId == -1) {
-                resId = R.drawable.generic_mime;
+                resId = R.drawable.ic_generic;
             }
         }
         return resId;

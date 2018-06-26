@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -602,6 +603,11 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			adapter.setContacts(visibleContacts);
 		}
 		
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
+
 	}
 
 	@Override

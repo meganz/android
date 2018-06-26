@@ -134,6 +134,51 @@
             android:layout_height="1dp"
             android:background="@color/separator_grey" />
 
+        <!-- VERSIONS LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_versions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="left" >
+            <ImageView
+                android:id="@+id/file_properties_versions_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_centerInParent="true"
+                android:alpha="0.30"
+                android:src="@drawable/ic_versions_black" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="26dp"
+                android:layout_toRightOf="@id/file_properties_versions_image" >
+
+                <Button
+                    android:id="@+id/file_properties_text_number_versions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="true"
+                    android:textSize="14sp"
+                    android:stateListAnimator="@null"
+                    android:elevation="0dp"
+                    android:textColor="@color/accentColor"
+                    android:background="@color/white"/>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/separator_versions"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="70dp"
+            android:background="@color/separator_grey" />
+
         <!-- SHARED LAYOUT -->
 
         <RelativeLayout
@@ -296,6 +341,175 @@
                         android:layout_below="@id/file_properties_info_menu_content"
                         android:textSize="14sp"
                         android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <!-- VERSIONS LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_folder_versions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="71dp"
+                android:layout_centerVertical="true"
+                android:gravity="left" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_folder_versions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/title_section_versions"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_folder_versions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <!-- CURRENT VERSIONS LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_folder_current_versions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="71dp"
+                android:layout_centerVertical="true"
+                android:gravity="left" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_folder_current_versions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_folder_current_versions"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_folder_current_versions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <!-- PREVIOUS VERSIONS LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_folder_previous_versions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="71dp"
+                android:layout_centerVertical="true"
+                android:gravity="left" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_folder_previous_versions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_folder_previous_versions"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_folder_previous_versions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/mail_my_account" />
+                </LinearLayout>
+
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <!-- LOCATION LAYOUT -->
+
+        <RelativeLayout
+            android:id="@+id/file_properties_location_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="71dp"
+                android:layout_centerVertical="true"
+                android:gravity="left" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_properties_info_location"
+                        android:textSize="14sp"
+                        android:textColor="@color/name_my_account"
+                        android:layout_marginRight="8dp"/>
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_location"
+                        android:textSize="14sp"
+                        android:textColor="@color/accentColor" />
                 </LinearLayout>
 
             </RelativeLayout>

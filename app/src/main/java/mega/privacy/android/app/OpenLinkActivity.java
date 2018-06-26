@@ -1,11 +1,13 @@
 package mega.privacy.android.app;
 
-import android.content.DialogInterface;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -16,6 +18,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -27,15 +30,23 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class OpenLinkActivity extends PinActivity implements MegaRequestListenerInterface {
+public class OpenLinkActivity extends PinActivity implements MegaRequestListenerInterface, View.OnClickListener {
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	DatabaseHandler dbH = null;
 
+	String urlConfirmationLink = null;
+
 	static OpenLinkActivity openLinkActivity = null;
-	
+
+	RelativeLayout relativeContainer;
+	TextView processingText;
+	TextView errorText;
+	ProgressBar progressBar;
+	RelativeLayout containerOkButton;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -49,6 +60,19 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		log("Original url: " + url);
 
 		openLinkActivity = this;
+
+
+		setContentView(R.layout.activity_open_link);
+
+		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_open_link);
+		processingText = (TextView) findViewById(R.id.open_link_text);
+		errorText = (TextView) findViewById(R.id.open_link_error);
+		errorText.setVisibility(View.GONE);
+		progressBar = (ProgressBar) findViewById(R.id.open_link_bar);
+		containerOkButton = (RelativeLayout) findViewById(R.id.container_accept_button);
+		containerOkButton.setVisibility(View.GONE);
+		containerOkButton.setOnClickListener(this);
+
 		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
@@ -70,7 +94,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		log("url " + url);
 		
 		// Download file link
-		if (url != null && (url.matches("^https://mega.co.nz/#!.+$") || url.matches("^https://mega.nz/#!.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#!.+$") || url.matches("^https://mega\\.nz/#!.+$"))) {
 			log("open link url");
 
 			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
@@ -83,33 +107,18 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		}
 		
 		// Confirmation link
-		if (url != null && (url.matches("^https://mega.co.nz/#confirm.+$") || url.matches("^https://mega.nz/#confirm.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#confirm.+$") || url.matches("^https://mega\\.nz/#confirm.+$"))) {
 			log("confirmation url");
 //			megaApi.localLogout();
-			AccountController aC = new AccountController(this);
-			aC.logout(this, megaApi, megaChatApi, true);
+			urlConfirmationLink = url;
 
-
-			if (dbH == null){
-				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-			}
-			if (dbH != null){
-				dbH.clearEphemeral();
-			}
-
-			Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
-			confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, url);
-			confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			confirmIntent.setAction(Constants.ACTION_CONFIRM);
-			startActivity(confirmIntent);
-			finish();
+			megaApi.querySignupLink(url, this);
 
 			return;
 		}
 
 		// Folder Download link
-		if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#F!.+$") || url.matches("^https://mega\\.nz/#F!.+$"))) {
 			log("folder link url");
 
 			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
@@ -123,7 +132,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		}
 
 		// Password link
-		if (url != null && (url.matches("^https://mega.co.nz/#P!.+$") || url.matches("^https://mega.nz/#P!.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#P!.+$") || url.matches("^https://mega\\.nz/#P!.+$"))) {
 			log("link with password url");
 
 			Intent openLinkIntent = new Intent(this, OpenPasswordLinkActivity.class);
@@ -136,7 +145,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		}
 
 		// Create account invitation - user must be logged OUT
-		if (url != null && (url.matches("^https://mega.co.nz/#newsignup.+$"))||(url.matches("^https://mega.nz/#newsignup.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#newsignup.+$"))||(url.matches("^https://mega\\.nz/#newsignup.+$"))) {
 			log("new signup url");
 
 			if (dbH == null){
@@ -145,16 +154,17 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			if (dbH != null) {
 				if (dbH.getCredentials() != null) {
 					log("Logged IN");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.log_out_warning);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+//					AlertDialog.Builder builder;
+//					builder = new AlertDialog.Builder(this);
+//					builder.setMessage(R.string.log_out_warning);
+//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+//							new DialogInterface.OnClickListener() {
+//								public void onClick(DialogInterface dialog, int whichButton) {
+//									finish();
+//								}
+//							});
+//					builder.show();
+					setError(getString(R.string.log_out_warning));
 				}
 				else{
 					log("Not logged");
@@ -168,7 +178,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		}
 
 		// Export Master Key link - user must be logged IN
-		if (url != null && (url.matches("^https://mega.co.nz/#backup")||url.matches("^https://mega.nz/#backup"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#backup")||url.matches("^https://mega\\.nz/#backup"))) {
 			log("export master key url");
 
 			if (dbH == null){
@@ -183,23 +193,24 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					finish();
 				} else {
 					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+//					AlertDialog.Builder builder;
+//					builder = new AlertDialog.Builder(this);
+//					builder.setMessage(R.string.alert_not_logged_in);
+//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+//							new DialogInterface.OnClickListener() {
+//								public void onClick(DialogInterface dialog, int whichButton) {
+//									finish();
+//								}
+//							});
+//					builder.show();
+					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
 			return;
 		}
 
 		// New mwssage chat- user must be logged IN
-		if (url != null && (url.matches("^https://mega.co.nz/#fm/chat")||url.matches("^https://mega.nz/#fm/chat"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#fm/chat")||url.matches("^https://mega\\.nz/#fm/chat"))) {
 			log("new message chat url");
 
 			if (dbH == null){
@@ -214,26 +225,27 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					finish();
 				} else {
 					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),	new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									Intent intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
-									intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-									intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-									startActivity(intent);
-									finish();
-								}
-							});
-					builder.show();
+//					AlertDialog.Builder builder;
+//					builder = new AlertDialog.Builder(this);
+//					builder.setMessage(R.string.alert_not_logged_in);
+//					builder.setPositiveButton(getString(R.string.cam_sync_ok),	new DialogInterface.OnClickListener() {
+//								public void onClick(DialogInterface dialog, int whichButton) {
+//									Intent intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
+//									intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+//									intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//									startActivity(intent);
+//									finish();
+//								}
+//							});
+//					builder.show();
+					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
 			return;
 		}
 
 		// Cancel account  - user must be logged IN
-		if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#cancel.+$"))||(url.matches("^https://mega\\.nz/#cancel.+$"))) {
 			log("cancel account url");
 
 			if (dbH == null){
@@ -257,23 +269,24 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					}
 				} else {
 					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+//					AlertDialog.Builder builder;
+//					builder = new AlertDialog.Builder(this);
+//					builder.setMessage(R.string.alert_not_logged_in);
+//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+//							new DialogInterface.OnClickListener() {
+//								public void onClick(DialogInterface dialog, int whichButton) {
+//									finish();
+//								}
+//							});
+//					builder.show();
+					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
 			return;
 		}
 
 		// Verify change mail - user must be logged IN
-		if (url != null && (url.matches("^https://mega.co.nz/#verify.+$"))||(url.matches("^https://mega.nz/#verify.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#verify.+$"))||(url.matches("^https://mega\\.nz/#verify.+$"))) {
 			log("verify mail url");
 
 			if (dbH == null){
@@ -301,23 +314,24 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					}
 				} else {
 					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+//					AlertDialog.Builder builder;
+//					builder = new AlertDialog.Builder(this);
+//					builder.setMessage(R.string.alert_not_logged_in);
+//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+//							new DialogInterface.OnClickListener() {
+//								public void onClick(DialogInterface dialog, int whichButton) {
+//									finish();
+//								}
+//							});
+//					builder.show();
+					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
 			return;
 		}
 
 		// Reset password - two options: logged IN or OUT
-		if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#recover.+$"))||(url.matches("^https://mega\\.nz/#recover.+$"))) {
 			log("reset pass url");
 			//Check if link with MK or not
 			if (dbH == null){
@@ -352,7 +366,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		}
 
 		// Pending contacts
-		if (url != null && (url.matches("^https://mega.co.nz/#fm/ipc"))||(url.matches("^https://mega.nz/#fm/ipc"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#fm/ipc"))||(url.matches("^https://mega\\.nz/#fm/ipc"))) {
 			log("pending contacts url");
 
 			if (dbH == null){
@@ -378,22 +392,23 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					}
 				} else {
 					log("Not logged");
-					AlertDialog.Builder builder;
-					builder = new AlertDialog.Builder(this);
-					builder.setMessage(R.string.alert_not_logged_in);
-					builder.setPositiveButton(getString(R.string.cam_sync_ok),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									finish();
-								}
-							});
-					builder.show();
+//					AlertDialog.Builder builder;
+//					builder = new AlertDialog.Builder(this);
+//					builder.setMessage(R.string.alert_not_logged_in);
+//					builder.setPositiveButton(getString(R.string.cam_sync_ok),
+//							new DialogInterface.OnClickListener() {
+//								public void onClick(DialogInterface dialog, int whichButton) {
+//									finish();
+//								}
+//							});
+//					builder.show();
+					setError(getString(R.string.alert_not_logged_in));
 				}
 			}
 			return;
 		}
 
-		if (url != null && (url.matches("^https://mega.co.nz/#blog") || url.matches("^https://mega.nz/#blog") || url.matches("^https://mega.nz/blog") || url.matches("^https://mega.co.nz/#blog.+$") || url.matches("^https://mega.nz/#blog.+$") || url.matches("^https://mega.nz/blog.+$") ) ) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#blog") || url.matches("^https://mega\\.nz/#blog") || url.matches("^https://mega\\.nz/blog") || url.matches("^https://mega\\.co\\.nz/#blog.+$") || url.matches("^https://mega\\.nz/#blog.+$") || url.matches("^https://mega\\.nz/blog.+$") ) ) {
 			log("blog link url");
 
 			Intent openBlogIntent = new Intent(this, WebViewActivityLollipop.class);
@@ -404,7 +419,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			return;
 		}
 
-		if (url != null && (url.matches("^https://mega.co.nz/#help") || url.matches("^https://mega.nz/#help") || url.matches("^https://mega.nz/help"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#help") || url.matches("^https://mega\\.nz/#help") || url.matches("^https://mega\\.nz/help"))) {
 			log("help link url");
 
 			Intent openHelpIntent = new Intent(this, WebViewActivityLollipop.class);
@@ -415,7 +430,51 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			return;
 		}
 
-		if (url != null && (url.matches("^https://mega.co.nz/#.+$") || url.matches("^https://mega.nz/#.+$"))) {
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#sync") || url.matches("^https://mega\\.nz/#sync") || url.matches("^https://mega\\.nz/sync"))) {
+			log("sync link url");
+
+			Intent openSyncIntent = new Intent(this, WebViewActivityLollipop.class);
+			openSyncIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openSyncIntent.setData(Uri.parse(url));
+			startActivity(openSyncIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#terms") || url.matches("^https://mega\\.nz/#terms") || url.matches("^https://mega\\.nz/terms"))) {
+			log("terms link url");
+
+			Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+			openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openTermsIntent.setData(Uri.parse(url));
+			startActivity(openTermsIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#privacy") || url.matches("^https://mega\\.nz/#privacy") || url.matches("^https://mega\\.nz/privacy"))) {
+			log("privacy link url");
+
+			Intent openPrivacyIntent = new Intent(this, WebViewActivityLollipop.class);
+			openPrivacyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openPrivacyIntent.setData(Uri.parse(url));
+			startActivity(openPrivacyIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#gdpr") || url.matches("^https://mega\\.nz/#gdpr") || url.matches("^https://mega\\.nz/gdpr"))) {
+			log("gdpr link url");
+
+			Intent openGdprIntent = new Intent(this, WebViewActivityLollipop.class);
+			openGdprIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openGdprIntent.setData(Uri.parse(url));
+			startActivity(openGdprIntent);
+			finish();
+			return;
+		}
+
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/#.+$") || url.matches("^https://mega\\.nz/#.+$"))) {
 			log("handle link url");
 
 			Intent handleIntent = new Intent(this, ManagerActivityLollipop.class);
@@ -424,6 +483,28 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 			startActivity(handleIntent);
 			finish();
 			return;
+		}
+
+		//Contact link
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) { //https://mega.nz/C!
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			}
+			if (dbH != null) {
+				if (dbH.getCredentials() != null) {
+					String[] s = url.split("C!");
+					long handle = MegaApiAndroid.base64ToHandle(s[1].trim());
+					Intent inviteContact = new Intent(this, ManagerActivityLollipop.class);
+					inviteContact.setAction(Constants.ACTION_INVITE_CONTACT);
+					inviteContact.putExtra("handle", handle);
+					startActivity(inviteContact);
+					finish();
+				} else {
+					log("Not logged");
+					setError(getString(R.string.alert_not_logged_in));
+				}
+				return;
+			}
 		}
 
 		log("wrong url: " + url);
@@ -456,7 +537,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				String url = request.getLink();
-				if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
+				if (url != null && (url.matches("^https://mega\\.co\\.nz/#cancel.+$"))||(url.matches("^https://mega\\.nz/#cancel.+$"))) {
 					log("cancel account url");
 					String myEmail = request.getEmail();
 					if(myEmail!=null){
@@ -471,7 +552,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						else{
 							log("Not logged with the correct account");
 							log(e.getErrorString() + "___" + e.getErrorCode());
-							Util.showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
+//							Util.showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
+							setError(getString(R.string.error_not_logged_with_correct_account));
 						}
 					}
 					else{
@@ -479,7 +561,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 					}
 
 				}
-				else if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
+				else if (url != null && (url.matches("^https://mega\\.co\\.nz/#recover.+$"))||(url.matches("^https://mega\\.nz/#recover.+$"))) {
 					log("reset pass url");
 					log("The recovery link has been sent");
 					boolean mk = request.getFlag();
@@ -496,7 +578,8 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						else{
 							log("LINK is null");
 							log(e.getErrorString() + "___" + e.getErrorCode());
-							Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+//							Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+							setError(getString(R.string.email_verification_text_error));
 						}
 					}
 					else{
@@ -509,31 +592,124 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 						finish();
 					}
 				}
-
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
 				log("Error expired link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
 				String url = request.getLink();
-				if (url != null && (url.matches("^https://mega.co.nz/#cancel.+$"))||(url.matches("^https://mega.nz/#cancel.+$"))) {
+				if (url != null && (url.matches("^https://mega\\.co\\.nz/#cancel.+$"))||(url.matches("^https://mega\\.nz/#cancel.+$"))) {
 					log("cancel account url");
-					Util.showAlert(this, getString(R.string.cancel_link_expired), getString(R.string.general_error_word));
+//					Util.showAlert(this, getString(R.string.cancel_link_expired), getString(R.string.general_error_word));
+					setError(getString(R.string.cancel_link_expired));
 				}
-				else if (url != null && (url.matches("^https://mega.co.nz/#recover.+$"))||(url.matches("^https://mega.nz/#recover.+$"))) {
+				else if (url != null && (url.matches("^https://mega\\.co\\.nz/#recover.+$"))||(url.matches("^https://mega\\.nz/#recover.+$"))) {
 					log("reset pass url");
-					Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+//					Util.showAlert(this, getString(R.string.recovery_link_expired), getString(R.string.general_error_word));
+					setError(getString(R.string.recovery_link_expired));
 				}
 			}
 			else{
 				log("Error when asking for recovery pass link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
-				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
+//				Util.showAlert(this, getString(R.string.invalid_link), getString(R.string.general_error_word));
+				setError(getString(R.string.invalid_link));
 			}
 		}
+		else if(request.getType() == MegaRequest.TYPE_LOGOUT){
+			if(Util.isChatEnabled()){
+				log("END logout sdk request - wait chat logout");
+
+				if(MegaApplication.getUrlConfirmationLink()!=null){
+					log("Confirmation link - show confirmation screen");
+					if (dbH == null){
+						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					}
+					if (dbH != null){
+						dbH.clearEphemeral();
+					}
+
+					AccountController aC = new AccountController(this);
+					aC.logoutConfirmed(this);
+
+					Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+					confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+					confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, urlConfirmationLink);
+					confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					confirmIntent.setAction(Constants.ACTION_CONFIRM);
+					startActivity(confirmIntent);
+					MegaApplication.setUrlConfirmationLink(null);
+					finish();
+				}
+			}
+			else{
+				log("END logout sdk request - chat disabled");
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+				if (dbH != null){
+					dbH.clearEphemeral();
+				}
+
+				AccountController aC = new AccountController(this);
+				aC.logoutConfirmed(this);
+
+				Intent confirmIntent = new Intent(this, LoginActivityLollipop.class);
+				confirmIntent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				confirmIntent.putExtra(Constants.EXTRA_CONFIRMATION, urlConfirmationLink);
+				confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				confirmIntent.setAction(Constants.ACTION_CONFIRM);
+				startActivity(confirmIntent);
+				MegaApplication.setUrlConfirmationLink(null);
+				finish();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
+			log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
+
+			if(e.getErrorCode() == MegaError.API_OK){
+				AccountController aC = new AccountController(this);
+				MegaApplication.setUrlConfirmationLink(request.getLink());
+
+				aC.logout(this, megaApi);
+			}
+			else{
+				setError(getString(R.string.invalid_link));
+
+//				AlertDialog.Builder builder;
+//				builder = new AlertDialog.Builder(this);
+//				builder.setMessage(R.string.invalid_link);
+//				builder.setPositiveButton(getString(R.string.cam_sync_ok),
+//						new DialogInterface.OnClickListener() {
+//							public void onClick(DialogInterface dialog, int whichButton) {
+//								finish();
+//							}
+//						});
+//				builder.show();
+
+			}
+		}
+	}
+
+	public void setError (String string) {
+		processingText.setVisibility(View.GONE);
+		progressBar.setVisibility(View.GONE);
+		errorText.setText(string);
+		errorText.setVisibility(View.VISIBLE);
+		containerOkButton.setVisibility(View.VISIBLE);
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+			case R.id.container_accept_button: {
+				this.finish();
+				break;
+			}
+		}
 	}
 }

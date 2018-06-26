@@ -11,10 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -28,8 +25,6 @@ import android.text.Spanned;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -110,14 +105,14 @@ public final class NotificationBuilder {
             Notification notification = buildNotificationPreN(uriParameter, unreadChats, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
             if(notification!=null){
-                notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+                notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
             }
         }
         else{
             log("Android 4 - no bundled - no inbox style");
             Notification notification = buildNotification(uriParameter, item, vibration, GROUP_KEY, email);
             log("Notification id: "+getNotificationIdByHandle(item.getChatId()));
-            notificationManager.notify(getNotificationIdByHandle(item.getChatId()), notification);
+            notificationManager.notify(Constants.NOTIFICATION_PRE_N_CHAT, notification);
         }
     }
 
@@ -183,7 +178,8 @@ public final class NotificationBuilder {
                     notificationBuilder.setVibrate(new long[] {0, 1000});
                 }
             }
-            String textToShow = String.format(context.getString(R.string.number_messages_chat_notification), unreadChats.size());
+
+            String textToShow = context.getResources().getQuantityString(R.plurals.plural_number_messages_chat_notification, (int)unreadChats.size(), unreadChats.size());
             inboxStyle.setBigContentTitle(textToShow);
 
             notificationBuilder.setContentTitle(textToShow);
@@ -450,7 +446,7 @@ public final class NotificationBuilder {
                         return createDefaultAvatar(item);
                     }
                     else{
-                        return getCircleBitmap(bitmap);
+                        return Util.getCircleBitmap(bitmap);
                     }
                 }
                 else{
@@ -461,29 +457,6 @@ public final class NotificationBuilder {
                 return createDefaultAvatar(item);
             }
         }
-    }
-
-    private Bitmap getCircleBitmap(Bitmap bitmap) {
-        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(output);
-
-        final int color = Color.RED;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawOval(rectF, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        bitmap.recycle();
-
-        return output;
     }
 
     public Bitmap createDefaultAvatar(MegaChatListItem item){
@@ -615,7 +588,7 @@ public final class NotificationBuilder {
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
 
-        mNotificationManager.notify(Constants.NOTIFICATION_PUSH_CHAT, mBuilderCompat.build());
+        mNotificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
 
     public static void log(String message) {

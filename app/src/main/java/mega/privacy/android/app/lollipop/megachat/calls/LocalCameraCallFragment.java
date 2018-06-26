@@ -91,6 +91,10 @@ public class LocalCameraCallFragment extends Fragment implements MegaChatVideoLi
                     this.bitmap = localRenderer.CreateBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 }
+                else{
+                    this.width = -1;
+                    this.height = -1;
+                }
             }
         }
 
