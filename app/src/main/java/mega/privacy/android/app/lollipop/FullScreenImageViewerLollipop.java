@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,13 +10,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.StatFs;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +24,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -36,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -43,6 +43,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -51,9 +54,10 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
@@ -66,12 +70,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -86,6 +89,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -114,6 +118,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	Context context;
 
 	int positionToRemove = -1;
+	String regex = "[*|\\?:\"<>\\\\\\\\/]";
+
+	NodeController nC;
 
 	private MegaFullScreenImageAdapterLollipop adapterMega;
 	private MegaOfflineFullScreenImageAdapterLollipop adapterOffline;
@@ -134,6 +141,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
 
+	private android.support.v7.app.AlertDialog downloadConfirmationDialog;
+
+	MegaOffline currentNode;
 
 	private RelativeLayout bottomLayout;
 	private ExtendedViewPager viewPager;
@@ -143,8 +153,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
+	private String offlinePathDirectory;
     
     int adapterType = 0;
+    long[] handlesNodesSearched;
 
 	int countChat = 0;
 	int errorSent = 0;
@@ -153,7 +165,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	public static int REQUEST_CODE_SELECT_CHAT = 1005;
+
 	
 	MegaNode node;
 
@@ -165,7 +177,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 	
-	private AlertDialog renameDialog;
+	private android.support.v7.app.AlertDialog renameDialog;
 	
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
@@ -202,7 +214,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		log("onCreateOptionsMenu");
 
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_full_screen_image_viewer, menu);
@@ -212,16 +223,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);
 		shareIcon = menu.findItem(R.id.full_image_viewer_share);
-		Drawable share = getResources().getDrawable(R.drawable.ic_social_share_white);
-		share.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-		shareIcon.setIcon(share);
 		propertiesIcon = menu.findItem(R.id.full_image_viewer_properties);
 		downloadIcon = menu.findItem(R.id.full_image_viewer_download);
-
-		Drawable download = getResources().getDrawable(R.drawable.ic_download_white);
-		download.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-		downloadIcon.setIcon(download);
-
 		renameIcon = menu.findItem(R.id.full_image_viewer_rename);
 		moveIcon = menu.findItem(R.id.full_image_viewer_move);
 		copyIcon = menu.findItem(R.id.full_image_viewer_copy);
@@ -231,6 +234,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		Intent intent = getIntent();
 		adapterType = intent.getIntExtra("adapterType", 0);
+		offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
@@ -239,8 +243,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			removelinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			shareIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			shareIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -509,6 +513,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
+
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
@@ -548,9 +553,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				long[] longArray = new long[1];
 				longArray[0] = imageHandles.get(positionG);
 
-				Intent i = new Intent(this, ChatExplorerActivity.class);
-				i.putExtra("NODE_HANDLES", longArray);
-				startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+				if(nC ==null){
+					nC = new NodeController(this);
+				}
+
+				nC.selectChatsToSendNodes(longArray);
 				break;
 			}
 
@@ -682,7 +689,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(node.getHandle());
-					downloadNode(handleList);
+					if(nC==null){
+						nC = new NodeController(this);
+					}
+					nC.prepareForDownload(handleList);
+
 					break;
 				}
 			}
@@ -743,6 +754,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
 
@@ -964,10 +976,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				viewPager.setCurrentItem(positionG);
 		
 				viewPager.setOnPageChangeListener(this);
-			}			
+			}
+
+			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+			else{
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+
+			currentNode = mOffListImages.get(positionG);
+
+			fileNameTextView.setText(currentNode.getName());
 		}				
 		else if (adapterType == Constants.ZIP_ADAPTER){
-			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
 			File offlineDirectory = new File(offlinePathDirectory);
 //			if (Environment.getExternalStorageDirectory() != null){
@@ -1092,6 +1116,57 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+
+		}else if(adapterType == Constants.SEARCH_BY_ADAPTER){
+			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
+
+			ArrayList<MegaNode> nodes = new ArrayList<>();
+			for(Long handle:handlesNodesSearched){
+				nodes.add(megaApi.getNodeByHandle(handle));
+			}
+			int imageNumber = 0;
+			for (int i=0;i<nodes.size();i++){
+				MegaNode n = nodes.get(i);
+				if (MimeTypeList.typeForName(n.getName()).isImage()){
+					imageHandles.add(n.getHandle());
+					if (i == positionG){
+						positionG = imageNumber;
+					}
+					imageNumber++;
+				}
+			}
+
+			if(imageHandles.size() == 0)
+			{
+				finish();
+				return;
+			}
+
+			if(positionG >= imageHandles.size())
+			{
+				positionG = 0;
+			}
+
+			fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+
+			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+			else{
+				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
+			}
+
+			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi);
+
+			viewPager.setAdapter(adapterMega);
+
+			viewPager.setCurrentItem(positionG);
+
+			viewPager.setOnPageChangeListener(this);
+
+			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		}else{
 
@@ -1445,129 +1520,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         	case Constants.REQUEST_WRITE_STORAGE:{
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
-					downloadNode(handleListM);
+					if(nC==null){
+						nC = new NodeController(this);
+					}
+
+					nC.prepareForDownload(handleListM);
 				}
 	        	break;
 	        }
         }
     }
-	
-	@SuppressLint("NewApi") 
-	public void downloadNode(ArrayList<Long> handleList){
-		
-		long size = 0;
-		long[] hashes = new long[handleList.size()];
-		for (int i=0;i<handleList.size();i++){
-			hashes[i] = handleList.get(i);
-			size += megaApi.getNodeByHandle(hashes[i]).getSize();
-		}
-		
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
-		
-		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							askMe = false;
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}		
-			
-		if (askMe){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				File[] fs = getExternalFilesDirs(null);
-				if (fs.length > 1){
-					if (fs[1] == null){
-						Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-						intent.setClass(this, FileStorageActivityLollipop.class);
-						intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-						startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-					}
-					else{
-						Dialog downloadLocationDialog;
-						String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
-				        AlertDialog.Builder b=new AlertDialog.Builder(this);
-	
-						b.setTitle(getResources().getString(R.string.settings_storage_download_location));
-						final long sizeFinal = size;
-						final long[] hashesFinal = new long[hashes.length];
-						for (int i=0; i< hashes.length; i++){
-							hashesFinal[i] = hashes[i];
-						}
-						
-						b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch(which){
-									case 0:{
-										Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, sizeFinal);
-										intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
-										intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashesFinal);
-										startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-										break;
-									}
-									case 1:{
-										File[] fs = getExternalFilesDirs(null);
-										if (fs.length > 1){
-											String path = fs[1].getAbsolutePath();
-											File defaultPathF = new File(path);
-											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
-											downloadTo(path, null, sizeFinal, hashesFinal);
-										}
-										break;
-									}
-								}
-							}
-						});
-						b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						});
-						downloadLocationDialog = b.create();
-						downloadLocationDialog.show();
-					}
-				}
-				else{
-					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-					intent.setClass(this, FileStorageActivityLollipop.class);
-					intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-				}
-			}
-			else{
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivityLollipop.class);
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-			}
-		}
-		else{
-			downloadTo(downloadLocationDefaultPath, null, size, hashes);
-		}
-	}
-	
+
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
@@ -1600,79 +1563,198 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	public void showRenameDialog(){
 		log("showRenameDialog");
-
 		node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+	//	    layout.setLayoutParams(params);
+
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
 		input.setSingleLine();
-		input.setText(node.getName());
-
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_rename),
-				EditorInfo.IME_ACTION_DONE);
-		
+		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
+		input.setText(node.getName());
+
+
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(final View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (node.isFolder()){
-						input.setSelection(0, input.getText().length());
-					}
-					else{
-						String [] s = node.getName().split("\\.");
-						if (s != null){
-							int numParts = s.length;
-							int lastSelectedPos = 0;
-							if (numParts == 1){
-								input.setSelection(0, input.getText().length());
-							}
-							else if (numParts > 1){
-								for (int i=0; i<(numParts-1);i++){
-									lastSelectedPos += s[i].length(); 
-									lastSelectedPos++;
-								}
-								lastSelectedPos--; //The last point should not be selected)
-								input.setSelection(0, lastSelectedPos);
-							}
+				@Override
+				public void onFocusChange(final View v, boolean hasFocus) {
+					if (hasFocus) {
+						if (node.isFolder()){
+							input.setSelection(0, input.getText().length());
 						}
-						showKeyboardDelayed(v);
+						else{
+							String [] s = node.getName().split("\\.");
+							if (s != null){
+								int numParts = s.length;
+								int lastSelectedPos = 0;
+								if (numParts == 1){
+									input.setSelection(0, input.getText().length());
+								}
+								else if (numParts > 1){
+									for (int i=0; i<(numParts-1);i++){
+										lastSelectedPos += s[i].length();
+										lastSelectedPos++;
+									}
+									lastSelectedPos--; //The last point should not be selected)
+									input.setSelection(0, lastSelectedPos);
+								}
+							}
+							showKeyboardDelayed(v);
+						}
 					}
+				}
+			});
+
+
+		layout.addView(input, params);
+
+		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
+
+		final RelativeLayout error_layout = new RelativeLayout(FullScreenImageViewerLollipop.this);
+		layout.addView(error_layout, params1);
+
+		final ImageView error_icon = new ImageView(FullScreenImageViewerLollipop.this);
+		error_icon.setImageDrawable(FullScreenImageViewerLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_layout.addView(error_icon);
+		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
+
+		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon.setLayoutParams(params_icon);
+
+		error_icon.setColorFilter(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
+
+		final TextView textError = new TextView(FullScreenImageViewerLollipop.this);
+		error_layout.addView(textError);
+		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(3, outMetrics), 0,0,0);
+		textError.setLayoutParams(params_text_error);
+
+		textError.setTextColor(ContextCompat.getColor(FullScreenImageViewerLollipop.this, R.color.login_warning));
+
+		error_layout.setVisibility(View.GONE);
+
+		input.getBackground().mutate().clearColorFilter();
+		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				if(error_layout.getVisibility() == View.VISIBLE){
+					error_layout.setVisibility(View.GONE);
+					input.getBackground().mutate().clearColorFilter();
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
-
-
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						rename(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		renameDialog = builder.create();
-		renameDialog.show();
 
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 										  KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					renameDialog.dismiss();
+
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						return true;
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_string));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						boolean result=matches(regex, value);
+						if(result){
+							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							textError.setText(getString(R.string.invalid_characters));
+							error_layout.setVisibility(View.VISIBLE);
+							input.requestFocus();
+
+						}else{
+	//						nC.renameNode(node, value);
+							renameDialog.dismiss();
+							rename(value);
+						}
 					}
-					rename(value);
 					return true;
 				}
 				return false;
 			}
 		});
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+							if (value.length() == 0) {
+								return;
+							}
+							rename(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialogInterface, int i) {
+				input.getBackground().clearColorFilter();
+			}
+		});
+		builder.setView(layout);
+		renameDialog = builder.create();
+		renameDialog.show();
+		renameDialog.getButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				String value = input.getText().toString().trim();
+
+				if (value.length() == 0) {
+					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					textError.setText(getString(R.string.invalid_string));
+					error_layout.setVisibility(View.VISIBLE);
+					input.requestFocus();
+				}
+				else{
+					boolean result=matches(regex, value);
+					if(result){
+						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						textError.setText(getString(R.string.invalid_characters));
+						error_layout.setVisibility(View.VISIBLE);
+						input.requestFocus();
+
+					}else{
+						//nC.renameNode(node, value);
+						renameDialog.dismiss();
+						rename(value);
+					}
+				}
+			}
+		});
+	}
+
+	public static boolean matches(String regex, CharSequence input) {
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(input);
+		return m.find();
 	}
 
 	private void rename(String newName){
@@ -1681,7 +1763,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		
 		if(!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -1749,7 +1831,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -1974,6 +2056,50 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
+
+	public void openAdvancedDevices (long handleToDownload){
+		log("openAdvancedDevices");
+//		handleToDownload = handle;
+		String externalPath = Util.getExternalCardPath();
+
+		if(externalPath!=null){
+			log("ExternalPath for advancedDevices: "+externalPath);
+			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
+			if(node!=null){
+
+//				File newFile =  new File(externalPath+"/"+node.getName());
+				File newFile =  new File(node.getName());
+				log("File: "+newFile.getPath());
+				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+				// Filter to only show results that can be "opened", such as
+				// a file (as opposed to a list of contacts or timezones).
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+				// Create a file with the requested MIME type.
+				String mimeType = MimeTypeList.getMimeType(newFile);
+				log("Mimetype: "+mimeType);
+				intent.setType(mimeType);
+				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
+				intent.putExtra("handleToDownload", handleToDownload);
+				try{
+					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
+				}
+				catch(Exception e){
+					log("Exception in External SDCARD");
+					Environment.getExternalStorageDirectory();
+					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+					toast.show();
+				}
+			}
+		}
+		else{
+			log("No external SD card");
+			Environment.getExternalStorageDirectory();
+			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+			toast.show();
+		}
+	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -1989,9 +2115,41 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
-			
-			downloadTo (parentPath, url, size, hashes);
-			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+
+			if(nC==null){
+				nC = new NodeController(this);
+			}
+			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+		}
+		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (!hasStoragePermission) {
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+							Constants.REQUEST_WRITE_STORAGE);
+				}
+			}
+
+			Uri treeUri = intent.getData();
+			log("--------------Create the node : "+treeUri);
+			long handleToDownload = intent.getLongExtra("handleToDownload", -1);
+			log("The recovered handle is: "+handleToDownload);
+			//Now, call to the DownloadService
+
+			if(handleToDownload!=0 && handleToDownload!=-1){
+				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
+				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/";
+				File tempDownDirectory = new File(path);
+				if(!tempDownDirectory.exists()){
+					tempDownDirectory.mkdirs();
+				}
+				service.putExtra(DownloadService.EXTRA_PATH, path);
+				startService(service);
+			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 			
@@ -2060,7 +2218,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
 			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
 			log("Send to "+chatHandles.length+" chats");
 
@@ -2105,133 +2263,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
-	
-	public void downloadTo(String parentPath, String url, long size, long [] hashes){
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
-			}
-		}
-		
-		double availableFreeSpace = Double.MAX_VALUE;
-		try{
-			StatFs stat = new StatFs(parentPath);
-			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-		}
-		catch(Exception ex){}
-		
-		
-		if (hashes == null){
-			if(url != null) {
-				if(availableFreeSpace < size) {
-					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-					return;
-				}
-				Intent service = new Intent(this, DownloadService.class);
-				service.putExtra(DownloadService.EXTRA_URL, url);
-				service.putExtra(DownloadService.EXTRA_SIZE, size);
-				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-				service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-				startService(service);
-			}
-		}
-		else{
-			if(hashes.length == 1){
-				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-					log("ISFILE");
-					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
-					if(localPath != null){	
-						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
-						}
-						catch(Exception e) {}
-
-						try {
-
-							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							} else {
-								viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							}
-							viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-								startActivity(viewIntent);
-							else {
-								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-									intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								} else {
-									intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								}
-								intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-								if (MegaApiUtils.isIntentAvailable(this, intentShare))
-									startActivity(intentShare);
-								String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-								Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
-							}
-						}
-						catch (Exception e){
-							String message = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
-						}
-						return;
-					}
-				}
-			}
-			
-			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				if(node != null){
-					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
-						dlFiles.put(node, parentPath);
-					}
-					
-					for (MegaNode document : dlFiles.keySet()) {
-						
-						String path = dlFiles.get(document);
-						
-						if(availableFreeSpace < document.getSize()){
-							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-							continue;
-						}
-						
-						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
-						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-						startService(service);
-					}
-				}
-				else if(url != null) {
-					if(availableFreeSpace < size) {
-						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
-						continue;
-					}
-					
-					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, hash);
-					service.putExtra(DownloadService.EXTRA_URL, url);
-					service.putExtra(DownloadService.EXTRA_SIZE, size);
-					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
-					startService(service);
-				}
-				else {
-					log("node not found");
-				}
-			}
-		}
-	}
 
 	public void showSnackbar(String s){
 		log("showSnackbar");
@@ -2239,6 +2270,109 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+
+	public void showSnackbarNotSpace(){
+		log("showSnackbarNotSpace");
+		Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+		mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+		mySnackbar.show();
+	}
+
+	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+		log("askSizeConfirmationBeforeDownload");
+
+		final String parentPathC = parentPath;
+		final String urlC = url;
+		final long [] hashesC = hashes;
+		final long sizeC=size;
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		LinearLayout confirmationLayout = new LinearLayout(this);
+		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final CheckBox dontShowAgain =new CheckBox(this);
+		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+		confirmationLayout.addView(dontShowAgain, params);
+
+		builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+
+		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+		builder.setPositiveButton(getString(R.string.general_download),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if(dontShowAgain.isChecked()){
+							dbH.setAttrAskSizeDownload("false");
+						}
+						if(nC==null){
+							nC = new NodeController(fullScreenImageViewer);
+						}
+						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				if(dontShowAgain.isChecked()){
+					dbH.setAttrAskSizeDownload("false");
+				}
+			}
+		});
+
+		downloadConfirmationDialog = builder.create();
+		downloadConfirmationDialog.show();
+	}
+
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+		log("askConfirmationNoAppInstaledBeforeDownload");
+
+		final String parentPathC = parentPath;
+		final String urlC = url;
+		final long [] hashesC = hashes;
+		final long sizeC=size;
+
+		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		LinearLayout confirmationLayout = new LinearLayout(this);
+		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final CheckBox dontShowAgain =new CheckBox(this);
+		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+
+		confirmationLayout.addView(dontShowAgain, params);
+
+		builder.setView(confirmationLayout);
+
+//				builder.setTitle(getString(R.string.confirmation_required));
+		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
+		builder.setPositiveButton(getString(R.string.general_download),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						if(dontShowAgain.isChecked()){
+							dbH.setAttrAskNoAppDownload("false");
+						}
+						if(nC==null){
+							nC = new NodeController(fullScreenImageViewer);
+						}
+						nC.download(parentPathC, urlC, sizeC, hashesC);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				if(dontShowAgain.isChecked()){
+					dbH.setAttrAskNoAppDownload("false");
+				}
+			}
+		});
+		downloadConfirmationDialog = builder.create();
+		downloadConfirmationDialog.show();
 	}
 
 	public void touchImage() {
@@ -2279,6 +2413,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
+	protected void onResume(){
+		log("onResume");
+		super.onResume();
+		if (adapterType != Constants.OFFLINE_ADAPTER){
+			if (imageHandles.get(positionG) != -1){
+				log("node updated");
+				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			}
+
+			if (node == null){
+				finish();
+			}
+		}
+	}
+
+	@Override
 	public void onBackPressed() {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		super.onBackPressed();
@@ -2286,6 +2436,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+
+	}
+
+	@Override
+	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
 

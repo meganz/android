@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relative_layout_frag"
+        android:background="@color/grid_item_separator">
+
+        <TextView
+            android:id="@+id/empty_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif"
+            android:textSize="20sp"
+            android:text="@string/file_storage_empty_folder"
+            android:textColor="@color/black"
+            android:visibility="gone"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/file_storage_grid_view_browser"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:choiceMode="multipleChoice"
+            android:background="@color/grid_item_separator"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal"/>
+
+</RelativeLayout>
+

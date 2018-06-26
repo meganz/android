@@ -55,7 +55,9 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/thread/posixthread.cpp \
     sdk/src/logging.cpp \
     sdk/src/mega_http_parser.cpp \
-    sdk/src/mega_zxcvbn.cpp
+    sdk/src/mega_zxcvbn.cpp \
+    sdk/src/mediafileattribute.cpp \
+    sdk/src/mega_evt_tls.cpp
     
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -105,7 +107,10 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/thread/posixthread.h \
         sdk/include/mega/logging.h \
 	sdk/include/mega/mega_http_parser.h \
-	sdk/include/mega/mega_zxcvbn.h
+	sdk/include/mega/mega_zxcvbn.h \
+        sdk/include/mega/mediafileattribute.h \
+	sdk/include/mega/mega_evt_tls.h \
+	sdk/include/mega/mega_evt_queue.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp

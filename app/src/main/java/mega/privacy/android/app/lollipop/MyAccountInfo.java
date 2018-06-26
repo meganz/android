@@ -15,6 +15,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MonthlyAnnualyFragmentLollipop;
@@ -101,7 +102,8 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     public void setAccountDetails(){
 
         if(accountInfo==null){
-            log("Error because accoun info is NUll in setAccountDetails");
+            log("Error because account info is NUll in setAccountDetails");
+            return;
         }
 
         long totalStorage = accountInfo.getStorageMax();
@@ -414,6 +416,21 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
                     lastNameText = request.getText();
                     lastName = true;
                     dbH.saveMyLastName(lastNameText);
+                }
+                else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+                    log("PasswordReminderFromMyAccount: "+((ManagerActivityLollipop)context).getPasswordReminderFromMyAccount());
+                    if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
+                        log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
+                        if (request.getFlag()){
+                            ((ManagerActivityLollipop) context).showRememberPasswordDialog(true);
+                        }
+                        else if (((ManagerActivityLollipop)context).getPasswordReminderFromMyAccount()){
+                            AccountController aC = new AccountController((ManagerActivityLollipop)context);
+                            aC.logout((ManagerActivityLollipop)context, megaApi);
+                        }
+                    }
+                    ((ManagerActivityLollipop) context).setPasswordReminderFromMyAccount(false);
+
                 }
                 if(firstName && lastName){
                     log("Name and First Name received!");

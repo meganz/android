@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -52,7 +54,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
 
 	TextView contentText;
 	View separator;
@@ -133,8 +134,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.file_list_empty_text_first);
-		emptyTextViewSecond = (TextView) v.findViewById(R.id.file_list_empty_text_second);
-
 		parentHandle = ((FileExplorerActivityLollipop)context).parentHandleIncoming;
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
@@ -234,16 +233,26 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.context_empty_incoming);
-				emptyTextViewSecond.setText(" "+text+".");
-				emptyTextViewSecond.setVisibility(View.VISIBLE);
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}else{
 
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-				emptyTextViewSecond.setVisibility(View.GONE);
 			}
 
 		}
@@ -295,12 +304,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		this.setDisableNodes(disabledNodes);
 	}
-	
-	public void changeActionBarTitle(String folder){
-		((FileExplorerActivityLollipop) context).changeTitle(folder);
-		((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
-	}
-	
+
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -317,7 +321,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				break;
 			}
 			case R.id.cancel_text:{
-				((FileExplorerActivityLollipop) context).finish();
+				((FileExplorerActivityLollipop) context).finishActivity();
 				break;
 			}
 		}
@@ -349,14 +353,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		log("Push to stack "+lastFirstVisiblePosition+" position");
 		lastPositionStack.push(lastFirstVisiblePosition);
 
-		MegaNode parentNode = megaApi.getNodeByHandle(handle);
-		changeActionBarTitle(parentNode.getName());
-
 		parentHandle = handle;
 		adapter.setParentHandle(parentHandle);
 		nodes.clear();
 		adapter.setNodes(nodes);
 		listView.scrollToPosition(0);
+
+		((FileExplorerActivityLollipop) context).changeTitle();
 
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
@@ -366,7 +369,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			emptyTextViewSecond.setVisibility(View.GONE);
 		}
 		else{
 			listView.setVisibility(View.VISIBLE);
@@ -377,9 +379,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (modeCloud == FileExplorerActivityLollipop.COPY){
 			activateButton(true);
 		}
-
-
-
 	}
 
     public void itemClick(View view, int position) {
@@ -404,8 +403,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					optionsBar.setVisibility(View.VISIBLE);
 				}
 			}
-			
-			MegaNode n = nodes.get(position);
 
 			int lastFirstVisiblePosition = 0;
 			lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
@@ -413,20 +410,19 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			log("Push to stack "+lastFirstVisiblePosition+" position");
 			lastPositionStack.push(lastFirstVisiblePosition);
 
-			changeActionBarTitle(n.getName());
-			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
 			listView.scrollToPosition(0);
+
+			((FileExplorerActivityLollipop) context).changeTitle();
 			
 			//If folder has no files
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-				emptyTextViewSecond.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (modeCloud == FileExplorerActivityLollipop.COPY){
@@ -488,12 +484,13 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		if(((FileExplorerActivityLollipop)context).deepBrowserTree==0){
 			parentHandle=-1;
-			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
 			findDisabledNodes();
 			
 			adapter.setNodes(nodes);
+			((FileExplorerActivityLollipop) context).changeTitle();
+
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
@@ -524,10 +521,21 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}else{
 					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_contacts);
-				String text = getString(R.string.context_empty_incoming);
-				emptyTextViewSecond.setText(" "+text+".");
-				emptyTextViewSecond.setVisibility(View.VISIBLE);
+				String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			}
 
@@ -539,7 +547,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 
 			if (parentNode != null){
-				changeActionBarTitle(parentNode.getName());
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
@@ -573,6 +580,8 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}
 				adapter.setParentHandle(parentHandle);
 
+				((FileExplorerActivityLollipop) context).changeTitle();
+
 				if (adapter.getItemCount() != 0){
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
@@ -583,7 +592,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					emptyTextViewSecond.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 				}
 				return 2;
@@ -648,14 +656,24 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					}else{
 						emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 					}
-					emptyTextViewFirst.setText(R.string.context_empty_contacts);
-					String text = getString(R.string.context_empty_incoming);
-					emptyTextViewSecond.setText(" "+text+".");
-					emptyTextViewSecond.setVisibility(View.VISIBLE);
+					String textToShow = String.format(context.getString(R.string.context_empty_contacts), getString(R.string.context_empty_incoming));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				} else {
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					emptyTextViewSecond.setVisibility(View.GONE);
 
 				}
 			}

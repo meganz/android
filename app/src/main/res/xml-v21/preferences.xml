@@ -84,6 +84,12 @@
 			android:title="@string/section_chat"
 			android:defaultValue="true"/>
 
+		<ListPreference
+			android:key="settings_chat_send_originals"
+			android:title="@string/settings_chat_upload_quality"
+			android:entries="@array/settings_chat_upload_quality_entries"
+			android:entryValues="@array/settings_chat_upload_quality_values" />
+
 	</PreferenceCategory>
 
 	<PreferenceCategory
@@ -158,6 +164,34 @@
 	        android:key="settings_storage_download_location"
 	        android:title="@string/settings_storage_download_location" />
 	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_security"
+		android:title="@string/settings_security_options_title"
+		android:layout="@layout/my_category_preference">
+
+		<Preference
+			android:key="settings_recovery_key"
+			android:title="@string/settings_recovery_key_title"
+			android:summary="@string/settings_recovery_key_summary" />
+
+		<Preference
+			android:key="settings_change_password"
+			android:title="@string/my_account_change_password"/>
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="settings_qrcode"
+		android:title="@string/section_qr_code"
+		android:layout="@layout/my_category_preference">
+
+		<SwitchPreference
+			android:key="settings_qrcode_autoaccept"
+			android:title="@string/settings_qrcode_autoaccept"
+			android:summary="@string/setting_subtitle_qrcode_autoccept"/>
+
+	</PreferenceCategory>
 	
 	<PreferenceCategory
 	    android:key="advanced_features"
@@ -209,6 +243,11 @@
             android:key="settings_about_terms_of_service"
         	android:title="@string/settings_about_terms_of_service"
         	android:summary="" />
+
+		<Preference
+			android:key="settings_about_gdpr"
+			android:title="@string/settings_about_gdpr"
+			android:summary="" />
 
 		<Preference
 			android:key="settings_about_code_link"

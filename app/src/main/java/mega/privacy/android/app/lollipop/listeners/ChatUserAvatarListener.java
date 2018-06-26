@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 
 import java.io.File;
 
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -28,10 +27,6 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
         if(adapter instanceof MegaListChatLollipopAdapter){
             this.holder = (MegaListChatLollipopAdapter.ViewHolderChatList) holder;
             this.adapter = (MegaListChatLollipopAdapter) adapter;
-        }
-        if(adapter instanceof MegaChatExplorerAdapter){
-            this.holder = (MegaChatExplorerAdapter.ViewHolderChatList) holder;
-            this.adapter = (MegaChatExplorerAdapter) adapter;
         }
     }
 
@@ -72,33 +67,6 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                     }
                 }
             }
-            else if(holder instanceof MegaChatExplorerAdapter.ViewHolderChatList){
-                if (((MegaChatExplorerAdapter.ViewHolderChatList)holder).getContactMail().compareTo(request.getEmail()) == 0){
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaChatExplorerAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaChatExplorerAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
-                    }
-                    Bitmap bitmap = null;
-                    if (avatar.exists()){
-                        if (avatar.length() > 0){
-                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                            bOpts.inPurgeable = true;
-                            bOpts.inInputShareable = true;
-                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                            if (bitmap == null) {
-                                avatar.delete();
-                            }
-                            else{
-                                ((MegaChatExplorerAdapter.ViewHolderChatList)holder).setImageView(bitmap);
-                            }
-                        }
-                    }
-                }
-            }
-
         }
     }
 

@@ -20,14 +20,14 @@
         android:visible="true"/>
 
     <item
-        android:id="@+id/full_image_viewer_save_for_offline"
+        android:id="@+id/chat_full_image_viewer_save_for_offline"
         android:orderInCategory="110"
         android:title="@string/save_for_offline"
         MEGA:showAsAction="never"
         android:visible="true"/>
 
     <item
-        android:id="@+id/full_image_viewer_remove"
+        android:id="@+id/chat_full_image_viewer_remove"
         android:orderInCategory="115"
         android:title="@string/context_remove"
         MEGA:showAsAction="never"

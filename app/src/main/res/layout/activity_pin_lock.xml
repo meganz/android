@@ -94,7 +94,7 @@
             android:inputType="numberPassword"
             android:maxLength="1" />
     </LinearLayout>
-    
+
     <LinearLayout
         android:id="@+id/six_pin_layout"
         android:layout_width="match_parent"
@@ -102,7 +102,7 @@
         android:layout_below="@id/unlock_text_view"
         android:background="@color/white"
         android:gravity="center_horizontal"
-        android:orientation="horizontal" 
+        android:orientation="horizontal"
         android:visibility="gone">
 
         <mega.privacy.android.app.components.EditTextPIN
@@ -131,7 +131,7 @@
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1" />
-        
+
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_fourth"
             android:layout_width="fill_parent"

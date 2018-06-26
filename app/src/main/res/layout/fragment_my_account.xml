@@ -129,17 +129,33 @@
                 android:id="@+id/MK_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/name_my_account"
                 android:layout_marginLeft="72dp"
                 android:layout_centerVertical="true"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
 				android:layout_marginTop="16dp"
-				android:layout_marginBottom="16dp"
+				android:textColor="@color/white"
                 android:text="@string/action_export_master_key"
-                android:background="@color/white"
+                android:background="@color/accentColor"
                 android:elevation="@dimen/elevation_upgrade_low"
-                android:stateListAnimator="@anim/button_upgrade_elevation"/>
+                android:stateListAnimator="@anim/button_upgrade_elevation"
+				android:tint="@android:color/white"/>
+
+			<Button
+				android:id="@+id/change_pass_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@color/name_my_account"
+				android:layout_marginLeft="72dp"
+				android:layout_centerVertical="true"
+				android:paddingLeft="12dp"
+				android:paddingRight="12dp"
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="16dp"
+				android:text="@string/my_account_change_password"
+				android:background="@color/white"
+				android:elevation="@dimen/elevation_upgrade_low"
+				android:stateListAnimator="@anim/button_upgrade_elevation"/>
 
 			<LinearLayout
 				android:id="@+id/my_account_achievements_layout"
@@ -366,12 +382,6 @@
 				</LinearLayout>
 
 		</LinearLayout>
-
-		<include
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			layout="@layout/export_mk_layout"
-			android:visibility="gone"/>
 
 	</LinearLayout>
 

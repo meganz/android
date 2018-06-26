@@ -148,15 +148,6 @@
                 android:gravity="center_horizontal"
                 android:textColor="@color/text_secondary"
                 android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/contact_list_empty_text_second"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:textColor="@color/black"
-                android:textSize="18sp"/>
-
         </LinearLayout>
 
 		<ProgressBar
@@ -170,10 +161,131 @@
 			android:visibility="gone"
 			android:layout_marginTop="10dp" />
 
-		<android.support.v7.widget.RecyclerView
-			android:id="@+id/add_contact_list"
+		<ScrollView
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:choiceMode="multipleChoice" />
+			android:layout_height="wrap_content">
+
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<RelativeLayout
+					android:id="@+id/header_list_mega"
+					android:layout_width="match_parent"
+					android:background="@color/camera_uploads_list_view"
+					android:layout_height="48dp">
+
+					<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
+						android:text="@string/contacts_mega"
+						android:textColor="@color/mail_my_account"
+						android:textSize="14sp"
+						android:layout_marginLeft="16dp"/>
+
+				</RelativeLayout>
+
+				<android.support.v7.widget.RecyclerView
+					android:id="@+id/add_contact_list_mega"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:choiceMode="multipleChoice"
+					android:layout_below="@+id/header_list_mega"/>
+
+				<RelativeLayout
+					android:id="@+id/header_list_phone"
+					android:layout_width="match_parent"
+					android:background="@color/camera_uploads_list_view"
+					android:layout_height="48dp"
+					android:layout_below="@+id/add_contact_list_mega">
+
+					<TextView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
+						android:text="@string/contacts_phone"
+						android:textColor="@color/mail_my_account"
+						android:textSize="14sp"
+						android:layout_marginLeft="16dp"/>
+
+				</RelativeLayout>
+
+				<android.support.v7.widget.RecyclerView
+					android:id="@+id/add_contact_list_phone"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:choiceMode="multipleChoice"
+					android:layout_below="@+id/header_list_phone"/>
+
+			</RelativeLayout>
+
+		</ScrollView>
+
+		<!--<RelativeLayout
+			android:id="@+id/container_list_mega"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentTop="true">
+
+			<RelativeLayout
+				android:id="@+id/header_list_mega"
+				android:layout_width="match_parent"
+				android:background="@color/camera_uploads_list_view"
+				android:layout_height="48dp">
+
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_centerVertical="true"
+					android:text="@string/contacts_mega"
+					android:textColor="@color/mail_my_account"
+					android:textSize="14sp"
+					android:layout_marginLeft="16dp"/>
+
+			</RelativeLayout>
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/add_contact_list_mega"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:choiceMode="multipleChoice"
+				android:layout_below="@+id/header_list_mega"/>
+
+		</RelativeLayout>
+
+		<RelativeLayout
+			android:id="@+id/container_list_phone"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/container_list_mega"
+			android:layout_alignParentBottom="true">
+
+			<RelativeLayout
+				android:id="@+id/header_list_phone"
+				android:layout_width="match_parent"
+				android:background="@color/camera_uploads_list_view"
+				android:layout_height="48dp">
+
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_centerVertical="true"
+					android:text="@string/contacts_phone"
+					android:textColor="@color/mail_my_account"
+					android:textSize="14sp"
+					android:layout_marginLeft="16dp"/>
+
+			</RelativeLayout>
+
+			<android.support.v7.widget.RecyclerView
+				android:id="@+id/add_contact_list_phone"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:choiceMode="multipleChoice"
+				android:layout_below="@+id/header_list_phone"/>
+
+		</RelativeLayout>-->
+
 	</RelativeLayout>
 </RelativeLayout>

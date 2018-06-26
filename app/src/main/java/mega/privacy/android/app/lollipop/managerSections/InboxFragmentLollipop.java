@@ -9,14 +9,16 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -24,18 +26,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -51,7 +49,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
@@ -62,15 +59,13 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
 
 public class InboxFragmentLollipop extends Fragment{
 
-	public static int GRID_WIDTH =400;
+	public static int GRID_WIDTH = 400;
 	
 	Context context;
-	ActionBar aB;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
@@ -84,14 +79,12 @@ public class InboxFragmentLollipop extends Fragment{
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView emptyTextViewSecond;
-
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	Stack<Integer> lastPositionStack;
 	
 	MegaApiAndroid megaApi;
-
+	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 	
 	private ActionMode actionMode;
@@ -169,6 +162,15 @@ public class InboxFragmentLollipop extends Fragment{
 					hideMultipleSelect();
 					break;
 				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.selectChatsToSendNodes(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -213,6 +215,7 @@ public class InboxFragmentLollipop extends Fragment{
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			boolean showDownload = false;
+			boolean showSendToChat = false;
 			boolean showRename = false;
 			boolean showCopy = false;
 			boolean showMove = false;
@@ -245,7 +248,7 @@ public class InboxFragmentLollipop extends Fragment{
 				else{
 					showRename = false;
 				}
-
+				allFiles = true;
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
@@ -256,6 +259,18 @@ public class InboxFragmentLollipop extends Fragment{
 						showMove = false;
 						break;
 					}
+				}
+				//showSendToChat
+				for(int i=0; i<selected.size();i++)	{
+					if(!selected.get(i).isFile()){
+						allFiles = false;
+					}
+				}
+
+				if(allFiles){
+					showSendToChat = true;
+				}else{
+					showSendToChat = false;
 				}
 			}
 			else{
@@ -268,6 +283,10 @@ public class InboxFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+			if(showSendToChat) {
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
@@ -346,10 +365,6 @@ public class InboxFragmentLollipop extends Fragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
-		
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
 
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -391,13 +406,11 @@ public class InboxFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_list_empty_text_second);
-
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
@@ -425,8 +438,6 @@ public class InboxFragmentLollipop extends Fragment{
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
-			emptyTextViewSecond = (TextView) v.findViewById(R.id.inbox_grid_empty_text_second);
-
 
 //			emptyImageView.setImageResource(R.drawable.inbox_empty);
 //			emptyTextView.setText(R.string.empty_inbox);
@@ -435,7 +446,7 @@ public class InboxFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, aB, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
@@ -473,7 +484,6 @@ public class InboxFragmentLollipop extends Fragment{
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 	
 	public void itemClick(int position) {
@@ -510,12 +520,11 @@ public class InboxFragmentLollipop extends Fragment{
 				log("Push to stack "+lastFirstVisiblePosition+" position");
 				lastPositionStack.push(lastFirstVisiblePosition);
 
-				aB.setTitle(n.getName());
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				((ManagerActivityLollipop) context).parentHandleInbox=nodes.get(position).getHandle();
 
-				((ManagerActivityLollipop) context).setParentHandleInbox(nodes.get(position).getHandle());
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				((ManagerActivityLollipop)context).setToolbarTitle();
+
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 
@@ -578,7 +587,7 @@ public class InboxFragmentLollipop extends Fragment{
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -629,7 +638,7 @@ public class InboxFragmentLollipop extends Fragment{
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -763,20 +772,11 @@ public class InboxFragmentLollipop extends Fragment{
 		if (parentNode != null) {
 			log("ParentNode: "+parentNode.getName());
 
-			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
-				aB.setTitle(getString(R.string.section_inbox));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			}
-			else{
-				aB.setTitle(parentNode.getName());
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-			}
-
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-			((ManagerActivityLollipop) context).setParentHandleInbox(parentNode.getHandle());
+			((ManagerActivityLollipop) context).parentHandleInbox = parentNode.getHandle();
+			((ManagerActivityLollipop) context).setToolbarTitle();
+
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			setNodes(nodes);
 
@@ -840,9 +840,22 @@ public class InboxFragmentLollipop extends Fragment{
 				}else{
 					emptyImageView.setImageResource(R.drawable.inbox_empty);
 				}
-				emptyTextViewFirst.setText(R.string.context_empty_inbox);
-				String text = getString(R.string.section_inbox);
-				emptyTextViewSecond.setText(" "+text+".");
+
+				String textToShow = String.format(context.getString(R.string.context_empty_inbox), getString(R.string.section_inbox));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 
 			} else {
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
