@@ -3,7 +3,7 @@ package mega.privacy.android.app;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class MegaContactDB implements Parcelable{
+public class MegaContactDB{
 	String handle;
 	String name;
 	String lastName;
@@ -47,37 +47,4 @@ public class MegaContactDB implements Parcelable{
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(handle);
-		dest.writeString(name);
-		dest.writeString(lastName);
-		dest.writeString(mail);
-	}
-
-	protected MegaContactDB(Parcel in) {
-		handle = in.readString();
-		name = in.readString();
-		lastName = in.readString();
-		mail = in.readString();
-	}
-
-	public static final Creator<MegaContactDB> CREATOR = new Creator<MegaContactDB>() {
-		@Override
-		public MegaContactDB createFromParcel(Parcel in) {
-			return new MegaContactDB(in);
-		}
-
-		@Override
-		public MegaContactDB[] newArray(int size) {
-			return new MegaContactDB[size];
-		}
-	};
-
 }
