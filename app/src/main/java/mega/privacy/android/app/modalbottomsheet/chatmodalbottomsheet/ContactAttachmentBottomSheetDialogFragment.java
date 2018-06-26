@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
+import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -62,6 +63,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     int position;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
     public TextView titleNameContactChatPanel;
@@ -151,6 +153,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_attachment_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.contact_attachment_chat_name_text);
         stateIcon = (ImageView) contentView.findViewById(R.id.contact_attachment_state_circle);
@@ -410,15 +413,17 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
+//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//            }
+//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//            }
+            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-            }
-            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-            }
         }
     }
 

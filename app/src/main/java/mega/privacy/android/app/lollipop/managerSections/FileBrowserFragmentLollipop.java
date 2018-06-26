@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -540,15 +539,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			return false;
 		}
-
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(recyclerView.getLayoutManager()!=null){
-			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
-		}
 	}
 
 	public static FileBrowserFragmentLollipop newInstance() {
@@ -897,15 +887,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void updateTransferButton(){
 		log("updateTransferButton");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			log("show PLAY button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
-			transfersTitleText.setText(getString(R.string.paused_transfers_title));
+
+		if(transfersOverViewLayout.getVisibility()==View.VISIBLE){
+			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+				log("show PLAY button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
+				transfersTitleText.setText(getString(R.string.paused_transfers_title));
+			}
+			else{
+				log("show PAUSE button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			}
 		}
 		else{
-			log("show PAUSE button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
-			transfersTitleText.setText(getString(R.string.section_transfers));
+			log("Transfer panel not visible");
 		}
 	}
 

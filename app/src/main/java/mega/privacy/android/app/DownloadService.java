@@ -652,6 +652,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							pdfIntent.putExtra("fromDownloadService", true);
 							pdfIntent.putExtra("inside", true);
 							pdfIntent.putExtra("isUrl", false);
 							startActivity(pdfIntent);
@@ -689,6 +690,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mediaIntent.putExtra("typeAccount", typeAccount);
 							mediaIntent.putExtra("isPlayList", false);
 							mediaIntent.putExtra("HANDLE", handle);
+							mediaIntent.putExtra("fromDownloadService", true);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
