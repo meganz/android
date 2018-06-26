@@ -85,6 +85,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private LinearLayout optionCopy;
     private LinearLayout optionRubbishBin;
     private LinearLayout optionRemove;
+    private LinearLayout optionRestoreFromRubbish;
     private LinearLayout optionOpenFolder;
     private LinearLayout optionOpenWith;
 
@@ -188,6 +189,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionCopy = (LinearLayout) contentView.findViewById(R.id.option_copy_layout);
         optionRubbishBin = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
+        optionRestoreFromRubbish = (LinearLayout) contentView.findViewById(R.id.option_restore_layout);
         optionOpenFolder = (LinearLayout) contentView.findViewById(R.id.option_open_folder_layout);
         optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
 
@@ -204,6 +206,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionMove.setOnClickListener(this);
         optionCopy.setOnClickListener(this);
         optionRubbishBin.setOnClickListener(this);
+        optionRestoreFromRubbish.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
@@ -333,6 +336,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemove.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
+                        optionRestoreFromRubbish.setVisibility(View.GONE);
 
                     } else if (tabSelected == 1) {
                         log("show Rubbish bottom sheet");
@@ -340,6 +344,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionInfoText.setText(R.string.general_folder_info);
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
+                        }
+
+                        if((megaApi.isInRubbish(node)) && (node.getRestoreHandle()!=-1)){
+                            optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            optionRestoreFromRubbish.setVisibility(View.GONE);
                         }
 
                         nodeIconLayout.setVisibility(View.GONE);
@@ -360,7 +371,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.GONE);
                         optionSendChat.setVisibility(View.GONE);
-
                     }
                     break;
 
@@ -405,6 +415,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionLeaveShares.setVisibility(View.GONE);
                     optionOpenFolder.setVisibility(View.GONE);
                     optionShare.setVisibility(View.GONE);
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
 
                     break;
                 }
@@ -576,6 +587,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOpenFolder.setVisibility(View.GONE);
                     }
 
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
+
                     break;
                 }
                 case SEARCH: {
@@ -629,6 +642,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionCopy.setVisibility(View.GONE);
                     optionClearShares.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
                     break;
                 }
             }
@@ -978,7 +992,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                openWith ();
+                openWith();
+                break;
+            }
+            case R.id.option_restore_layout:{
+                log("Restore option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+                ((ManagerActivityLollipop) context).restoreFromRubbish(node);
+
                 break;
             }
         }
