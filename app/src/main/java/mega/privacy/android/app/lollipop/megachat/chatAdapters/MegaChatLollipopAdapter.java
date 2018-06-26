@@ -1725,7 +1725,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
 
-                    textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+                    textToShow = String.format(context.getString(R.string.call_missed_messages));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
