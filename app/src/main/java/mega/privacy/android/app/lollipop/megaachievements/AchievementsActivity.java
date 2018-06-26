@@ -60,6 +60,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     private android.support.v7.app.AlertDialog successDialog;
 
     ArrayList<String> mails;
+    ArrayList<String> pendingContacts;
+    boolean pendingAttaches = false;
 
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
@@ -127,6 +129,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             visibleFragment = savedInstanceState.getInt("visibleFragment", Constants.ACHIEVEMENTS_FRAGMENT);
             achievementType = savedInstanceState.getInt("achievementType", -1);
             mails = savedInstanceState.getStringArrayList("mails");
+            pendingContacts = savedInstanceState.getStringArrayList("pendingContacts");
+            pendingAttaches = savedInstanceState.getBoolean("pendingAttaches", false);
         }
     }
 
@@ -137,6 +141,8 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         outState.putInt("visibleFragment", visibleFragment);
         outState.putInt("achievementType", achievementType);
         outState.putStringArrayList("mails", mails);
+        outState.putStringArrayList("pendingContacts", pendingContacts);
+        outState.putBoolean("pendingAttaches", pendingAttaches);
     }
 
     @Override
@@ -264,6 +270,9 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                     else {
                         showFragment(visibleFragment, achievementType);
                     }
+                    if (pendingAttaches){
+                        attachPendig();
+                    }
                 }
             }
             else{
@@ -379,15 +388,34 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
             log("REQUEST_CODE_GET_CONTACTS");
             ArrayList<String> contacts = data.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contacts != null){
-                for (int i=0; i<contacts.size(); i++){
-                    if (inviteFriendsFragment != null){
+                if (inviteFriendsFragment != null && inviteFriendsFragment.isAdded()){
+                    for (int i=0; i<contacts.size(); i++){
                         inviteFriendsFragment.addMail(contacts.get(i));
                     }
+                }
+                else {
+                    megaApi.getAccountAchievements(this);
+                    pendingAttaches = true;
+                    pendingContacts = contacts;
+                    visibleFragment = Constants.INVITE_FRIENDS_FRAGMENT;
+                    achievementType = -1;
                 }
             }
         }
         else{
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    void attachPendig () {
+        if (pendingContacts != null) {
+            if (inviteFriendsFragment != null && inviteFriendsFragment.isAdded()) {
+                for (int i = 0; i < pendingContacts.size(); i++) {
+                    inviteFriendsFragment.addMail(pendingContacts.get(i));
+                }
+                pendingAttaches = false;
+                pendingContacts.clear();
+            }
         }
     }
 
