@@ -974,6 +974,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				if(megaChatApi!=null){
 					log("Send node: "+nodeHandle+ " to chat: "+pendMsg.getChatId());
 					requestSent++;
+					MegaNode nodePdf = megaApi.getNodeByHandle(nodeHandle);
+					if(nodePdf.hasPreview()){
+						log("The pdf node has preview");
+					}
 					megaChatApi.attachNode(pendMsg.getChatId(), nodeHandle, this);
 				}
 			}
@@ -1056,6 +1060,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
+		//Send the file without preview if the set attribute fails
 		if(request.getType() == MegaRequest.TYPE_SET_ATTR_FILE && request.getParamType()==MegaApiJava.ATTR_TYPE_PREVIEW){
 			requestSent--;
 			long handle = request.getNodeHandle();
@@ -1192,5 +1197,4 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}
-
 }
