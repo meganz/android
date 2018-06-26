@@ -507,7 +507,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				importButton.setVisibility(View.VISIBLE);
 			}
 			else{
-				importButton.setVisibility(View.INVISIBLE);
+				importButton.setVisibility(View.GONE);
 			}
 		}
 

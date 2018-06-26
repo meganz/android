@@ -123,6 +123,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	
 	// constructor
 	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<String> paths, boolean zipImage) {
+
 		this.activity = activity;
 		this.paths = paths;
 		this.megaFullScreenImageAdapter = this;
@@ -240,11 +241,15 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
     }
 	
 	public TouchImageView getVisibleImage(int position){
+		log("getVisibleImage");
+
 		return visibleImgs.get(position).imgDisplay;
 	}
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
+
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_image:{
 				
