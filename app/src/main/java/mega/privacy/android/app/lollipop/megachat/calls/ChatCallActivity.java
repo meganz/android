@@ -1212,6 +1212,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
             if (ringerTimer != null) {
+                log("Cancel ringer timer");
                 ringerTimer.cancel();
             }
 
