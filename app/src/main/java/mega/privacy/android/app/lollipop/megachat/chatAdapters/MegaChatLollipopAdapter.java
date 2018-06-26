@@ -1411,7 +1411,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             switch(message.getTermCode()){
                 case MegaChatMessage.END_CALL_REASON_ENDED:{
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_made));
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
 
                     int minutes = (message.getDuration() % 3600) / 60;
                     int seconds = message.getDuration() % 60;
@@ -1445,7 +1445,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_REJECTED:{
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
 
                     textToShow = String.format(context.getString(R.string.call_rejected_messages));
                     try {
@@ -1460,7 +1460,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_not_answered));
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
                     textToShow = String.format(context.getString(R.string.call_not_answered_messages));
                     try {
@@ -1475,7 +1475,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_FAILED:{
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
                     textToShow = String.format(context.getString(R.string.call_failed_messages));
                     try {
@@ -1490,7 +1490,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_CANCELLED:{
 
-                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+                    ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
 
                     textToShow = String.format(context.getString(R.string.call_cancelled_messages));
                     try {
@@ -1644,7 +1644,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             switch(message.getTermCode()){
                 case MegaChatMessage.END_CALL_REASON_ENDED:{
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_received));
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
 
                     int minutes = (message.getDuration() % 3600) / 60;
                     int seconds = message.getDuration() % 60;
@@ -1678,7 +1678,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_REJECTED:{
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
 
                     textToShow = String.format(context.getString(R.string.call_rejected_messages));
                     try {
@@ -1693,7 +1693,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_missed));
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
 
                     textToShow = String.format(context.getString(R.string.call_missed_messages));
                     try {
@@ -1708,7 +1708,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_FAILED:{
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
                     textToShow = String.format(context.getString(R.string.call_failed_messages));
                     try {
@@ -1723,7 +1723,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 case MegaChatMessage.END_CALL_REASON_CANCELLED:{
 
-                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_g_call_rejected));
+                    ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
 
                     textToShow = String.format(context.getString(R.string.call_missed_messages));
                     try {
