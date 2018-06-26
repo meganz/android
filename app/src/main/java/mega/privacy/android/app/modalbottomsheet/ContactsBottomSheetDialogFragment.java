@@ -10,12 +10,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
@@ -223,17 +225,21 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//            final ContactsBottomSheetDialogFragment thisclass = this;
+//
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//            }
+//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//            }
+
+            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-            final ContactsBottomSheetDialogFragment thisclass = this;
-
-
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-            }
-            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-            }
 
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
@@ -245,20 +251,20 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    if(slideOffset> 0 && !heightseted){
-                        if(context instanceof CustomHeight){
-                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
-                        }
-                        if(height != -1 && heightReal != -1){
-                            heightseted = true;
-                            int numSons = 0;
-                            int num = items_layout.getChildCount();
-                            for(int i=0; i<num; i++){
-                                View v = items_layout.getChildAt(i);
-                                if(v.getVisibility() == View.VISIBLE){
-                                    numSons++;
-                                }
-                            }
+//                    if(slideOffset> 0 && !heightseted){
+//                        if(context instanceof CustomHeight){
+//                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
+//                        }
+//                        if(height != -1 && heightReal != -1){
+//                            heightseted = true;
+//                            int numSons = 0;
+//                            int num = items_layout.getChildCount();
+//                            for(int i=0; i<num; i++){
+//                                View v = items_layout.getChildAt(i);
+//                                if(v.getVisibility() == View.VISIBLE){
+//                                    numSons++;
+//                                }
+//                            }
 //                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
 //
 //                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
@@ -269,10 +275,27 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 //                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
 //                                params.height = height;
 //                                bottomSheet.setLayoutParams(params);
+////                            }
+//                            if(heightReal > height){
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
 //                            }
-                            if(heightReal > height){
-                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                                params.height = height;
+//                        }
+//                    }
+                    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                        ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                        if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
+                            int tBHeight = getActivity().findViewById(R.id.toolbar).getHeight();
+                            Rect rectangle = new Rect();
+                            getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+                            int windowHeight = rectangle.bottom;
+                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
+                            int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
+
+                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
+                            if (mainLinearLayout.getHeight() > maxHeight) {
+                                params.height = maxHeight;
                                 bottomSheet.setLayoutParams(params);
                             }
                         }

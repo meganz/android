@@ -89,9 +89,11 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
 
         <LinearLayout
+            android:id="@+id/items_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
@@ -100,7 +102,7 @@
             <LinearLayout
                 android:id="@+id/option_view_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -131,7 +133,7 @@
             <LinearLayout
                 android:id="@+id/option_forward_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -161,7 +163,7 @@
             <LinearLayout
                 android:id="@+id/option_download_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -192,7 +194,7 @@
             <LinearLayout
                 android:id="@+id/option_import_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -222,7 +224,7 @@
             <LinearLayout
                 android:id="@+id/option_save_offline_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -253,7 +255,7 @@
             <LinearLayout
                 android:id="@+id/option_remove_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
