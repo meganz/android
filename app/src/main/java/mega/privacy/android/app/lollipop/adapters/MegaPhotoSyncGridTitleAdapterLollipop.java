@@ -1017,7 +1017,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     continue;
                 }
 
-                if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
+                if (!MimeTypeThumbnail.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeThumbnail.typeForName(nodes.get(i).getName()).isVideo())){
                     continue;
                 }
                 checkedItems.append(i, true);
@@ -1113,11 +1113,11 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
                         MegaNode file = n;
 
-                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                        String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
                         log("FILENAME: " + file.getName());
 
                         Intent mediaIntent;
-                        if (MimeTypeList.typeForName(n.getName()).isVideoNotSupported()){
+                        if (MimeTypeThumbnail.typeForName(n.getName()).isVideoNotSupported()){
                             mediaIntent = new Intent(Intent.ACTION_VIEW);
                         }
                         else {
@@ -1159,7 +1159,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                                 mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                             }
                             else{
-                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeThumbnail.typeForName(file.getName()).getType());
                             }
                             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         }

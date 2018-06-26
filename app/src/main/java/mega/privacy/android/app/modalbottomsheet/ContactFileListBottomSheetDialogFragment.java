@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
@@ -23,8 +25,8 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -68,6 +70,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
     private int height = -1;
     private boolean heightseted = false;
     private int heightReal = -1;
+    private int heightDisplay;
 
     private MegaApiAndroid megaApi;
     private DatabaseHandler dbH;
@@ -107,6 +110,8 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
+
+        heightDisplay = outMetrics.heightPixels;
 
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_file_list, null);
 
@@ -255,6 +260,9 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
             final ContactFileListBottomSheetDialogFragment thisclass = this;
@@ -269,24 +277,41 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    if(slideOffset> 0 && !heightseted){
-                        if(context instanceof ContactFileListBottomSheetDialogFragment.CustomHeight){
-                            height = ((ContactFileListBottomSheetDialogFragment.CustomHeight) context).getHeightToPanel(thisclass);
-                        }
-                        if(height != -1 && heightReal != -1){
-                            heightseted = true;
-                            int numSons = 0;
-                            int num = items_layout.getChildCount();
-                            for(int i=0; i<num; i++){
-                                View v = items_layout.getChildAt(i);
-                                if(v.getVisibility() == View.VISIBLE){
-                                    numSons++;
-                                }
-                            }
+//                    if(slideOffset> 0 && !heightseted){
+//                        if(context instanceof ContactFileListBottomSheetDialogFragment.CustomHeight){
+//                            height = ((ContactFileListBottomSheetDialogFragment.CustomHeight) context).getHeightToPanel(thisclass);
+//                        }
+//                        if(height != -1 && heightReal != -1){
+//                            heightseted = true;
+//                            int numSons = 0;
+//                            int num = items_layout.getChildCount();
+//                            for(int i=0; i<num; i++){
+//                                View v = items_layout.getChildAt(i);
+//                                if(v.getVisibility() == View.VISIBLE){
+//                                    numSons++;
+//                                }
+//                            }
+//
+//                            if(heightReal > height){
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
+//                            }
+//                        }
+//                    }
+                    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                        ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                        if (getActivity() != null && getActivity().findViewById(R.id.toolbar_main_contact_properties) != null) {
+                            int tBHeight = getActivity().findViewById(R.id.toolbar_main_contact_properties).getHeight();
+                            Rect rectangle = new Rect();
+                            getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+                            int windowHeight = rectangle.bottom;
+                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
+                            int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
-                            if(heightReal > height){
-                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                                params.height = height;
+                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
+                            if (mainLinearLayout.getHeight() > maxHeight) {
+                                params.height = maxHeight;
                                 bottomSheet.setLayoutParams(params);
                             }
                         }
@@ -340,7 +365,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                     }
                 }
                 else {
-                    i.putExtra("imageId", MimeTypeInfo.typeForName(node.getName()).getIconResourceId());
+                    i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
                 }
                 i.putExtra("name", node.getName());
                 context.startActivity(i);

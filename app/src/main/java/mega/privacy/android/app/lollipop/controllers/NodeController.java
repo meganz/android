@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -972,7 +973,7 @@ public class NodeController {
                                 File mediaFile = new File(localPath);
 
                                 Intent mediaIntent;
-                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported()) {
+                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(mediaFile.getName()).isAudioNotSupported()) {
                                     mediaIntent = new Intent(Intent.ACTION_VIEW);
 
                                 } else {
@@ -1807,6 +1808,14 @@ public class NodeController {
                 File file = new File(path);
                 if (file.exists()) {
                     file.delete();
+
+                    if(context instanceof ManagerActivityLollipop){
+                        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                        if(mAF!=null && mAF.isAdded()){
+                            mAF.setMkButtonText();
+                        }
+                    }
 
                     ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
 

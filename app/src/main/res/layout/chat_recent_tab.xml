@@ -48,7 +48,7 @@
                 android:paddingTop="-3dp"
                 android:paddingBottom="-3dp"
                 android:textColor="@color/white"
-                android:text="@string/contact_invite"
+                android:text="@string/menu_add_contact"
                 android:background="@color/accentColor"
                 android:elevation="@dimen/elevation_upgrade_high"
                 android:tint="@android:color/white" />

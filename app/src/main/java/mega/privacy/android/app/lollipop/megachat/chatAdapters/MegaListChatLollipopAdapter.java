@@ -453,9 +453,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(context instanceof ManagerActivityLollipop){
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			holder.imageButtonThreeDots.setOnClickListener(this);
 		}
 		else{
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setOnClickListener(null);
 		}
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
@@ -1780,6 +1782,131 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					textToShow = textToShow.replace("[C]", "");
 					textToShow = textToShow.replace("[/C]", "");
 				} catch (Exception e) {
+				}
+
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.textViewContent.setText(result);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+			}
+			else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
+				String messageContent = chat.getLastMessage();
+
+				char separator = 0x01;
+				String separatorString = separator + "";
+
+				String [] sp = messageContent.split(separatorString);
+
+				String textToShow = "";
+
+				if(sp.length>=2){
+
+					String durationString = sp[0];
+					String termCodeString = sp[1];
+
+					int duration = Integer.parseInt(durationString);
+					int termCode = Integer.parseInt(termCodeString);
+
+
+					switch(termCode){
+						case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+							int minutes = (duration % 3600) / 60;
+							int seconds = duration % 60;
+
+							if(minutes == 0){
+								textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+							}
+							else{
+								if(seconds == 0){
+									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+								}
+								else if (seconds == 1){
+									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+								}
+								else{
+									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+								}
+							}
+
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+								textToShow = textToShow.replace("[C]", "");
+								textToShow = textToShow.replace("[/C]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+							textToShow = String.format(context.getString(R.string.call_rejected_messages));
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+							long lastMsgSender = chat.getLastMessageSender();
+							if(lastMsgSender==megaChatApi.getMyUserHandle()){
+								textToShow = String.format(context.getString(R.string.call_not_answered_messages));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.call_missed_messages));
+							}
+
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+							textToShow = String.format(context.getString(R.string.call_failed_messages));
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+							textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+					}
 				}
 
 				Spanned result = null;

@@ -61,7 +61,7 @@ import nz.mega.sdk.MegaUser;
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.5_196";
+	static final public String USER_AGENT = "MEGAAndroid/3.3.6_199";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -80,6 +80,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean showPinScreen = true;
 
 	private static long openChatId = -1;
+
+	private static boolean closedChat = true;
 
 	private static long openCallChatId = -1;
 
@@ -141,7 +143,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if (e.getErrorCode() == MegaError.API_OK){
 					if (megaApi != null){
 						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption ");
-						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption - Session: " + megaApi.dumpSession());
 //						megaApi.enableTransferResumption();
 					}
 				}
@@ -192,30 +193,39 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private final int interval = 3000;
 	private Handler keepAliveHandler = new Handler();
+	int backgroundStatus = -1;
 
 	private Runnable keepAliveRunnable = new Runnable() {
 		@Override
 		public void run() {
+
 			try {
 
 				if (activityVisible) {
-					log("SEND KEEPALIVE");
+					log("KEEPALIVE: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
-						megaChatApi.setBackgroundStatus(false);
+						backgroundStatus = megaChatApi.getBackgroundStatus();
+						log("backgroundStatus_activityVisible: " + backgroundStatus);
+						if (backgroundStatus != -1){
+							if (backgroundStatus != 0){
+								megaChatApi.setBackgroundStatus(false);
+							}
+						}
 					}
 
 				} else {
-					log("SEND KEEPALIVEAWAY");
+					log("KEEPALIVEAWAY: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
-						megaChatApi.setBackgroundStatus(true);
+						backgroundStatus = megaChatApi.getBackgroundStatus();
+						log("backgroundStatus_!activityVisible: " + backgroundStatus);
+						if (backgroundStatus != -1){
+							if (backgroundStatus != 1){
+								megaChatApi.setBackgroundStatus(true);
+							}
+						}
 					}
 				}
 
-				if (activityVisible) {
-					log("Handler KEEPALIVE: " + System.currentTimeMillis());
-				} else {
-					log("Handler KEEPALIVEAWAY: " + System.currentTimeMillis());
-				}
 				keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
 				keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 			}
@@ -1151,5 +1161,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	public static void setEnabledRichLinks(boolean enabledRichLinks) {
 		MegaApplication.enabledRichLinks = enabledRichLinks;
+	}
+
+	public static boolean isClosedChat() {
+		return closedChat;
+	}
+
+	public static void setClosedChat(boolean closedChat) {
+		MegaApplication.closedChat = closedChat;
 	}
 }

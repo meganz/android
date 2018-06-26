@@ -37,6 +37,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
@@ -547,7 +548,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				nodeSize = file.length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}
-			holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
 			holder.iconView.setVisibility(View.VISIBLE);
 			holder.imageView.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setTag(holder);
@@ -624,12 +625,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 		}
 
-		holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+		holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
 		holder.imageView.setVisibility(View.GONE);
 		holder.iconView.setVisibility(View.VISIBLE);
 
 		if (currentFile.isFile()){
-			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
+			if (MimeTypeThumbnail.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
 								
 				if (currentFile.exists()){

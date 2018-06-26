@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
@@ -21,6 +23,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -421,6 +424,56 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}, 50);
 	}
 
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int position;
+			int adapterType;
+			int actionType;
+			ImageView imageDrag = null;
+
+			if (intent != null) {
+				position = intent.getIntExtra("position", -1);
+				adapterType = intent.getIntExtra("adapterType", 0);
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if (position != -1) {
+					if (adapterType == Constants.CONTACT_FILE_ADAPTER) {
+						if (cflF != null && cflF.isAdded()) {
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = cflF.getImageDrag(position);
+								if (cflF.imageDrag != null) {
+									cflF.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null) {
+									cflF.imageDrag = imageDrag;
+									cflF.imageDrag.setVisibility(View.GONE);
+								}
+							} else if (actionType == Constants.SCROLL_TO_POSITION) {
+								cflF.updateScrollPosition(position);
+							}
+						}
+					}
+				}
+
+				if (imageDrag != null){
+					int[] positionDrag = new int[2];
+					int[] screenPosition = new int[4];
+					imageDrag.getLocationOnScreen(positionDrag);
+
+					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
+					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
+					screenPosition[2] = imageDrag.getWidth();
+					screenPosition[3] = imageDrag.getHeight();
+
+					Intent intent1 =  new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					intent1.putExtra("screenPosition", screenPosition);
+					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
+				}
+			}
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -460,6 +513,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		megaApi.addGlobalListener(this);
 
 		contactPropertiesMainActivity=this;
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
 
@@ -711,6 +766,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			megaApi.removeGlobalListener(this);	
 			megaApi.removeRequestListener(this);
 		}
+
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 	}
 
 	@Override

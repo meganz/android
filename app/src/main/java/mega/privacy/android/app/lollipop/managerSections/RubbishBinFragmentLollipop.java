@@ -59,7 +59,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-public class RubbishBinFragmentLollipop extends Fragment {
+public class RubbishBinFragmentLollipop extends Fragment{
 
 	public static ImageView imageDrag;
 
@@ -67,9 +67,9 @@ public class RubbishBinFragmentLollipop extends Fragment {
 	
 	Context context;
 	RecyclerView recyclerView;
-	public static LinearLayoutManager mLayoutManager;
-	public static  CustomizedGridLayoutManager gridLayoutManager;
-	public static MegaBrowserLollipopAdapter adapter;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
+	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
 
 	ArrayList<MegaNode> nodes;
@@ -104,7 +104,39 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
-	
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null){
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null){
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+
+		return null;
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -261,7 +293,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		}
 		
 	}
-	
+
 	public boolean showSelectMenuItem(){
 		if (adapter != null){
 			return adapter.isMultipleSelect();
@@ -720,7 +752,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent mediaIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 					}
 					else {
@@ -729,6 +761,16 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
 					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
 					File f = new File(downloadLocationDefaultPath, file.getName());

@@ -529,8 +529,11 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             .bigText(notificationContent))
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
                     .setContentIntent(pendingIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                notificationBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            }
 
             Drawable d;
 

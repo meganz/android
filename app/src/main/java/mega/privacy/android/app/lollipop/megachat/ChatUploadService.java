@@ -503,24 +503,32 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message)
 						.setContentText(getString(R.string.chat_upload_title_notification))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.build();
 			}
 			else if (currentapiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
 
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message)
 						.setContentText(getString(R.string.chat_upload_title_notification))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 
 			}
@@ -1137,11 +1145,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify)
-				.setColor(ContextCompat.getColor(this, R.color.mega))
 				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 				.setAutoCancel(true).setTicker(contentText)
 				.setContentTitle(message).setContentText(contentText)
 				.setOngoing(false);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+			mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+		}
 
 		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}

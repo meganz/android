@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +45,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -115,8 +117,8 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -323,6 +325,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openSettingsStorage = false;
 
+    int orientationSaved;
+
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
 
@@ -391,7 +395,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	public static String searchQuery = null;
+	public String searchQuery = null;
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
@@ -542,6 +546,269 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Button recoveryKeyButton;
 	private Button dismissButton;
 	private boolean rememberPasswordLogout = false;
+
+	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int position;
+			int adapterType;
+			int actionType;
+			ImageView imageDrag = null;
+
+			if (intent != null){
+				position = intent.getIntExtra("position", -1);
+				adapterType = intent.getIntExtra("adapterType", 0);
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if (position != -1){
+					if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
+						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = rubbishBinFLol.getImageDrag(position);
+								if (rubbishBinFLol.imageDrag != null){
+									rubbishBinFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									rubbishBinFLol.imageDrag = imageDrag;
+									rubbishBinFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								rubbishBinFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.INBOX_ADAPTER){
+						if (iFLol != null && iFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = iFLol.getImageDrag(position);
+								if (iFLol.imageDrag != null){
+									iFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									iFLol.imageDrag = imageDrag;
+									iFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								iFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+						if (inSFLol != null && inSFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = inSFLol.getImageDrag(position);
+								if (inSFLol.imageDrag != null){
+									inSFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									inSFLol.imageDrag = imageDrag;
+									inSFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								inSFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
+						if (outSFLol != null && outSFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = outSFLol.getImageDrag(position);
+								if (outSFLol.imageDrag != null){
+									outSFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									outSFLol.imageDrag = imageDrag;
+									outSFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								outSFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.SEARCH_ADAPTER){
+						Long handle = intent.getLongExtra("handle", -1);
+						if (sFLol != null && sFLol.isAdded()){
+							ArrayList<MegaNode> listNodes = sFLol.getNodes();
+							for (int i=0; i<listNodes.size(); i++){
+								if (listNodes.get(i).getHandle() == handle){
+									position = i;
+									break;
+								}
+							}
+
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = sFLol.getImageDrag(position);
+								if (sFLol.imageDrag != null){
+									sFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									sFLol.imageDrag = imageDrag;
+									sFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								sFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
+						if (fbFLol != null && fbFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = fbFLol.getImageDrag(position);
+								if (fbFLol.imageDrag != null){
+									fbFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									fbFLol.imageDrag = imageDrag;
+									fbFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								fbFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER) {
+						Long handle = intent.getLongExtra("handle", -1);
+						if (cuFL != null && cuFL.isAdded()){
+
+							if (cuFL.getAdapterList() != null){
+								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = cuFL.getNodesArray();
+								for (int i=0; i<listNodes.size(); i++){
+									if (listNodes.get(i).getHandle() == handle){
+										position = i;
+										break;
+									}
+								}
+							}
+							else {
+								ArrayList<MegaMonthPicLollipop> listNodes = cuFL.getMonthPics();
+								ArrayList<Long> handles;
+								int count = 0;
+								boolean found = false;
+								for (int i=0; i<listNodes.size(); i++){
+									handles = listNodes.get(i).getNodeHandles();
+									for (int j=0; j<handles.size(); j++){
+										count++;
+										String h1 = handles.get(j).toString();
+										String h2 = handle.toString();
+										if (h1.equals(h2)){
+											position = count;
+											found = true;
+											break;
+										}
+									}
+									count++;
+									if (found){
+										break;
+									}
+								}
+							}
+
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = cuFL.getImageDrag(position);
+								if (cuFL.imageDrag != null){
+									cuFL.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									cuFL.imageDrag = imageDrag;
+									cuFL.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								cuFL.updateScrollPosition(position);
+							}
+						}
+						else if (muFLol != null && muFLol.isAdded()){
+
+							if (muFLol.getAdapterList() != null){
+								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = muFLol.getNodesArray();
+								for (int i=0; i<listNodes.size(); i++){
+									if (listNodes.get(i).getHandle() == handle){
+										position = i;
+										break;
+									}
+								}
+							}
+							else {
+								ArrayList<MegaMonthPicLollipop> listNodes = muFLol.getMonthPics();
+								ArrayList<Long> handles;
+								int count = 0;
+								boolean found = false;
+								for (int i=0; i<listNodes.size(); i++){
+									handles = listNodes.get(i).getNodeHandles();
+									for (int j=0; j<handles.size(); j++){
+										count++;
+										String h1 = handles.get(j).toString();
+										String h2 = String.valueOf(handle);
+										if (h1.equals(h2)){
+											position = count;
+											found = true;
+											break;
+										}
+									}
+									count++;
+									if (found){
+										break;
+									}
+								}
+							}
+
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = muFLol.getImageDrag(position);
+								if (muFLol.imageDrag != null){
+									muFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									muFLol.imageDrag = imageDrag;
+									muFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								muFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.OFFLINE_ADAPTER){
+						if (oFLol != null && oFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = oFLol.getImageDrag(position);
+								if (oFLol.imageDrag != null){
+									oFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									oFLol.imageDrag = imageDrag;
+									oFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								oFLol.updateScrollPosition(position);
+							}
+						}
+					}
+
+					if (imageDrag != null){
+						int[] positionDrag = new int[2];
+						int[] screenPosition = new int[4];
+						imageDrag.getLocationOnScreen(positionDrag);
+
+						screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
+						screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
+						screenPosition[2] = imageDrag.getWidth();
+						screenPosition[3] = imageDrag.getHeight();
+
+						Intent intent1 =  new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+						intent1.putExtra("screenPosition", screenPosition);
+						LocalBroadcastManager.getInstance(managerActivity).sendBroadcast(intent1);
+					}
+				}
+			}
+		}
+	};
 
 	//Billing
 
@@ -1147,6 +1414,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (turnOnNotifications){
 			outState.putBoolean("turnOnNotifications", turnOnNotifications);
 		}
+
+		outState.putInt("orientationSaved", orientationSaved);
 	}
 
 	@Override
@@ -1203,6 +1472,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
+			orientationSaved = savedInstanceState.getInt("orientationSaved");
 		}
 		else{
 			log("Bundle is NULL");
@@ -1219,6 +1489,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			this.setPathNavigationOffline("/");
 		}
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -2162,7 +2434,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									}
 								}
 								else {
-									i.putExtra("imageId", MimeTypeInfo.typeForName(nodeLink.getName()).getIconResourceId());
+									i.putExtra("imageId", MimeTypeThumbnail.typeForName(nodeLink.getName()).getIconResourceId());
 								}
 								i.putExtra("name", nodeLink.getName());
 								startActivity(i);
@@ -2401,15 +2673,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordDialogText.setText(R.string.recovery_key_exported_dialog_text_logout);
 			recoveryKeyButton.setText(R.string.option_export_recovery_key);
 			dismissButton.setText(R.string.option_logout_anyway);
-			params.setMargins(0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
 		else {
 			rememberPasswordDialogText.setText(R.string.remember_pwd_dialog_text);
 			recoveryKeyButton.setText(R.string.action_export_master_key);
 			dismissButton.setText(R.string.general_dismiss);
-			params.setMargins(0, 0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
-		dismissButton.setLayoutParams(params);
 
 		rememberPasswordDialog = builder.create();
 		rememberPasswordDialog.setCancelable(false);
@@ -2446,6 +2715,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		dbH.setShowNotifOff(true);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			queryIfNotificationsAreOn();
+		}
+
+		if (getResources().getConfiguration().orientation != orientationSaved) {
+			orientationSaved = getResources().getConfiguration().orientation;
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 	}
 
@@ -3567,6 +3841,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			this.unregisterReceiver(networkStateReceiver);
 		}
 
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
+
     	super.onDestroy();
 	}
 	public void selectDrawerItemCloudDrive(){
@@ -3694,7 +3970,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						else{
 							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-							aB.setTitle(node.getName());
+							if(node==null){
+								log("Node NULL - cannot be recovered");
+								aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							}
+							else{
+								aB.setTitle(node.getName());
+							}
+
 							firstNavigationLevel = false;
 						}
 						break;
@@ -3720,7 +4003,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 							if(parentHandleIncoming!=-1){
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-								aB.setTitle(node.getName());
+								if(node==null){
+									log("Node NULL - cannot be recovered");
+									aB.setTitle(getResources().getString(R.string.section_shared_items));
+								}
+								else{
+									aB.setTitle(node.getName());
+								}
+
 								firstNavigationLevel = false;
 							}
 							else{
@@ -3912,7 +4202,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(numberUnread==0){
 
 					if(isFirstNavigationLevel()){
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						if (drawerItem == DrawerItem.SEARCH){
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+						else {
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						}
 					}
 					else{
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3920,7 +4215,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					if(isFirstNavigationLevel()){
-						badgeDrawable.setProgress(0.0f);
+						if (drawerItem == DrawerItem.SEARCH){
+							badgeDrawable.setProgress(1.0f);
+						}
+						else {
+							badgeDrawable.setProgress(0.0f);
+						}
 					}
 					else{
 						badgeDrawable.setProgress(1.0f);
@@ -3938,7 +4238,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				if(isFirstNavigationLevel()){
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					if (drawerItem == DrawerItem.SEARCH){
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					}
+					else {
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					}
 				}
 				else{
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3946,7 +4251,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		} else {
 			if(isFirstNavigationLevel()){
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				if (drawerItem == DrawerItem.SEARCH){
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				}
+				else {
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
 			}
 			else{
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -5001,6 +5311,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					hidden.setChecked(true);
 				}
 
+				drawerLayout.closeDrawer(Gravity.LEFT);
+
     			drawerItem = DrawerItem.SEARCH;
 				sFLol = new SearchFragmentLollipop().newInstance();
 
@@ -5311,6 +5623,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				textsearchQuery = false;
 				searchQuery = "";
+				firstNavigationLevel = true;
+				parentHandleSearch = -1;
+				levelsSearch = -1;
+				drawerItem = DrawerItem.SEARCH;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				return true;
 			}
@@ -5627,11 +5943,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+					takePicture.setVisible(false);
+
 					if(firstNavigationLevel){
 						if(!firstTimeCam){
 							searchByDate.setVisible(true);
@@ -5714,11 +6027,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+
+					takePicture.setVisible(false);
+
 					if(firstNavigationLevel){
 						if(!firstTimeCam){
 							searchByDate.setVisible(true);
@@ -6616,7 +6927,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				if (firstNavigationLevel){
+				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					drawerLayout.openDrawer(nV);
 				}else{
 					log("NOT firstNavigationLevel");
@@ -6702,8 +7013,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
+
 		    			if (sFLol != null && sFLol.isAdded()){
-		    				sFLol.onBackPressed();
+//		    				sFLol.onBackPressed();
+		    				onBackPressed();
 		    				return true;
 		    			}
 		    		}
@@ -11592,8 +11905,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case DialogInterface.BUTTON_POSITIVE: {
 						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
+
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
+
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14406,6 +14721,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdateLollipop");
+
 		try {
 			statusDialog.dismiss();
 		}
@@ -15721,26 +16037,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	}
 
 	public void changeStatusBarColor(int option) {
+		log("changeStatusBarColor");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			final Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
-		if (option == 1) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			if (option == 2){
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 500);
 			}
+		}
+		if (option == 1){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-
-		} else if (option == 2) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
-			}
+		}
+		else {
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
+
 	}
 
 	public long getParentHandleInbox() {

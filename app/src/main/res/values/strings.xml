@@ -3,9 +3,9 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.5 (196)</string>
-    <string name="sdk_version" context="Not translate">a6a7e37</string>
-    <string name="karere_version" context="Not translate">1229c65</string>
+    <string name="app_version" context="Not translate">3.3.6 (199)</string>
+    <string name="sdk_version" context="Not translate">0c4ad49</string>
+    <string name="karere_version" context="Not translate">f6d537a</string>
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users\' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
@@ -1677,12 +1677,11 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scann another valid code.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scann another valid code or to open another valid link.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
     <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scan QR code</string>
-    <string name="invite_not_sent_link_text" context="Text of dialog shown when a contact request has not been sent with contact link">The contact link is invalid. Try with another valid link.</string>
     <string name="button_copy_link" context="get the contact link and copy it">Copy link</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
@@ -1886,6 +1885,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a valid password</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
+    <string name="title_storage_usage" context="title of usage storage section in Storage">Usage Storage</string>
 
     <plurals name="plural_number_contact_request_notification" context="Notification title to show the number of incoming contact request">
         <item context="contact request" quantity="one">%1$d pending contact request</item>
@@ -1904,6 +1904,7 @@
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d files were not shared</string>
+    <string name="preview_content" context="button's text to open a full screen image">PREVIEW CONTENT</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">The streaming can not be executed and the file is not been downloaded</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File already exists on Save for Offline</string>
@@ -1918,4 +1919,42 @@
 
     <string name="contact_email" context="Indicates that can type a contact email">Contact\'s email</string>
     <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">Contact not added, is already added.</string>
+
+    <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
+        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minute[/C]</item>
+        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minutes[/C]</item>
+    </plurals>
+
+    <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
+        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d second[/C]</item>
+        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d second[/C]</item>
+    </plurals>
+
+    <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
+        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d seconds[/C]</item>
+        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d seconds[/C]</item>
+    </plurals>
+
+    <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
+        <item context="one second" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d second[/C]</item>
+        <item context="more seconds" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d seconds[/C]</item>
+    </plurals>
+
+    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was[/A][B] cancelled[/B]</string>
+
+    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was[/A][B] not answered[/B]</string>
+
+    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Call[/A][B] missed[/B]</string>
+
+    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was[/A][B] rejected[/B]</string>
+
+    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call[/A][B] failed[/B]</string>
+
+    <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
+    <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
+
+    <string name="add_to_cloud_import" context="Menu option">Add to Cloud</string>
+
+    <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error ocurred trying to create the streaming</string>
+
 </resources>
