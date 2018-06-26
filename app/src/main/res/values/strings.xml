@@ -1953,4 +1953,9 @@
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error ocurred trying to create the streaming</string>
 
+    <string name="context_restore" context="Menu option to restore an item from the Rubbish bin">Restore</string>
+
+    <string name="context_correctly_node_restored" context="success message when a node was restore from Rubbish bin">Restored to %s</string>
+    <string name="context_no_restored" context="error message when a node was restore from Rubbish bin">Error. Not restored</string>
+
 </resources>
