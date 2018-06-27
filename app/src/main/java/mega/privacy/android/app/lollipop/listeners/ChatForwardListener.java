@@ -18,10 +18,11 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
 
     Context context;
 
-    public ChatForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, Context context) {
+    public ChatForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context) {
         super();
         this.actionListener = action;
         this.context = context;
+        this.counter = counter;
         this.messagesSelected = messagesSelected;
     }
 
@@ -51,11 +52,6 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
-        counter++;
-        if(counter>max_items){
-            max_items=counter;
-        }
-        log("Counter on RequestStart: "+counter);
     }
 
     @Override
