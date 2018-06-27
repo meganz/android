@@ -34,6 +34,7 @@ public class Constants {
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
 	public static int ACTION_SEARCH_BY_DATE = 1024;
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
+	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";

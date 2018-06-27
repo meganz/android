@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import mega.privacy.android.app.MegaContactAdapter;
