@@ -723,9 +723,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 			Intent mediaIntent;
 			boolean internalIntent;
+			boolean opusFile = false;
 			if (MimeTypeList.typeForName(document.getName()).isVideoNotSupported() || MimeTypeList.typeForName(document.getName()).isAudioNotSupported()) {
 				mediaIntent = new Intent(Intent.ACTION_VIEW);
 				internalIntent = false;
+				String[] s = document.getName().split("\\.");
+				if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+					opusFile = true;
+				}
 			} else {
 				log("showFile:setIntentToAudioVideoPlayer");
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
@@ -768,7 +773,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			}
 
 			mediaIntent.putExtra("HANDLE", document.getHandle());
-
+			if (opusFile){
+				mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+			}
 			if (internalIntent) {
 				startActivity(mediaIntent);
 			} else {

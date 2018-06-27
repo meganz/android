@@ -302,6 +302,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     MegaChatMessage msgChat;
 
     MegaNode currentDocument;
+    int playbackStateSaved;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -1112,7 +1113,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                     log("onPlayerStateChanged: " + playbackState);
-
+                    playbackStateSaved = playbackState;
                     if (playbackState == Player.STATE_BUFFERING) {
                         audioContainer.setVisibility(View.GONE);
                         if (onPlaylist) {
@@ -1242,11 +1243,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }).start();
                 }
             }
-            else {
+            else if (playbackStateSaved != Player.STATE_BUFFERING){
                 audioContainer.setVisibility(View.VISIBLE);
             }
         }
-        else {
+        else if (playbackStateSaved != Player.STATE_BUFFERING){
             audioContainer.setVisibility(View.VISIBLE);
         }
     }
@@ -3452,6 +3453,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             player.release();
         }
 
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 
         super.onDestroy();
@@ -3737,9 +3742,20 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onBackPressed() {
         if (!onPlaylist){
             super.onBackPressed();
-            if (player != null) {
+            if (megaApi != null) {
+                megaApi.removeTransferListener(this);
+                megaApi.removeGlobalListener(this);
+                megaApi.httpServerStop();
+            }
+            if (player != null){
                 player.release();
             }
+
+            if (handler != null) {
+                handler.removeCallbacksAndMessages(null);
+            }
+
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
             setImageDragVisibility(View.VISIBLE);
         }
         else {
@@ -4215,5 +4231,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public boolean isFolderLink (){
         return isFolderLink;
+    }
+
+    public Handler getHandler () {
+        return handler;
     }
 }

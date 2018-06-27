@@ -226,7 +226,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
             case MotionEvent.ACTION_MOVE: {
                 float newMotionY = event.getRawY();
                 if (Math.abs(motionYOrigin - newMotionY) > 5 && ((PdfViewerActivityLollipop) context).isToolbarVisible()){
-                    ((PdfViewerActivityLollipop) context).setToolbarVisibilityHide();
+                    ((PdfViewerActivityLollipop) context).setToolbarVisibilityHide(200L);
                 }
             }
         }

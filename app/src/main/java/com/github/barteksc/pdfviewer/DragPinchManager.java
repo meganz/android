@@ -153,7 +153,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         scrolling = true;
 
         if (((PdfViewerActivityLollipop) pdfView.getContext()).isToolbarVisible()){
-            ((PdfViewerActivityLollipop) pdfView.getContext()).setToolbarVisibilityHide();
+            ((PdfViewerActivityLollipop) pdfView.getContext()).setToolbarVisibilityHide(200L);
         }
 
         if (pdfView.isZooming() || pdfView.isSwipeEnabled()) {
