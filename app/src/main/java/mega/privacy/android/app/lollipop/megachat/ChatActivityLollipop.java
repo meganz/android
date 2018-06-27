@@ -5794,6 +5794,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         snackbar.show();
     }
 
+    public void removeProgressDialog(){
+        try{
+            statusDialog.dismiss();
+        } catch(Exception ex) {};
+    }
+
     public void showSnackbarNotSpace(){
         log("showSnackbarNotSpace");
         Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);

@@ -1789,6 +1789,7 @@
 
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
+    <string name="messages_forwarded_error_not_available" context="Error non existing resource after forwarding one or several messages to several chats">Error. The resource is no longer available</string>
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
     <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
