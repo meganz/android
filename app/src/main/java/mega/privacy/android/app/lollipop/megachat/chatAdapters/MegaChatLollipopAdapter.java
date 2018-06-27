@@ -2854,6 +2854,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     ((ViewHolderMessageChat) holder).urlContactMessageIcon.setVisibility(View.GONE);
                 }
+
                 if (Util.isOnline(context)) {
                     if(isMultipleSelect()){
                         ((ViewHolderMessageChat) holder).urlContactMessageText.setLinksClickable(false);
@@ -4333,7 +4334,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (Util.isOnline(context)) {
                     if(isMultipleSelect()){
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
-                    }else {
+                    }else{
                         Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
                     }
