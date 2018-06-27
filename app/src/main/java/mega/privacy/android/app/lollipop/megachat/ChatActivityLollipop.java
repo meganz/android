@@ -3437,7 +3437,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             AndroidMegaChatMessage m = messages.get(position);
 
             if (adapter.isMultipleSelect()) {
-
                 if (!m.isUploading()) {
                     if (m.getMessage() != null) {
                         log("Message id: " + m.getMessage().getMsgId());
