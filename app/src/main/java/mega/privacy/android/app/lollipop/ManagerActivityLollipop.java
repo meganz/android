@@ -9367,10 +9367,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		MegaNode newParent = megaApi.getNodeByHandle(node.getRestoreHandle());
 		if(newParent !=null){
-			megaApi.moveNode(node, newParent);
+			megaApi.moveNode(node, newParent, this);
 		}
 		else{
-			showSnackbar("The restore folder no longer exists");
+			log("restoreFromRubbish:The restore folder no longer exists");
 		}
 	}
 
@@ -14089,6 +14089,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.INBOX){
 							setInboxNavigationDrawer();
 						}
+						moveToRubbish = false;
 					}
 					else if(restoreFromRubbish){
 						log("Not moved to rubbish");
@@ -14109,6 +14110,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					showSnackbar(getString(R.string.context_no_moved));
+					moveToRubbish = false;
 				}
 			}
 

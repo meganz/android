@@ -346,8 +346,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionInfoText.setText(R.string.general_file_info);
                         }
 
-                        if((megaApi.isInRubbish(node)) && (node.getRestoreHandle()!=-1)){
-                            optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                        long restoreHandle = node.getRestoreHandle();
+                        if(restoreHandle!=-1){
+                            MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+                            if((!megaApi.isInRubbish(node)) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
+                                optionRestoreFromRubbish.setVisibility(View.GONE);
+                            }
+                            else{
+                                optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                            }
                         }
                         else{
                             optionRestoreFromRubbish.setVisibility(View.GONE);
