@@ -28,7 +28,6 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
 
     int counter = 0;
     int error = 0;
-    int max_items = 0;
     int actionListener = -1;
     String message;
     ArrayList<AndroidMegaChatMessage> messagesSelected;
@@ -75,7 +74,7 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
                     if(actionListener==Constants.MULTIPLE_FORWARD_MESSAGES){
                         //Many files shared with one contacts
                         if(error>0){
-                            message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, max_items);
+                            message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
                             if(context instanceof ChatActivityLollipop){
                                 ((ChatActivityLollipop) context).removeRequestDialog();
                                 ((ChatActivityLollipop) context).showSnackbar(message);
