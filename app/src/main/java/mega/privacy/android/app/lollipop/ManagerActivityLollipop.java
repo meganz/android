@@ -6510,7 +6510,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									thumbViewMenuItem.setVisible(true);
 								}else{
 									thumbViewMenuItem.setVisible(false);
-								}								if (isList){
+								}
+								if (isList){
 									thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 								}
 								else{
@@ -8589,6 +8590,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
+		}else if(drawerItem == DrawerItem.SEARCH){
+			if(sFLol!=null){
+				if(sFLol.isAdded()){
+					sFLol.hideMultipleSelect();
+					sFLol.refresh();
+				}
+			}
+			//Refresh Rubbish Fragment
+			if(cloudPageAdapter!=null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+				if (rubbishBinFLol != null){
+					if(rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes;
+						if(parentHandleRubbish == -1){
+							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						}
+
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
+					}
+				}
+			}
+
 		}
 		setToolbarTitle();
 	}
@@ -8648,6 +8675,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(cloudPageAdapter!=null){
 				cloudPageAdapter.notifyDataSetChanged();
 			}
+		}else if(drawerItem == DrawerItem.SEARCH){
+			if (sFLol != null && sFLol.isAdded()){
+
+				sFLol.hideMultipleSelect();
+				sFLol.refresh();
+			}
 		}
 
 		setToolbarTitle();
@@ -8695,6 +8728,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //							rubbishBinFLol.setNodes(nodes);
 				iFLol.hideMultipleSelect();
 				iFLol.refresh();
+			}
+		}else if(drawerItem == DrawerItem.SEARCH){
+			if (sFLol != null && sFLol.isAdded()){
+				sFLol.hideMultipleSelect();
+				sFLol.refresh();
 			}
 		}
 	}
@@ -14065,6 +14103,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
 
 					if (moveToRubbish){
+						log("moveToRubbish ");
 						//Update both tabs
         				//Rubbish bin
 						log("Move to Rubbish");
@@ -14698,6 +14737,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void onNodesSearchUpdate() {
+		log("onNodesSearchUpdate");
+		if (sFLol != null){
+			if(sFLol.isAdded()){
+				sFLol.refresh();
+			}
+		}
+	}
+
 	public void onNodesSharedUpdate() {
 		log("onNodesSharedUpdate");
 
@@ -14760,9 +14808,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		onNodesCloudDriveUpdate();
 
-		if (sFLol != null && sFLol.isAdded()){
-			sFLol.refresh();
-		}
+//		if (sFLol != null && sFLol.isAdded()){
+//			sFLol.refresh();
+//		}
+
+		onNodesSearchUpdate();
 
 		onNodesSharedUpdate();
 

@@ -586,10 +586,9 @@ public class SearchFragmentLollipop extends Fragment{
 				lastPositionStack.push(lastFirstVisiblePosition);
 				
 				contentText.setText(MegaApiUtils.getInfoFolder(n, context));
-				
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			
+
 				((ManagerActivityLollipop)context).parentHandleSearch= n.getHandle();
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
@@ -1060,13 +1059,14 @@ public class SearchFragmentLollipop extends Fragment{
 		log("refresh ");
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
-		}
-		else{
+		}else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+			}else{
+				nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 			}
 		}
 		setNodes(nodes);
@@ -1074,7 +1074,31 @@ public class SearchFragmentLollipop extends Fragment{
 		if(adapter != null){
 			adapter.notifyDataSetChanged();
 		}
+
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		visibilityFastScroller();
+
 	}
+
+//	public void refresh(){
+//		log("refresh ");
+//		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
+//			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+//		}
+//		else{
+//			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
+//			if(parentNode!=null){
+//				log("parentNode: "+parentNode.getName());
+//				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+//				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+//			}
+//		}
+//		setNodes(nodes);
+//
+//		if(adapter != null){
+//			adapter.notifyDataSetChanged();
+//		}
+//	}
 
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
