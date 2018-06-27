@@ -725,6 +725,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
             holder.urlOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_own_message_text);
+            holder.urlOwnMessageText.setTag(holder);
+            holder.urlOwnMessageText.setOnClickListener(this);
+            holder.urlOwnMessageText.setOnLongClickListener(this);
+
             holder.urlOwnMessageWarningButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_warning_layout);
             holder.neverRichLinkButton = (Button) v.findViewById(R.id.url_never_button);
             holder.alwaysAllowRichLinkButton = (Button) v.findViewById(R.id.url_always_allow_button);
@@ -762,6 +766,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardContactRichLinks.setTag(holder);
             holder.forwardContactRichLinks.setVisibility(View.GONE);
             holder.urlContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_contact_message_text);
+            holder.urlContactMessageText.setTag(holder);
+            holder.urlContactMessageText.setOnClickListener(this);
+            holder.urlContactMessageText.setOnLongClickListener(this);
 
             holder.urlContactMessageTitle = (TextView) v.findViewById(R.id.url_contact_message_title);
             holder.urlContactMessageDescription = (TextView) v.findViewById(R.id.url_contact_message_description);
@@ -7642,6 +7649,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             case R.id.content_own_message_text:
             case R.id.content_contact_message_text:
+            case R.id.url_own_message_text:
+            case R.id.url_contact_message_text:
             case R.id.message_chat_item_layout:{
                 ((ChatActivityLollipop) context).itemClick(currentPosition);
                 break;
