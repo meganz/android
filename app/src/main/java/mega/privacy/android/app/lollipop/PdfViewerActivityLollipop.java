@@ -261,6 +261,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             renamed = savedInstanceState.getBoolean("renamed");
             accountType = savedInstanceState.getInt("typeAccount");
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+            toolbarVisible = savedInstanceState.getBoolean("toolbarVisible", toolbarVisible);
         }
         else {
             currentPage = 1;
@@ -531,6 +532,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
 
         pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+
+        if (!toolbarVisible) {
+            setToolbarVisibilityHide(0L);
+        }
 
         if (savedInstanceState == null){
             ViewTreeObserver observer = pdfView.getViewTreeObserver();
@@ -856,6 +861,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putBoolean("renamed", renamed);
         outState.putInt("typeAccount", accountType);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
+        outState.putBoolean("toolbarVisible", toolbarVisible);
     }
 
     @Override
@@ -1336,20 +1342,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    public void setToolbarVisibilityHide () {
+    public void setToolbarVisibilityHide (long duration) {
         log("setToolbarVisibilityHide");
         toolbarVisible = false;
         if(tB != null) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
+            tB.animate().translationY(-220).setDuration(duration).withEndAction(new Runnable() {
                 @Override
                 public void run() {
                     aB.hide();
                 }
             }).start();
-            bottomLayout.animate().translationY(220).setDuration(200L).start();
-            uploadContainer.animate().translationY(220).setDuration(200L).start();
-            pageNumber.animate().translationY(0).setDuration(200L).start();
+            bottomLayout.animate().translationY(220).setDuration(duration).start();
+            uploadContainer.animate().translationY(220).setDuration(duration).start();
+            pageNumber.animate().translationY(0).setDuration(duration).start();
         }
         else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -1371,7 +1377,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
 
         if (aB != null && aB.isShowing()) {
-            setToolbarVisibilityHide();
+            setToolbarVisibilityHide(200L);
         } else if (aB != null && !aB.isShowing()){
             setToolbarVisibilityShow();
         }
@@ -2636,10 +2642,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         log("modDate = " + meta.getModDate());
         printBookmarksTree(pdfView.getTableOfContents(), "-");
 
-        new Handler().postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                setToolbarVisibilityHide();
+                if (toolbarVisible)
+                    setToolbarVisibilityHide(200L);
             }
         }, 2000);
     }
@@ -2965,6 +2972,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             megaApi.removeTransferListener(this);
             megaApi.removeGlobalListener(this);
             megaApi.httpServerStop();
+        }
+
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
         }
 
         super.onDestroy();

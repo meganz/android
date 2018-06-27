@@ -257,8 +257,7 @@ public class PlaylistFragment extends Fragment{
         containerPlayer.setVisibility(View.VISIBLE);
         containerPlayer.animate().translationY(0).setDuration(200L).start();
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        ((AudioVideoPlayerLollipop) context).getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (scroll){
@@ -364,9 +363,8 @@ public class PlaylistFragment extends Fragment{
     }
 
     public void scrollTo(final int position) {
-        Handler handler = new Handler();
 
-        handler.postDelayed(new Runnable() {
+        ((AudioVideoPlayerLollipop) context).getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mLayoutManager.scrollToPosition(position);
