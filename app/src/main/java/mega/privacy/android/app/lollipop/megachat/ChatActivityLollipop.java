@@ -3187,7 +3187,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
 
                                 int type = selected.get(0).getMessage().getType();
-                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE) {
+                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 } else{
                                     if(Util.isOnline(chatActivity)){
@@ -3203,7 +3203,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 importIcon.setVisible(false);
 
                                 int type = selected.get(0).getMessage().getType();
-                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE) {
+                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 } else{
                                     if(Util.isOnline(chatActivity)){
@@ -3250,7 +3250,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                             if (showForward) {
                                 int type = selected.get(i).getMessage().getType();
-                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE) {
+                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED) {
                                     showForward = false;
                                 }
                             }
