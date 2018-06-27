@@ -3455,6 +3455,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    }
                 }
             }else{
+
                 if(m!=null){
                     if(m.isUploading()){
                         if(m.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
