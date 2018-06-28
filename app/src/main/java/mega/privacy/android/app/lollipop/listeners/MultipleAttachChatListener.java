@@ -4,7 +4,6 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -70,29 +69,10 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
         if(counter==0){
             int success = max_items - error;
 
-            if(context instanceof ChatActivityLollipop){
+            if(context instanceof ManagerActivityLollipop){
                 if(success>0){
                     if(max_items==1){
-                        ((ChatActivityLollipop) context).openChatAfterForward(chatId);
-                    }
-                    else{
-                        ((ChatActivityLollipop) context).openChatAfterForward(chatId);
-                    }
-                }
-                else{
-                    if(e.getErrorCode() == MegaError.API_ENOENT){
-                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error_not_available));
-                    }
-                    else{
-                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
-                    }
-                    ((ChatActivityLollipop) context).removeProgressDialog();
-                }
-            }
-            else if(context instanceof ManagerActivityLollipop){
-                if(success>0){
-                    if(max_items==1){
-                        ((ManagerActivityLollipop) context).openChat(chatId);
+                        ((ManagerActivityLollipop) context).openChat(chatId, null);
                     }
                     else{
                         if(sendMultipleFiles){

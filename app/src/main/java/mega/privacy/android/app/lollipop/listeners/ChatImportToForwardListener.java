@@ -14,11 +14,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class ChatForwardListener implements MegaRequestListenerInterface {
+public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
     Context context;
 
-    public ChatForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context) {
+    public ChatImportToForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context) {
         super();
         this.actionListener = action;
         this.context = context;
@@ -95,6 +95,6 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
     }
 
     private static void log(String log) {
-        Util.log("ChatForwardListener", log);
+        Util.log("ChatImportToForwardListener", log);
     }
 }

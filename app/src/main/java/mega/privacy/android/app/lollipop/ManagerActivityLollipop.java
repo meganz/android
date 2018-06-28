@@ -2335,8 +2335,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						String text = getIntent().getStringExtra("showSnackbar");
 						if(chatId!=-1){
-							openChat(chatId);
+							openChat(chatId, text);
 						}
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
@@ -3040,8 +3041,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					String text = getIntent().getStringExtra("showSnackbar");
 					if(chatId!=-1){
-						openChat(chatId);
+						openChat(chatId, text);
 					}
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
@@ -3182,7 +3184,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	}
 	}
 
-	public void openChat(long chatId){
+	public void openChat(long chatId, String text){
 		log("openChat: "+chatId);
 //		drawerItem=DrawerItem.CHAT;
 //		selectDrawerItemLollipop(drawerItem);
@@ -3194,6 +3196,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 				intentToChat.putExtra("CHAT_ID", chatId);
+				if(text!=null){
+					intentToChat.putExtra("showSnackbar", text);
+				}
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -12172,7 +12177,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						for(int j=0;j<nodeHandles.length;j++){
 							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
 						}
-
 					}
 				}
 			}
