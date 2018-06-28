@@ -240,8 +240,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                     } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                         nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                    } else {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                    }
+                    else{
+//                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                        if(((ManagerActivityLollipop) context).isCameraUploads(node)){
+                            nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
+                        }else{
+                            nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                        }
                     }
                     optionSendChat.setVisibility(View.GONE);
                 } else {
