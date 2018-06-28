@@ -539,15 +539,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			return false;
 		}
-
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(recyclerView.getLayoutManager()!=null){
-			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
-		}
 	}
 
 	public static FileBrowserFragmentLollipop newInstance() {

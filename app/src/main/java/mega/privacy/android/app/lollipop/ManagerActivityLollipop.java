@@ -418,6 +418,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
+	private boolean restoreFromRubbish = false;
 
 	private List<ShareInfo> filePreparedInfos;
 	boolean megaContacts = true;
@@ -2335,8 +2336,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						String text = getIntent().getStringExtra("showSnackbar");
 						if(chatId!=-1){
-							openChat(chatId);
+							openChat(chatId, text);
 						}
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
@@ -2673,15 +2675,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordDialogText.setText(R.string.recovery_key_exported_dialog_text_logout);
 			recoveryKeyButton.setText(R.string.option_export_recovery_key);
 			dismissButton.setText(R.string.option_logout_anyway);
-			params.setMargins(0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
 		else {
 			rememberPasswordDialogText.setText(R.string.remember_pwd_dialog_text);
 			recoveryKeyButton.setText(R.string.action_export_master_key);
 			dismissButton.setText(R.string.general_dismiss);
-			params.setMargins(0, 0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
-		dismissButton.setLayoutParams(params);
 
 		rememberPasswordDialog = builder.create();
 		rememberPasswordDialog.setCancelable(false);
@@ -3043,8 +3042,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					String text = getIntent().getStringExtra("showSnackbar");
 					if(chatId!=-1){
-						openChat(chatId);
+						openChat(chatId, text);
 					}
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
@@ -3185,7 +3185,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	}
 	}
 
-	public void openChat(long chatId){
+	public void openChat(long chatId, String text){
 		log("openChat: "+chatId);
 //		drawerItem=DrawerItem.CHAT;
 //		selectDrawerItemLollipop(drawerItem);
@@ -3197,6 +3197,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 				intentToChat.putExtra("CHAT_ID", chatId);
+				if(text!=null){
+					intentToChat.putExtra("showSnackbar", text);
+				}
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -9362,6 +9365,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		downloadConfirmationDialog.show();
 	}
 
+	public void restoreFromRubbish(final MegaNode node) {
+		log("restoreFromRubbish");
+
+		restoreFromRubbish = true;
+
+		MegaNode newParent = megaApi.getNodeByHandle(node.getRestoreHandle());
+		if(newParent !=null){
+			megaApi.moveNode(node, newParent, this);
+		}
+		else{
+			log("restoreFromRubbish:The restore folder no longer exists");
+		}
+	}
+
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
 		LinearLayout layout = new LinearLayout(this);
@@ -12143,16 +12160,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Send "+nodeHandles.length+" nodes");
 
 			int countChat = chatHandles.length;
+			MultipleAttachChatListener listener = null;
+			int counter = chatHandles.length*nodeHandles.length;
+			if(countChat==1){
+				if(nodeHandles.length==1){
+					listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+				}
+				else{
+					listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
+				}
+			}
+			else{
+
+				if(nodeHandles.length==1){
+					listener = new MultipleAttachChatListener(this, -1, false, counter);
+				}
+				else{
+					listener = new MultipleAttachChatListener(this, -1, true, counter);
+				}
+			}
 			if(countChat==1){
 
 				if(nodeHandles.length==1){
 					//One chat, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], false);
 					megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
 				}
 				else{
 					//One chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], true);
 					for(int i=0;i<nodeHandles.length;i++){
 						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
 					}
@@ -12162,7 +12196,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				if(nodeHandles.length==1){
 					//Many chats, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, false);
 					for(int i=0;i<chatHandles.length;i++){
 						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
 					}
@@ -12170,12 +12203,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					//Many chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, true);
 					for(int i=0;i<chatHandles.length;i++){
 						for(int j=0;j<nodeHandles.length;j++){
 							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
 						}
-
 					}
 				}
 			}
@@ -14077,6 +14108,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.INBOX){
 							setInboxNavigationDrawer();
 						}
+						moveToRubbish = false;
+					}
+					else if(restoreFromRubbish){
+						log("Not moved to rubbish");
+						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
+						showSnackbar(getString(R.string.context_correctly_node_restored, destination.getName()));
+						restoreFromRubbish = false;
 					}
 					else{
 						log("Not moved to rubbish");
@@ -14085,7 +14123,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 			}
 			else {
-				showSnackbar(getString(R.string.context_no_moved));
+				if(restoreFromRubbish){
+					showSnackbar(getString(R.string.context_no_restored));
+					restoreFromRubbish = false;
+				}
+				else{
+					showSnackbar(getString(R.string.context_no_moved));
+					moveToRubbish = false;
+				}
 			}
 
 			log("SINGLE move nodes request finished");

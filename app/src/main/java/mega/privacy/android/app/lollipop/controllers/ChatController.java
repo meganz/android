@@ -697,7 +697,6 @@ public class ChatController {
                     log("Content: " + message.getContent());
                     return "";
                 }
-
             }
         }
     }

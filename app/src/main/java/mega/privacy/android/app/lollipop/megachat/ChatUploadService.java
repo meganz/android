@@ -674,6 +674,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								log("No location info");
 							}
 						}
+						attachNodes(transfer);
 					}
 					else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
 						log("Is image!!!");
@@ -681,33 +682,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 						if(node!=null){
 
-							if(sendOriginalAttachments){
-								File previewDir = PreviewUtils.getPreviewFolder(this);
-								File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-								File thumbDir = ThumbnailUtils.getThumbFolder(this);
-								File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-								megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-								megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-							}
-							else{
-								File previewDir = PreviewUtils.getPreviewFolder(this);
+							File previewDir = PreviewUtils.getPreviewFolder(this);
+							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
-								try{
-									File previewOldPreview = new File(transfer.getPath());
-									String newName = MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg";
-									File preview = new File(previewDir, newName);
-
-									previewOldPreview.renameTo(preview);
-								}
-								catch (Exception e){
-									log("Cannot rename file preview");
-								}
-
-								File thumbDir = ThumbnailUtils.getThumbFolder(this);
-								File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-								megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-								megaApi.setPreview(node, transfer.getPath());
-							}
+							File thumbDir = ThumbnailUtils.getThumbFolder(this);
+							File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
 
 							try {
 								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
@@ -721,6 +702,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								log("Couldn't read exif info: " + transfer.getPath());
 							}
 						}
+						attachNodes(transfer);
 					}
 					else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
 						log("Is pdf!!!");
@@ -764,14 +746,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								if (oldPreview.exists()){
 									oldPreview.delete();
 								}
+								//Attach node one the request finish
+								requestSent++;
 								megaApi.setPreview(pdfNode, preview.getAbsolutePath(), this);
 							}
 							else{
 								log("Not Compress");
 							}
 							pdfiumCore.closeDocument(pdfDocument);
+
+							updatePdfAttachStatus(transfer);
+
 						} catch(Exception e) {
 							log("Pdf preview could not be created");
+							attachNodes(transfer);
 						} finally {
 							try {
 								if (out != null)
@@ -783,9 +771,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					else{
 						log("NOT video, image or pdf!");
+						attachNodes(transfer);
 					}
-
-					attachNodes(transfer);
 				}
 				else{
 					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
@@ -892,8 +879,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	}
 
-
-
 	public void attachNodes(MegaTransfer transfer){
 		log("attachNodes");
 		//Find the pending message
@@ -959,6 +944,49 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 	}
 
+	public void updatePdfAttachStatus(MegaTransfer transfer){
+		log("updatePdfAttachStatus");
+		//Find the pending message
+		for(int i=0; i<pendingMessages.size();i++){
+			PendingMessage pendMsg = pendingMessages.get(i);
+			PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
+
+			if(nodeAttachment.getFilePath().equals(transfer.getPath())){
+				log("NodeHANDLE of the nodeAttachment: "+nodeAttachment.getNodeHandle());
+				if(nodeAttachment.getNodeHandle()==-1){
+					nodeAttachment.setNodeHandle(transfer.getNodeHandle());
+				}
+				else{
+					log("updatePdfAttachStatus: set node handle error");
+				}
+			}
+		}
+	}
+
+	public void attachPdfNode(long nodeHandle){
+		log("attachPdfNode: nodeHandle: "+nodeHandle);
+		//Find the pending message
+		for(int i=0; i<pendingMessages.size();i++){
+			PendingMessage pendMsg = pendingMessages.get(i);
+			PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
+
+			if(nodeAttachment.getNodeHandle()==nodeHandle){
+				if(megaChatApi!=null){
+					log("Send node: "+nodeHandle+ " to chat: "+pendMsg.getChatId());
+					requestSent++;
+					MegaNode nodePdf = megaApi.getNodeByHandle(nodeHandle);
+					if(nodePdf.hasPreview()){
+						log("The pdf node has preview");
+					}
+					megaChatApi.attachNode(pendMsg.getChatId(), nodeHandle, this);
+				}
+			}
+			else{
+				log("PDF attach error");
+			}
+		}
+	}
+
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
@@ -1015,21 +1043,34 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("UPLOAD: onRequestFinish "+request.getRequestString());
 
 		if (e.getErrorCode()==MegaError.API_OK){
 			log("onRequestFinish OK");
 		}
-		else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-			log("OVERQUOTA ERROR: "+e.getErrorCode());
-			isOverquota = true;
-
-			onQueueComplete();
-		}
-		else{
+		else {
 			log("ERROR: "+e.getErrorCode());
+
+			if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				log("OVERQUOTA ERROR: "+e.getErrorCode());
+				isOverquota = true;
+
+				onQueueComplete();
+			}
+		}
+
+		//Send the file without preview if the set attribute fails
+		if(request.getType() == MegaRequest.TYPE_SET_ATTR_FILE && request.getParamType()==MegaApiJava.ATTR_TYPE_PREVIEW){
+			requestSent--;
+			long handle = request.getNodeHandle();
+			MegaNode node = megaApi.getNodeByHandle(handle);
+			if(node!=null){
+				String nodeName = node.getName();
+				if(MimeTypeList.typeForName(nodeName).isPdf()){
+					attachPdfNode(handle);
+				}
+			}
 		}
 	}
 
@@ -1156,5 +1197,4 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}
-
 }
