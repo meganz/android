@@ -92,7 +92,8 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,7 +105,7 @@
             <LinearLayout
                 android:id="@+id/option_download_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -135,7 +136,7 @@
             <LinearLayout
                 android:id="@+id/option_properties_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -165,7 +166,7 @@
             <LinearLayout
                 android:id="@+id/option_leave_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -196,7 +197,7 @@
             <LinearLayout
                 android:id="@+id/option_rename_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -227,7 +228,7 @@
             <LinearLayout
                 android:id="@+id/option_move_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -258,7 +259,7 @@
             <LinearLayout
                 android:id="@+id/option_copy_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -289,7 +290,7 @@
             <LinearLayout
                 android:id="@+id/option_rubbish_bin_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
