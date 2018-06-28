@@ -418,6 +418,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
+	private boolean restoreFromRubbish = false;
 
 	private List<ShareInfo> filePreparedInfos;
 	boolean megaContacts = true;
@@ -9364,6 +9365,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		downloadConfirmationDialog.show();
 	}
 
+	public void restoreFromRubbish(final MegaNode node) {
+		log("restoreFromRubbish");
+
+		restoreFromRubbish = true;
+
+		MegaNode newParent = megaApi.getNodeByHandle(node.getRestoreHandle());
+		if(newParent !=null){
+			megaApi.moveNode(node, newParent, this);
+		}
+		else{
+			log("restoreFromRubbish:The restore folder no longer exists");
+		}
+	}
+
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
 		LinearLayout layout = new LinearLayout(this);
@@ -14093,6 +14108,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.INBOX){
 							setInboxNavigationDrawer();
 						}
+						moveToRubbish = false;
+					}
+					else if(restoreFromRubbish){
+						log("Not moved to rubbish");
+						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
+						showSnackbar(getString(R.string.context_correctly_node_restored, destination.getName()));
+						restoreFromRubbish = false;
 					}
 					else{
 						log("Not moved to rubbish");
@@ -14101,7 +14123,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 			}
 			else {
-				showSnackbar(getString(R.string.context_no_moved));
+				if(restoreFromRubbish){
+					showSnackbar(getString(R.string.context_no_restored));
+					restoreFromRubbish = false;
+				}
+				else{
+					showSnackbar(getString(R.string.context_no_moved));
+					moveToRubbish = false;
+				}
 			}
 
 			log("SINGLE move nodes request finished");
