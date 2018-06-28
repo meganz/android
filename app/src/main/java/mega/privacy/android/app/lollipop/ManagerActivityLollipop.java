@@ -4103,24 +4103,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
-
 				if(parentHandleSearch==-1){
+					sFLol.setAllowedMultiselect(true);
+					firstNavigationLevel = true;
+
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-							firstNavigationLevel = true;
-						}
-						else{
+						}else{
 							aB.setTitle(getString(R.string.action_search)+": "+"");
-							firstNavigationLevel = true;
 						}
-					}
-					else{
+					}else{
 						aB.setTitle(getString(R.string.action_search)+": "+"");
-						firstNavigationLevel = true;
 					}
-				}
-				else{
+				}else{
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSearch);
 					if (parentNode != null){
 						aB.setTitle(parentNode.getName());
@@ -5645,6 +5641,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public boolean onQueryTextSubmit(String query) {
+				log("onQueryTextSubmit: "+query);
 				searchQuery = "" + query;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				setToolbarTitle();
@@ -5656,20 +5653,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-                log("Searching by text: "+newText);
 				if(textSubmitted){
 					textSubmitted = false;
 				}
 				else if (textsearchQuery) {
 					selectDrawerItemLollipop(DrawerItem.SEARCH);
-				}
-				else{
+				}else{
 					searchQuery = newText;
 					selectDrawerItemLollipop(DrawerItem.SEARCH);
 				}
 				return true;
 			}
-
     	});
 
 		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
@@ -6912,6 +6906,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected() ");
 		fromTakePicture = -1;
 		log("onOptionsItemSelected");
 		if (megaApi == null){
@@ -11733,6 +11728,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     	if ((intent != null) && Intent.ACTION_SEARCH.equals(intent.getAction())){
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
+    		log("searchQuery: "+searchQuery);
     		parentHandleSearch = -1;
     		setToolbarTitle();
     		isSearching = true;

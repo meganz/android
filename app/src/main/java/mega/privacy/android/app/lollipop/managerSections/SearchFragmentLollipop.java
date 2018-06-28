@@ -105,6 +105,8 @@ public class SearchFragmentLollipop extends Fragment{
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
+	boolean multiselectBoolean = false;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -1214,6 +1216,13 @@ public class SearchFragmentLollipop extends Fragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
+	}
+
+	public boolean isAllowedMultiselect(){
+		return multiselectBoolean;
+	}
+	public void setAllowedMultiselect(boolean option){
+		multiselectBoolean = option;
 	}
 
 }
