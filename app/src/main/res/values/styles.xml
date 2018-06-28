@@ -233,4 +233,11 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <style name="Theme.Add.Contacts" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/status_bar_login</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_back</item>
+        <item name="homeAsUpIndicator">@drawable/ic_back</item>
+    </style>
 </resources>
