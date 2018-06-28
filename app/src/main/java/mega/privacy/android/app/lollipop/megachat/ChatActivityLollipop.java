@@ -5565,9 +5565,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void removePendingMsg(long id){
         log("removePendingMsg: "+selectedMessageId);
-        dbH.removePendingMessageById(id);
-        messages.remove(selectedPosition);
-        adapter.removeMessage(selectedPosition, messages);
+        try{
+            dbH.removePendingMessageById(id);
+            messages.remove(selectedPosition);
+            adapter.removeMessage(selectedPosition, messages);
+        }
+        catch (IndexOutOfBoundsException e){
+            log("removePendingMsg: EXCEPTION: "+e.getMessage());
+        }
     }
 
     public void showSnackbar(String s){
