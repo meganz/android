@@ -12145,16 +12145,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Send "+nodeHandles.length+" nodes");
 
 			int countChat = chatHandles.length;
+			MultipleAttachChatListener listener = null;
+			int counter = chatHandles.length*nodeHandles.length;
+			if(countChat==1){
+				if(nodeHandles.length==1){
+					listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+				}
+				else{
+					listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
+				}
+			}
+			else{
+
+				if(nodeHandles.length==1){
+					listener = new MultipleAttachChatListener(this, -1, false, counter);
+				}
+				else{
+					listener = new MultipleAttachChatListener(this, -1, true, counter);
+				}
+			}
 			if(countChat==1){
 
 				if(nodeHandles.length==1){
 					//One chat, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], false);
 					megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
 				}
 				else{
 					//One chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], true);
 					for(int i=0;i<nodeHandles.length;i++){
 						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
 					}
@@ -12164,7 +12181,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				if(nodeHandles.length==1){
 					//Many chats, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, false);
 					for(int i=0;i<chatHandles.length;i++){
 						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
 					}
@@ -12172,7 +12188,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					//Many chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, true);
 					for(int i=0;i<chatHandles.length;i++){
 						for(int j=0;j<nodeHandles.length;j++){
 							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);

@@ -16,25 +16,19 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
     Context context;
     boolean sendMultipleFiles;
-
-    public MultipleAttachChatListener(Context context, long chatId) {
-        super();
-        this.context = context;
-        this.chatId = chatId;
-        this.sendMultipleFiles = false;
-    }
-
-    public MultipleAttachChatListener(Context context, long chatId, boolean sendMultipleFiles) {
-        super();
-        this.context = context;
-        this.chatId = chatId;
-        this.sendMultipleFiles = sendMultipleFiles;
-    }
-
     int counter = 0;
     int error = 0;
     int max_items = 0;
     long chatId = -1;
+
+    public MultipleAttachChatListener(Context context, long chatId, boolean sendMultipleFiles, int counter) {
+        super();
+        this.context = context;
+        this.chatId = chatId;
+        this.counter = counter;
+        this.max_items = counter;
+        this.sendMultipleFiles = sendMultipleFiles;
+    }
 
     private static void log(String log) {
         Util.log("MultipleAttachChatListener", log);
@@ -42,11 +36,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        counter++;
-        if(counter>max_items){
-            max_items=counter;
-        }
-        log("Counter on RequestStart: "+counter);
+        log("onRequestStart");
     }
 
     @Override
@@ -62,7 +52,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
             log("Attach node error: "+e.getErrorString()+"__"+e.getErrorCode());
         }
 
-        int requestType = request.getType();
         log("Counter on RequestFinish: "+counter);
         log("Error on RequestFinish: "+error);
 
@@ -71,16 +60,17 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
             if(context instanceof ManagerActivityLollipop){
                 if(success>0){
-                    if(max_items==1){
-                        ((ManagerActivityLollipop) context).openChat(chatId, null);
-                    }
-                    else{
+
+                    if(chatId==-1){
                         if(sendMultipleFiles){
                             ((ManagerActivityLollipop) context).showSnackbar((context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 10)));
                         }
                         else{
                             ((ManagerActivityLollipop) context).showSnackbar((context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, 1)));
                         }
+                    }
+                    else{
+                        ((ManagerActivityLollipop) context).openChat(chatId, null);
                     }
                 }
                 else{
