@@ -278,7 +278,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 			else{
 				holder.permissionsIcon.setVisibility(View.GONE);
-				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+//				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+				if(((CloudDriveExplorerFragmentLollipop) fragment).isCameraUploads(node)){
+					holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
+				}else{
+					holder.imageView.setImageResource(R.drawable.ic_folder_list);
+				}
+
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			}
 		}
