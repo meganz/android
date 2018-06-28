@@ -1917,41 +1917,37 @@
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
     <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
 
-    <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minute[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minutes[/C]</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d second[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d second[/C]</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d seconds[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d seconds[/C]</item>
-    </plurals>
-
-    <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
-        <item context="one second" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d second[/C]</item>
-        <item context="more seconds" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d seconds[/C]</item>
-    </plurals>
-
-    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was[/A][B] cancelled[/B]</string>
-
-    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was[/A][B] not answered[/B]</string>
-
-    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Call[/A][B] missed[/B]</string>
-
-    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was[/A][B] rejected[/B]</string>
-
-    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call[/A][B] failed[/B]</string>
-
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
 
     <string name="add_to_cloud_import" context="Menu option">Add to Cloud</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error ocurred trying to create the streaming</string>
+
+    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Missed call[/A]</string>
+    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was rejected[/A]</string>
+    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was cancelled[/A]</string>
+    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call failed[/A]</string>
+    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was not answered[/A]</string>
+
+    <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minutes[/B]</item>
+    </plurals>
+
+    <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d second[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d second[/B]</item>
+    </plurals>
+
+    <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d seconds[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d seconds[/B]</item>
+    </plurals>
+
+    <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
+        <item context="one second" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d seconds[/B]</item>
+    </plurals>
 
 </resources>
