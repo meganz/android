@@ -1088,8 +1088,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			if (isProLiteMonthly){
 				log("PRO LITE IS SUBSCRIPTED: ORDERID: ***____" + proLiteMonthly.getOrderId() + "____*****");
-			}
-			else{
+			}else{
 				log("PRO LITE IS NOT SUBSCRIPTED");
 			}
 
