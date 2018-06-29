@@ -489,16 +489,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			}
 
-			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-
-			for(int i=0;i<selected.size();i++){
-				MegaNode n = selected.get(i);
-				if(n.isFolder()){
-					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
-					break;
-				}
-			}
-
 			return false;
 		}
 	}
