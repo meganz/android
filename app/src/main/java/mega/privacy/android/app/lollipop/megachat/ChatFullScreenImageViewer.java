@@ -526,7 +526,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 

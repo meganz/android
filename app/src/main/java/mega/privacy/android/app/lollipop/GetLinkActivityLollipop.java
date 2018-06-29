@@ -290,7 +290,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		});
 
 		input1.getBackground().mutate().clearColorFilter();
-		input1.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input1.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -307,13 +307,13 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				if(errorLayout1.getVisibility() == View.VISIBLE){
 					errorLayout1.setVisibility(View.GONE);
 					input1.getBackground().mutate().clearColorFilter();
-					input1.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getLinkActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
 
 		input2.getBackground().mutate().clearColorFilter();
-		input2.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input2.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -330,7 +330,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				if(errorLayout2.getVisibility() == View.VISIBLE){
 					errorLayout2.setVisibility(View.GONE);
 					input2.getBackground().mutate().clearColorFilter();
-					input2.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -342,7 +342,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				if (actionId == EditorInfo.IME_ACTION_NEXT) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input1.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						errorLayout1.setVisibility(View.VISIBLE);
 						input1.requestFocus();
 						return true;
@@ -384,7 +384,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 						passwordDialog.dismiss();
 					}
 					else{
-						input2.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						errorLayout2.setVisibility(View.VISIBLE);
 						textError2.setText(getString(R.string.error_passwords_dont_match));
 						input2.requestFocus();
@@ -392,23 +392,23 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(!proceedInput1&&proceedInput2){
 					log("Error on pass1");
-					input1.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout1.setVisibility(View.VISIBLE);
 					input1.requestFocus();
 				}
 				else if(!proceedInput2&&proceedInput1){
 					log("Error on pass2");
-					input2.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout2.setVisibility(View.VISIBLE);
 					input2.requestFocus();
 				}
 				else{
 					log("Error on both");
-					input1.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input1.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout1.setVisibility(View.VISIBLE);
 					input1.requestFocus();
 
-					input2.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input2.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					errorLayout2.setVisibility(View.VISIBLE);
 				}
 			}

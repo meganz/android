@@ -187,7 +187,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
 					holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 					holder.contactInitialLetter.setVisibility(View.GONE);
 				}
@@ -227,7 +227,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if(this.isItemChecked(position)){
 //					holder.imageButtonThreeDots.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 
 					holder.contactInitialLetter.setVisibility(View.GONE);
@@ -287,8 +287,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				holder.layoutPendingMessages.setAlpha(.4f);
 
-				holder.textViewContent.setTextColor(context.getResources().getColor(R.color.text_secondary));
-				holder.textViewDate.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+				holder.textViewDate.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 				holder.textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 			}
 			else{
@@ -499,28 +499,28 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 			case 1:{
 				log("drawing circle for one digit");
-				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_1));
+				holder.circlePendingMessages.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_unread_1));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case 2:{
 				log("drawing oval for two digits");
-				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_2));
+				holder.circlePendingMessages.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_unread_2));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case 3:{
 				log("drawing oval for three digits");
-				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_3));
+				holder.circlePendingMessages.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_unread_3));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			default:{
 				log("drawing oval for DEFAULT");
-				holder.circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_4));
+				holder.circlePendingMessages.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_unread_4));
 				holder.layoutPendingMessages.setVisibility(View.VISIBLE);
 
 				break;
@@ -588,7 +588,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		else{
 			log("Default color to the avatar");
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
 		int radius;
@@ -1935,11 +1935,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
 					Spannable me = new SpannableString("Me: ");
-					me.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);
-						myMessage.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
 						holder.textViewContent.setText(indexedText);
 					}

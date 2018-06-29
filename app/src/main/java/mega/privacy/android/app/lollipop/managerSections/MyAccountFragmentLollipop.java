@@ -673,7 +673,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		else{
 			log("Default color to the avatar");
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
 		int radius;

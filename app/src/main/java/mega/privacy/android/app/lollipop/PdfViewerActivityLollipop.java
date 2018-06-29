@@ -2074,7 +2074,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         layout.addView(error_layout, params1);
 
         final ImageView error_icon = new ImageView(PdfViewerActivityLollipop.this);
-        error_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_input_warning));
+        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
         error_layout.addView(error_icon);
         RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -3138,7 +3138,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 

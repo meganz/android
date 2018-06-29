@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -417,11 +418,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				log("Default color to the avatar");
-				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+				p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			}
 		}
 		else {
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
 		int radius;

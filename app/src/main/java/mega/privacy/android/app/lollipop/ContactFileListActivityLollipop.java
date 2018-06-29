@@ -206,7 +206,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ContactFileListActivityLollipop.this);
-		error_icon.setImageDrawable(ContactFileListActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -231,7 +231,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -248,14 +248,14 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
 
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(contactPropertiesMainActivity, R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -265,7 +265,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -316,7 +316,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -899,7 +899,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 //		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -944,7 +944,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(ContactFileListActivityLollipop.this);
-		error_icon.setImageDrawable(ContactFileListActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -969,7 +969,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -986,7 +986,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -1000,7 +1000,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					log("actionId is IME_ACTION_DONE");
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -1043,7 +1043,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(contactPropertiesMainActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -1321,7 +1321,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				Resources resources = permissionsDialog.getContext().getResources();
 				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				alertTitle.setTextColor(resources.getColor(R.color.black));
+				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 				/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
@@ -1920,7 +1920,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -1969,7 +1969,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
