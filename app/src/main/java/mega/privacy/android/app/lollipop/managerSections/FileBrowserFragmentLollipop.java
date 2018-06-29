@@ -67,7 +67,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
 
 
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
@@ -230,43 +229,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_send_file:{
-					//Check that all the selected options are files
-
-					if(megaApi!=null && megaApi.getRootNode()!=null){
-						ArrayList<MegaUser> contacts = megaApi.getContacts();
-						if(contacts==null){
-							if(context instanceof ManagerActivityLollipop){
-								((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-							}
-						}
-						else {
-							if(contacts.isEmpty()){
-								((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-							}
-							else{
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								for (int i=0;i<documents.size();i++){
-									if(documents.get(i).isFile()){
-										handleList.add(documents.get(i).getHandle());
-									}
-								}
-
-								log("sendToInbox no of files: "+handleList.size());
-								NodeController nC = new NodeController(context);
-								nC.selectContactToSendNodes(handleList);
-							}
-						}
-					}
-					else{
-						log("Online but not megaApi");
-						((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
-					}
 
 					clearSelections();
 					hideMultipleSelect();

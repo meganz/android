@@ -78,7 +78,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private TextView optionShareText;
     private LinearLayout optionClearShares;
     private LinearLayout optionLeaveShares;
-    private LinearLayout optionSendInbox;
     private LinearLayout optionSendChat;
     private LinearLayout optionRename;
     private LinearLayout optionMove;
@@ -181,8 +180,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionShareText = (TextView) contentView.findViewById(R.id.option_share_text);
         optionClearShares = (LinearLayout) contentView.findViewById(R.id.option_clear_share_layout);
         optionLeaveShares = (LinearLayout) contentView.findViewById(R.id.option_leave_share_layout);
-        optionSendInbox = (LinearLayout) contentView.findViewById(R.id.option_send_inbox_layout);
-        optionSendInbox.setVisibility(View.GONE);
+
         optionSendChat = (LinearLayout) contentView.findViewById(R.id.option_send_chat_layout);
         optionRename = (LinearLayout) contentView.findViewById(R.id.option_rename_layout);
         optionMove = (LinearLayout) contentView.findViewById(R.id.option_move_layout);
@@ -200,7 +198,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionShare.setOnClickListener(this);
         optionClearShares.setOnClickListener(this);
         optionLeaveShares.setOnClickListener(this);
-//        optionSendInbox.setOnClickListener(this);
         optionRename.setOnClickListener(this);
         optionSendChat.setOnClickListener(this);
         optionMove.setOnClickListener(this);
@@ -887,37 +884,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     return;
                 }
                 ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
-                break;
-            }
-            case R.id.option_send_inbox_layout:{
-                log("Send inbox option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-
-                if(megaApi!=null && megaApi.getRootNode()!=null){
-                    ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if(contacts==null){
-                        if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-                        }
-                    }
-                    else {
-                        if(contacts.isEmpty()){
-                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-                        }
-                        else{
-                            nC.selectContactToSendNode(node);
-                        }
-                    }
-                }
-                else{
-                    log("Online but not megaApi");
-                    ((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
-                }
-
-                dismissAllowingStateLoss();
                 break;
             }
             case R.id.option_send_chat_layout:{
