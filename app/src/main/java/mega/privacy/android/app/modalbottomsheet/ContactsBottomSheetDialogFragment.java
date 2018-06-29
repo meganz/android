@@ -293,7 +293,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                             int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
                             int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
-                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
+//                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
                             if (mainLinearLayout.getHeight() > maxHeight) {
                                 params.height = maxHeight;
                                 bottomSheet.setLayoutParams(params);
