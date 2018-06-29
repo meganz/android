@@ -138,6 +138,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToSendFileListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -12290,7 +12291,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				//Create first the chats
+				CreateChatToSendFileListener listener = new CreateChatToSendFileListener(chats, usersNoChat, fileHandle, this);
 
+				for(int i=0; i<usersNoChat.size(); i++){
+					MegaChatPeerList peers = MegaChatPeerList.createInstance();
+					peers.addPeer(usersNoChat.get(i).getHandle(), MegaChatPeerList.PRIV_STANDARD);
+					megaChatApi.createChat(false, peers, listener);
+				}
 			}
 
 		}
