@@ -396,7 +396,7 @@
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Remove from Offline</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
-    <string name="context_send_file" context="menu item">Send file</string>
+    <string name="context_send_file" context="menu item">Send file to chat</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <!--
@@ -1965,4 +1965,6 @@
 
     <string name="context_correctly_node_restored" context="success message when a node was restore from Rubbish bin">Restored to %s</string>
     <string name="context_no_restored" context="error message when a node was restore from Rubbish bin">Error. Not restored</string>
+
+    <string name="context_send_message" context="menu item from contact section to send a message to a contact">Send message</string>
 </resources>
