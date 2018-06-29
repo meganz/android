@@ -1266,7 +1266,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         else {
             contactErrorLayout.setVisibility(View.VISIBLE);
         }
-        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
         Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
         background.setColorFilter(porterDuffColorFilter);
         addContactEditText.setBackground(background);

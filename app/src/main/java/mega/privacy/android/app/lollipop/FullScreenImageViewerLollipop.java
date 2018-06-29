@@ -2011,7 +2011,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(FullScreenImageViewerLollipop.this);
-		error_icon.setImageDrawable(FullScreenImageViewerLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 

@@ -664,7 +664,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         String temp = s.toString();
                         if(temp.trim().length()>0){
                             sendIcon.setEnabled(true);
-                            sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
 
                             textChat.setHint(" ");
                             textChat.setMinLines(1);
@@ -672,7 +672,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         }else{
                             sendIcon.setEnabled(false);
-                            sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+                            sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                             log("textChat:TextChangedListener:onTextChanged:lengthInvalid1:sendStopTypingNotification");
                             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -689,7 +689,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }else {
                         sendIcon.setEnabled(false);
-                        sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+                        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                         log("textChat:TextChangedListener:onTextChanged:lengthInvalid2:sendStopTypingNotification");
                         megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -706,7 +706,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }else{
                     sendIcon.setEnabled(false);
-                    sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+                    sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
                     log("textChat:TextChangedListener:onTextChanged:nullText:sendStopTypingNotification");
                     megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
@@ -810,7 +810,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         sendIcon = (ImageButton) findViewById(R.id.send_message_icon_chat);
         sendIcon.setOnClickListener(this);
-        sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+        sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_trans));
         sendIcon.setEnabled(false);
 
         listView = (RecyclerView) findViewById(R.id.messages_chat_list_view);
@@ -6041,7 +6041,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -6681,23 +6681,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(flag){
             //multiselect on
             if(!text.isEmpty()) {
-                textChat.setTextColor(getResources().getColor(R.color.transfer_progress));
+                textChat.setTextColor(ContextCompat.getColor(this, R.color.transfer_progress));
             }
             if(!sendIcon.isEnabled()){
                 sendIcon.setEnabled(true);
-                sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+                sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_black));
             }
         }else if(!flag){
             //multiselect off
             if(sendIcon.isEnabled()) {
 
-                textChat.setTextColor(getResources().getColor(R.color.black));
+                textChat.setTextColor(ContextCompat.getColor(this, R.color.black));
                 if(!text.isEmpty()) {
                     sendIcon.setEnabled(true);
-                    sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_black));
+                    sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_black));
                 }else{
                     sendIcon.setEnabled(false);
-                    sendIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_send_trans));
+                    sendIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_trans));
                 }
             }
         }

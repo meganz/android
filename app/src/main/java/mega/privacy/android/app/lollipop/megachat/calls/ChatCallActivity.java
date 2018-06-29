@@ -564,7 +564,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             contactInitialLetter = (TextView) findViewById(R.id.call_chat_contact_image_initial_letter);
 
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
-            videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
+            videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_video_off));
 
             //Contact's avatar
             chatId = extras.getLong("chatHandle", -1);
@@ -814,7 +814,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
         else{
             log("Default color to the avatar");
-            p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;
@@ -1056,7 +1056,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                    }
 //                    else{
 //                        log("Disable audio");
-//                        microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+//                        microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
 //                    }
 //                }
 //                else if(request.getParamType()==MegaChatRequest.VIDEO){
@@ -1064,7 +1064,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                        log("Enable video");
 //                        myAvatarLayout.setVisibility(View.VISIBLE);
 //                        myImageBorder.setVisibility(GONE);
-//                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+//                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
 //                    }
 //                    else{
 //                        log("Disable video");
@@ -1440,8 +1440,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             relativeVideo.setVisibility(View.VISIBLE);
             linearArrowVideo.setVisibility(GONE);
             videoFAB.setVisibility(View.VISIBLE);
-            videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-            videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
+            videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
+            videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_videocam_white));
 
             microFAB.setVisibility(GONE);
 
@@ -1648,8 +1648,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             log("Video local connected");
             if (myAvatarLayout.getVisibility() == View.VISIBLE) {
-                videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-                videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
+                videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
+                videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_videocam_white));
 
                 if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
                     if(localCameraFragmentFS == null){
@@ -1704,7 +1704,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
-            videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_video_off));
+            videoFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_video_off));
         }
     }
 
@@ -1713,13 +1713,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(callChat.hasLocalAudio()){
 
             log("Audio local connected");
-            microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-            microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_record_audio_w));
+            microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
+            microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_record_audio_w));
 
         }else{
             log("Audio local NOT connected");
             microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
-            microFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_mic_off));
+            microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_off));
         }
     }
 
