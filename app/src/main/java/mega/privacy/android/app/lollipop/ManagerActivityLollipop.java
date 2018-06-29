@@ -12248,10 +12248,51 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-			final long fileHandle = intent.getLongExtra("SELECT", 0);
+			if(cFLol!=null && cFLol.isAdded()){
+				if(cFLol.isMultipleselect()){
+					cFLol.hideMultipleSelect();
+					cFLol.clearSelectionsNoAnimations();
+				}
+			}
 
-			nC.sendToInbox(fileHandle, selectedContacts);
+			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			long fileHandle = intent.getLongExtra("SELECT", 0);
+
+			//Send file to contacts
+			//Check if all contacts have a chat created
+
+			ArrayList<MegaChatRoom> chats = null;
+			ArrayList<MegaUser> usersNoChat = null;
+
+			for(int i=0; i<selectedContacts.size(); i++){
+
+				MegaUser contact = megaApi.getContact(selectedContacts.get(i));
+
+				MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(contact.getHandle());
+				if(chatRoom!=null){
+					if(chats==null){
+						chats = new ArrayList<MegaChatRoom>();
+					}
+					chats.add(chatRoom);
+
+				}
+				else{
+					if(usersNoChat==null){
+						usersNoChat = new ArrayList<MegaUser>();
+					}
+					usersNoChat.add(contact);
+				}
+			}
+
+			if(usersNoChat==null || usersNoChat.isEmpty()){
+				sendFileToChatsFromContacts(chats, fileHandle);
+
+			}
+			else{
+				//Create first the chats
+
+			}
+
 		}
 		else if(requestCode == Constants.ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
 			if (intent == null) {
@@ -12833,6 +12874,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
+		}
+	}
+
+	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
+		log("sendFileToChatsFromContacts");
+
+		MultipleAttachChatListener listener = null;
+
+		if(chats.size()==1){
+			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
+		}
+		else{
+			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
+		}
+
+		if(chats.size()==1){
+			//One chat, one file
+			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
+		}
+		else if(chats.size()>1){
+			//Many chats, one file
+			for(int i=0;i<chats.size();i++){
+				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
+			}
 		}
 	}
 

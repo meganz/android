@@ -36,8 +36,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.zxing.Result;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
@@ -1338,5 +1336,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	public void setVisibleContacts(ArrayList<MegaContactAdapter> visibleContacts) {
 		this.visibleContacts = visibleContacts;
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
 	}
 }
