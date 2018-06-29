@@ -960,7 +960,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 			case R.id.cab_menu_file_info_share_folder: {
-				Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+				Intent intent = new Intent();
 				intent.setClass(this, AddContactActivityLollipop.class);
 				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
@@ -2606,40 +2606,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
 				}
-				else{
-					for (int i=0;i<contactsData.size();i++){
-						MegaUser u = megaApi.getContact(contactsData.get(i));
-						megaApi.sendFileToUser(node, u, fileInfoActivity);
-					}
-				}
 			}
 			else{
-				if (node.isFolder()){
-					for (int i=0; i < contactsData.size();i++){
-						String type = contactsData.get(i);
-						if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-						else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-					}
-				}
-				else{
-					for (int i=0; i < contactsData.size();i++){
-						String type = contactsData.get(i);
-						if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-						else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-					}
-				}
+                Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}

@@ -12389,93 +12389,76 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
-			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 
 			//if (megaContacts){
 
-				if(sentToInbox==0){
+			if(multiselectIntent==0){
+				//One file to share
+				final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-					if(multiselectIntent==0){
-						//One file to share
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
+					permissionsDialog.dismiss();
 
-							permissionsDialog.dismiss();
+					switch(item) {
+						case 0:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
+							break;
+						}
+						case 1:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
+							break;
+						}
+						case 2:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
+							break;
+						}
+					}
+					}
+				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+			}
+			else if(multiselectIntent==1){
+				//Several folders to share
+				final long[] nodeHandles = intent.getLongArrayExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE);
 
-							switch(item) {
-								case 0:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
-									break;
-								}
-								case 1:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
-									break;
-								}
-								case 2:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
-									break;
-								}
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+
+						permissionsDialog.dismiss();
+						switch(item) {
+							case 0:{
+								log("ACCESS_READ");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
+								break;
 							}
+							case 1:{
+								log("ACCESS_READWRITE");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
+								break;
 							}
-						});
-						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
-					}
-					else if(multiselectIntent==1){
-						//Several folders to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
+							case 2:{
+								log("ACCESS_FULL");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
-
-								permissionsDialog.dismiss();
-								switch(item) {
-				                    case 0:{
-				                    	log("ACCESS_READ");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
-				                    	break;
-				                    }
-				                    case 1:{
-				                    	log("ACCESS_READWRITE");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
-				                        break;
-				                    }
-				                    case 2:{
-				                    	log("ACCESS_FULL");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
-
-				                        break;
-									}
-								}
+								break;
 							}
-						});
-						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
+						}
 					}
-
-				}
-				else if (sentToInbox==1){
-					if(multiselectIntent==0){
-						//Send one file to one contact
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
-						nC.sendToInbox(nodeHandle, contactsData);
-					}
-					else{
-						//Send multiple files to one contact
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
-						nC.sendToInbox(nodeHandles, contactsData);
-					}
-				}
+				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+			}
 			//}
 			//else{
 				//log("no contact");
