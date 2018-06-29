@@ -212,6 +212,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -12158,59 +12159,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Send to "+chatHandles.length+" chats");
 
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-			log("Send "+nodeHandles.length+" nodes");
+
+			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			int countChat = chatHandles.length;
-			MultipleAttachChatListener listener = null;
-			int counter = chatHandles.length*nodeHandles.length;
-			if(countChat==1){
-				if(nodeHandles.length==1){
-					listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
-				}
-				else{
-					listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
-				}
-			}
-			else{
+			log("Selected: "+countChat+" chats to send");
 
-				if(nodeHandles.length==1){
-					listener = new MultipleAttachChatListener(this, -1, false, counter);
-				}
-				else{
-					listener = new MultipleAttachChatListener(this, -1, true, counter);
-				}
-			}
-			if(countChat==1){
-
-				if(nodeHandles.length==1){
-					//One chat, one file
-					megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
-				}
-				else{
-					//One chat, many files
-					for(int i=0;i<nodeHandles.length;i++){
-						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+			if(nodeHandles!=null){
+				log("Send "+nodeHandles.length+" nodes");
+				MultipleAttachChatListener listener = null;
+				int counter = chatHandles.length*nodeHandles.length;
+				if(countChat==1){
+					if(nodeHandles.length==1){
+						listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+					}
+					else{
+						listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
 					}
 				}
-			}
-			else if(countChat>1){
-
-				if(nodeHandles.length==1){
-					//Many chats, one file
-					for(int i=0;i<chatHandles.length;i++){
-						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
-					}
-
-				}
 				else{
-					//Many chat, many files
-					for(int i=0;i<chatHandles.length;i++){
-						for(int j=0;j<nodeHandles.length;j++){
-							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+
+					if(nodeHandles.length==1){
+						listener = new MultipleAttachChatListener(this, -1, false, counter);
+					}
+					else{
+						listener = new MultipleAttachChatListener(this, -1, true, counter);
+					}
+				}
+				if(countChat==1){
+
+					if(nodeHandles.length==1){
+						//One chat, one file
+						megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
+					}
+					else{
+						//One chat, many files
+						for(int i=0;i<nodeHandles.length;i++){
+							megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+						}
+					}
+				}
+				else if(countChat>1){
+
+					if(nodeHandles.length==1){
+						//Many chats, one file
+						for(int i=0;i<chatHandles.length;i++){
+							megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
+						}
+
+					}
+					else{
+						//Many chat, many files
+						for(int i=0;i<chatHandles.length;i++){
+							for(int j=0;j<nodeHandles.length;j++){
+								megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+							}
 						}
 					}
 				}
 			}
+			else if(userHandles!=null){
+				log("Send "+userHandles.length+" contacts");
+
+				for(int i=0;i<chatHandles.length;i++){
+					for(int j=0;j<userHandles.length;j++){
+						MegaHandleList handleList = MegaHandleList.createInstance();
+						handleList.addMegaHandle(userHandles[j]);
+						megaChatApi.attachContacts(chatHandles[i], handleList);
+					}
+				}
+
+				if(countChat==1){
+					openChat(chatHandles[0], null);
+				}
+				else{
+					String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
+					showSnackbar(message);
+				}
+			}
+			else{
+				log("Error on sending to chat");
+			}
+
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
