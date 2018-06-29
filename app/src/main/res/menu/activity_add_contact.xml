@@ -13,7 +13,6 @@
 		android:id="@+id/action_send_invitation"
 		android:orderInCategory="100"
 		android:title="@string/context_send"
-		android:icon="@drawable/ic_send_trans"
 		MEGA:showAsAction="always"
 		android:visible="false" />
 

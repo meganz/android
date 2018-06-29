@@ -159,4 +159,5 @@
     <color name="file_playlist_playing">#FFF2FCFA</color>
     <color name="file_playlist_state">#FF00BFA5</color>
 
+    <color name="add_contact_icons">#FF707070</color>
 </resources>

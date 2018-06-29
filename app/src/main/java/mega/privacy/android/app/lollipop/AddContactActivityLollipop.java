@@ -325,7 +325,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                                     emptyTextView.setVisibility(View.VISIBLE);
                                 }
                                 else {
-                                    separator.setVisibility(View.GONE);
                                     emptyImageView.setVisibility(View.GONE);
                                     emptyTextView.setVisibility(View.GONE);
                                 }
@@ -338,7 +337,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                     else{
                         filteredContactsPhoneIsEmpty = false;
-                        separator.setVisibility(View.GONE);
                         headerContactsPhone.setVisibility(View.VISIBLE);
                         recyclerViewPhone.setVisibility(View.VISIBLE);
                         emptyImageView.setVisibility(View.GONE);
@@ -414,7 +412,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         searchAutoComplete.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 
         ImageView closeIcon = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
-        closeIcon.setImageResource(R.drawable.ic_remove);
+        closeIcon.setImageDrawable(Util.mutateIcon(this, R.drawable.ic_close_white, R.color.add_contact_icons));
 
         searchAutoComplete.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -661,6 +659,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         });
 
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
+        sendInvitationMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_send_white, R.color.accentColor));
         setSendInvitationVisibility();
 
         return super.onCreateOptionsMenu(menu);
@@ -1180,7 +1179,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.VISIBLE);
                 } else {
-                    separator.setVisibility(View.GONE);
                     headerContactsMega.setVisibility(View.VISIBLE);
                     recyclerViewMega.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
@@ -1259,7 +1257,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                                     emptyTextView.setVisibility(View.VISIBLE);
                                 }
                                 else {
-                                    separator.setVisibility(View.GONE);
                                     emptyImageView.setVisibility(View.GONE);
                                     emptyTextView.setVisibility(View.GONE);
                                 }
@@ -1272,7 +1269,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                     else{
                         filteredContactsPhoneIsEmpty = false;
-                        separator.setVisibility(View.GONE);
                         headerContactsPhone.setVisibility(View.VISIBLE);
                         recyclerViewPhone.setVisibility(View.VISIBLE);
                         emptyImageView.setVisibility(View.GONE);
@@ -1418,7 +1414,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.VISIBLE);
                 } else {
-                    separator.setVisibility(View.GONE);
                     headerContactsMega.setVisibility(View.VISIBLE);
                     recyclerViewMega.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
@@ -1640,7 +1635,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.VISIBLE);
                 } else {
-                    separator.setVisibility(View.GONE);
                     headerContactsMega.setVisibility(View.VISIBLE);
                     recyclerViewMega.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
@@ -1753,7 +1747,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     emptyImageView.setVisibility(View.VISIBLE);
                     emptyTextView.setVisibility(View.VISIBLE);
                 } else {
-                    separator.setVisibility(View.GONE);
                     headerContactsMega.setVisibility(View.VISIBLE);
                     recyclerViewMega.setVisibility(View.VISIBLE);
                     emptyImageView.setVisibility(View.GONE);
@@ -2189,7 +2182,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         adapterMEGA.setContacts(filteredContactMEGA);
 
         if (adapterMEGA.getItemCount() != 0){
-            separator.setVisibility(View.GONE);
             headerContactsMega.setVisibility(View.VISIBLE);
             recyclerViewMega.setVisibility(View.VISIBLE);
             emptyImageView.setVisibility(View.GONE);
@@ -2205,7 +2197,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("Size filteredContactsPhone: " +filteredContactsPhone.size());
         if(adapterPhone!=null){
             if (adapterPhone.getItemCount() != 0){
-                separator.setVisibility(View.GONE);
                 headerContactsPhone.setVisibility(View.VISIBLE);
                 recyclerViewPhone.setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);

@@ -552,6 +552,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		    	intent.setClass(this, AddContactActivityLollipop.class);
 				intent.putExtra("SEND_FILE",0);
 		    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 		    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		    	
 	        	return true;
