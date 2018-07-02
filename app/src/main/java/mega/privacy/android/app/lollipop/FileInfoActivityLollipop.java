@@ -84,7 +84,6 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -143,8 +142,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	Toolbar toolbar;
 	ActionBar aB;
-
-	int accountType;
 
 	private boolean isGetLink = false;
 
@@ -551,17 +548,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 from = extras.getInt("from");
                 if(from==FROM_INCOMING_SHARES){
                     firstIncomingLevel = extras.getBoolean("firstLevel");
-                }
-
-                MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
-                if(accountInfo!=null){
-                    accountType = accountInfo.getAccountType();
-                    if(accountType==-1){
-                        accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
-                    }
-                }
-                else{
-                    accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
                 }
 
                 long handleNode = extras.getLong("handle", -1);

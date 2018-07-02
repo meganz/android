@@ -93,10 +93,8 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -138,7 +136,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	Toolbar tB;
 	ActionBar aB;
 
-	int accountType;
 	private boolean isGetLink = false;
 	float scaleText;
 
@@ -864,17 +861,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		positionG = intent.getIntExtra("position", 0);
 		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
-
-		MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
-		if(accountInfo!=null){
-			accountType = accountInfo.getAccountType();
-			if(accountType==-1){
-				accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
-			}
-		}
-		else{
-			accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
-		}
 
 		adapterType = intent.getIntExtra("adapterType", 0);
 

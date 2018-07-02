@@ -96,7 +96,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -128,7 +127,6 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -263,7 +261,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DisplayMetrics outMetrics;
 
     private boolean fromShared = false;
-    int accountType;
     int typeExport = -1;
     private AlertDialog renameDialog;
     String regex = "[*|\\?:\"<>\\\\\\\\/]";
@@ -351,7 +348,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             currentWindowIndex = savedInstanceState.getInt("currentWindowIndex");
             querySearch = savedInstanceState.getString("querySearch");
             playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
-            accountType = savedInstanceState.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
             isAbHide = savedInstanceState.getBoolean("isAbHide", false);
         }
@@ -360,17 +356,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             onPlaylist = false;
             currentTime = 0;
             currentWindowIndex = 0;
-
-            MyAccountInfo accountInfo = ((MegaApplication) getApplication()).getMyAccountInfo();
-            if(accountInfo!=null){
-                accountType = accountInfo.getAccountType();
-                if(accountType==-1){
-                    accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
-                }
-            }
-            else{
-                accountType = MegaAccountDetails.ACCOUNT_TYPE_FREE;
-            }
 
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
@@ -1627,7 +1612,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putInt("size", size);
         outState.putString("querySearch", querySearch);
         outState.putBoolean("playWhenReady", playWhenReady);
-        outState.putInt("typeAccount", accountType);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
         outState.putBoolean("isAbHide", isAbHide);
     }
