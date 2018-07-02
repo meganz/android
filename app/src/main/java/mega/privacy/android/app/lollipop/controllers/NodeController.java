@@ -762,6 +762,9 @@ public class NodeController {
                 service.putExtra(DownloadService.EXTRA_URL, url);
                 service.putExtra(DownloadService.EXTRA_SIZE, size);
                 service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                    service.putExtra("fromMV", true);
+                }
                 context.startService(service);
             }
         }
@@ -971,6 +974,9 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_URL, url);
                             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
                             service.putExtra(DownloadService.EXTRA_PATH, path);
+                            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                                service.putExtra("fromMV", true);
+                            }
                             context.startService(service);
                         }
                     }
@@ -983,6 +989,9 @@ public class NodeController {
                     service.putExtra(DownloadService.EXTRA_URL, url);
                     service.putExtra(DownloadService.EXTRA_SIZE, size);
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                    if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                        service.putExtra("fromMV", true);
+                    }
                     context.startService(service);
                 }
                 else {

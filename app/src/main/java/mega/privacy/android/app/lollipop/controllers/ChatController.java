@@ -1189,6 +1189,9 @@ public class ChatController {
             log("serializeString: "+serializeString);
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
+            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                service.putExtra("fromMV", true);
+            }
             context.startService(service);
         }
 
@@ -1268,6 +1271,9 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
             service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
             service.putExtra(DownloadService.EXTRA_PATH, path);
+            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                service.putExtra("fromMV", true);
+            }
             context.startService(service);
         }
 
@@ -1652,6 +1658,9 @@ public class ChatController {
                         log("serializeString: "+serializeString);
                         service.putExtra(DownloadService.EXTRA_SERIALIZE_STRING, serializeString);
                         service.putExtra(DownloadService.EXTRA_PATH, path);
+                        if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
+                            service.putExtra("fromMV", true);
+                        }
                         context.startService(service);
                     }
                 }
