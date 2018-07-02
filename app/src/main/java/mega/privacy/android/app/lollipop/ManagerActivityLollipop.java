@@ -11533,15 +11533,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        	usedSpaceWarning.setVisibility(View.VISIBLE);
 		}
-
-		if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			if (myAccountInfo.getUsedPerc() > 95){
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.detach(fbFLol);
-				ft.attach(fbFLol);
-				ft.commitAllowingStateLoss();
-			}
-		}
 	}
 
 	public void selectSortByContacts(int _orderContacts){
