@@ -75,9 +75,6 @@ import nz.mega.sdk.MegaUser;
 
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener{
 
-    public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
-    public static String ACTION_PICK_CONTACT_SEND_FILE = "ACTION_PICK_CONTACT_SEND_FILE";
-
     DisplayMetrics outMetrics;
     private android.support.v7.app.AlertDialog shareFolderDialog;
     MegaApplication app;
@@ -86,7 +83,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     DatabaseHandler dbH = null;
     int contactType = 0;
     int multipleSelectIntent;
-    int sendToInbox;
     long nodeHandle = -1;
     long[] nodeHandles;
     Handler handler;
@@ -452,7 +448,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     log("onCreate multiselect YES!");
                     nodeHandles=getIntent().getLongArrayExtra(EXTRA_NODE_HANDLE);
                 }
-                sendToInbox= getIntent().getIntExtra("SEND_FILE", -1);
             }
         }
 
@@ -1808,11 +1803,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             intent.putExtra("MULTISELECT", 1);
         }
 
-        if(sendToInbox==0){
-            intent.putExtra("SEND_FILE",0);
-        } else {
-            intent.putExtra("SEND_FILE",1);
-        }
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
         setResult(RESULT_OK, intent);
         hideKeyboard();
@@ -1891,11 +1881,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             intent.putExtra("MULTISELECT", 1);
         }
 
-        if(sendToInbox==0){
-            intent.putExtra("SEND_FILE",0);
-        } else {
-            intent.putExtra("SEND_FILE",1);
-        }
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
         setResult(RESULT_OK, intent);
         hideKeyboard();

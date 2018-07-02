@@ -1336,4 +1336,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void setVisibleContacts(ArrayList<MegaContactAdapter> visibleContacts) {
 		this.visibleContacts = visibleContacts;
 	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
+	}
 }

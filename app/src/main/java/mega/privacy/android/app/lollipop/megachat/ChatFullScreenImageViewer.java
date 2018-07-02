@@ -590,7 +590,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-		log("onRequestFinish");
+		log("onRequestFinish: "+e.getErrorCode());
 		if(request.getType() == MegaRequest.TYPE_COPY){
 			if (e.getErrorCode() != MegaError.API_OK) {
 
@@ -602,6 +602,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_ENOENT){
+					Snackbar.make(fragmentContainer, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), Snackbar.LENGTH_LONG).show();
 				}
 				else
 				{

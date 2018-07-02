@@ -80,97 +80,104 @@
         android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
 
-    <!--Contact info-->
     <LinearLayout
-        android:id="@+id/file_contact_list_option_info_layout"
+        android:id="@+id/items_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/file_contact_list_option_info_image"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:paddingBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/info_ic"
-            android:visibility="visible" />
+        <!--Contact info-->
+        <LinearLayout
+            android:id="@+id/file_contact_list_option_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/file_contact_list_option_info_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/contact_properties_activity"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/file_contact_list_option_info_image"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.54"
+                android:paddingBottom="2dp"
+                android:layout_marginLeft="5dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/info_ic"
+                android:visibility="visible" />
 
-    <LinearLayout
-        android:id="@+id/file_contact_list_option_permissions_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/file_contact_list_option_info_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="18dp"
+                android:text="@string/contact_properties_activity"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/file_contact_list_option_permissions_file"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_change_permissions"
-            android:visibility="visible" />
+        <LinearLayout
+            android:id="@+id/file_contact_list_option_permissions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/file_contacts_list_option_permissions_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/file_properties_shared_folder_change_permissions"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/file_contact_list_option_permissions_file"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.54"
+                android:layout_marginLeft="5dp"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_change_permissions"
+                android:visibility="visible" />
 
-    <LinearLayout
-        android:id="@+id/file_contact_list_option_delete_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/file_contacts_list_option_permissions_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="18dp"
+                android:text="@string/file_properties_shared_folder_change_permissions"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/file_contact_list_delete_remove"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_remove"
-            android:visibility="visible" />
+        <LinearLayout
+            android:id="@+id/file_contact_list_option_delete_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/file_contacts_list_option_delete_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/context_remove"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
+            <ImageView
+                android:id="@+id/file_contact_list_delete_remove"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.54"
+                android:layout_marginLeft="5dp"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:src="@drawable/ic_remove"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/file_contacts_list_option_delete_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp"
+                android:layout_marginLeft="18dp"
+                android:text="@string/context_remove"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"/>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
