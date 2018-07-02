@@ -1957,4 +1957,6 @@
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error ocurred trying to create the streaming</string>
 
+    <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Invite contacts</string>
+    <string name="share_with" cotext="Label shown when the user wants to share something with other contacts">Share with</string>
 </resources>
