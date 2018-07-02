@@ -700,7 +700,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             Rect rectangle = new Rect();
                             getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
                             int windowHeight = rectangle.bottom;
-                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, getContext().getResources().getDisplayMetrics());
+                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,8, context.getResources().getDisplayMetrics());
                             int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
                             log("bottomSheet.height: "+mainLinearLayout.getHeight()+" maxHeight: "+maxHeight);
