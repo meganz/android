@@ -466,7 +466,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					screenPosition[2] = imageDrag.getWidth();
 					screenPosition[3] = imageDrag.getHeight();
 
-					Intent intent1 =  new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					Intent intent1 =  new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
 					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
 				}
@@ -514,7 +514,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		contactPropertiesMainActivity=this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
 

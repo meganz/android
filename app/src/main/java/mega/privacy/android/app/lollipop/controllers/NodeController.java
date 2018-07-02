@@ -764,12 +764,6 @@ public class NodeController {
                 service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                 if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                     service.putExtra("fromMV", true);
-                    if (context instanceof AudioVideoPlayerLollipop){
-                        service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                    }
-                    else if (context instanceof PdfViewerActivityLollipop){
-                        service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                    }
                 }
                 context.startService(service);
             }
@@ -982,12 +976,6 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                                 service.putExtra("fromMV", true);
-                                if (context instanceof AudioVideoPlayerLollipop){
-                                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                                }
-                                else if (context instanceof PdfViewerActivityLollipop){
-                                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                                }
                             }
                             context.startService(service);
                         }
@@ -1003,12 +991,6 @@ public class NodeController {
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                     if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                         service.putExtra("fromMV", true);
-                        if (context instanceof AudioVideoPlayerLollipop){
-                            service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                        }
-                        else if (context instanceof PdfViewerActivityLollipop){
-                            service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                        }
                     }
                     context.startService(service);
                 }
