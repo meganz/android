@@ -38,7 +38,6 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -46,8 +45,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -483,10 +480,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
 						intent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
 						intent.putExtra("orderGetChildren", orderGetChildren);
-						MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-						if(accountInfo!=null){
-							intent.putExtra("typeAccount", accountInfo.getAccountType());
-						}
+
 						log("Position in nodes: "+positionInNodes);
 						if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
 							intent.putExtra("parentNodeHandle", -1L);
@@ -523,10 +517,6 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 						mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 						mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
 
-						MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-						if(accountInfo!=null) {
-							mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-						}
 						mediaIntent.putExtra("HANDLE", file.getHandle());
 						mediaIntent.putExtra("FILENAME", file.getName());
 						boolean isOnMegaDownloads = false;

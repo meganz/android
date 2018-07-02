@@ -836,8 +836,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 //		}
 
 		if(myAccountInfo == null){
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		for (int i=0;i<contacts.size();i++){

@@ -1,42 +1,23 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.Activity;
 import android.content.Context;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.FortumoFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MonthlyAnnualyFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.Purchase;
 import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
-public class MyAccountInfo implements MegaRequestListenerInterface {
+public class MyAccountInfo {
 
     int usedPerc = 0;
     int accountType = -1;
@@ -72,7 +53,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     DatabaseHandler dbH;
     Context context;
-    MegaUser myUser = null;
 
     public ArrayList<Product> productAccounts;
 
@@ -85,13 +65,15 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     Purchase proIIIMonthly = null;
     Purchase proIIIYearly = null;
 
+    MegaPricing pricing;
+
     public MyAccountInfo(Context context){
         log("MyAccountInfo created");
 
         this.context = context;
 
         if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+            megaApi = ((MegaApplication) context).getMegaApi();
         }
 
         if (dbH == null){
@@ -317,21 +299,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     public void setInventoryFinished(boolean inventoryFinished) {
         this.inventoryFinished = inventoryFinished;
-
-        ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-        if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT) {
-            if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.UPGRADE_ACCOUNT_FRAGMENT) {
-                UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
-                if (upAFL != null) {
-                    upAFL.setPricing();
-                }
-            } else if (((ManagerActivityLollipop) context).getAccountFragment() == Constants.MONTHLY_YEARLY_FRAGMENT) {
-                MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
-                if (myFL != null) {
-                    myFL.setPricing();
-                }
-            }
-        }
     }
 
     public String getLastSessionFormattedDate() {
@@ -339,21 +306,12 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     }
 
     public void setLastSessionFormattedDate(String lastSessionFormattedDate) {
+        log("setLastSessionFormattedDate: "+lastSessionFormattedDate);
         this.lastSessionFormattedDate = lastSessionFormattedDate;
     }
 
     public static void log(String message) {
         Util.log("MyAccountInfo", message);
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-        log("onRequestStart: " + request.getRequestString());
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
     }
 
     public void setFullName(){
@@ -367,7 +325,7 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
         if (fullName.trim().length() <= 0){
             log("Put email as fullname");
-            String email = myUser.getEmail();
+            String email = megaApi.getMyUser().getEmail();
             String[] splitEmail = email.split("[@._]");
             fullName = splitEmail[0];
         }
@@ -381,291 +339,23 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
         firstLetter = firstLetter.toUpperCase(Locale.getDefault());
     }
 
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish: " + request.getRequestString());
+    public void setProductAccounts(MegaPricing p){
+        log("setProductAccounts");
 
-        if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
-            log("paramType: "+request.getParamType());
-            boolean avatarExists = false;
-            if (e.getErrorCode() == MegaError.API_OK){
-                if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
-                    log("(0)request avatar");
-                    ((ManagerActivityLollipop) context).setProfileAvatar();
-
-                    //refresh MyAccountFragment if visible
-                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                        log("Update the account fragment");
-                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
-                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                            if(mAF!=null){
-                                mAF.updateAvatar(false);
-                            }
-                        }
-                    }
-                }
-                else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-                    log("(1)request.getText(): "+request.getText());
-                    firstNameText=request.getText();
-                    firstName=true;
-                    dbH.saveMyFirstName(firstNameText);
-                }
-                else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-                    log("(2)request.getText(): "+request.getText());
-                    lastNameText = request.getText();
-                    lastName = true;
-                    dbH.saveMyLastName(lastNameText);
-                }
-                else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
-                    log("PasswordReminderFromMyAccount: "+((ManagerActivityLollipop)context).getPasswordReminderFromMyAccount());
-                    if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
-                        log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
-                        if (request.getFlag()){
-                            ((ManagerActivityLollipop) context).showRememberPasswordDialog(true);
-                        }
-                        else if (((ManagerActivityLollipop)context).getPasswordReminderFromMyAccount()){
-                            AccountController aC = new AccountController((ManagerActivityLollipop)context);
-                            aC.logout((ManagerActivityLollipop)context, megaApi);
-                        }
-                    }
-                    ((ManagerActivityLollipop) context).setPasswordReminderFromMyAccount(false);
-
-                }
-                if(firstName && lastName){
-                    log("Name and First Name received!");
-
-                    setFullName();
-                    ((ManagerActivityLollipop) context).updateUserNameNavigationView(fullName, firstLetter);
-
-                    firstName= false;
-                    lastName = false;
-
-                    //refresh MyAccountFragment if visible
-                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                        log("Update the account fragment");
-                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
-                            log("MyAccount is selected!");
-                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                            if(mAF!=null){
-                                mAF.updateNameView(fullName);
-                            }
-                            else{
-                                log("MyAccount is Null");
-                            }
-                        }
-                    }
-                }
-            }
-            else{
-                log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
-
-                if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-                    log("ERROR - (1)request.getText(): "+request.getText());
-                    firstNameText = "";
-                    firstName=true;
-                }
-                else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-                    log("ERROR - (2)request.getText(): "+request.getText());
-                    lastNameText = "";
-                    lastName = true;
-                }
-                else if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR) {
-                    if(e.getErrorCode()==MegaError.API_ENOENT) {
-                        ((ManagerActivityLollipop) context).setDefaultAvatar();
-                    }
-
-                    if(e.getErrorCode()==MegaError.API_EARGS){
-                        log("Error changing avatar: ");
-                        if(request.getFile()!=null){
-                            log("DESTINATION FILE: "+request.getFile());
-                        }
-                        if(request.getEmail()!=null){
-                            log("email: "+request.getEmail());
-                        }
-                    }
-
-                    //refresh MyAccountFragment if visible
-                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                        log("Update the account fragment");
-                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
-                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                            if(mAF!=null){
-                                mAF.updateAvatar(false);
-                            }
-                        }
-                    }
-                    return;
-                }
-                if(firstName && lastName){
-                    log("ERROR - Name and First Name received!");
-
-                    setFullName();
-                    ((ManagerActivityLollipop) context).updateUserNameNavigationView(fullName, firstLetter);
-
-                    firstName= false;
-                    lastName = false;
-
-                    //refresh MyAccountFragment if visible
-                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                        log("Update the account fragment");
-                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
-                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                            if(mAF!=null){
-                                mAF.updateNameView(fullName);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
-            log ("account_details request");
-            if (e.getErrorCode() == MegaError.API_OK){
-
-                dbH.setAccountDetailsTimeStamp();
-
-                setAccountInfo(request.getMegaAccountDetails());
-
-                setAccountDetails();
-
-                if(request.getMegaAccountDetails()!=null){
-                    log("getMegaAccountDetails not Null");
-
-                    MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
-
-                    if(megaAccountSession!=null){
-                        log("getMegaAccountSESSION not Null");
-                        dbH.setExtendedAccountDetailsTimestamp();
-                        long mostRecentSession = megaAccountSession.getMostRecentUsage();
-                        log("The last session: "+mostRecentSession);
-                        java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-                        Date date = new Date(mostRecentSession * 1000);
-                        Calendar cal = Calendar.getInstance();
-                        TimeZone tz = cal.getTimeZone();
-                        df.setTimeZone(tz);
-                        lastSessionFormattedDate = df.format(date);
-                        log("Formatted date: "+lastSessionFormattedDate);
-
-                        createSessionTimeStamp = megaAccountSession.getCreationTimestamp();
-                        log("createSessionTimeStamp: " + createSessionTimeStamp);
-                        date = new Date(createSessionTimeStamp * 1000);
-                        cal = Calendar.getInstance();
-                        tz = cal.getTimeZone();
-                        df.setTimeZone(tz);
-                        log("createSessionTimeStamp: " + df.format(date));
-
-                    }
-                }
-
-                if(!((ManagerActivityLollipop)context).isFinishing()){
-
-                    ((ManagerActivityLollipop)context).updateAccountDetailsVisibleInfo();
-
-                    //Check if myAccount section is visible
-                    ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                    if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                        if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MY_ACCOUNT_FRAGMENT){
-                            MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-                            if(mAF!=null){
-                                if(mAF.isAdded()){
-                                    mAF.setAccountDetails();
-                                }
-                            }
-                            MyStorageFragmentLollipop mStorageF = ((ManagerActivityLollipop) context).getMyStorageFragment();
-                            if(mStorageF!=null){
-                                if(mStorageF.isAdded()){
-                                    mStorageF.setAccountDetails();
-                                }
-                            }
-                        }
-                        else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
-                            UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
-                            if(upAFL!=null){
-                                upAFL.showAvailableAccount();
-                            }
-                        }
-                    }
-                }
-
-                log("onRequest TYPE_ACCOUNT_DETAILS: "+getUsedPerc());
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
-            log ("payment methods request");
-            getPaymentMethodsBoolean=true;
-            if (e.getErrorCode() == MegaError.API_OK){
-                dbH.setPaymentMethodsTimeStamp();
-                setPaymentBitSet(Util.convertToBitSet(request.getNumber()));
-            }
-        }
-        else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
-            if (e.getErrorCode() == MegaError.API_OK){
-                setNumberOfSubscriptions(request.getNumber());
-                log("NUMBER OF SUBS: " + getNumberOfSubscriptions());
-                ((ManagerActivityLollipop) context).updateCancelSubscriptions();
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-            MegaPricing p = request.getPricing();
+        if(productAccounts==null){
             productAccounts = new ArrayList<Product>();
-
-            if (e.getErrorCode() == MegaError.API_OK) {
-                dbH.setPricingTimestamp();
-                for (int i = 0; i < p.getNumProducts(); i++) {
-                    log("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
-
-                    Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-
-                    productAccounts.add(account);
-                }
-                //			/*RESULTS
-                //	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
-                //        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
-                //        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
-                //        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
-                //        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
-                //        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-
-                //Check if myAccount section is visible
-                ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
-                if(drawerItem== ManagerActivityLollipop.DrawerItem.ACCOUNT){
-                    if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.UPGRADE_ACCOUNT_FRAGMENT) {
-                        UpgradeAccountFragmentLollipop upAFL = ((ManagerActivityLollipop) context).getUpgradeAccountFragment();
-                        if(upAFL!=null){
-                            upAFL.setPricing();
-                        }
-                    }
-                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.MONTHLY_YEARLY_FRAGMENT) {
-                        MonthlyAnnualyFragmentLollipop myFL = ((ManagerActivityLollipop) context).getMonthlyAnnualyFragment();
-                        if(myFL!=null){
-                            myFL.setPricing();
-                        }
-                    }
-                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.CENTILI_FRAGMENT) {
-                        CentiliFragmentLollipop ctFL = ((ManagerActivityLollipop) context).getCentiliFragment();
-                        if(ctFL!=null){
-                            ctFL.getPaymentId();
-                        }
-                    }
-                    else if(((ManagerActivityLollipop) context).getAccountFragment()== Constants.FORTUMO_FRAGMENT) {
-                        FortumoFragmentLollipop fFL = ((ManagerActivityLollipop) context).getFortumoFragment();
-                        if(fFL!=null){
-                            fFL.getPaymentId();
-                        }
-                    }
-                }
-            }
-
         }
-    }
+        else{
+            productAccounts.clear();
+        }
 
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+        for (int i = 0; i < p.getNumProducts(); i++) {
+            log("p[" + i + "] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 
+            Product account = new Product(p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+
+            productAccounts.add(account);
+        }
     }
 
     public ArrayList<Product> getProductAccounts() {
@@ -675,7 +365,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
     public void setProductAccounts(ArrayList<Product> productAccounts) {
         this.productAccounts = productAccounts;
     }
-
 
     public boolean isFirstName() {
         return firstName;
@@ -710,15 +399,6 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
         this.lastNameText = lastNameText;
         setFullName();
     }
-
-    public MegaUser getMyUser() {
-        return myUser;
-    }
-
-    public void setMyUser(MegaUser myUser) {
-        this.myUser = myUser;
-    }
-
 
     public String getFullName() {
         return fullName;
@@ -838,5 +518,30 @@ public class MyAccountInfo implements MegaRequestListenerInterface {
 
     public Purchase getProIIIYearly() {
         return proIIIYearly;
+    }
+
+    public boolean isGetPaymentMethodsBoolean() {
+        return getPaymentMethodsBoolean;
+    }
+
+    public void setGetPaymentMethodsBoolean(boolean getPaymentMethodsBoolean) {
+        this.getPaymentMethodsBoolean = getPaymentMethodsBoolean;
+    }
+
+    public long getCreateSessionTimeStamp() {
+        return createSessionTimeStamp;
+    }
+
+    public void setCreateSessionTimeStamp(long createSessionTimeStamp) {
+        log("setCreateSessionTimeStamp: " + createSessionTimeStamp);
+        this.createSessionTimeStamp = createSessionTimeStamp;
+    }
+
+    public MegaPricing getPricing() {
+        return pricing;
+    }
+
+    public void setPricing(MegaPricing pricing) {
+        this.pricing = pricing;
     }
 }
