@@ -45,6 +45,8 @@ public class Constants {
 
 	public static String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
+	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
+
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
 	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
@@ -188,7 +190,8 @@ public class Constants {
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
-	final public static int FROM_CHAT = 2019;
+	final public static int FILE_LINK_ADAPTER = 2019;
+	final public static int FROM_CHAT = 2020;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;

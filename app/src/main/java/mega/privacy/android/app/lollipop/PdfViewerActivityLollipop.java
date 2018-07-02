@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StatFs;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
 import android.support.design.widget.Snackbar;
@@ -69,11 +71,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -221,12 +226,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     boolean toolbarVisible = true;
     boolean fromChat = false;
     boolean isDeleteDialogShow = false;
+    boolean fromDownload = false;
 
     ChatController chatC;
     private long msgId = -1;
     private long chatId = -1;
     MegaNode nodeChat;
     MegaChatMessage msgChat;
+
+    MegaNode currentDocument;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -264,6 +272,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 return;
             }
         }
+        fromDownload = intent.getBooleanExtra("fromDownloadService", false);
         fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
 //        handle = intent.getLongExtra("HANDLE", -1);
@@ -295,6 +304,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         if (type == Constants.OFFLINE_ADAPTER){
             isOffLine = true;
             pathNavigation = intent.getStringExtra("pathNavigation");
+        }
+        else if (type == Constants.FILE_LINK_ADAPTER) {
+            String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
+            if(serialize!=null) {
+                currentDocument = MegaNode.unserialize(serialize);
+                if (currentDocument != null) {
+                    log("currentDocument NOT NULL");
+                }
+                else {
+                    log("currentDocument is NULL");
+                }
+            }
+            isOffLine = false;
+            fromChat = false;
         }
         else {
             isOffLine = false;
@@ -369,11 +392,26 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     log("Total mem: "+mi.totalMem+" allocate 16 MB");
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
-                    MegaNode node = megaApi.getNodeByHandle(handle);
+
+                if (savedInstanceState != null && uri.toString().contains("http://")){
+                    MegaNode node = null;
+                    if (fromChat) {
+                        node = nodeChat;
+                    }
+                    else if (type == Constants.FILE_LINK_ADAPTER) {
+                        node = currentDocument;
+                    }
+                    else {
+                        node = megaApi.getNodeByHandle(handle);
+                    }
                     if (node != null){
                         uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
                     }
+                    else {
+                        showSnackbar(getString(R.string.error_streaming));
+                    }
                 }
+            }
 
             log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
             if(megaApi.getBandwidthOverquotaDelay()>0){
@@ -942,25 +980,319 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    public void downloadFromCloud(){
-        MegaNode node = megaApi.getNodeByHandle(handle);
+    public void download(){
+
+        if (type == Constants.FILE_LINK_ADAPTER){
+            MegaNode node = megaApi.getNodeByHandle(currentDocument.getHandle());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+
+                    handleListM.add(node.getHandle());
+                }
+            }
+
+            downloadNode();
+        }
+        else if (fromChat){
+            if (chatC == null){
+                chatC = new ChatController(this);
+            }
+            if (nodeChat != null){
+                chatC.prepareForChatDownload(nodeChat);
+            }
+        }
+        else {
+            MegaNode node = megaApi.getNodeByHandle(handle);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasStoragePermission) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            Constants.REQUEST_WRITE_STORAGE);
+
+                    handleListM.add(node.getHandle());
+                }
+            }
+
+            ArrayList<Long> handleList = new ArrayList<Long>();
+            handleList.add(node.getHandle());
+
+            if(nC==null){
+                nC = new NodeController(this);
+            }
+            nC.prepareForDownload(handleList);
+        }
+    }
+
+    public void downloadNode(){
+        log("downloadNode()");
+        if (currentDocument == null){
+            return;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-
-                handleListM.add(node.getHandle());
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                return;
             }
         }
-        ArrayList<Long> handleList = new ArrayList<Long>();
-        handleList.add(node.getHandle());
 
-        if(nC==null){
-            nC = new NodeController(this);
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
         }
-        nC.prepareForDownload(handleList);
+
+        if (dbH.getCredentials() == null || dbH.getPreferences() == null){
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                File[] fs = getExternalFilesDirs(null);
+                if (fs.length > 1){
+                    if (fs[1] == null){
+
+                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                        intent.setClass(this, FileStorageActivityLollipop.class);
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }else{
+                        Dialog downloadLocationDialog;
+                        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+                        android.app.AlertDialog.Builder b=new android.app.AlertDialog.Builder(this);
+
+                        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+                        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch(which){
+                                    case 0:{
+                                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                                        intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                                        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                        break;
+                                    }
+                                    case 1:{
+                                        File[] fs = getExternalFilesDirs(null);
+                                        if (fs.length > 1){
+                                            String path = fs[1].getAbsolutePath();
+                                            File defaultPathF = new File(path);
+                                            defaultPathF.mkdirs();
+                                            Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+                                            downloadTo(path, uri.toString(), currentDocument.getSize(), currentDocument.getHandle());
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                        b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        downloadLocationDialog = b.create();
+                        downloadLocationDialog.show();
+                    }
+                }
+                else{
+                    Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                    intent.setClass(this, FileStorageActivityLollipop.class);
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                    startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+            }
+            else{
+                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                intent.setClass(this, FileStorageActivityLollipop.class);
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            }
+            return;
+        }
+
+        boolean askMe = true;
+        String downloadLocationDefaultPath = "";
+        prefs = dbH.getPreferences();
+        if (prefs != null){
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            askMe = false;
+                            downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+                            log("downloadLocationDefaultPath = "+downloadLocationDefaultPath);
+
+                        }
+                    }
+                }
+            }
+        }
+
+        if (askMe){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                File[] fs = getExternalFilesDirs(null);
+                if (fs.length > 1){
+                    if (fs[1] == null){
+                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                        intent.setClass(this, FileStorageActivityLollipop.class);
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                    }
+                    else{
+                        Dialog downloadLocationDialog;
+                        String[] sdCardOptions = getResources().getStringArray(R.array.settings_storage_download_location_array);
+                        android.app.AlertDialog.Builder b=new android.app.AlertDialog.Builder(this);
+
+                        b.setTitle(getResources().getString(R.string.settings_storage_download_location));
+//						final long sizeFinal = size;
+//						final long[] hashesFinal = new long[hashes.length];
+//						for (int i=0; i< hashes.length; i++){
+//							hashesFinal[i] = hashes[i];
+//						}
+
+                        b.setItems(sdCardOptions, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch(which){
+                                    case 0:{
+                                        Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                                        intent.setClass(getApplicationContext(), FileStorageActivityLollipop.class);
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                                        intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                                        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                                        break;
+                                    }
+                                    case 1:{
+                                        File[] fs = getExternalFilesDirs(null);
+                                        if (fs.length > 1){
+                                            String path = fs[1].getAbsolutePath();
+                                            File defaultPathF = new File(path);
+                                            defaultPathF.mkdirs();
+                                            Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+                                            downloadTo(path, uri.toString(), currentDocument.getSize(), currentDocument.getHandle());
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                        b.setNegativeButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        downloadLocationDialog = b.create();
+                        downloadLocationDialog.show();
+                    }
+                }
+                else{
+                    Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                    intent.setClass(this, FileStorageActivityLollipop.class);
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                    intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                    startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+                }
+            }
+            else{
+                Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+                intent.setClass(this, FileStorageActivityLollipop.class);
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_URL, uri.toString());
+                intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, currentDocument.getSize());
+                startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+            }
+        }
+        else{
+            downloadTo(downloadLocationDefaultPath, null, currentDocument.getSize(), currentDocument.getHandle());
+        }
+    }
+
+    public void downloadTo(String parentPath, String url, long size, long hash){
+        log("downloadTo");
+        double availableFreeSpace = Double.MAX_VALUE;
+        try{
+            StatFs stat = new StatFs(parentPath);
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        }
+        catch(Exception ex){}
+
+        MegaNode tempNode = currentDocument;
+        if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+            log("is file");
+            String localPath = mega.privacy.android.app.utils.Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+            if(localPath != null){
+                try {
+                    mega.privacy.android.app.utils.Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
+                }catch(Exception e) {}
+
+                showSnackbar(getString(R.string.general_already_downloaded));
+            }else{
+                log("LocalPath is NULL");
+            }
+
+            MegaNode node = currentDocument;
+            if(node != null){
+                log("Node!=null: "+node.getName());
+                Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+                dlFiles.put(node, parentPath);
+
+                for (MegaNode document : dlFiles.keySet()) {
+                    String path = dlFiles.get(document);
+
+                    if(availableFreeSpace < document.getSize()){
+                        showSnackbarNotSpace();
+                        continue;
+                    }
+
+                    Intent service = new Intent(this, DownloadService.class);
+                    service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+//                    service.putExtra(DownloadService.EXTRA_URL, url);
+                    service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
+                    service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+                    service.putExtra(DownloadService.EXTRA_PATH, path);
+                    service.putExtra("fromMV", true);
+                    log("intent to DownloadService");
+                    startService(service);
+                }
+            }else if(url != null) {
+                if(availableFreeSpace < size) {
+                    showSnackbarNotSpace();
+                }
+
+                Intent service = new Intent(this, DownloadService.class);
+                service.putExtra(DownloadService.EXTRA_HASH, hash);
+//                service.putExtra(DownloadService.EXTRA_URL, url);
+                service.putExtra(Constants.EXTRA_SERIALIZE_STRING, currentDocument.serialize());
+                service.putExtra(DownloadService.EXTRA_SIZE, size);
+                service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                service.putExtra("fromMV", true);
+                startService(service);
+            }else {
+                log("node not found. Let's try the document");
+            }
+        }
     }
 
     public void onIntentProcessed(List<ShareInfo> infos) {
@@ -1237,166 +1569,201 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     }
                 }
             }
+            else if (type == Constants.FILE_LINK_ADAPTER) {
+                log("onCreateOptionsMenu FILE_LINK_ADAPTER");
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                shareMenuItem.setVisible(false);
+                propertiesMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                chatMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+            }
             else {
                 shareMenuItem.setVisible(true);
                 boolean shareVisible = true;
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
-                if(type==Constants.CONTACT_FILE_ADAPTER){
-                    shareMenuItem.setVisible(false);
-                    shareVisible = false;
-                }
-                else{
-                    if(fromShared){
-                        shareMenuItem.setVisible(false);
-                        shareVisible = false;
-                    }
-                    if(isFolderLink){
-                        shareMenuItem.setVisible(false);
-                        shareVisible = false;
-                    }
-                }
-                copyMenuItem.setVisible(true);
-
-                if(node.isExported()){
+                if (node == null) {
                     getlinkMenuItem.setVisible(false);
-                    removelinkMenuItem.setVisible(true);
+                    removelinkMenuItem.setVisible(false);
+                    shareMenuItem.setVisible(false);
+                    propertiesMenuItem.setVisible(false);
+                    downloadMenuItem.setVisible(false);
+                    renameMenuItem.setVisible(false);
+                    moveMenuItem.setVisible(false);
+                    copyMenuItem.setVisible(false);
+                    moveToTrashMenuItem.setVisible(false);
+                    removeMenuItem.setVisible(false);
+                    chatMenuItem.setVisible(false);
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+                    chatRemoveMenuItem.setVisible(false);
                 }
-                else{
+                else {
                     if(type==Constants.CONTACT_FILE_ADAPTER){
-                        getlinkMenuItem.setVisible(false);
-                        removelinkMenuItem.setVisible(false);
+                        shareMenuItem.setVisible(false);
+                        shareVisible = false;
                     }
                     else{
                         if(fromShared){
-                            removelinkMenuItem.setVisible(false);
-                            getlinkMenuItem.setVisible(false);
+                            shareMenuItem.setVisible(false);
+                            shareVisible = false;
                         }
-                        else{
-                            if(isFolderLink){
-                                getlinkMenuItem.setVisible(false);
-                                removelinkMenuItem.setVisible(false);
-
-                            }
-                            else{
-                                getlinkMenuItem.setVisible(true);
-                                removelinkMenuItem.setVisible(false);
-                            }
+                        if(isFolderLink){
+                            shareMenuItem.setVisible(false);
+                            shareVisible = false;
                         }
                     }
-                }
+                    copyMenuItem.setVisible(true);
 
-                if(fromShared){
-                    removeMenuItem.setVisible(false);
-                    chatMenuItem.setVisible(false);
-
-                    node = megaApi.getNodeByHandle(handle);
-                    int accessLevel = megaApi.getAccess(node);
-
-                    switch(accessLevel){
-                        case MegaShare.ACCESS_OWNER:
-                        case MegaShare.ACCESS_FULL:{
-                            renameMenuItem.setVisible(true);
-                            moveMenuItem.setVisible(true);
-                            moveToTrashMenuItem.setVisible(true);
-                            break;
-                        }
-                        case MegaShare.ACCESS_READWRITE:
-                        case MegaShare.ACCESS_READ:{
-                            renameMenuItem.setVisible(false);
-                            moveMenuItem.setVisible(false);
-                            moveToTrashMenuItem.setVisible(false);
-                            break;
-                        }
-                    }
-                }
-                else{
-                    if(isFolderLink){
-                        propertiesMenuItem.setVisible(false);
-                        moveToTrashMenuItem.setVisible(false);
-                        removeMenuItem.setVisible(false);
-                        renameMenuItem.setVisible(false);
-                        moveMenuItem.setVisible(false);
-                        copyMenuItem.setVisible(false);
-                        chatMenuItem.setVisible(false);
+                    if(node.isExported()){
+                        getlinkMenuItem.setVisible(false);
+                        removelinkMenuItem.setVisible(true);
                     }
                     else{
-                        propertiesMenuItem.setVisible(true);
-
                         if(type==Constants.CONTACT_FILE_ADAPTER){
-                            removeMenuItem.setVisible(false);
-                            node = megaApi.getNodeByHandle(handle);
-                            int accessLevel = megaApi.getAccess(node);
-                            switch(accessLevel){
-                                case MegaShare.ACCESS_OWNER:
-                                case MegaShare.ACCESS_FULL:{
-                                    renameMenuItem.setVisible(true);
-                                    moveMenuItem.setVisible(true);
-                                    moveToTrashMenuItem.setVisible(true);
-                                    if(Util.isChatEnabled()){
-                                        chatMenuItem.setVisible(true);
-                                    }
-                                    else{
-                                        chatMenuItem.setVisible(false);
-                                    }
-                                    break;
-                                }
-                                case MegaShare.ACCESS_READWRITE:
-                                case MegaShare.ACCESS_READ:{
-                                    renameMenuItem.setVisible(false);
-                                    moveMenuItem.setVisible(false);
-                                    moveToTrashMenuItem.setVisible(false);
-                                    chatMenuItem.setVisible(false);
-                                    break;
-                                }
-                            }
+                            getlinkMenuItem.setVisible(false);
+                            removelinkMenuItem.setVisible(false);
                         }
                         else{
-                            if(Util.isChatEnabled()){
-                                chatMenuItem.setVisible(true);
-                            }
-                            else{
-                                chatMenuItem.setVisible(false);
-                            }
-                            renameMenuItem.setVisible(true);
-                            moveMenuItem.setVisible(true);
-
-                            node = megaApi.getNodeByHandle(handle);
-
-                            final long handle = node.getHandle();
-                            MegaNode parent = megaApi.getNodeByHandle(handle);
-
-                            while (megaApi.getParentNode(parent) != null){
-                                parent = megaApi.getParentNode(parent);
-                            }
-
-                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-                                moveToTrashMenuItem.setVisible(true);
-                                removeMenuItem.setVisible(false);
-
-                            }
-                            else{
-                                moveToTrashMenuItem.setVisible(false);
-                                removeMenuItem.setVisible(true);
-                                getlinkMenuItem.setVisible(false);
+                            if(fromShared){
                                 removelinkMenuItem.setVisible(false);
+                                getlinkMenuItem.setVisible(false);
+                            }
+                            else{
+                                if(isFolderLink){
+                                    getlinkMenuItem.setVisible(false);
+                                    removelinkMenuItem.setVisible(false);
+
+                                }
+                                else{
+                                    getlinkMenuItem.setVisible(true);
+                                    removelinkMenuItem.setVisible(false);
+                                }
                             }
                         }
                     }
-                }
-                if (isUrl){
-                    downloadMenuItem.setVisible(true);
-                    shareMenuItem.setVisible(false);
-                }
-                else {
-                    downloadMenuItem.setVisible(false);
-                    if (shareVisible){
-                        shareMenuItem.setVisible(true);
+
+                    if(fromShared){
+                        removeMenuItem.setVisible(false);
+                        chatMenuItem.setVisible(false);
+
+                        node = megaApi.getNodeByHandle(handle);
+                        int accessLevel = megaApi.getAccess(node);
+
+                        switch(accessLevel){
+                            case MegaShare.ACCESS_OWNER:
+                            case MegaShare.ACCESS_FULL:{
+                                renameMenuItem.setVisible(true);
+                                moveMenuItem.setVisible(true);
+                                moveToTrashMenuItem.setVisible(true);
+                                break;
+                            }
+                            case MegaShare.ACCESS_READWRITE:
+                            case MegaShare.ACCESS_READ:{
+                                renameMenuItem.setVisible(false);
+                                moveMenuItem.setVisible(false);
+                                moveToTrashMenuItem.setVisible(false);
+                                break;
+                            }
+                        }
                     }
+                    else{
+                        if(isFolderLink){
+                            propertiesMenuItem.setVisible(false);
+                            moveToTrashMenuItem.setVisible(false);
+                            removeMenuItem.setVisible(false);
+                            renameMenuItem.setVisible(false);
+                            moveMenuItem.setVisible(false);
+                            copyMenuItem.setVisible(false);
+                            chatMenuItem.setVisible(false);
+                        }
+                        else{
+                            propertiesMenuItem.setVisible(true);
+
+                            if(type==Constants.CONTACT_FILE_ADAPTER){
+                                removeMenuItem.setVisible(false);
+                                node = megaApi.getNodeByHandle(handle);
+                                int accessLevel = megaApi.getAccess(node);
+                                switch(accessLevel){
+                                    case MegaShare.ACCESS_OWNER:
+                                    case MegaShare.ACCESS_FULL:{
+                                        renameMenuItem.setVisible(true);
+                                        moveMenuItem.setVisible(true);
+                                        moveToTrashMenuItem.setVisible(true);
+                                        if(Util.isChatEnabled()){
+                                            chatMenuItem.setVisible(true);
+                                        }
+                                        else{
+                                            chatMenuItem.setVisible(false);
+                                        }
+                                        break;
+                                    }
+                                    case MegaShare.ACCESS_READWRITE:
+                                    case MegaShare.ACCESS_READ:{
+                                        renameMenuItem.setVisible(false);
+                                        moveMenuItem.setVisible(false);
+                                        moveToTrashMenuItem.setVisible(false);
+                                        chatMenuItem.setVisible(false);
+                                        break;
+                                    }
+                                }
+                            }
+                            else{
+                                if(Util.isChatEnabled()){
+                                    chatMenuItem.setVisible(true);
+                                }
+                                else{
+                                    chatMenuItem.setVisible(false);
+                                }
+                                renameMenuItem.setVisible(true);
+                                moveMenuItem.setVisible(true);
+
+                                node = megaApi.getNodeByHandle(handle);
+
+                                final long handle = node.getHandle();
+                                MegaNode parent = megaApi.getNodeByHandle(handle);
+
+                                while (megaApi.getParentNode(parent) != null){
+                                    parent = megaApi.getParentNode(parent);
+                                }
+
+                                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                                    moveToTrashMenuItem.setVisible(true);
+                                    removeMenuItem.setVisible(false);
+
+                                }
+                                else{
+                                    moveToTrashMenuItem.setVisible(false);
+                                    removeMenuItem.setVisible(true);
+                                    getlinkMenuItem.setVisible(false);
+                                    removelinkMenuItem.setVisible(false);
+                                }
+                            }
+                        }
+                    }
+                    if (isUrl){
+                        downloadMenuItem.setVisible(true);
+                        shareMenuItem.setVisible(false);
+                    }
+                    else {
+                        downloadMenuItem.setVisible(false);
+                        if (shareVisible){
+                            shareMenuItem.setVisible(true);
+                        }
+                    }
+                    importMenuItem.setVisible(false);
+                    saveForOfflineMenuItem.setVisible(false);
+                    chatRemoveMenuItem.setVisible(false);
                 }
-                importMenuItem.setVisible(false);
-                saveForOfflineMenuItem.setVisible(false);
-                chatRemoveMenuItem.setVisible(false);
             }
         }
 
@@ -1420,17 +1787,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 break;
             }
             case R.id.pdf_viewer_download: {
-                if (fromChat){
-                    if (chatC == null){
-                        chatC = new ChatController(this);
-                    }
-                    if (nodeChat != null){
-                        chatC.prepareForChatDownload(nodeChat);
-                    }
-                }
-                else {
-                    downloadFromCloud();
-                }
+                download();
                 break;
             }
             case R.id.pdf_viewer_chat: {
@@ -2148,15 +2505,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (requestCode == Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             log("local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-            long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-            long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-            log("URL: " + url + "___SIZE: " + size);
-
-            if(nC==null){
-                nC = new NodeController(this);
+            if (type == Constants.FILE_LINK_ADAPTER){
+                downloadTo(parentPath, uri.toString(), currentDocument.getSize(), currentDocument.getHandle());
             }
-            nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+            else {
+                String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
+                long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
+                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+                log("URL: " + url + "___SIZE: " + size);
+
+                if(nC==null){
+                    nC = new NodeController(this);
+                }
+                nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+            }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
@@ -2411,19 +2773,19 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             log("Not launch connect: "+megaChatApi.getInitState());
                         }
                         MegaApplication.setLoggingIn(false);
-                        downloadFromCloud();
+                        download();
                     }
                     else{
 
                         log("Chat NOT enabled - readyToManager");
                         MegaApplication.setLoggingIn(false);
-                        downloadFromCloud();
+                        download();
                     }
                 }
                 else{
                     log("chatSettings NULL - readyToManager");
                     MegaApplication.setLoggingIn(false);
-                    downloadFromCloud();
+                    download();
                 }
             }
         }
@@ -2591,8 +2953,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     protected void onResume() {
         super.onResume();
         log("onResume");
-        if (!isOffLine && !fromChat && !isFolderLink){
-            if (megaApi.getNodeByHandle(handle) == null && inside){
+        if (!isOffLine && !fromChat && !isFolderLink
+                && type != Constants.FILE_LINK_ADAPTER){
+            if (megaApi.getNodeByHandle(handle) == null && inside && !fromDownload){
                 finish();
             }
             updateFile();

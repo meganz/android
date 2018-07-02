@@ -10,12 +10,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -61,6 +64,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public LinearLayout optionInfoContact;
     public LinearLayout optionStartConversation;
     public LinearLayout optionSendFile;
+    public LinearLayout optionSendContact;
     public LinearLayout optionShareFolder;
     public LinearLayout optionRemove;
     ImageView contactStateIcon;
@@ -147,6 +151,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionInfoContact = (LinearLayout) contentView.findViewById(R.id.contact_list_info_contact_layout);
         optionStartConversation = (LinearLayout) contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
         optionSendFile= (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_file_layout);
+        optionSendContact = (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_contact_layout);
         optionShareFolder = (LinearLayout) contentView.findViewById(R.id.contact_list_option_share_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
         contactStateIcon = (ImageView) contentView.findViewById(R.id.contact_list_drawable_state);
@@ -162,6 +167,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionInfoContact.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionSendFile.setOnClickListener(this);
+        optionSendContact.setOnClickListener(this);
         optionShareFolder.setOnClickListener(this);
 
         if(contact!=null){
@@ -223,17 +229,21 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//            final ContactsBottomSheetDialogFragment thisclass = this;
+//
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//            }
+//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//            }
+
+            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-            final ContactsBottomSheetDialogFragment thisclass = this;
-
-
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-            }
-            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-            }
 
             mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                 @Override
@@ -245,20 +255,20 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    if(slideOffset> 0 && !heightseted){
-                        if(context instanceof CustomHeight){
-                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
-                        }
-                        if(height != -1 && heightReal != -1){
-                            heightseted = true;
-                            int numSons = 0;
-                            int num = items_layout.getChildCount();
-                            for(int i=0; i<num; i++){
-                                View v = items_layout.getChildAt(i);
-                                if(v.getVisibility() == View.VISIBLE){
-                                    numSons++;
-                                }
-                            }
+//                    if(slideOffset> 0 && !heightseted){
+//                        if(context instanceof CustomHeight){
+//                            height = ((CustomHeight) context).getHeightToPanel(thisclass);
+//                        }
+//                        if(height != -1 && heightReal != -1){
+//                            heightseted = true;
+//                            int numSons = 0;
+//                            int num = items_layout.getChildCount();
+//                            for(int i=0; i<num; i++){
+//                                View v = items_layout.getChildAt(i);
+//                                if(v.getVisibility() == View.VISIBLE){
+//                                    numSons++;
+//                                }
+//                            }
 //                            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && numSons > 3){
 //
 //                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
@@ -269,10 +279,27 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
 //                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
 //                                params.height = height;
 //                                bottomSheet.setLayoutParams(params);
+////                            }
+//                            if(heightReal > height){
+//                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+//                                params.height = height;
+//                                bottomSheet.setLayoutParams(params);
 //                            }
-                            if(heightReal > height){
-                                ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
-                                params.height = height;
+//                        }
+//                    }
+                    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                        ViewGroup.LayoutParams params = bottomSheet.getLayoutParams();
+                        if (getActivity() != null && getActivity().findViewById(R.id.toolbar) != null) {
+                            int tBHeight = getActivity().findViewById(R.id.toolbar).getHeight();
+                            Rect rectangle = new Rect();
+                            getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+                            int windowHeight = rectangle.bottom;
+                            int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
+                            int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
+
+//                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
+                            if (mainLinearLayout.getHeight() > maxHeight) {
+                                params.height = maxHeight;
                                 bottomSheet.setLayoutParams(params);
                             }
                         }
@@ -428,6 +455,20 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                 user.add(contact.getMegaUser());
                 ContactController cC = new ContactController(context);
                 cC.pickFileToSend(user);
+                dismissAllowingStateLoss();
+                break;
+            }
+            case R.id.contact_list_option_send_contact_layout:{
+                log("optionSendContact");
+                if(contact==null){
+                    log("Selected contact NULL");
+                    return;
+                }
+
+                ChatController cC = new ChatController(context);
+
+                cC.selectChatsToAttachContact(contact.getMegaUser());
+
                 dismissAllowingStateLoss();
                 break;
             }

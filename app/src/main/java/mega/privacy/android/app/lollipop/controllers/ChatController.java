@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -99,6 +100,20 @@ public class ChatController {
         }
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.leaveChat(chat.getChatId(), (ChatActivityLollipop) context);
+        }
+    }
+
+    public void selectChatsToAttachContact(MegaUser contact){
+        log("selectChatsToSendNode");
+
+        long[] longArray = new long[1];
+        longArray[0] = contact.getHandle();
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("USER_HANDLES", longArray);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 
@@ -697,7 +712,6 @@ public class ChatController {
                     log("Content: " + message.getContent());
                     return "";
                 }
-
             }
         }
     }
@@ -756,7 +770,7 @@ public class ChatController {
         log("privilege is: "+privilege);
         if(privilege==MegaChatRoom.PRIV_UNKNOWN||privilege==MegaChatRoom.PRIV_RM){
             log("Not participant any more!");
-            String handleString = megaApi.handleToBase64(userHandle);
+            String handleString = MegaApiJava.userHandleToBase64(userHandle);
             log("The user handle to find is: "+handleString);
             MegaUser contact = megaApi.getContact(handleString);
             if(contact!=null){

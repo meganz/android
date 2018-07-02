@@ -66,7 +66,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUser;
 
 
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener{
@@ -229,43 +228,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					NodeController nC = new NodeController(context);
 					nC.selectContactToShareFolders(handleList);
-
-					clearSelections();
-					hideMultipleSelect();
-					break;
-				}
-				case R.id.cab_menu_send_file:{
-					//Check that all the selected options are files
-
-					if(megaApi!=null && megaApi.getRootNode()!=null){
-						ArrayList<MegaUser> contacts = megaApi.getContacts();
-						if(contacts==null){
-							if(context instanceof ManagerActivityLollipop){
-								((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-							}
-						}
-						else {
-							if(contacts.isEmpty()){
-								((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-							}
-							else{
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								for (int i=0;i<documents.size();i++){
-									if(documents.get(i).isFile()){
-										handleList.add(documents.get(i).getHandle());
-									}
-								}
-
-								log("sendToInbox no of files: "+handleList.size());
-								NodeController nC = new NodeController(context);
-								nC.selectContactToSendNodes(handleList);
-							}
-						}
-					}
-					else{
-						log("Online but not megaApi");
-						((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
-					}
 
 					clearSelections();
 					hideMultipleSelect();
@@ -526,26 +488,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				menu.findItem(R.id.cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			}
 
-			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-
-			for(int i=0;i<selected.size();i++){
-				MegaNode n = selected.get(i);
-				if(n.isFolder()){
-					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
-					break;
-				}
-			}
-
 			return false;
-		}
-
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(recyclerView.getLayoutManager()!=null){
-			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
 		}
 	}
 
@@ -895,15 +838,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void updateTransferButton(){
 		log("updateTransferButton");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			log("show PLAY button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
-			transfersTitleText.setText(getString(R.string.paused_transfers_title));
+
+		if(transfersOverViewLayout.getVisibility()==View.VISIBLE){
+			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+				log("show PLAY button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
+				transfersTitleText.setText(getString(R.string.paused_transfers_title));
+			}
+			else{
+				log("show PAUSE button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			}
 		}
 		else{
-			log("show PAUSE button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
-			transfersTitleText.setText(getString(R.string.section_transfers));
+			log("Transfer panel not visible");
 		}
 	}
 
@@ -931,6 +880,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				int lastFirstVisiblePosition = 0;
 				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
+					log("lastFirstVisiblePosition: "+lastFirstVisiblePosition);
+
 				}
 				else{
 					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
@@ -1184,20 +1135,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				cameraSyncHandle = null;
 			}
-		}
-		else{
+		}else{
 			prefs=null;
 		}
 
 		if(cameraSyncHandle!=null){
-			if(!(cameraSyncHandle.equals("")))
-			{
+			if(!(cameraSyncHandle.equals(""))){
 				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
 					((ManagerActivityLollipop)context).cameraUploadsClicked();
 					return;
 				}
-			}
-			else{
+			}else{
 				if(n.getName().equals("Camera Uploads")){
 					if (prefs != null){
 						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
@@ -1208,9 +1156,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					return;
 				}
 			}
-		}
-		else{
+
+		}else{
 			if(n.getName().equals("Camera Uploads")){
+
 				if (prefs != null){
 					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
 				}
@@ -1228,23 +1177,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if(prefs!=null){
 			if(prefs.getMegaHandleSecondaryFolder()!=null){
 				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
-			}
-			else{
+			}else{
 				secondaryMediaHandle = null;
 			}
 		}
 
 		if(secondaryMediaHandle!=null){
-			if(!(secondaryMediaHandle.equals("")))
-			{
+			if(!(secondaryMediaHandle.equals(""))){
 				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
 					log("Click on Media Uploads");
 					((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
 					return;
 				}
 			}
-		}
-		else{
+		}else{
 			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
 				if (prefs != null){
 					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
@@ -1687,6 +1633,5 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-
 	}
 }

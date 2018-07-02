@@ -137,6 +137,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToSendFileListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -210,6 +211,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -416,6 +418,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
+	private boolean restoreFromRubbish = false;
 
 	private List<ShareInfo> filePreparedInfos;
 	boolean megaContacts = true;
@@ -2393,8 +2396,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						String text = getIntent().getStringExtra("showSnackbar");
 						if(chatId!=-1){
-							openChat(chatId);
+							openChat(chatId, text);
 						}
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
@@ -2730,15 +2734,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordDialogText.setText(R.string.recovery_key_exported_dialog_text_logout);
 			recoveryKeyButton.setText(R.string.option_export_recovery_key);
 			dismissButton.setText(R.string.option_logout_anyway);
-			params.setMargins(0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
 		else {
 			rememberPasswordDialogText.setText(R.string.remember_pwd_dialog_text);
 			recoveryKeyButton.setText(R.string.action_export_master_key);
 			dismissButton.setText(R.string.general_dismiss);
-			params.setMargins(0, 0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
-		dismissButton.setLayoutParams(params);
 
 		rememberPasswordDialog = builder.create();
 		rememberPasswordDialog.setCancelable(false);
@@ -3100,8 +3101,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					String text = getIntent().getStringExtra("showSnackbar");
 					if(chatId!=-1){
-						openChat(chatId);
+						openChat(chatId, text);
 					}
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
@@ -3242,7 +3244,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	}
 	}
 
-	public void openChat(long chatId){
+	public void openChat(long chatId, String text){
 		log("openChat: "+chatId);
 //		drawerItem=DrawerItem.CHAT;
 //		selectDrawerItemLollipop(drawerItem);
@@ -3254,6 +3256,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 				intentToChat.putExtra("CHAT_ID", chatId);
+				if(text!=null){
+					intentToChat.putExtra("showSnackbar", text);
+				}
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -4030,7 +4035,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						else{
 							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-							aB.setTitle(node.getName());
+							if(node==null){
+								log("Node NULL - cannot be recovered");
+								aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							}
+							else{
+								aB.setTitle(node.getName());
+							}
+
 							firstNavigationLevel = false;
 						}
 						break;
@@ -4056,7 +4068,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 							if(parentHandleIncoming!=-1){
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-								aB.setTitle(node.getName());
+								if(node==null){
+									log("Node NULL - cannot be recovered");
+									aB.setTitle(getResources().getString(R.string.section_shared_items));
+								}
+								else{
+									aB.setTitle(node.getName());
+								}
+
 								firstNavigationLevel = false;
 							}
 							else{
@@ -9399,6 +9418,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		downloadConfirmationDialog.show();
 	}
 
+	public void restoreFromRubbish(final MegaNode node) {
+		log("restoreFromRubbish");
+
+		restoreFromRubbish = true;
+
+		MegaNode newParent = megaApi.getNodeByHandle(node.getRestoreHandle());
+		if(newParent !=null){
+			megaApi.moveNode(node, newParent, this);
+		}
+		else{
+			log("restoreFromRubbish:The restore folder no longer exists");
+		}
+	}
+
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
 		LinearLayout layout = new LinearLayout(this);
@@ -11937,8 +11970,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case DialogInterface.BUTTON_POSITIVE: {
 						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
+
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
+
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -12167,45 +12202,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Send to "+chatHandles.length+" chats");
 
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-			log("Send "+nodeHandles.length+" nodes");
+
+			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			int countChat = chatHandles.length;
-			if(countChat==1){
+			log("Selected: "+countChat+" chats to send");
 
-				if(nodeHandles.length==1){
-					//One chat, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], false);
-					megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
-				}
-				else{
-					//One chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], true);
-					for(int i=0;i<nodeHandles.length;i++){
-						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+			if(nodeHandles!=null){
+				log("Send "+nodeHandles.length+" nodes");
+				MultipleAttachChatListener listener = null;
+				int counter = chatHandles.length*nodeHandles.length;
+				if(countChat==1){
+					if(nodeHandles.length==1){
+						listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+					}
+					else{
+						listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
 					}
 				}
-			}
-			else if(countChat>1){
-
-				if(nodeHandles.length==1){
-					//Many chats, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, false);
-					for(int i=0;i<chatHandles.length;i++){
-						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
-					}
-
-				}
 				else{
-					//Many chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, true);
-					for(int i=0;i<chatHandles.length;i++){
-						for(int j=0;j<nodeHandles.length;j++){
-							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+
+					if(nodeHandles.length==1){
+						listener = new MultipleAttachChatListener(this, -1, false, counter);
+					}
+					else{
+						listener = new MultipleAttachChatListener(this, -1, true, counter);
+					}
+				}
+				if(countChat==1){
+
+					if(nodeHandles.length==1){
+						//One chat, one file
+						megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
+					}
+					else{
+						//One chat, many files
+						for(int i=0;i<nodeHandles.length;i++){
+							megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+						}
+					}
+				}
+				else if(countChat>1){
+
+					if(nodeHandles.length==1){
+						//Many chats, one file
+						for(int i=0;i<chatHandles.length;i++){
+							megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
 						}
 
 					}
+					else{
+						//Many chat, many files
+						for(int i=0;i<chatHandles.length;i++){
+							for(int j=0;j<nodeHandles.length;j++){
+								megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+							}
+						}
+					}
 				}
 			}
+			else if(userHandles!=null){
+				log("Send "+userHandles.length+" contacts");
+
+				for(int i=0;i<chatHandles.length;i++){
+					for(int j=0;j<userHandles.length;j++){
+						MegaHandleList handleList = MegaHandleList.createInstance();
+						handleList.addMegaHandle(userHandles[j]);
+						megaChatApi.attachContacts(chatHandles[i], handleList);
+					}
+				}
+
+				if(countChat==1){
+					openChat(chatHandles[0], null);
+				}
+				else{
+					String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
+					showSnackbar(message);
+				}
+			}
+			else{
+				log("Error on sending to chat");
+			}
+
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -12244,10 +12322,57 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-			final long fileHandle = intent.getLongExtra("SELECT", 0);
+			if(cFLol!=null && cFLol.isAdded()){
+				if(cFLol.isMultipleselect()){
+					cFLol.hideMultipleSelect();
+					cFLol.clearSelectionsNoAnimations();
+				}
+			}
 
-			nC.sendToInbox(fileHandle, selectedContacts);
+			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			long fileHandle = intent.getLongExtra("SELECT", 0);
+
+			//Send file to contacts
+			//Check if all contacts have a chat created
+
+			ArrayList<MegaChatRoom> chats = null;
+			ArrayList<MegaUser> usersNoChat = null;
+
+			for(int i=0; i<selectedContacts.size(); i++){
+
+				MegaUser contact = megaApi.getContact(selectedContacts.get(i));
+
+				MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(contact.getHandle());
+				if(chatRoom!=null){
+					if(chats==null){
+						chats = new ArrayList<MegaChatRoom>();
+					}
+					chats.add(chatRoom);
+
+				}
+				else{
+					if(usersNoChat==null){
+						usersNoChat = new ArrayList<MegaUser>();
+					}
+					usersNoChat.add(contact);
+				}
+			}
+
+			if(usersNoChat==null || usersNoChat.isEmpty()){
+				sendFileToChatsFromContacts(chats, fileHandle);
+
+			}
+			else{
+				//Create first the chats
+				CreateChatToSendFileListener listener = new CreateChatToSendFileListener(chats, usersNoChat, fileHandle, this);
+
+				for(int i=0; i<usersNoChat.size(); i++){
+					MegaChatPeerList peers = MegaChatPeerList.createInstance();
+					peers.addPeer(usersNoChat.get(i).getHandle(), MegaChatPeerList.PRIV_STANDARD);
+					megaChatApi.createChat(false, peers, listener);
+				}
+			}
+
 		}
 		else if(requestCode == Constants.ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
 			if (intent == null) {
@@ -12344,93 +12469,76 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
-			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 
 			//if (megaContacts){
 
-				if(sentToInbox==0){
+			if(multiselectIntent==0){
+				//One file to share
+				final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-					if(multiselectIntent==0){
-						//One file to share
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
+					permissionsDialog.dismiss();
 
-							permissionsDialog.dismiss();
+					switch(item) {
+						case 0:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
+							break;
+						}
+						case 1:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
+							break;
+						}
+						case 2:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
+							break;
+						}
+					}
+					}
+				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+			}
+			else if(multiselectIntent==1){
+				//Several folders to share
+				final long[] nodeHandles = intent.getLongArrayExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE);
 
-							switch(item) {
-								case 0:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
-									break;
-								}
-								case 1:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
-									break;
-								}
-								case 2:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
-									break;
-								}
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+
+						permissionsDialog.dismiss();
+						switch(item) {
+							case 0:{
+								log("ACCESS_READ");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
+								break;
 							}
+							case 1:{
+								log("ACCESS_READWRITE");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
+								break;
 							}
-						});
-						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
-					}
-					else if(multiselectIntent==1){
-						//Several folders to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
+							case 2:{
+								log("ACCESS_FULL");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
-
-								permissionsDialog.dismiss();
-								switch(item) {
-				                    case 0:{
-				                    	log("ACCESS_READ");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
-				                    	break;
-				                    }
-				                    case 1:{
-				                    	log("ACCESS_READWRITE");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
-				                        break;
-				                    }
-				                    case 2:{
-				                    	log("ACCESS_FULL");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
-
-				                        break;
-									}
-								}
+								break;
 							}
-						});
-						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
+						}
 					}
-
-				}
-				else if (sentToInbox==1){
-					if(multiselectIntent==0){
-						//Send one file to one contact
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
-						nC.sendToInbox(nodeHandle, contactsData);
-					}
-					else{
-						//Send multiple files to one contact
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
-						nC.sendToInbox(nodeHandles, contactsData);
-					}
-				}
+				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+			}
 			//}
 			//else{
 				//log("no contact");
@@ -12824,6 +12932,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
+		}
+	}
+
+	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
+		log("sendFileToChatsFromContacts");
+
+		MultipleAttachChatListener listener = null;
+
+		if(chats.size()==1){
+			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
+		}
+		else{
+			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
+		}
+
+		if(chats.size()==1){
+			//One chat, one file
+			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
+		}
+		else if(chats.size()>1){
+			//Many chats, one file
+			for(int i=0;i<chats.size();i++){
+				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
+			}
 		}
 	}
 
@@ -14212,6 +14344,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.INBOX){
 							setInboxNavigationDrawer();
 						}
+						moveToRubbish = false;
+					}
+					else if(restoreFromRubbish){
+						log("Not moved to rubbish");
+						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
+						showSnackbar(getString(R.string.context_correctly_node_restored, destination.getName()));
+						restoreFromRubbish = false;
 					}
 					else{
 						log("Not moved to rubbish");
@@ -14220,7 +14359,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 			}
 			else {
-				showSnackbar(getString(R.string.context_no_moved));
+				if(restoreFromRubbish){
+					showSnackbar(getString(R.string.context_no_restored));
+					restoreFromRubbish = false;
+				}
+				else{
+					showSnackbar(getString(R.string.context_no_moved));
+					moveToRubbish = false;
+				}
 			}
 
 			log("SINGLE move nodes request finished");
@@ -14859,6 +15005,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdateLollipop");
+
 		try {
 			statusDialog.dismiss();
 		}
@@ -16380,5 +16527,80 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void refreshMenu(){
 		log("refreshMenu");
 		supportInvalidateOptionsMenu();
+	}
+
+	public boolean isCameraUploads(MegaNode n){
+		log("isCameraUploads()");
+		String cameraSyncHandle = null;
+
+		//Check if the item is the Camera Uploads folder
+		if(dbH.getPreferences()!=null){
+			prefs = dbH.getPreferences();
+			if(prefs.getCamSyncHandle()!=null){
+				cameraSyncHandle = prefs.getCamSyncHandle();
+			}else{
+				cameraSyncHandle = null;
+			}
+		}else{
+			prefs=null;
+		}
+
+		if(cameraSyncHandle!=null){
+			if(!(cameraSyncHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+					return true;
+				}
+
+			}else{
+				if(n.getName().equals("Camera Uploads")){
+					if (prefs != null){
+						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					}
+					dbH.setCamSyncHandle(n.getHandle());
+					log("FOUND Camera Uploads!!----> "+n.getHandle());
+					return true;
+				}
+			}
+
+		}else{
+			if(n.getName().equals("Camera Uploads")){
+				if (prefs != null){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				}
+				dbH.setCamSyncHandle(n.getHandle());
+				log("FOUND Camera Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+
+		//Check if the item is the Media Uploads folder
+		String secondaryMediaHandle = null;
+
+		if(prefs!=null){
+			if(prefs.getMegaHandleSecondaryFolder()!=null){
+				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
+			}else{
+				secondaryMediaHandle = null;
+			}
+		}
+
+		if(secondaryMediaHandle!=null){
+			if(!(secondaryMediaHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+					log("Click on Media Uploads");
+					return true;
+				}
+			}
+		}else{
+			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+				if (prefs != null){
+					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				}
+				dbH.setSecondaryFolderHandle(n.getHandle());
+				log("FOUND Media Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+		return false;
 	}
 }

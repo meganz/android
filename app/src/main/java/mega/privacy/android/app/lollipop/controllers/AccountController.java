@@ -391,8 +391,8 @@ public class AccountController implements View.OnClickListener{
         String message = context.getString(R.string.toast_master_key_removed);
         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-        if(mAF!=null){
-            mAF.setMkButtonText();;
+        if(mAF!=null && mAF.isAdded()){
+            mAF.setMkButtonText();
         }
         Util.showAlert(((ManagerActivityLollipop) context), message, null);
     }

@@ -47,12 +47,10 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 	TextView expirationAccountTitle;
 	TextView expirationAccountText;
-//	TextView storageAvailableText;
 	ImageView transferQuotaUsedIcon;
 	TextView transferQuotaUsedText;
 
 	TextView totalUsedSpace;
-
 	TextView cloudDriveUsedText;
 	TextView inboxUsedText;
 	TextView incomingUsedText;
@@ -276,6 +274,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 			totalUsedSpace.setText(getString(R.string.recovering_info));
 		}
 		else{
+
 			String usedSpaceString = String.format(context.getString(R.string.my_account_of_string), myAccountInfo.getUsedFormatted(), myAccountInfo.getTotalFormatted());
 			try{
 				usedSpaceString = usedSpaceString.replace("[A]", "<font color=\'#777777\'>");
@@ -285,7 +284,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 			Spanned result = null;
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 				result = Html.fromHtml(usedSpaceString,Html.FROM_HTML_MODE_LEGACY);
-			} else {
+			}else {
 				result = Html.fromHtml(usedSpaceString);
 			}
 
