@@ -609,6 +609,8 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro3TransparentLayout.setVisibility(View.INVISIBLE);
         //END -- PRO III ACCOUNT
 
+        setPricingInfo();
+
         return v;
     }
 

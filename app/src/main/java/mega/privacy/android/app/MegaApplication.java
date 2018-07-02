@@ -421,7 +421,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	public void askForFullAccountInfo(){
-
+		log("askForFullAccountInfo");
 		megaApi.getPaymentMethods(null);
 		megaApi.getAccountDetails(null);
 		megaApi.getPricing(null);
