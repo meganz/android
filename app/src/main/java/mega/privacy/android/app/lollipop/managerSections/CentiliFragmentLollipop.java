@@ -46,7 +46,6 @@ WebView myWebView;
 	MyAccountInfo myAccountInfo;
 	private ActionBar aB;
 	
-	
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -102,9 +101,13 @@ WebView myWebView;
 
 		if(DBUtil.callToPricing(context)){
 			log("megaApi.getPricing SEND");
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}else{
 			getPaymentId();
+		}
+
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		return v;
@@ -112,6 +115,14 @@ WebView myWebView;
 
 	public void getPaymentId(){
 		log("getPaymentId");
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
+
+		if(myAccountInfo == null){
+			return;
+		}
+
 		ArrayList<Product> p = myAccountInfo.getProductAccounts();
 		for (int i=0;i<p.size();i++){
 			Product account = p.get(i);
@@ -217,9 +228,5 @@ WebView myWebView;
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
 
-	}
-
-	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
-		this.myAccountInfo = myAccountInfo;
 	}
 }

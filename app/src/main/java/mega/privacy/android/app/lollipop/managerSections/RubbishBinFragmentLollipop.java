@@ -49,7 +49,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -734,10 +733,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
@@ -769,10 +764,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
@@ -849,10 +841,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);

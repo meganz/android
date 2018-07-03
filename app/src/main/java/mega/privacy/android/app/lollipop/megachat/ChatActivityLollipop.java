@@ -93,9 +93,9 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatForwardListener;
+import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
 import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -1050,6 +1050,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
                             log("ACTION_CHAT_SHOW_MESSAGES");
                             isOpeningChat = true;
+
+                            String text = newIntent.getStringExtra("showSnackbar");
+                            if(text!=null){
+                                showSnackbar(text);
+                            }
 
                             LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyImageView.getLayoutParams();
 
@@ -2083,230 +2088,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             long[] idMessages = intent.getLongArrayExtra("ID_MESSAGES");
             log("Send "+idMessages.length+" messages");
 
-            MultipleAttachChatListener listener = null;
-            if(chatHandles.length==1){
-                for(int i=0;i<idMessages.length;i++){
-                    MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
-                    if(messageToForward!=null){
-                        int type = messageToForward.getType();
-                        log("Type of message to forward: "+type);
-                        switch(type){
-                            case MegaChatMessage.TYPE_NORMAL:{
-                                String text = messageToForward.getContent();
+            MultipleForwardChatProcessor forwardChatProcessor = new MultipleForwardChatProcessor(this, chatHandles, idMessages, idChat);
 
-                                if(chatHandles[0]==idChat){
-                                    sendMessage(text);
-                                }
-                                else{
-                                    megaChatApi.sendMessage(chatHandles[0], text);
-                                }
-
-                                break;
-                            }
-                            case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
-                                MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[0]);
-                                if(chatHandles[0]==idChat){
-                                    if(contactMessage!=null){
-                                        AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                                        sendMessageToUI(androidMsgSent);
-                                    }
-                                }
-
-                                break;
-                            }
-                            case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-                                if(listener == null){
-                                    listener = new MultipleAttachChatListener(this, chatHandles[0]);
-                                }
-                                if(messageToForward.getUserHandle()!=myUserHandle){
-                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                    if(nodeList != null) {
-                                        for (int j = 0; j < nodeList.size(); j++) {
-                                            MegaNode temp = nodeList.get(j);
-                                            String name = temp.getName();
-                                            MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
-                                            if(chatFolder==null){
-                                                log("Error no chat folder - return");
-                                                return;
-                                            }
-                                            MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                            if(nodeToAttach!=null){
-                                                if(chatHandles[0]==idChat){
-                                                    megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), this);
-                                                }
-                                                else{
-                                                    megaChatApi.attachNode(chatHandles[0], nodeToAttach.getHandle(), listener);
-                                                }
-                                            }
-                                            else{
-                                                log("ERROR - Node to attach is NULL - one node not attached");
-                                            }
-                                        }
-                                    }
-                                }
-                                else{
-                                    MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                    if(nodeList != null) {
-                                        for (int j = 0; j < nodeList.size(); j++) {
-                                            MegaNode temp = nodeList.get(j);
-                                            if(chatHandles[0]==idChat){
-                                                megaChatApi.attachNode(chatHandles[0], temp.getHandle(), this);
-                                            }
-                                            else{
-                                                megaChatApi.attachNode(chatHandles[0], temp.getHandle(), listener);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                break;
-                            }case MegaChatMessage.TYPE_CONTAINS_META:{
-                                MegaChatContainsMeta meta = messageToForward.getContainsMeta();
-                                String text = "";
-                                if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                                    text = meta.getRichPreview().getText();
-                                }
-                                if(chatHandles[0]==idChat){
-                                    sendMessage(text);
-                                }
-                                else{
-                                    megaChatApi.sendMessage(chatHandles[0], text);
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                    else{
-                        log("ERROR -> message is null on forwarding");
-                    }
-                }
-            }
-            else{
-
-                for(int k=0;k<chatHandles.length;k++){
-                    for(int i=0;i<idMessages.length;i++){
-                        MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
-                        if(messageToForward!=null){
-                            int type = messageToForward.getType();
-                            log("Type of message to forward: "+type);
-                            switch(type){
-                                case MegaChatMessage.TYPE_NORMAL:{
-                                    String text = messageToForward.getContent();
-                                    if(chatHandles[k]==idChat){
-                                        sendMessage(text);
-                                    }
-                                    else{
-                                        megaChatApi.sendMessage(chatHandles[k], text);
-                                    }
-                                    break;
-                                }
-                                case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
-
-                                    MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[0]);
-                                    if(chatHandles[k]==idChat){
-                                        if(contactMessage!=null){
-                                            AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);
-                                            sendMessageToUI(androidMsgSent);
-                                        }
-                                    }
-
-                                    break;
-                                }
-                                case MegaChatMessage.TYPE_NODE_ATTACHMENT:{
-                                    if(listener == null){
-                                        listener = new MultipleAttachChatListener(this, -1);
-                                    }
-
-                                    if(messageToForward.getUserHandle()!=myUserHandle){
-                                        MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                        if(nodeList != null) {
-                                            for (int j = 0; j < nodeList.size(); j++) {
-                                                MegaNode temp = nodeList.get(j);
-                                                String name = temp.getName();
-                                                MegaNode chatFolder = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
-                                                if(chatFolder==null){
-                                                    log("Error no chat folder - return");
-                                                    return;
-                                                }
-                                                MegaNode nodeToAttach = megaApi.getNodeByPath(name, chatFolder);
-                                                if(nodeToAttach!=null){
-                                                    if(chatHandles[k]==idChat){
-                                                        megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), this);
-                                                    }
-                                                    else{
-                                                        megaChatApi.attachNode(chatHandles[k], nodeToAttach.getHandle(), listener);
-                                                    }
-                                                }
-                                                else{
-                                                    log("ERROR - Node to attach is NULL - one node not attached");
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        MegaNodeList nodeList = messageToForward.getMegaNodeList();
-                                        if(nodeList != null) {
-                                            for (int j = 0; j < nodeList.size(); j++) {
-                                                MegaNode temp = nodeList.get(j);
-
-                                                if(chatHandles[k]==idChat){
-                                                    megaChatApi.attachNode(chatHandles[k], temp.getHandle(), this);
-                                                }
-                                                else{
-                                                    megaChatApi.attachNode(chatHandles[k], temp.getHandle(), listener);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    break;
-                                }case MegaChatMessage.TYPE_CONTAINS_META:{
-                                    MegaChatContainsMeta meta = messageToForward.getContainsMeta();
-                                    String text = "";
-                                    if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                                        text = meta.getRichPreview().getText();
-                                    }
-                                    if(chatHandles[k]==idChat){
-                                        sendMessage(text);
-                                    }
-                                    else{
-                                        megaChatApi.sendMessage(chatHandles[k], text);
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-                        else{
-                            log("ERROR -> message is null on forwarding");
-                        }
-                    }
-                }
-            }
-
-            if(listener==null){
-                if(chatHandles.length==1){
-                    if(chatHandles[0] == idChat){
-                        try{
-                            statusDialog.dismiss();
-                        } catch(Exception ex) {};
-
-                        if(adapter!=null){
-                            if(adapter.isMultipleSelect()){
-                                clearSelections();
-                                hideMultipleSelect();
-                            }
-                        }
-                    }
-                    else{
-                        openChatAfterForward(chatHandles[0]);
-                    }
-                }
-                else{
-                    openChatAfterForward(-1);
-                }
-            }
+            forwardChatProcessor.forward();
         }
         else if (requestCode == Constants.TAKE_PHOTO_CODE && resultCode == RESULT_OK) {
             if (resultCode == Activity.RESULT_OK) {
@@ -3187,7 +2971,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 }
 
                                 int type = selected.get(0).getMessage().getType();
-                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE) {
+                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 } else{
                                     if(Util.isOnline(chatActivity)){
@@ -3203,7 +2987,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 importIcon.setVisible(false);
 
                                 int type = selected.get(0).getMessage().getType();
-                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE) {
+                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 } else{
                                     if(Util.isOnline(chatActivity)){
@@ -3250,7 +3034,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                             if (showForward) {
                                 int type = selected.get(i).getMessage().getType();
-                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE) {
+                                if (type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED) {
                                     showForward = false;
                                 }
                             }
@@ -3455,6 +3239,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    }
                 }
             }else{
+
                 if(m!=null){
                     if(m.isUploading()){
                         if(m.getPendingMessage().getState()==PendingMessage.STATE_ERROR){
@@ -5785,9 +5570,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void removePendingMsg(long id){
         log("removePendingMsg: "+selectedMessageId);
-        dbH.removePendingMessageById(id);
-        messages.remove(selectedPosition);
-        adapter.removeMessage(selectedPosition, messages);
+        try{
+            dbH.removePendingMessageById(id);
+            messages.remove(selectedPosition);
+            adapter.removeMessage(selectedPosition, messages);
+        }
+        catch (IndexOutOfBoundsException e){
+            log("removePendingMsg: EXCEPTION: "+e.getMessage());
+        }
     }
 
     public void showSnackbar(String s){
@@ -5796,6 +5586,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
         snackbar.show();
+    }
+
+    public void removeProgressDialog(){
+        try{
+            statusDialog.dismiss();
+        } catch(Exception ex) {};
     }
 
     public void showSnackbarNotSpace(){
@@ -6415,7 +6211,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         else{
             log("Proceed to import nodes to own Cloud");
-            ChatForwardListener listener = new ChatForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, this);
+            ChatImportToForwardListener listener = new ChatImportToForwardListener(Constants.MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), this);
 
             MegaNode target = megaApi.getNodeByPath(Constants.CHAT_FOLDER, megaApi.getRootNode());
             if(target==null){
@@ -6465,7 +6261,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
     }
 
-    public void openChatAfterForward(long chatHandle){
+    public void openChatAfterForward(long chatHandle, String text){
         log("openChatAfterForward");
         try{
             statusDialog.dismiss();
@@ -6473,6 +6269,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatHandle==idChat){
             log("Chat already opened");
+
+            try{
+                statusDialog.dismiss();
+            } catch(Exception ex) {};
+
+            if(adapter!=null){
+                if(adapter.isMultipleSelect()){
+                    clearSelections();
+                    hideMultipleSelect();
+                }
+            }
+
+            if(text!=null){
+                showSnackbar(text);
+            }
         }
         else{
             if(chatHandle!=-1){
@@ -6482,6 +6293,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentOpenChat.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
                 intentOpenChat.putExtra("CHAT_ID", chatHandle);
+                if(text!=null){
+                    intentOpenChat.putExtra("showSnackbar", text);
+                }
                 startActivity(intentOpenChat);
                 finish();
             }
@@ -6490,7 +6304,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     clearSelections();
                     hideMultipleSelect();
                 }
-                showSnackbar(getString(R.string.messages_forwarded_success));
+                if(text!=null){
+                    showSnackbar(text);
+                }
             }
         }
     }

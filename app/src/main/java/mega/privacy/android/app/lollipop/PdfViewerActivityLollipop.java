@@ -101,7 +101,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -210,7 +209,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     private RelativeLayout bottomLayout;
     private TextView fileNameTextView;
-    int accountType;
     int typeExport = -1;
     private Handler handler;
     private AlertDialog renameDialog;
@@ -259,13 +257,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             pdfFileName = savedInstanceState.getString("pdfFileName");
             uri = Uri.parse(savedInstanceState.getString("uri"));
             renamed = savedInstanceState.getBoolean("renamed");
-            accountType = savedInstanceState.getInt("typeAccount");
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
             toolbarVisible = savedInstanceState.getBoolean("toolbarVisible", toolbarVisible);
         }
         else {
             currentPage = 1;
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
@@ -660,7 +656,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else {
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;
@@ -859,7 +855,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putString("pdfFileName", pdfFileName);
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
-        outState.putInt("typeAccount", accountType);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
         outState.putBoolean("toolbarVisible", toolbarVisible);
     }
@@ -2337,7 +2332,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         log("showGetLinkActivity");
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
-        linkIntent.putExtra("account", accountType);
         startActivity(linkIntent);
     }
 
@@ -3279,9 +3273,5 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
-    }
-
-    public int getAccountType() {
-        return accountType;
     }
 }

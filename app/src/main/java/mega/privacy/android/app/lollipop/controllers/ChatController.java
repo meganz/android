@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -99,6 +100,20 @@ public class ChatController {
         }
         else if(context instanceof ChatActivityLollipop){
             megaChatApi.leaveChat(chat.getChatId(), (ChatActivityLollipop) context);
+        }
+    }
+
+    public void selectChatsToAttachContact(MegaUser contact){
+        log("selectChatsToSendNode");
+
+        long[] longArray = new long[1];
+        longArray[0] = contact.getHandle();
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("USER_HANDLES", longArray);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 
@@ -697,7 +712,6 @@ public class ChatController {
                     log("Content: " + message.getContent());
                     return "";
                 }
-
             }
         }
     }
@@ -1177,12 +1191,6 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                 service.putExtra("fromMV", true);
-                if (context instanceof AudioVideoPlayerLollipop){
-                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                }
             }
             context.startService(service);
         }
@@ -1265,12 +1273,6 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                 service.putExtra("fromMV", true);
-                if (context instanceof AudioVideoPlayerLollipop){
-                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                }
             }
             context.startService(service);
         }
@@ -1696,12 +1698,6 @@ public class ChatController {
                         service.putExtra(DownloadService.EXTRA_PATH, path);
                         if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                             service.putExtra("fromMV", true);
-                            if (context instanceof AudioVideoPlayerLollipop){
-                                service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                            }
-                            else if (context instanceof PdfViewerActivityLollipop){
-                                service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                            }
                         }
                         context.startService(service);
                     }
