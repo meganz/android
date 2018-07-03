@@ -308,6 +308,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     ExtractorsFactory extractorsFactory;
     MediaSource mediaSource = null;
     boolean creatingPlaylist = true;
+    boolean playListCreated = false;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -978,18 +979,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void onTimelineChanged(Timeline timeline, Object manifest) {
                     log("onTimelineChanged");
+                    enableNextButton();
                 }
 
                 @Override
                 public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
                     log("onTracksChanged");
                     if (!creatingPlaylist) {
-                        int previousIndex = currentWindowIndex;
+//                        int previousIndex = currentWindowIndex;
                         if (size > 1) {
                             currentWindowIndex = player.getCurrentWindowIndex();
-                            if (currentWindowIndex == previousIndex && onTracksChange && !loop) {
-                                currentWindowIndex++;
-                            }
+//                            if (currentWindowIndex == previousIndex && onTracksChange && !loop) {
+//                                currentWindowIndex++;
+//                            }
 
                             if (isOffLine) {
                                 MegaOffline n = mediaOffList.get(currentWindowIndex);
@@ -1032,13 +1034,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                     onTracksChange = true;
                     updateContainers();
+                    enableNextButton();
                 }
 
                 @Override
                 public void onLoadingChanged(boolean isLoading) {
                     log("onLoadingChanged");
-
                     updateContainers();
+                    enableNextButton();
                 }
 
                 @Override
@@ -1055,8 +1058,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             progressBar.setVisibility(View.VISIBLE);
                         }
                     }
-                    else if (playbackState == Player.STATE_ENDED && !loop && !onPlaylist) {
-                        showActionStatusBar();
+                    else if (playbackState == Player.STATE_ENDED) {
+                        if (creatingPlaylist){
+                            player.prepare(concatenatingMediaSource);
+                            player.seekTo(currentWindowIndex+1, 0);
+                            creatingPlaylist = false;
+                        }
+                        else if (!loop && !onPlaylist && !creatingPlaylist) {
+                            showActionStatusBar();
+                        }
                     }
                     else {
                         if (onPlaylist) {
@@ -1075,16 +1085,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                         updateContainers();
                     }
+                    enableNextButton();
                 }
 
                 @Override
                 public void onRepeatModeChanged(int repeatMode) {
                     log("onRepeatModeChanged");
+                    enableNextButton();
                 }
 
                 @Override
                 public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
                     log("onShuffleModeEnabledChanged");
+                    enableNextButton();
                 }
 
                 @Override
@@ -1096,16 +1109,19 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 @Override
                 public void onPositionDiscontinuity(int reason) {
                     log("onPositionDiscontinuity");
+                    enableNextButton();
                 }
 
                 @Override
                 public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
                     log("onPlaybackParametersChanged");
+                    enableNextButton();
                 }
 
                 @Override
                 public void onSeekProcessed() {
                     log("onSeekProcessed");
+                    enableNextButton();
                 }
             });
             numErrors = 0;
@@ -1121,6 +1137,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             log("Error creating player");
+        }
+    }
+
+    void enableNextButton() {
+        if (creatingPlaylist && playListCreated){
+            if (onPlaylist){
+                if (playlistFragment != null && playlistFragment.isAdded()){
+                    playlistFragment.nextButton.setEnabled(true);
+                    playlistFragment.nextButton.setAlpha(1F);
+                }
+            }
+            else {
+                nextButton.setEnabled(true);
+                nextButton.setAlpha(1F);
+            }
         }
     }
 
@@ -1631,6 +1662,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             if (video){
                 simpleExoPlayerView.showController();
+                if (creatingPlaylist){
+                    enableNextButton();
+                }
                 containerControls.animate().translationY(0).setDuration(400L).start();
             }
         }
@@ -4059,6 +4093,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (loop && player != null){
                 player.setRepeatMode(Player.REPEAT_MODE_OFF);
             }
+            if (creatingPlaylist && player != null){
+                player.prepare(concatenatingMediaSource);
+                player.seekTo(currentWindowIndex+1, 0);
+                creatingPlaylist = false;
+            }
         }
 
         return false;
@@ -4076,9 +4115,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void instantiatePlaylist(){
+        findSelected();
         if (player != null) {
-//            player.setPlayWhenReady(false);
             playWhenReady = player.getPlayWhenReady();
+            if (creatingPlaylist){
+                player.prepare(concatenatingMediaSource);
+                player.seekTo(currentWindowIndex, currentTime);
+                creatingPlaylist = false;
+            }
         }
         onPlaylist = true;
         progressBar.setVisibility(View.GONE);
@@ -4100,12 +4144,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         ft.replace(R.id.fragment_container, playlistFragment, "playlistFragment");
         ft.commitNowAllowingStateLoss();
 
-        if (playlistProgressBar != null){
-            playlistProgressBar.setVisibility(View.GONE);
-        }
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
+        showToolbar();
     }
 
     public class CreatePlayList extends AsyncTask<Void, Void, Void> {
@@ -4113,6 +4155,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         @Override
         protected Void doInBackground(Void... voids) {
             log("CreatePlayList doInBackground");
+            playListCreated = false;
             final List<MediaSource> playlist = new ArrayList<>();
             MediaSource mSource = null;
             String localPath;
@@ -4195,11 +4238,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         protected void onPostExecute(Void avoid) {
             super.onPostExecute(avoid);
             log("CreatePlayList onPostExecute");
-            player.prepare(concatenatingMediaSource);
             createPlaylistProgressBar.setVisibility(View.GONE);
+            enableNextButton();
             playList.setVisibility(View.VISIBLE);
-            player.seekTo(currentWindowIndex, currentTime);
-            creatingPlaylist = false;
+            playListCreated = true;
         }
     }
 

@@ -330,6 +330,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         setContentView(R.layout.activity_pdfviewer);
 
+        pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+
         if (Build.VERSION.SDK_INT >= 26) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
@@ -526,8 +528,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 finish();
             }
         });
-
-        pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
 
         if (!toolbarVisible) {
             setToolbarVisibilityHide(0L);
