@@ -1813,7 +1813,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					int duration = Integer.parseInt(durationString);
 					int termCode = Integer.parseInt(termCodeString);
 
-
 					switch(termCode){
 						case MegaChatMessage.END_CALL_REASON_ENDED:{
 

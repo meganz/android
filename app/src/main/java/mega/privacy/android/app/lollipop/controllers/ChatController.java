@@ -625,7 +625,100 @@ public class ChatController {
                     }else{
                        return "";
                     }
-                }else{
+                } else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                    String textToShow = "";
+                    switch(message.getTermCode()){
+                        case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+                            int minutes = (message.getDuration() % 3600) / 60;
+                            int seconds = message.getDuration() % 60;
+
+                            if(minutes == 0){
+                                textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                            }
+                            else{
+                                if(seconds == 0){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+                                }
+                                else if (seconds == 1){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+                                }
+                                else{
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                                }
+                            }
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                                textToShow = textToShow.replace("[C]", "");
+                                textToShow = textToShow.replace("[/C]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+                            textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+                            textToShow = String.format(context.getString(R.string.call_not_answered_messages));
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+                            textToShow = String.format(context.getString(R.string.call_failed_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+                            textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                    }
+
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else{
                     return "";
                 }
             } else {
@@ -707,7 +800,101 @@ public class ChatController {
                     }else{
                         return "";
                     }
-                }else{
+                }
+                else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                    String textToShow = "";
+                    switch(message.getTermCode()){
+                        case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+                            int minutes = (message.getDuration() % 3600) / 60;
+                            int seconds = message.getDuration() % 60;
+
+                            if(minutes == 0){
+                                textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                            }
+                            else{
+                                if(seconds == 0){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+                                }
+                                else if (seconds == 1){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+                                }
+                                else{
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                                }
+                            }
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                                textToShow = textToShow.replace("[C]", "");
+                                textToShow = textToShow.replace("[/C]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+                            textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+                            textToShow = String.format(context.getString(R.string.call_missed_messages));
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+                            textToShow = String.format(context.getString(R.string.call_failed_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+                            textToShow = String.format(context.getString(R.string.call_missed_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                    }
+
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else{
                     log("Type message: " + message.getType());
                     log("Content: " + message.getContent());
                     return "";
