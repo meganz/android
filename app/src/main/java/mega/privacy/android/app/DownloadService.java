@@ -43,7 +43,6 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -119,7 +118,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
-	int typeAccount;
 
 	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
@@ -223,7 +221,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
-		typeAccount = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 
         boolean fromMV = intent.getBooleanExtra("fromMV", false);
         log("fromMV: "+fromMV);
@@ -643,7 +640,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (!fromMV) {
 							Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 
-							pdfIntent.putExtra("typeAccount", typeAccount);
 							pdfIntent.putExtra("HANDLE", handle);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -687,7 +683,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								internalIntent = true;
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
-							mediaIntent.putExtra("typeAccount", typeAccount);
+
 							mediaIntent.putExtra("isPlayList", false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);

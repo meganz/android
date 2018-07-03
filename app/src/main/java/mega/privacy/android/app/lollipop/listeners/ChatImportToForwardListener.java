@@ -14,20 +14,20 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class ChatForwardListener implements MegaRequestListenerInterface {
+public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
     Context context;
 
-    public ChatForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, Context context) {
+    public ChatImportToForwardListener(int action, ArrayList<AndroidMegaChatMessage> messagesSelected, int counter, Context context) {
         super();
         this.actionListener = action;
         this.context = context;
+        this.counter = counter;
         this.messagesSelected = messagesSelected;
     }
 
     int counter = 0;
     int error = 0;
-    int max_items = 0;
     int actionListener = -1;
     String message;
     ArrayList<AndroidMegaChatMessage> messagesSelected;
@@ -51,11 +51,6 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
-        counter++;
-        if(counter>max_items){
-            max_items=counter;
-        }
-        log("Counter on RequestStart: "+counter);
     }
 
     @Override
@@ -79,7 +74,7 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
                     if(actionListener==Constants.MULTIPLE_FORWARD_MESSAGES){
                         //Many files shared with one contacts
                         if(error>0){
-                            message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, max_items);
+                            message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
                             if(context instanceof ChatActivityLollipop){
                                 ((ChatActivityLollipop) context).removeRequestDialog();
                                 ((ChatActivityLollipop) context).showSnackbar(message);
@@ -100,6 +95,6 @@ public class ChatForwardListener implements MegaRequestListenerInterface {
     }
 
     private static void log(String log) {
-        Util.log("ChatForwardListener", log);
+        Util.log("ChatImportToForwardListener", log);
     }
 }

@@ -93,10 +93,8 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -138,7 +136,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	Toolbar tB;
 	ActionBar aB;
 
-	int accountType;
 	private boolean isGetLink = false;
 	float scaleText;
 
@@ -836,7 +833,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		handler = new Handler();
 		fullScreenImageViewer = this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
 
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -864,7 +861,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		positionG = intent.getIntExtra("position", 0);
 		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
-		accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
 		adapterType = intent.getIntExtra("adapterType", 0);
 
 		MegaApplication app = (MegaApplication)getApplication();
@@ -1590,7 +1587,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	};
 
 	public void getImageView (int i, long handle) {
-		Intent intent = new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION);
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
 		intent.putExtra("actionType", Constants.UPDATE_IMAGE_DRAG);
 		intent.putExtra("adapterType", adapterType);
@@ -1635,7 +1632,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	void scrollToPosition (int i, long handle) {
 		getImageView(i, handle);
-		Intent intent = new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION);
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
 		intent.putExtra("actionType", Constants.SCROLL_TO_POSITION);
 		intent.putExtra("adapterType", adapterType);
@@ -2310,7 +2307,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		log("showGetLinkActivity");
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
-		linkIntent.putExtra("account", accountType);
 		startActivity(linkIntent);
 	}
 

@@ -36,8 +36,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.zxing.Result;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
@@ -838,8 +836,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 //		}
 
 		if(myAccountInfo == null){
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		for (int i=0;i<contacts.size();i++){
@@ -1338,5 +1335,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	public void setVisibleContacts(ArrayList<MegaContactAdapter> visibleContacts) {
 		this.visibleContacts = visibleContacts;
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
 	}
 }

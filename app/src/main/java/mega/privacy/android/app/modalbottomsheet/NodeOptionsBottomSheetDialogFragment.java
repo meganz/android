@@ -39,7 +39,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -78,13 +77,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     private TextView optionShareText;
     private LinearLayout optionClearShares;
     private LinearLayout optionLeaveShares;
-    private LinearLayout optionSendInbox;
     private LinearLayout optionSendChat;
     private LinearLayout optionRename;
     private LinearLayout optionMove;
     private LinearLayout optionCopy;
     private LinearLayout optionRubbishBin;
     private LinearLayout optionRemove;
+    private LinearLayout optionRestoreFromRubbish;
     private LinearLayout optionOpenFolder;
     private LinearLayout optionOpenWith;
 
@@ -180,14 +179,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionShareText = (TextView) contentView.findViewById(R.id.option_share_text);
         optionClearShares = (LinearLayout) contentView.findViewById(R.id.option_clear_share_layout);
         optionLeaveShares = (LinearLayout) contentView.findViewById(R.id.option_leave_share_layout);
-        optionSendInbox = (LinearLayout) contentView.findViewById(R.id.option_send_inbox_layout);
-        optionSendInbox.setVisibility(View.GONE);
+
         optionSendChat = (LinearLayout) contentView.findViewById(R.id.option_send_chat_layout);
         optionRename = (LinearLayout) contentView.findViewById(R.id.option_rename_layout);
         optionMove = (LinearLayout) contentView.findViewById(R.id.option_move_layout);
         optionCopy = (LinearLayout) contentView.findViewById(R.id.option_copy_layout);
         optionRubbishBin = (LinearLayout) contentView.findViewById(R.id.option_rubbish_bin_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
+        optionRestoreFromRubbish = (LinearLayout) contentView.findViewById(R.id.option_restore_layout);
         optionOpenFolder = (LinearLayout) contentView.findViewById(R.id.option_open_folder_layout);
         optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
 
@@ -198,12 +197,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionShare.setOnClickListener(this);
         optionClearShares.setOnClickListener(this);
         optionLeaveShares.setOnClickListener(this);
-//        optionSendInbox.setOnClickListener(this);
         optionRename.setOnClickListener(this);
         optionSendChat.setOnClickListener(this);
         optionMove.setOnClickListener(this);
         optionCopy.setOnClickListener(this);
         optionRubbishBin.setOnClickListener(this);
+        optionRestoreFromRubbish.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionOpenFolder.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
@@ -237,8 +236,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
                     } else if (node.isOutShare() || megaApi.isPendingShare(node)) {
                         nodeThumb.setImageResource(R.drawable.ic_folder_outgoing);
-                    } else {
-                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                    }
+                    else{
+//                        nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                        if(((ManagerActivityLollipop) context).isCameraUploads(node)){
+                            nodeThumb.setImageResource(R.drawable.ic_folder_image_list);
+                        }else{
+                            nodeThumb.setImageResource(R.drawable.ic_folder_list);
+                        }
                     }
                     optionSendChat.setVisibility(View.GONE);
                 } else {
@@ -333,6 +338,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionRemove.setVisibility(View.GONE);
                         optionLeaveShares.setVisibility(View.GONE);
                         optionOpenFolder.setVisibility(View.GONE);
+                        optionRestoreFromRubbish.setVisibility(View.GONE);
 
                     } else if (tabSelected == 1) {
                         log("show Rubbish bottom sheet");
@@ -340,6 +346,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                             optionInfoText.setText(R.string.general_folder_info);
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
+                        }
+
+                        long restoreHandle = node.getRestoreHandle();
+                        if(restoreHandle!=-1){
+                            MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+                            if((!megaApi.isInRubbish(node)) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
+                                optionRestoreFromRubbish.setVisibility(View.GONE);
+                            }
+                            else{
+                                optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        else{
+                            optionRestoreFromRubbish.setVisibility(View.GONE);
                         }
 
                         nodeIconLayout.setVisibility(View.GONE);
@@ -360,7 +380,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.GONE);
                         optionSendChat.setVisibility(View.GONE);
-
                     }
                     break;
 
@@ -405,6 +424,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionLeaveShares.setVisibility(View.GONE);
                     optionOpenFolder.setVisibility(View.GONE);
                     optionShare.setVisibility(View.GONE);
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
 
                     break;
                 }
@@ -576,6 +596,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOpenFolder.setVisibility(View.GONE);
                     }
 
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
+
                     break;
                 }
                 case SEARCH: {
@@ -629,6 +651,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     optionCopy.setVisibility(View.GONE);
                     optionClearShares.setVisibility(View.GONE);
                     optionLeaveShares.setVisibility(View.GONE);
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
                     break;
                 }
             }
@@ -798,10 +821,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
                 }
                 i.putExtra("name", node.getName());
-                MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                if(accountInfo!=null){
-                    i.putExtra("typeAccount", accountInfo.getAccountType());
-                }
+
                 context.startActivity(i);
                 dismissAllowingStateLoss();
                 break;
@@ -860,37 +880,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     return;
                 }
                 ((ManagerActivityLollipop) context).showConfirmationLeaveIncomingShare(node);
-                break;
-            }
-            case R.id.option_send_inbox_layout:{
-                log("Send inbox option");
-                if(node==null){
-                    log("The selected node is NULL");
-                    return;
-                }
-
-                if(megaApi!=null && megaApi.getRootNode()!=null){
-                    ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if(contacts==null){
-                        if(context instanceof ManagerActivityLollipop){
-                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-                        }
-                    }
-                    else {
-                        if(contacts.isEmpty()){
-                            ((ManagerActivityLollipop) context).showSnackbar("You have no MEGA contacts. Please, invite friends from the Contacts section");
-                        }
-                        else{
-                            nC.selectContactToSendNode(node);
-                        }
-                    }
-                }
-                else{
-                    log("Online but not megaApi");
-                    ((ManagerActivityLollipop) context).showSnackbar(getString(R.string.error_server_connection_problem));
-                }
-
-                dismissAllowingStateLoss();
                 break;
             }
             case R.id.option_send_chat_layout:{
@@ -978,7 +967,17 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                openWith ();
+                openWith();
+                break;
+            }
+            case R.id.option_restore_layout:{
+                log("Restore option");
+                if(node==null){
+                    log("The selected node is NULL");
+                    return;
+                }
+                ((ManagerActivityLollipop) context).restoreFromRubbish(node);
+
                 break;
             }
         }

@@ -654,7 +654,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 		else{
-			holder.iconView.setImageResource(R.drawable.ic_folder_list);
+			holder.iconView.setImageResource(R.drawable.ic_folder);
 			holder.imageView.setVisibility(View.GONE);
 			holder.iconView.setVisibility(View.VISIBLE);
 		}

@@ -1947,20 +1947,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 					log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
 
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 					if(chat.isGroup()){
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
 						holder.currentPosition = position;
 						holder.userHandle = lastMsgSender;
 
-						String fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-						if(fullNameAction==null){
-							fullNameAction = "";
-						}
+						String fullNameAction = "";
+						if(chatRoom!=null){
+							fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+							if(fullNameAction==null){
+								fullNameAction = "";
+							}
 
-						if(fullNameAction.trim().length()<=0){
-							fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+							if(fullNameAction.trim().length()<=0){
+								fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+							}
+						}
+						else{
+							log("ERROR: the chatroom is NULL: "+chat.getChatId());
 						}
 
 						if(fullNameAction.trim().length()<=0){
