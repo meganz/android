@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -233,6 +234,12 @@ public class PlaylistFragment extends Fragment{
             setNodesSearch(((AudioVideoPlayerLollipop) context).querySearch);
         }
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ((AudioVideoPlayerLollipop) context).showToolbar();
     }
 
     @Override
