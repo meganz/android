@@ -115,12 +115,15 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 , intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
-                .setColor(ContextCompat.getColor(this,R.color.mega))
                 .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), pendingIntent)
                 .setOngoing(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+        }
 
         String title = null;
         String email = null;

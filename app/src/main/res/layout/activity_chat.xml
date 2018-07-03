@@ -88,12 +88,12 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:textSize="14sp"
-                            android:hint="@string/type_message_hint"
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
                             emojicon:emojiconSize="16sp"
                             android:minLines="1"
-                            android:maxLines="5"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:textColor="@color/black"/>
 
                         <RelativeLayout

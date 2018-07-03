@@ -819,7 +819,7 @@ public class Util {
 				}
 				if(cursor != null) cursor.close();
 			}
-			else if(MimeTypeList.typeForName(fileName).isVideo())
+			else if(MimeTypeList.typeForName(fileName).isVideoReproducible())
 			{
 				final String[] projection = { MediaStore.Video.Media.DATA };
 				final String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
@@ -848,7 +848,36 @@ public class Util {
 			        if(new File(path).exists()) return path;
 				}
 				if(cursor != null) cursor.close();
-			}	
+			}
+			else if (MimeTypeList.typeForName(fileName).isAudio()) {
+				final String[] projection = { MediaStore.Audio.Media.DATA };
+				final String selection = MediaStore.Audio.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Audio.Media.SIZE + " = ?";
+				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+
+				cursor = context.getContentResolver().query(
+						Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
+						selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+					String path =  cursor.getString(dataColumn);
+					cursor.close();
+					cursor = null;
+					if(new File(path).exists()) return path;
+				}
+				if(cursor != null) cursor.close();
+
+				cursor = context.getContentResolver().query(
+						Video.Media.INTERNAL_CONTENT_URI, projection, selection,
+						selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+					int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+					String path =  cursor.getString(dataColumn);
+					cursor.close();
+					cursor = null;
+					if(new File(path).exists()) return path;
+				}
+				if(cursor != null) cursor.close();
+			}
 		} catch (Exception e) 
 		{
 			if(cursor != null) cursor.close();

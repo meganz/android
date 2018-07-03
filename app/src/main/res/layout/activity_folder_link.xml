@@ -34,28 +34,35 @@
             android:paddingTop="3dp"
             android:textColor="@color/white"
             android:textSize="14sp" />
+
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center_horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/options_explorer_layout">
 
-            <ImageView
-                android:id="@+id/folder_link_list_empty_image"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true" />
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_horizontal|center_vertical">
 
-            <TextView
-                android:id="@+id/folder_link_list_empty_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/folder_link_list_empty_image"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/text_secondary"
-                android:textSize="16sp" />
+                <ImageView
+                    android:id="@+id/folder_link_list_empty_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:id="@+id/folder_link_list_empty_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/folder_link_list_empty_image"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="18sp" />
             </RelativeLayout>
 
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/options_folder_link_layout"
@@ -76,7 +83,7 @@
                android:minWidth="0dp"
                android:layout_marginRight="16dp"
                android:background="@color/participants_layout"
-               android:text="@string/general_import"/>
+               android:text="@string/add_to_cloud_import"/>
 
             <Button
                 android:id="@+id/folder_link_button_download"

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -149,7 +150,15 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		switch (v.getId()){
 			case R.id.photo_sync_list_item_layout:{
 				if (type == Constants.CAMERA_UPLOAD_ADAPTER){
-					((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition);
+					ImageView imageView = (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+					int[] positionIV = new int[2];
+					imageView.getLocationOnScreen(positionIV);
+					int[] screenPosition = new int[4];
+					screenPosition[0] = positionIV[0];
+					screenPosition[1] = positionIV[1];
+					screenPosition[2] = imageView.getWidth();
+					screenPosition[3] = imageView.getHeight();
+					((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition, imageView, screenPosition);
 				}
 				break;
 			}

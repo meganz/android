@@ -10,19 +10,26 @@
 		    android:descendantFocusability="blocksDescendants"
 		    android:id="@+id/photo_sync_list_item_layout"
 		    android:background="@drawable/statelist_item_layout">
-	   
-	    <ImageView
-	        android:id="@+id/photo_sync_list_thumbnail"
-			android:layout_width="36dp"
-			android:layout_height="36dp"
-			android:scaleType="fitCenter"
-			android:layout_centerVertical="true"
-	        android:layout_marginLeft="18dp"
-			android:layout_marginRight="18dp"/>
+
+			<RelativeLayout
+				android:layout_width="36dp"
+				android:layout_height="match_parent"
+				android:layout_marginLeft="18dp"
+				android:layout_marginRight="18dp"
+				android:id="@+id/container_thumbnail">
+
+				<ImageView
+					android:id="@+id/photo_sync_list_thumbnail"
+					android:layout_width="36dp"
+					android:layout_height="36dp"
+					android:scaleType="fitCenter"
+					android:layout_centerVertical="true"/>
+			</RelativeLayout>
+
 			<LinearLayout
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_toRightOf="@id/photo_sync_list_thumbnail"
+				android:layout_toRightOf="@id/container_thumbnail"
 				android:gravity="center_vertical"
 				android:orientation="vertical">
 				<TextView

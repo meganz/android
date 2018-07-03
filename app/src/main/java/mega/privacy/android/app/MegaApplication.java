@@ -26,7 +26,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
+import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
@@ -59,14 +60,15 @@ import nz.mega.sdk.MegaUser;
 
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/3.3.5_196";
+
+	static final public String USER_AGENT = "MEGAAndroid/3.3.7_201";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
-	final static private String APP_KEY = "6tioyn8ka5l6hty";
+	final static public String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
 	private static boolean activityVisible = false;
@@ -79,7 +81,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private static long openChatId = -1;
 
+	private static boolean closedChat = true;
+
 	private static long openCallChatId = -1;
+
+	private static boolean showRichLinkWarning = false;
+	private static int counterNotNowRichLinkWarning = -1;
+	private static boolean enabledRichLinks = false;
 
 	private static boolean recentChatVisible = false;
 	private static boolean chatNotificationReceived = false;
@@ -135,7 +143,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				if (e.getErrorCode() == MegaError.API_OK){
 					if (megaApi != null){
 						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption ");
-						log("BackgroundRequestListener:onRequestFinish: enableTransferResumption - Session: " + megaApi.dumpSession());
 //						megaApi.enableTransferResumption();
 					}
 				}
@@ -186,30 +193,39 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	private final int interval = 3000;
 	private Handler keepAliveHandler = new Handler();
+	int backgroundStatus = -1;
 
 	private Runnable keepAliveRunnable = new Runnable() {
 		@Override
 		public void run() {
+
 			try {
 
 				if (activityVisible) {
-					log("SEND KEEPALIVE");
+					log("KEEPALIVE: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
-						megaChatApi.setBackgroundStatus(false);
+						backgroundStatus = megaChatApi.getBackgroundStatus();
+						log("backgroundStatus_activityVisible: " + backgroundStatus);
+						if (backgroundStatus != -1){
+							if (backgroundStatus != 0){
+								megaChatApi.setBackgroundStatus(false);
+							}
+						}
 					}
 
 				} else {
-					log("SEND KEEPALIVEAWAY");
+					log("KEEPALIVEAWAY: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
-						megaChatApi.setBackgroundStatus(true);
+						backgroundStatus = megaChatApi.getBackgroundStatus();
+						log("backgroundStatus_!activityVisible: " + backgroundStatus);
+						if (backgroundStatus != -1){
+							if (backgroundStatus != 1){
+								megaChatApi.setBackgroundStatus(true);
+							}
+						}
 					}
 				}
 
-				if (activityVisible) {
-					log("Handler KEEPALIVE: " + System.currentTimeMillis());
-				} else {
-					log("Handler KEEPALIVEAWAY: " + System.currentTimeMillis());
-				}
 				keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis() + interval);
 				keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 			}
@@ -710,13 +726,39 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
-		// TODO Auto-generated method stub
+		log("onAccountUpdate");
 	}
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
 
+		if(requests!=null){
+			for (int i = 0; i < requests.size(); i++) {
+				MegaContactRequest cr = requests.get(i);
+				if (cr != null) {
+					if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
+
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+
+						notificationBuilder.removeAllIncomingContactNotifications();
+						notificationBuilder.showIncomingContactRequestNotification();
+
+						log("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+					}
+					else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
+
+						ContactsAdvancedNotificationBuilder notificationBuilder;
+						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+
+						notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
+
+						log("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+					}
+				}
+			}
+		}
 	}
 
 	public void sendSignalPresenceActivity(){
@@ -758,6 +800,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				}
 			}
 			catch (Exception exc){}
+
+			try{
+				ShortcutBadger.applyCount(getApplicationContext(), 0);
+
+				startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
+			}
+			catch (Exception exc){
+                log("EXCEPTION removing badge indicator");
+            }
 
 			if(megaApi!=null){
 				int loggedState = megaApi.isLoggedIn();
@@ -822,8 +873,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				log("OK:TYPE_PUSH_RECEIVED");
 				chatNotificationReceived = true;
 
-				AdvancedNotificationBuilder notificationBuilder;
-				notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+				ChatAdvancedNotificationBuilder notificationBuilder;
+				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
 				notificationBuilder.removeAllChatNotifications();
 				notificationBuilder.generateChatNotification(request);
@@ -922,8 +973,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 //	public void updateChatNotification(long chatid, MegaChatMessage msg){
-//		AdvancedNotificationBuilder notificationBuilder;
-//		notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+//		ChatAdvancedNotificationBuilder notificationBuilder;
+//		notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 //
 //		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //			notificationBuilder.updateNotification(chatid, msg);
@@ -940,17 +991,17 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //				}
 //			}
 //			if(shown){
-//				notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//				notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //			}
 //		}
 //		else{
-//			notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//			notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //		}
 //	}
 //
 //	public void removeChatSeenNotification(long chatid, MegaChatMessage msg){
-//		AdvancedNotificationBuilder notificationBuilder;
-//		notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+//		ChatAdvancedNotificationBuilder notificationBuilder;
+//		notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 //
 //		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 //			notificationBuilder.removeSeenNotification(chatid, msg);
@@ -967,11 +1018,11 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 //				}
 //			}
 //			if(shown){
-//				notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//				notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //			}
 //		}
 //		else{
-//			notificationBuilder.sendBundledNotification(null, null, chatid, msg);
+//			notificationBuilder.sendBundledNotificationIPC(null, null, chatid, msg);
 //		}
 //	}
 
@@ -1029,7 +1080,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 					if(call.isLocalTermCode()==false){
 						log("onChatCallUpdate:localTermCodeNotLocal");
 						try{
-							AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+							ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 							notificationBuilder.showMissedCallNotification(call);
 						}
 						catch(Exception e){
@@ -1048,7 +1099,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		log("checkQueuedCalls");
 
 		try{
-			AdvancedNotificationBuilder notificationBuilder = AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+			ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 			notificationBuilder.checkQueuedCalls();
 		}
 		catch (Exception e){
@@ -1086,5 +1137,37 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		catch(Exception e){
 			log("clearIncomingCallNotification:EXCEPTION");
 		}
+	}
+
+	public static boolean isShowRichLinkWarning() {
+		return showRichLinkWarning;
+	}
+
+	public static void setShowRichLinkWarning(boolean showRichLinkWarning) {
+		MegaApplication.showRichLinkWarning = showRichLinkWarning;
+	}
+
+	public static int getCounterNotNowRichLinkWarning() {
+		return counterNotNowRichLinkWarning;
+	}
+
+	public static void setCounterNotNowRichLinkWarning(int counterNotNowRichLinkWarning) {
+		MegaApplication.counterNotNowRichLinkWarning = counterNotNowRichLinkWarning;
+	}
+
+	public static boolean isEnabledRichLinks() {
+		return enabledRichLinks;
+	}
+
+	public static void setEnabledRichLinks(boolean enabledRichLinks) {
+		MegaApplication.enabledRichLinks = enabledRichLinks;
+	}
+
+	public static boolean isClosedChat() {
+		return closedChat;
+	}
+
+	public static void setClosedChat(boolean closedChat) {
+		MegaApplication.closedChat = closedChat;
 	}
 }

@@ -74,6 +74,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
+	public static ImageView imageDrag;
+
 	Context context;
 	ActionBar aB;
 	LinearLayout linearLayoutRecycler;
@@ -127,6 +129,39 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null) {
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -504,15 +539,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			return false;
 		}
-
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if(recyclerView.getLayoutManager()!=null){
-			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
-		}
 	}
 
 	public static FileBrowserFragmentLollipop newInstance() {
@@ -669,7 +695,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
-			//recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
@@ -861,20 +887,26 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	public void updateTransferButton(){
 		log("updateTransferButton");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			log("show PLAY button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
-			transfersTitleText.setText(getString(R.string.paused_transfers_title));
+
+		if(transfersOverViewLayout.getVisibility()==View.VISIBLE){
+			if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
+				log("show PLAY button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_play));
+				transfersTitleText.setText(getString(R.string.paused_transfers_title));
+			}
+			else{
+				log("show PAUSE button");
+				playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			}
 		}
 		else{
-			log("show PAUSE button");
-			playButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pause));
-			transfersTitleText.setText(getString(R.string.section_transfers));
+			log("Transfer panel not visible");
 		}
 	}
 
-    public void itemClick(int position) {
-		log("itemClick:position: " + position);
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+		log("item click position: " + position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		if (adapter.isMultipleSelect()){
 			log("itemClick:multiselectON");
@@ -930,8 +962,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						intent.putExtra("typeAccount", accountInfo.getAccountType());
 					}
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					startActivity(intent);
-
+					intent.putExtra("screenPosition", screenPosition);
+					context.startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					log("itemClick:isFile:isVideoReproducibleOrIsAudio");
@@ -943,7 +977,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 					Intent mediaIntent;
 					boolean internalIntent;
-					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported()){
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
 						internalIntent=false;
 					}
@@ -952,13 +986,32 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						internalIntent=true;
 					}
-
+					mediaIntent.putExtra("position", position);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					mediaIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					mediaIntent.putExtra("screenPosition", screenPosition);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
 					mediaIntent.putExtra("FILENAME", file.getName());
+					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							log("itemClick:FileProviderOption");
 							Uri mediaFileUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile);
 							if(mediaFileUri==null){
@@ -1021,7 +1074,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
-
+					imageDrag = imageView;
 					if(internalIntent){
 						context.startActivity(mediaIntent);
 					}
@@ -1040,38 +1093,33 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							nC.prepareForDownload(handleList);
 						}
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					log("itemClick:isFile:isPdf");
 					MegaNode file = nodes.get(position);
 
-					if (megaApi.httpServerIsRunning() == 0) {
-						megaApi.httpServerStart();
-					}
-
-					ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-					ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-					activityManager.getMemoryInfo(mi);
-
-					if(mi.totalMem>Constants.BUFFER_COMP){
-						log("Total mem: "+mi.totalMem+" allocate 32 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-					}
-					else{
-						log("Total mem: "+mi.totalMem+" allocate 16 MB");
-						megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-					}
-
-					String url = megaApi.httpServerGetLocalLink(file);
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName() + " TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					pdfIntent.putExtra("APP", true);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					pdfIntent.putExtra("inside", true);
+					pdfIntent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
+					boolean isOnMegaDownloads = false;
 					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-					if (localPath != null){
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					log("isOnMegaDownloads: "+isOnMegaDownloads);
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
+								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -1080,9 +1128,29 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
 						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
 					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
 						context.startActivity(pdfIntent);
 					}
@@ -1094,6 +1162,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else{
 					log("itemClick:isFile:otherOption");
@@ -1240,8 +1309,26 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				emptyTextViewFirst.setText(result);
 
 			} else {
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+				}else{
+					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+				}
+				String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				emptyTextViewFirst.setText(result);
 			}
 		}
 		else{
@@ -1443,9 +1530,26 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						emptyTextViewFirst.setText(result);
 
 					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
-					}
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						}else{
+							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						}
+						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);					}
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
@@ -1491,8 +1595,27 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						emptyTextViewFirst.setText(result);
 
 					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						}else{
+							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						}
+
+						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 					}
 				}
 				else{

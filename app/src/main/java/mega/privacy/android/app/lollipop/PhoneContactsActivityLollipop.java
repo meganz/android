@@ -276,7 +276,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 		android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		String message= getResources().getString(R.string.confirmation_add_contact,contact.getEmail());
-		builder.setMessage(message).setPositiveButton(R.string.contact_invite, dialogClickListener)
+		builder.setMessage(message).setPositiveButton(R.string.menu_add_contact, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 

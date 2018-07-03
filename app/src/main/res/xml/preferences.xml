@@ -88,6 +88,11 @@
 			android:entries="@array/settings_chat_upload_quality_entries"
 			android:entryValues="@array/settings_chat_upload_quality_values" />
 
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_rich_links_enable"
+			android:title="@string/option_enable_chat_rich_preview"
+			android:defaultValue="false"/>
+
 	</PreferenceCategory>
 
 	<PreferenceCategory

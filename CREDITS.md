@@ -152,6 +152,74 @@ The MIT License (MIT)
 
 --------------------------------------------------------------------
 
+#### TokenAutoComplete
+https://github.com/splitwise/TokenAutoComplete
+
+TokenAutoComplete is an Android Gmail style token auto-complete text field and filter. 
+
+Copyright (c) 2013, 2014 splitwise, Wouter Dullaert
+
+###### License:
+Apache License, Version 2.0
+
+--------------------------------------------------------------------
+
+#### Recycler Bubble
+https://github.com/FutureMind/recycler-fast-scroll
+
+Provides fast scroll and section indexer for recycler view.
+
+Copyright 2015 Future Mind
+
+###### License:
+Apache License, Version 2.0
+
+--------------------------------------------------------------------
+
+#### ZXing
+https://github.com/zxing/zxing
+
+ZXing ("zebra crossing") is an open-source, multi-format 1D/2D barcode image processing library implemented in Java, with ports to other languages.
+
+###### License:
+Apache License, Version 2.0
+
+--------------------------------------------------------------------
+
+#### code scanner
+https://github.com/yuriy-budiyev/code-scanner
+
+Code scanner library for Android, based on ZXing
+
+###### License:
+The MIT License (MIT)
+
+--------------------------------------------------------------------
+
+#### Picasso
+https://github.com/square/picasso
+
+A powerful image downloading and caching library for Android
+
+Copyright 2013 Square, Inc.
+
+###### License:
+Apache License, Version 2.0
+
+--------------------------------------------------------------------
+
+#### ShortcutBadger
+https://github.com/leolin310148/ShortcutBadger
+
+A powerful image downloading and caching library for Android
+
+Copyright 2014 Leo Lin
+
+###### License:
+Apache License, Version 2.0
+
+--------------------------------------------------------------------
+
 #### Android Support Library v7 appcompat
 
 This library adds support for the Action Bar user interface design pattern. This library includes support for material design user interface implementations.

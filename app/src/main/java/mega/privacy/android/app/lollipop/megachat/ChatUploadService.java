@@ -19,6 +19,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.RemoteViews;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -386,6 +387,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		catch (Exception e){
 			log("EXCEPTION: pathVideoDownsampling not deleted");
 		}
+
+
+		try{
+			File f = getExternalFilesDir(null);
+//			File f = new File(pathSelfie);
+			//Delete recursively all files and folder
+			if (f.exists()) {
+				if (f.isDirectory()) {
+					if(f.list().length<=0){
+						f.delete();
+					}
+				}
+			}
+		}
+		catch (Exception e){
+			log("EXCEPTION: pathSelfie not deleted");
+		}
 	}
 
 	public void updateProgressDownsampling(int percentage, String key){
@@ -484,33 +502,42 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			int currentapiVersion = Build.VERSION.SDK_INT;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
+						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message)
 						.setContentText(getString(R.string.chat_upload_title_notification))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.build();
 			}
 			else if (currentapiVersion >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
 
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
+						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message)
 						.setContentText(getString(R.string.chat_upload_title_notification))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 
 			}
 			else
 			{
-				notification = new Notification(R.drawable.ic_stat_notify_upload, null, 1);
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
 				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_upload);
+				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 				notification.contentView.setTextViewText(R.id.status_text, message);
 				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
 			}
@@ -576,7 +603,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
 				File f = new File(pathSelfie);
 				//Delete recursively all files and folder
-				if (f.isDirectory()) {
+				if (f.exists()) {
 					if (f.isDirectory()) {
 						if(f.list().length<=0){
 							f.delete();
@@ -1035,6 +1062,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
 		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
             requestSent--;
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
@@ -1116,11 +1144,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 
 		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify_upload)
+				.setSmallIcon(R.drawable.ic_stat_notify)
 				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 				.setAutoCancel(true).setTicker(contentText)
 				.setContentTitle(message).setContentText(contentText)
 				.setOngoing(false);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+			mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+		}
 
 		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 	}

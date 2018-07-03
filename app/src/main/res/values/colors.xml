@@ -141,13 +141,22 @@
 
     <color name="color_background_versions">#FFF2F2F2</color>
 
+
+    <color name="black_p50">#9f000000</color>
+
     <color name="turn_on_notifications_background">#FF00A38C</color>
     <color name="turn_on_notifications_statusbar">#FF008270</color>
     <color name="turn_on_notifications_text">#B3000000</color>
+
 
     <color name="color_background_jump_to_least">#80000000</color>
 
     <color name="color_background_new_messages">#FFF7F7F7</color>
     <color name="color_text_new_messages">#B3000000</color>
+    <color name="message_background_2">#ffEDE9E8</color>
+    <color name="message_background_3">#FFE4EBEA</color>
+    <color name="shape_page_number">#E600BFA5</color>
+    <color name="file_playlist_playing">#FFF2FCFA</color>
+    <color name="file_playlist_state">#FF00BFA5</color>
 
 </resources>
