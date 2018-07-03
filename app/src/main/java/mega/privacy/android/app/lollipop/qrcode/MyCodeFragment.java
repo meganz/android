@@ -25,7 +25,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -42,31 +41,24 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
@@ -75,10 +67,13 @@ import static android.graphics.Color.WHITE;
  * Created by mega on 22/01/18.
  */
 
-public class MyCodeFragment extends Fragment implements View.OnClickListener, MegaRequestListenerInterface {
+public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     final int RELATIVE_WIDTH = 280;
     final int WIDTH = 500;
+    final int AVATAR_LEFT = 177;
+    final int AVATAR_RIGTH = 323;
+    final int AVATAR_WIDTH = 145;
 
     MegaUser myUser;
     String myEmail;
@@ -234,7 +229,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         log("createQRCode");
 
         Bitmap qrCode = Bitmap.createBitmap(WIDTH,WIDTH, Bitmap.Config.ARGB_8888);
-        int width = (int)getResources().getDimension(R.dimen.width_qr);
+//        int width = (int)getResources().getDimension(R.dimen.width_qr);
+        int width = AVATAR_WIDTH;
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -245,10 +241,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
         c.drawBitmap(qr, 0f, 0f, null);
-        c.drawRect(getResources().getDimension(R.dimen.start_avatar_qr),
-                getResources().getDimension(R.dimen.start_avatar_qr),
-                getResources().getDimension(R.dimen.end_avatar_qr),
-                getResources().getDimension(R.dimen.end_avatar_qr), paint);
+        c.drawRect(AVATAR_LEFT,
+                AVATAR_LEFT,
+                AVATAR_RIGTH,
+                AVATAR_RIGTH, paint);
 //        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
         c.drawBitmap(avatar, pos, pos, null);
 
@@ -522,10 +518,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         qrFile = queryIfQRExists();
         if (qrFile != null && qrFile.exists()) {
             setImageQR();
-            megaApi.contactLinkCreate(false, this);
+            megaApi.contactLinkCreate(false, (QRCodeActivity) context);
         }
         else {
-            megaApi.contactLinkCreate(false, this);
+            megaApi.contactLinkCreate(false, (QRCodeActivity) context);
             ProgressDialog temp = null;
             try{
                 temp = new ProgressDialog(context);
@@ -546,118 +542,91 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         snackbar.show();
     }
 
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+    public void initCreateQR(MegaRequest request, MegaError e){
+        boolean reset = false;
+        if (handle != -1 && handle != request.getNodeHandle() && copyLink){
+            reset = true;
+        }
+        if (e.getErrorCode() == MegaError.API_OK) {
+            log("Contact link create LONG: " + request.getNodeHandle());
+            log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
 
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-        if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
-            boolean reset = false;
-            if (handle != -1 && handle != request.getNodeHandle() && copyLink){
-                reset = true;
+            handle = request.getNodeHandle();
+            contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
+            qrcode_link.setText(contactLink);
+            qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
+            File qrCodeFile = null;
+            if (context.getExternalCacheDir() != null){
+                qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
             }
-            if (e.getErrorCode() == MegaError.API_OK) {
-                log("Contact link create LONG: " + request.getNodeHandle());
-                log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
-
-                handle = request.getNodeHandle();
-                contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
-                qrcode_link.setText(contactLink);
-                qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
-                File qrCodeFile = null;
+            else{
+                qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            }
+            if (reset && qrCodeFile!= null && qrCodeFile.exists()){
+                qrCodeFile.delete();
+                qrCodeFile = null;
                 if (context.getExternalCacheDir() != null){
                     qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
                 else{
                     qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
-                if (reset && qrCodeFile!= null && qrCodeFile.exists()){
-                    qrCodeFile.delete();
-                    qrCodeFile = null;
-                    if (context.getExternalCacheDir() != null){
-                        qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                    }
-                    else{
-                        qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                    }
-                }
-                if (qrCodeFile != null && !qrCodeFile.exists()) {
-                    try {
-                        FileOutputStream out = new FileOutputStream(qrCodeFile);
-                        qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                    } catch (FileNotFoundException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-                qrcode.setImageBitmap(qrCodeBitmap);
-                qrcode_copy_link.setEnabled(true);
-                if (reset){
-                    ((QRCodeActivity) context).resetSuccessfully(true);
-                }
-                if (createQR){
-                    ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_create_successfully));
-                    ((QRCodeActivity) context).createSuccessfully();
-                    qrcode_copy_link.setText(getResources().getString(R.string.button_copy_link));
-                    createQR = false;
-                    copyLink = true;
-                }
-                if (processingDialog != null) {
-                    processingDialog.dismiss();
+            }
+            if (qrCodeFile != null && !qrCodeFile.exists()) {
+                try {
+                    FileOutputStream out = new FileOutputStream(qrCodeFile);
+                    qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
                 }
             }
-            else {
-                if (reset){
-                    ((QRCodeActivity) context).resetSuccessfully(false);
-                }
+            qrcode.setImageBitmap(qrCodeBitmap);
+            qrcode_copy_link.setEnabled(true);
+            if (reset){
+                ((QRCodeActivity) context).resetSuccessfully(true);
+            }
+            if (createQR){
+                ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_create_successfully));
+                ((QRCodeActivity) context).createSuccessfully();
+                qrcode_copy_link.setText(getResources().getString(R.string.button_copy_link));
+                createQR = false;
+                copyLink = true;
+            }
+            if (processingDialog != null) {
+                processingDialog.dismiss();
             }
         }
-
-//        megaApi.contactLinkQuery(request.getNodeHandle(), this);
-        if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
-            }
-        }
-
-//        megaApi.contactLinkDelete(request.getNodeHandle(), this);
-        if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_DELETE){
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
-                File qrCodeFile = null;
-                if (context.getExternalCacheDir() != null){
-                    qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
-                else{
-                    qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
-                if (qrCodeFile != null && qrCodeFile.exists()){
-                    qrCodeFile.delete();
-                }
-                ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_successfully));
-                qrcode.setImageBitmap(Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888));
-                qrcode_copy_link.setText(getResources().getString(R.string.button_create_qr));
-                copyLink = false;
-                createQR = true;
-                qrcode_link.setText("");
-                ((QRCodeActivity) context).deleteSuccessfully();
-            }
-            else {
-                ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_not_successfully));
+        else {
+            if (reset){
+                ((QRCodeActivity) context).resetSuccessfully(false);
             }
         }
     }
 
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
+    public void initDeleteQR(MegaRequest request, MegaError e){
+        if (e.getErrorCode() == MegaError.API_OK){
+            log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+            File qrCodeFile = null;
+            if (context.getExternalCacheDir() != null){
+                qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            }
+            else{
+                qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            }
+            if (qrCodeFile != null && qrCodeFile.exists()){
+                qrCodeFile.delete();
+            }
+            ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_successfully));
+            qrcode.setImageBitmap(Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888));
+            qrcode_copy_link.setText(getResources().getString(R.string.button_create_qr));
+            copyLink = false;
+            createQR = true;
+            qrcode_link.setText("");
+            ((QRCodeActivity) context).deleteSuccessfully();
+        }
+        else {
+            ((QRCodeActivity) context).showSnackbar(getResources().getString(R.string.qrcode_delete_not_successfully));
+        }
     }
 
     public void resetQRCode () {
@@ -667,7 +636,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 //        megaApi.contactLinkDelete(handle, this);
-        megaApi.contactLinkCreate(true, this);
+        megaApi.contactLinkCreate(true, (QRCodeActivity) context);
     }
 
     public void deleteQRCode() {
@@ -676,6 +645,6 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener, Me
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
-        megaApi.contactLinkDelete(handle, this);
+        megaApi.contactLinkDelete(handle, (QRCodeActivity) context);
     }
 }

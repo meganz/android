@@ -228,7 +228,7 @@ public class SettingsChatFragment extends PreferenceFragment implements Preferen
         else if (preference.getKey().compareTo(KEY_CHAT_SOUND) == 0){
             log("KEY_CHAT_SOUND");
 
-            ((ChatPreferencesActivity) context).changeSound();
+            ((ChatPreferencesActivity) context).changeSound(chatSettings.getNotificationsSound());
         }
         return true;
     }

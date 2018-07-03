@@ -22,13 +22,23 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/file_list_checkbox"/> 
      -->
-     <ImageView
-        android:id="@+id/file_list_thumbnail"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:scaleType="fitCenter"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/file_list_saved_offline" />
+	<RelativeLayout
+		android:id="@+id/container_thumbnail"
+		android:layout_width="48dp"
+		android:layout_height="match_parent"
+		android:layout_toRightOf="@+id/file_list_saved_offline"
+		android:layout_centerVertical="true"
+		android:layout_margin="0dp"
+		android:padding="0dp">
+
+		<ImageView
+			android:id="@+id/file_list_thumbnail"
+			android:layout_width="48dp"
+			android:layout_height="48dp"
+			android:layout_centerVertical="true"
+			android:scaleType="fitCenter"/>
+
+	</RelativeLayout>
 <!--    
         <TextView
         android:id="@+id/file_list_owner"
@@ -88,7 +98,7 @@
 		android:id="@+id/file_list_filename"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/file_list_thumbnail"
+		android:layout_toRightOf="@id/container_thumbnail"
 		android:layout_toLeftOf="@id/file_list_public_link"
 		android:layout_marginTop="15dp"
 		android:layout_marginLeft="12dp"
@@ -102,7 +112,7 @@
 		android:id="@+id/file_list_filesize"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_toRightOf="@id/file_list_thumbnail"
+		android:layout_toRightOf="@id/container_thumbnail"
 		android:layout_toLeftOf="@id/file_list_public_link"
 		android:layout_below="@+id/file_list_filename"
 		android:textColor="@color/file_list_second_row"
@@ -117,7 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/arrow_selection"
-		android:layout_alignBottom="@id/file_list_thumbnail"
+		android:layout_alignBottom="@id/container_thumbnail"
         android:layout_alignParentRight="true"
         android:paddingRight="15dp" />-->        
     

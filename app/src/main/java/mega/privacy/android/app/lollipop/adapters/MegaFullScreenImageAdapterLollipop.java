@@ -21,7 +21,7 @@ import android.widget.RelativeLayout;
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -54,6 +54,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	MegaApiAndroid megaApi;
 	Context context;
+	boolean isFileLink = false;
+	String nameFileLink=null;
 
 	/*view holder class*/
     public class ViewHolderFullImage {
@@ -72,6 +74,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     	
 		@Override
 		protected Integer doInBackground(Long... params){
+			log("PreviewAsyncTask()-doInBackground");
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
 			preview = PreviewUtils.getPreviewFromFolder(node, activity);
@@ -92,6 +95,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected void onPostExecute(Integer param){
+			log("PreviewAsyncTask()-onPostExecute");
+
 			if (param == 0){
 				int position = 0;
 				boolean holderIsVisible = false;
@@ -130,6 +135,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     	
 		@Override
 		protected Integer doInBackground(Long... params){
+			log("PreviewDownloadAsyncTask()-doInBackground");
+
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
 			if (node == null){
@@ -183,6 +190,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected void onPostExecute(Integer param){
+			log("PreviewDownloadAsyncTask()-onPostExecute");
+
 			if (param == 0 || param == 1){
 				int position = 0;
 				boolean holderIsVisible = false;
@@ -218,7 +227,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected String[] doInBackground(String... params) {
-			log("AttachPreviewStart");
+			log("AttachPreviewTask()-doInBackground");
 			long handle = Long.parseLong(params[0]);
 			String localPath = params[1];
 			
@@ -238,6 +247,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		
 		@Override
 		protected void onPostExecute(String[] params) {
+			log("AttachPreviewTask()-onPostExecute");
+
 			long handle = Long.parseLong(params[0]);
 			boolean previewCreated = Boolean.parseBoolean(params[1]);
 			
@@ -268,12 +279,15 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 	
 	// constructor
-	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
+	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi, boolean isFileLink, String nameFileLink) {
 		this.activity = activity;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
 		this.megaFullScreenImageAdapter = this;
 		this.context = context;
+		this.isFileLink = isFileLink;
+		this.nameFileLink = nameFileLink;
+
 
 	}
 
@@ -299,12 +313,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
         log ("instantiateItem POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
-		
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
-		if (node == null){
+		if ((node == null)&&(!isFileLink)){
 			Intent intent = new Intent(activity, LoginActivityLollipop.class);
 			intent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
 	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
@@ -313,70 +326,95 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	        activity.finish();
 	        return viewLayout;
 		}
-		
-		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
-		holder.imgDisplay.setOnClickListener(this);
 
-		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
-		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
-		holder.downloadProgressBar.setVisibility(View.GONE);
-		holder.document = imageHandles.get(position);
+		if((node == null)&&(isFileLink)){
+			log("isFileLink");
+			holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
+			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(nameFileLink).getIconResourceId());
+			holder.imgDisplay.setOnClickListener(this);
+			holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
+			holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
+			holder.downloadProgressBar.setVisibility(View.GONE);
+			holder.document = imageHandles.get(position);
 
-		visibleImgs.put(position, holder);
-        
-		Bitmap preview = null;
-		Bitmap thumb = null;
-		
-		thumb = ThumbnailUtils.getThumbnailFromCache(node);
-		if (thumb != null){
-			holder.imgDisplay.setImageBitmap(thumb);
-		}
-		else{
-			thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+			visibleImgs.put(position, holder);
+
+			Bitmap preview = PreviewUtils.getPreviewFromCache(holder.document);
+
+			if (preview != null){
+				PreviewUtils.previewCache.put(holder.document, preview);
+				holder.imgDisplay.setImageBitmap(preview);
+				holder.progressBar.setVisibility(View.GONE);
+			}else{
+				try{
+					new PreviewAsyncTask().execute(holder.document);
+				}
+				catch(Exception ex){
+					//Too many AsyncTasks
+					log("Too many AsyncTasks");
+				}
+			}
+			((ViewPager) container).addView(viewLayout);
+			return viewLayout;
+
+		}else{
+			holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
+			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
+			holder.imgDisplay.setOnClickListener(this);
+
+			holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
+			holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
+			holder.downloadProgressBar.setVisibility(View.GONE);
+			holder.document = imageHandles.get(position);
+
+			visibleImgs.put(position, holder);
+
+			Bitmap preview = null;
+			Bitmap thumb = null;
+
+			thumb = ThumbnailUtils.getThumbnailFromCache(node);
 			if (thumb != null){
 				holder.imgDisplay.setImageBitmap(thumb);
-			}
-		}
-		
-		if (node.hasPreview()){
-			preview = PreviewUtils.getPreviewFromCache(node);
-			if (preview != null){
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
-				holder.imgDisplay.setImageBitmap(preview);
-				holder.progressBar.setVisibility(View.GONE);
-			}
-			else{
-				try{
-					new PreviewAsyncTask().execute(node.getHandle());
-				}
-				catch(Exception ex){
-					//Too many AsyncTasks
-					log("Too many AsyncTasks");
-				} 
-			}
-		}
-		else{
-			preview = PreviewUtils.getPreviewFromCache(node);
-			if (preview != null){
-				PreviewUtils.previewCache.put(node.getHandle(), preview);
-				holder.imgDisplay.setImageBitmap(preview);
-				holder.progressBar.setVisibility(View.GONE);
-			}
-			else{
-				try{
-					new PreviewDownloadAsyncTask().execute(node.getHandle());
-				}
-				catch(Exception ex){
-					//Too many AsyncTasks
-					log("Too many AsyncTasks");
+			}else{
+				thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+				if (thumb != null){
+					holder.imgDisplay.setImageBitmap(thumb);
 				}
 			}
+
+			if (node.hasPreview()){
+				preview = PreviewUtils.getPreviewFromCache(node);
+				if (preview != null){
+					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					holder.imgDisplay.setImageBitmap(preview);
+					holder.progressBar.setVisibility(View.GONE);
+				}else{
+					try{
+						new PreviewAsyncTask().execute(node.getHandle());
+					}
+					catch(Exception ex){
+						//Too many AsyncTasks
+						log("Too many AsyncTasks");
+					}
+				}
+			}else{
+				preview = PreviewUtils.getPreviewFromCache(node);
+				if (preview != null){
+					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					holder.imgDisplay.setImageBitmap(preview);
+					holder.progressBar.setVisibility(View.GONE);
+				}else{
+					try{
+						new PreviewDownloadAsyncTask().execute(node.getHandle());
+					}catch(Exception ex){
+						//Too many AsyncTasks
+						log("Too many AsyncTasks");
+					}
+				}
+			}
+			((ViewPager) container).addView(viewLayout);
+			return viewLayout;
 		}
-		
-        ((ViewPager) container).addView(viewLayout);
-		
-		return viewLayout;
 	}
 	
 	@Override
@@ -388,11 +426,22 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     }
 	
 	public TouchImageView getVisibleImage(int position){
-		return visibleImgs.get(position).imgDisplay;
+		log("getVisibleImage");
+		if (visibleImgs.get(position) != null){
+			return visibleImgs.get(position).imgDisplay;
+		}
+		return null;
+	}
+
+	public Long getImageHandle(int position) {
+		log("getImageHandle");
+		return imageHandles.get(position);
 	}
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
+
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_image:{
 
@@ -597,10 +646,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 
 	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)

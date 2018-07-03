@@ -434,7 +434,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void importNode(){
-		log("importNode");
+		log("importNodes");
 
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
@@ -442,7 +442,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	public void importNodeList(){
-		log("importNode");
+		log("importNodes");
 
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
