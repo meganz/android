@@ -6003,7 +6003,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState){
         log("onSaveInstanceState");

@@ -1973,4 +1973,6 @@
         <item context="one contact" quantity="one">Contact sent to chats successfully</item>
         <item context="more contacts" quantity="other">Contacts sent to chats successfully</item>
     </plurals>
+
+    <string name="error_MEGAdrop_not_supported" context="Error message on opening a MEGAdrop folder link">MEGAdrop folders are not supported yet</string>
 </resources>

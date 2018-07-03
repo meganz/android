@@ -59,7 +59,6 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 
 		openLinkActivity = this;
 
-
 		setContentView(R.layout.activity_open_link);
 
 		relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_open_link);
@@ -70,7 +69,6 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		containerOkButton = (RelativeLayout) findViewById(R.id.container_accept_button);
 		containerOkButton.setVisibility(View.GONE);
 		containerOkButton.setOnClickListener(this);
-
 		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
@@ -503,6 +501,13 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 				}
 				return;
 			}
+		}
+
+		//MEGA DROP link
+		if (url != null && (url.matches("^https://mega\\.co\\.nz/megadrop/.+$") || url.matches("^https://mega\\.nz/megadrop/.+$"))) { //https://mega.nz/megadrop
+
+			setError(getString(R.string.error_MEGAdrop_not_supported));
+			return;
 		}
 
 		log("wrong url: " + url);
