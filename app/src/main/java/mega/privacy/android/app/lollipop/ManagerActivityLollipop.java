@@ -402,7 +402,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	ArrayList<MegaNode> searchNodes;
 	public int levelsSearch = -1;
 	boolean openLink = false;
-	boolean sendToInbox = false;
 
 	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
@@ -3026,8 +3025,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
     			}
     			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_STORAGE)){
-	    			showOverquotaAlert();
+	    			showOverquotaAlert(false);
 	    		}
+				else if(intent.getAction().equals(Constants.ACTION_PRE_OVERQUOTA_STORAGE)){
+					showOverquotaAlert(true);
+				}
 	    		else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
 					log("onPostResume show overquota transfer alert!!");
 					if(alertDialogTransferOverquota==null){
@@ -9643,11 +9645,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}, 50);
 	}
 
-	public void setSendToInbox(boolean value){
-		log("setSendToInbox: "+value);
-		sendToInbox = value;
-	}
-
 	public void setIsGetLink(boolean value){
 		this.isGetLink = value;
 	}
@@ -11484,14 +11481,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		return -1;
 	}
 
-	private void showOverquotaAlert(){
-		log("showOverquotaAlert");
-		dbH.setCamSyncEnabled(false);
+	private void showOverquotaAlert(boolean prewarning){
+		log("showOverquotaAlert: prewarning: "+prewarning);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.overquota_alert_title));
+
+		if(prewarning){
+			builder.setMessage(getString(R.string.pre_overquota_alert_text));
+		}
+		else{
+			builder.setMessage(getString(R.string.overquota_alert_text));
+			dbH.setCamSyncEnabled(false);
+		}
 
 		if(overquotaDialog==null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(getString(R.string.overquota_alert_title));
-			builder.setMessage(getString(R.string.overquota_alert_text));
 
 			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
 
@@ -11514,12 +11518,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			overquotaDialog = builder.create();
 			overquotaDialog.setCanceledOnTouchOutside(false);
-			overquotaDialog.show();
-//			Util.brandAlertDialog(overquotaDialog);
 		}
-		else{
-			overquotaDialog.show();
-		}
+
+		overquotaDialog.show();
 	}
 
 	public void updateAccountDetailsVisibleInfo(){
@@ -14571,71 +14572,57 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("TYPE_COPY");
-			if(sendToInbox){
-				log("sendToInbox: "+e.getErrorCode()+" "+e.getErrorString());
-				setSendToInbox(false);
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("OK");
-					showSnackbar(getString(R.string.context_correctly_sent_node));
-				}
-				else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());
-					showOverquotaAlert();
-				}
-				else
-				{
-					log("NO SENT");
-					showSnackbar(getString(R.string.context_no_sent_node));
-				}
+
+			try {
+				statusDialog.dismiss();
 			}
-			else{
-				try {
-					statusDialog.dismiss();
-				}
-				catch (Exception ex) {}
+			catch (Exception ex) {}
 
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
-					showSnackbar(getString(R.string.context_correctly_copied));
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+				showSnackbar(getString(R.string.context_correctly_copied));
 
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
-						int index = viewPagerCDrive.getCurrentItem();
-	        			log("----------------------------------------INDEX: "+index);
-	        			if(index==1){
-	        				//Rubbish bin
-	        				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-	        				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-								rubbishBinFLol.setNodes(nodes);
-								rubbishBinFLol.getRecyclerView().invalidate();
-							}
-	        			}
-	        			else{
-	        				//Cloud Drive
-	        				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-	        				if (fbFLol != null && fbFLol.isAdded()){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-								fbFLol.setNodes(nodes);
-								fbFLol.getRecyclerView().invalidate();
-							}
-	        			}
+					int index = viewPagerCDrive.getCurrentItem();
+					log("----------------------------------------INDEX: "+index);
+					if(index==1){
+						//Rubbish bin
+						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+							rubbishBinFLol.setNodes(nodes);
+							rubbishBinFLol.getRecyclerView().invalidate();
+						}
 					}
-					else if (drawerItem == DrawerItem.INBOX){
-						if (iFLol != null && iFLol.isAdded()){
-							iFLol.getRecyclerView().invalidate();
+					else{
+						//Cloud Drive
+						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+						if (fbFLol != null && fbFLol.isAdded()){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+							fbFLol.setNodes(nodes);
+							fbFLol.getRecyclerView().invalidate();
 						}
 					}
 				}
-				else{
-					if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-						log("OVERQUOTA ERROR: "+e.getErrorCode());
-						showOverquotaAlert();
+				else if (drawerItem == DrawerItem.INBOX){
+					if (iFLol != null && iFLol.isAdded()){
+						iFLol.getRecyclerView().invalidate();
 					}
-					else
-					{
-						showSnackbar(getString(R.string.context_no_copied));
-					}
+				}
+			}
+			else{
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					showOverquotaAlert(false);
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					showOverquotaAlert(true);
+				}
+				else
+				{
+					showSnackbar(getString(R.string.context_no_copied));
 				}
 			}
 		}

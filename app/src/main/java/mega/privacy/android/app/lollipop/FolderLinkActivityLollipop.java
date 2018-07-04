@@ -1330,12 +1330,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
-				}else{
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
+				else{
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 				}
 
 			}else{
-				log("OK");
+				log("onRequestFinish:OK");
 				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 				clearSelections();
 				hideMultipleSelect();
@@ -2175,6 +2183,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		startActivity(intent);
 		finish();
 	}
+
+	public void errorPreOverquota() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+		startActivity(intent);
+		finish();
+	}
+
 	public void successfulCopy(){
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);

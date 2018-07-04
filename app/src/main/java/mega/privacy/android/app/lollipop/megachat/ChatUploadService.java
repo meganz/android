@@ -72,7 +72,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	boolean sendOriginalAttachments=false;
 
-	boolean isOverquota = false;
+	//0 - not overquota, not pre-overquota
+	//1 - overquota
+	//2 - pre-overquota
+	int isOverquota = 0;
 
 	ArrayList<PendingMessage> pendingMessages;
 	HashMap<String, Integer> mapVideoDownsampling;
@@ -123,7 +126,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		isForeground = false;
 		canceled = false;
-		isOverquota = false;
+		isOverquota = 0;
 
 		mapVideoDownsampling = new HashMap();
 
@@ -184,7 +187,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		}
 
-		isOverquota = false;
+		isOverquota = 0;
 
 		onHandleIntent(intent);
 
@@ -335,7 +338,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-		if(isOverquota){
+		if(isOverquota!=0){
 			showStorageOverquotaNotification();
 		}
 
@@ -454,7 +457,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		if(!isOverquota){
+		if(isOverquota==0){
 			int totalTransfers = megaApi.getTotalUploads()+numberVideosPending;
 
 			long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
@@ -783,7 +786,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					else{
 
 						if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-							isOverquota = true;
+							isOverquota = 1;
+						}
+						else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+							isOverquota = 2;
 						}
 
 						//Find the pending message
@@ -856,7 +862,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 				}
 
-				if (isOverquota) {
+				if (isOverquota!=0) {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				}
 
@@ -1016,7 +1022,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 			}
 
-			if(isOverquota){
+			if(isOverquota!=0){
 				log("after overquota alert");
 				return;
 			}
@@ -1046,20 +1052,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("UPLOAD: onRequestFinish "+request.getRequestString());
 
-		if (e.getErrorCode()==MegaError.API_OK){
-			log("onRequestFinish OK");
-		}
-		else {
-			log("ERROR: "+e.getErrorCode());
-
-			if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-				log("OVERQUOTA ERROR: "+e.getErrorCode());
-				isOverquota = true;
-
-				onQueueComplete();
-			}
-		}
-
 		//Send the file without preview if the set attribute fails
 		if(request.getType() == MegaRequest.TYPE_SET_ATTR_FILE && request.getParamType()==MegaApiJava.ATTR_TYPE_PREVIEW){
 			requestSent--;
@@ -1071,6 +1063,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					attachPdfNode(handle);
 				}
 			}
+		}
+
+		if (e.getErrorCode()==MegaError.API_OK){
+			log("onRequestFinish OK");
+		}
+		else {
+			log("ERROR: "+e.getErrorCode());
+
+			if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				log("OVERQUOTA ERROR: "+e.getErrorCode());
+				isOverquota = 1;
+			}
+			else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+				log("PRE-OVERQUOTA ERROR: "+e.getErrorCode());
+				isOverquota = 2;
+			}
+			onQueueComplete();
 		}
 	}
 
@@ -1182,7 +1191,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String message = getString(R.string.overquota_alert_title);
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
-		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+
+		if(isOverquota==1){
+			intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		}
+		else{
+			intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+		}
 
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify)

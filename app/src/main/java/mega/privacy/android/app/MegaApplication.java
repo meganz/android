@@ -286,9 +286,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private Runnable keepAliveRunnable = new Runnable() {
 		@Override
 		public void run() {
-
 			try {
-
 				if (activityVisible) {
 					log("KEEPALIVE: " + System.currentTimeMillis());
 					if (megaChatApi != null) {
