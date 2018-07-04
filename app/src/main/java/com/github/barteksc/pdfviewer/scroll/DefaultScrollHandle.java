@@ -77,7 +77,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
 //        addView(textViewBubble, tvBlp);
 
 
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(Util.getDP(context, 40), RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         pdfView.addView(this, lp);
 
