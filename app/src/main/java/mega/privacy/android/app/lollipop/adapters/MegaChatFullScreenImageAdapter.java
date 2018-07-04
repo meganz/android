@@ -21,10 +21,11 @@ import android.widget.RelativeLayout;
 import java.io.File;
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -37,10 +38,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUtilsAndroid;
-
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-
-
 
 public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface  {
 
@@ -112,10 +109,12 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				}
 			}
 			else if(param == 2){
-				File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
-				log("GET PREVIEW OF HANDLE: " + node.getHandle());
-				pendingPreviews.add(node.getHandle());
-				megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);
+				if(megaApi!=null){
+					File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
+					log("GET PREVIEW OF HANDLE: " + node.getHandle());
+					pendingPreviews.add(node.getHandle());
+					megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);
+				}
 			}
 		}
 	}
@@ -250,7 +249,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 		}
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+		holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
 
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);

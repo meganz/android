@@ -42,7 +42,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.fcm.AdvancedNotificationBuilder;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -356,7 +355,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setText(result);
         emptyTextViewInvite.setVisibility(View.VISIBLE);
 
-        inviteButton.setText(getString(R.string.contact_invite));
+        inviteButton.setText(getString(R.string.menu_add_contact));
         inviteButton.setVisibility(View.VISIBLE);
 
         String textToShowB = String.format(context.getString(R.string.recent_chat_empty));
@@ -1421,18 +1420,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition=0;
-
-        try {
-            AdvancedNotificationBuilder notificationBuilder;
-            notificationBuilder =  AdvancedNotificationBuilder.newInstance(context, megaApi, megaChatApi);
-
-            notificationBuilder.removeAllChatNotifications();
-        }
-        catch (Exception e){
-            log("Exception NotificationManager - remove all notifications");
-        }
-
-        MegaApplication.setRecentChatVisible(true);
 
         super.onResume();
     }

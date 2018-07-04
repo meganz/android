@@ -1,12 +1,17 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,7 +31,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -39,9 +46,11 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -50,7 +59,9 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-public class RubbishBinFragmentLollipop extends Fragment {
+public class RubbishBinFragmentLollipop extends Fragment{
+
+	public static ImageView imageDrag;
 
 	public static int GRID_WIDTH =400;
 	
@@ -83,6 +94,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
+	String downloadLocationDefaultPath = null;
 	////
 
 	public void activateActionMode(){
@@ -92,7 +104,39 @@ public class RubbishBinFragmentLollipop extends Fragment {
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
-	
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null){
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null){
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+
+		return null;
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -249,7 +293,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
 		}
 		
 	}
-	
+
 	public boolean showSelectMenuItem(){
 		if (adapter != null){
 			return adapter.isMultipleSelect();
@@ -286,6 +330,20 @@ public class RubbishBinFragmentLollipop extends Fragment {
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
+
+		if (prefs != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					log("askMe==false");
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}
 
 		lastPositionStack = new Stack<>();
 		
@@ -404,8 +462,28 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					}
+					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 			}
 			else{
@@ -495,8 +573,28 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					}
+					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 			}
 			else{
@@ -515,7 +613,7 @@ public class RubbishBinFragmentLollipop extends Fragment {
         context = activity;
     }
 
-    public void itemClick(int position) {
+    public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick: "+position);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -593,8 +691,28 @@ public class RubbishBinFragmentLollipop extends Fragment {
 						emptyTextViewFirst.setText(result);
 
 					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//						emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+						if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+							emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+						}else{
+							emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+						}
+						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+						try{
+							textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+							textToShow = textToShow.replace("[/A]", "</font>");
+							textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+							textToShow = textToShow.replace("[/B]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned result = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+						} else {
+							result = Html.fromHtml(textToShow);
+						}
+						emptyTextViewFirst.setText(result);
 					}
 				}
 				else{
@@ -622,7 +740,158 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
-					startActivity(intent);
+					intent.putExtra("screenPosition", screenPosition);
+					context.startActivity(intent);
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					imageDrag = imageView;
+				}
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+					MegaNode file = nodes.get(position);
+
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent mediaIntent;
+					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
+						mediaIntent = new Intent(Intent.ACTION_VIEW);
+					}
+					else {
+						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+					}
+					mediaIntent.putExtra("screenPosition", screenPosition);
+					mediaIntent.putExtra("FILENAME", file.getName());
+					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
+						mediaIntent.putExtra("parentNodeHandle", -1L);
+					}
+					else{
+						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+					}
+					boolean isOnMegaDownloads = false;
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+						File mediaFile = new File(localPath);
+						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
+						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					mediaIntent.putExtra("HANDLE", file.getHandle());
+					imageDrag = imageView;
+					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+						context.startActivity(mediaIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+				}
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
+					MegaNode file = nodes.get(position);
+
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
+
+					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+					if(accountInfo!=null){
+						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
+					}
+					pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
+					pdfIntent.putExtra("inside", true);
+					pdfIntent.putExtra("APP", true);
+					boolean isOnMegaDownloads = false;
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+						File mediaFile = new File(localPath);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						else{
+							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+						}
+						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					}
+					else {
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
+						}
+
+						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+						ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+						activityManager.getMemoryInfo(mi);
+
+						if(mi.totalMem>Constants.BUFFER_COMP){
+							log("Total mem: "+mi.totalMem+" allocate 32 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+						}
+						else{
+							log("Total mem: "+mi.totalMem+" allocate 16 MB");
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+						}
+
+						String url = megaApi.httpServerGetLocalLink(file);
+						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+					}
+					pdfIntent.putExtra("HANDLE", file.getHandle());
+					pdfIntent.putExtra("screenPosition", screenPosition);
+					imageDrag = imageView;
+					if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
+						startActivity(pdfIntent);
+					}
+					else{
+						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else{
 					adapter.notifyDataSetChanged();
@@ -831,8 +1100,28 @@ public class RubbishBinFragmentLollipop extends Fragment {
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					}
+					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 			}
 			else{

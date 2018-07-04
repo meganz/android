@@ -509,8 +509,28 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 					}
 					emptyTextViewFirst.setText(result);
 				} else {
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyTextViewFirst.setText(R.string.file_browser_empty_folder);
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					}else{
+						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					}
+					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					try{
+						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]", "</font>");
+						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]", "</font>");
+					}
+					catch (Exception e){}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
 				}
 			}
 			else{

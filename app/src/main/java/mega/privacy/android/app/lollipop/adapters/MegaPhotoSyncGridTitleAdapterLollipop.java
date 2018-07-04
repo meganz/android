@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
@@ -112,7 +113,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     DatabaseHandler dbH;
     MegaPreferences prefs;
-    String downloadLocationDefaultPath = Util.downloadDIR;
+    String downloadLocationDefaultPath;
+    String defaultPath;
 
     public static class ItemInformation{
         public int type = -1;
@@ -902,7 +904,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
     }
 
-    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList) {
+    public MegaPhotoSyncGridTitleAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, LinearLayout emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type, int count, int countTitles, List<ItemInformation> itemInformationList, String defaultPath) {
         this.context = _context;
         this.monthPics = _monthPics;
         this.photosyncHandle = _photosyncHandle;
@@ -926,6 +928,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         this.countTitles = countTitles;
 
         this.itemInformationList = itemInformationList;
+
+        this.defaultPath = defaultPath;
     }
 
     public void setNumberOfCells(int numberOfCells, int gridWidth){
@@ -949,7 +953,10 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     }
 
     public Object getItem(int position) {
-        return monthPics.get(position);
+        if (monthPics.size() > position){
+            return monthPics.get(position);
+        }
+        return null;
     }
 
     @Override
@@ -1010,7 +1017,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     continue;
                 }
 
-                if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
+                if (!MimeTypeThumbnail.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeThumbnail.typeForName(nodes.get(i).getName()).isVideo())){
                     continue;
                 }
                 checkedItems.append(i, true);
@@ -1061,6 +1068,15 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             MegaNode n = megaApi.getNodeByHandle(holder.getDocument());
             if (n != null){
                 if (!n.isFolder()){
+                    ImageView imageView = holder.getImageView();
+                    int[] positionIV = new int[2];
+                    imageView.getLocationOnScreen(positionIV);
+                    int[] screenPosition = new int[4];
+                    screenPosition[0] = positionIV[0];
+                    screenPosition[1] = positionIV[1];
+                    screenPosition[2] = imageView.getWidth();
+                    screenPosition[3] = imageView.getHeight();
+
                     if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
                         Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                         intent.putExtra("position", positionInNodes);
@@ -1089,49 +1105,83 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         else{
                             intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
                         }
+                        intent.putExtra("screenPosition", screenPosition);
                         context.startActivity(intent);
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
-                    else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
+                    else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
                         MegaNode file = n;
 
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart();
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if(mi.totalMem>Constants.BUFFER_COMP){
-                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                        }
-                        else{
-                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                        }
-
-                        String url = megaApi.httpServerGetLocalLink(file);
-                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                        String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
                         log("FILENAME: " + file.getName());
 
-                        //Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-                        Intent mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        Intent mediaIntent;
+                        if (MimeTypeThumbnail.typeForName(n.getName()).isVideoNotSupported()){
+                            mediaIntent = new Intent(Intent.ACTION_VIEW);
+                        }
+                        else {
+                            mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                        }
+                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+                        if(accountInfo!=null){
+                            mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
+                        }
+                        mediaIntent.putExtra("position", positionInNodes);
+                        if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
+                            mediaIntent.putExtra("parentNodeHandle", -1L);
+                        }
+                        else{
+                            mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(positionInNodes)).getHandle());
+                        }
+                        mediaIntent.putExtra("orderGetChildren", orderGetChildren);
+                        mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
                         mediaIntent.putExtra("HANDLE", file.getHandle());
                         mediaIntent.putExtra("FILENAME", file.getName());
-                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                        if (localPath != null){
+                        mediaIntent.putExtra("screenPosition", screenPosition);
+                        if(((ManagerActivityLollipop)context).isFirstNavigationLevel() == true){
+                            mediaIntent.putExtra("adapterType", Constants.PHOTO_SYNC_ADAPTER);
+
+                        }else{
+                            mediaIntent.putExtra("adapterType", Constants.SEARCH_BY_ADAPTER);
+                            long[] arrayHandles = new long[nodes.size()];
+                            for(int i = 0; i < nodes.size(); i++) {
+                                arrayHandles[i] = nodes.get(i).getHandle();
+                            }
+                            mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
+                        }
+                        String localPath = findLocalPath(file.getName(), file.getSize(), file);
+                        if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
                             File mediaFile = new File(localPath);
-                            //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                 mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                             }
                             else{
-                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeThumbnail.typeForName(file.getName()).getType());
                             }
                             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         }
                         else {
+                            if (megaApi.httpServerIsRunning() == 0) {
+                                megaApi.httpServerStart();
+                            }
+
+                            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+                            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+                            activityManager.getMemoryInfo(mi);
+
+                            if(mi.totalMem>Constants.BUFFER_COMP){
+                                log("Total mem: "+mi.totalMem+" allocate 32 MB");
+                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+                            }
+                            else{
+                                log("Total mem: "+mi.totalMem+" allocate 16 MB");
+                                megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+                            }
+
+                            String url = megaApi.httpServerGetLocalLink(file);
                             mediaIntent.setDataAndType(Uri.parse(url), mimeType);
                         }
                         if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
@@ -1144,59 +1194,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             NodeController nC = new NodeController(context);
                             nC.prepareForDownload(handleList);
                         }
-                    }
-                    else if (MimeTypeList.typeForName(n.getName()).isPdf()){
-                        MegaNode file = n;
-
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart();
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if(mi.totalMem>Constants.BUFFER_COMP){
-                            log("Total mem: "+mi.totalMem+" allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-                        }
-                        else{
-                            log("Total mem: "+mi.totalMem+" allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-                        }
-
-                        String url = megaApi.httpServerGetLocalLink(file);
-                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
-                        log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
-
-                        Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                        pdfIntent.putExtra("APP", true);
-                        String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
-                        if (localPath != null){
-                            File mediaFile = new File(localPath);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-                            }
-                            else{
-                                pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-                            }
-                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        }
-                        else {
-                            pdfIntent.setDataAndType(Uri.parse(url), mimeType);
-                        }
-                        pdfIntent.putExtra("HANDLE", file.getHandle());
-                        if (MegaApiUtils.isIntentAvailable(context, pdfIntent)){
-                            context.startActivity(pdfIntent);
-                        }
-                        else{
-                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-
-                            ArrayList<Long> handleList = new ArrayList<Long>();
-                            handleList.add(n.getHandle());
-                            NodeController nC = new NodeController(context);
-                            nC.prepareForDownload(handleList);
-                        }
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else{
                         ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1225,6 +1224,124 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 clearSelections();
             }
         }
+    }
+
+    public String findLocalPath (String fileName, long fileSize, MegaNode file) {
+        log("findLocalPath");
+        String localPath = null;
+
+        localPath = getPath(fileName, fileSize, defaultPath, file);
+        if (localPath != null) {
+            return localPath;
+        }
+
+        if (localPath == null){
+            boolean isOnMegaDownloads = false;
+            localPath = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+            File f = new File(downloadLocationDefaultPath, file.getName());
+            if(f.exists() && (f.length() == file.getSize())){
+                isOnMegaDownloads = true;
+            }
+            if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+                return localPath;
+            }
+        }
+
+        return null;
+    }
+
+    public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
+        log("getPath");
+        String path = null;
+        if (destDir != null){
+            File dir = new File(destDir);
+            File [] listFiles = dir.listFiles();
+
+            if (listFiles != null){
+                for (int i=0; i<listFiles.length; i++){
+//                    log("listFiles[]: "+listFiles[i].getAbsolutePath());
+                    if (listFiles[i].isDirectory()){
+                        path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
+                        if (path != null) {
+//                            log("path number X: "+path);
+                            return path;
+                        }
+                    }
+                    else {
+                        boolean isOnMegaDownloads = false;
+                        path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+                        File f = new File(downloadLocationDefaultPath, file.getName());
+                        if(f.exists() && (f.length() == file.getSize())){
+                            isOnMegaDownloads = true;
+                        }
+                        if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
+//                            log("path number X: "+path);
+                            return path;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public String getRealName (String photoSyncName) {
+        String realName = null;
+        String date = "";
+        String time = "";
+        String extension = "";
+        boolean index = false;
+
+        String[] s = photoSyncName.split(" ");
+        if (s != null){
+            if (s.length > 0){
+                date = s[0];
+                time = s[1];
+
+                if (time != null) {
+                    s = time.split("_");
+                    if (s != null){
+                        if (s.length > 0) {
+                            time = s[0];
+                            s = s[s.length-1].split("\\.");
+                            extension = s[s.length-1];
+                            index = true;
+                        }
+                    }
+                    s = time.split("\\.");
+                    if (s != null) {
+                        if (s.length > 0) {
+                            if (!index){
+                                extension = s[s.length-1];
+                            }
+                            time = "";
+                            for (int i= 0; i<s.length-1; i++){
+                                time += s[i];
+                            }
+                        }
+                    }
+                }
+
+                if (date != null) {
+                    s = date.split("-");
+                    if (s != null) {
+                        if (s.length > 0) {
+                            date = "";
+                            for (int i=0; i<s.length; i++) {
+                                date += s[i];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        realName = date + "_" + time + "." + extension;
+
+        return realName;
     }
 
     public void onNodeLongClick(MegaPhotoSyncGridTitleAdapterLollipop.ViewHolderPhotoTitleSyncGridTitle holder, int positionInNodes){

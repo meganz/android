@@ -7,6 +7,7 @@
         android:orderInCategory="110"
         android:title="@string/general_share"
         MEGA:showAsAction="always"
+        android:icon="@drawable/ic_social_share_white"
         android:visible="true" />
 
     <item

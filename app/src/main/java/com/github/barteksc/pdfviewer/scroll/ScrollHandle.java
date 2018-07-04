@@ -18,7 +18,7 @@ public interface ScrollHandle {
      *
      * @param pdfView PDFView instance
      */
-    void setupLayout(PDFView pdfView, int numPages);
+    void setupLayout(PDFView pdfView);
 
     /**
      * Method called by PDFView when handle should be removed from layout
