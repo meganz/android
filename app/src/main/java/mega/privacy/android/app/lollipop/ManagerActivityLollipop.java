@@ -3064,13 +3064,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //					builder.setTitle(title);
 		            builder.setMessage(text);
 
-					builder.setPositiveButton(getString(R.string.general_yes),
+					builder.setPositiveButton(getString(R.string.cam_sync_stop),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
 									startService(cancelIntent);
 								}
 							});
-					builder.setNegativeButton(getString(R.string.general_no), null);
+					builder.setNegativeButton(getString(R.string.general_cancel), null);
 					final AlertDialog dialog = builder.create();
 					try {
 						dialog.show();
