@@ -1894,7 +1894,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 						case MegaChatMessage.END_CALL_REASON_CANCELLED:{
 
-							textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+							long lastMsgSender = chat.getLastMessageSender();
+							if(lastMsgSender==megaChatApi.getMyUserHandle()){
+								textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.call_missed_messages));
+							}
+
 							try {
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");

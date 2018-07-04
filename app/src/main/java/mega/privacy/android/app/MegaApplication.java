@@ -1207,7 +1207,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		//Show missed call if time out ringing (for incoming calls)
 		if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED){
 			try{
-				if((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT && !(call.isIgnored()))){
+				if(((call.getTermCode()==MegaChatCall.TERM_CODE_ANSWER_TIMEOUT || call.getTermCode()==MegaChatCall.TERM_CODE_CALL_REQ_CANCEL) && !(call.isIgnored()))){
 					log("onChatCallUpdate:TERM_CODE_ANSWER_TIMEOUT");
 					if(call.isLocalTermCode()==false){
 						log("onChatCallUpdate:localTermCodeNotLocal");
