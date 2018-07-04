@@ -28,6 +28,7 @@ import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
 import com.google.zxing.Result;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -39,11 +40,9 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
@@ -54,7 +53,7 @@ import static android.graphics.Color.WHITE;
  * Created by mega on 22/01/18.
  */
 
-public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.ResultHandler, */View.OnClickListener, MegaRequestListenerInterface{
+public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.ResultHandler, */View.OnClickListener{
 
     public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150;
     public static int WIDTH = 500;
@@ -101,6 +100,12 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     private boolean isContact = false;
 
+    private Bitmap avatarSave;
+    private String initialLetterSave;
+    private boolean contentAvatar = false;
+
+    private MegaUser userQuery;
+
     public static ScanCodeFragment newInstance() {
         log("newInstance");
         ScanCodeFragment fragment = new ScanCodeFragment();
@@ -123,6 +128,15 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             myEmail = savedInstanceState.getString("myEmail");
             success = savedInstanceState.getBoolean("success", true);
             handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
+
+            byte[] avatarByteArray = savedInstanceState.getByteArray("avatar");
+            if (avatarByteArray != null){
+                avatarSave = BitmapFactory.decodeByteArray(avatarByteArray, 0, avatarByteArray.length);
+                contentAvatar = savedInstanceState.getBoolean("contentAvatar", false);
+                if (!contentAvatar){
+                    initialLetterSave = savedInstanceState.getString("initialLetter");
+                }
+            }
         }
 
         if (megaApi == null){
@@ -195,9 +209,24 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             outState.putInt("dialogTitleContent", dialogTitleContent);
             outState.putInt("dialogTextContent", dialogTextContent);
         }
-        outState.putString("myEmail", myEmail);
-        outState.putBoolean("success", success);
-        outState.putLong("handleContactLink", handleContactLink);
+        if (dialogshown || inviteShown){
+            outState.putString("myEmail", myEmail);
+            outState.putBoolean("success", success);
+            outState.putLong("handleContactLink", handleContactLink);
+            if (avatarImage != null){
+                avatarImage.buildDrawingCache(true);
+                Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
+
+                ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+                avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+                byte[] avatarByteArray = avatarOutputStream.toByteArray();
+                outState.putByteArray("avatar", avatarByteArray);
+                outState.putBoolean("contentAvatar", contentAvatar);
+            }
+            if (!contentAvatar){
+                outState.putString("initialLetter", initialLetter.getText().toString());
+            }
+        }
     }
 
     @Override
@@ -293,7 +322,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             if (megaApi == null){
                 megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
             }
-            megaApi.contactLinkQuery(handle, this);
+            megaApi.contactLinkQuery(handle, (QRCodeActivity) context);
 
             View v = inflater.inflate(R.layout.dialog_accept_contact, null);
             builder.setView(v);
@@ -350,6 +379,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.accept_contact_invite: {
+                inviteShown = false;
                 sendInvitation();
                 if (inviteAlertDialog != null){
                     inviteAlertDialog.dismiss();
@@ -357,6 +387,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 break;
             }
             case R.id.dialog_invite_button: {
+                dialogshown = false;
 //                scannerView.stopCamera();
                 codeScanner.releaseResources();
                 if (requestedAlertDialog != null){
@@ -374,6 +405,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 break;
             }
             case R.id.view_contact: {
+                inviteShown = false;
                 codeScanner.releaseResources();
                 if (inviteAlertDialog != null){
                     inviteAlertDialog.dismiss();
@@ -394,39 +426,48 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     public void setAvatar(){
         log("updateAvatar");
-        File avatar = null;
-        if(context!=null){
-            log("context is not null");
 
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
+        if (!isContact){
+            log("setAvatar is not Contact");
+            setDefaultAvatar();
         }
-        else{
-            log("context is null!!!");
-            if(getActivity()!=null){
-                log("getActivity is not null");
-                if (getActivity().getExternalCacheDir() != null){
-                    avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+        else {
+
+            log("setAvatar is Contact");
+            File avatar = null;
+            if(context!=null){
+                log("context is not null");
+
+                if (context.getExternalCacheDir() != null){
+                    avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
                 }
                 else{
-                    avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                    avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
                 }
             }
             else{
-                log("getActivity is ALSOOO null");
-                return;
+                log("context is null!!!");
+                if(getActivity()!=null){
+                    log("getActivity is not null");
+                    if (getActivity().getExternalCacheDir() != null){
+                        avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                    }
+                    else{
+                        avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+                    }
+                }
+                else{
+                    log("getActivity is ALSOOO null");
+                    return;
+                }
             }
-        }
 
-        if(avatar!=null){
-            setProfileAvatar(avatar);
-        }
-        else{
-            setDefaultAvatar();
+            if(avatar!=null){
+                setProfileAvatar(avatar);
+            }
+            else{
+                setDefaultAvatar();
+            }
         }
     }
 
@@ -451,13 +492,14 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                     log("Show my avatar");
                     avatarImage.setImageBitmap(imBitmap);
                     initialLetter.setVisibility(View.GONE);
+                    contentAvatar = true;
                 }
             }
         }else{
             log("my avatar NOT exists!");
             log("Call to getUserAvatar");
             log("DO NOT Retry!");
-            megaApi.getUserAvatar(myEmail, avatar.getPath(), this);
+            megaApi.getUserAvatar(myEmail, avatar.getPath(), (QRCodeActivity) context);
 //            setDefaultAvatar();
         }
     }
@@ -469,13 +511,18 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         Paint p = new Paint();
         p.setAntiAlias(true);
 
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.handleToBase64(handleContactLink).trim());
-        if(color!=null){
-            log("The color to set the avatar is "+color);
-            p.setColor(Color.parseColor(color));
+        if (isContact && userQuery != null){
+            String color = megaApi.getUserAvatarColor(userQuery);
+            if(color!=null){
+                log("The color to set the avatar is "+color);
+                p.setColor(Color.parseColor(color));
+            }
+            else{
+                log("Default color to the avatar");
+                p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            }
         }
-        else{
-            log("Default color to the avatar");
+        else {
             p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
         }
 
@@ -500,13 +547,16 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             //No name, ask for it and later refresh!!
             fullName = myEmail;
         }
-        String firstLetter = fullName.charAt(0) + "";
-        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+        if (fullName != null && fullName.length() > 0) {
+            String firstLetter = fullName.charAt(0) + "";
+            firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 
-        initialLetter.setText(firstLetter);
-        initialLetter.setTextSize(30);
-        initialLetter.setTextColor(WHITE);
-        initialLetter.setVisibility(View.VISIBLE);
+            initialLetter.setText(firstLetter);
+            initialLetter.setTextSize(30);
+            initialLetter.setTextColor(WHITE);
+            initialLetter.setVisibility(View.VISIBLE);
+            contentAvatar = false;
+        }
     }
 
     private int getAvatarTextSize (float density){
@@ -532,16 +582,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         }
 
         return (int)textSize;
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
     }
 
     void showInviteDialog (){
@@ -575,6 +615,27 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             contactName = (TextView) v.findViewById(R.id.accept_contact_name);
             contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
 
+            if (avatarSave != null){
+                avatarImage.setImageBitmap(avatarSave);
+                if (contentAvatar){
+                    initialLetter.setVisibility(View.GONE);
+                }
+                else {
+                    if (initialLetterSave != null) {
+                        initialLetter.setText(initialLetterSave);
+                        initialLetter.setTextSize(30);
+                        initialLetter.setTextColor(WHITE);
+                        initialLetter.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        setAvatar();
+                    }
+                }
+            }
+            else {
+                setAvatar();
+            }
+
             if (isContact){
                 contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
                 invite.setVisibility(View.GONE);
@@ -595,14 +656,14 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 }
             });
             contactName.setText(contactNameContent);
-            setAvatar();
+//            setAvatar();
         }
         codeScanner.releaseResources();
         inviteAlertDialog.show();
         inviteShown = true;
     }
 
-    boolean queryIfIsContact() {
+    MegaUser queryIfIsContact() {
 
         ArrayList<MegaUser> contacts = megaApi.getContacts();
 
@@ -610,58 +671,30 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                 log("Contact mail[i]="+i+":"+contacts.get(i).getEmail()+" contact mail request: "+myEmail);
                 if (contacts.get(i).getEmail().equals(myEmail)){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-//        megaApi.contactLinkQuery(request.getNodeHandle(), this);
-        if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
-            if (e.getErrorCode() == MegaError.API_OK){
-                log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
-
-                this.request = request;
-                myEmail = request.getEmail();
-                handleContactLink = request.getNodeHandle();
-                contactNameContent = request.getName() + " " + request.getText();
-                if (queryIfIsContact()){
                     isContact = true;
+                    return contacts.get(i);
                 }
-                else {
-                    isContact = false;
-                }
-                showInviteDialog();
-            }
-            else if (e.getErrorCode() == MegaError.API_EEXIST){
-                dialogTitleContent = R.string.invite_not_sent;
-                dialogTextContent = R.string.invite_not_sent_text_already_contact;
-                showAlertDialog(dialogTitleContent, dialogTextContent, true);
-            }
-            else {
-                dialogTitleContent = R.string.invite_not_sent;
-                dialogTextContent = R.string.invite_not_sent_text;
-                showAlertDialog(dialogTitleContent, dialogTextContent, false);
             }
         }
-        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                log("Get user avatar OK");
-                setAvatar();
-            }
-            else {
-                log("Get user avatar FAIL");
-                setDefaultAvatar();
-            }
-        }
+        isContact = false;
+        return null;
     }
 
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
+    public void initDialogInvite(MegaRequest request, MegaError e){
+        if (e.getErrorCode() == MegaError.API_OK) {
+            log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
+            handleContactLink = request.getNodeHandle();
+            contactNameContent = request.getName() + " " + request.getText();
+            userQuery = queryIfIsContact();
+            showInviteDialog();
+        } else if (e.getErrorCode() == MegaError.API_EEXIST) {
+            dialogTitleContent = R.string.invite_not_sent;
+            dialogTextContent = R.string.invite_not_sent_text_already_contact;
+            showAlertDialog(dialogTitleContent, dialogTextContent, true);
+        } else {
+            dialogTitleContent = R.string.invite_not_sent;
+            dialogTextContent = R.string.invite_not_sent_text;
+            showAlertDialog(dialogTitleContent, dialogTextContent, false);
+        }
     }
 }

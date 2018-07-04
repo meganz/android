@@ -1,12 +1,13 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.os.Environment;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.print.PrintHelper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -22,25 +24,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.IOException;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaNode;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
@@ -49,6 +49,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     NodeController nC;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     LinearLayout mainLinearLayout;
     ImageView nodeThumb;
@@ -56,6 +57,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
     TextView nodeInfo;
     LinearLayout optionDeleteOffline;
     private LinearLayout optionOpenWith;
+    LinearLayout optionPrint;
+    LinearLayout copyClip;
+    LinearLayout saveFilesystem;
 
     DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -105,6 +109,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_offline_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.offline_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         nodeThumb = (ImageView) contentView.findViewById(R.id.offline_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.offline_name_text);
@@ -112,6 +117,13 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteOffline = (LinearLayout) contentView.findViewById(R.id.option_delete_offline_layout);
         optionOpenWith = (LinearLayout) contentView.findViewById(R.id.option_open_with_layout);
 
+        optionPrint = (LinearLayout) contentView.findViewById(R.id.option_print_offline_layout);
+        copyClip = (LinearLayout) contentView.findViewById(R.id.option_copy_offline_layout);
+        saveFilesystem = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
+
+        optionPrint.setOnClickListener(this);
+        copyClip.setOnClickListener(this);
+        saveFilesystem.setOnClickListener(this);
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
@@ -140,8 +152,20 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                     }
                     nodeThumb.setImageResource(MimeTypeList.typeForName(nodeOffline.getName()).getIconResourceId());
                 }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                    optionPrint.setVisibility(View.VISIBLE);
+                }
+                else {
+                    optionPrint.setVisibility(View.GONE);
+                }
+                copyClip.setVisibility(View.VISIBLE);
+                saveFilesystem.setVisibility(View.VISIBLE);
             }
             else{
+
+                optionPrint.setVisibility(View.GONE);
+                copyClip.setVisibility(View.GONE);
+                saveFilesystem.setVisibility(View.GONE);
 
                 log("Set node info");
                 String path=null;
@@ -170,28 +194,32 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 if (file.isDirectory()){
 
                     File[] fList = file.listFiles();
-                    for (File f : fList){
+                    if(fList != null){
+                        for (File f : fList){
 
-                        if (f.isDirectory()){
-                            folders++;
+                            if (f.isDirectory()){
+                                folders++;
+                            }
+                            else{
+                                files++;
+                            }
                         }
-                        else{
-                            files++;
-                        }
-                    }
 
-                    String info = "";
-                    if (folders > 0){
-                        info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-                        if (files > 0){
-                            info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+                        String info = "";
+                        if (folders > 0){
+                            info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+                            if (files > 0){
+                                info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+                            }
                         }
-                    }
-                    else {
-                        info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-                    }
+                        else {
+                            info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+                        }
 
-                    nodeInfo.setText(info);
+                        nodeInfo.setText(info);
+                    }else{
+                        nodeInfo.setText(" ");
+                    }
                 }
                 else{
                     long nodeSize = file.length();
@@ -230,14 +258,17 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//        }
+//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//        }
+        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-        }
-        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-        }
     }
 
 
@@ -258,10 +289,103 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 openWith();
                 break;
             }
+            case R.id.option_print_offline_layout:{
+                log("Option print rK");
+                printRK();
+                break;
+            }
+            case R.id.option_save_offline_layout:{
+                log("Option save on filesystem");
+                AccountController aC = new AccountController(getContext());
+                aC.saveRkToFileSystem(true);
+                break;
+            }
+            case R.id.option_copy_offline_layout:{
+                log("Option copy to clipboard");
+                if (Util.isOnline(context)){
+                    AccountController aC = new AccountController(getContext());
+                    aC.copyMK(false);
+                }
+                else {
+                    copyFromFile();
+                }
+                break;
+            }
         }
 //        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public String readRKFromFile (){
+        String line = null;
+        if (nodeOffline != null && nodeOffline.getPath() != null){
+            File file = new File(nodeOffline.getPath());
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                line = br.readLine();
+            }
+            catch (IOException e) {
+                log("IOException: " + e.getMessage());
+            }
+            return line;
+        }
+
+
+        return null;
+    }
+
+    public void copyFromFile () {
+        String key = readRKFromFile();
+        if (key != null) {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
+            clipboard.setPrimaryClip(clip);
+            if (clipboard.getPrimaryClip() != null) {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+            }
+            else {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            }
+        }
+        else {
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+        }
+    }
+
+    public void printRK(){
+        Bitmap rKBitmap = null;
+        if (Util.isOnline(context)) {
+            AccountController aC = new AccountController(getContext());
+            rKBitmap = aC.createRkBitmap();
+        }
+        else {
+            rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
+            String key =  readRKFromFile();
+            if (key != null){
+                Canvas canvas = new Canvas(rKBitmap);
+                Paint paint = new Paint();
+
+                paint.setTextSize(40);
+                paint.setColor(Color.BLACK);
+                paint.setStyle(Paint.Style.FILL);
+                float height = paint.measureText("yY");
+                float width = paint.measureText(key);
+                float x = (rKBitmap.getWidth()-width)/2;
+                canvas.drawText(key, x, height+15f, paint);
+            }
+            else {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
+            }
+
+        }
+        if (rKBitmap != null){
+            PrintHelper printHelper = new PrintHelper(getActivity());
+            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+            printHelper.printBitmap("rKPrint", rKBitmap);
+        }
     }
 
     public void openWith () {

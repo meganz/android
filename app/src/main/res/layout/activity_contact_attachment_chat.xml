@@ -49,7 +49,7 @@
             android:minWidth="0dp"
             android:layout_marginRight="16dp"
             android:background="@color/participants_layout"
-            android:text="@string/contact_invite"/>
+            android:text="@string/menu_add_contact"/>
     </LinearLayout>
 
     <View

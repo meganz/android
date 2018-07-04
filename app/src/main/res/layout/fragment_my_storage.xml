@@ -5,370 +5,367 @@
 	android:layout_height="match_parent">
 
 	<LinearLayout
+		android:id="@+id/my_storage_parent_linear_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:background="@color/white"
 		android:orientation="vertical">
 
-		<LinearLayout
-			android:id="@+id/my_storage_parent_linear_layout"
+		<!--Account plan-->
+		<RelativeLayout
+			android:id="@+id/my_storage_account_plan_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="25dp"
-			android:layout_marginBottom="34dp"
-			android:orientation="vertical">
+			android:layout_marginBottom="4dp">
 
+			<RelativeLayout
+				android:id="@+id/my_storage_account_plan_icon_rl"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
+				android:layout_marginLeft="20dp">
+				<ImageView
+					android:id="@+id/my_storage_account_plan_icon"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal"/>
+			</RelativeLayout>
 			<TextView
-				android:id="@+id/my_storage_account_title_text"
+				android:id="@+id/my_storage_account_plan_text"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="16sp"
+				android:layout_marginLeft="72dp"
 				android:textColor="@color/name_my_account"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:layout_marginBottom="8dp"
-				android:text="@string/my_account_title"/>
+				android:layout_alignParentTop="true"/>
+		</RelativeLayout>
 
-			<RelativeLayout
-				android:id="@+id/my_storage_account_plan_layout"
+		<!--Progress bar-->
+		<RelativeLayout
+			android:id="@+id/my_storage_account_progress_bar_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/white"
+			android:layout_marginLeft="72dp"
+			android:layout_marginRight="16dp"
+			android:gravity="left"
+			android:orientation="horizontal"
+			android:layout_marginBottom="6dp">
+			<ProgressBar
+				android:id="@+id/my_storage_progress_bar"
 				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:minHeight="2dp"
+				style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+				android:indeterminate="false"
+				android:max="100"/>
+		</RelativeLayout>
+
+		<!--Used space-->
+		<TextView
+			android:id="@+id/my_storage_used_space_result_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_marginLeft="72dp"
+			android:textSize="14sp"
+			android:textColor="@color/name_my_account"
+			android:layout_marginBottom="14dp" />
+
+		<!--Expiration-->
+		<RelativeLayout
+			android:id="@+id/my_storage_account_expiration_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/white"
+			android:layout_marginLeft="72dp"
+			android:gravity="left"
+			android:orientation="horizontal"
+			android:layout_marginBottom="12dp">
+			<TextView
+				android:id="@+id/my_storage_account_expiration_title"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_marginBottom="10dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:background="@color/white">
+				android:layout_alignParentLeft="true"
+				android:text="@string/expires_on"
+				android:textSize="14sp"
+				android:textColor="@color/mail_my_account" />
+			<TextView
+				android:id="@+id/my_storage_account_expiration_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_toRightOf="@+id/my_storage_account_expiration_title"
+				android:textSize="14sp"
+				android:textColor="@color/name_my_account"/>
+		</RelativeLayout>
 
-				<TextView
-					android:id="@+id/my_storage_account_plan_title_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="14sp"
-					android:layout_alignParentLeft="true"
-					android:textColor="@color/mail_my_account"
-					android:text="@string/account_plan"/>
+		<!--Separator-->
+		<LinearLayout
+			android:id="@+id/my_account_separator_1"
+			android:layout_width="match_parent"
+			android:layout_marginLeft="72dp"
+			android:layout_height="1dp"
+			android:layout_marginRight="16dp"
+			android:background="@color/divider_upgrade_account"
+			android:orientation="horizontal"
+			android:layout_marginBottom="17dp"/>
 
-				<TextView
-					android:id="@+id/my_storage_account_plan_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="14sp"
-					android:layout_alignParentRight="true"
-					android:textColor="@color/name_my_account"
-					android:text="FREE"/>
-			</RelativeLayout>
-
+		<!--Transfers quota-->
+		<RelativeLayout
+			android:id="@+id/my_storage_account_transfer_layout"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginBottom="16dp">
 			<RelativeLayout
-				android:id="@+id/my_storage_account_space_layout"
-				android:layout_width="match_parent"
+				android:id="@+id/my_storage_account_transfer_icon_rl"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_marginBottom="10dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:background="@color/white">
-
-				<TextView
-					android:id="@+id/my_storage_account_space_title_text"
+				android:layout_alignParentTop="true"
+				android:layout_marginLeft="20dp">
+				<ImageView
+					android:id="@+id/my_storage_account_transfer_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textSize="14sp"
-					android:layout_alignParentLeft="true"
-					android:textColor="@color/mail_my_account"
-					android:text="@string/storage_space"/>
-
-				<TextView
-					android:id="@+id/my_storage_account_space_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:textSize="14sp"
-					android:layout_alignParentRight="true"
-					android:textColor="@color/name_my_account"
-					android:text="50 GB"/>
+					android:layout_alignParentTop="true"
+					android:layout_gravity="center_horizontal"
+					android:src="@drawable/ic_transfers_quota_storage"
+					android:background="@null"/>
 			</RelativeLayout>
-
-			<RelativeLayout
-				android:id="@+id/my_storage_account_expiration_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:layout_marginBottom="10dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:gravity="left"
-				android:orientation="horizontal" >
-
-				<TextView
-					android:id="@+id/my_storage_account_expiration_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/expires_on"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_account_expiration_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="@color/name_my_account"/>
-
-			</RelativeLayout>
-
 			<LinearLayout
-				android:id="@+id/my_account_separator_1"
 				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:layout_marginTop="6dp"
-				android:background="@color/divider_upgrade_account"
-				android:orientation="horizontal" />
-
-			<RelativeLayout
-				android:id="@+id/my_storage_account_transfer_layout"
-				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginTop="14dp"
-				android:layout_marginBottom="13dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
-
+				android:layout_marginLeft="72dp"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentTop="true"
+				android:orientation="vertical">
 				<TextView
 					android:id="@+id/my_storage_account_transfer_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
 					android:text="@string/transfer_quota"
 					android:textSize="16sp"
 					android:textColor="@color/name_my_account" />
-
 				<TextView
 					android:id="@+id/my_storage_account_transfer_text"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
 					android:textSize="14sp"
-					android:textColor="@color/name_my_account"
+					android:textColor="@color/mail_my_account"
 					android:text="@string/not_available"/>
+			</LinearLayout>
 
-			</RelativeLayout>
+		</RelativeLayout>
 
-			<LinearLayout
-				android:id="@+id/my_account_separator_2"
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:background="@color/divider_upgrade_account"
-				android:orientation="horizontal" />
+		<!--Separator-->
+		<LinearLayout
+			android:id="@+id/my_account_separator_2"
+			android:layout_width="match_parent"
+			android:layout_marginLeft="72dp"
+			android:layout_height="1dp"
+			android:layout_marginRight="16dp"
+			android:background="@color/divider_upgrade_account"
+			android:orientation="horizontal"
+			android:layout_marginBottom="18dp"/>
 
-			<RelativeLayout
-				android:id="@+id/my_storage_used_space_layout"
-				android:layout_width="fill_parent"
+		<!--Usage Storage-->
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginTop="14dp"
-				android:layout_marginBottom="13dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
+				android:layout_marginLeft="72dp"
+				android:layout_marginBottom="10dp"
+				android:text="@string/title_storage_usage"
+				android:textColor="@color/name_my_account"
+				android:textSize="16sp"/>
 
-				<TextView
-					android:id="@+id/my_storage_used_space_title_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/my_account_used_space"
-					android:textSize="16sp"
-					android:textColor="@color/name_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_used_space_result_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="@color/name_my_account"/>
-
-			</RelativeLayout>
-
-			<LinearLayout
-				android:id="@+id/my_account_separator_3"
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:background="@color/divider_upgrade_account"
-				android:orientation="horizontal" />
-
+			<!--cloud drive-->
 			<RelativeLayout
 				android:id="@+id/my_storage_account_cloud_storage_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginTop="13dp"
-				android:layout_marginBottom="12dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
-
-				<TextView
-					android:id="@+id/my_storage_account_cloud_storage_title"
+				android:layout_width="match_parent"
+				android:layout_height="32dp">
+				<ImageView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/section_cloud_drive"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_account_cloud_storage_text"
-					android:layout_width="wrap_content"
+					android:layout_gravity="left"
+					android:layout_marginLeft="28dp"
+					android:layout_centerVertical="true"
+					android:src="@drawable/ic_b_cd_storage"
+					android:background="@null"/>
+				<RelativeLayout
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="15sp"
-					android:textColor="@color/name_my_account"/>
-
+					android:layout_marginLeft="72dp"
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true">
+					<TextView
+						android:id="@+id/my_storage_account_cloud_storage_title"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentLeft="true"
+						android:text="@string/section_cloud_drive"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+					<TextView
+						android:id="@+id/my_storage_account_cloud_storage_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true"
+						android:textSize="14sp"
+						android:textColor="@color/name_my_account"/>
+				</RelativeLayout>
 			</RelativeLayout>
 
+			<!--inbox-->
 			<RelativeLayout
 				android:id="@+id/my_storage_account_inbox_storage_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginBottom="12dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
-
-				<TextView
-					android:id="@+id/my_storage_account_inbox_storage_title"
+				android:layout_width="match_parent"
+				android:layout_height="32dp">
+				<ImageView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/section_inbox"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_account_inbox_storage_text"
-					android:layout_width="wrap_content"
+					android:layout_gravity="left"
+					android:layout_marginLeft="28dp"
+					android:layout_centerVertical="true"
+					android:src="@drawable/ic_b_inbox_storage"
+					android:background="@null"/>
+				<RelativeLayout
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="15sp"
-					android:textColor="@color/name_my_account"/>
-
+					android:layout_marginLeft="72dp"
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true">
+					<TextView
+						android:id="@+id/my_storage_account_inbox_storage_title"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentLeft="true"
+						android:text="@string/section_inbox"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+					<TextView
+						android:id="@+id/my_storage_account_inbox_storage_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true"
+						android:textSize="14sp"
+						android:textColor="@color/name_my_account"/>
+				</RelativeLayout>
 			</RelativeLayout>
 
+			<!--incoming shares-->
 			<RelativeLayout
 				android:id="@+id/my_storage_account_incoming_storage_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginBottom="12dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
-
-				<TextView
-					android:id="@+id/my_storage_account_incoming_storage_title"
+				android:layout_width="match_parent"
+				android:layout_height="32dp">
+				<ImageView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/title_incoming_shares_explorer"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_account_incoming_storage_text"
-					android:layout_width="wrap_content"
+					android:layout_gravity="left"
+					android:layout_marginLeft="28dp"
+					android:layout_centerVertical="true"
+					android:src="@drawable/ic_b_incoming_storage"
+					android:background="@null"/>
+				<RelativeLayout
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="15sp"
-					android:textColor="@color/name_my_account"/>
-
+					android:layout_marginLeft="72dp"
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true">
+					<TextView
+						android:id="@+id/my_storage_account_incoming_storage_title"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentLeft="true"
+						android:text="@string/title_incoming_shares_explorer"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+					<TextView
+						android:id="@+id/my_storage_account_incoming_storage_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true"
+						android:textSize="14sp"
+						android:textColor="@color/name_my_account"/>
+				</RelativeLayout>
 			</RelativeLayout>
 
+			<!--rubbish bin-->
 			<RelativeLayout
 				android:id="@+id/my_storage_account_rubbish_storage_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginBottom="12dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
-
-				<TextView
-					android:id="@+id/my_storage_account_rubbish_storage_title"
+				android:layout_width="match_parent"
+				android:layout_height="32dp">
+				<ImageView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/section_rubbish_bin"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_account_rubbish_storage_text"
-					android:layout_width="wrap_content"
+					android:layout_gravity="left"
+					android:layout_marginLeft="28dp"
+					android:layout_centerVertical="true"
+					android:src="@drawable/ic_b_rubbish_bin_storage"
+					android:background="@null"/>
+				<RelativeLayout
+					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="15sp"
-					android:textColor="@color/name_my_account"/>
-
+					android:layout_marginLeft="72dp"
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true">
+					<TextView
+						android:id="@+id/my_storage_account_rubbish_storage_title"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentLeft="true"
+						android:text="@string/section_rubbish_bin"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+					<TextView
+						android:id="@+id/my_storage_account_rubbish_storage_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true"
+						android:textSize="14sp"
+						android:textColor="@color/name_my_account"/>
+				</RelativeLayout>
 			</RelativeLayout>
 
+			<!--Previous versions-->
 			<RelativeLayout
 				android:id="@+id/my_storage_account_available_storage_layout"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:gravity="left"
-				android:layout_marginBottom="16dp"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:orientation="horizontal" >
-
-				<TextView
-					android:id="@+id/my_storage_account_available_storage_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/available_space"
-					android:textSize="14sp"
-					android:textColor="@color/mail_my_account" />
-
-				<TextView
-					android:id="@+id/my_storage_account_available_storage_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="15sp"
-					android:textColor="@color/name_my_account"/>
-
-			</RelativeLayout>
-
-			<RelativeLayout
-				android:id="@+id/my_storage_account_progress_bar_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:background="@color/white"
-				android:layout_marginLeft="16dp"
-				android:layout_marginRight="16dp"
-				android:gravity="left"
-				android:orientation="horizontal" >
-
-				<ProgressBar
-					android:id="@+id/my_storage_progress_bar"
+				android:layout_height="32dp">
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="left"
+					android:layout_marginLeft="28dp"
+					android:layout_centerVertical="true"
+					android:src="@drawable/ic_versions_storage"
+					android:background="@null"/>
+				<RelativeLayout
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:minHeight="8dp"
-					style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-					android:indeterminate="false"
-					android:max="100"/>
+					android:layout_height="wrap_content"
+					android:layout_marginLeft="72dp"
+					android:layout_marginRight="16dp"
+					android:layout_centerVertical="true">
+					<TextView
+						android:id="@+id/my_storage_account_available_storage_title"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentLeft="true"
+						android:text="Previous versions"
+						android:textSize="14sp"
+						android:textColor="@color/mail_my_account" />
+					<TextView
+						android:id="@+id/my_storage_account_available_storage_text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_alignParentRight="true"
+						android:textSize="14sp"
+						android:textColor="@color/name_my_account"/>
+				</RelativeLayout>
 			</RelativeLayout>
 		</LinearLayout>
 	</LinearLayout>

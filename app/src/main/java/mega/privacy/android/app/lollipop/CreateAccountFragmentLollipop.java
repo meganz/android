@@ -569,7 +569,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         dbH.clearCredentials();
 //        megaApi.localLogout();
 
-        if (!validateForm() || !passwdValid) {
+        if (!validateForm()) {
             return;
         }
 
@@ -660,6 +660,10 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         String value = userPassword.getText().toString();
         if (value.length() == 0) {
             return getString(R.string.error_enter_password);
+        }
+        else if (!passwdValid){
+            containerPasswdElements.setVisibility(View.GONE);
+            return getString(R.string.error_password);
         }
         return null;
     }

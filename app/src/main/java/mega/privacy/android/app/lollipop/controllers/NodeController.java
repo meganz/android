@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -199,6 +200,12 @@ public class NodeController {
         }
         else if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+        else if (context instanceof PdfViewerActivityLollipop){
+            ((PdfViewerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+        else if (context instanceof AudioVideoPlayerLollipop){
+            ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 
@@ -877,6 +884,15 @@ public class NodeController {
                 service.putExtra(DownloadService.EXTRA_URL, url);
                 service.putExtra(DownloadService.EXTRA_SIZE, size);
                 service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                    service.putExtra("fromMV", true);
+                    if (context instanceof AudioVideoPlayerLollipop){
+                        service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
+                    }
+                    else if (context instanceof PdfViewerActivityLollipop){
+                        service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
+                    }
+                }
                 context.startService(service);
             }
         }
@@ -928,87 +944,99 @@ public class NodeController {
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
                             log("Pdf file");
-                            File pdfFile = new File(localPath);
+                            if (context instanceof PdfViewerActivityLollipop){
+                                ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                            }
+                            else {
+                                File pdfFile = new File(localPath);
 
-                            Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-                            pdfIntent.putExtra("APP", true);
-                            pdfIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
-                                pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
+                                pdfIntent.putExtra("HANDLE", tempNode.getHandle());
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
+                                    pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                } else {
+                                    pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                }
+                                pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                pdfIntent.putExtra("inside", true);
+                                pdfIntent.putExtra("isUrl", false);
+                                context.startActivity(pdfIntent);
                             }
-                            else{
-                                pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            pdfIntent.putExtra("inside", true);
-                            pdfIntent.putExtra("isUrl", false);
-                            context.startActivity(pdfIntent);
                         }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideo()) {
-                            log("Video file");
-                            File videoFile = new File(localPath);
+                        else if (MimeTypeList.typeForName(tempNode.getName()).isVideoReproducible() || MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                            log("Video/Audio file");
+                            if (context instanceof AudioVideoPlayerLollipop){
+                                ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                            }
+                            else {
+                                File mediaFile = new File(localPath);
 
-                            Intent videoIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            videoIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
-                                videoIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            else{
-                                videoIntent.setDataAndType(Uri.fromFile(videoFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            context.startActivity(videoIntent);
-                        }
-                        else if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                            log("Audio file");
-                            File audioFile = new File(localPath);
+                                Intent mediaIntent;
+                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(mediaFile.getName()).isAudioNotSupported()) {
+                                    mediaIntent = new Intent(Intent.ACTION_VIEW);
 
-                            Intent audioIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            audioIntent.putExtra("HANDLE", tempNode.getHandle());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && audioFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
-                                audioIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                } else {
+                                    mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                                }
+                                mediaIntent.putExtra("isPlayList", false);
+                                mediaIntent.putExtra("HANDLE", tempNode.getHandle());
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+
+                                } else {
+                                    mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                }
+                                mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                context.startActivity(mediaIntent);
                             }
-                            else{
-                                audioIntent.setDataAndType(Uri.fromFile(audioFile), MimeTypeList.typeForName(tempNode.getName()).getType());
-                            }
-                            audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            context.startActivity(audioIntent);
                         }
                         else {
                             log("MimeTypeList other file");
-                            try {
-                                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                } else {
-                                    viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-                                }
-                                viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                if (MegaApiUtils.isIntentAvailable(context, viewIntent)) {
-                                    log("if isIntentAvailable");
-                                    context.startActivity(viewIntent);
-                                } else {
-                                    log("ELSE isIntentAvailable");
-                                    Intent intentShare = new Intent(Intent.ACTION_SEND);
+                            if(context instanceof FullScreenImageViewerLollipop){
+                                ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                            }
+                            else {
+                                try {
+                                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                        intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
                                     } else {
-                                        intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
                                     }
-                                    intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                    if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
-                                        log("call to startActivity(intentShare)");
-                                        context.startActivity(intentShare);
-                                    }
+                                    viewIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    if (MegaApiUtils.isIntentAvailable(context, viewIntent)) {
+                                        log("if isIntentAvailable");
+                                        context.startActivity(viewIntent);
+                                    } else {
+                                        log("ELSE isIntentAvailable");
+                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        } else {
+                                            intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+                                            log("call to startActivity(intentShare)");
+                                            context.startActivity(intentShare);
+                                        }
 
+                                        if(context instanceof ManagerActivityLollipop){
+                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        }
+                                        else if(context instanceof FileInfoActivityLollipop){
+                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        }
+                                        else if(context instanceof ContactFileListActivityLollipop){
+                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                        }
+                                    }
+                                }
+                                catch (Exception e){
                                     if(context instanceof ManagerActivityLollipop){
                                         ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof FullScreenImageViewerLollipop){
-                                        ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
                                     else if(context instanceof FileInfoActivityLollipop){
                                         ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
@@ -1016,32 +1044,6 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
-                                    else if(context instanceof PdfViewerActivityLollipop){
-                                        ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                    else if(context instanceof AudioVideoPlayerLollipop){
-                                        ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                    }
-                                }
-                            }
-                            catch (Exception e){
-                                if(context instanceof ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                }
-                                else if(context instanceof FullScreenImageViewerLollipop){
-                                    ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                }
-                                else if(context instanceof FileInfoActivityLollipop){
-                                    ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                }
-                                else if(context instanceof ContactFileListActivityLollipop){
-                                    ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                }
-                                else if(context instanceof PdfViewerActivityLollipop){
-                                    ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
-                                }
-                                else if(context instanceof AudioVideoPlayerLollipop){
-                                    ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                 }
                             }
                         }
@@ -1100,6 +1102,15 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_URL, url);
                             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
                             service.putExtra(DownloadService.EXTRA_PATH, path);
+                            if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                                service.putExtra("fromMV", true);
+                                if (context instanceof AudioVideoPlayerLollipop){
+                                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
+                                }
+                                else if (context instanceof PdfViewerActivityLollipop){
+                                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
+                                }
+                            }
                             context.startService(service);
                         }
                     }
@@ -1112,6 +1123,15 @@ public class NodeController {
                     service.putExtra(DownloadService.EXTRA_URL, url);
                     service.putExtra(DownloadService.EXTRA_SIZE, size);
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                    if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
+                        service.putExtra("fromMV", true);
+                        if (context instanceof AudioVideoPlayerLollipop){
+                            service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
+                        }
+                        else if (context instanceof PdfViewerActivityLollipop){
+                            service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
+                        }
+                    }
                     context.startService(service);
                 }
                 else {
@@ -1788,6 +1808,14 @@ public class NodeController {
                 File file = new File(path);
                 if (file.exists()) {
                     file.delete();
+
+                    if(context instanceof ManagerActivityLollipop){
+                        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                        if(mAF!=null && mAF.isAdded()){
+                            mAF.setMkButtonText();
+                        }
+                    }
 
                     ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
 

@@ -21,12 +21,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
@@ -43,7 +37,6 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -87,7 +80,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
     String remoteMessageType = "";
 
-    private AdvancedNotificationBuilder notificationBuilder;
+    private ChatAdvancedNotificationBuilder chatNotificationBuilder;
 
     Handler h;
 
@@ -138,7 +131,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         log("From: " + remoteMessage.getFrom());
 
-        notificationBuilder =  AdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
         remoteMessageType = remoteMessage.getData().get("type");
 
         // Check if message contains a data payload.
@@ -181,6 +173,25 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("Awaiting info on listener");
                     }
                 }
+                else if(remoteMessageType.equals("5")) {
+                    log("ACCEPTANCE notification");
+                    //Leave the flag showMessageNotificationAfterPush as it is
+                    //If true - wait until connection finish
+                    //If false, no need to change it
+                    log("Flag showMessageNotificationAfterPush: "+showMessageNotificationAfterPush);
+
+                    String email = remoteMessage.getData().get("email");
+                    log("Acceptance CR of: "+email);
+
+                    if (megaApi.getRootNode() == null) {
+                        log("RootNode = null");
+                        String gSession = credentials.getSession();
+                        performLoginProccess(gSession);
+                    }
+                    else{
+                        log("Awaiting info on listener");
+                    }
+                }
                 else if(remoteMessageType.equals("4")) {
                     log("CALL notification");
                     //Leave the flag showMessageNotificationAfterPush as it is
@@ -204,7 +215,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                         log("connection state ---> "+connectionState);
                     }
 
-                }else if(remoteMessageType.equals("2")){
+                }
+                else if(remoteMessageType.equals("2")){
                     log("CHAT notification");
 
                     if(app.isActivityVisible()){
@@ -245,6 +257,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
                             performLoginProccess(gSession);
 
+                            chatNotificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
                             h = new Handler(Looper.getMainLooper());
                             h.postDelayed(
                                     new Runnable() {
@@ -253,7 +267,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                             boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
                                             if(!shown){
                                                 log("Show simple notification - no connection finished");
-                                                notificationBuilder.showSimpleNotification();
+                                                chatNotificationBuilder.showSimpleNotification();
                                             }
                                             else{
                                                 log("Notification already shown");
@@ -272,6 +286,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                             megaChatApi.pushReceived(beep);
                             beep = false;
 
+                            chatNotificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+
                             h = new Handler(Looper.getMainLooper());
                             h.postDelayed(
                                     new Runnable() {
@@ -280,7 +296,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                                             boolean shown = ((MegaApplication) getApplication()).isChatNotificationReceived();
                                             if(!shown){
                                                 log("Show simple notification - no connection finished");
-                                                notificationBuilder.showSimpleNotification();
+                                                chatNotificationBuilder.showSimpleNotification();
                                             }
                                             else{
                                                 log("Notification already shown");
@@ -506,15 +522,18 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(getString(R.string.title_incoming_folder_notification))
                     .setContentText(notificationContent)
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(notificationContent))
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(this, R.color.mega))
                     .setContentIntent(pendingIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                notificationBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            }
 
             Drawable d;
 
@@ -583,103 +602,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 //        }
     }
 
-    public void showContactRequestNotification(MegaContactRequest crToShow) {
-        log("showContactRequestNotification");
-
-        String notificationContent;
-        if(crToShow!=null){
-            notificationContent = crToShow.getSourceEmail();
-        }
-        else{
-            log("Return because the request is NULL");
-            return;
-        }
-
-        int notificationId = Constants.NOTIFICATION_PUSH_CONTACT;
-
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.ACTION_IPC);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setContentTitle(getString(R.string.title_contact_request_notification))
-                .setContentText(notificationContent)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(notificationContent))
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setColor(ContextCompat.getColor(this,R.color.mega))
-                .setContentIntent(pendingIntent);
-
-        if(crToShow!=null){
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
-                if(largeIcon!=null){
-                    notificationBuilder.setLargeIcon(largeIcon);
-                }
-            }
-        }
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(notificationId, notificationBuilder.build());
-    }
-
-    public Bitmap createDefaultAvatar(String email){
-        log("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintCircle.setAntiAlias(true);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, paintCircle);
-
-        if(email!=null){
-            if(!email.isEmpty()){
-                char title = email.charAt(0);
-                String firstLetter = new String(title+"");
-
-                if(!firstLetter.equals("(")){
-
-                    log("Draw letter: "+firstLetter);
-                    Rect bounds = new Rect();
-
-                    paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-                    int xPos = (c.getWidth()/2);
-                    int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-                }
-
-            }
-        }
-        return defaultAvatar;
-    }
-
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
@@ -738,15 +660,21 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     return;
                 }
 
-                for (int i = 0; i < requests.size(); i++) {
-                    MegaContactRequest cr = requests.get(i);
-                    if (cr != null) {
-                        if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
-                            showContactRequestNotification(cr);
-                            log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-                        }
-                    }
-                }
+//                for (int i = 0; i < requests.size(); i++) {
+//                    MegaContactRequest cr = requests.get(i);
+//                    if (cr != null) {
+//                        if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
+//
+//                            ContactsAdvancedNotificationBuilder notificationBuilder;
+//                            notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
+//
+//                            notificationBuilder.removeAllIncomingContactNotifications();
+//                            notificationBuilder.showIncomingContactRequestNotification();
+//
+//                            log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+//                        }
+//                    }
+//                }
             } catch (Exception e) {
                 log("Exception when showing IPC request: " + e.getMessage());
             }

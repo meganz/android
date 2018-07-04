@@ -3,8 +3,6 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -21,7 +19,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
@@ -32,6 +29,7 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
     AccountController aC;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
     public TextView titleText;
@@ -73,6 +71,7 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_transfers, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.transfers_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         titleText = (TextView) contentView.findViewById(R.id.transfers_title_text);
 
@@ -101,14 +100,17 @@ public class TransfersBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//        }
+//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//        }
+        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 48));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-        }
-        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-        }
     }
 
 

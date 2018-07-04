@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
+import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 
@@ -310,6 +311,12 @@ public class ShareInfo {
 						return;
 					}
 					log("External No path traversal: " + title);
+					if (context instanceof PdfViewerActivityLollipop){
+						log("context of PdfViewerActivityLollipop");
+						if (!title.endsWith(".pdf")){
+							title += ".pdf";
+						}
+					}
 					file = new File(context.getExternalCacheDir(), title);
 				}
 				else{
@@ -323,6 +330,12 @@ public class ShareInfo {
 						return;
 					}
 					log("Internal No path traversal: " + title);
+					if (context instanceof PdfViewerActivityLollipop){
+						log("context of PdfViewerActivityLollipop");
+						if (!title.endsWith(".pdf")){
+							title += ".pdf";
+						}
+					}
 					file = new File(context.getCacheDir(), title);
 				}
 				else{

@@ -31,7 +31,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -39,6 +38,7 @@ import android.widget.TextView;
 
 import com.google.zxing.Result;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +60,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -81,11 +80,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public static final String ARG_OBJECT = "object";
 
 	String myEmail;
-	MegaUser myUser;
 	private RoundedImageView avatarImage;
 	private TextView contactName;
 	private TextView contactMail;
 	private Button invite;
+	private Button view;
 	private TextView initialLetterInvite;
 	private TextView dialogTitle;
 	private TextView dialogText;
@@ -129,6 +128,21 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	MegaUser selectedUser = null;
 
+	private boolean isContact = false;
+	private boolean inviteShown = false;
+	private boolean dialogshown = false;
+
+	public int dialogTitleContent = -1;
+	public int dialogTextContent = -1;
+	private String contactNameContent;
+
+	private Bitmap avatarSave;
+	private String initialLetterSave;
+	private boolean contentAvatar = false;
+	private boolean success;
+
+	private MegaUser userQuery;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -154,18 +168,21 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
 
 				myEmail = request.getEmail();
-				if (megaApi == null){
-					megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-				}
 				handleContactLink = request.getNodeHandle();
-				contactName.setText(request.getName() + " " + request.getText());
-				contactMail.setText(request.getEmail());
-				setAvatar();
+				contactNameContent = request.getName() + " " + request.getText();
 
-				inviteAlertDialog.show();
+				userQuery = queryIfIsContact();
+				showInviteDialog();
+			}
+			else if (e.getErrorCode() == MegaError.API_EEXIST){
+				dialogTitleContent = R.string.invite_not_sent;
+				dialogTextContent = R.string.invite_not_sent_text_already_contact;
+				showAlertDialog(dialogTitleContent, dialogTextContent, true);
 			}
 			else {
-				showAlertDialog( R.string.invite_not_sent, R.string.invite_not_sent_link_text, false);
+				dialogTitleContent = R.string.invite_not_sent;
+				dialogTextContent = R.string.invite_not_sent_text;
+				showAlertDialog(dialogTitleContent, dialogTextContent, false);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
@@ -185,41 +202,173 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		if (inviteShown){
+			outState.putBoolean("inviteShown",inviteShown);
+			outState.putString("contactNameContent", contactNameContent);
+			outState.putBoolean("isContact", isContact);
+		}
+		if (dialogshown){
+			outState.putBoolean("dialogshown", dialogshown);
+			outState.putInt("dialogTitleContent", dialogTitleContent);
+			outState.putInt("dialogTextContent", dialogTextContent);
+		}
+		if (dialogshown || inviteShown){
+			outState.putString("myEmail", myEmail);
+			outState.putLong("handleContactLink", handleContactLink);
+			outState.putBoolean("success", success);
+			if (avatarImage != null){
+				avatarImage.buildDrawingCache(true);
+				Bitmap avatarBitmap = avatarImage.getDrawingCache(true);
+
+				ByteArrayOutputStream avatarOutputStream = new ByteArrayOutputStream();
+				avatarBitmap.compress(Bitmap.CompressFormat.PNG, 100, avatarOutputStream);
+				byte[] avatarByteArray = avatarOutputStream.toByteArray();
+				outState.putByteArray("avatar", avatarByteArray);
+				outState.putBoolean("contentAvatar", contentAvatar);
+			}
+			if (!contentAvatar){
+				outState.putString("initialLetter", initialLetterInvite.getText().toString());
+			}
+		}
+	}
+
+	void showInviteDialog (){
+		if (inviteAlertDialog != null){
+			contactName.setText(contactNameContent);
+			if (isContact){
+				contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
+				invite.setVisibility(View.GONE);
+				view.setVisibility(View.VISIBLE);
+			}
+			else {
+				contactMail.setText(myEmail);
+				invite.setVisibility(View.VISIBLE);
+				view.setVisibility(View.GONE);
+			}
+			setAvatar();
+		}
+		else {
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+			LayoutInflater inflater = getActivity().getLayoutInflater();
+
+			View v = inflater.inflate(R.layout.dialog_accept_contact, null);
+			builder.setView(v);
+			invite = (Button) v.findViewById(R.id.accept_contact_invite);
+			invite.setOnClickListener(this);
+			view = (Button) v.findViewById(R.id.view_contact);
+			view.setOnClickListener(this);
+
+			avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
+			initialLetterInvite = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
+			contactName = (TextView) v.findViewById(R.id.accept_contact_name);
+			contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
+
+			if (avatarSave != null){
+				avatarImage.setImageBitmap(avatarSave);
+				if (contentAvatar){
+					initialLetterInvite.setVisibility(View.GONE);
+				}
+				else {
+					if (initialLetterSave != null) {
+						initialLetterInvite.setText(initialLetterSave);
+						initialLetterInvite.setTextSize(30);
+						initialLetterInvite.setTextColor(WHITE);
+						initialLetterInvite.setVisibility(View.VISIBLE);
+					}
+					else {
+						setAvatar();
+					}
+				}
+			}
+			else {
+				setAvatar();
+			}
+
+			if (isContact){
+				contactMail.setText(getResources().getString(R.string.context_contact_already_exists, myEmail));
+				invite.setVisibility(View.GONE);
+				view.setVisibility(View.VISIBLE);
+			}
+			else {
+				contactMail.setText(myEmail);
+				invite.setVisibility(View.VISIBLE);
+				view.setVisibility(View.GONE);
+			}
+			inviteAlertDialog = builder.create();
+			inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					log("onDismiss");
+					inviteShown = false;
+				}
+			});
+			contactName.setText(contactNameContent);
+		}
+		inviteAlertDialog.show();
+		inviteShown = true;
+	}
+
+	MegaUser queryIfIsContact() {
+
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+
+		for (int i=0; i<contacts.size(); i++){
+			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+				log("Contact mail[i]="+i+":"+contacts.get(i).getEmail()+" contact mail request: "+myEmail);
+				if (contacts.get(i).getEmail().equals(myEmail)){
+					isContact = true;
+					return contacts.get(i);
+				}
+			}
+		}
+		isContact = false;
+		return null;
+	}
+
 	public void setAvatar(){
 		log("updateAvatar");
-		File avatar = null;
-		if(context!=null){
-			log("context is not null");
-
-			if (context.getExternalCacheDir() != null){
-				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-			}
-			else{
-				avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-			}
+		if (!isContact){
+			setDefaultAvatar();
 		}
-		else{
-			log("context is null!!!");
-			if(getActivity()!=null){
-				log("getActivity is not null");
-				if (getActivity().getExternalCacheDir() != null){
-					avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		else {
+			File avatar = null;
+			if(context!=null){
+				log("context is not null");
+
+				if (context.getExternalCacheDir() != null){
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
 				}
 				else{
-					avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+					avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
 				}
 			}
 			else{
-				log("getActivity is ALSOOO null");
-				return;
+				log("context is null!!!");
+				if(getActivity()!=null){
+					log("getActivity is not null");
+					if (getActivity().getExternalCacheDir() != null){
+						avatar = new File(getActivity().getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+					}
+					else{
+						avatar = new File(getActivity().getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+					}
+				}
+				else{
+					log("getActivity is ALSOOO null");
+					return;
+				}
 			}
-		}
 
-		if(avatar!=null){
-			setProfileAvatar(avatar);
-		}
-		else{
-			setDefaultAvatar();
+			if(avatar!=null){
+				setProfileAvatar(avatar);
+			}
+			else{
+				setDefaultAvatar();
+			}
 		}
 	}
 
@@ -262,13 +411,18 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 
-		String color = megaApi.getUserAvatarColor(myUser);
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
+		if (isContact && userQuery != null){
+			String color = megaApi.getUserAvatarColor(userQuery);
+			if(color!=null){
+				log("The color to set the avatar is "+color);
+				p.setColor(Color.parseColor(color));
+			}
+			else{
+				log("Default color to the avatar");
+				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			}
 		}
-		else{
-			log("Default color to the avatar");
+		else {
 			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
 		}
 
@@ -341,6 +495,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 		invite = (Button) v.findViewById(R.id.accept_contact_invite);
 		invite.setOnClickListener(this);
+		view = (Button) v.findViewById(R.id.view_contact);
+		view.setOnClickListener(this);
 
 		avatarImage = (RoundedImageView) v.findViewById(R.id.accept_contact_avatar);
 		initialLetterInvite = (TextView) v.findViewById(R.id.accept_contact_initial_letter);
@@ -348,6 +504,14 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		contactMail = (TextView) v.findViewById(R.id.accept_contact_mail);
 
 		inviteAlertDialog = builder.create();
+		inviteAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				inviteShown = false;
+			}
+		});
+
+		((ManagerActivityLollipop) context).handleInviteContact = 0;
 	}
 
 	public void showAlertDialog (int title, int text, final boolean success) {
@@ -360,19 +524,33 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		dialogText = (TextView) v.findViewById(R.id.dialog_invite_text);
 		dialogButton = (Button) v.findViewById(R.id.dialog_invite_button);
 		dialogButton.setOnClickListener(this);
-//            dialogTitle.setText(getResources().getString(R.string.invite_accepted));
-//            dialogText.setText(getResources().getString(R.string.invite_accepted_text, myEmail));
 
+		this.success = success;
+
+		if (dialogTitleContent == -1){
+			dialogTitleContent = title;
+		}
+		if (dialogTextContent == -1) {
+			dialogTextContent = text;
+		}
+		dialogTitle.setText(getResources().getString(dialogTitleContent));
 		if (success){
-			dialogTitle.setText(getResources().getString(title));
-			dialogText.setText(getResources().getString(text, myEmail));
+			dialogText.setText(getResources().getString(dialogTextContent, myEmail));
 		}
 		else {
-			dialogTitle.setText(getResources().getString(title));
-			dialogText.setText(getResources().getString(text));
+			dialogText.setText(getResources().getString(dialogTextContent));
 		}
 
 		requestedAlertDialog = builder.create();
+		requestedAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				if (success){
+					dialogshown = false;
+				}
+			}
+		});
+		dialogshown = true;
 		requestedAlertDialog.show();
 	}
 
@@ -380,6 +558,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void onClick(View v) {
 		switch (v.getId()){
 			case R.id.accept_contact_invite: {
+				inviteShown = false;
 				megaApi.inviteContact(myEmail, null, MegaContactRequest.INVITE_ACTION_ADD, handleContactLink, (ManagerActivityLollipop) context);
 				if (inviteAlertDialog != null){
 					inviteAlertDialog.dismiss();
@@ -387,9 +566,21 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				break;
 			}
 			case R.id.dialog_invite_button: {
+				dialogshown = false;
 				if (requestedAlertDialog != null){
 					requestedAlertDialog.dismiss();
 				}
+				break;
+			}
+			case R.id.view_contact: {
+				inviteShown = false;
+				((ManagerActivityLollipop) context).handleInviteContact = 0;
+				if (inviteAlertDialog != null){
+					inviteAlertDialog.dismiss();
+				}
+				Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
+				intent.putExtra("name", myEmail);
+				startActivity(intent);
 				break;
 			}
 		}
@@ -606,6 +797,27 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
+
+		if (savedInstanceState != null){
+			isContact = savedInstanceState.getBoolean("isContact", false);
+			inviteShown = savedInstanceState.getBoolean("inviteShown", false);
+			dialogshown = savedInstanceState.getBoolean("dialogshown", false);
+			dialogTitleContent = savedInstanceState.getInt("dialogTitleContent", -1);
+			dialogTextContent = savedInstanceState.getInt("dialogTextContent", -1);
+			contactNameContent = savedInstanceState.getString("contactNameContent");
+			success = savedInstanceState.getBoolean("success", true);
+			myEmail = savedInstanceState.getString("myEmail");
+			handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
+
+			byte[] avatarByteArray = savedInstanceState.getByteArray("avatar");
+			if (avatarByteArray != null){
+				avatarSave = BitmapFactory.decodeByteArray(avatarByteArray, 0, avatarByteArray.length);
+				contentAvatar = savedInstanceState.getBoolean("contentAvatar", false);
+				if (!contentAvatar){
+					initialLetterSave = savedInstanceState.getString("initialLetter");
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -739,6 +951,13 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
+			if (inviteShown){
+				showInviteDialog();
+			}
+			else if (dialogshown){
+				showAlertDialog(dialogTitleContent, dialogTextContent, success);
+			}
+
 			return v;
 		}
 		else{
@@ -746,7 +965,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
-//			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			((CustomizedGridRecyclerView) recyclerView).setWrapContent();
@@ -823,6 +1042,14 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
+			if (inviteShown){
+				showInviteDialog();
+			}
+			else if (dialogshown){
+				showAlertDialog(dialogTitleContent, dialogTextContent, success);
+			}
+
 			return v;
 		}			
 	}

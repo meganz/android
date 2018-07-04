@@ -423,7 +423,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			File currentFile = new File(absolutePath);			
 			intent.putExtra("offlinePathDirectory", currentFile.getParent());
 			startActivity(intent);
-					
+			overridePendingTransition(0,0);
 		}
 //		else if(MimeType.typeForName(absolutePath).isPdf()){
 //			

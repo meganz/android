@@ -158,6 +158,15 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             message = context.getString(R.string.number_correctly_sent_multifile, max_items);
                         }
                     }
+                    else if(actionListener==Constants.MULTIPLE_CHAT_IMPORT){
+                        //Many files shared with one contacts
+                        if(error>0){
+                            message = context.getString(R.string.number_correctly_imported_from_chat, max_items-error) + context.getString(R.string.number_no_imported_from_chat, error);
+                        }
+                        else{
+                            message = context.getString(R.string.import_success_message);
+                        }
+                    }
                     else{
                         log("copy request finished");
                         if(error>0){
@@ -261,6 +270,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                 ((ManagerActivityLollipop) context).showSnackbar(message);
             }
             else if(context instanceof ChatActivityLollipop){
+                ((ChatActivityLollipop) context).removeRequestDialog();
                 ((ChatActivityLollipop) context).showSnackbar(message);
             }
             else if(context instanceof ContactAttachmentActivityLollipop){

@@ -2,12 +2,15 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -103,8 +106,29 @@ public class TransfersFragmentLollipop extends Fragment {
 		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
 		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
 
-		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
-		emptyText.setText(getString(R.string.transfers_empty));
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			emptyImage.setImageResource(R.drawable.ic_zero_landscape_saved_for_offline);
+		}else{
+			emptyImage.setImageResource(R.drawable.ic_zero_portrait_transfers);
+		}
+
+//		emptyText.setText(getString(R.string.transfers_empty));
+
+		String textToShow = String.format(context.getString(R.string.transfers_empty_new));
+		try{
+			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[/B]", "</font>");
+		}
+		catch (Exception e){}
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		emptyText.setText(result);
 
 		setTransfers();
 		
@@ -174,22 +198,26 @@ public class TransfersFragmentLollipop extends Fragment {
 
 	public void transferUpdate(MegaTransfer transfer){
         log("transferUpdate");
-
-		ListIterator li = tL.listIterator();
-		int index = 0;
-		while(li.hasNext()) {
-			MegaTransfer next = (MegaTransfer) li.next();
-			if(next!=null){
-				if(next.getTag() == transfer.getTag()){
-					index=li.previousIndex();
-					break;
+        try{
+			ListIterator li = tL.listIterator();
+			int index = 0;
+			while(li.hasNext()) {
+				MegaTransfer next = (MegaTransfer) li.next();
+				if(next!=null){
+					if(next.getTag() == transfer.getTag()){
+						index=li.previousIndex();
+						break;
+					}
 				}
 			}
-		}
-		tL.set(index, transfer);
-		log("Update the transfer with index : "+index +", left: "+tL.size());
+			tL.set(index, transfer);
+			log("Update the transfer with index : "+index +", left: "+tL.size());
 
-		adapter.updateProgress(index, transfer);
+			adapter.updateProgress(index, transfer);
+		}
+        catch(IndexOutOfBoundsException e){
+			log("EXCEPTION:transferUpdate: "+e.getMessage());
+		}
     }
 
 	public void changeStatusButton(int tag){

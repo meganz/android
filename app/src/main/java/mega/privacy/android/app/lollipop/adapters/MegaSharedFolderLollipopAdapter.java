@@ -405,8 +405,13 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 					break;	
 				}
 			}
+
+			if(share.isPending()){
+				String pending = " "+context.getString(R.string.pending_outshare_indicator);
+				holder.textViewPermissions.append(pending);
+			}
 		}
-		
+
         holder.threeDotsLayout.setTag(holder);
 		holder.threeDotsLayout.setOnClickListener(this);
 	}
