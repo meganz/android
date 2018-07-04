@@ -64,8 +64,8 @@ import nz.mega.sdk.MegaNode;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener {
 
-	static public int ADAPTER_RECENT_CHATS = 0;
-	static public int ADAPTER_ARCHIVED_CHATS = ADAPTER_RECENT_CHATS+1;
+	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
+	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
 
 	Context context;
 	int positionClicked;
