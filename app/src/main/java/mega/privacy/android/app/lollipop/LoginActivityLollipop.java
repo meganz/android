@@ -63,6 +63,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     RelativeLayout relativeContainer;
 
+    boolean cancelledConfirmationProcess = false;
+
     //Fragments
     TourFragmentLollipop tourFragment;
     LoginFragmentLollipop loginFragment;
@@ -263,8 +265,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             }
             case Constants.CREATE_ACCOUNT_FRAGMENT: {
                 log("Show CREATE_ACCOUNT_FRAGMENT");
-                if (createAccountFragment == null) {
+                if (createAccountFragment == null || cancelledConfirmationProcess) {
                     createAccountFragment = new CreateAccountFragmentLollipop();
+                    cancelledConfirmationProcess = false;
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -854,10 +857,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                         showFragment(visibleFragment);
 
                     } else {
-                        dbH.clearEphemeral();
-                        waitingForConfirmAccount = false;
-                        visibleFragment = Constants.LOGIN_FRAGMENT;
-                        showFragment(visibleFragment);
+                        cancelConfirmationAccount();
                     }
                 }
             }
@@ -865,6 +865,18 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 log("ExceptionManager");
             }
         }
+    }
+
+    public void cancelConfirmationAccount(){
+        log("cancelConfirmationAccount");
+        dbH.clearEphemeral();
+        dbH.clearCredentials();
+        cancelledConfirmationProcess = true;
+        waitingForConfirmAccount = false;
+        passwdTemp = null;
+        emailTemp = null;
+        visibleFragment = Constants.TOUR_FRAGMENT;
+        showFragment(visibleFragment);
     }
 
     @Override
