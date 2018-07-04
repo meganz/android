@@ -2833,6 +2833,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (e.getErrorCode() == MegaError.API_OK){
                 Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
             }
+            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
+            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
             else{
                 Snackbar.make(pdfviewerContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
             }
