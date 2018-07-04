@@ -44,7 +44,6 @@ import nz.mega.sdk.MegaApiAndroid;
  */
 public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> implements OnClickListener {
 
-	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	DatabaseHandler dbH = null;
 	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
 	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
@@ -140,16 +139,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		this.phoneContacts = phoneContacts;
 		notifyDataSetChanged();
 
-	}
-
-	public PhoneContactInfo getDocumentAt(int position)
-	{
-		if(position < phoneContacts.size())
-		{
-			return phoneContacts.get(position);
-		}
-
-		return null;
 	}
 
 	@Override
@@ -308,7 +297,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	    display.getMetrics(outMetrics);
 	    float density  = mContext.getResources().getDisplayMetrics().density;
 	    
-	    int avatarTextSize = getAvatarTextSize(density);
+	    int avatarTextSize = Util.getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (isMegaContact){
 		    if (holder.contactMail != null){
@@ -334,31 +323,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	    		}
 	    	}
 	    }
-	}
-	
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-		
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-		}
-		
-		return (int)textSize;
 	}
 	
 	@Override
