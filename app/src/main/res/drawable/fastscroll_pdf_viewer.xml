@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+     <item>
+        <shape android:shape="oval" android:useLevel="false">
+            <solid android:color="@color/shape_page_number"/>
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_scroll_white"
+        android:bottom="12dp"
+        android:left="10dp"
+        android:right="20dp"
+        android:top="12dp"/>
+</layer-list>

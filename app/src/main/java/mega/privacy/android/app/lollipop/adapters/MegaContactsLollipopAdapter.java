@@ -206,6 +206,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
+
+			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
+			}
+			else{
+				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
+				holderList.textViewContactName.setMaxWidth((int) width);
+			}
+
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.threeDotsLayout = (RelativeLayout) v.findViewById(R.id.contact_list_three_dots_layout);
 
@@ -969,6 +979,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				return megaContactAdapter.getMegaUser();
 			}
 		} catch (IndexOutOfBoundsException e) {
+			log("EXCEPTION: "+e.getMessage());
 		}
 		return null;
 	}
@@ -982,45 +993,52 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		if (!(adapterType == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT)){
 			ViewHolderContacts holder = (ViewHolderContacts) v.getTag();
 			int currentPosition = holder.getAdapterPosition();
-			MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
-			
-			switch (v.getId()){			
-				case R.id.contact_list_three_dots_layout:
-				case R.id.contact_grid_three_dots:{
-					log("click contact three dots!");
-					if(multipleSelect){
+			try {
+				MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
+
+				switch (v.getId()){
+					case R.id.contact_list_three_dots_layout:
+					case R.id.contact_grid_three_dots:{
+						log("click contact three dots!");
+						if(multipleSelect){
+							if (fragment != null){
+								fragment.itemClick(currentPosition);
+							}
+						}
+						else{
+							((ManagerActivityLollipop) context).showContactOptionsPanel(c);
+						}
+
+						break;
+					}
+					case R.id.contact_list_item_layout:
+					case R.id.contact_grid_item_layout:{
+						log("contact_item_layout");
 						if (fragment != null){
 							fragment.itemClick(currentPosition);
 						}
+						break;
 					}
-					else{
-						((ManagerActivityLollipop) context).showContactOptionsPanel(c);
-					}
-
-					break;
-				}			
-				case R.id.contact_list_item_layout:
-				case R.id.contact_grid_item_layout:{
-					log("contact_item_layout");
-					if (fragment != null){
-						fragment.itemClick(currentPosition);
-					}
-					break;
 				}
+			} catch (IndexOutOfBoundsException e) {
+				log("EXCEPTION: "+e.getMessage());
 			}
 		}
 		else {
 			if(!isMultipleSelect()){
 				ViewHolderContactsList holder = (ViewHolderContactsList) v.getTag();
 				int currentPosition = holder.getAdapterPosition();
-				MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
-
-				switch (v.getId()){
-					case R.id.contact_list_item_layout: {
-						log("contact_list_item_layout");
-						((AddContactActivityLollipop) context).itemClick(c.getMegaUser().getEmail(), currentPosition);
-						break;
+				try {
+					MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
+					switch (v.getId()){
+						case R.id.contact_list_item_layout: {
+							log("contact_list_item_layout");
+							((AddContactActivityLollipop) context).itemClick(c.getMegaUser().getEmail(), currentPosition);
+							break;
+						}
 					}
+				} catch (IndexOutOfBoundsException e) {
+					log("EXCEPTION: "+e.getMessage());
 				}
 			}
 		}

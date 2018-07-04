@@ -3,6 +3,30 @@
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/action_search"
+        android:orderInCategory="100"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_menu_search"
+        MEGA:actionViewClass="android.support.v7.widget.SearchView"
+        MEGA:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/full_video_viewer_get_link"
+        android:orderInCategory="115"
+        android:title="@string/context_get_link_menu"
+        android:icon="@drawable/link_ic_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_remove_link"
+        android:orderInCategory="115"
+        android:title="@string/context_remove_link_menu"
+        android:icon="@drawable/ic_remove_link_w"
+        MEGA:showAsAction="always"
+        android:visible="false" />
+
+    <item
         android:id="@+id/full_video_viewer_share"
         android:orderInCategory="110"
         android:title="@string/general_share"
@@ -19,19 +43,84 @@
         android:visible="true"/>
 
     <item
+        android:id="@+id/full_video_viewer_properties"
+        android:orderInCategory="105"
+        android:title="@string/general_file_info"
+        android:icon="@drawable/info_ic_white"
+        MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
         android:id="@+id/full_video_viewer_download"
-        android:orderInCategory="110"
-        android:title="@string/context_download"
+        android:orderInCategory="100"
+        android:title="@string/general_download"
         android:icon="@drawable/ic_download_white"
         MEGA:showAsAction="always"
         android:visible="true"/>
 
     <item
-        android:id="@+id/full_video_viewer_properties"
+        android:id="@+id/full_video_viewer_loop"
+        android:orderInCategory="100"
+        android:title="@string/context_loop_video"
+        MEGA:showAsAction="never"
+        android:visible="true"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_rename"
+        android:orderInCategory="100"
+        android:title="@string/context_rename"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_move"
+        android:orderInCategory="105"
+        android:title="@string/context_move"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_copy"
         android:orderInCategory="110"
-        android:title="@string/general_file_info"
-        android:icon="@drawable/info_ic_white"
+        android:title="@string/context_copy"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_move_to_trash"
+        android:orderInCategory="115"
+        android:title="@string/context_move_to_trash"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/full_video_viewer_remove"
+        android:orderInCategory="115"
+        android:title="@string/context_remove"
+        MEGA:showAsAction="never"
+        android:visible="false"/>
+    
+    <item
+        android:id="@+id/chat_full_video_viewer_import"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_import_to_cloud_white"
+        android:title="@string/add_to_cloud"
         MEGA:showAsAction="always"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/chat_full_video_viewer_save_for_offline"
+        android:orderInCategory="110"
+        android:title="@string/save_for_offline"
+        MEGA:showAsAction="never"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/chat_full_video_viewer_remove"
+        android:orderInCategory="115"
+        android:title="@string/context_remove"
+        MEGA:showAsAction="never"
         android:visible="true"/>
 
 </menu>

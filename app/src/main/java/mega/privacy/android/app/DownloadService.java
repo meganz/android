@@ -18,6 +18,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
@@ -42,6 +43,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -116,6 +118,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	int transfersCount = 0;
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
+	HashMap<Long, Boolean> fromMediaViewers;
+	int typeAccount;
 
 	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
@@ -142,6 +146,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		canceled = false;
 
 		storeToAdvacedDevices = new HashMap<Long, Uri>();
+		fromMediaViewers = new HashMap<>();
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -218,6 +223,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
+		typeAccount = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
+        boolean fromMV = intent.getBooleanExtra("fromMV", false);
+        log("fromMV: "+fromMV);
 
 		megaApi = app.getMegaApi();
 
@@ -321,6 +330,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return;
 		}
 
+		fromMediaViewers.put(currentDocument.getHandle(), fromMV);
+
         currentDir = getDir(currentDocument, intent);
         currentDir.mkdirs();
         if (currentDir.isDirectory()){
@@ -338,7 +349,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			alreadyDownloaded++;
             if ((megaApi.getNumPendingDownloads() == 0) && (megaApiFolder.getNumPendingDownloads() == 0)){
-                onQueueComplete();
+                onQueueComplete(currentDocument.getHandle());
             }
 
             return;
@@ -365,6 +376,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 log("currentDir is not a directory");
             }
             storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
+
+			if (currentDir.getAbsolutePath().contains(Util.offlineDIR)){
+				log("currentDir contains offlineDIR");
+				openFile = false;
+			}
+			else {
+				log("currentDir is NOT on offlineDIR: openFile->"+openFile);
+			}
 
 			if (isFolderLink){
 				if (dbH.getCredentials() == null) {
@@ -417,6 +436,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     log("IS FILE_:_");
                 }
 
+				if (currentDir.getAbsolutePath().contains(Util.offlineDIR)){
+                	log("currentDir contains offlineDIR");
+					openFile = false;
+				}
+				else {
+					log("currentDir is NOT on offlineDIR: openFile->"+openFile);
+				}
+
                 if (isFolderLink){
 
                     log("Folder link node");
@@ -443,7 +470,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
     }
 
-	private void onQueueComplete() {
+	private void onQueueComplete(long handle) {
 		log("onQueueComplete");
 
 		if((lock != null) && (lock.isHeld()))
@@ -451,7 +478,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-        showCompleteNotification();
+        showCompleteNotification(handle);
 
 		isForeground = false;
 		stopForeground(true);
@@ -511,7 +538,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	/*
 	 * Show download success notification
 	 */
-	private void showCompleteNotification() {
+	private void showCompleteNotification(long handle) {
 		log("showCompleteNotification");
 		String notificationTitle, size;
 
@@ -548,13 +575,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		{
 			intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
-			log("Show notification");
+			log("Show notification 1");
 			mBuilderCompat
-			.setSmallIcon(R.drawable.ic_stat_notify_download)
+			.setSmallIcon(R.drawable.ic_stat_notify)
 			.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 			.setAutoCancel(true).setTicker(notificationTitle)
 			.setContentTitle(notificationTitle).setContentText(size)
 			.setOngoing(false);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
 
 			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 		}
@@ -601,52 +632,77 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						externalFile = false;
 					}
 
+					boolean fromMV = false;
+					if (fromMediaViewers.containsKey(handle)){
+						fromMV = fromMediaViewers.get(handle);
+					}
+
 					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
-						Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
-						pdfIntent.putExtra("APP", true);
-						pdfIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						else{
-							pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						pdfIntent.putExtra("inside", true);
-						pdfIntent.putExtra("isUrl", false);
-						startActivity(pdfIntent);
-					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isVideo()) {
-						log("Video file");
 
-						Intent videoIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-						videoIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
-							videoIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						else{
-							videoIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						videoIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						videoIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(videoIntent);
-					}
-					else if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-						log("Audio file");
+						if (!fromMV) {
+							Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 
-						Intent audioIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-						audioIntent.putExtra("HANDLE", currentDocument.getHandle());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
-							audioIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							pdfIntent.putExtra("typeAccount", typeAccount);
+							pdfIntent.putExtra("HANDLE", handle);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
+								pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							} else {
+								pdfIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							}
+							pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							pdfIntent.putExtra("fromDownloadService", true);
+							pdfIntent.putExtra("inside", true);
+							pdfIntent.putExtra("isUrl", false);
+							startActivity(pdfIntent);
 						}
-						else{
-							audioIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						else {
+							log("Show notification 2");
+							mBuilderCompat
+									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 						}
-						audioIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						audioIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(audioIntent);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+						log("Video/Audio file");
+
+						if (!fromMV) {
+							Intent mediaIntent;
+							if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(currentFile.getName()).isAudioNotSupported()) {
+								mediaIntent = new Intent(Intent.ACTION_VIEW);
+							} else {
+								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+							}
+							mediaIntent.putExtra("typeAccount", typeAccount);
+							mediaIntent.putExtra("isPlayList", false);
+							mediaIntent.putExtra("HANDLE", handle);
+							mediaIntent.putExtra("fromDownloadService", true);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
+								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							} else {
+								mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							}
+							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(mediaIntent);
+						}
+						else {
+							log("Show notification 2");
+							mBuilderCompat
+									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
 						log("Download is document");
@@ -680,30 +736,47 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 					} else if (MimeTypeList.typeForName(currentFile.getName()).isImage()) {
 						log("Download is IMAGE");
-
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						} else {
-							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						}
-						viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-						if (MegaApiUtils.isIntentAvailable(this, viewIntent))
-							startActivity(viewIntent);
-						else {
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
+						if (!fromMV){
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+							//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								viewIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
-								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							}
-							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-							startActivity(intentShare);
+							viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+							if (MegaApiUtils.isIntentAvailable(this, viewIntent))
+								startActivity(viewIntent);
+							else {
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								} else {
+									intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								}
+								intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								startActivity(intentShare);
+							}
 						}
+						else {
+							log("Show notification 2");
+							mBuilderCompat
+									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
+
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+								mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+							}
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+						}
+
 					} else {
 
 						log("Download is OTHER FILE");
@@ -736,13 +809,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 						}
 
-						log("Show notification");
+						log("Show notification 2");
 						mBuilderCompat
-								.setSmallIcon(R.drawable.ic_stat_notify_download)
+								.setSmallIcon(R.drawable.ic_stat_notify)
 								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 								.setAutoCancel(true).setTicker(notificationTitle)
 								.setContentTitle(notificationTitle).setContentText(size)
 								.setOngoing(false);
+
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+							mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+						}
 
 						mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 					}
@@ -751,29 +828,37 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
-					log("Show notification");
+					log("Show notification 3");
 					mBuilderCompat
-							.setSmallIcon(R.drawable.ic_stat_notify_download)
+							.setSmallIcon(R.drawable.ic_stat_notify)
 							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 							.setAutoCancel(true).setTicker(notificationTitle)
 							.setContentTitle(notificationTitle).setContentText(size)
 							.setOngoing(false);
+
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+						mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+					}
 
 					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 				}
 			}
 			catch (Exception e){
 				openFile = true; //Set the openFile to the default
-
+				log("Exception: " + e.getMessage());
 				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
-				log("Show notification");
+				log("Show notification 4");
 				mBuilderCompat
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 						.setAutoCancel(true).setTicker(notificationTitle)
 						.setContentTitle(notificationTitle).setContentText(size)
 						.setOngoing(false);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
 
 				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 			}
@@ -848,7 +933,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this,R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -859,21 +945,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			{
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_download)
+						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(contentText)
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 			}
 			else
 			{
-				notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+				notification = new Notification(R.drawable.ic_stat_notify, null, 1);
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
 				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 				notification.contentView.setTextViewText(R.id.status_text, message);
 				notification.contentView.setTextViewText(R.id.progress_text, info);
 				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
@@ -928,32 +1019,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			mBuilder
-					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setColor(ContextCompat.getColor(this,R.color.mega))
 					.setProgress(100, progressPercent, false)
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message).setSubText(info)
 					.setContentText(contentText)
 					.setOnlyAlertOnce(true);
+
 			notification = mBuilder.build();
 		}
 		else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
 			mBuilder
-					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setProgress(100, progressPercent, false)
 					.setContentIntent(pendingIntent)
 					.setOngoing(true).setContentTitle(message).setContentInfo(info)
 					.setContentText(contentText)
 					.setOnlyAlertOnce(true);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+			}
+
 			notification = mBuilder.getNotification();
 		}
 		else
 		{
-			notification = new Notification(R.drawable.ic_stat_notify_download, null, 1);
+			notification = new Notification(R.drawable.ic_stat_notify, null, 1);
 			notification.flags |= Notification.FLAG_ONGOING_EVENT;
 			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 			notification.contentIntent = pendingIntent;
-			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_download);
+			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 			notification.contentView.setTextViewText(R.id.status_text, message);
 			notification.contentView.setTextViewText(R.id.progress_text, info);
 			notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
@@ -1130,7 +1228,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			if ((megaApi.getNumPendingDownloads() == 0) && (transfersCount==0) && (megaApiFolder.getNumPendingDownloads() == 0)){
-				onQueueComplete();
+				onQueueComplete(transfer.getNodeHandle());
 			}
 		}
 	}
