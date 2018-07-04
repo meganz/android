@@ -320,6 +320,27 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         aB.setTitle(fullName);
+        updateSubTitle();
+    }
+
+    public void updateSubTitle(){
+        log("updateSubTitle");
+        if(callChat.getStatus()<=MegaChatCall.CALL_STATUS_RING_IN){
+            aB.setSubtitle(getString(R.string.call_starting));
+        }
+        else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
+            long sessionStatus = callChat.getSessionStatus(chat.getPeerHandle(0));
+            log("sessionStatus: "+sessionStatus);
+            if(sessionStatus==MegaChatCall.SESSION_STATUS_IN_PROGRESS){
+                startClock();
+            }
+            else{
+                aB.setSubtitle(getString(R.string.chat_connecting));
+            }
+        }
+        else{
+            aB.setSubtitle(null);
+        }
     }
 
     protected void onNewIntent(Intent intent) {
@@ -931,6 +952,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaChatApi.removeChatVideoListener(this);
         }
 
+        if (customHandler != null){
+            customHandler.removeCallbacksAndMessages(null);
+        }
+
         stopAudioSignals();
 
         MegaApplication.activityPaused();
@@ -953,6 +978,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
+        }
+
+        if (customHandler != null){
+            customHandler.removeCallbacksAndMessages(null);
         }
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1095,8 +1124,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         rtcAudioManager.start(null);
 
                         showInitialFABConfiguration();
-                        startClock();
-
+                        updateSubTitle();
                         break;
                     }
                     case MegaChatCall.CALL_STATUS_TERMINATING:{
@@ -1119,6 +1147,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
                         break;
                     }
+                }
+            }
+            else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_STATUS)){
+                log("Session status have changed");
+                if(call.getPeerSessionStatusChange()==chat.getPeerHandle(0)){
+                    updateSubTitle();
                 }
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
@@ -1178,6 +1212,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
             if (ringerTimer != null) {
+                log("Cancel ringer timer");
                 ringerTimer.cancel();
             }
 
@@ -1826,6 +1861,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     private void startClock(){
+        log("startClock");
         long seconds = 0;
 
         if(callChat!=null){

@@ -585,9 +585,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                 intent.setData(uriData);
                             }
-                            else  if (action.equals(Constants.ACTION_INVITE_CONTACT)){
+                            else  if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = Constants.ACTION_INVITE_CONTACT;
+                                action = Constants.ACTION_OPEN_CONTACTS_SECTION;
                                 if(intentReceived.getLongExtra("handle", 0) != 0){
                                     intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
                                 }
@@ -644,7 +644,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                             intent.setData(uriData);
                         }
-                        else if (action.equals(Constants.ACTION_INVITE_CONTACT)){
+                        else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             if(intentReceived.getLongExtra("handle", 0) != 0){
                                 intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
@@ -1581,9 +1581,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                     action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
                                     intent.setData(uriData);
                                 }
-                                else if (action.equals(Constants.ACTION_INVITE_CONTACT)){
+                                else if (action.equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
                                     intent.putExtra("handle", intentReceived.getLongExtra("handle", 0));
-                                    action = Constants.ACTION_INVITE_CONTACT;
+                                    action = Constants.ACTION_OPEN_CONTACTS_SECTION;
                                 }
                                 intent.setAction(action);
                                 if (url != null){
@@ -1736,7 +1736,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 gSession = megaApi.dumpSession();
 
-                log("Logged in: " + gSession);
+                log("Logged in with session");
 
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
@@ -1930,6 +1930,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     try {
                         serversBusyText.setVisibility(View.VISIBLE);
                         if(error.getErrorCode()==MegaError.API_EAGAIN){
+                            log("onRequestTemporaryError:onFinish:API_EAGAIN: :value: "+error.getValue());
                             if(error.getValue() == MegaApiJava.RETRY_CONNECTIVITY){
                                 serversBusyText.setText(getString(R.string.login_connectivity_issues));
                             }

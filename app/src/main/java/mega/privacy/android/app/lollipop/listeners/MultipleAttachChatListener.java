@@ -80,7 +80,13 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                     }
                 }
                 else{
-                    ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
+                    if(e.getErrorCode() == MegaError.API_ENOENT){
+                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error_not_available));
+                    }
+                    else{
+                        ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.messages_forwarded_error));
+                    }
+                    ((ChatActivityLollipop) context).removeProgressDialog();
                 }
             }
             else if(context instanceof ManagerActivityLollipop){

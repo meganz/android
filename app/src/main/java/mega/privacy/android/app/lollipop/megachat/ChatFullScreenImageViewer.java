@@ -119,6 +119,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 
+	boolean isDeleteDialogShow = false;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -141,6 +143,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
 		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
 
+//		Drawable drawable = importIcon.getIcon();
+//		if (drawable != null) {
+//			// If we don't mutate the drawable, then all drawable's with this id will have a color
+//			// filter applied to it.
+//			drawable.mutate();
+//			drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+//			drawable.setAlpha(255);
+//		}
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -156,19 +167,18 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 
-		if(node!=null){
-			if(megaApi.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaApi.getMyUserHandle())){
-				if((megaApi.getNodeByHandle(node.getHandle()))==null){
-					log("The node is not mine");
-					removeIcon.setVisible(false);
+		if(megaApi==null || (!Util.isOnline(this))){
+			downloadIcon.setVisible(false);
+			importIcon.setVisible(false);
+			saveForOfflineIcon.setVisible(false);
+
+			if(MegaApiJava.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaChatApi.getMyUserHandle())){
+
+				if(messages.get(positionG).isDeletable()){
+					removeIcon.setVisible(true);
 				}
 				else{
-					if(messages.get(positionG).isDeletable()){
-						removeIcon.setVisible(true);
-					}
-					else{
-						removeIcon.setVisible(false);
-					}
+					removeIcon.setVisible(false);
 				}
 			}
 			else{
@@ -177,10 +187,32 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 		else{
-			removeIcon.setVisible(false);
-			downloadIcon.setVisible(false);
-			importIcon.setVisible(false);
-			saveForOfflineIcon.setVisible(false);
+			if(node!=null){
+				if(messages.get(positionG).getUserHandle()==megaChatApi.getMyUserHandle()){
+					if((megaApi.getNodeByHandle(node.getHandle()))==null){
+						log("The node is not mine");
+						removeIcon.setVisible(false);
+					}
+					else{
+						if(messages.get(positionG).isDeletable()){
+							removeIcon.setVisible(true);
+						}
+						else{
+							removeIcon.setVisible(false);
+						}
+					}
+				}
+				else{
+					log("The message is not mine");
+					removeIcon.setVisible(false);
+				}
+			}
+			else{
+				removeIcon.setVisible(false);
+				downloadIcon.setVisible(false);
+				importIcon.setVisible(false);
+				saveForOfflineIcon.setVisible(false);
+			}
 		}
 
 		return super.onPrepareOptionsMenu(menu);
@@ -224,7 +256,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 			case R.id.chat_full_image_viewer_save_for_offline: {
 				log("save for offline option");
-				showSnackbar("Coming soon...");
+//				showSnackbar("Coming soon...");
+				ChatController chatC = new ChatController(this);
+				if (messages.get(positionG) != null){
+					chatC.saveForOffline(messages.get(positionG).getMegaNodeList());
+				}
 				break;
 			}
 			case R.id.chat_full_image_viewer_remove: {
@@ -260,6 +296,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		else{
 			scaleText = scaleW;
 		}
+		if (savedInstanceState != null){
+			isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+		}
+		else {
+			isDeleteDialogShow = false;
+		}
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
@@ -269,17 +311,18 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		MegaApplication app = (MegaApplication)getApplication();
 
-		megaApi = app.getMegaApi();
+		if(Util.isOnline(this)){
+			megaApi = app.getMegaApi();
 
-
-		if(megaApi==null||megaApi.getRootNode()==null){
-			log("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
+			if(megaApi==null||megaApi.getRootNode()==null){
+				log("Refresh session - sdk");
+				Intent intent = new Intent(this, LoginActivityLollipop.class);
+				intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+				return;
+			}
 		}
 
 		if(Util.isChatEnabled()){
@@ -298,7 +341,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 
-		megaApi.addGlobalListener(this);
+		if(megaApi!=null){
+			megaApi.addGlobalListener(this);
+		}
 
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -426,6 +471,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 
+		if (isDeleteDialogShow && chatId != -1 && messages.get(positionG) != null) {
+			showConfirmationDeleteNode(chatId, messages.get(positionG));
+		}
+
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 	}
@@ -507,13 +556,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	
 
 	public void importNode(MegaNode node){
-		log("importNode");
+		log("importNodes");
 
 		nodeToImport = node;
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
 		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
-
 	}
 
 	@Override
@@ -521,7 +569,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
-
+		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
 	}
 	
 	@Override
@@ -586,11 +634,13 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					case DialogInterface.BUTTON_POSITIVE:
 						ChatController cC = new ChatController(fullScreenImageViewer);
 						cC.deleteMessage(message, chatId);
+						isDeleteDialogShow = false;
 						finish();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
 						//No button clicked
+						isDeleteDialogShow = false;
 						break;
 				}
 			}
@@ -608,6 +658,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+		isDeleteDialogShow = true;
+
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				isDeleteDialogShow = false;
+			}
+		});
 	}
 	
 	@Override
@@ -629,7 +688,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			log("onActivityResult REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
-			if(!Util.isOnline(this)) {
+			if(!Util.isOnline(this)||megaApi==null) {
 				try{
 					statusDialog.dismiss();
 				} catch(Exception ex) {};
@@ -668,6 +727,16 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+
+		if(!Util.isOnline(this)||megaApi==null) {
+			try{
+				statusDialog.dismiss();
+			} catch(Exception ex) {};
+
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+			return;
+		}
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {

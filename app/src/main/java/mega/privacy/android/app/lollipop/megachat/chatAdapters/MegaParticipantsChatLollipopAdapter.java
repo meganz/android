@@ -150,12 +150,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("onCreate: Landscape configuration");
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
-				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(270, outMetrics));
+				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
-				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
+				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
+				holderList.textViewContent.setMaxWidth(Util.scaleWidthPx(180, outMetrics));
 			}
 
 			holderList.itemLayout.setTag(holderList);
