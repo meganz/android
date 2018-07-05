@@ -28,7 +28,8 @@
                 android:textSize="20sp"
                 android:gravity="center"
                 android:layout_gravity="center"
-                android:text="@string/turn_on_notifications_title"/>
+                android:text="@string/turn_on_notifications_title"
+                android:fontFamily="roboto"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -39,7 +40,8 @@
                 android:textSize="16sp"
                 android:gravity="center"
                 android:layout_gravity="center"
-                android:text="@string/turn_on_notifications_subtitle"/>
+                android:text="@string/turn_on_notifications_subtitle"
+                android:fontFamily="roboto"/>
 
         </LinearLayout>
 
@@ -73,23 +75,17 @@
                         android:layout_marginLeft="12dp"
                         android:textSize="16sp"
                         android:textColor="@color/white"
+                        android:fontFamily="roboto"
                         android:text="1."/>
 
                     <TextView
+                        android:id="@+id/first_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:textSize="16sp"
                         android:textColor="@color/turn_on_notifications_text"
-                        android:text="@string/turn_on_notifications_first_step"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:textSize="16sp"
-                        android:textColor="@color/white"
-                        android:text="@string/action_settings"/>
+                        android:fontFamily="roboto"/>
 
                 </LinearLayout>
 
@@ -119,23 +115,17 @@
                         android:layout_marginLeft="12dp"
                         android:textSize="16sp"
                         android:textColor="@color/white"
+                        android:fontFamily="roboto"
                         android:text="2."/>
 
                     <TextView
+                        android:id="@+id/second_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:textSize="16sp"
                         android:textColor="@color/turn_on_notifications_text"
-                        android:text="@string/context_open_link"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:textSize="16sp"
-                        android:textColor="@color/white"
-                        android:text="@string/turn_on_notifications_second_step"/>
+                        android:fontFamily="roboto"/>
 
                 </LinearLayout>
 
@@ -165,23 +155,17 @@
                         android:layout_marginLeft="12dp"
                         android:textSize="16sp"
                         android:textColor="@color/white"
+                        android:fontFamily="roboto"
                         android:text="3."/>
 
                     <TextView
+                        android:id="@+id/third_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:textSize="16sp"
                         android:textColor="@color/turn_on_notifications_text"
-                        android:text="@string/general_select"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:textSize="16sp"
-                        android:textColor="@color/white"
-                        android:text="@string/app_name"/>
+                        android:fontFamily="roboto"/>
 
                 </LinearLayout>
 
@@ -201,23 +185,17 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textColor="@color/white"
+                    android:fontFamily="roboto"
                     android:text="4."/>
 
                 <TextView
+                    android:id="@+id/fourth_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:textSize="16sp"
                     android:textColor="@color/turn_on_notifications_text"
-                    android:text="@string/context_open_link"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:text="@string/turn_on_notifications_fourth_step"/>
+                    android:fontFamily="roboto"/>
 
             </LinearLayout>
 
@@ -236,6 +214,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textColor="@color/white"
+                    android:fontFamily="roboto"
                     android:text="5."/>
 
                 <TextView
@@ -244,7 +223,8 @@
                     android:layout_marginLeft="5dp"
                     android:textSize="16sp"
                     android:textColor="@color/turn_on_notifications_text"
-                    android:text="@string/turn_on_notifications_fifth_step"/>
+                    android:text="@string/turn_on_notifications_fifth_step"
+                    android:fontFamily="roboto"/>
 
             </LinearLayout>
 
