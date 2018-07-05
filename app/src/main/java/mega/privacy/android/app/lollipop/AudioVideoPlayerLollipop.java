@@ -213,7 +213,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MenuItem saveForOfflineMenuItem;
     private MenuItem chatRemoveMenuItem;
 
-    private RelativeLayout audioVideoPlayerContainer;
     private RelativeLayout playerLayout;
     
     private RelativeLayout audioContainer;
@@ -493,8 +492,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         audioContainer = (RelativeLayout) findViewById(R.id.audio_container);
         audioContainer.setVisibility(View.GONE);
-        
-        audioVideoPlayerContainer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container);
+
         progressBar = (ProgressBar) findViewById(R.id.full_video_viewer_progress_bar);
         playPauseButton = (RelativeLayout) findViewById(R.id.play_pause_button);
         containerControls = (RelativeLayout) findViewById(R.id.container_exo_controls);
@@ -1084,9 +1082,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         else {
                             progressBar.setVisibility(View.GONE);
                         }
-                        updateContainers();
                     }
                     enableNextButton();
+                    updateContainers();
                 }
 
                 @Override
@@ -1155,7 +1153,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     void playerError() {
         numErrors++;
         player.stop();
-        if (numErrors <= 2) {
+        if (numErrors <= 6) {
             if (isPlayList && size > 1 && playListCreated) {
 //                player.prepare(finalLoopingMediaSource);
                 player.prepare(concatenatingMediaSource);
@@ -1205,10 +1203,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
             else if (playbackStateSaved != Player.STATE_BUFFERING){
+                simpleExoPlayerView.showController();
+                containerControls.animate().translationY(0).setDuration(0).start();
                 audioContainer.setVisibility(View.VISIBLE);
             }
         }
         else if (playbackStateSaved != Player.STATE_BUFFERING){
+            simpleExoPlayerView.showController();
+            containerControls.animate().translationY(0).setDuration(0).start();
             audioContainer.setVisibility(View.VISIBLE);
         }
     }
@@ -1661,13 +1663,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 tB.animate().translationY(0).setDuration(400L).start();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
-            if (video){
-                simpleExoPlayerView.showController();
-                if (creatingPlaylist){
-                    enableNextButton();
-                }
-                containerControls.animate().translationY(0).setDuration(400L).start();
+            simpleExoPlayerView.showController();
+            if (creatingPlaylist){
+                enableNextButton();
             }
+            containerControls.animate().translationY(0).setDuration(400L).start();
         }
     }
 
@@ -3195,7 +3195,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else{
-                Snackbar.make(audioVideoPlayerContainer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.not_download), Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -3318,7 +3318,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 try{
                     statusDialog.dismiss();
                 } catch(Exception ex) {};
-                Snackbar.make(audioVideoPlayerContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
                 return;
             }
 
@@ -3337,12 +3337,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
                 else {
                     log("TARGET: null");
-                    Snackbar.make(audioVideoPlayerContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(containerAudioVideoPlayer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
                 }
             }
             else{
                 log("DOCUMENT: null");
-                Snackbar.make(audioVideoPlayerContainer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(containerAudioVideoPlayer, getString(R.string.import_success_error), Snackbar.LENGTH_LONG).show();
             }
         }
     }
