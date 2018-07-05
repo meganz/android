@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat.chatAdapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -46,6 +47,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
+import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
@@ -76,7 +78,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	RecyclerView listFragment;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
-	boolean multipleSelect;
+	boolean multipleSelect = false;
 	private SparseBooleanArray selectedItems;
 	Object fragment;
 
@@ -115,11 +117,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
     	else{
     		log("Number of chats: NULL");
     	}
-
-		if(!(context instanceof ManagerActivityLollipop)){
-			selectedItems = new SparseBooleanArray();
-			multipleSelect = true;
-		}
 	}
 	
 	/*public view holder class*/
@@ -344,6 +341,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			holder.itemLayout.setOnClickListener(null);
 			holder.itemLayout.setOnLongClickListener(null);
+
+			ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
+			if(archivedChats!=null){
+				((ViewHolderArchivedChatList)holder).textViewArchived.setText(context.getString(R.string.archived_chats_show_option, archivedChats.size()));
+			}
+			else{
+				((ViewHolderArchivedChatList)holder).textViewArchived.setText(context.getString(R.string.archived_chats_title_section));
+			}
 		}
 	}
 
@@ -484,7 +489,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 			((ViewHolderNormalChatList)holder).imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
 
-			if(context instanceof ManagerActivityLollipop){
+			if((context instanceof ManagerActivityLollipop) || (context instanceof ArchivedChatsActivity)){
 				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 				((ViewHolderNormalChatList)holder).imageButtonThreeDots.setOnClickListener(this);
 			}
@@ -680,12 +685,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public int getItemCount() {
-		log("getItemCount");
 
-		boolean archivedChats = true;
+		if(context instanceof ManagerActivityLollipop){
+			ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
 
-		if(archivedChats){
-			return chats.size()+1;
+			if(archivedChats!=null && archivedChats.size()>0){
+				return chats.size()+1;
+			}
+			else{
+				return chats.size();
+			}
 		}
 		else{
 			return chats.size();
@@ -694,7 +703,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public int getItemViewType(int position) {
-		log("getItemViewType: position"+position);
 
 		if(position>=chats.size()){
 			return ITEM_VIEW_TYPE_ARCHIVED_CHATS;
@@ -746,7 +754,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (selectedItems.size() <= 0){
-						if(context instanceof ManagerActivityLollipop){
+						if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
 							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
 						}
 					}
@@ -792,7 +800,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (selectedItems.size() <= 0){
-						if(context instanceof ManagerActivityLollipop){
+						if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
 							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
 						}
 					}
@@ -907,6 +915,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						((ManagerActivityLollipop) context).showChatPanel(c);
 					}
 				}
+				else if(context instanceof ArchivedChatsActivity) {
+					if (multipleSelect) {
+						((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
+					} else {
+						((ArchivedChatsActivity) context).showChatPanel(c);
+					}
+				}
 
 				break;
 			}
@@ -919,14 +934,20 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(context instanceof ManagerActivityLollipop){
 					((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else{
+				else if(context instanceof ChatExplorerActivity){
 					((ChatExplorerFragment) fragment).itemClick(currentPosition);
+				}
+				else if(context instanceof ArchivedChatsActivity){
+					((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
 				}
 
 				break;
 			}
 			case R.id.archived_chat_option_text:{
 				log("Show archived chats");
+
+				Intent archivedChatsIntent = new Intent(context, ArchivedChatsActivity.class);
+				context.startActivity(archivedChatsIntent);
 				break;
 			}
 		}
@@ -938,7 +959,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		ViewHolderChatList holder = (ViewHolderChatList) view.getTag();
 		int currentPosition = holder.getAdapterPosition();
 
-		if(context instanceof ManagerActivityLollipop) {
+		if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
 			((RecentChatsFragmentLollipop) fragment).activateActionMode();
 			((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
 		}

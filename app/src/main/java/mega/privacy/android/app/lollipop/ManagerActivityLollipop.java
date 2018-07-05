@@ -13769,6 +13769,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				showSnackbar(getString(R.string.changing_status_error));
 			}
 		}
+		else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+			long chatHandle = request.getChatHandle();
+			MegaChatListItem chatItem = megaChatApi.getChatListItem(chatHandle);
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				if(request.getFlag()){
+					log("Chat archived");
+					showSnackbar(getString(R.string.success_archive_chat, chatItem.getTitle()));
+				}
+				else{
+					log("Chat unarchived");
+					showSnackbar(getString(R.string.success_unarchive_chat, chatItem.getTitle()));
+				}
+			}
+			else{
+				if(request.getFlag()){
+					log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
+					showSnackbar(getString(R.string.error_archive_chat, chatItem.getTitle()));
+				}
+				else{
+					log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
+					showSnackbar(getString(R.string.error_unarchive_chat, chatItem.getTitle()));
+				}
+			}
+		}
 	}
 
 	@Override

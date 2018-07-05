@@ -31,6 +31,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
@@ -66,6 +67,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public LinearLayout optionMuteChat;
     public ImageView optionMuteChatIcon;
     public TextView optionMuteChatText;
+    public LinearLayout optionArchiveChat;
+    public TextView archiveChatText;
+    public ImageView archiveChatIcon;
 
     boolean notificationsEnabled;
     ChatItemPreferences chatPrefs;
@@ -99,7 +103,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             log("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 chatId = ((ManagerActivityLollipop) context).selectedChatItemId;
-
+            }
+            else if(context instanceof ArchivedChatsActivity){
+                chatId = ((ArchivedChatsActivity) context).selectedChatItemId;
             }
         }
 
@@ -140,6 +146,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionMuteChat = (LinearLayout) contentView.findViewById(R.id.chat_list_mute_chat_layout);
         optionMuteChatIcon = (ImageView) contentView.findViewById(R.id.chat_list_mute_chat_image);
         optionMuteChatText = (TextView) contentView.findViewById(R.id.chat_list_mute_chat_text);
+        optionArchiveChat = (LinearLayout) contentView.findViewById(R.id.chat_list_archive_chat_layout);
+        archiveChatText = (TextView) contentView.findViewById(R.id.chat_list_archive_chat_text);
+        archiveChatIcon = (ImageView) contentView.findViewById(R.id.file_archive_chat_image);
 
         titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
@@ -148,6 +157,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionMuteChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
         optionClearHistory.setOnClickListener(this);
+        optionArchiveChat.setOnClickListener(this);
 
         titleNameContactChatPanel.setText(chat.getTitle());
 
@@ -249,6 +259,19 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			optionMuteChatText.setText(getString(R.string.general_mute));
 			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
 		}
+
+        if(chat.isArchived()){
+            archiveChatText.setText(getString(R.string.unarchive_chat_option));
+            archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
+            optionInfoChat.setVisibility(View.GONE);
+            optionMuteChat.setVisibility(View.GONE);
+            optionLeaveChat.setVisibility(View.GONE);
+            optionClearHistory.setVisibility(View.GONE);
+        }
+        else{
+            archiveChatText.setText(getString(R.string.archive_chat_option));
+            archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
+        }
 
         dialog.setContentView(contentView);
 
@@ -435,6 +458,15 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 }
 
                 ((ManagerActivityLollipop)context).showMuteIcon(chat);
+                break;
+            }
+            case R.id.chat_list_archive_chat_layout:{
+                if(chat==null){
+                    log("Selected chat NULL");
+                }
+
+                ChatController chatC = new ChatController(context);
+                chatC.archiveChat(chat);
                 break;
             }
         }

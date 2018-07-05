@@ -1709,7 +1709,7 @@
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]%1$s[/A][B].[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts">[B]No [/B][A]%1$s[/A][B].[/B]</string>
 
-    <string name="recent_chat_empty" context="Message shown when the user has no archived chats">[A]No[/A] [B]Conversations[/B]</string>
+    <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Loading[/A] [B]Conversations...[/B]</string>
 
     <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">Incoming Shared folders</string>
@@ -1979,5 +1979,21 @@
 
     <string name="pre_overquota_alert_text" context="Pre overquota error dialog when trying to copy or import a file">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
 
-    <string name="archived_chats_show_option" context="Text of the option to show the arhived chat">Archived chats</string>
+    <string name="archived_chats_title_section" context="Title of the section Archived chats">Archived chats</string>
+
+    <string name="archived_chats_show_option" context="Text of the option to show the arhived chat, it shows the number of archived chats">Archived chats (%d)</string>
+
+    <string name="archive_chat_option" context="Title of the option on the chat list to archive a chat">Archive chat</string>
+    <string name="unarchive_chat_option" context="Title of the option on the chat list to unarchive a chat">Unarchive chat</string>
+
+    <string name="general_archive" context="Confirmation button of the dialog to archive a chat">Archive</string>
+
+    <string name="success_archive_chat" context="Message shown when a chat is successfully archived, it shows the name of the chat">%s chat was archived.</string>
+    <string name="error_archive_chat" context="Error message shown when a chat has not be archived, it shows the name of the chat">Error. %s chat was not archived.</string>
+
+    <string name="success_unarchive_chat" context="Message shown when a chat is successfully unarchived, it shows the name of the chat">%s chat was unarchived.</string>
+    <string name="error_unarchive_chat" context="Error message shown when a chat has not be unarchived, it shows the name of the chat">Error. %s chat was not unarchived.</string>
+
+    <string name="archived_chats_empty" context="Message shown when the user has no archived chats">[A]No[/A] [B]Archived Chats[/B]</string>
+
 </resources>

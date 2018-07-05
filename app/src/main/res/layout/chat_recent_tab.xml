@@ -69,8 +69,6 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_recent_list_view"
         android:clipToPadding="false"
-        android:paddingBottom="92dp"
-        android:paddingTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:choiceMode="multipleChoice" />
