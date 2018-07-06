@@ -84,7 +84,6 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -143,8 +142,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	Toolbar toolbar;
 	ActionBar aB;
-
-	int accountType;
 
 	private boolean isGetLink = false;
 
@@ -552,7 +549,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if(from==FROM_INCOMING_SHARES){
                     firstIncomingLevel = extras.getBoolean("firstLevel");
                 }
-                accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
                 long handleNode = extras.getLong("handle", -1);
                 log("Handle of the selected node: "+handleNode);
                 node = megaApi.getNodeByHandle(handleNode);
@@ -2247,7 +2244,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("showGetLinkActivity");
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
-		linkIntent.putExtra("account", accountType);
 		startActivity(linkIntent);
 	}
 
@@ -2392,6 +2388,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 				}
 			}
+            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+
+            }
+            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 			}

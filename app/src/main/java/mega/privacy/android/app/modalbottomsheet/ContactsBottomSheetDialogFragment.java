@@ -38,6 +38,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -63,6 +64,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
     public LinearLayout optionInfoContact;
     public LinearLayout optionStartConversation;
     public LinearLayout optionSendFile;
+    public LinearLayout optionSendContact;
     public LinearLayout optionShareFolder;
     public LinearLayout optionRemove;
     ImageView contactStateIcon;
@@ -149,6 +151,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionInfoContact = (LinearLayout) contentView.findViewById(R.id.contact_list_info_contact_layout);
         optionStartConversation = (LinearLayout) contentView.findViewById(R.id.contact_list_option_start_conversation_layout);
         optionSendFile= (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_file_layout);
+        optionSendContact = (LinearLayout) contentView.findViewById(R.id.contact_list_option_send_contact_layout);
         optionShareFolder = (LinearLayout) contentView.findViewById(R.id.contact_list_option_share_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.contact_list_option_remove_layout);
         contactStateIcon = (ImageView) contentView.findViewById(R.id.contact_list_drawable_state);
@@ -164,6 +167,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionInfoContact.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionSendFile.setOnClickListener(this);
+        optionSendContact.setOnClickListener(this);
         optionShareFolder.setOnClickListener(this);
 
         if(contact!=null){
@@ -293,7 +297,7 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                             int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, context.getResources().getDisplayMetrics());
                             int maxHeight = windowHeight - tBHeight - rectangle.top - padding;
 
-                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
+//                            log("bottomSheet.height: " + mainLinearLayout.getHeight() + " maxHeight: " + maxHeight);
                             if (mainLinearLayout.getHeight() > maxHeight) {
                                 params.height = maxHeight;
                                 bottomSheet.setLayoutParams(params);
@@ -451,6 +455,20 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                 user.add(contact.getMegaUser());
                 ContactController cC = new ContactController(context);
                 cC.pickFileToSend(user);
+                dismissAllowingStateLoss();
+                break;
+            }
+            case R.id.contact_list_option_send_contact_layout:{
+                log("optionSendContact");
+                if(contact==null){
+                    log("Selected contact NULL");
+                    return;
+                }
+
+                ChatController cC = new ChatController(context);
+
+                cC.selectChatsToAttachContact(contact.getMegaUser());
+
                 dismissAllowingStateLoss();
                 break;
             }

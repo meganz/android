@@ -49,10 +49,10 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -197,6 +197,32 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					hideMultipleSelect();
 					break;
 				}
+				case R.id.cab_menu_restore_from_rubbish:{
+
+					if(documents!=null){
+						if(documents.size()>1){
+							log("restore multiple: "+documents.size());
+							MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_RESTORED_FROM_RUBBISH, (ManagerActivityLollipop) context);
+							for (int i=0;i<documents.size();i++){
+								MegaNode newParent = megaApi.getNodeByHandle(documents.get(i).getRestoreHandle());
+								if(newParent !=null){
+									megaApi.moveNode(documents.get(i), newParent, moveMultipleListener);
+								}
+								else{
+									log("restoreFromRubbish:The restore folder no longer exists");
+								}
+							}
+						}
+						else{
+							log("restore single item");
+							((ManagerActivityLollipop) context).restoreFromRubbish(documents.get(0));
+
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 			}
 			return false;
 		}
@@ -224,6 +250,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
+			boolean showRestore = true;
 			showRename = false;
 			showLink = false;
 
@@ -258,10 +285,33 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 				}
+
+				for(int i = 0; i<selected.size();i++){
+					long restoreHandle = selected.get(i).getRestoreHandle();
+					if(restoreHandle!=-1){
+						MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+						if((!megaApi.isInRubbish(selected.get(i))) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
+							showRestore = false;
+							break;
+						}
+					}
+					else{
+						showRestore = false;
+						break;
+					}
+				}
+
+				if(showRestore){
+					menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(true);
+				}
+				else{
+					menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
+				}
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
 			}
 
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
@@ -734,10 +784,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
@@ -761,10 +807,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
@@ -833,10 +876,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);

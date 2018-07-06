@@ -5846,9 +5846,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         log("Error. The idPendMsg is -1");
                     }
 
-                    boolean isOverquota = intent.getBooleanExtra("IS_OVERQUOTA", false);
-                    if(isOverquota){
-                        showOverquotaAlert();
+                    int isOverquota = intent.getIntExtra("IS_OVERQUOTA", 0);
+                    if(isOverquota==1){
+                        showOverquotaAlert(false);
+                    }
+                    else if (isOverquota==2){
+                        showOverquotaAlert(true);
                     }
 
                     return;
@@ -5985,7 +5988,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
                     startActivity(intent);
                     finish();
-
+                }
+                else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+                    log("OVERQUOTA ERROR: "+e.getErrorCode());
+                    Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                    intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                    startActivity(intent);
+                    finish();
                 }
                 else
                 {
@@ -6002,7 +6011,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState){
@@ -6703,14 +6711,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    private void showOverquotaAlert(){
-        log("showOverquotaAlert");
-        dbH.setCamSyncEnabled(false);
+    private void showOverquotaAlert(boolean prewarning){
+        log("showOverquotaAlert: prewarning: "+prewarning);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.overquota_alert_title));
+
+        if(prewarning){
+            builder.setMessage(getString(R.string.pre_overquota_alert_text));
+        }
+        else{
+            builder.setMessage(getString(R.string.overquota_alert_text));
+            dbH.setCamSyncEnabled(false);
+        }
 
         if(overquotaDialog==null){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.overquota_alert_title));
-            builder.setMessage(getString(R.string.overquota_alert_text));
 
             builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
 
@@ -6730,11 +6745,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             overquotaDialog = builder.create();
             overquotaDialog.setCanceledOnTouchOutside(false);
-            overquotaDialog.show();
         }
-        else{
-            overquotaDialog.show();
-        }
+
+        overquotaDialog.show();
     }
 
     public void showUpgradeAccount(){

@@ -1813,7 +1813,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					int duration = Integer.parseInt(durationString);
 					int termCode = Integer.parseInt(termCodeString);
 
-
 					switch(termCode){
 						case MegaChatMessage.END_CALL_REASON_ENDED:{
 
@@ -1895,7 +1894,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 						case MegaChatMessage.END_CALL_REASON_CANCELLED:{
 
-							textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+							long lastMsgSender = chat.getLastMessageSender();
+							if(lastMsgSender==megaChatApi.getMyUserHandle()){
+								textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.call_missed_messages));
+							}
+
 							try {
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
@@ -1947,20 +1953,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 					log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
 
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 					if(chat.isGroup()){
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
 						holder.currentPosition = position;
 						holder.userHandle = lastMsgSender;
 
-						String fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-						if(fullNameAction==null){
-							fullNameAction = "";
-						}
+						String fullNameAction = "";
+						if(chatRoom!=null){
+							fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+							if(fullNameAction==null){
+								fullNameAction = "";
+							}
 
-						if(fullNameAction.trim().length()<=0){
-							fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+							if(fullNameAction.trim().length()<=0){
+								fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+							}
+						}
+						else{
+							log("ERROR: the chatroom is NULL: "+chat.getChatId());
 						}
 
 						if(fullNameAction.trim().length()<=0){

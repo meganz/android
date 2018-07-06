@@ -109,7 +109,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
 
-	boolean sendToInbox=false;
 	boolean moveToRubbish=false;
 
 	public static int REQUEST_CODE_GET = 1000;
@@ -466,7 +465,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					screenPosition[2] = imageDrag.getWidth();
 					screenPosition[3] = imageDrag.getHeight();
 
-					Intent intent1 =  new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					Intent intent1 =  new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
 					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
 				}
@@ -514,7 +513,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		contactPropertiesMainActivity=this;
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
 
@@ -1170,8 +1169,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
-			sendToInbox=false;
-
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for (int i = 0; i < copyHandles.length; i++) {
 				log("NODO A COPIAR: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
@@ -1599,50 +1596,34 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			} catch (Exception ex) {
 			}
 
-			if(sendToInbox) {
-				log("sendToInbox: " + e.getErrorCode() + " " + e.getErrorString());
-				if (e.getErrorCode() == MegaError.API_OK){
+			if (e.getErrorCode() == MegaError.API_OK){
 
-					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-					if(cflF!=null && cflF.isVisible()){
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						if(coordinatorFragment!=null){
-							showSnackbar(getString(R.string.context_correctly_sent_node), coordinatorFragment);
-						}
-						else{
-							showSnackbar(getString(R.string.context_correctly_sent_node), fragmentContainer);
-						}
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					cflF.clearSelections();
+					cflF.hideMultipleSelect();
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
 					}
-				}
-				else{
-					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-					if(cflF!=null && cflF.isVisible()){
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						if(coordinatorFragment!=null){
-							showSnackbar(getString(R.string.context_no_sent_node), coordinatorFragment);
-						}
-						else{
-							showSnackbar(getString(R.string.context_no_sent_node), fragmentContainer);
-						}
+					else{
+						showSnackbar(getString(R.string.context_correctly_copied), fragmentContainer);
 					}
 				}
 			}
 			else{
-				if (e.getErrorCode() == MegaError.API_OK){
-
-					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-					if(cflF!=null && cflF.isVisible()){
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						if(coordinatorFragment!=null){
-							showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
-						}
-						else{
-							showSnackbar(getString(R.string.context_correctly_copied), fragmentContainer);
-						}
-					}
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
 				}
 				else{
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
@@ -1658,7 +1639,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					}
 				}
 			}
-			sendToInbox=false;
+
 			log("copy nodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
