@@ -603,6 +603,13 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					startActivity(intent);
 					finish();
 				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
 				else if(e.getErrorCode()==MegaError.API_ENOENT){
 					Snackbar.make(fragmentContainer, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), Snackbar.LENGTH_LONG).show();
 				}

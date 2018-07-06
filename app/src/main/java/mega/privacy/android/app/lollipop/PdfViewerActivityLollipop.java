@@ -101,7 +101,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -210,7 +209,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     private RelativeLayout bottomLayout;
     private TextView fileNameTextView;
-    int accountType;
     int typeExport = -1;
     private Handler handler;
     private AlertDialog renameDialog;
@@ -258,12 +256,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             pdfFileName = savedInstanceState.getString("pdfFileName");
             uri = Uri.parse(savedInstanceState.getString("uri"));
             renamed = savedInstanceState.getBoolean("renamed");
-            accountType = savedInstanceState.getInt("typeAccount");
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
         }
         else {
             currentPage = 0;
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
@@ -654,7 +650,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         else {
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 0;
@@ -853,7 +849,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putString("pdfFileName", pdfFileName);
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
-        outState.putInt("typeAccount", accountType);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
     }
 
@@ -2329,7 +2324,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         log("showGetLinkActivity");
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
-        linkIntent.putExtra("account", accountType);
         startActivity(linkIntent);
     }
 
@@ -2839,6 +2833,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (e.getErrorCode() == MegaError.API_OK){
                 Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
             }
+            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
+            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
             else{
                 Snackbar.make(pdfviewerContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
             }
@@ -3260,9 +3268,5 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
-    }
-
-    public int getAccountType() {
-        return accountType;
     }
 }
