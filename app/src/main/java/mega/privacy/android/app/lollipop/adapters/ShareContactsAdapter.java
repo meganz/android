@@ -107,55 +107,55 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
 
         ShareContactInfo contact = (ShareContactInfo) getItem(position);
         String[] s;
-        if (contact.getPhoneContactInfo()){
-            if (contact.getName() != null){
-                s = contact.getName().split(" ");
+        if (contact.isPhoneContact()){
+            if (contact.getPhoneContactInfo().getName() != null){
+                s = contact.getPhoneContactInfo().getName().split(" ");
                 if (s != null && s.length > 0){
                     holder.textViewName.setText(s[0]);
                 }
                 else {
-                    holder.textViewName.setText(contact.getName());
+                    holder.textViewName.setText(contact.getPhoneContactInfo().getName());
                 }
             }
             else {
-                s = contact.getEmail().split("[@._]");
+                s = contact.getPhoneContactInfo().getEmail().split("[@._]");
                 if (s != null && s.length > 0){
                     holder.textViewName.setText(s[0]);
                 }
                 else {
-                    holder.textViewName.setText(contact.getEmail());
+                    holder.textViewName.setText(contact.getPhoneContactInfo().getEmail());
                 }
             }
         }
-        else if (contact.getMegaContactAdapter()){
-            if (contact.getFullName() != null) {
-                if (contact.getMegaUser() == null && contact.getMegaContactDB() == null) {
-                    s = contact.getFullName().split("[@._]");
+        else if (contact.isMegaContact()){
+            if (contact.getMegaContactAdapter().getFullName() != null) {
+                if (contact.getMegaContactAdapter().getMegaUser() == null && contact.getMegaContactAdapter().getMegaContactDB() == null) {
+                    s = contact.getMegaContactAdapter().getFullName().split("[@._]");
                     if (s != null && s.length > 0) {
                         holder.textViewName.setText(s[0]);
                     }
                     else {
-                        holder.textViewName.setText(contact.getFullName());
+                        holder.textViewName.setText(contact.getMegaContactAdapter().getFullName());
                     }
                 }
                 else {
-                    s = contact.getFullName().split(" ");
+                    s = contact.getMegaContactAdapter().getFullName().split(" ");
                     if (s != null && s.length > 0) {
                         holder.textViewName.setText(s[0]);
                     }
                     else {
-                        holder.textViewName.setText(contact.getFullName());
+                        holder.textViewName.setText(contact.getMegaContactAdapter().getFullName());
                     }
                 }
             }
         }
         else {
-            s = contact.getEmail().split("[@._]");
+            s = contact.getMail().split("[@._]");
             if (s != null && s.length > 0) {
                 holder.textViewName.setText(s[0]);
             }
             else {
-                holder.textViewName.setText(contact.getEmail());
+                holder.textViewName.setText(contact.getMail());
             }
         }
 
@@ -226,26 +226,9 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         File avatar = null;
         String mail = null;
 
-        if (contact.getPhoneContactInfo()){
-            if (contact.getEmail() != null) {
-                mail = contact.getEmail();
-            }
-        }
-        else if (contact.getMegaContactAdapter()) {
-            if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
-                mail = contact.getMegaUser().getEmail();
-            }
-            else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
-                mail = contact.getMegaContactDB().getMail();
-            }
-        }
-        else {
-            if (contact.getEmail() != null) {
-                mail = contact.getEmail();
-            }
-        }
+        mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
 
-        if (!contact.getPhoneContactInfo() && !contact.getMegaContactAdapter()) {
+        if (!contact.isPhoneContact() && !contact.isMegaContact()) {
             return createDefaultAvatar(mail, contact);
         }
 
@@ -297,8 +280,8 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         paintText.setStyle(Paint.Style.FILL);
 
         String color = null;
-        if (contact.getMegaUser() != null) {
-            color = megaApi.getUserAvatarColor(contact.getMegaUser());
+        if (contact.isMegaContact() && contact.getMegaContactAdapter().getMegaUser() != null) {
+            color = megaApi.getUserAvatarColor(contact.getMegaContactAdapter().getMegaUser());
         }
         if(color!=null){
             log("The color to set the avatar is "+color);
@@ -307,7 +290,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         }
         else{
             log("Default color to the avatar");
-            if (contact.getPhoneContactInfo()){
+            if (contact.isPhoneContact()){
                 paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
             }
             else {
@@ -326,14 +309,14 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
 
         String fullName = null;
-        if(contact.getPhoneContactInfo()){
-            fullName = contact.getName();
+        if(contact.isPhoneContact()){
+            fullName = contact.getPhoneContactInfo().getName();
             if (fullName == null) {
                 fullName = mail;
             }
         }
-        else if (contact.getMegaContactAdapter()) {
-            fullName = contact.getFullName();
+        else if (contact.isMegaContact()) {
+            fullName = contact.getMegaContactAdapter().getFullName();
             if (fullName == null) {
                 fullName = mail;
             }

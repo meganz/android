@@ -150,16 +150,16 @@
 			android:layout_height="wrap_content">
 
 			<RelativeLayout
-				android:id="@+id/header_list_mega"
+				android:id="@+id/header_list"
 				android:layout_width="match_parent"
 				android:background="@color/camera_uploads_list_view"
 				android:layout_height="48dp">
 
 				<TextView
+					android:id="@+id/text_header_list"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_centerVertical="true"
-					android:text="@string/contacts_mega"
 					android:textColor="@color/mail_my_account"
 					android:textSize="14sp"
 					android:layout_marginLeft="16dp"/>
@@ -167,49 +167,12 @@
 			</RelativeLayout>
 
 			<android.support.v7.widget.RecyclerView
-				android:id="@+id/add_contact_list_mega"
+				android:id="@+id/add_contact_list"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:choiceMode="multipleChoice"
-				android:layout_below="@+id/header_list_mega"/>
+				android:layout_below="@+id/header_list"/>
 
-			<RelativeLayout
-				android:id="@+id/header_list_phone"
-				android:layout_width="match_parent"
-				android:background="@color/camera_uploads_list_view"
-				android:layout_height="48dp"
-				android:layout_below="@+id/add_contact_list_mega">
-
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_centerVertical="true"
-					android:text="@string/contacts_phone"
-					android:textColor="@color/mail_my_account"
-					android:textSize="14sp"
-					android:layout_marginLeft="16dp"/>
-
-			</RelativeLayout>
-
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/add_contact_list_phone"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:choiceMode="multipleChoice"
-				android:layout_below="@+id/header_list_phone"/>
-
-		</RelativeLayout>
-
-		<RelativeLayout
-			android:id="@+id/container_list_share"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/add_contact_list_share"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:choiceMode="multipleChoice"/>
 		</RelativeLayout>
 
 	</RelativeLayout>
