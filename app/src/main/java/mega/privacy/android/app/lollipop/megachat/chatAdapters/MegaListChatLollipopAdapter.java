@@ -110,13 +110,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		cC = new ChatController(context);
 		
-		if(chats!=null)
-    	{
-    		log("Number of chats: "+chats.size());
-    	}
-    	else{
-    		log("Number of chats: NULL");
-    	}
+		if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
+			selectedItems = new SparseBooleanArray();
+			multipleSelect = true;
+		}
 	}
 	
 	/*public view holder class*/
@@ -934,7 +931,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(context instanceof ManagerActivityLollipop){
 					((RecentChatsFragmentLollipop) fragment).itemClick(currentPosition);
 				}
-				else if(context instanceof ChatExplorerActivity){
+				else if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
 					((ChatExplorerFragment) fragment).itemClick(currentPosition);
 				}
 				else if(context instanceof ArchivedChatsActivity){
