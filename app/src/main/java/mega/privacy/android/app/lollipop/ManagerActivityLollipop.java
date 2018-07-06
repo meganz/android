@@ -14946,16 +14946,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void onNodesInboxUpdate() {
-		log("onNodesInboxUpdate");
 
 		if (iFLol != null){
 			if(iFLol.isAdded()){
-				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-				if (node != null){
-					log("Go to inbox node: "+node.getName());
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-					iFLol.setNodes(nodes);
-				}
+				iFLol.refresh();
 			}
 		}
 	}
