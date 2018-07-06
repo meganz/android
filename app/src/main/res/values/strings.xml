@@ -1979,4 +1979,7 @@
 
     <string name="pre_overquota_alert_text" context="Pre overquota error dialog when trying to copy or import a file">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
 
+    <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
+    <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
+
 </resources>
