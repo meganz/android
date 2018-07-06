@@ -12,6 +12,13 @@
         android:orderInCategory="100"
         android:title="@string/action_unselect_all"
         MEGA:showAsAction="never" />
+
+   <item
+       android:id="@+id/cab_menu_restore_from_rubbish"
+       android:orderInCategory="100"
+       android:title="@string/context_restore"
+       android:visible="false"
+       MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_download"
