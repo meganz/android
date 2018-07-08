@@ -53,6 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
+            android:layout_marginBottom="4dp"
             android:layout_below="@+id/title_own_message_layout"
             android:visibility="gone">
 
@@ -78,7 +79,6 @@
                     android:textSize="14sp"
                     android:gravity="left"
                     android:layout_toRightOf="@id/own_management_message_icon"
-                    android:layout_marginLeft="48dp"
                     android:layout_marginBottom="6dp"
                     android:layout_marginTop="6dp"
                     android:textColor="@color/mail_my_account"/>
@@ -924,6 +924,7 @@
                 android:id="@+id/contact_management_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/blue"
                 android:gravity="left"
                 android:layout_below="@+id/title_contact_message_layout"
                 android:visibility="gone">
@@ -945,7 +946,6 @@
                     android:textSize="14sp"
                     android:gravity="left"
                     android:layout_toRightOf="@id/contact_management_message_icon"
-                    android:layout_marginLeft="48dp"
                     android:layout_centerVertical="true"
                     android:layout_marginBottom="6dp"
                     android:textColor="@color/mail_my_account"/>
