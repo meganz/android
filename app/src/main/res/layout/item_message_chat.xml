@@ -36,16 +36,14 @@
             android:id="@+id/title_own_message_layout"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:gravity="right">
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:id="@+id/message_chat_time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
                 android:textSize="12sp"
                 android:textColor="@color/file_list_second_row"
-                android:gravity="right"
                 android:layout_centerVertical="true"/>
         </RelativeLayout>
 
@@ -882,7 +880,6 @@
         android:id="@+id/message_chat_contact_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
         android:layout_below="@+id/message_chat_date_layout"
         android:layout_marginBottom="6dp">
 
@@ -906,7 +903,6 @@
                     android:text="name of the contact"
                     android:textColor="@color/name_my_account"
                     android:layout_marginRight="4dp"
-                    android:gravity="left"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_centerVertical="true"/>
@@ -917,7 +913,6 @@
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
                     android:textColor="@color/file_list_second_row"
-                    android:gravity="left"
                     android:layout_toEndOf="@+id/contact_message_chat_name_text"
                     android:layout_toRightOf="@+id/contact_message_chat_name_text"
                     android:layout_centerVertical="true"/>
