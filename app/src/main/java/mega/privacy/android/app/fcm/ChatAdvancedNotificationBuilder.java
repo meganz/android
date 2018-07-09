@@ -166,14 +166,17 @@ public final class ChatAdvancedNotificationBuilder {
         }
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
-        notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega))
-                .setShowWhen(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+
+        notificationBuilder.setShowWhen(true);
 
         if(uriParameter!=null){
             notificationBuilder.setSound(uriParameter);
@@ -231,13 +234,20 @@ public final class ChatAdvancedNotificationBuilder {
                                         String name = "";
                                         name = message.getUserName(0);
                                         if (name.trim().isEmpty()) {
-                                            name = message.getUserEmail(0);
+                                            name = message.getUserName(0);
                                         }
-                                        String email = message.getUserEmail(0);
-                                        log("Contact EMail: " + name);
+                                        String email = message.getUserName(0);
+                                        log("Contact Name: " + name);
                                         messageContent = email;
                                     }
-
+                                    else{
+                                        StringBuilder name = new StringBuilder("");
+                                        name.append(message.getUserName(0));
+                                        for (int k = 1; k < userCount; k++) {
+                                            name.append(", " + message.getUserName(k));
+                                        }
+                                        messageContent = name.toString();
+                                    }
                                 }
                                 else if(message.getType()==MegaChatMessage.TYPE_TRUNCATE){
                                     log("Type TRUNCATE message");
@@ -349,11 +359,14 @@ public final class ChatAdvancedNotificationBuilder {
 //        Spanned notificationContent;
 
         Notification.Builder notificationBuilder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setAutoCancel(true)
                 .setShowWhen(true)
                 .setGroup(groupKey);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         Notification.MessagingStyle messagingStyleContent = new Notification.MessagingStyle(chat.getTitle());
 
@@ -383,13 +396,20 @@ public final class ChatAdvancedNotificationBuilder {
                         String name = "";
                         name = msg.getUserName(0);
                         if (name.trim().isEmpty()) {
-                            name = msg.getUserEmail(0);
+                            name = msg.getUserName(0);
                         }
-                        String email = msg.getUserEmail(0);
+                        String email = msg.getUserName(0);
                         log("Contact EMail: " + name);
                         messageContent = email;
                     }
-
+                    else{
+                        StringBuilder name = new StringBuilder("");
+                        name.append(msg.getUserName(0));
+                        for (int j = 1; j < userCount; j++) {
+                            name.append(", " + msg.getUserName(j));
+                        }
+                        messageContent = name.toString();
+                    }
                 }
                 else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
                     log("Type TRUNCATE message");
@@ -595,15 +615,20 @@ public final class ChatAdvancedNotificationBuilder {
         intent.putExtra("CHAT_ID", -1);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        return new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
+
+        notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify)
                 .setShowWhen(true)
                 .setGroup(groupKey)
                 .setGroupSummary(true)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build();
+                .setContentIntent(pendingIntent);
+
+        return notificationBuilder.build();
     }
 
     public void removeAllChatNotifications(){
@@ -627,12 +652,15 @@ public final class ChatAdvancedNotificationBuilder {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true).setTicker("Chat activity")
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentTitle("Chat activity").setContentText("You may have new messages")
                 .setOngoing(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            mBuilderCompat.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
@@ -676,14 +704,17 @@ public final class ChatAdvancedNotificationBuilder {
 
             //No sound just vibration
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(chatToAnswer.getPeerFullname(0))
                     .setContentText(context.getString(R.string.notification_subtitle_incoming))
                     .setAutoCancel(false)
                     .setVibrate(pattern)
-                    .setColor(ContextCompat.getColor(context,R.color.mega))
                     .addAction(actionIgnore)
                     .addAction(actionAnswer);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+            }
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
                 //API 25 = Android 7.1
@@ -832,14 +863,17 @@ public final class ChatAdvancedNotificationBuilder {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify_download)
+                .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentTitle(context.getString(R.string.missed_call_notification_title))
                 .setContentText(notificationContent)
                 .setAutoCancel(true)
                 .setVibrate(pattern)
                 .setSound(defaultSoundUri)
-                .setColor(ContextCompat.getColor(context,R.color.mega))
                 .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+        }
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
             //API 25 = Android 7.1
@@ -848,8 +882,6 @@ public final class ChatAdvancedNotificationBuilder {
         else{
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
         }
-
-        notificationBuilder.setFullScreenIntent(pendingIntent, true);
 
         if(chat.getPeerEmail(0)!=null){
 

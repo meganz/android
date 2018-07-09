@@ -84,7 +84,6 @@ import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -143,8 +142,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	Toolbar toolbar;
 	ActionBar aB;
-
-	int accountType;
 
 	private boolean isGetLink = false;
 
@@ -331,10 +328,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
-        }
-        else
-        {
-
+        }else{
             collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
         }
         collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
@@ -555,7 +549,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if(from==FROM_INCOMING_SHARES){
                     firstIncomingLevel = extras.getBoolean("firstLevel");
                 }
-                accountType = extras.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
                 long handleNode = extras.getLong("handle", -1);
                 log("Handle of the selected node: "+handleNode);
                 node = megaApi.getNodeByHandle(handleNode);
@@ -963,7 +957,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 			case R.id.cab_menu_file_info_share_folder: {
-				Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+				Intent intent = new Intent();
 				intent.setClass(this, AddContactActivityLollipop.class);
 				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
@@ -2250,7 +2244,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("showGetLinkActivity");
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
-		linkIntent.putExtra("account", accountType);
 		startActivity(linkIntent);
 	}
 
@@ -2395,6 +2388,21 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 				}
 			}
+            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+
+            }
+            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 			}
@@ -2556,94 +2564,78 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-			final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
-			final boolean megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
-			if (megaContacts){
-				if (node.isFolder()){
-					AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							ProgressDialog temp = null;
-							try{
-								temp = new ProgressDialog(fileInfoActivity);
-								temp.setMessage(getString(R.string.context_sharing_folder));
-								temp.show();
-							}
-							catch(Exception e){
-								return;
-							}
-							statusDialog = temp;
-							permissionsDialog.dismiss();
+            if (node.isFolder()){
+                AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+                final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+                dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        ProgressDialog temp = null;
+                        try{
+                            temp = new ProgressDialog(fileInfoActivity);
+                            temp.setMessage(getString(R.string.context_sharing_folder));
+                            temp.show();
+                        }
+                        catch(Exception e){
+                            return;
+                        }
+                        statusDialog = temp;
+                        permissionsDialog.dismiss();
 
-							switch(item) {
-			                    case 0:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileInfoActivity);
-			                    	}
-			                    	break;
-			                    }
-			                    case 1:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileInfoActivity);
-			                    	}
-			                        break;
-			                    }
-			                    case 2:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileInfoActivity);
-			                    	}
-			                        break;
-			                    }
-			                }
-						}
-					});
-					permissionsDialog = dialogBuilder.create();
-					permissionsDialog.show();
-					/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
-				}
-				else{
-					for (int i=0;i<contactsData.size();i++){
-						MegaUser u = megaApi.getContact(contactsData.get(i));
-						megaApi.sendFileToUser(node, u, fileInfoActivity);
-					}
-				}
-			}
-			else{
-				if (node.isFolder()){
-					for (int i=0; i < contactsData.size();i++){
-						String type = contactsData.get(i);
-						if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-						else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-					}
-				}
-				else{
-					for (int i=0; i < contactsData.size();i++){
-						String type = contactsData.get(i);
-						if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-						else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
-							i++;
-							Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
-						}
-					}
-				}
-			}
+                        switch(item) {
+                            case 0:{
+                                for (int i=0;i<contactsData.size();i++){
+                                    MegaUser u = megaApi.getContact(contactsData.get(i));
+
+                                    if(u!=null){
+                                        log("Share: "+ node.getName() + " to "+ u.getEmail());
+                                        megaApi.share(node, u, MegaShare.ACCESS_READ, fileInfoActivity);
+                                    }
+                                    else{
+                                        log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                                        megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, fileInfoActivity);
+                                    }
+                                }
+                                break;
+                            }
+                            case 1:{
+                                for (int i=0;i<contactsData.size();i++){
+                                    MegaUser u = megaApi.getContact(contactsData.get(i));
+                                    if(u!=null){
+                                        log("Share: "+ node.getName() + " to "+ u.getEmail());
+                                        megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileInfoActivity);
+                                    }
+                                    else{
+                                        log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                                        megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, fileInfoActivity);
+                                    }
+                                }
+                                break;
+                            }
+                            case 2:{
+                                for (int i=0;i<contactsData.size();i++){
+                                    MegaUser u = megaApi.getContact(contactsData.get(i));
+                                    if(u!=null){
+                                        log("Share: "+ node.getName() + " to "+ u.getEmail());
+                                        megaApi.share(node, u, MegaShare.ACCESS_FULL, fileInfoActivity);
+                                    }
+                                    else{
+                                        log("USER is NULL when sharing!->SHARE WITH NON CONTACT");
+                                        megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, fileInfoActivity);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                });
+                permissionsDialog = dialogBuilder.create();
+                permissionsDialog.show();
+            }
+            else{
+                log("ERROR, the file is not folder");
+            }
 		}
 	}
 

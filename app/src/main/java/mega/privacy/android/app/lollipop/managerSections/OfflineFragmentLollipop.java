@@ -50,7 +50,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -70,8 +69,8 @@ public class OfflineFragmentLollipop extends Fragment{
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
-	public static LinearLayoutManager mLayoutManager;
-	public static CustomizedGridLayoutManager gridLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
 	
@@ -79,10 +78,10 @@ public class OfflineFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	public static MegaOfflineLollipopAdapter adapter;
+	MegaOfflineLollipopAdapter adapter;
 	OfflineFragmentLollipop offlineFragment = this;
 	DatabaseHandler dbH = null;
-	public static ArrayList<MegaOffline> mOffList= null;
+	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
 	boolean isList = true;
@@ -104,6 +103,39 @@ public class OfflineFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+				}
+			}
+		}
+
+		return null;
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -1057,12 +1089,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						intent.putExtra("pathNavigation", pathNavigation);
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						intent.putExtra("screenPosition", screenPosition);
-						if (context instanceof ManagerActivityLollipop){
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-							if(accountInfo!=null){
-								intent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
-						}
+
 						startActivity(intent);
 						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 						imageDrag = imageView;
@@ -1071,18 +1098,13 @@ public class OfflineFragmentLollipop extends Fragment{
 						log("Video file");
 
 						Intent mediaIntent;
-						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported()) {
+						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(currentFile.getName()).isAudioNotSupported()) {
 							mediaIntent = new Intent(Intent.ACTION_VIEW);
 						}
 						else {
 							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						}
-						if (context instanceof ManagerActivityLollipop) {
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
-							if (accountInfo != null) {
-								mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
-						}
+
 						mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						mediaIntent.putExtra("FILENAME", currentNode.getName());
 						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
@@ -1111,12 +1133,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						//String localPath = Util.getLocalFile(context, currentFile.getName(), currentFile.get, currentFile.getParent());
 
 						Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-						if (context instanceof ManagerActivityLollipop) {
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop) context).getMyAccountInfo();
-							if (accountInfo != null) {
-								pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
-						}
+
 						pdfIntent.putExtra("inside", true);
 						pdfIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
 						pdfIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);

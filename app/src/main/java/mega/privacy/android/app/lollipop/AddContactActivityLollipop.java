@@ -69,13 +69,11 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 
 public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener{
-
-    public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
-    public static String ACTION_PICK_CONTACT_SEND_FILE = "ACTION_PICK_CONTACT_SEND_FILE";
 
     DisplayMetrics outMetrics;
     private android.support.v7.app.AlertDialog shareFolderDialog;
@@ -85,13 +83,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     DatabaseHandler dbH = null;
     int contactType = 0;
     int multipleSelectIntent;
-    int sendToInbox;
     long nodeHandle = -1;
     long[] nodeHandles;
     Handler handler;
     boolean cancelled = false;
     boolean heightMax = false;
     boolean recyclerOn = true;
+    long chatId = -1;
 
     AddContactActivityLollipop addContactActivityLollipop;
 
@@ -434,6 +432,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", Constants.CONTACT_TYPE_MEGA);
+            chatId = getIntent().getLongExtra("chatId", -1);
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
                 comesFromChat = bundle.getBoolean("chat");
@@ -449,7 +448,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     log("onCreate multiselect YES!");
                     nodeHandles=getIntent().getLongArrayExtra(EXTRA_NODE_HANDLE);
                 }
-                sendToInbox= getIntent().getIntExtra("SEND_FILE", -1);
             }
         }
 
@@ -847,23 +845,105 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             contactsMEGA = megaApi.getContacts();
             visibleContactsMEGA.clear();
 
-            for (int i=0;i<contactsMEGA.size();i++){
-                log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
-                if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+            if(chatId!=-1){
+                log("Add participant to chat");
+                if(megaChatApi!=null){
+                    MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+                    if(chat!=null){
+                        long participantsCount = chat.getPeerCount();
 
-                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
-                    String fullName = "";
-                    if(contactDB!=null){
-                        ContactController cC = new ContactController(this);
-                        fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                        for (int i=0;i<contactsMEGA.size();i++){
+                            if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+
+                                boolean found = false;
+
+                                for(int j=0;j<participantsCount;j++) {
+
+                                    long peerHandle = chat.getPeerHandle(j);
+
+                                    if(peerHandle == contactsMEGA.get(i).getHandle()){
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!found){
+                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
+                                    String fullName = "";
+                                    if(contactDB!=null){
+                                        ContactController cC = new ContactController(this);
+                                        fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                                    }
+                                    else{
+                                        //No name, ask for it and later refresh!!
+                                        fullName = contactsMEGA.get(i).getEmail();
+                                    }
+
+                                    log("Added to list: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
+                                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                                    visibleContactsMEGA.add(megaContactAdapter);
+                                }
+                                else{
+                                    MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
+                                    String fullName = "";
+                                    if(contactDB!=null){
+                                        ContactController cC = new ContactController(this);
+                                        fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                                    }
+                                    else{
+                                        //No name, ask for it and later refresh!!
+                                        fullName = contactsMEGA.get(i).getEmail();
+                                    }
+
+                                    log("Removed from list - already included on chat: "+fullName);
+                                }
+                            }
+                        }
                     }
                     else{
-                        //No name, ask for it and later refresh!!
-                        fullName = contactsMEGA.get(i).getEmail();
-                    }
+                        for (int i=0;i<contactsMEGA.size();i++){
+                            log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
+                            if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
 
-                    MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
-                    visibleContactsMEGA.add(megaContactAdapter);
+                                MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
+                                String fullName = "";
+                                if(contactDB!=null){
+                                    ContactController cC = new ContactController(this);
+                                    fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                                }
+                                else{
+                                    //No name, ask for it and later refresh!!
+                                    fullName = contactsMEGA.get(i).getEmail();
+                                }
+
+                                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                                visibleContactsMEGA.add(megaContactAdapter);
+
+                            }
+                        }
+                    }
+                }
+            }
+            else{
+                for (int i=0;i<contactsMEGA.size();i++){
+                    log("contact: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
+                    if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+
+                        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
+                        String fullName = "";
+                        if(contactDB!=null){
+                            ContactController cC = new ContactController(this);
+                            fullName = cC.getFullName(contactDB.getName(), contactDB.getLastName(), contactsMEGA.get(i).getEmail());
+                        }
+                        else{
+                            //No name, ask for it and later refresh!!
+                            fullName = contactsMEGA.get(i).getEmail();
+                        }
+
+                        MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
+                        visibleContactsMEGA.add(megaContactAdapter);
+
+                    }
                 }
             }
 
@@ -1723,11 +1803,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             intent.putExtra("MULTISELECT", 1);
         }
 
-        if(sendToInbox==0){
-            intent.putExtra("SEND_FILE",0);
-        } else {
-            intent.putExtra("SEND_FILE",1);
-        }
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
         setResult(RESULT_OK, intent);
         hideKeyboard();
@@ -1806,11 +1881,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             intent.putExtra("MULTISELECT", 1);
         }
 
-        if(sendToInbox==0){
-            intent.putExtra("SEND_FILE",0);
-        } else {
-            intent.putExtra("SEND_FILE",1);
-        }
         intent.putExtra(EXTRA_MEGA_CONTACTS, false);
         setResult(RESULT_OK, intent);
         hideKeyboard();

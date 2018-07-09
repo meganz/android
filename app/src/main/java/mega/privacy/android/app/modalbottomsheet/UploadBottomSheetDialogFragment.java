@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -28,6 +27,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     Context context;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
     public TextView title;
@@ -60,6 +60,7 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_upload, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.upload_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         optionFromDevice = (LinearLayout) contentView.findViewById(R.id.upload_from_device_layout);
         optionFromSystem = (LinearLayout) contentView.findViewById(R.id.upload_from_system_layout);
@@ -71,14 +72,17 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//        }
+//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//        }
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-        }
-        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-        }
+        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 48));
+        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     @Override

@@ -547,14 +547,16 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             //No name, ask for it and later refresh!!
             fullName = myEmail;
         }
-        String firstLetter = fullName.charAt(0) + "";
-        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+        if (fullName != null && fullName.length() > 0) {
+            String firstLetter = fullName.charAt(0) + "";
+            firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 
-        initialLetter.setText(firstLetter);
-        initialLetter.setTextSize(30);
-        initialLetter.setTextColor(WHITE);
-        initialLetter.setVisibility(View.VISIBLE);
-        contentAvatar = false;
+            initialLetter.setText(firstLetter);
+            initialLetter.setTextSize(30);
+            initialLetter.setTextColor(WHITE);
+            initialLetter.setVisibility(View.VISIBLE);
+            contentAvatar = false;
+        }
     }
 
     private int getAvatarTextSize (float density){
