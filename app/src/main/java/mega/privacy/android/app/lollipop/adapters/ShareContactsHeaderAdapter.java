@@ -30,6 +30,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
 import mega.privacy.android.app.utils.Constants;
@@ -42,7 +43,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
  * Created by mega on 4/07/18.
  */
 
-public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener {
+public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
     DatabaseHandler dbH = null;
     public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
@@ -86,6 +87,19 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    @Override
+    public String getSectionTitle(int position) {
+        ShareContactInfo contact = shareContacts.get(position);
+
+        if (contact.isMegaContact() && !contact.isHeader()){
+            return contact.getMegaContactAdapter().getFullName().substring(0, 1).toUpperCase();
+        }
+        else if (!contact.isHeader()) {
+            return contact.getPhoneContactInfo().getName().substring(0,1).toUpperCase();
+        }
+        return null;
     }
 
     public class ViewHolderShareContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
