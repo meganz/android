@@ -50,6 +50,8 @@ public class MyStorageFragmentLollipop extends Fragment {
 	ImageView transferQuotaUsedIcon;
 	TextView transferQuotaUsedText;
 
+	RelativeLayout inboxStorageLayout;
+
 	TextView totalUsedSpace;
 	TextView cloudDriveUsedText;
 	TextView inboxUsedText;
@@ -115,6 +117,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
 
 		/* Usage storage */
+		inboxStorageLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_inbox_storage_layout);
 		cloudDriveUsedText = (TextView) v.findViewById(R.id.my_storage_account_cloud_storage_text);
 		inboxUsedText = (TextView) v.findViewById(R.id.my_storage_account_inbox_storage_text);
 		incomingUsedText = (TextView) v.findViewById(R.id.my_storage_account_incoming_storage_text);
@@ -298,7 +301,16 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		//Check size of the different nodes
 		cloudDriveUsedText.setText(myAccountInfo.getFormattedUsedCloud());
-		inboxUsedText.setText(myAccountInfo.getFormattedUsedInbox());
+
+		String inboxStorage = myAccountInfo.getFormattedUsedInbox();
+		if(inboxStorage == null || inboxStorage.isEmpty()){
+			inboxStorageLayout.setVisibility(View.GONE);
+		}
+		else{
+			inboxStorageLayout.setVisibility(View.VISIBLE);
+			inboxUsedText.setText(inboxStorage);
+		}
+
 		rubbishUsedText.setText(myAccountInfo.getFormattedUsedRubbish());
 		incomingUsedText.setText(myAccountInfo.getFormattedUsedIncoming());
 		availableSpaceText.setText(myAccountInfo.getFormattedAvailableSpace());
