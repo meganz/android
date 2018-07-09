@@ -1,7 +1,7 @@
 <shape
     xmlns:android="http://schemas.android.com/apk/res/android">
     <solid
-        android:color="@color/message_background_2">
+        android:color="@color/message_background_3">
     </solid>
     <stroke
         android:width="0dp">

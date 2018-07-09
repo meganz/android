@@ -1088,16 +1088,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			String key = getPreferenceScreen().getPreference(i).getKey();
 			if (key.equals(storageCategory.getKey())){
 				((ManagerActivityLollipop) context).openSettingsStorage = false;
-				listView.clearFocus();
-				final int finalI = i;
-				listView.postDelayed(new Runnable() {
-					@Override
-					public void run() {
+				if (listView != null) {
+					listView.clearFocus();
+					final int finalI = i;
+					listView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
 //						listView.requestFocusFromTouch();
-						listView.setSelection(finalI+8);
+							listView.setSelection(finalI + 8);
 //						listView.requestFocus();
-					}
-				}, 200);
+						}
+					}, 200);
+				}
 				break;
 			}
 		}

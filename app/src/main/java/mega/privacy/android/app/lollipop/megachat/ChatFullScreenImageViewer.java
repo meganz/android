@@ -119,6 +119,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	ArrayList<Long> handleListM = new ArrayList<Long>();
 
+	boolean isDeleteDialogShow = false;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
@@ -254,7 +256,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 			case R.id.chat_full_image_viewer_save_for_offline: {
 				log("save for offline option");
-				showSnackbar("Coming soon...");
+//				showSnackbar("Coming soon...");
+				ChatController chatC = new ChatController(this);
+				if (messages.get(positionG) != null){
+					chatC.saveForOffline(messages.get(positionG).getMegaNodeList());
+				}
 				break;
 			}
 			case R.id.chat_full_image_viewer_remove: {
@@ -289,6 +295,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		else{
 			scaleText = scaleW;
+		}
+		if (savedInstanceState != null){
+			isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+		}
+		else {
+			isDeleteDialogShow = false;
 		}
 
 		dbH = DatabaseHandler.getDbHandler(this);
@@ -459,6 +471,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 
+		if (isDeleteDialogShow && chatId != -1 && messages.get(positionG) != null) {
+			showConfirmationDeleteNode(chatId, messages.get(positionG));
+		}
+
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 	}
@@ -553,7 +569,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
-
+		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
 	}
 	
 	@Override
@@ -574,7 +590,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-		log("onRequestFinish");
+		log("onRequestFinish: "+e.getErrorCode());
 		if(request.getType() == MegaRequest.TYPE_COPY){
 			if (e.getErrorCode() != MegaError.API_OK) {
 
@@ -586,6 +602,16 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_ENOENT){
+					Snackbar.make(fragmentContainer, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), Snackbar.LENGTH_LONG).show();
 				}
 				else
 				{
@@ -618,11 +644,13 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					case DialogInterface.BUTTON_POSITIVE:
 						ChatController cC = new ChatController(fullScreenImageViewer);
 						cC.deleteMessage(message, chatId);
+						isDeleteDialogShow = false;
 						finish();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
 						//No button clicked
+						isDeleteDialogShow = false;
 						break;
 				}
 			}
@@ -640,6 +668,15 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		builder.setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
+		isDeleteDialogShow = true;
+
+		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				isDeleteDialogShow = false;
+			}
+		});
 	}
 	
 	@Override

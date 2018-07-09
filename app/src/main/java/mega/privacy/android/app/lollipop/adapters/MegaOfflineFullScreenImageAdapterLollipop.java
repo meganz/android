@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -134,6 +134,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 	
 	// constructor
 	public MegaOfflineFullScreenImageAdapterLollipop(Context context, Activity activity, ArrayList<String> paths, boolean zipImage) {
+
 		this.activity = activity;
 		this.paths = paths;
 		this.megaFullScreenImageAdapter = this;
@@ -246,7 +247,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 							pb.setVisibility(View.GONE);
 							return false;
 						}
-					}).placeholder(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}).placeholder(MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 				}
 			}
 		}
@@ -254,7 +255,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 			holder.isGIF = false;
 			holder.imgDisplay.setVisibility(View.VISIBLE);
 			holder.gifImgDisplay.setVisibility(View.GONE);
-			holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
+			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId());
 
 			if (zipImage){
 				holder.currentPath = paths.get(position);
@@ -314,7 +315,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
         log ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
  
     }
-	
+
 	public ImageView getVisibleImage(int position){
     	if (visibleImgs.get(position).isGIF) {
 			return visibleImgs.get(position).gifImgDisplay;
@@ -326,6 +327,8 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
+
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_gif:
 			case R.id.full_screen_image_viewer_image:{

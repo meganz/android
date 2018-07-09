@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +45,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -97,7 +99,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
@@ -115,8 +116,8 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeInfo;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -136,6 +137,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToSendFileListener;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -209,6 +211,7 @@ import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -261,7 +264,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	NodeController nC;
 	ContactController cC;
 	AccountController aC;
-	MyAccountInfo myAccountInfo;
 
 	long[] searchDate = null;
 
@@ -322,6 +324,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     public boolean openFolderFromSearch = false;
 
     public boolean openSettingsStorage = false;
+
+    int orientationSaved;
 
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT;
@@ -391,14 +395,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean firstTime = true;
 //	String pathNavigation = "/";
-	public static String searchQuery = null;
+	public String searchQuery = null;
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
 	ArrayList<MegaNode> searchNodes;
 	public int levelsSearch = -1;
 	boolean openLink = false;
-	boolean sendToInbox = false;
 
 	long lastTimeOnTransferUpdate = Calendar.getInstance().getTimeInMillis();
 
@@ -414,6 +417,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
+	private boolean restoreFromRubbish = false;
 
 	private List<ShareInfo> filePreparedInfos;
 	boolean megaContacts = true;
@@ -542,6 +546,339 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Button recoveryKeyButton;
 	private Button dismissButton;
 	private boolean rememberPasswordLogout = false;
+
+	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			int actionType;
+
+			if (intent != null){
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if(actionType == Constants.UPDATE_GET_PRICING){
+					log("BROADCAST TO UPDATE AFTER GET PRICING");
+					//UPGRADE_ACCOUNT_FRAGMENT
+					if(upAFL!=null && upAFL.isAdded()){
+						upAFL.setPricing();
+					}
+
+					//MONTHLY_YEARLY_FRAGMENT
+					if(myFL!=null && myFL.isAdded()){
+						myFL.setPricing();
+					}
+
+					//CENTILI_FRAGMENT
+					if(ctFL!=null && ctFL.isAdded()){
+						ctFL.getPaymentId();
+					}
+
+					//FORTUMO_FRAGMENT
+					if(fFL!=null && fFL.isAdded()){
+						fFL.getPaymentId();
+					}
+				}
+				else if(actionType == Constants.UPDATE_ACCOUNT_DETAILS){
+					log("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS");
+					if(!isFinishing()){
+
+						updateAccountDetailsVisibleInfo();
+
+						//Check if myAccount section is visible
+						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						if(maFLol!=null && maFLol.isAdded()){
+							log("Update the account fragment");
+							maFLol.setAccountDetails();
+						}
+
+						String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
+						mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+						if(mStorageFLol!=null && mStorageFLol.isAdded()){
+							log("Update the account fragment");
+							mStorageFLol.setAccountDetails();
+						}
+
+						if(upAFL!=null && upAFL.isAdded()){
+							upAFL.showAvailableAccount();
+						}
+					}
+				}
+				else if(actionType == Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION){
+					log("BROADCAST TO UPDATE AFTER UPDATE_CREDIT_CARD_SUBSCRIPTION");
+					updateCancelSubscriptions();
+				}
+				else if(actionType == Constants.UPDATE_PAYMENT_METHODS){
+					log("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver receiverUpdatePosition = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int position;
+			int adapterType;
+			int actionType;
+			ImageView imageDrag = null;
+
+			if (intent != null){
+				actionType = intent.getIntExtra("actionType", -1);
+
+
+				position = intent.getIntExtra("position", -1);
+				adapterType = intent.getIntExtra("adapterType", 0);
+
+				if (position != -1){
+					if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
+						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = rubbishBinFLol.getImageDrag(position);
+								if (rubbishBinFLol.imageDrag != null){
+									rubbishBinFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									rubbishBinFLol.imageDrag = imageDrag;
+									rubbishBinFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								rubbishBinFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.INBOX_ADAPTER){
+						if (iFLol != null && iFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = iFLol.getImageDrag(position);
+								if (iFLol.imageDrag != null){
+									iFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									iFLol.imageDrag = imageDrag;
+									iFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								iFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
+						if (inSFLol != null && inSFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = inSFLol.getImageDrag(position);
+								if (inSFLol.imageDrag != null){
+									inSFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									inSFLol.imageDrag = imageDrag;
+									inSFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								inSFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
+						if (outSFLol != null && outSFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = outSFLol.getImageDrag(position);
+								if (outSFLol.imageDrag != null){
+									outSFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									outSFLol.imageDrag = imageDrag;
+									outSFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								outSFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.SEARCH_ADAPTER){
+						Long handle = intent.getLongExtra("handle", -1);
+						if (sFLol != null && sFLol.isAdded()){
+							ArrayList<MegaNode> listNodes = sFLol.getNodes();
+							for (int i=0; i<listNodes.size(); i++){
+								if (listNodes.get(i).getHandle() == handle){
+									position = i;
+									break;
+								}
+							}
+
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = sFLol.getImageDrag(position);
+								if (sFLol.imageDrag != null){
+									sFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									sFLol.imageDrag = imageDrag;
+									sFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								sFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
+						if (fbFLol != null && fbFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = fbFLol.getImageDrag(position);
+								if (fbFLol.imageDrag != null){
+									fbFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									fbFLol.imageDrag = imageDrag;
+									fbFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								fbFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER) {
+						Long handle = intent.getLongExtra("handle", -1);
+						if (cuFL != null && cuFL.isAdded()){
+
+							if (cuFL.getAdapterList() != null){
+								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = cuFL.getNodesArray();
+								for (int i=0; i<listNodes.size(); i++){
+									if (listNodes.get(i).getHandle() == handle){
+										position = i;
+										break;
+									}
+								}
+							}
+							else {
+								ArrayList<MegaMonthPicLollipop> listNodes = cuFL.getMonthPics();
+								ArrayList<Long> handles;
+								int count = 0;
+								boolean found = false;
+								for (int i=0; i<listNodes.size(); i++){
+									handles = listNodes.get(i).getNodeHandles();
+									for (int j=0; j<handles.size(); j++){
+										count++;
+										String h1 = handles.get(j).toString();
+										String h2 = handle.toString();
+										if (h1.equals(h2)){
+											position = count;
+											found = true;
+											break;
+										}
+									}
+									count++;
+									if (found){
+										break;
+									}
+								}
+							}
+
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = cuFL.getImageDrag(position);
+								if (cuFL.imageDrag != null){
+									cuFL.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									cuFL.imageDrag = imageDrag;
+									cuFL.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								cuFL.updateScrollPosition(position);
+							}
+						}
+						else if (muFLol != null && muFLol.isAdded()){
+
+							if (muFLol.getAdapterList() != null){
+								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = muFLol.getNodesArray();
+								for (int i=0; i<listNodes.size(); i++){
+									if (listNodes.get(i).getHandle() == handle){
+										position = i;
+										break;
+									}
+								}
+							}
+							else {
+								ArrayList<MegaMonthPicLollipop> listNodes = muFLol.getMonthPics();
+								ArrayList<Long> handles;
+								int count = 0;
+								boolean found = false;
+								for (int i=0; i<listNodes.size(); i++){
+									handles = listNodes.get(i).getNodeHandles();
+									for (int j=0; j<handles.size(); j++){
+										count++;
+										String h1 = handles.get(j).toString();
+										String h2 = String.valueOf(handle);
+										if (h1.equals(h2)){
+											position = count;
+											found = true;
+											break;
+										}
+									}
+									count++;
+									if (found){
+										break;
+									}
+								}
+							}
+
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = muFLol.getImageDrag(position);
+								if (muFLol.imageDrag != null){
+									muFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									muFLol.imageDrag = imageDrag;
+									muFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								muFLol.updateScrollPosition(position);
+							}
+						}
+					}
+					else if (adapterType == Constants.OFFLINE_ADAPTER){
+						if (oFLol != null && oFLol.isAdded()){
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = oFLol.getImageDrag(position);
+								if (oFLol.imageDrag != null){
+									oFLol.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null){
+									oFLol.imageDrag = imageDrag;
+									oFLol.imageDrag.setVisibility(View.GONE);
+								}
+							}
+							else if (actionType == Constants.SCROLL_TO_POSITION) {
+								oFLol.updateScrollPosition(position);
+							}
+						}
+					}
+
+					if (imageDrag != null){
+						int[] positionDrag = new int[2];
+						int[] screenPosition = new int[4];
+						imageDrag.getLocationOnScreen(positionDrag);
+
+						screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
+						screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
+						screenPosition[2] = imageDrag.getWidth();
+						screenPosition[3] = imageDrag.getHeight();
+
+						Intent intent1 =  new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+						intent1.putExtra("screenPosition", screenPosition);
+						LocalBroadcastManager.getInstance(managerActivity).sendBroadcast(intent1);
+					}
+				}
+			}
+		}
+	};
 
 	//Billing
 
@@ -717,8 +1054,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proLiteMonthly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(0);
-				myAccountInfo.setProLiteMonthly(proLiteMonthly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProLiteMonthly(proLiteMonthly);
 				maxP = proLiteMonthly;
 //	        		}
 //            	}
@@ -728,8 +1065,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proLiteYearly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(0);
-				myAccountInfo.setProLiteYearly(proLiteYearly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(0);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProLiteYearly(proLiteYearly);
 				maxP = proLiteYearly;
 //	        		}
 //            	}
@@ -739,8 +1076,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proIMonthly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(1);
-				myAccountInfo.setProIMonthly(proIMonthly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProIMonthly(proIMonthly);
 				maxP = proIMonthly;
 //	        		}
 //            	}
@@ -750,8 +1087,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proIYearly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(1);
-				myAccountInfo.setProIYearly(proIYearly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(1);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProIYearly(proIYearly);
 				maxP = proIYearly;
 //	        		}
 //            	}
@@ -761,8 +1098,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proIIMonthly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(2);
-				myAccountInfo.setProIIMonthly(proIIMonthly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProIIMonthly(proIIMonthly);
 				maxP = proIIMonthly;
 //	        		}
 //            	}
@@ -772,8 +1109,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proIIYearly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(2);
-				myAccountInfo.setProIIYearly(proIIYearly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(2);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProIIYearly(proIIYearly);
 				maxP = proIIYearly;
 //	        		}
 //            	}
@@ -783,9 +1120,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proIIIMonthly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(3);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
 				maxP = proIIIMonthly;
-				myAccountInfo.setProIIIMonthly(proIIIMonthly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProIIIMonthly(proIIIMonthly);
 //	        		}
 //            	}
 				log("PRO III MONTHLY (JSON): __*" + proIIIMonthly.getOriginalJson() + "*__");
@@ -794,20 +1131,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (proIIIYearly != null){
 //            	if (megaApi.getMyUser().getEmail() != null){
 //	            	if (proIIIYearly.getDeveloperPayload().compareTo(megaApi.getMyUser().getEmail()) == 0){
-				myAccountInfo.setLevelInventory(3);
-				myAccountInfo.setProIIIYearly(proIIIYearly);
+				((MegaApplication) getApplication()).getMyAccountInfo().setLevelInventory(3);
+				((MegaApplication) getApplication()).getMyAccountInfo().setProIIIYearly(proIIIYearly);
 				maxP = proIIIYearly;
 //	        		}
 //            	}
 				log("PRO III ANNUALY (JSON): __*" + proIIIYearly.getOriginalJson() + "*__");
 			}
 
-			myAccountInfo.setInventoryFinished(true);
+			((MegaApplication) getApplication()).getMyAccountInfo().setInventoryFinished(true);
 
-			log("LEVELACCOUNTDETAILS: " + myAccountInfo.getLevelAccountDetails() + "; LEVELINVENTORY: " + myAccountInfo.getLevelInventory() + "; ACCOUNTDETAILSFINISHED: " + myAccountInfo.isAccountDetailsFinished());
+			if (upAFL != null && upAFL.isAdded()) {
+				upAFL.setPricing();
+			}
 
-			if (myAccountInfo.isAccountDetailsFinished()){
-				if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()){
+			if (myFL != null && myFL.isAdded()) {
+				myFL.setPricing();
+			}
+
+			log("LEVELACCOUNTDETAILS: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() + "; LEVELINVENTORY: " + ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() + "; ACCOUNTDETAILSFINISHED: " + ((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished());
+
+			if (((MegaApplication) getApplication()).getMyAccountInfo().isAccountDetailsFinished()){
+				if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() > ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails()){
 					if (maxP != null){
 						log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
 						megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
@@ -1123,9 +1468,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				outState.putInt("selectedPaymentMethod", selectedPaymentMethod);
 			}
 		}
-		if(myAccountInfo==null){
-			log("My AccountInfo is Null");
-		}
+
 		if(searchQuery!=null){
 			outState.putInt("levelsSearch", levelsSearch);
 			outState.putString("searchQuery", searchQuery);
@@ -1147,6 +1490,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (turnOnNotifications){
 			outState.putBoolean("turnOnNotifications", turnOnNotifications);
 		}
+
+		outState.putInt("orientationSaved", orientationSaved);
 	}
 
 	@Override
@@ -1203,6 +1548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordLogout = savedInstanceState.getBoolean("rememberPasswordLogout", false);
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
+			orientationSaved = savedInstanceState.getInt("orientationSaved");
 		}
 		else{
 			log("Bundle is NULL");
@@ -1220,10 +1566,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			this.setPathNavigationOffline("/");
 		}
 
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+
 		nC = new NodeController(this);
 		cC = new ContactController(this);
 		aC = new AccountController(this);
-		myAccountInfo = new MyAccountInfo(this);
 
 		File thumbDir;
 		if (getExternalCacheDir() != null){
@@ -1845,36 +2193,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
 			}
 
-			if(myAccountInfo==null){
-				myAccountInfo = new MyAccountInfo(this);
-			}
 
-			myAccountInfo.setMyUser(megaApi.getMyUser());
-			if (myAccountInfo.getMyUser() != null){
-				nVEmail.setVisibility(View.VISIBLE);
-				nVEmail.setText(myAccountInfo.getMyUser().getEmail());
+			nVEmail.setVisibility(View.VISIBLE);
+			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
-				log("getUserAttribute FirstName");
-				myAccountInfo.setFirstName(false);
-				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
-				log("getUserAttribute LastName");
-				myAccountInfo.setLastName(false);
-				megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+			log("getUserAttribute FirstName");
+			((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
+			log("getUserAttribute LastName");
+			((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
-				this.setDefaultAvatar();
+			this.setDefaultAvatar();
 
-				this.setProfileAvatar();
-			}
-
-
-			if(myAccountInfo==null){
-				myAccountInfo=new MyAccountInfo(this);
-			}
-			megaApi.getPaymentMethods(myAccountInfo);
-			megaApi.getAccountDetails(myAccountInfo);
-			megaApi.getPricing(myAccountInfo);
-			megaApi.creditCardQuerySubscriptions(myAccountInfo);
-			dbH.resetExtendedAccountDetailsTimestamp();
+			this.setProfileAvatar();
 
 			initGooglePlayPayments();
 
@@ -2063,8 +2395,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						String text = getIntent().getStringExtra("showSnackbar");
 						if(chatId!=-1){
-							openChat(chatId);
+							openChat(chatId, text);
 						}
 						selectDrawerItemPending=false;
 						getIntent().setAction(null);
@@ -2162,7 +2495,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									}
 								}
 								else {
-									i.putExtra("imageId", MimeTypeInfo.typeForName(nodeLink.getName()).getIconResourceId());
+									i.putExtra("imageId", MimeTypeThumbnail.typeForName(nodeLink.getName()).getIconResourceId());
 								}
 								i.putExtra("name", nodeLink.getName());
 								startActivity(i);
@@ -2218,8 +2551,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
-						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
-						BitSet paymentBitSet = Util.convertToBitSet(paymentBitSetLong);;
+
 						switch (accountType){
 							case 0:{
 								log("intent firstTime==true");
@@ -2282,7 +2614,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
-						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
+
 						switch (accountType){
 							case Constants.FREE:{
 								log("intent firstTime==true");
@@ -2401,15 +2733,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			rememberPasswordDialogText.setText(R.string.recovery_key_exported_dialog_text_logout);
 			recoveryKeyButton.setText(R.string.option_export_recovery_key);
 			dismissButton.setText(R.string.option_logout_anyway);
-			params.setMargins(0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()), (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
 		else {
 			rememberPasswordDialogText.setText(R.string.remember_pwd_dialog_text);
 			recoveryKeyButton.setText(R.string.action_export_master_key);
 			dismissButton.setText(R.string.general_dismiss);
-			params.setMargins(0, 0, 0, (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics()));
 		}
-		dismissButton.setLayoutParams(params);
 
 		rememberPasswordDialog = builder.create();
 		rememberPasswordDialog.setCancelable(false);
@@ -2447,6 +2776,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			queryIfNotificationsAreOn();
 		}
+
+		if (getResources().getConfiguration().orientation != orientationSaved) {
+			orientationSaved = getResources().getConfiguration().orientation;
+			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -2460,10 +2794,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 
-		if (megaChatApi == null){
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
 		if (turnOnNotifications){
 			setTurnOnNotificationsFragment();
 		}
@@ -2473,8 +2803,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (!nf.areNotificationsEnabled()){
 				log("off");
 				if (dbH.getShowNotifOff() == null || dbH.getShowNotifOff().equals("true")){
-					if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
-						setTurnOnNotificationsFragment();
+					if (Util.isChatEnabled()){
+						if (megaChatApi == null){
+							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
+						}
+						if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
+							setTurnOnNotificationsFragment();
+						}
+					}
+					else {
+						if ((megaApi.getContacts().size() >= 1)){
+							setTurnOnNotificationsFragment();
+						}
 					}
 				}
 			}
@@ -2685,8 +3025,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
     			}
     			else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_STORAGE)){
-	    			showOverquotaAlert();
+	    			showOverquotaAlert(false);
 	    		}
+				else if(intent.getAction().equals(Constants.ACTION_PRE_OVERQUOTA_STORAGE)){
+					showOverquotaAlert(true);
+				}
 	    		else if(intent.getAction().equals(Constants.ACTION_OVERQUOTA_TRANSFER)){
 					log("onPostResume show overquota transfer alert!!");
 					if(alertDialogTransferOverquota==null){
@@ -2721,13 +3064,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //					builder.setTitle(title);
 		            builder.setMessage(text);
 
-					builder.setPositiveButton(getString(R.string.general_yes),
+					builder.setPositiveButton(getString(R.string.cam_sync_stop),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
 									startService(cancelIntent);
 								}
 							});
-					builder.setNegativeButton(getString(R.string.general_no), null);
+					builder.setNegativeButton(getString(R.string.general_cancel), null);
 					final AlertDialog dialog = builder.create();
 					try {
 						dialog.show();
@@ -2760,8 +3103,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("onPostResume: ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					String text = getIntent().getStringExtra("showSnackbar");
 					if(chatId!=-1){
-						openChat(chatId);
+						openChat(chatId, text);
 					}
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_CHAT_SUMMARY)) {
@@ -2902,7 +3246,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     	}
 	}
 
-	public void openChat(long chatId){
+	public void openChat(long chatId, String text){
 		log("openChat: "+chatId);
 //		drawerItem=DrawerItem.CHAT;
 //		selectDrawerItemLollipop(drawerItem);
@@ -2914,6 +3258,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 				intentToChat.putExtra("CHAT_ID", chatId);
+				if(text!=null){
+					intentToChat.putExtra("showSnackbar", text);
+				}
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -2938,10 +3285,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("setProfileAvatar");
 		File avatar = null;
 		if (getExternalCacheDir() != null){
-			avatar = new File(getExternalCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + ".jpg");
+			avatar = new File(getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
 		}
 		else{
-			avatar = new File(getCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + ".jpg");
+			avatar = new File(getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
 		}
 		Bitmap imBitmap = null;
 		if (avatar.exists()){
@@ -2960,10 +3307,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (imBitmap == null) {
 					avatar.delete();
 					if (getExternalCacheDir() != null){
-						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+						megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
 					}
 					else{
-						megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+						megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
 					}
 				}
 				else{
@@ -2987,19 +3334,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				if (getExternalCacheDir() != null){
-					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+					megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
 				}
 				else{
-					megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+					megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
 				}
 			}
 		}
 		else{
 			if (getExternalCacheDir() != null){
-				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+				megaApi.getUserAvatar(megaApi.getMyUser(), getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
 			}
 			else{
-				megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+				megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + ".jpg", this);
 			}
 		}
 	}
@@ -3012,7 +3359,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		String color = megaApi.getUserAvatarColor(myAccountInfo.getMyUser());
+		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
 		if(color!=null){
 			log("The color to set the avatar is "+color);
 			p.setColor(Color.parseColor(color));
@@ -3034,12 +3381,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int avatarTextSize = Util.getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		String firstLetter = myAccountInfo.getFirstLetter();
+		String firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
 		nVPictureProfileTextView.setText(firstLetter);
 		nVPictureProfileTextView.setTextSize(30);
 		nVPictureProfileTextView.setTextColor(Color.WHITE);
 		nVPictureProfileTextView.setVisibility(View.VISIBLE);
-
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
@@ -3095,8 +3441,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		p.setAntiAlias(true);
 
 		String myHandleEncoded = "";
-		if(myAccountInfo.getMyUser()!=null){
-			myHandle = myAccountInfo.getMyUser().getHandle();
+		if(megaApi.getMyUser()!=null){
+			myHandle = megaApi.getMyUser().getHandle();
 			myHandleEncoded = MegaApiAndroid.userHandleToBase64(myHandle);
 		}
 		else{
@@ -3269,7 +3615,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 		inputFirstName.setSingleLine();
-		inputFirstName.setText(myAccountInfo.getFirstNameText());
+		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
 		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -3307,7 +3653,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
+						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
 						changeUserAttributeDialog.dismiss();
 					}
 				}
@@ -3342,7 +3688,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 		inputLastName.setSingleLine();
-		inputLastName.setText(myAccountInfo.getLastNameText());
+		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
 		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -3380,7 +3726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
+						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
 						changeUserAttributeDialog.dismiss();
 					}
 				}
@@ -3416,7 +3762,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 		inputMail.setSingleLine();
-		inputMail.setText(myAccountInfo.getMyUser().getEmail());
+		inputMail.setText(megaApi.getMyUser().getEmail());
 		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
 		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -3454,7 +3800,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else {
 						log("positive button pressed - change user attribute");
-						countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
+						countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
 						changeUserAttributeDialog.dismiss();
 					}
 				}
@@ -3519,7 +3865,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else {
 					log("positive button pressed - change user attribute");
-					countUserAttributes = aC.updateUserAttributes(myAccountInfo.getFirstNameText(), valueFirstName, myAccountInfo.getLastNameText(), valueLastName, myAccountInfo.getMyUser().getEmail(), value);
+					countUserAttributes = aC.updateUserAttributes(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText(), valueFirstName, ((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText(), valueLastName, megaApi.getMyEmail(), value);
 					changeUserAttributeDialog.dismiss();
 				}
 			}
@@ -3560,6 +3906,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(networkStateReceiver!=null){
 			this.unregisterReceiver(networkStateReceiver);
 		}
+
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 
     	super.onDestroy();
 	}
@@ -3688,7 +4037,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 						else{
 							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-							aB.setTitle(node.getName());
+							if(node==null){
+								log("Node NULL - cannot be recovered");
+								aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							}
+							else{
+								aB.setTitle(node.getName());
+							}
+
 							firstNavigationLevel = false;
 						}
 						break;
@@ -3714,7 +4070,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 							if(parentHandleIncoming!=-1){
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
-								aB.setTitle(node.getName());
+								if(node==null){
+									log("Node NULL - cannot be recovered");
+									aB.setTitle(getResources().getString(R.string.section_shared_items));
+								}
+								else{
+									aB.setTitle(node.getName());
+								}
+
 								firstNavigationLevel = false;
 							}
 							else{
@@ -3906,7 +4269,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if(numberUnread==0){
 
 					if(isFirstNavigationLevel()){
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						if (drawerItem == DrawerItem.SEARCH){
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						}
+						else {
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						}
 					}
 					else{
 						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3914,7 +4282,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else{
 					if(isFirstNavigationLevel()){
-						badgeDrawable.setProgress(0.0f);
+						if (drawerItem == DrawerItem.SEARCH){
+							badgeDrawable.setProgress(1.0f);
+						}
+						else {
+							badgeDrawable.setProgress(0.0f);
+						}
 					}
 					else{
 						badgeDrawable.setProgress(1.0f);
@@ -3932,7 +4305,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else{
 				if(isFirstNavigationLevel()){
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					if (drawerItem == DrawerItem.SEARCH){
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					}
+					else {
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					}
 				}
 				else{
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -3940,7 +4318,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		} else {
 			if(isFirstNavigationLevel()){
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				if (drawerItem == DrawerItem.SEARCH){
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				}
+				else {
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				}
 			}
 			else{
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -4995,6 +5378,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					hidden.setChecked(true);
 				}
 
+				drawerLayout.closeDrawer(Gravity.LEFT);
+
     			drawerItem = DrawerItem.SEARCH;
 				sFLol = new SearchFragmentLollipop().newInstance();
 
@@ -5102,7 +5487,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void showCC(int type, MyAccountInfo myAccountInfo, int payMonth, boolean refresh){
+	public void showCC(int type, int payMonth, boolean refresh){
 
 		accountFragment = Constants.CC_FRAGMENT;
 		tabLayoutContacts.setVisibility(View.GONE);
@@ -5117,12 +5502,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (!refresh){
 			if (ccFL == null){
 				ccFL = new CreditCardFragmentLollipop();
-				ccFL.setInfo(type, myAccountInfo, payMonth);
+				ccFL.setInfo(type, payMonth);
 				ft.replace(R.id.fragment_container, ccFL, "ccF");
 				ft.commitNow();
 			}
 			else{
-				ccFL.setInfo(type, myAccountInfo, payMonth);
+				ccFL.setInfo(type, payMonth);
 				ft.replace(R.id.fragment_container, ccFL, "ccF");
 				ft.commitNow();
 			}
@@ -5137,12 +5522,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				if (ccFL == null){
 					ccFL = new CreditCardFragmentLollipop();
-					ccFL.setInfo(type, myAccountInfo, payMonth);
+					ccFL.setInfo(type, payMonth);
 					ft.replace(R.id.fragment_container, ccFL, "ccF");
 					ft.commitNow();
 				}
 				else{
-					ccFL.setInfo(type, myAccountInfo, payMonth);
+					ccFL.setInfo(type, payMonth);
 					ft.replace(R.id.fragment_container, ccFL, "ccF");
 					ft.commitNow();
 				}
@@ -5155,7 +5540,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         if (cancelSubscription != null){
             cancelSubscription.setVisible(false);
         }
-        if (myAccountInfo.getNumberOfSubscriptions() > 0){
+        if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
             if (cancelSubscription != null){
                 if (drawerItem == DrawerItem.ACCOUNT){
                     if (maFLol != null){
@@ -5179,12 +5564,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (fFL == null){
 			fFL = new FortumoFragmentLollipop();
-			fFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container,  fFL, "fF");
 			ft.commitNow();
 		}
 		else{
-			fFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, fFL, "fF");
 			ft.commitNow();
 		}
@@ -5204,12 +5587,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (ctFL == null){
 			ctFL = new CentiliFragmentLollipop();
-			ctFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container,  ctFL, "ctF");
 			ft.commitNow();
 		}
 		else{
-			ctFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, ctFL, "ctF");
 			ft.commitNow();
 		}
@@ -5236,12 +5617,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (myFL == null){
 			myFL = new MonthlyAnnualyFragmentLollipop();
-			myFL.setInfo(paymentMethod, type, myAccountInfo);
+			myFL.setInfo(paymentMethod, type);
 			ft.replace(R.id.fragment_container, myFL, "myF");
 			ft.commitNow();
 		}
 		else{
-			myFL.setInfo(paymentMethod, type, myAccountInfo);
+			myFL.setInfo(paymentMethod, type);
 			ft.replace(R.id.fragment_container, myFL, "myF");
 			ft.commitNow();
 		}
@@ -5268,12 +5649,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if(upAFL==null){
 			upAFL = new UpgradeAccountFragmentLollipop();
-			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commitNowAllowingStateLoss();
 		}
 		else{
-			upAFL.setMyAccountInfo(myAccountInfo);
 			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commitNowAllowingStateLoss();
 		}
@@ -5305,6 +5684,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				textsearchQuery = false;
 				searchQuery = "";
+				firstNavigationLevel = true;
+				parentHandleSearch = -1;
+				levelsSearch = -1;
+				drawerItem = DrawerItem.SEARCH;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				return true;
 			}
@@ -5621,11 +6004,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+					takePicture.setVisible(false);
+
 					if(firstNavigationLevel){
 						if(!firstTimeCam){
 							searchByDate.setVisible(true);
@@ -5708,11 +6088,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 					//Show
 					upgradeAccountMenuItem.setVisible(true);
-					if(!firstTimeCam){
-						takePicture.setVisible(true);
-					}else{
-						takePicture.setVisible(false);
-					}
+
+					takePicture.setVisible(false);
+
 					if(firstNavigationLevel){
 						if(!firstTimeCam){
 							searchByDate.setVisible(true);
@@ -6265,7 +6643,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							exportMK.setVisible(false);
 						}
 
-						if (myAccountInfo.getNumberOfSubscriptions() > 0) {
+						if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0) {
 							cancelSubscription.setVisible(true);
 						}
 						else{
@@ -6610,7 +6988,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int id = item.getItemId();
 		switch(id){
 			case android.R.id.home:{
-				if (firstNavigationLevel){
+				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					drawerLayout.openDrawer(nV);
 				}else{
 					log("NOT firstNavigationLevel");
@@ -6696,8 +7074,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 		    		else if (drawerItem == DrawerItem.SEARCH){
+
 		    			if (sFLol != null && sFLol.isAdded()){
-		    				sFLol.onBackPressed();
+//		    				sFLol.onBackPressed();
+		    				onBackPressed();
 		    				return true;
 		    			}
 		    		}
@@ -9040,6 +9420,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		downloadConfirmationDialog.show();
 	}
 
+	public void restoreFromRubbish(final MegaNode node) {
+		log("restoreFromRubbish");
+
+		restoreFromRubbish = true;
+
+		MegaNode newParent = megaApi.getNodeByHandle(node.getRestoreHandle());
+		if(newParent !=null){
+			megaApi.moveNode(node, newParent, this);
+		}
+		else{
+			log("restoreFromRubbish:The restore folder no longer exists");
+		}
+	}
+
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
 		LinearLayout layout = new LinearLayout(this);
@@ -9232,7 +9626,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("showGetLinkActivity");
 		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
 		linkIntent.putExtra("handle", handle);
-		linkIntent.putExtra("account", myAccountInfo.getAccountType());
 		startActivity(linkIntent);
 
 		refreshAfterMovingToRubbish();
@@ -9250,11 +9643,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
-	}
-
-	public void setSendToInbox(boolean value){
-		log("setSendToInbox: "+value);
-		sendToInbox = value;
 	}
 
 	public void setIsGetLink(boolean value){
@@ -11093,14 +11481,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		return -1;
 	}
 
-	private void showOverquotaAlert(){
-		log("showOverquotaAlert");
-		dbH.setCamSyncEnabled(false);
+	private void showOverquotaAlert(boolean prewarning){
+		log("showOverquotaAlert: prewarning: "+prewarning);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.overquota_alert_title));
+
+		if(prewarning){
+			builder.setMessage(getString(R.string.pre_overquota_alert_text));
+		}
+		else{
+			builder.setMessage(getString(R.string.overquota_alert_text));
+			dbH.setCamSyncEnabled(false);
+		}
 
 		if(overquotaDialog==null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(getString(R.string.overquota_alert_title));
-			builder.setMessage(getString(R.string.overquota_alert_text));
 
 			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
 
@@ -11123,12 +11518,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			overquotaDialog = builder.create();
 			overquotaDialog.setCanceledOnTouchOutside(false);
-			overquotaDialog.show();
-//			Util.brandAlertDialog(overquotaDialog);
 		}
-		else{
-			overquotaDialog.show();
-		}
+
+		overquotaDialog.show();
 	}
 
 	public void updateAccountDetailsVisibleInfo(){
@@ -11137,20 +11529,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			return;
 		}
 
-		usedSpacePB.setProgress(myAccountInfo.getUsedPerc());
+		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(myAccountInfo.getUsedFormatted());
-		totalSpaceTV.setText(myAccountInfo.getTotalFormatted());
+		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
+		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
 
-		usedSpacePB.setProgress(myAccountInfo.getUsedPerc());
+		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(myAccountInfo.getUsedFormatted());
-		totalSpaceTV.setText(myAccountInfo.getTotalFormatted());
+		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
+		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
 
-		if (myAccountInfo.isInventoryFinished()){
-			if (myAccountInfo.getLevelAccountDetails() < myAccountInfo.getLevelInventory()){
+		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
+			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
 				if (maxP != null){
 					log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
 					megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
@@ -11158,12 +11550,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-		if(myAccountInfo.getUsedPerc()>=95){
+		if(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc()>=95){
 			showOverquotaPanel();
 		}
 		else{
 			outSpaceLayout.setVisibility(View.GONE);
-			if(myAccountInfo.getAccountType()==0){
+			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==0){
 				log("usedSpacePerc<95");
 				if(Util.showMessageRandom()){
 					log("Random: TRUE");
@@ -11174,32 +11566,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //		showOverquotaPanel();
 //		showProPanel();
 
-		if (getUsedPerc() < 90){
+		if (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() < 90){
 			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
 		}
-		else if ((getUsedPerc() >= 90) && (getUsedPerc() <= 95)){
+		else if ((((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() >= 90) && (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() <= 95)){
 			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        	usedSpaceWarning.setVisibility(View.VISIBLE);
 		}
 		else{
-			if (getUsedPerc() > 100){
-				myAccountInfo.setUsedPerc(100);
+			if (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() > 100){
+				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
 			}
 			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
 //		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //		        	usedSpaceWarning.setVisibility(View.VISIBLE);
-		}
-
-		if(drawerItem==DrawerItem.CLOUD_DRIVE){
-			if (myAccountInfo.getUsedPerc() > 95){
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.detach(fbFLol);
-				ft.attach(fbFLol);
-				ft.commitAllowingStateLoss();
-			}
 		}
 	}
 
@@ -11330,13 +11713,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public boolean isFirstNavigationLevel() {
 		return firstNavigationLevel;
-	}
-
-	public int getUsedPerc(){
-		if(myAccountInfo!=null){
-			return myAccountInfo.getUsedPerc();
-		}
-		return 0;
 	}
 
 	public void setParentHandleBrowser(long parentHandleBrowser){
@@ -11586,8 +11962,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					case DialogInterface.BUTTON_POSITIVE: {
 						String pathNavigation = getPathNavigationOffline();
 						MegaOffline mOff = getSelectedOfflineNode();
+
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
+
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -11816,45 +12194,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("Send to "+chatHandles.length+" chats");
 
 			long[] nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
-			log("Send "+nodeHandles.length+" nodes");
+
+			long[] userHandles = intent.getLongArrayExtra("USER_HANDLES");
 
 			int countChat = chatHandles.length;
-			if(countChat==1){
+			log("Selected: "+countChat+" chats to send");
 
-				if(nodeHandles.length==1){
-					//One chat, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], false);
-					megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
-				}
-				else{
-					//One chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatHandles[0], true);
-					for(int i=0;i<nodeHandles.length;i++){
-						megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+			if(nodeHandles!=null){
+				log("Send "+nodeHandles.length+" nodes");
+				MultipleAttachChatListener listener = null;
+				int counter = chatHandles.length*nodeHandles.length;
+				if(countChat==1){
+					if(nodeHandles.length==1){
+						listener = new MultipleAttachChatListener(this, chatHandles[0], false, counter);
+					}
+					else{
+						listener = new MultipleAttachChatListener(this, chatHandles[0], true, counter);
 					}
 				}
-			}
-			else if(countChat>1){
-
-				if(nodeHandles.length==1){
-					//Many chats, one file
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, false);
-					for(int i=0;i<chatHandles.length;i++){
-						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
-					}
-
-				}
 				else{
-					//Many chat, many files
-					MultipleAttachChatListener listener = new MultipleAttachChatListener(this, -1, true);
-					for(int i=0;i<chatHandles.length;i++){
-						for(int j=0;j<nodeHandles.length;j++){
-							megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+
+					if(nodeHandles.length==1){
+						listener = new MultipleAttachChatListener(this, -1, false, counter);
+					}
+					else{
+						listener = new MultipleAttachChatListener(this, -1, true, counter);
+					}
+				}
+				if(countChat==1){
+
+					if(nodeHandles.length==1){
+						//One chat, one file
+						megaChatApi.attachNode(chatHandles[0], nodeHandles[0], listener);
+					}
+					else{
+						//One chat, many files
+						for(int i=0;i<nodeHandles.length;i++){
+							megaChatApi.attachNode(chatHandles[0], nodeHandles[i], listener);
+						}
+					}
+				}
+				else if(countChat>1){
+
+					if(nodeHandles.length==1){
+						//Many chats, one file
+						for(int i=0;i<chatHandles.length;i++){
+							megaChatApi.attachNode(chatHandles[i], nodeHandles[0], listener);
 						}
 
 					}
+					else{
+						//Many chat, many files
+						for(int i=0;i<chatHandles.length;i++){
+							for(int j=0;j<nodeHandles.length;j++){
+								megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
+							}
+						}
+					}
 				}
 			}
+			else if(userHandles!=null){
+				log("Send "+userHandles.length+" contacts");
+
+				for(int i=0;i<chatHandles.length;i++){
+					for(int j=0;j<userHandles.length;j++){
+						MegaHandleList handleList = MegaHandleList.createInstance();
+						handleList.addMegaHandle(userHandles[j]);
+						megaChatApi.attachContacts(chatHandles[i], handleList);
+					}
+				}
+
+				if(countChat==1){
+					openChat(chatHandles[0], null);
+				}
+				else{
+					String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, userHandles.length);
+					showSnackbar(message);
+				}
+			}
+			else{
+				log("Error on sending to chat");
+			}
+
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -11893,10 +12314,57 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 
-			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
-			final long fileHandle = intent.getLongExtra("SELECT", 0);
+			if(cFLol!=null && cFLol.isAdded()){
+				if(cFLol.isMultipleselect()){
+					cFLol.hideMultipleSelect();
+					cFLol.clearSelectionsNoAnimations();
+				}
+			}
 
-			nC.sendToInbox(fileHandle, selectedContacts);
+			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			long fileHandle = intent.getLongExtra("SELECT", 0);
+
+			//Send file to contacts
+			//Check if all contacts have a chat created
+
+			ArrayList<MegaChatRoom> chats = null;
+			ArrayList<MegaUser> usersNoChat = null;
+
+			for(int i=0; i<selectedContacts.size(); i++){
+
+				MegaUser contact = megaApi.getContact(selectedContacts.get(i));
+
+				MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(contact.getHandle());
+				if(chatRoom!=null){
+					if(chats==null){
+						chats = new ArrayList<MegaChatRoom>();
+					}
+					chats.add(chatRoom);
+
+				}
+				else{
+					if(usersNoChat==null){
+						usersNoChat = new ArrayList<MegaUser>();
+					}
+					usersNoChat.add(contact);
+				}
+			}
+
+			if(usersNoChat==null || usersNoChat.isEmpty()){
+				sendFileToChatsFromContacts(chats, fileHandle);
+
+			}
+			else{
+				//Create first the chats
+				CreateChatToSendFileListener listener = new CreateChatToSendFileListener(chats, usersNoChat, fileHandle, this);
+
+				for(int i=0; i<usersNoChat.size(); i++){
+					MegaChatPeerList peers = MegaChatPeerList.createInstance();
+					peers.addPeer(usersNoChat.get(i).getHandle(), MegaChatPeerList.PRIV_STANDARD);
+					megaChatApi.createChat(false, peers, listener);
+				}
+			}
+
 		}
 		else if(requestCode == Constants.ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
 			if (intent == null) {
@@ -11993,93 +12461,76 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaContacts = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_MEGA_CONTACTS, true);
 
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
-			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 
 			//if (megaContacts){
 
-				if(sentToInbox==0){
+			if(multiselectIntent==0){
+				//One file to share
+				final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-					if(multiselectIntent==0){
-						//One file to share
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
+					permissionsDialog.dismiss();
 
-							permissionsDialog.dismiss();
+					switch(item) {
+						case 0:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
+							break;
+						}
+						case 1:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
+							break;
+						}
+						case 2:{
+							nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
+							break;
+						}
+					}
+					}
+				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+			}
+			else if(multiselectIntent==1){
+				//Several folders to share
+				final long[] nodeHandles = intent.getLongArrayExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE);
 
-							switch(item) {
-								case 0:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READ);
-									break;
-								}
-								case 1:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_READWRITE);
-									break;
-								}
-								case 2:{
-									nC.shareFolder(nodeHandle, contactsData, MegaShare.ACCESS_FULL);
-									break;
-								}
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+
+						permissionsDialog.dismiss();
+						switch(item) {
+							case 0:{
+								log("ACCESS_READ");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
+								break;
 							}
+							case 1:{
+								log("ACCESS_READWRITE");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
+								break;
 							}
-						});
-						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
-					}
-					else if(multiselectIntent==1){
-						//Several folders to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
+							case 2:{
+								log("ACCESS_FULL");
+								nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
 
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int item) {
-
-								permissionsDialog.dismiss();
-								switch(item) {
-				                    case 0:{
-				                    	log("ACCESS_READ");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READ);
-				                    	break;
-				                    }
-				                    case 1:{
-				                    	log("ACCESS_READWRITE");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_READWRITE);
-				                        break;
-				                    }
-				                    case 2:{
-				                    	log("ACCESS_FULL");
-										nC.shareFolders(nodeHandles, contactsData, MegaShare.ACCESS_FULL);
-
-				                        break;
-									}
-								}
+								break;
 							}
-						});
-						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
-						permissionsDialog = dialogBuilder.create();
-						permissionsDialog.show();
+						}
 					}
-
-				}
-				else if (sentToInbox==1){
-					if(multiselectIntent==0){
-						//Send one file to one contact
-						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
-						nC.sendToInbox(nodeHandle, contactsData);
-					}
-					else{
-						//Send multiple files to one contact
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
-						nC.sendToInbox(nodeHandles, contactsData);
-					}
-				}
+				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+			}
 			//}
 			//else{
 				//log("no contact");
@@ -12205,13 +12656,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				return;
 			}
 
-			if(myAccountInfo==null){
-				myAccountInfo = new MyAccountInfo(this);
-			}
-
-			megaApi.getExtendedAccountDetails(true, false, false, myAccountInfo);
-			megaApi.getPaymentMethods(myAccountInfo);
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) getApplication()).askForFullAccountInfo();
+			((MegaApplication) getApplication()).askForExtendedAccountDetails();
 
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
@@ -12294,7 +12740,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("TAKE_PICTURE_PROFILE_CODE");
 			if(resultCode == Activity.RESULT_OK){
 
-				String myEmail =  myAccountInfo.getMyUser().getEmail();
+				String myEmail =  megaApi.getMyUser().getEmail();
 				String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.profilePicDIR + "/picture.jpg";;
 				File imgFile = new File(filePath);
 
@@ -12478,6 +12924,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
+		}
+	}
+
+	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
+		log("sendFileToChatsFromContacts");
+
+		MultipleAttachChatListener listener = null;
+
+		if(chats.size()==1){
+			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
+		}
+		else{
+			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
+		}
+
+		if(chats.size()==1){
+			//One chat, one file
+			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
+		}
+		else if(chats.size()>1){
+			//Many chats, one file
+			for(int i=0;i<chats.size();i++){
+				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
+			}
 		}
 	}
 
@@ -12852,7 +13322,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
 
 		Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-		if(myAccountInfo.getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
+		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE){
 			log("USER PRO");
 			paymentButton.setText(getString(R.string.action_upgrade_account));
 		}
@@ -12888,7 +13358,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (cancelSubscription != null){
 			cancelSubscription.setVisible(false);
 		}
-		if (myAccountInfo.getNumberOfSubscriptions() > 0){
+		if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
 			if (cancelSubscription != null){
 				if (drawerItem == DrawerItem.ACCOUNT){
 					if (maFLol != null){
@@ -12994,13 +13464,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						String newPath = null;
 						File qrFile = null;
 						if (getExternalCacheDir() != null){
-							newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
-							qrFile = new File(getExternalCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + "QRcode.jpg");
+							newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
+							qrFile = new File(getExternalCacheDir().getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
 						}
 						else{
 							log("getExternalCacheDir() is NULL");
-							newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + "Temp.jpg";
-							qrFile = new File(getCacheDir().getAbsolutePath(), myAccountInfo.getMyUser().getEmail() + "QRcode.jpg");
+							newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
+							qrFile = new File(getCacheDir().getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
 						}
 
 						if (qrFile.exists()) {
@@ -13327,7 +13797,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
 			}
-			megaApi.creditCardQuerySubscriptions(myAccountInfo);
+			((MegaApplication) getApplication()).askForCCSubscriptions();
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("onRequestFinish: " + MegaRequest.TYPE_LOGOUT);
@@ -13365,17 +13835,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				log("(1)request.getText(): "+request.getText());
 				countUserAttributes--;
-				myAccountInfo.setFirstNameText(request.getText());
+				((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The first name has changed");
 					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
 					if(maFLol!=null){
 						if(maFLol.isAdded()){
-							maFLol.updateNameView(myAccountInfo.getFullName());
+							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 						}
 					}
-					updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
 				}
 				else{
 					log("Error with first name");
@@ -13399,17 +13869,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 				log("(2)request.getText(): "+request.getText());
 				countUserAttributes--;
-				myAccountInfo.setLastNameText(request.getText());
+				((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The last name has changed");
 					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
 					if(maFLol!=null){
 						if(maFLol.isAdded()){
-							maFLol.updateNameView(myAccountInfo.getFullName());
+							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 						}
 					}
-					updateUserNameNavigationView(myAccountInfo.getFullName(), myAccountInfo.getFirstLetter());
+					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
 				}
 				else{
 					log("Error with last name");
@@ -13447,11 +13917,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(oldFile.exists()){
 								String newPath = null;
 								if (getExternalCacheDir() != null){
-									newPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+									newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
 								}
 								else{
 									log("getExternalCacheDir() is NULL");
-									newPath = getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+									newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
 								}
 								File newFile = new File(newPath);
 								oldFile.renameTo(newFile);
@@ -13504,6 +13974,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+				//Listener from logout menu
 				log("TYPE_GET_ATTR_USER. PasswordReminderFromMyAccount: "+getPasswordReminderFromMyAccount());
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT){
 					log("New value of attribute USER_ATTR_PWD_REMINDER: " +request.getText());
@@ -13523,6 +13994,118 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				setPasswordReminderFromMyAccount(false);
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
+				log("(0)request avatar");
+				if (e.getErrorCode() == MegaError.API_OK){
+					setProfileAvatar();
+					//refresh MyAccountFragment if visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.updateAvatar(false);
+					}
+				}
+				else{
+					if(e.getErrorCode()==MegaError.API_ENOENT) {
+						setDefaultAvatar();
+					}
+
+					if(e.getErrorCode()==MegaError.API_EARGS){
+						log("Error changing avatar: ");
+						if(request.getFile()!=null){
+							log("DESTINATION FILE: "+request.getFile());
+						}
+						if(request.getEmail()!=null){
+							log("email: "+request.getEmail());
+						}
+					}
+
+					//refresh MyAccountFragment if visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.updateAvatar(false);
+					}
+				}
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("(1)request.getText(): "+request.getText());
+					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
+						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(true);
+					}
+					dbH.saveMyFirstName(request.getText());
+				}
+				else{
+					log("ERROR - (1)request.getText(): "+request.getText());
+					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText("");
+						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(true);
+					}
+				}
+
+				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+					if(((MegaApplication) getApplication()).getMyAccountInfo().isFirstName() && ((MegaApplication) getApplication()).getMyAccountInfo().isLastName()){
+						log("Name and First Name received!");
+
+						((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
+						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
+
+						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+
+						//refresh MyAccountFragment if visible
+						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						if(maFLol!=null && maFLol.isAdded()){
+							log("Update the account fragment");
+							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+						}
+					}
+				}
+
+			}
+			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
+				if (e.getErrorCode() == MegaError.API_OK){
+					log("(2)request.getText(): "+request.getText());
+					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
+						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(true);
+					}
+
+					dbH.saveMyLastName(request.getText());
+				}
+				else{
+					log("ERROR - (2)request.getText(): "+request.getText());
+					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText("");
+						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(true);
+					}
+				}
+
+				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+					if(((MegaApplication) getApplication()).getMyAccountInfo().isFirstName() && ((MegaApplication) getApplication()).getMyAccountInfo().isLastName()){
+						log("Name and First Name received!");
+
+						((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
+						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
+
+						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+
+						//refresh MyAccountFragment if visible
+						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+						if(maFLol!=null && maFLol.isAdded()){
+							log("Update the account fragment");
+							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+						}
+					}
+				}
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
 
@@ -13592,7 +14175,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				log("cancel account url");
 				String myEmail = request.getEmail();
 				if(myEmail!=null){
-					if(myEmail.equals(myAccountInfo.getMyUser().getEmail())){
+					if(myEmail.equals(megaApi.getMyEmail())){
 						log("The email matchs!!!");
 						showDialogInsertPassword(url, true);
 					}
@@ -13753,6 +14336,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (drawerItem == DrawerItem.INBOX){
 							setInboxNavigationDrawer();
 						}
+						moveToRubbish = false;
+					}
+					else if(restoreFromRubbish){
+						log("Not moved to rubbish");
+						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
+						showSnackbar(getString(R.string.context_correctly_node_restored, destination.getName()));
+						restoreFromRubbish = false;
 					}
 					else{
 						log("Not moved to rubbish");
@@ -13761,7 +14351,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 			}
 			else {
-				showSnackbar(getString(R.string.context_no_moved));
+				if(restoreFromRubbish){
+					showSnackbar(getString(R.string.context_no_restored));
+					restoreFromRubbish = false;
+				}
+				else{
+					showSnackbar(getString(R.string.context_no_moved));
+					moveToRubbish = false;
+				}
 			}
 
 			log("SINGLE move nodes request finished");
@@ -13975,71 +14572,57 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("TYPE_COPY");
-			if(sendToInbox){
-				log("sendToInbox: "+e.getErrorCode()+" "+e.getErrorString());
-				setSendToInbox(false);
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("OK");
-					showSnackbar(getString(R.string.context_correctly_sent_node));
-				}
-				else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());
-					showOverquotaAlert();
-				}
-				else
-				{
-					log("NO SENT");
-					showSnackbar(getString(R.string.context_no_sent_node));
-				}
+
+			try {
+				statusDialog.dismiss();
 			}
-			else{
-				try {
-					statusDialog.dismiss();
-				}
-				catch (Exception ex) {}
+			catch (Exception ex) {}
 
-				if (e.getErrorCode() == MegaError.API_OK){
-					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
-					showSnackbar(getString(R.string.context_correctly_copied));
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+				showSnackbar(getString(R.string.context_correctly_copied));
 
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
-						int index = viewPagerCDrive.getCurrentItem();
-	        			log("----------------------------------------INDEX: "+index);
-	        			if(index==1){
-	        				//Rubbish bin
-	        				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-	        				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-								rubbishBinFLol.setNodes(nodes);
-								rubbishBinFLol.getRecyclerView().invalidate();
-							}
-	        			}
-	        			else{
-	        				//Cloud Drive
-	        				fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-	        				if (fbFLol != null && fbFLol.isAdded()){
-								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-								fbFLol.setNodes(nodes);
-								fbFLol.getRecyclerView().invalidate();
-							}
-	        			}
+					int index = viewPagerCDrive.getCurrentItem();
+					log("----------------------------------------INDEX: "+index);
+					if(index==1){
+						//Rubbish bin
+						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+							rubbishBinFLol.setNodes(nodes);
+							rubbishBinFLol.getRecyclerView().invalidate();
+						}
 					}
-					else if (drawerItem == DrawerItem.INBOX){
-						if (iFLol != null && iFLol.isAdded()){
-							iFLol.getRecyclerView().invalidate();
+					else{
+						//Cloud Drive
+						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+						if (fbFLol != null && fbFLol.isAdded()){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+							fbFLol.setNodes(nodes);
+							fbFLol.getRecyclerView().invalidate();
 						}
 					}
 				}
-				else{
-					if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-						log("OVERQUOTA ERROR: "+e.getErrorCode());
-						showOverquotaAlert();
+				else if (drawerItem == DrawerItem.INBOX){
+					if (iFLol != null && iFLol.isAdded()){
+						iFLol.getRecyclerView().invalidate();
 					}
-					else
-					{
-						showSnackbar(getString(R.string.context_no_copied));
-					}
+				}
+			}
+			else{
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					showOverquotaAlert(false);
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					showOverquotaAlert(true);
+				}
+				else
+				{
+					showSnackbar(getString(R.string.context_no_copied));
 				}
 			}
 		}
@@ -14175,11 +14758,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("The user: "+user.getEmail()+"changed his first name");
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my first name");
-								myAccountInfo.setFirstName(false);
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, myAccountInfo);
+								((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
 							}
 							else{
-								myAccountInfo.setFirstName(false);
+								((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
 							}
 						}
@@ -14187,11 +14770,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("The user: "+user.getEmail()+"changed his last name");
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my last name");
-								myAccountInfo.setLastName(false);
-								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, myAccountInfo);
+								((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
 							}
 							else{
-								myAccountInfo.setLastName(false);
+								((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
 							}
 						}
@@ -14214,10 +14797,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								log("I change my avatar");
 								if (getExternalCacheDir() != null){
 									String destinationPath = null;
-									destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg";
+									destinationPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
 									if(destinationPath!=null){
 										log("The destination of the avatar is: "+destinationPath);
-										megaApi.getUserAvatar(myAccountInfo.getMyUser(), destinationPath, myAccountInfo);
+										megaApi.getUserAvatar(megaApi.getMyUser(), destinationPath, this);
 									}
 									else{
 										log("ERROR! Destination PATH is NULL");
@@ -14225,7 +14808,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								}
 								else{
 									log("getExternalCacheDir() is NULL");
-									megaApi.getUserAvatar(myAccountInfo.getMyUser(), getCacheDir().getAbsolutePath() + "/" + myAccountInfo.getMyUser().getEmail() + ".jpg", myAccountInfo);
+									megaApi.getUserAvatar(megaApi.getMyUser(), getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg", this);
 								}
 							}
 							else {
@@ -14363,16 +14946,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void onNodesInboxUpdate() {
-		log("onNodesInboxUpdate");
 
 		if (iFLol != null){
 			if(iFLol.isAdded()){
-				MegaNode node = megaApi.getNodeByHandle(parentHandleInbox);
-				if (node != null){
-					log("Go to inbox node: "+node.getName());
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderCloud);
-					iFLol.setNodes(nodes);
-				}
+				iFLol.refresh();
 			}
 		}
 	}
@@ -14400,6 +14977,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdateLollipop");
+
 		try {
 			statusDialog.dismiss();
 		}
@@ -14520,15 +15098,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		log("onAccountUpdate");
-
-		if(myAccountInfo==null){
-			myAccountInfo=new MyAccountInfo(this);
-		}
-		megaApi.getPaymentMethods(myAccountInfo);
-		megaApi.getAccountDetails(myAccountInfo);
-		megaApi.getPricing(myAccountInfo);
-		megaApi.creditCardQuerySubscriptions(myAccountInfo);
-		dbH.resetExtendedAccountDetailsTimestamp();
 	}
 
 	@Override
@@ -14909,19 +15478,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		Util.log("ManagerActivityLollipop", message);
 	}
 
-	public MegaAccountDetails getAccountInfo() {
-		if(myAccountInfo!=null){
-			return myAccountInfo.getAccountInfo();
-		}
-		return null;
-	}
-
-	public void setAccountInfo(MegaAccountDetails accountInfo) {
-		if(myAccountInfo!=null){
-			myAccountInfo.setAccountInfo(accountInfo);
-		}
-	}
-
 	public boolean isList() {
 		return isList;
 	}
@@ -15101,7 +15657,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void updateMailNavigationView(String email){
 		log("updateMailNavigationView: "+email);
-		nVEmail.setText(myAccountInfo.getMyUser().getEmail());
+		nVEmail.setText(megaApi.getMyEmail());
 	}
 
 	public void animateFABCollection(){
@@ -15426,14 +15982,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.accountFragment = accountFragment;
 	}
 
-	public MyAccountInfo getMyAccountInfo() {
-		return myAccountInfo;
-	}
-
-	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
-		this.myAccountInfo = myAccountInfo;
-	}
-
 	public MegaOffline getSelectedOfflineNode() {
 		return selectedOfflineNode;
 	}
@@ -15715,26 +16263,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	}
 
 	public void changeStatusBarColor(int option) {
+		log("changeStatusBarColor");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			final Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
-		if (option == 1) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+			if (option == 2){
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 500);
 			}
+		}
+		if (option == 1){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-
-		} else if (option == 2) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_transparent_black));
-			}
+		}
+		else {
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
+
 	}
 
 	public long getParentHandleInbox() {
@@ -15868,13 +16419,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				body.append(getString(R.string.settings_feedback_body_android_version)+"  "+Build.VERSION.RELEASE+" "+Build.DISPLAY+"\n");
 				body.append(getString(R.string.user_account_feedback)+"  "+megaApi.getMyEmail());
 
-				myAccountInfo = getMyAccountInfo();
-				if(myAccountInfo!=null){
-					if(myAccountInfo.getAccountType()<0||myAccountInfo.getAccountType()>4){
+				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()<0||((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>4){
 						body.append(" ("+getString(R.string.my_account_free)+")");
 					}
 					else{
-						switch(myAccountInfo.getAccountType()){
+						switch(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()){
 							case 0:{
 								body.append(" ("+getString(R.string.my_account_free)+")");
 								break;
@@ -15949,5 +16499,80 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void refreshMenu(){
 		log("refreshMenu");
 		supportInvalidateOptionsMenu();
+	}
+
+	public boolean isCameraUploads(MegaNode n){
+		log("isCameraUploads()");
+		String cameraSyncHandle = null;
+
+		//Check if the item is the Camera Uploads folder
+		if(dbH.getPreferences()!=null){
+			prefs = dbH.getPreferences();
+			if(prefs.getCamSyncHandle()!=null){
+				cameraSyncHandle = prefs.getCamSyncHandle();
+			}else{
+				cameraSyncHandle = null;
+			}
+		}else{
+			prefs=null;
+		}
+
+		if(cameraSyncHandle!=null){
+			if(!(cameraSyncHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+					return true;
+				}
+
+			}else{
+				if(n.getName().equals("Camera Uploads")){
+					if (prefs != null){
+						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					}
+					dbH.setCamSyncHandle(n.getHandle());
+					log("FOUND Camera Uploads!!----> "+n.getHandle());
+					return true;
+				}
+			}
+
+		}else{
+			if(n.getName().equals("Camera Uploads")){
+				if (prefs != null){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				}
+				dbH.setCamSyncHandle(n.getHandle());
+				log("FOUND Camera Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+
+		//Check if the item is the Media Uploads folder
+		String secondaryMediaHandle = null;
+
+		if(prefs!=null){
+			if(prefs.getMegaHandleSecondaryFolder()!=null){
+				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
+			}else{
+				secondaryMediaHandle = null;
+			}
+		}
+
+		if(secondaryMediaHandle!=null){
+			if(!(secondaryMediaHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+					log("Click on Media Uploads");
+					return true;
+				}
+			}
+		}else{
+			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+				if (prefs != null){
+					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				}
+				dbH.setSecondaryFolderHandle(n.getHandle());
+				log("FOUND Media Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+		return false;
 	}
 }

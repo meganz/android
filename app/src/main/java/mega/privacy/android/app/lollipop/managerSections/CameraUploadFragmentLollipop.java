@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -73,7 +72,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -105,7 +103,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private ActionBar aB;
 	private RecyclerView listView;
 	private GestureDetectorCompat detector;
-	public static RecyclerView.LayoutManager mLayoutManager;
+	RecyclerView.LayoutManager mLayoutManager;
 	FastScroller fastScroller;
 
 	long[] arrayHandles = null;
@@ -124,8 +122,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
 
-	public static MegaPhotoSyncListAdapterLollipop adapterList;
-	public static MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
+	MegaPhotoSyncListAdapterLollipop adapterList;
+	MegaPhotoSyncGridTitleAdapterLollipop adapterGrid;
 	private MegaApiAndroid megaApi;
 
 //	long parentHandle = -1;
@@ -136,9 +134,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private ArrayList<MegaNode> nodes;
 	private ArrayList<MegaNode> searchNodes;
 
-	public static ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
+	private ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
 	private ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncGridHolder>();
-	public static ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
+	private ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
 	private long[] searchByDate;
 
 	private ActionMode actionMode;
@@ -177,6 +175,31 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (mLayoutManager != null) {
+                mLayoutManager.scrollToPosition(position);
+            }
+	}
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapterList != null && mLayoutManager != null){
+			View v = mLayoutManager.findViewByPosition(position);
+			if (v != null) {
+				return  (ImageView) v.findViewById(R.id.photo_sync_list_thumbnail);
+			}
+		}
+		else if (mLayoutManager != null){
+			View v = mLayoutManager.findViewByPosition(position);
+			if (v != null) {
+				return  (ImageView) v.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+			}
+		}
+
+		return null;
+	}
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 		public void onLongPress(MotionEvent e) {
@@ -1660,10 +1683,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							else{
 								intent.putExtra("parentNodeHandle", megaApi.getParentNode(psHMegaNode).getHandle());
 							}
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-							if(accountInfo!=null){
-								intent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
+
 							intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCamera);
 							intent.putExtra("screenPosition", screenPosition);
 							startActivity(intent);
@@ -1797,29 +1817,30 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public String getPath (String fileName, long fileSize, String destDir, MegaNode file) {
 		log("getPath");
 		String path = null;
-		File dir = new File(destDir);
-		File [] listFiles = dir.listFiles();
+		if (destDir != null) {
+			File dir = new File(destDir);
+			File[] listFiles = dir.listFiles();
 
-		if (listFiles != null){
-			for (int i=0; i<listFiles.length; i++){
-				log("listFiles[]: "+listFiles[i].getAbsolutePath());
-				if (listFiles[i].isDirectory()){
-					path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
-					if (path != null) {
-						log("path number X: "+path);
-						return path;
-					}
-				}
-				else {
-					boolean isOnMegaDownloads = false;
-					path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
-					File f = new File(downloadLocationDefaultPath, file.getName());
-					if(f.exists() && (f.length() == file.getSize())){
-						isOnMegaDownloads = true;
-					}
-					if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
-						log("path number X: "+path);
-						return path;
+			if (listFiles != null) {
+				for (int i = 0; i < listFiles.length; i++) {
+					log("listFiles[]: " + listFiles[i].getAbsolutePath());
+					if (listFiles[i].isDirectory()) {
+						path = getPath(fileName, fileSize, listFiles[i].getAbsolutePath(), file);
+						if (path != null) {
+							log("path number X: " + path);
+							return path;
+						}
+					} else {
+						boolean isOnMegaDownloads = false;
+						path = Util.getLocalFile(context, fileName, fileSize, downloadLocationDefaultPath);
+						File f = new File(downloadLocationDefaultPath, file.getName());
+						if (f.exists() && (f.length() == file.getSize())) {
+							isOnMegaDownloads = true;
+						}
+						if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))) {
+							log("path number X: " + path);
+							return path;
+						}
 					}
 				}
 			}
@@ -2630,4 +2651,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		//setNodes(nodesResult);
 	}
 
+	public MegaPhotoSyncListAdapterLollipop getAdapterList() {
+		return adapterList;
+	}
+
+	public MegaPhotoSyncGridTitleAdapterLollipop getAdapterGrid() {
+		return adapterGrid;
+	}
+
+	public ArrayList<MegaMonthPicLollipop> getMonthPics() {
+		return monthPics;
+	}
+
+	public ArrayList<PhotoSyncHolder> getNodesArray() {
+		return nodesArray;
+	}
 }

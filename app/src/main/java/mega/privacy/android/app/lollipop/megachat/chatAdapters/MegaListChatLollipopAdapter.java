@@ -41,10 +41,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -274,8 +276,44 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			holder.muteIcon.setVisibility(View.GONE);
 		}
 
-		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);
+		if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
+
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chat.getOwnPrivilege()==MegaChatRoom.PRIV_RO){
+				holder.imageView.setAlpha(.4f);
+
+				holder.itemLayout.setOnClickListener(null);
+				holder.itemLayout.setOnLongClickListener(null);
+
+				holder.layoutPendingMessages.setAlpha(.4f);
+
+				holder.textViewContent.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewDate.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+			}
+			else{
+				holder.imageView.setAlpha(1.0f);
+
+				holder.imageButtonThreeDots.setTag(holder);
+
+				holder.itemLayout.setOnClickListener(this);
+				holder.itemLayout.setOnLongClickListener(null);
+
+				holder.layoutPendingMessages.setAlpha(1.0f);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewDate.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+				holder.textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+			}
+		}
+		else{
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+
+			holder.imageButtonThreeDots.setTag(holder);
+
+			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setOnLongClickListener(this);
+		}
 	}
 
 	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
@@ -415,9 +453,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(context instanceof ManagerActivityLollipop){
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			holder.imageButtonThreeDots.setOnClickListener(this);
 		}
 		else{
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setOnClickListener(null);
 		}
 
 		holder.layoutPendingMessages = (RelativeLayout) v.findViewById(R.id.recent_chat_list_unread_layout);
@@ -425,9 +465,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		holder.numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 		holder.contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
-
-		holder.itemLayout.setOnClickListener(this);
-		holder.itemLayout.setOnLongClickListener(this);
 
 		v.setTag(holder);
 
@@ -1758,6 +1795,137 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
+			else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
+				String messageContent = chat.getLastMessage();
+
+				char separator = 0x01;
+				String separatorString = separator + "";
+
+				String [] sp = messageContent.split(separatorString);
+
+				String textToShow = "";
+
+				if(sp.length>=2){
+
+					String durationString = sp[0];
+					String termCodeString = sp[1];
+
+					int duration = Integer.parseInt(durationString);
+					int termCode = Integer.parseInt(termCodeString);
+
+					switch(termCode){
+						case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+							int minutes = (duration % 3600) / 60;
+							int seconds = duration % 60;
+
+							if(minutes == 0){
+								textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+							}
+							else{
+								if(seconds == 0){
+									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+								}
+								else if (seconds == 1){
+									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+								}
+								else{
+									textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+								}
+							}
+
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+								textToShow = textToShow.replace("[C]", "");
+								textToShow = textToShow.replace("[/C]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+							textToShow = String.format(context.getString(R.string.call_rejected_messages));
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+							long lastMsgSender = chat.getLastMessageSender();
+							if(lastMsgSender==megaChatApi.getMyUserHandle()){
+								textToShow = String.format(context.getString(R.string.call_not_answered_messages));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.call_missed_messages));
+							}
+
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+							textToShow = String.format(context.getString(R.string.call_failed_messages));
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+						case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+							long lastMsgSender = chat.getLastMessageSender();
+							if(lastMsgSender==megaChatApi.getMyUserHandle()){
+								textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+							}
+							else{
+								textToShow = String.format(context.getString(R.string.call_missed_messages));
+							}
+
+							try {
+								textToShow = textToShow.replace("[A]", "");
+								textToShow = textToShow.replace("[/A]", "");
+								textToShow = textToShow.replace("[B]", "");
+								textToShow = textToShow.replace("[/B]", "");
+							} catch (Exception e) {
+							}
+
+							break;
+						}
+					}
+				}
+
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.textViewContent.setText(result);
+
+				holder.textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+			}
 			else{
 				//OTHER TYPE OF MESSAGE
 				if(lastMessageString==null){
@@ -1785,20 +1953,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 					log("getLastMessageSender: The last message NOT mine"+lastMsgSender);
 
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 					if(chat.isGroup()){
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 
 						holder.currentPosition = position;
 						holder.userHandle = lastMsgSender;
 
-						String fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
-						if(fullNameAction==null){
-							fullNameAction = "";
-						}
+						String fullNameAction = "";
+						if(chatRoom!=null){
+							fullNameAction = chatRoom.getPeerFirstnameByHandle(lastMsgSender);
+							if(fullNameAction==null){
+								fullNameAction = "";
+							}
 
-						if(fullNameAction.trim().length()<=0){
-							fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+							if(fullNameAction.trim().length()<=0){
+								fullNameAction = cC.getFirstName(lastMsgSender, chatRoom);
+							}
+						}
+						else{
+							log("ERROR: the chatroom is NULL: "+chat.getChatId());
 						}
 
 						if(fullNameAction.trim().length()<=0){

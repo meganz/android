@@ -49,7 +49,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -69,9 +68,9 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	Context context;
 	RecyclerView recyclerView;
-	public static LinearLayoutManager mLayoutManager;
-	public static CustomizedGridLayoutManager gridLayoutManager;
-	public static MegaBrowserLollipopAdapter adapter;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
+	MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
@@ -104,6 +103,39 @@ public class InboxFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null){
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null){
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if ( gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -545,10 +577,7 @@ public class InboxFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
 					context.startActivity(intent);
@@ -578,10 +607,7 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					mediaIntent.putExtra("screenPosition", screenPosition);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);
@@ -644,10 +670,7 @@ public class InboxFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					boolean isOnMegaDownloads = false;

@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
@@ -346,7 +346,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 							pb.setVisibility(View.GONE);
 							return false;
 						}
-					}).placeholder(MimeTypeMime.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}).placeholder(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 				}
 
 			}
@@ -399,7 +399,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 								pb.setVisibility(View.GONE);
 								return false;
 							}
-						}).placeholder(MimeTypeMime.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+						}).placeholder(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 					}
 				}
 			}
@@ -408,7 +408,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			holder.isGIF = false;
 			holder.imgDisplay.setVisibility(View.VISIBLE);
 			holder.gifImgDisplay.setVisibility(View.GONE);
-			holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
 			thumb = ThumbnailUtils.getThumbnailFromCache(node);
 			if (thumb != null){

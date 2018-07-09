@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
@@ -21,6 +23,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -106,7 +109,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
 
-	boolean sendToInbox=false;
 	boolean moveToRubbish=false;
 
 	public static int REQUEST_CODE_GET = 1000;
@@ -421,6 +423,56 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		}, 50);
 	}
 
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int position;
+			int adapterType;
+			int actionType;
+			ImageView imageDrag = null;
+
+			if (intent != null) {
+				position = intent.getIntExtra("position", -1);
+				adapterType = intent.getIntExtra("adapterType", 0);
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if (position != -1) {
+					if (adapterType == Constants.CONTACT_FILE_ADAPTER) {
+						if (cflF != null && cflF.isAdded()) {
+							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
+								imageDrag = cflF.getImageDrag(position);
+								if (cflF.imageDrag != null) {
+									cflF.imageDrag.setVisibility(View.VISIBLE);
+								}
+								if (imageDrag != null) {
+									cflF.imageDrag = imageDrag;
+									cflF.imageDrag.setVisibility(View.GONE);
+								}
+							} else if (actionType == Constants.SCROLL_TO_POSITION) {
+								cflF.updateScrollPosition(position);
+							}
+						}
+					}
+				}
+
+				if (imageDrag != null){
+					int[] positionDrag = new int[2];
+					int[] screenPosition = new int[4];
+					imageDrag.getLocationOnScreen(positionDrag);
+
+					screenPosition[0] = (imageDrag.getWidth() / 2) + positionDrag[0];
+					screenPosition[1] = (imageDrag.getHeight() / 2) + positionDrag[1];
+					screenPosition[2] = imageDrag.getWidth();
+					screenPosition[3] = imageDrag.getHeight();
+
+					Intent intent1 =  new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					intent1.putExtra("screenPosition", screenPosition);
+					LocalBroadcastManager.getInstance(contactPropertiesMainActivity).sendBroadcast(intent1);
+				}
+			}
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -460,6 +512,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		megaApi.addGlobalListener(this);
 
 		contactPropertiesMainActivity=this;
+
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		handler = new Handler();
 
@@ -711,6 +765,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			megaApi.removeGlobalListener(this);	
 			megaApi.removeRequestListener(this);
 		}
+
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
 	}
 
 	@Override
@@ -1113,8 +1169,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
-			sendToInbox=false;
-
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for (int i = 0; i < copyHandles.length; i++) {
 				log("NODO A COPIAR: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
@@ -1317,126 +1371,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				}
 				startService(uploadServiceIntent);
 				i++;
-			}
-		}
-		else if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
-			log("onActivityResult REQUEST_CODE_SELECT_CONTACT OK");
-
-
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
-			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
-
-			if(multiselectIntent==0){
-				//Send one file to one contact
-				final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
-				sendToInbox(nodeHandle, contactsData);
-			}
-			else{
-				//Send multiple files to one contact
-				final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE);
-				sendToInbox(nodeHandles, contactsData);
-			}
-		}
-
-	}
-
-	public void sendToInbox(long[] nodeHandles, ArrayList<String> selectedContacts) {
-
-		sendToInbox=true;
-
-		if (!Util.isOnline(this)) {
-			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-			if(coordinatorFragment!=null){
-				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
-			}
-			else{
-				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
-			}
-			return;
-		}
-
-		if(nodeHandles!=null){
-			MultipleRequestListener sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILES_SEND_INBOX, this);
-			MegaUser u = megaApi.getContact(selectedContacts.get(0));
-			if(nodeHandles.length>1){
-				log("many files to one contact");
-				for(int j=0; j<nodeHandles.length;j++){
-
-					final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-
-					if(u!=null){
-						log("Send: "+ node.getName() + " to "+ u.getEmail());
-						megaApi.sendFileToUser(node, u, sendMultipleListener);
-					}
-					else{
-						log("Send File to a NON contact! ");
-						megaApi.sendFileToUser(node, selectedContacts.get(0), sendMultipleListener);
-					}
-				}
-			}
-			else{
-				log("one file to many contacts");
-
-				final MegaNode node = megaApi.getNodeByHandle(nodeHandles[0]);
-				if(u!=null){
-					log("Send: "+ node.getName() + " to "+ u.getEmail());
-					megaApi.sendFileToUser(node, u, this);
-				}
-				else{
-					log("Send File to a NON contact! ");
-					megaApi.sendFileToUser(node, selectedContacts.get(0), this);
-				}
-			}
-		}
-	}
-
-	public void sendToInbox(long fileHandle, ArrayList<String> selectedContacts){
-
-		sendToInbox=true;
-
-		if (!Util.isOnline(this)) {
-			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-			if(coordinatorFragment!=null){
-				showSnackbar(getString(R.string.error_server_connection_problem), coordinatorFragment);
-			}
-			else{
-				showSnackbar(getString(R.string.error_server_connection_problem), fragmentContainer);
-			}
-			return;
-		}
-
-		MultipleRequestListener sendMultipleListener = null;
-		MegaNode node = megaApi.getNodeByHandle(fileHandle);
-		if(node!=null)
-		{
-			log("File to send: "+node.getName());
-			if(selectedContacts.size()>1){
-				log("File to multiple contacts");
-				sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SEND_INBOX, this);
-				for (int i=0;i<selectedContacts.size();i++){
-					MegaUser user= megaApi.getContact(selectedContacts.get(i));
-
-					if(user!=null){
-						log("Send File to contact: "+user.getEmail());
-						megaApi.sendFileToUser(node, user, sendMultipleListener);
-					}
-					else{
-						log("Send File to a NON contact! ");
-						megaApi.sendFileToUser(node, selectedContacts.get(i), sendMultipleListener);
-					}
-				}
-			}
-			else{
-				log("File to a single contact");
-				MegaUser user= megaApi.getContact(selectedContacts.get(0));
-				if(user!=null){
-					log("Send File to contact: "+user.getEmail());
-					megaApi.sendFileToUser(node, user, this);
-				}
-				else{
-					log("Send File to a NON contact! ");
-					megaApi.sendFileToUser(node, selectedContacts.get(0), this);
-				}
 			}
 		}
 	}
@@ -1662,50 +1596,34 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			} catch (Exception ex) {
 			}
 
-			if(sendToInbox) {
-				log("sendToInbox: " + e.getErrorCode() + " " + e.getErrorString());
-				if (e.getErrorCode() == MegaError.API_OK){
+			if (e.getErrorCode() == MegaError.API_OK){
 
-					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-					if(cflF!=null && cflF.isVisible()){
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						if(coordinatorFragment!=null){
-							showSnackbar(getString(R.string.context_correctly_sent_node), coordinatorFragment);
-						}
-						else{
-							showSnackbar(getString(R.string.context_correctly_sent_node), fragmentContainer);
-						}
+				CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
+				if(cflF!=null && cflF.isVisible()){
+					cflF.clearSelections();
+					cflF.hideMultipleSelect();
+					if(coordinatorFragment!=null){
+						showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
 					}
-				}
-				else{
-					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-					if(cflF!=null && cflF.isVisible()){
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						if(coordinatorFragment!=null){
-							showSnackbar(getString(R.string.context_no_sent_node), coordinatorFragment);
-						}
-						else{
-							showSnackbar(getString(R.string.context_no_sent_node), fragmentContainer);
-						}
+					else{
+						showSnackbar(getString(R.string.context_correctly_copied), fragmentContainer);
 					}
 				}
 			}
 			else{
-				if (e.getErrorCode() == MegaError.API_OK){
-
-					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-					if(cflF!=null && cflF.isVisible()){
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						if(coordinatorFragment!=null){
-							showSnackbar(getString(R.string.context_correctly_copied), coordinatorFragment);
-						}
-						else{
-							showSnackbar(getString(R.string.context_correctly_copied), fragmentContainer);
-						}
-					}
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
 				}
 				else{
 					CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
@@ -1721,7 +1639,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 					}
 				}
 			}
-			sendToInbox=false;
+
 			log("copy nodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){

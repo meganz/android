@@ -51,7 +51,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -72,8 +71,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 	Context context;
 
 	RecyclerView recyclerView;
-	public static LinearLayoutManager mLayoutManager;
-	public static CustomizedGridLayoutManager gridLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
@@ -82,7 +81,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 	boolean allFiles = true;
 
-	public static MegaBrowserLollipopAdapter adapter;
+	MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
 	RelativeLayout transfersOverViewLayout;
 
@@ -111,6 +110,38 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null){
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+		return null;
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -1124,10 +1155,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.OUTGOING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -1162,10 +1190,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					mediaIntent.putExtra("screenPosition", screenPosition);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.OUTGOING_SHARES_ADAPTER);
@@ -1228,10 +1253,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.OUTGOING_SHARES_ADAPTER);
 					boolean isOnMegaDownloads = false;
