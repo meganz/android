@@ -35,19 +35,17 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
                     scaleY = ((float) screenPosition[3]) / touchImageView.getImageHeight();
                     log("Scale: " + scaleX + " " + scaleY + " dimensions: " + touchImageView.getImageWidth() + " " + touchImageView.getImageHeight() + " position: " + screenPosition[0] + " " + screenPosition[1]);
                 }
-                else {
-                    surfaceView = (SurfaceView) currentView;
-                    //            screenPosition[0] += screenPosition[2] / 2;
-                    //            screenPosition[1] += screenPosition[3] / 2;
-                    scaleX = ((float) screenPosition[2]) / ((float) surfaceView.getWidth());
-                    scaleY = ((float) screenPosition[3]) / ((float) surfaceView.getHeight());
-                    log("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[2] + " " + screenPosition[3]);
-                }
                 else if (currentView instanceof ImageView){
                     imageView = (ImageView) currentView;
                     scaleX = ((float)screenPosition[2]) / imageView.getDrawable().getIntrinsicWidth();
                     scaleY = ((float)screenPosition[3]) / imageView.getDrawable().getIntrinsicHeight();
                     log("Scale: "+scaleX+" "+scaleY+" dimensions: "+imageView.getWidth()+" "+imageView.getHeight()+ " position: "+screenPosition[0]+" "+screenPosition[1]);
+                }
+                else {
+                    surfaceView = (SurfaceView) currentView;
+                    scaleX = ((float) screenPosition[2]) / ((float) surfaceView.getWidth());
+                    scaleY = ((float) screenPosition[3]) / ((float) surfaceView.getHeight());
+                    log("Scale: " + scaleX + " " + scaleY + " dimensions: " + surfaceView.getWidth() + " " + surfaceView.getHeight() + " position: " + screenPosition[2] + " " + screenPosition[3]);
                 }
 
                 ViewCompat.animate(draggableView)
