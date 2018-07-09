@@ -403,9 +403,6 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					log("Too many AsyncTasks");
 				}
 			}
-			((ViewPager) container).addView(viewLayout);
-			return viewLayout;
-
 		}
 		else {
 			if (isGIF(node.getName())) {
