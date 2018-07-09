@@ -754,8 +754,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageImage.setBorderWidth(0);
             holder.urlOwnMessageImage.setOval(false);
 
-
-
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             int radius = Util.scaleWidthPx(15, outMetrics);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
@@ -861,7 +859,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -1540,9 +1538,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsOwnManagement.leftMargin = Util.scaleWidthPx(12, outMetrics);
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(11, outMetrics);
             }else{
-                paramsOwnManagement.leftMargin = Util.scaleWidthPx(14, outMetrics);
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(13, outMetrics);
             }
             holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
@@ -1647,9 +1645,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                paramsContactManagement.leftMargin = Util.scaleWidthPx(12, outMetrics);
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(11, outMetrics);
             }else{
-                paramsContactManagement.leftMargin = Util.scaleWidthPx(14, outMetrics);
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(13, outMetrics);
             }
             holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
@@ -1788,7 +1786,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(27, outMetrics),0,0,0);
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(28, outMetrics),0,0,0);
             }else{
                 ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -1928,7 +1926,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Privilege of the user: " + privilege);
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -2163,7 +2161,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(27, outMetrics),0,0,0);
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(28, outMetrics),0,0,0);
             }else{
                 ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -2314,7 +2312,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("Participant privilege change!");
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -2769,7 +2767,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                    holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
                 }else{
                     holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
                 }
@@ -3338,7 +3336,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -4121,7 +4119,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -4864,7 +4862,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -5436,7 +5434,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -5602,7 +5600,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(27, outMetrics),0,0,0);
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(28, outMetrics),0,0,0);
             }else{
                 ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -5726,7 +5724,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -5831,7 +5829,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(27, outMetrics),0,0,0);
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(28, outMetrics),0,0,0);
             }else{
                 ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -5951,7 +5949,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -6053,7 +6051,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(27, outMetrics),0,0,0);
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(28, outMetrics),0,0,0);
             }else{
                 ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -6164,7 +6162,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }
@@ -6389,7 +6387,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                holder.titleContactMessage.setPadding(Util.scaleWidthPx(27,outMetrics),0,0,0);
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(28,outMetrics),0,0,0);
             }else{
                 holder.titleContactMessage.setPadding(Util.scaleWidthPx(48, outMetrics),0,0,0);
             }

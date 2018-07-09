@@ -36,15 +36,15 @@
             android:id="@+id/title_own_message_layout"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:layout_marginTop="4dp">
-
+            android:gravity="left|bottom">
             <TextView
                 android:id="@+id/message_chat_time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:textColor="@color/file_list_second_row"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"/>
         </RelativeLayout>
 
         <!--management messages-->
@@ -53,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="6dp"
             android:layout_below="@+id/title_own_message_layout"
             android:visibility="gone">
 
@@ -68,7 +68,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:background="@null"
                     android:layout_marginLeft="16dp"
                     android:visibility="gone"/>
 
@@ -77,10 +76,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:gravity="left"
+                    android:gravity="left|center_vertical"
+                    android:layout_centerVertical="true"
                     android:layout_toRightOf="@id/own_management_message_icon"
-                    android:layout_marginBottom="6dp"
-                    android:layout_marginTop="6dp"
                     android:textColor="@color/mail_my_account"/>
 
             </RelativeLayout>
@@ -905,7 +903,8 @@
                     android:layout_marginRight="4dp"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"/>
 
                 <TextView
                     android:id="@+id/contact_message_chat_time_text"
@@ -915,7 +914,8 @@
                     android:textColor="@color/file_list_second_row"
                     android:layout_toEndOf="@+id/contact_message_chat_name_text"
                     android:layout_toRightOf="@+id/contact_message_chat_name_text"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"/>
 
             </RelativeLayout>
 
@@ -924,32 +924,39 @@
                 android:id="@+id/contact_management_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/blue"
                 android:gravity="left"
+                android:layout_marginBottom="6dp"
                 android:layout_below="@+id/title_contact_message_layout"
                 android:visibility="gone">
 
-                <ImageView
-                    android:id="@+id/contact_management_message_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:background="@null"
-                    android:layout_marginLeft="16dp"
-                    android:src="@drawable/ic_call_started"
-                    android:visibility="invisible"/>
-
-                <TextView
-                    android:id="@+id/contact_management_message_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                <RelativeLayout
+                    android:id="@+id/contact_text_layout"
+                    android:layout_width="match_parent"
                     android:gravity="left"
-                    android:layout_toRightOf="@id/contact_management_message_icon"
-                    android:layout_centerVertical="true"
-                    android:layout_marginBottom="6dp"
-                    android:textColor="@color/mail_my_account"/>
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/contact_management_message_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="16dp"
+                        android:src="@drawable/ic_call_started"
+                        android:visibility="gone"/>
+
+                    <TextView
+                        android:id="@+id/contact_management_message_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:gravity="left|center_vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/contact_management_message_icon"
+                        android:textColor="@color/mail_my_account"/>
+                </RelativeLayout>
+
             </RelativeLayout>
+
 
             <RelativeLayout
                 android:id="@+id/content_contact_message_layout"
