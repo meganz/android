@@ -858,7 +858,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				else{
 					((ChatExplorerFragment) fragment).itemClick(currentPosition);
-
 				}
 
 				break;

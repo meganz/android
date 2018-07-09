@@ -6769,7 +6769,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
         log("onChatCallUpdate");
         if(call.getChatid()==idChat){
-            if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED||call.getStatus()==MegaChatCall.CALL_STATUS_TERMINATING){
+            if(call.getStatus()==MegaChatCall.CALL_STATUS_DESTROYED||call.getStatus()==MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION){
                 log("Hide call in progress");
                 callInProgressLayout.setVisibility(View.GONE);
                 callInProgressLayout.setOnClickListener(null);

@@ -760,7 +760,7 @@ public final class ChatAdvancedNotificationBuilder {
                     MegaChatCall call = megaChatApi.getChatCall(handleList.get(i));
                     if(call!=null){
                         log("Call ChatID: "+call.getChatid()+" Status: "+call.getStatus());
-                        if((call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS) && (call.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING)){
+                        if((call.getStatus()>=MegaChatCall.CALL_STATUS_IN_PROGRESS) && (call.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION)){
                             callInProgress = call;
                             log("FOUND Call in progress: "+callInProgress.getChatid());
                             break;
@@ -773,7 +773,7 @@ public final class ChatAdvancedNotificationBuilder {
                     log("openCallId: "+openCallChatId);
                     if(openCallChatId!=-1){
                         MegaChatCall possibleCall = megaChatApi.getChatCall(openCallChatId);
-                        if(possibleCall.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING){
+                        if(possibleCall.getStatus()<MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION){
                             callInProgress = possibleCall;
                             log("FOUND Call activity shown: "+callInProgress.getChatid());
                         }
