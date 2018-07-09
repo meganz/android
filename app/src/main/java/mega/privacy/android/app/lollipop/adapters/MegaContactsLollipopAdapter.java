@@ -36,6 +36,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
@@ -50,7 +51,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContactsLollipopAdapter.ViewHolderContacts> implements OnClickListener, View.OnLongClickListener {
+public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContactsLollipopAdapter.ViewHolderContacts> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 	
 	public static final int ITEM_VIEW_TYPE_LIST = 0;
 	public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -91,7 +92,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 		listFragment = _listView;
 	}
-	
+
+	@Override
+	public String getSectionTitle(int position) {
+		return contacts.get(position).getFullName().substring(0, 1).toUpperCase();
+	}
+
 	/*private view holder class*/
     public static class ViewHolderContacts extends RecyclerView.ViewHolder{
     	public ViewHolderContacts(View v) {

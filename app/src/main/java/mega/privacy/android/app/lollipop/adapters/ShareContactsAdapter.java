@@ -286,19 +286,12 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         if(color!=null){
             log("The color to set the avatar is "+color);
             paintCircle.setColor(Color.parseColor(color));
-            paintCircle.setAntiAlias(true);
         }
         else{
             log("Default color to the avatar");
-            if (contact.isPhoneContact()){
-                paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
-            }
-            else {
-                paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-            }
-            paintCircle.setAntiAlias(true);
+            paintCircle.setColor(ContextCompat.getColor(context, R.color.color_default_avatar_phone));
         }
-
+        paintCircle.setAntiAlias(true);
 
         int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

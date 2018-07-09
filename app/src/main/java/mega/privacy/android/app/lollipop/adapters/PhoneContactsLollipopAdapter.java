@@ -33,6 +33,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -42,11 +43,16 @@ import nz.mega.sdk.MegaApiAndroid;
 /*
  * Adapter for FilestorageActivity list
  */
-public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> implements OnClickListener {
+public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> implements OnClickListener, SectionTitleProvider {
 
 	DatabaseHandler dbH = null;
 	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
 	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
+
+	@Override
+	public String getSectionTitle(int position) {
+		return phoneContacts.get(position).getName().substring(0, 1).toUpperCase();
+	}
 
 	private class ContactPicture extends AsyncTask<Void, Void, Long> {
 
@@ -228,7 +234,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
 		holder.contactImageLayout = (RelativeLayout) rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
 		holder.initialLetter = (TextView) rowView.findViewById(R.id.contact_explorer_initial_letter);
-		
+
 		return holder;
 		
 	}
