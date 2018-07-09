@@ -29,9 +29,20 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
     Bitmap bitmap;
     MegaChatApiAndroid megaChatApi;
     Context context;
+    long chatId;
 
     public SurfaceView localFullScreenSurfaceView;
     MegaSurfaceRenderer localRenderer;
+
+    public static LocalCameraCallFullScreenFragment newInstance(long chatId) {
+        log("newInstance");
+        LocalCameraCallFullScreenFragment f = new LocalCameraCallFullScreenFragment();
+
+        Bundle args = new Bundle();
+        args.putLong("chatId", chatId);
+        f.setArguments(args);
+        return f;
+    }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -39,6 +50,9 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         if (megaChatApi == null){
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
+
+        Bundle args = getArguments();
+        this.chatId = args.getInt("chatId", -1);
 
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
@@ -60,7 +74,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
 
-        megaChatApi.addChatLocalVideoListener(this);
+        megaChatApi.addChatLocalVideoListener(chatId, this);
 
         return v;
     }
@@ -120,7 +134,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
 
     @Override
     public void onDestroy(){
-        megaChatApi.removeChatVideoListener(this);
+        megaChatApi.removeChatVideoListener(chatId, -1, this);
         super.onDestroy();
     }
     @Override
