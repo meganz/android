@@ -104,7 +104,12 @@ public class MyAccountInfo {
 
         if(megaApi.getInboxNode()!=null){
             usedInbox = accountInfo.getStorageUsed(megaApi.getInboxNode().getHandle());
-            formattedUsedInbox = Util.getSizeString(usedInbox);
+            if(usedInbox<1){
+                formattedUsedInbox = "";
+            }
+            else {
+                formattedUsedInbox = Util.getSizeString(usedInbox);
+            }
         }
 
         if(megaApi.getRubbishNode()!=null){
