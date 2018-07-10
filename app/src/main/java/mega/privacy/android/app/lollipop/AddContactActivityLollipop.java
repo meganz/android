@@ -187,6 +187,29 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 for (int i = 0; i < phoneContacts.size(); i++) {
                     filteredContactsPhone.add(phoneContacts.get(i));
                 }
+                getVisibleMEGAContacts();
+
+                boolean found;
+                PhoneContactInfo contactPhone;
+                MegaContactAdapter contactMEGA;
+
+                if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
+                    for (int i=0; i<filteredContactsPhone.size(); i++) {
+                        found = false;
+                        contactPhone = filteredContactsPhone.get(i);
+                        for (int j=0; j<visibleContactsMEGA.size(); j++) {
+                            contactMEGA = visibleContactsMEGA.get(j);
+                            if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))){
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) {
+                            filteredContactsPhone.remove(contactPhone);
+                            i--;
+                        }
+                    }
+                }
             }
             else {
                 phoneContacts.clear();

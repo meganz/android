@@ -33,6 +33,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ShareContactInfo;
+import mega.privacy.android.app.lollipop.listeners.UserAvatarListenerShare;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -109,7 +110,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         RelativeLayout itemLayout;
         TextView contactNameTextView;
         TextView emailTextView;
-        RoundedImageView avatar;
+        public String mail;
+        public RoundedImageView avatar;
         ImageView contactStateIcon;
         LinearLayout itemDecoration;
         int currentPosition;
@@ -178,6 +180,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
                 String name;
                 String mail = ((AddContactActivityLollipop) mContext).getShareContactMail(contact);
+                holder.mail = mail;
                 if (contact.getMegaContactAdapter().getFullName() != null) {
                     name = contact.getMegaContactAdapter().getFullName();
                 }
@@ -226,6 +229,53 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 }
 
                 holder.avatar.setImageBitmap(setUserAvatar(contact));
+
+                UserAvatarListenerShare listener = new UserAvatarListenerShare(mContext, holder);
+
+                File avatar = null;
+                if (mContext.getExternalCacheDir() != null){
+                    avatar = new File(mContext.getExternalCacheDir().getAbsolutePath(), mail + ".jpg");
+                }
+                else{
+                    avatar = new File(mContext.getCacheDir().getAbsolutePath(), mail + ".jpg");
+                }
+                Bitmap bitmap = null;
+                if (avatar.exists()){
+                    if (avatar.length() > 0){
+                        BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                        bOpts.inPurgeable = true;
+                        bOpts.inInputShareable = true;
+                        bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                        if (bitmap == null) {
+                            avatar.delete();
+                            if (mContext.getExternalCacheDir() != null){
+                                megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getExternalCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
+                            }
+                            else{
+                                megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
+                            }
+                        }
+                        else{
+                            holder.avatar.setImageBitmap(bitmap);
+                        }
+                    }
+                    else{
+                        if (mContext.getExternalCacheDir() != null){
+                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getExternalCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
+                        }
+                        else{
+                            megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
+                        }
+                    }
+                }
+                else{
+                    if (mContext.getExternalCacheDir() != null){
+                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getExternalCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
+                    }
+                    else{
+                        megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
+                    }
+                }
 
                 if (contact.isLastItem()) {
                     holder.itemDecoration.setVisibility(View.GONE);
