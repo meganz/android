@@ -969,7 +969,6 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginRight="8dp"
                     android:layout_alignParentBottom="true"
                     android:layout_marginBottom="10dp"
                     android:background="@android:color/transparent">
@@ -1001,7 +1000,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/name_my_account"
-                    android:layout_toRightOf="@+id/layout_avatar"
                     android:textSize="14sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
@@ -1016,8 +1014,6 @@
                     android:layout_width="256dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="48dp"
-                    android:layout_toRightOf="@+id/layout_avatar"
                     android:background="@drawable/contact_background_rich_link">
 
                     <RelativeLayout
@@ -1171,7 +1167,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="48dp"
                     android:gravity="left"
                     android:background="@android:color/transparent">
 
@@ -1424,7 +1419,6 @@
                     android:layout_height="wrap_content"
                     android:minHeight="56dp"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
-                    android:layout_marginLeft="48dp"
                     android:gravity="left"
                     android:layout_alignParentLeft="true"
                     android:paddingRight="12dp"
