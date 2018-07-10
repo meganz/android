@@ -308,7 +308,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		layout.addView(input, params);
 
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.password_text));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -457,7 +457,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
+		log("onRequestFinish: " + request.getRequestString()+ " code: "+e.getErrorCode());
 		if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
 			try { 
 				statusDialog.dismiss();	
@@ -647,6 +647,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					startActivity(intent);
 					finish();
 
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+
+					log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
 				}
 				else
 				{
@@ -1668,6 +1676,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	public void errorOverquota() {
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
 		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		startActivity(intent);
+		finish();
+	}
+
+	public void errorPreOverquota() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
 		startActivity(intent);
 		finish();
 	}

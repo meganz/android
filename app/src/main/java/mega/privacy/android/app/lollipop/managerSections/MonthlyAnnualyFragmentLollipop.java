@@ -258,14 +258,12 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		log("Check the last call to callToPricing");
 		if(DBUtil.callToPricing(context)){
-			log("megaApi.getPricing SEND");
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}
 
 		log("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
-			log("megaApi.getPaymentMethods SEND");
-			megaApi.getPaymentMethods(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}
 	}
 
@@ -274,15 +272,19 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		DecimalFormat df = new DecimalFormat("#.##");
 
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
+
 		if(myAccountInfo == null){
-			myAccountInfo = new MyAccountInfo(context);
+			return;
 		}
 
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
 		if (accounts == null){
 			log("accounts == null");
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 			return;
 		}
 
@@ -726,10 +728,13 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 	}
 
-	public void setInfo (int _paymentMethod, int _type, MyAccountInfo _myAccountInfo){
+	public void setInfo (int _paymentMethod, int _type){
 		this.paymentMethod = _paymentMethod;
-		this.myAccountInfo = _myAccountInfo;
 		this.parameterType = _type;
+
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
 	}
 
 	public String sizeTranslation(long size, int type) {
@@ -776,7 +781,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 1: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_MONTH, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -795,7 +800,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 2: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_MONTH, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -814,7 +819,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 3: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_MONTH, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -833,7 +838,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 4: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_MONTH, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -859,7 +864,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 1: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_YEAR, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -878,7 +883,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 2: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_YEAR, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -897,7 +902,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 3: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_YEAR, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
@@ -916,7 +921,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						case 4: {
 							switch (paymentMethod) {
 								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
-									((ManagerActivityLollipop) context).showCC(parameterType, myAccountInfo, Constants.PAYMENT_CC_YEAR, true);
+									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
 									break;
 								}
 								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {

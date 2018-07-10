@@ -759,6 +759,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
             holder.urlOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_own_message_text);
+            holder.urlOwnMessageText.setTag(holder);
+            holder.urlOwnMessageText.setOnClickListener(this);
+            holder.urlOwnMessageText.setOnLongClickListener(this);
+
             holder.urlOwnMessageWarningButtonsLayout = (LinearLayout) v.findViewById(R.id.url_own_message_buttons_warning_layout);
             holder.neverRichLinkButton = (Button) v.findViewById(R.id.url_never_button);
             holder.alwaysAllowRichLinkButton = (Button) v.findViewById(R.id.url_always_allow_button);
@@ -2729,6 +2733,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlOwnMessageIcon.setVisibility(View.GONE);
                 }
 
+                if (Util.isOnline(context)) {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).urlOwnMessageText.setLinksClickable(false);
+                    }else{
+                        ((ViewHolderMessageChat) holder).urlOwnMessageText.setLinksClickable(true);
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).urlOwnMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).urlOwnMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.white));
+                    }
+                }else{
+                    ((ViewHolderMessageChat) holder).urlOwnMessageText.setLinksClickable(false);
+                }
+
                 if (!multipleSelect) {
                     if (positionClicked != -1) {
                         if (positionClicked == position) {
@@ -2738,24 +2754,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         } else {
                             holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                             holder.forwardOwnRichLinks.setEnabled(true);
-
                         }
                     } else {
                         holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                         holder.forwardOwnRichLinks.setEnabled(true);
-
                     }
                 } else {
-                    log("Multiselect ON");
                     if (this.isItemChecked(position)) {
                         holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
                         holder.forwardOwnRichLinks.setEnabled(false);
-
                     } else {
                         log("NOT selected");
                         holder.contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
                         holder.forwardOwnRichLinks.setEnabled(true);
-
                     }
                 }
             } else {
@@ -2959,6 +2970,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlContactMessageIcon.setVisibility(View.GONE);
                 }
 
+                if (Util.isOnline(context)) {
+                    if(isMultipleSelect()){
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setLinksClickable(false);
+                    }else{
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setLinksClickable(true);
+                        Linkify.addLinks(((ViewHolderMessageChat) holder).urlContactMessageText, Linkify.WEB_URLS);
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.accentColor));
+                    }
+                }else{
+                    ((ViewHolderMessageChat) holder).urlContactMessageText.setLinksClickable(false);
+                }
+
                 if (!multipleSelect) {
                     if (positionClicked != -1) {
                         if (positionClicked == position) {
@@ -3087,7 +3110,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                     log("Show triangle retry!");
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
-                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
 
                     ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.VISIBLE);
@@ -3096,7 +3119,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else if ((status == MegaChatMessage.STATUS_SENDING)) {
                     log("Status not received by server: " + message.getStatus());
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
-                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
 
                     ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
@@ -3105,7 +3128,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("Status: " + message.getStatus());
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
-                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
 
                     ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
@@ -3125,14 +3148,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (ssb != null) {
 
-                    ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(context.getResources().getColor(R.color.white)), new StyleSpan(Typeface.ITALIC));
+                    ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), new StyleSpan(Typeface.ITALIC));
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 } else {
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(content + " ");
 
                     Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                     edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.append(edited);
@@ -3422,7 +3445,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
 
                     if (ssb != null) {
-                        ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
+                        ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
                         ((ViewHolderMessageChat) holder).urlContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                     } else {
                         messageContent = messageContent + " ";
@@ -3852,17 +3875,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 if(ssb!=null){
-                    ssb.append(" "+context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(context.getResources().getColor(R.color.white)), new StyleSpan(Typeface.ITALIC));
+                    ssb.append(" "+context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), new StyleSpan(Typeface.ITALIC));
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                 }
                 else{
                     Spannable content = new SpannableString(messageContent);
-                    content.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(content+" ");
 
                     Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                     edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.white)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.append(edited);
@@ -4229,7 +4252,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
 
                     if (ssb != null) {
-                        ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(context.getResources().getColor(R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
+                        ssb.append(" " + context.getString(R.string.edited_message_text), new RelativeSizeSpan(0.70f), new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), new StyleSpan(Typeface.ITALIC));
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setText(ssb.build(), TextView.BufferType.SPANNABLE);
                     } else {
                         messageContent = messageContent + " ";
@@ -4440,7 +4463,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (Util.isOnline(context)) {
                     if(isMultipleSelect()){
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(false);
-                    }else {
+                    }else{
                         Linkify.addLinks(((ViewHolderMessageChat) holder).contentContactMessageText, Linkify.WEB_URLS);
                         ((ViewHolderMessageChat) holder).contentContactMessageText.setLinksClickable(true);
                     }
@@ -6665,10 +6688,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 p.setColor(Color.parseColor(color));
             } else {
                 log("Default color to the avatar");
-                p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         } else {
-            p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;
@@ -6711,10 +6734,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 p.setColor(Color.parseColor(color));
             } else {
                 log("Default color to the avatar");
-                p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         } else {
-            p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
 
@@ -7833,8 +7856,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
                 break;
             }
+
             case R.id.content_own_message_text:
             case R.id.content_contact_message_text:
+            case R.id.url_own_message_text:
+            case R.id.url_contact_message_text:
             case R.id.message_chat_item_layout:{
                 ((ChatActivityLollipop) context).itemClick(currentPosition);
                 break;
@@ -7857,10 +7883,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 megaApi.setRichLinkWarningCounterValue(counter);
                 break;
             }
+
             case R.id.url_never_button: {
                 ((ChatActivityLollipop) context).showRichLinkWarning = Constants.RICH_WARNING_CONFIRMATION;
                 break;
             }
+
             case R.id.url_yes_disable_button: {
                 ((ChatActivityLollipop) context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
                 megaApi.enableRichPreviews(false);

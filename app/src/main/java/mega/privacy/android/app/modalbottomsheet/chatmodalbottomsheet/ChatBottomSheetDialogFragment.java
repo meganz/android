@@ -42,7 +42,6 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -67,7 +66,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public LinearLayout optionMuteChat;
     public ImageView optionMuteChatIcon;
     public TextView optionMuteChatText;
-
 
     boolean notificationsEnabled;
     ChatItemPreferences chatPrefs;
@@ -157,11 +155,37 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
 			iconStateChatPanel.setVisibility(View.GONE);
 			addAvatarChatPanel(null, chat);
+
+            infoChatText.setText(getString(R.string.group_chat_info_label));
+            optionInfoChat.setVisibility(View.GONE);
+
+            optionLeaveChat.setVisibility(View.VISIBLE);
 		}
 		else{
 			iconStateChatPanel.setVisibility(View.VISIBLE);
 
             long userHandle = chat.getPeerHandle();
+            MegaUser contact = megaApi.getContact(MegaApiJava.userHandleToBase64(userHandle));
+            if(contact!=null){
+                log("User email: "+contact.getEmail());
+                titleMailContactChatPanel.setText(contact.getEmail());
+                addAvatarChatPanel(contact.getEmail(), chat);
+
+                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                    optionInfoChat.setVisibility(View.VISIBLE);
+                    infoChatText.setText(getString(R.string.contact_properties_activity));
+                }
+                else{
+                    optionInfoChat.setVisibility(View.GONE);
+                    optionClearHistory.setVisibility(View.GONE);
+                }
+            }
+            else{
+                optionInfoChat.setVisibility(View.GONE);
+                optionClearHistory.setVisibility(View.GONE);
+            }
+
+            optionLeaveChat.setVisibility(View.GONE);
             int state = megaChatApi.getUserOnlineStatus(userHandle);
 
             if(state == MegaChatApi.STATUS_ONLINE){
@@ -192,62 +216,14 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 log("This user status is: "+state);
                 iconStateChatPanel.setVisibility(View.GONE);
             }
-
-			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-			MegaUser user = megaApi.getContact(userHandleEncoded);
-			if(user!=null){
-				log("El email del user es: "+user.getEmail());
-				titleMailContactChatPanel.setText(user.getEmail());
-				addAvatarChatPanel(user.getEmail(), chat);
-			}
-			else{
-				log("El user es NULL");
-			}
 		}
 
-		if(chat.isGroup()){
-			infoChatText.setText(getString(R.string.group_chat_info_label));
-
-			optionLeaveChat.setVisibility(View.VISIBLE);
-
-            if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-                optionClearHistory.setVisibility(View.GONE);
-            }
-            else{
-                if(chat.getOwnPrivilege()!= MegaChatRoom.PRIV_MODERATOR){
-                    optionClearHistory.setVisibility(View.GONE);
-                }
-                else{
-                    optionClearHistory.setVisibility(View.VISIBLE);
-                }
-            }
-		}
-		else{
-            long userHandle = chat.getPeerHandle();
-            MegaUser contact = megaApi.getContact(MegaApiJava.handleToBase64(userHandle));
-            if(contact!=null){
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    optionInfoChat.setVisibility(View.VISIBLE);
-                    infoChatText.setText(getString(R.string.contact_properties_activity));
-
-                    if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-                        optionClearHistory.setVisibility(View.GONE);
-                    }
-                    else{
-                        optionClearHistory.setVisibility(View.VISIBLE);
-                    }
-                }
-                else{
-                    optionInfoChat.setVisibility(View.GONE);
-                    optionClearHistory.setVisibility(View.GONE);
-                }
-            }
-            else{
-                optionInfoChat.setVisibility(View.GONE);
-                optionClearHistory.setVisibility(View.GONE);
-            }
-			optionLeaveChat.setVisibility(View.GONE);
-		}
+        if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
+            optionClearHistory.setVisibility(View.GONE);
+        }
+        else{
+            optionClearHistory.setVisibility(View.VISIBLE);
+        }
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
@@ -324,7 +300,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         p.setAntiAlias(true);
 
         if(chat.isGroup()){
-            p.setColor(getResources().getColor(R.color.divider_upgrade_account));
+            p.setColor(ContextCompat.getColor(context, R.color.divider_upgrade_account));
         }
         else{
             MegaUser contact = megaApi.getContact(contactMail);
@@ -335,11 +311,11 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     p.setColor(Color.parseColor(color));
                 } else {
                     log("Default color to the avatar");
-                    p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                    p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
                 }
             } else {
                 log("Contact is NULL");
-                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
 
