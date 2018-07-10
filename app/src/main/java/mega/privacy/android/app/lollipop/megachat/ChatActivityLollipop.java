@@ -5205,6 +5205,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         long userHandleToCompare = -1;
         long previousUserHandleToCompare = -1;
 
+        if (msg.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED){
+            msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME);
+            return AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME;
+        }
+
         if(msg.isUploading()){
             userHandleToCompare = myUserHandle;
         }
@@ -5482,7 +5487,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                    msg.setShowAvatar(true);
 //                }
 //                else{
-                    if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CHAT_TITLE)) {
+                    if ((previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS) || (previousMessage.getMessage().getType() == MegaChatMessage.TYPE_CHAT_TITLE)) {
                         msg.setShowAvatar(true);
                         log("Set: "+true);
                     } else {
