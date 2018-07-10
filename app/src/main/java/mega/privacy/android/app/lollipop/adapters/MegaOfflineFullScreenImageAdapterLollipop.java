@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -216,7 +217,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 			else if (thumb != null){
 				drawable = new BitmapDrawable(context.getResources(), thumb);
 			}
-
+			if (drawable == null) {
+				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId());
+			}
 			File file = getOfflineFile(position);
 			if (file != null){
 				final ProgressBar pb = holder.progressBar;
@@ -247,7 +250,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 							pb.setVisibility(View.GONE);
 							return false;
 						}
-					}).placeholder(MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 				}
 			}
 		}
