@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -73,7 +72,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -1685,10 +1683,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							else{
 								intent.putExtra("parentNodeHandle", megaApi.getParentNode(psHMegaNode).getHandle());
 							}
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-							if(accountInfo!=null){
-								intent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
+
 							intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCamera);
 							intent.putExtra("screenPosition", screenPosition);
 							startActivity(intent);

@@ -7,6 +7,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -132,7 +133,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     passwordToggle.setVisibility(View.VISIBLE);
-                    passwordToggle.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    passwordToggle.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_b_shared_read));
                 }
                 else {
                     passwordToggle.setVisibility(View.GONE);
@@ -176,7 +177,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             } else{
                 passwordEditText.setBackground(password_background);
             }
-            backupRecoveryKeyButton.setTextColor(getResources().getColor(R.color.accentColor));
+            backupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
         }
     }
 
@@ -187,24 +188,24 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             Drawable background = password_background.mutate().getConstantState().newDrawable();
             PorterDuffColorFilter porterDuffColorFilter;
             if (correct){
-                porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP);
+                porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP);
                 passwordErrorText.setText(getString(R.string.test_pwd_accepted));
-                passwordErrorText.setTextColor(getResources().getColor(R.color.green_unlocked_rewards));
-                passwordErrorImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_accept_test));
+                passwordErrorText.setTextColor(ContextCompat.getColor(this, R.color.green_unlocked_rewards));
+                passwordErrorImage.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_accept_test));
                 confirmPasswordButton.setVisibility(View.GONE);
-                backupRecoveryKeyButton.setTextColor(getResources().getColor(R.color.accentColor));
+                backupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
                 passwordEditText.setEnabled(false);
                 megaApi.passwordReminderDialogSucceeded(this);
             }
             else {
-                porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 passwordErrorText.setText(getString(R.string.test_pwd_wrong));
-                passwordErrorText.setTextColor(getResources().getColor(R.color.login_warning));
-                Drawable errorIcon = getResources().getDrawable(R.drawable.ic_input_warning);
+                passwordErrorText.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+                Drawable errorIcon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
                 errorIcon.setColorFilter(porterDuffColorFilter);
                 passwordErrorImage.setImageDrawable(errorIcon);
                 confirmPasswordButton.setVisibility(View.VISIBLE);
-                backupRecoveryKeyButton.setTextColor(getResources().getColor(R.color.login_warning));
+                backupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
             }
             background.setColorFilter(porterDuffColorFilter);
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -260,12 +261,12 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         switch (v.getId()){
             case R.id.toggle_button:{
                 if (passwdVisibility) {
-                    passwordToggle.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    passwordToggle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
                     passwdVisibility = false;
                     showHidePassword();
                 }
                 else {
-                    passwordToggle.setImageDrawable(getResources().getDrawable(R.drawable.ic_b_see));
+                    passwordToggle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_see));
                     passwdVisibility = true;
                     showHidePassword();
                 }

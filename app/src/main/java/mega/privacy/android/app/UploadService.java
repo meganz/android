@@ -95,7 +95,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private HashMap<String, String> transfersCopy;
 
-	boolean isOverquota = false;
+	//0 - not overquota, not pre-overquota
+	//1 - overquota
+	//2 - pre-overquota
+	int isOverquota = 0;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -113,7 +116,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		isForeground = false;
 		canceled = false;
-		isOverquota = false;
+		isOverquota = 0;
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -170,7 +173,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 
-		isOverquota = false;
+		isOverquota = 0;
 
 		onHandleIntent(intent);
 
@@ -315,7 +318,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-		if(isOverquota){
+		if(isOverquota!=0){
 			showStorageOverquotaNotification();
 		}
 		else{
@@ -356,7 +359,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void showCompleteNotification() {
 		log("showCompleteNotification");
 
-		if(!isOverquota){
+		if(isOverquota==0){
 			String notificationTitle, size;
 
 			int totalUploads = megaApi.getTotalUploads();
@@ -395,7 +398,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		if(!isOverquota){
+		if(isOverquota==0){
 			int pendingTransfers = megaApi.getNumPendingUploads();
 			int totalTransfers = megaApi.getTotalUploads();
 
@@ -510,7 +513,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			transfersCount--;
 
 			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-					isOverquota = true;
+				isOverquota = 1;
+			}
+			else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+				isOverquota = 2;
 			}
 
 			if (!transfer.isFolderTransfer()) {
@@ -712,7 +718,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (isOverquota) {
+				if (isOverquota!=0) {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				}
 
@@ -752,7 +758,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					return;
 				}
 
-				if(isOverquota){
+				if(isOverquota!=0){
 					log("after overquota alert");
 					return;
 				}
@@ -775,7 +781,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		String message = getString(R.string.overquota_alert_title);
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
-		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		if(isOverquota==1){
+			intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		}
+		else{
+			intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+		}
 
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify)
@@ -829,7 +840,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
-				isOverquota = true;
+				isOverquota = 1;
+
+				onQueueComplete();
+			}
+			else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+				log("OVERQUOTA ERROR: "+e.getErrorCode());
+				isOverquota = 2;
 
 				onQueueComplete();
 			}

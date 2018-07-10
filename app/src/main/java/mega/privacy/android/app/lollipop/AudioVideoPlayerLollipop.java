@@ -96,7 +96,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -128,7 +127,6 @@ import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLolli
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -263,7 +261,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DisplayMetrics outMetrics;
 
     private boolean fromShared = false;
-    int accountType;
     int typeExport = -1;
     private AlertDialog renameDialog;
     String regex = "[*|\\?:\"<>\\\\\\\\/]";
@@ -322,7 +319,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         audioVideoPlayerLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
 
         getDownloadLocation();
 
@@ -351,7 +348,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             currentWindowIndex = savedInstanceState.getInt("currentWindowIndex");
             querySearch = savedInstanceState.getString("querySearch");
             playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
-            accountType = savedInstanceState.getInt("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
             isAbHide = savedInstanceState.getBoolean("isAbHide", false);
         }
@@ -360,7 +356,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             onPlaylist = false;
             currentTime = 0;
             currentWindowIndex = 0;
-            accountType = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
+
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 handle = bundle.getLong("HANDLE");
@@ -1261,7 +1257,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void getImageView (int i, long handle) {
-        Intent intent = new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION);
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
         intent.putExtra("actionType", Constants.UPDATE_IMAGE_DRAG);
         intent.putExtra("adapterType", adapterType);
@@ -1300,7 +1296,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     void scrollToPosition (int i, long handle) {
         getImageView(i, handle);
-        Intent intent = new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION);
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
         intent.putExtra("actionType", Constants.SCROLL_TO_POSITION);
         intent.putExtra("adapterType", adapterType);
@@ -1616,7 +1612,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putInt("size", size);
         outState.putString("querySearch", querySearch);
         outState.putBoolean("playWhenReady", playWhenReady);
-        outState.putInt("typeAccount", accountType);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
         outState.putBoolean("isAbHide", isAbHide);
     }
@@ -2338,7 +2333,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
          final CheckBox dontShowAgain =new CheckBox(this);
          dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-         dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+         dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
          confirmationLayout.addView(dontShowAgain, params);
 
@@ -2585,7 +2580,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         layout.addView(error_layout, params1);
 
         final ImageView error_icon = new ImageView(AudioVideoPlayerLollipop.this);
-        error_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_input_warning));
+        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
         error_layout.addView(error_icon);
         RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -2812,7 +2807,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         log("showGetLinkActivity");
         Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
         linkIntent.putExtra("handle", handle);
-        linkIntent.putExtra("account", accountType);
         startActivity(linkIntent);
     }
 
@@ -4019,6 +4013,20 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (e.getErrorCode() == MegaError.API_OK){
                 Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
             }
+            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                log("OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
+            else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+                log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+                startActivity(intent);
+                finish();
+            }
             else{
                 Snackbar.make(containerAudioVideoPlayer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
             }
@@ -4167,10 +4175,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public ArrayList<MegaOffline> getMediaOffList(){
         return mediaOffList;
-    }
-
-    public int getAccountType() {
-        return accountType;
     }
 
     public boolean isFolderLink (){

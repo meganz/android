@@ -91,6 +91,16 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else
                             ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
                     }
+                    else if (actionListener== Constants.MULTIPLE_RESTORED_FROM_RUBBISH){
+                        log("restore nodes from rubbish request finished");
+                        if(error>0){
+                            message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items-error) + context.getString(R.string.number_incorrectly_restored_from_rubbish, error);
+                        }
+                        else{
+                            message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items);
+                        }
+                        ((ManagerActivityLollipop) context).refreshAfterMovingToRubbish();
+                    }
                     else{
                         log("move nodes request finished");
                         if(error>0){

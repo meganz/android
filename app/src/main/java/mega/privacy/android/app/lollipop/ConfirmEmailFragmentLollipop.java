@@ -2,8 +2,12 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -12,8 +16,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -40,10 +42,10 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 	ImageView icon;
 	EditText et_newEmail;
 	Button resendButton;
+	Button cancelButton;
 	TextView awaiting;
 	TextView explanation;
 	TextView mispelled;
-
 
 	@Override
 	public void onAttach(Activity context) {
@@ -89,12 +91,34 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 		et_newEmail = (EditText) v.findViewById(R.id.confirm_email_new_email);
 		mispelled = (TextView) v.findViewById(R.id.confirm_email_misspelled);
 		resendButton = (Button) v.findViewById(R.id.confirm_email_new_email_resend);
+		cancelButton = (Button) v.findViewById(R.id.confirm_email_cancel);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			resendButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
+		}
+
+		String textMispelled = String.format(getString(R.string.confirm_email_misspelled));
+		try {
+			textMispelled = textMispelled.replace("[A]", "<b>");
+			textMispelled = textMispelled.replace("[/A]", "</b>");
+		}
+		catch(Exception e){
+		}
+
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textMispelled,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textMispelled);
+		}
+		mispelled.setText(result);
 
 		et_newEmail.setCursorVisible(true);
 		et_newEmail.setText(emailTemp);
 		et_newEmail.requestFocus();
 
 		resendButton.setOnClickListener(this);
+		cancelButton.setOnClickListener(this);
 
 		return v;
 	}
@@ -167,6 +191,10 @@ public class ConfirmEmailFragmentLollipop extends Fragment implements MegaReques
 			case R.id.confirm_email_new_email_resend:{
 				((LoginActivityLollipop)context).setEmailTemp(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
 				megaApi.sendSignupLink(et_newEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), firstNameTemp, passwdTemp, this);
+				break;
+			}
+			case R.id.confirm_email_cancel:{
+				((LoginActivityLollipop)context).cancelConfirmationAccount();
 				break;
 			}
 		}

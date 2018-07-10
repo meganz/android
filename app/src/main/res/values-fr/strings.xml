@@ -1720,7 +1720,6 @@
     <string name="pass_medium" context="Password medium">Moyen</string>
     <string name="pass_good" context="Password good">Bon</string>
     <string name="pass_strong" context="Password strong">Robuste</string>
-    <string name="wrong_passwd" context="Error shown when it is changing the password and the old password is incorrect">Mot de passe erroné</string>
 
     <string name="title_notification_call_in_progress" context="Title of the notification shown on the action bar when there is a call in progress">Appel en cours</string>
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Cliquer pour retourner vers l\'appel</string>
