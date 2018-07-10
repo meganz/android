@@ -23,14 +23,18 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -44,6 +48,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.flowlayoutmanager.Alignment;
 import mega.privacy.android.app.components.flowlayoutmanager.FlowLayoutManager;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -66,6 +71,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	FlowLayoutManager mLayoutManager;
 	MegaInviteFriendsAdapter adapter;
 	EditText editTextMail;
+	ImageView toggleButtonMail;
 	LinearLayout linearLayoutCard;
 	Button inviteButton;
 	private RelativeLayout emailErrorLayout;
@@ -81,6 +87,8 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
+	String inputString = null;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");
@@ -89,6 +97,13 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		((AchievementsActivity) context).setMails(mails);
 	}
 
 	@Override
@@ -136,13 +151,60 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 
 		titleCard.setText(getString(R.string.figures_achievements_text_referrals, Util.getSizeString(referralsStorageValue), Util.getSizeString(referralsTransferValue)));
 
+		toggleButtonMail = (ImageView) v.findViewById(R.id.toggle_button_invite_mail);
+		toggleButtonMail.setOnClickListener(this);
 		editTextMail = (EditText) v.findViewById(R.id.edit_text_invite_mail);
 		editTextBackground = editTextMail.getBackground().mutate().getConstantState().newDrawable();
 
+		editTextMail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					log("first");
+					String s =  v.getText().toString();
+					inputString = v.getText().toString();
+					if (s.isEmpty() || s.equals("null") || s.equals("")) {
+						hideKeyboard();
+					}
+					else {
+						boolean isValid = isValidEmail(s);
+						if(isValid){
+							addMail(s.trim());
+							editTextMail.getText().clear();
+							inputString = "";
+						}
+						else{
+							setError();
+						}
+					}
+					return true;
+				}
+
+				if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_SEND)) {
+					log("second");
+					if (mails.isEmpty()) {
+						hideKeyboard();
+					}
+					else {
+						((AchievementsActivity)context).inviteFriends(mails);
+						editTextMail.getText().clear();
+						mails.clear();
+						adapter.setNames(mails);
+						adapter.notifyDataSetChanged();
+					}
+					return true;
+				}
+
+				return false;
+			}
+		});
+
+		editTextMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		editTextMail.addTextChangedListener(new TextWatcher() {
 
 			public void afterTextChanged(Editable s) {
-
+				refreshKeyboard();
 			}
 
 			public void beforeTextChanged(CharSequence s, int start,
@@ -155,6 +217,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 				if (s != null) {
 					if (s.length() > 0) {
 						String temp = s.toString();
+						inputString = s.toString();
 						char last = s.charAt(s.length()-1);
 						if(last == ' '){
 							temp = temp.trim();
@@ -162,6 +225,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 							if(isValid){
 								addMail(temp.trim());
 								editTextMail.getText().clear();
+								inputString = "";
 							}
 							else{
 								setError();
@@ -170,6 +234,9 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 						else{
 							log("Last character is: "+last);
 						}
+					}
+					else {
+						inputString = "";
 					}
 				}
 			}
@@ -187,9 +254,57 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 		recyclerView.setAdapter(adapter);
 
+		if (((AchievementsActivity) context).getMails() != null){
+			mails = ((AchievementsActivity) context).getMails();
+			adapter.setNames(mails);
+		}
+
+		if(mails.isEmpty()){
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
+			inviteButton.setOnClickListener(null);
+		}
+		else{
+			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+			inviteButton.setOnClickListener(this);
+		}
+
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
+	}
+
+	public void refreshKeyboard() {
+
+		String s = inputString;
+		if (s != null) {
+			if (s.length() == 0 && !mails.isEmpty()){
+				editTextMail.setImeOptions(EditorInfo.IME_ACTION_SEND);
+			}
+			else {
+				editTextMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
+			}
+		}
+		else if (!mails.isEmpty()) {
+			editTextMail.setImeOptions(EditorInfo.IME_ACTION_SEND);
+		}
+		else {
+			editTextMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		}
+
+		View view = ((AchievementsActivity) context).getCurrentFocus();
+		if (view != null) {
+			InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+			//inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			inputMethodManager.restartInput(view);
+		}
+	}
+
+	public void hideKeyboard () {
+		View view = ((AchievementsActivity) context).getCurrentFocus();
+		if (view != null) {
+			InputMethodManager inputMethodManager = (InputMethodManager) ((AchievementsActivity) context).getSystemService(Context.INPUT_METHOD_SERVICE);
+			inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
 	}
 
 	private void setError(){
@@ -259,11 +374,17 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 			inviteButton.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
 			inviteButton.setOnClickListener(this);
 		}
+		refreshKeyboard();
 	}
 
 	public void addMail(String mail){
 		log("addMail: "+mail);
-		mails.add(mail);
+		if (mails.contains(mail)){
+			((AchievementsActivity) context).showSnackbar(context.getString(R.string.contact_not_added));
+		}
+		else {
+			mails.add(mail);
+		}
 		adapter.setNames(mails);
 
 		if(mails.isEmpty()){
@@ -276,9 +397,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 		}
 
 		recyclerView.setVisibility(View.VISIBLE);
-
-
-
+		refreshKeyboard();
 	}
 
 	@Override
@@ -310,6 +429,14 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 				mails.clear();
 				adapter.setNames(mails);
 				adapter.notifyDataSetChanged();
+				break;
+			}
+			case R.id.toggle_button_invite_mail: {
+				Intent intent = new Intent(context, AddContactActivityLollipop.class);
+				intent.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+				intent.putExtra("fromAchievements", true);
+				intent.putStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS, mails);
+				((AchievementsActivity)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_CONTACTS);
 				break;
 			}
 		}
