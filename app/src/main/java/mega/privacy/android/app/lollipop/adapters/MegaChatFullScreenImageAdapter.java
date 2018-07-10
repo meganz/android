@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -312,6 +313,9 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 			if (resource != null){
 				drawable = new BitmapDrawable(context.getResources(), resource);
 			}
+			if (drawable == null) {
+				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
+			}
 
 			boolean isOnMegaDownloads = false;
 			String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
@@ -334,21 +338,6 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 						}
 					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 				}
-				else {
-					Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
-						@Override
-						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-							return false;
-						}
-
-						@Override
-						public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-							pb.setVisibility(View.GONE);
-							return false;
-						}
-					}).placeholder(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
-				}
-
 			}
 			else {
 				holder.progressBar.setVisibility(View.VISIBLE);
@@ -399,7 +388,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 								pb.setVisibility(View.GONE);
 								return false;
 							}
-						}).placeholder(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+						}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 					}
 				}
 			}

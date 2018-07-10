@@ -862,6 +862,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		positionG = intent.getIntExtra("position", 0);
 		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+		isFileLink = intent.getBooleanExtra("isFileLink",false);
 
 		adapterType = intent.getIntExtra("adapterType", 0);
 
@@ -872,7 +873,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			megaApi = app.getMegaApi();
 		}
 
-		if(Util.isOnline(this)) {
+		if(Util.isOnline(this) && !isFileLink) {
 			if (megaApi == null || megaApi.getRootNode() == null) {
 				log("Refresh session - sdk");
 				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
@@ -1059,7 +1060,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			fileNameTextView.setText(currentNode.getName());
 		}else if (adapterType == Constants.FILE_LINK_ADAPTER){
 //			draggableView.setDraggable(false);
-			isFileLink = intent.getBooleanExtra("isFileLink",false);
 			url = intent.getStringExtra("urlFileLink");
 			String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
 			if(serialize!=null){
@@ -1069,7 +1069,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					log("handle: "+hash);
 					imageHandles.add(hash);
 
-					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi, isFileLink, currentDocument.getName());
+					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi, isFileLink, currentDocument);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
 					viewPager.setOnPageChangeListener(this);
@@ -1196,7 +1196,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				positionG = 0;
 			}
 			
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi, false,null);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,imageHandles, megaApi, false, null);
 
 			viewPager.setAdapter(adapterMega);
 

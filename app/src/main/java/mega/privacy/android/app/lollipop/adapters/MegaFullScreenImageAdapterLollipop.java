@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -68,7 +69,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	MegaApiAndroid megaApi;
 	Context context;
 	boolean isFileLink = false;
-	String nameFileLink=null;
+	MegaNode fileLink = null;
 
 	String downloadLocationDefaultPath = Util.downloadDIR;
 	DatabaseHandler dbH;
@@ -307,15 +308,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 	
 	// constructor
-	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi, boolean isFileLink, String nameFileLink) {
+	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi, boolean isFileLink, MegaNode fileLink) {
 		this.activity = activity;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
 		this.megaFullScreenImageAdapter = this;
 		this.context = context;
 		this.isFileLink = isFileLink;
-		this.nameFileLink = nameFileLink;
-
+		this.fileLink = fileLink;
 
 		dbH = DatabaseHandler.getDbHandler(context);
 
@@ -386,22 +386,75 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 
 		if ((node == null) && isFileLink) {
 			log("isFileLink");
-			holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(nameFileLink).getIconResourceId());
 
-			preview = PreviewUtils.getPreviewFromCache(holder.document);
+			if (isGIF(fileLink.getName())) {
+				holder.isGIF = true;
+				holder.imgDisplay.setVisibility(View.GONE);
+				holder.gifImgDisplay.setVisibility(View.VISIBLE);
+				holder.progressBar.setVisibility(View.VISIBLE);
 
-			if (preview != null){
-				PreviewUtils.previewCache.put(holder.document, preview);
-				holder.imgDisplay.setImageBitmap(preview);
-				holder.progressBar.setVisibility(View.GONE);
-			}else{
-				try{
-					new PreviewAsyncTask().execute(holder.document);
+				Bitmap resource = setImageResource(fileLink, holder);
+				Drawable drawable = null;
+				if (resource != null) {
+					drawable = new BitmapDrawable(context.getResources(), resource);
 				}
-				catch(Exception ex){
-					//Too many AsyncTasks
-					log("Too many AsyncTasks");
+				if (drawable == null) {
+					drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(fileLink.getName()).getIconResourceId());
 				}
+				holder.progressBar.setVisibility(View.VISIBLE);
+
+				if (megaApi.httpServerIsRunning() == 0) {
+					megaApi.httpServerStart();
+				}
+
+				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+				ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+				activityManager.getMemoryInfo(mi);
+
+				if (mi.totalMem > Constants.BUFFER_COMP) {
+					log("Total mem: " + mi.totalMem + " allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+				}
+				else {
+					log("Total mem: " + mi.totalMem + " allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+				}
+				String url = megaApi.httpServerGetLocalLink(fileLink);
+				if (url != null) {
+					final ProgressBar pb = holder.progressBar;
+
+					if (drawable != null) {
+						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							@Override
+							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+								return false;
+							}
+
+							@Override
+							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+								pb.setVisibility(View.GONE);
+								return false;
+							}
+						}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}
+					else {
+						Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							@Override
+							public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
+								return false;
+							}
+
+							@Override
+							public boolean onResourceReady(GlideDrawable resource, Uri model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+								pb.setVisibility(View.GONE);
+								return false;
+							}
+						}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+					}
+				}
+			}
+			else {
+				setImageHolder(holder, fileLink);
 			}
 		}
 		else {
@@ -415,6 +468,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				Drawable drawable = null;
 				if (resource != null) {
 					drawable = new BitmapDrawable(context.getResources(), resource);
+				}
+				if (drawable == null) {
+					drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 				}
 
 				boolean isOnMegaDownloads = false;
@@ -438,23 +494,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 							}
 						}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 					}
-					else {
-						Glide.with(context).load(new File(localPath)).listener(new RequestListener<File, GlideDrawable>() {
-							@Override
-							public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
-								return false;
-							}
-
-							@Override
-							public boolean onResourceReady(GlideDrawable resource, File model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-								pb.setVisibility(View.GONE);
-								return false;
-							}
-						}).placeholder(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
-					}
 				}
 				else {
-
 					holder.progressBar.setVisibility(View.VISIBLE);
 
 					if (megaApi.httpServerIsRunning() == 0) {
@@ -504,60 +545,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 									pb.setVisibility(View.GONE);
 									return false;
 								}
-							}).placeholder(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId()).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
+							}).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 						}
 					}
 				}
 			}
 			else {
-				holder.isGIF = false;
-				holder.imgDisplay.setVisibility(View.VISIBLE);
-				holder.gifImgDisplay.setVisibility(View.GONE);
-				holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
-
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null) {
-					holder.imgDisplay.setImageBitmap(thumb);
-				}
-				else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
-					if (thumb != null) {
-						holder.imgDisplay.setImageBitmap(thumb);
-					}
-				}
-
-				if (node.hasPreview()) {
-					preview = PreviewUtils.getPreviewFromCache(node);
-					if (preview != null) {
-						PreviewUtils.previewCache.put(node.getHandle(), preview);
-						holder.imgDisplay.setImageBitmap(preview);
-						holder.progressBar.setVisibility(View.GONE);
-					}
-					else {
-						try {
-							new PreviewAsyncTask().execute(node.getHandle());
-						} catch (Exception ex) {
-							//Too many AsyncTasks
-							log("Too many AsyncTasks");
-						}
-					}
-				}
-				else {
-					preview = PreviewUtils.getPreviewFromCache(node);
-					if (preview != null) {
-						PreviewUtils.previewCache.put(node.getHandle(), preview);
-						holder.imgDisplay.setImageBitmap(preview);
-						holder.progressBar.setVisibility(View.GONE);
-					}
-					else {
-						try {
-							new PreviewDownloadAsyncTask().execute(node.getHandle());
-						} catch (Exception ex) {
-							//Too many AsyncTasks
-							log("Too many AsyncTasks");
-						}
-					}
-				}
+				setImageHolder(holder, node);
 			}
 		}
 		visibleImgs.put(position, holder);
@@ -565,6 +559,61 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
         ((ViewPager) container).addView(viewLayout);
 		
 		return viewLayout;
+	}
+
+	public void setImageHolder (ViewHolderFullImage holder, MegaNode node) {
+
+		Bitmap thumb = null;
+		Bitmap preview = null;
+
+		holder.isGIF = false;
+		holder.imgDisplay.setVisibility(View.VISIBLE);
+		holder.gifImgDisplay.setVisibility(View.GONE);
+		holder.imgDisplay.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
+
+		thumb = ThumbnailUtils.getThumbnailFromCache(node);
+		if (thumb != null) {
+			holder.imgDisplay.setImageBitmap(thumb);
+		}
+		else {
+			thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+			if (thumb != null) {
+				holder.imgDisplay.setImageBitmap(thumb);
+			}
+		}
+
+		if (node.hasPreview()) {
+			preview = PreviewUtils.getPreviewFromCache(node);
+			if (preview != null) {
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				holder.imgDisplay.setImageBitmap(preview);
+				holder.progressBar.setVisibility(View.GONE);
+			}
+			else {
+				try {
+					new PreviewAsyncTask().execute(node.getHandle());
+				} catch (Exception ex) {
+					//Too many AsyncTasks
+					log("Too many AsyncTasks");
+				}
+			}
+		}
+		else {
+			preview = PreviewUtils.getPreviewFromCache(node);
+			if (preview != null) {
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				holder.imgDisplay.setImageBitmap(preview);
+				holder.progressBar.setVisibility(View.GONE);
+			}
+			else {
+				try {
+					new PreviewDownloadAsyncTask().execute(node.getHandle());
+				} catch (Exception ex) {
+					//Too many AsyncTasks
+					log("Too many AsyncTasks");
+				}
+			}
+		}
 	}
 
 	public Bitmap setImageResource(MegaNode node, ViewHolderFullImage holder){
