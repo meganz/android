@@ -95,6 +95,21 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static int MAX_WIDTH_FILENAME_LAND = 455;
     public static int MAX_WIDTH_FILENAME_PORT = 180;
 
+    //margins of management message and hour
+    public static int MANAGEMENT_MESSAGE_LAND = 28;
+    public static int MANAGEMENT_MESSAGE_PORT = 48;
+
+    //margins of management message and hour in a CALL
+    public static int MANAGEMENT_MESSAGE_CALL_LAND = 40;
+    public static int MANAGEMENT_MESSAGE_CALL_PORT = 60;
+
+    //paddings of hours (right and left)
+    public static int PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND = 9;
+    public static int PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT = 16;
+
+    public static int PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND = 28;
+    public static int PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT = 48;
+
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
@@ -691,10 +706,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.newMessagesLayout = (LinearLayout) v.findViewById(R.id.message_chat_new_relative_layout);
             holder.newMessagesText = (TextView) v.findViewById(R.id.message_chat_new_text);
 
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+
+                MANAGEMENT_MESSAGE_CALL_LAND= 45;
+                MANAGEMENT_MESSAGE_CALL_PORT= 65;
+
+                PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND = 31;
+                PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT = 55;
+
+                PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND = 10;
+                PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT = 18;
+            }
+
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
             holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
             holder.timeOwnText = (TextView) v.findViewById(R.id.message_chat_time_text);
+
+            holder.titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                holder.titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
 
 //        holder.meText = (TextView) v.findViewById(R.id.message_chat_me_text);
 
@@ -746,34 +780,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.urlOwnMessageImage.setCornerRadius(radiusImageRL);
             holder.urlOwnMessageImage.setBorderWidth(0);
             holder.urlOwnMessageImage.setOval(false);
-
-            //Contact rich links message
-            holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
-            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
-                ViewGroup.LayoutParams params=holder.urlContactMessageLayout.getLayoutParams();
-                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    params.width=450;
-                }else{
-                    params.width=330;
-                }
-                holder.urlContactMessageLayout.setLayoutParams(params);
-            }
-            holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
-            holder.forwardContactRichLinks.setTag(holder);
-            holder.forwardContactRichLinks.setVisibility(View.GONE);
-            holder.urlContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_contact_message_text);
-
-            holder.urlContactMessageTitle = (TextView) v.findViewById(R.id.url_contact_message_title);
-            holder.urlContactMessageDescription = (TextView) v.findViewById(R.id.url_contact_message_description);
-
-            holder.urlContactMessageIconAndLinkLayout = (LinearLayout) v.findViewById(R.id.url_contact_message_icon_link_layout);
-            holder.urlContactMessageIcon = (ImageView) v.findViewById(R.id.url_contact_message_icon);
-            holder.urlContactMessageLink = (TextView) v.findViewById(R.id.url_contact_message_link);
-
-            holder.urlContactMessageImage = (RoundedImageView) v.findViewById(R.id.url_contact_message_image);
-            holder.urlContactMessageImage.setCornerRadius(radiusImageRL);
-            holder.urlContactMessageImage.setBorderWidth(0);
-            holder.urlContactMessageImage.setOval(false);
 
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             int radius = Util.scaleWidthPx(15, outMetrics);
@@ -856,15 +862,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnLandscape.setVisibility(View.GONE);
 
             holder.ownManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.own_management_message_layout);
-            //Margins
-            RelativeLayout.LayoutParams ownManagementParams = (RelativeLayout.LayoutParams) holder.ownManagementMessageLayout.getLayoutParams();
-            ownManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
-            ownManagementParams.setMargins(0, 0, 0, Util.scaleHeightPx(4, outMetrics));
-            holder.ownManagementMessageLayout.setLayoutParams(ownManagementParams);
 
             holder.ownManagementMessageText = (TextView) v.findViewById(R.id.own_management_message_text);
-            holder.ownManagementMessageIcon = (ImageView) v.findViewById(R.id.own_management_message_icon);
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
+            holder.ownManagementMessageIcon = (ImageView) v.findViewById(R.id.own_management_message_icon);
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holder.contentOwnMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
                 holder.ownManagementMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
@@ -876,6 +884,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             //Contact messages////////////////////////////////////////
             holder.contactMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_contact_message_layout);
             holder.titleContactMessage = (RelativeLayout) v.findViewById(R.id.title_contact_message_layout);
+
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
 
             holder.contactImageView = (RoundedImageView) v.findViewById(R.id.contact_thumbnail);
             holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_initial_letter);
@@ -896,6 +910,34 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardContactPreviewLandscape = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_landscape);
             holder.forwardContactPreviewLandscape.setTag(holder);
             holder.forwardContactPreviewLandscape.setVisibility(View.GONE);
+
+            //Contact rich links message
+            holder.urlContactMessageLayout = (RelativeLayout) v.findViewById(R.id.url_contact_message_layout);
+            if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
+                ViewGroup.LayoutParams params=holder.urlContactMessageLayout.getLayoutParams();
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    params.width=450;
+                }else{
+                    params.width=330;
+                }
+                holder.urlContactMessageLayout.setLayoutParams(params);
+            }
+            holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
+            holder.forwardContactRichLinks.setTag(holder);
+            holder.forwardContactRichLinks.setVisibility(View.GONE);
+            holder.urlContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_contact_message_text);
+
+            holder.urlContactMessageTitle = (TextView) v.findViewById(R.id.url_contact_message_title);
+            holder.urlContactMessageDescription = (TextView) v.findViewById(R.id.url_contact_message_description);
+
+            holder.urlContactMessageIconAndLinkLayout = (LinearLayout) v.findViewById(R.id.url_contact_message_icon_link_layout);
+            holder.urlContactMessageIcon = (ImageView) v.findViewById(R.id.url_contact_message_icon);
+            holder.urlContactMessageLink = (TextView) v.findViewById(R.id.url_contact_message_link);
+
+            holder.urlContactMessageImage = (RoundedImageView) v.findViewById(R.id.url_contact_message_image);
+            holder.urlContactMessageImage.setCornerRadius(radiusImageRL);
+            holder.urlContactMessageImage.setBorderWidth(0);
+            holder.urlContactMessageImage.setOval(false);
 
             holder.contentContactMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
@@ -947,12 +989,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.iconContactTypeDocPortraitPreview = (ImageView) v.findViewById(R.id.contact_attachment_type_icon_portrait);
 
             holder.contactManagementMessageLayout = (RelativeLayout) v.findViewById(R.id.contact_management_message_layout);
-            //Margins
-            RelativeLayout.LayoutParams contactManagementParams = (RelativeLayout.LayoutParams) holder.contactManagementMessageLayout.getLayoutParams();
-            contactManagementParams.addRule(RelativeLayout.ALIGN_LEFT);
-            holder.contactManagementMessageLayout.setLayoutParams(contactManagementParams);
 
             holder.contactManagementMessageText = (TextView) v.findViewById(R.id.contact_management_message_text);
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             holder.contactManagementMessageIcon = (ImageView) v.findViewById(R.id.contact_management_message_icon);
 
             if(((ChatActivityLollipop) context).getDeviceDensity() == 1){
@@ -1018,12 +1063,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).retryAlert.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
+
         ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
-        ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.RIGHT);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-        params.rightMargin = Util.scaleWidthPx(16, outMetrics);
-        params.leftMargin = Util.scaleWidthPx(0, outMetrics);
-        ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+        }else{
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+        }
 
         ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.VISIBLE);
         ((ViewHolderMessageChat) holder).iconOwnTypeDocLandPreview.setVisibility(View.GONE);
@@ -1378,6 +1424,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (message.getUserHandle() == myUserHandle) {
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_LAND, outMetrics),0,0,0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_PORT, outMetrics),0,0,0);
+            }
+
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -1449,10 +1504,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_rejected_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
+
                     } catch (Exception e) {
                     }
 
@@ -1464,10 +1518,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_not_answered_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1479,10 +1531,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_failed_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1494,10 +1544,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_cancelled_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1516,14 +1564,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.VISIBLE);
 
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_LAND, outMetrics);
+            }else{
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_PORT, outMetrics);
+            }
+            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
-
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -1580,6 +1628,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -1616,6 +1670,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.VISIBLE);
+
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_LAND, outMetrics);
+            }else{
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_CALL_PORT, outMetrics);
+            }
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -1682,10 +1744,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_rejected_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1697,10 +1757,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_missed_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1712,10 +1770,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_failed_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1727,10 +1783,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     textToShow = String.format(context.getString(R.string.call_missed_messages));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'#DE000000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                        textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
 
@@ -1757,6 +1811,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaChatMessage message = androidMessage.getMessage();
 
         if (message.getHandleOfAction() == myUserHandle) {
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics),0,0,0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             log("me alter participant");
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
@@ -1856,17 +1918,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 result = Html.fromHtml(textToShow);
             }
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
-
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
-
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -1892,6 +1952,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("CONTACT Message type ALTER PARTICIPANTS");
             int privilege = message.getPrivilege();
             log("Privilege of the user: " + privilege);
+
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
@@ -1923,7 +1989,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
@@ -2108,9 +2182,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("bindPrivChangeMessage");
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
+
         MegaChatMessage message = androidMessage.getMessage();
 
         if (message.getHandleOfAction() == myUserHandle) {
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics),0,0,0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             log("a moderator change my privilege");
             int privilege = message.getPrivilege();
             log("Privilege of the user: " + privilege);
@@ -2220,14 +2303,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
 
 
             log("Visible own management message!");
@@ -2255,6 +2338,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
         } else {
             log("Participant privilege change!");
+
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -2286,7 +2376,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -2459,6 +2557,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             if (message.getUserHandle() == myUserHandle) {
                 ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
+
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+                }else{
+                    ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+                }
 
                 log("MY message!!");
                 log("MY message handle!!: " + message.getMsgId());
@@ -2689,6 +2794,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.nameContactText.setVisibility(View.GONE);
                 }
 
+                if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+                }else{
+                    holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+                }
+
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     switch (messages.get(position - 1).getInfoToShow()) {
                         case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -2892,10 +3003,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         MegaNode node = androidMessage.getRichLinkMessage().getNode();
 
         if (message.getUserHandle() == myUserHandle) {
-            ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
-
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
+
+            ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -3244,6 +3363,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -3506,6 +3631,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
             ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
@@ -3771,13 +3903,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 //                ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
-                ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
-                ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.RIGHT);
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-                params.rightMargin = Util.scaleWidthPx(16, outMetrics);
-                params.leftMargin = Util.scaleWidthPx(0, outMetrics);
-                ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
-
                 if (Util.isOnline(context)) {
                     if(isMultipleSelect()){
                         ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinksClickable(false);
@@ -3818,12 +3943,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.ownManagementMessageText.setText(context.getString(R.string.text_deleted_message));
 
                 holder.ownManagementMessageLayout.setVisibility(View.GONE);
-                holder.titleOwnMessage.setGravity(Gravity.LEFT);
-                holder.timeOwnText.setGravity(Gravity.LEFT);
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.timeOwnText.getLayoutParams();
-                params.rightMargin = Util.scaleWidthPx(0, outMetrics);
-                params.leftMargin = Util.scaleWidthPx(48, outMetrics);
-                holder.timeOwnText.setLayoutParams(params);
 
                 holder.previewFrameLand.setVisibility(View.GONE);
                 holder.contentOwnMessageThumbLand.setVisibility(View.GONE);
@@ -4025,6 +4144,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
+            }
+
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
             }
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
@@ -4357,6 +4482,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("MY message!!");
             ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
             log("MY message handle!!: " + message.getMsgId());
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
@@ -4758,6 +4889,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -5122,6 +5259,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (message.getUserHandle() == myUserHandle) {
             ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
 
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
+
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
 
@@ -5249,13 +5393,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
 
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.RIGHT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(16, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(0, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
-
             if (!multipleSelect) {
                 if (positionClicked != -1) {
                     if (positionClicked == position) {
@@ -5324,6 +5461,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -5478,9 +5620,19 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void bindChangeTitleMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("bindChangeTitleMessage");
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.INVISIBLE);
+
+
         MegaChatMessage message = androidMessage.getMessage();
 
         if (message.getUserHandle() == myUserHandle) {
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics),0,0,0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
             if (messages.get(position - 1).getInfoToShow() != -1) {
@@ -5533,16 +5685,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
-
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -5599,6 +5751,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -5634,7 +5792,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
 
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
+
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -5687,6 +5854,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics),0,0,0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
 
@@ -5737,13 +5911,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.INVISIBLE);
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.LEFT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(0, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(48, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
+            ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsOwnManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -5801,6 +5976,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -5835,7 +6016,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.INVISIBLE);
+            ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+            }else{
+                paramsContactManagement.leftMargin = Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+            }
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
+
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             if (!multipleSelect) {
@@ -5886,6 +6076,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (message.getUserHandle() == myUserHandle) {
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.LEFT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics),0,0,0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
@@ -5992,6 +6189,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
             }
 
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics),0,0,0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -6089,6 +6292,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("MY message!!");
             log("MY message handle!!: " + message.getMsgId());
 
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
+
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
@@ -6137,12 +6347,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
-            ((ViewHolderMessageChat) holder).timeOwnText.setGravity(Gravity.RIGHT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) ((ViewHolderMessageChat) holder).timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(16, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(0, outMetrics);
-            ((ViewHolderMessageChat) holder).timeOwnText.setLayoutParams(params);
+
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
@@ -6207,6 +6412,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
                 ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
+            }
+
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_LAND,outMetrics),0,0,0);
+            }else{
+                holder.titleContactMessage.setPadding(Util.scaleWidthPx(PADDING_LEFT_HOUR_OF_CONTACT_MESSAGE_PORT, outMetrics),0,0,0);
             }
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
@@ -7347,12 +7558,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
             holder.ownManagementMessageLayout.setVisibility(View.GONE);
-            holder.titleOwnMessage.setGravity(Gravity.RIGHT);
-            holder.timeOwnText.setGravity(Gravity.RIGHT);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.timeOwnText.getLayoutParams();
-            params.rightMargin = Util.scaleWidthPx(16, outMetrics);
-            params.leftMargin = Util.scaleWidthPx(0, outMetrics);
-            holder.timeOwnText.setLayoutParams(params);
+
+            ((ViewHolderMessageChat) holder).titleOwnMessage.setGravity(Gravity.RIGHT);
+            if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_LAND, outMetrics),0);
+            }else{
+                ((ViewHolderMessageChat) holder).titleOwnMessage.setPadding(0,0,Util.scaleWidthPx(PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT, outMetrics),0);
+            }
+
             holder.forwardOwnPortrait.setVisibility(View.GONE);
             holder.forwardOwnLandscape.setVisibility(View.GONE);
 
