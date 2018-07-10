@@ -333,7 +333,7 @@
 
 			<!--Previous versions-->
 			<RelativeLayout
-				android:id="@+id/my_storage_account_available_storage_layout"
+				android:id="@+id/my_storage_account_previous_versions_layout"
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
@@ -351,7 +351,7 @@
 					android:layout_marginRight="16dp"
 					android:layout_centerVertical="true">
 					<TextView
-						android:id="@+id/my_storage_account_available_storage_title"
+						android:id="@+id/my_storage_account_previous_versions_title"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_alignParentLeft="true"
@@ -359,7 +359,7 @@
 						android:textSize="14sp"
 						android:textColor="@color/mail_my_account" />
 					<TextView
-						android:id="@+id/my_storage_account_available_storage_text"
+						android:id="@+id/my_storage_account_previous_versions_text"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"

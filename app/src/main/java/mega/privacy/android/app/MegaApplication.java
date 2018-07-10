@@ -146,6 +146,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			if (e.getErrorCode() == MegaError.API_ESID){
 				if (request.getType() == MegaRequest.TYPE_LOGOUT){
 					log("type_logout");
+					myAccountInfo = null;
 					AccountController.logout(getApplicationContext(), getMegaApi());
 				}
 			}
@@ -260,9 +261,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 							myAccountInfo.setLastSessionFormattedDate(df.format(date));
 							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
 						}
-					}
 
-					log("onRequest TYPE_ACCOUNT_DETAILS: "+myAccountInfo.getUsedPerc());
+						log("onRequest TYPE_ACCOUNT_DETAILS: "+myAccountInfo.getUsedPerc());
+					}
 
 					Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
 					intent.putExtra("actionType", Constants.UPDATE_ACCOUNT_DETAILS);
@@ -794,6 +795,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
+			myAccountInfo = null;
 			if (e.getErrorCode() == MegaError.API_ESID){
 				log("calling ManagerActivity.logout");
 				AccountController.logout(getApplicationContext(), getMegaApi());

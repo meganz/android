@@ -67,6 +67,9 @@ public class MyAccountInfo {
 
     MegaPricing pricing;
 
+    int numVersions = -1;
+    long previousVersionsSize = -1;
+
     public MyAccountInfo(Context context){
         log("MyAccountInfo created");
 
@@ -453,6 +456,10 @@ public class MyAccountInfo {
         return formattedAvailableSpace;
     }
 
+    public String getFormattedPreviousVersionsSize() {
+        return Util.getSizeString(previousVersionsSize);
+    }
+
     public void setFormattedAvailableSpace(String formattedAvailableSpace) {
         this.formattedAvailableSpace = formattedAvailableSpace;
     }
@@ -540,6 +547,22 @@ public class MyAccountInfo {
     public void setCreateSessionTimeStamp(long createSessionTimeStamp) {
         log("setCreateSessionTimeStamp: " + createSessionTimeStamp);
         this.createSessionTimeStamp = createSessionTimeStamp;
+    }
+
+    public int getNumVersions() {
+        return numVersions;
+    }
+
+    public void setNumVersions(int numVersions) {
+        this.numVersions = numVersions;
+    }
+
+    public long getPreviousVersionsSize() {
+        return previousVersionsSize;
+    }
+
+    public void setPreviousVersionsSize(long previousVersionsSize) {
+        this.previousVersionsSize = previousVersionsSize;
     }
 
     public MegaPricing getPricing() {

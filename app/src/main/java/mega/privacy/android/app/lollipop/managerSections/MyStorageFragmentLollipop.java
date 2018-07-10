@@ -57,7 +57,9 @@ public class MyStorageFragmentLollipop extends Fragment {
 	TextView inboxUsedText;
 	TextView incomingUsedText;
 	TextView rubbishUsedText;
-	TextView availableSpaceText;
+	TextView previousVersionsText;
+
+	RelativeLayout previousVersionsLayout;
 
 	ProgressBar progressBar;
 	
@@ -122,8 +124,8 @@ public class MyStorageFragmentLollipop extends Fragment {
 		inboxUsedText = (TextView) v.findViewById(R.id.my_storage_account_inbox_storage_text);
 		incomingUsedText = (TextView) v.findViewById(R.id.my_storage_account_incoming_storage_text);
 		rubbishUsedText = (TextView) v.findViewById(R.id.my_storage_account_rubbish_storage_text);
-		availableSpaceText = (TextView) v.findViewById(R.id.my_storage_account_available_storage_text);
-
+		previousVersionsText = (TextView) v.findViewById(R.id.my_storage_account_previous_versions_text);
+		previousVersionsLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_previous_versions_layout);
 
 //		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
 //		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();
@@ -313,7 +315,14 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		rubbishUsedText.setText(myAccountInfo.getFormattedUsedRubbish());
 		incomingUsedText.setText(myAccountInfo.getFormattedUsedIncoming());
-		availableSpaceText.setText(myAccountInfo.getFormattedAvailableSpace());
+
+		if(myAccountInfo.getPreviousVersionsSize()>0){
+			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
+			previousVersionsLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			previousVersionsLayout.setVisibility(View.GONE);
+		}
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
@@ -358,6 +367,17 @@ public class MyStorageFragmentLollipop extends Fragment {
 			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
 		}
 		progressBar.setProgress(usedPerc);
+	}
+
+
+	public void refreshVersionsInfo(){
+		if(myAccountInfo.getPreviousVersionsSize()>0){
+			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
+			previousVersionsLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			previousVersionsLayout.setVisibility(View.GONE);
+		}
 	}
 
 	@Override
