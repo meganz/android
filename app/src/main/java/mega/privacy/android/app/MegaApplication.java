@@ -146,7 +146,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			if (e.getErrorCode() == MegaError.API_ESID){
 				if (request.getType() == MegaRequest.TYPE_LOGOUT){
 					log("type_logout");
-					myAccountInfo = null;
+					myAccountInfo = new MyAccountInfo(getApplicationContext());
 					AccountController.logout(getApplicationContext(), getMegaApi());
 				}
 			}
@@ -795,7 +795,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
-			myAccountInfo = null;
+			myAccountInfo = new MyAccountInfo(this);
 			if (e.getErrorCode() == MegaError.API_ESID){
 				log("calling ManagerActivity.logout");
 				AccountController.logout(getApplicationContext(), getMegaApi());
