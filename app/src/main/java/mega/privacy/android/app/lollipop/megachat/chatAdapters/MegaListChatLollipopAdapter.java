@@ -1852,8 +1852,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							try {
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
-								textToShow = textToShow.replace("[B]", "");
-								textToShow = textToShow.replace("[/B]", "");
 							} catch (Exception e) {
 							}
 
@@ -1872,8 +1870,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							try {
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
-								textToShow = textToShow.replace("[B]", "");
-								textToShow = textToShow.replace("[/B]", "");
 							} catch (Exception e) {
 							}
 
@@ -1885,8 +1881,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							try {
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
-								textToShow = textToShow.replace("[B]", "");
-								textToShow = textToShow.replace("[/B]", "");
 							} catch (Exception e) {
 							}
 
@@ -1905,8 +1899,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							try {
 								textToShow = textToShow.replace("[A]", "");
 								textToShow = textToShow.replace("[/A]", "");
-								textToShow = textToShow.replace("[B]", "");
-								textToShow = textToShow.replace("[/B]", "");
 							} catch (Exception e) {
 							}
 

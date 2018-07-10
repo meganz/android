@@ -1927,38 +1927,34 @@
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
     <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
 
+    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Missed call[/A]</string>
+    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was rejected[/A]</string>
+    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was cancelled[/A]</string>
+    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call failed[/A]</string>
+    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was not answered[/A]</string>
+
     <string name="contact_email" context="Indicates that can type a contact email">Contact\'s email</string>
     <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">Contact not added, is already added.</string>
 
     <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minute[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minutes[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minutes[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d second[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d second[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d second[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d second[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d seconds[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d seconds[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d seconds[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d seconds[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
-        <item context="one second" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d second[/C]</item>
-        <item context="more seconds" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d seconds[/C]</item>
+        <item context="one second" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d seconds[/B]</item>
     </plurals>
-
-    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was[/A][B] cancelled[/B]</string>
-
-    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was[/A][B] not answered[/B]</string>
-
-    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Call[/A][B] missed[/B]</string>
-
-    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was[/A][B] rejected[/B]</string>
-
-    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call[/A][B] failed[/B]</string>
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
