@@ -2198,11 +2198,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
-			log("getUserAttribute FirstName");
-			((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+			if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
+				log("getUserAttribute FirstName");
+				((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+				log("getUserAttribute LastName");
+				((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+			}
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
-			log("getUserAttribute LastName");
-			((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
 
 			this.setDefaultAvatar();
@@ -3382,7 +3385,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		int avatarTextSize = Util.getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		String firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
+		String firstLetter = " ";
+		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
+			firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
+		}
+
 		nVPictureProfileTextView.setText(firstLetter);
 		nVPictureProfileTextView.setTextSize(30);
 		nVPictureProfileTextView.setTextColor(Color.WHITE);
@@ -5546,7 +5553,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
         if (cancelSubscription != null){
             cancelSubscription.setVisible(false);
         }
-        if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
+        if (((MegaApplication) getApplication()).getMyAccountInfo()!= null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0){
             if (cancelSubscription != null){
                 if (drawerItem == DrawerItem.ACCOUNT){
                     if (maFLol != null){
@@ -6649,7 +6656,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							exportMK.setVisible(false);
 						}
 
-						if (((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0) {
+						if (((MegaApplication) getApplication()).getMyAccountInfo()!= null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumberOfSubscriptions() > 0) {
 							cancelSubscription.setVisible(true);
 						}
 						else{
@@ -13841,6 +13848,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				log("(1)request.getText(): "+request.getText());
 				countUserAttributes--;
+				if(((MegaApplication) getApplication()).getMyAccountInfo() == null){
+					log("ERROR: MyAccountInfo is NULL");
+				}
 				((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The first name has changed");
@@ -13875,6 +13885,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 				log("(2)request.getText(): "+request.getText());
 				countUserAttributes--;
+				if(((MegaApplication) getApplication()).getMyAccountInfo() == null){
+					log("ERROR: MyAccountInfo is NULL");
+				}
 				((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("The last name has changed");
@@ -14788,11 +14801,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("The user: "+user.getEmail()+"changed his first name");
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my first name");
-								((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null)
+								{
+									((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+								}
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
 							}
 							else{
-								((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null)
+								{
+									((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
+								}
+
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
 							}
 						}
@@ -14800,11 +14820,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							log("The user: "+user.getEmail()+"changed his last name");
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my last name");
-								((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
+									((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+								}
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
 							}
 							else{
-								((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
+									((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
+								}
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
 							}
 						}
