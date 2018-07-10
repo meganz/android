@@ -69,7 +69,6 @@
                     android:layout_height="36dp"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginRight="14dp"
                     android:visibility="gone"/>
 
                 <TextView
@@ -79,7 +78,6 @@
                     android:textSize="14sp"
                     android:gravity="left|center_vertical"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/own_management_message_icon"
                     android:textColor="@color/mail_my_account"/>
 
             </RelativeLayout>
@@ -942,7 +940,6 @@
                         android:layout_height="36dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="16dp"
-                        android:layout_marginRight="14dp"
                         android:src="@drawable/ic_call_started"
                         android:visibility="gone"/>
 
@@ -953,7 +950,6 @@
                         android:textSize="14sp"
                         android:gravity="left|center_vertical"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@id/contact_management_message_icon"
                         android:textColor="@color/mail_my_account"/>
                 </RelativeLayout>
 
