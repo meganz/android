@@ -189,14 +189,14 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 0:{
 					typeAccountText.setText(R.string.free_account);
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_free_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_free_crest));
 					expirationAccountLayout.setVisibility(View.GONE);
 					break;
 				}
 				case 1:{
 					typeAccountText.setText(getString(R.string.pro1_account));
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_1_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_1_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -210,7 +210,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 2:{
 					typeAccountText.setText(getString(R.string.pro2_account));
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_2_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_2_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -224,7 +224,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 3:{
 					typeAccountText.setText(getString(R.string.pro3_account));
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_3_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_3_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -239,7 +239,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 					String textLite = getString(R.string.prolite_account);
 					typeAccountText.setText(textLite.toUpperCase());
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_lite_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_lite_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -355,16 +355,16 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		int usedPerc = myAccountInfo.getUsedPerc();
 		if (usedPerc < 90){
-			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
+			progressBar.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.custom_progress_bar_horizontal_ok));
 		}
 		else if ((usedPerc >= 90) && (usedPerc <= 95)){
-			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
+			progressBar.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.custom_progress_bar_horizontal_warning));
 		}
 		else{
 			if (usedPerc > 100){
 				myAccountInfo.setUsedPerc(100);
 			}
-			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
+			progressBar.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.custom_progress_bar_horizontal_exceed));
 		}
 		progressBar.setProgress(usedPerc);
 	}

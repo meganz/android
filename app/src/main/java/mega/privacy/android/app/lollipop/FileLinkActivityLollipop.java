@@ -308,7 +308,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		layout.addView(input, params);
 
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.password_text));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);

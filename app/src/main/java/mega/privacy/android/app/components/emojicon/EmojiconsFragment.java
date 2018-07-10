@@ -27,6 +27,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -73,7 +74,7 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.emojicons, container, false);
-        view.setBackgroundColor(getResources().getColor(R.color.white));
+        view.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
 
         mViewPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         mTabs =  (TabLayout) view.findViewById(R.id.sliding_tabs);

@@ -640,7 +640,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	    layout.addView(input, params);		
 		
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.alert_decryption_key));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);

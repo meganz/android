@@ -387,11 +387,11 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
                 p.setColor(Color.parseColor(color));
             } else {
                 log("Default color to the avatar");
-                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         } else {
             log("Contact is NULL");
-            p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;
