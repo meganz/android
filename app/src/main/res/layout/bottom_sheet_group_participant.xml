@@ -112,228 +112,241 @@
             android:layout_marginLeft="72dp"
             android:background="@color/chat_sliding_panel_separator"/>
 
-        <!--Contact info-->
-        <LinearLayout
-            android:id="@+id/contact_info_group_participants_chat_layout"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+            android:scrollbars="vertical">
 
-            <ImageView
-                android:id="@+id/contact_info_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/items_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:paddingBottom="2dp"
-                android:layout_marginLeft="5dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/info_ic"
-                android:visibility="visible" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/contact_info_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/contact_properties_activity"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Contact info-->
+                <LinearLayout
+                    android:id="@+id/contact_info_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-        <!--Start conversation-->
-        <LinearLayout
-            android:id="@+id/start_chat_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/contact_info_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:paddingBottom="2dp"
+                        android:layout_marginLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/info_ic"
+                        android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/start_chat_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:paddingBottom="2dp"
-                android:layout_marginLeft="5dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_start_chat"
-                android:tint="@color/black"
-                android:visibility="visible" />
+                    <TextView
+                        android:id="@+id/contact_info_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/contact_properties_activity"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/start_chat_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/group_chat_start_conversation_label"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Start conversation-->
+                <LinearLayout
+                    android:id="@+id/start_chat_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-        <!--Change Permissions-->
-        <LinearLayout
-            android:id="@+id/change_permissions_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/start_chat_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:paddingBottom="2dp"
+                        android:layout_marginLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_start_chat"
+                        android:tint="@color/black"
+                        android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/change_permissions_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:paddingBottom="2dp"
-                android:layout_marginLeft="5dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_change_permissions"
-                android:visibility="visible" />
+                    <TextView
+                        android:id="@+id/start_chat_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/context_send_message"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/change_permissions_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/file_properties_shared_folder_change_permissions"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Change Permissions-->
+                <LinearLayout
+                    android:id="@+id/change_permissions_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-        <!--Remove contact-->
-        <LinearLayout
-            android:id="@+id/remove_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/change_permissions_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:paddingBottom="2dp"
+                        android:layout_marginLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_change_permissions"
+                        android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/remove_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:layout_marginLeft="5dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_remove"
-                android:visibility="visible" />
+                    <TextView
+                        android:id="@+id/change_permissions_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/file_properties_shared_folder_change_permissions"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/remove_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/remove_participant_menu_item"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Remove contact-->
+                <LinearLayout
+                    android:id="@+id/remove_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-        <!--Edit profile-->
-        <LinearLayout
-            android:id="@+id/edit_profile_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/remove_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginLeft="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_remove"
+                        android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/edit_profile_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:layout_marginLeft="5dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/info_ic"
-                android:visibility="visible" />
+                    <TextView
+                        android:id="@+id/remove_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/remove_participant_menu_item"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/edit_profile_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/group_chat_edit_profile_label"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Edit profile-->
+                <LinearLayout
+                    android:id="@+id/edit_profile_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-        <!--Leave chat-->
-        <LinearLayout
-            android:id="@+id/leave_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/edit_profile_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginLeft="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/info_ic"
+                        android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/leave_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:alpha="0.54"
-                android:layout_marginLeft="5dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_leave_chat"
-                android:visibility="visible" />
+                    <TextView
+                        android:id="@+id/edit_profile_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/group_chat_edit_profile_label"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/leave_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/title_properties_chat_leave_chat"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Leave chat-->
+                <LinearLayout
+                    android:id="@+id/leave_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
 
-        <!--Invite a non-contac-->
-        <LinearLayout
-            android:id="@+id/invite_group_participants_chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+                    <ImageView
+                        android:id="@+id/leave_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.54"
+                        android:layout_marginLeft="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_leave_chat"
+                        android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/invite_group_participants_chat_image"
-                style="@style/dialogActionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:src="@drawable/ic_add_contact_chat_item"
-                android:visibility="visible" />
+                    <TextView
+                        android:id="@+id/leave_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/title_properties_chat_leave_chat"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/invite_group_participants_chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:text="@string/menu_add_contact"
-                android:textColor="@color/name_my_account"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                <!--Invite a non-contac-->
+                <LinearLayout
+                    android:id="@+id/invite_group_participants_chat_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/invite_group_participants_chat_image"
+                        style="@style/dialogActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:src="@drawable/ic_add_contact_chat_item"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/invite_group_participants_chat_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp"
+                        android:layout_marginLeft="18dp"
+                        android:text="@string/menu_add_contact"
+                        android:textColor="@color/name_my_account"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
     </LinearLayout>
 </LinearLayout>

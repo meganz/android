@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -117,7 +118,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		{
 			if(document.getFile().canRead() == false){
 				Util.setViewAlpha(holder.imageView, .4f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.setMargins(36, 0, 0, 0);
@@ -133,7 +134,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			}	
 			else{
 				Util.setViewAlpha(holder.imageView, 1);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 
 				RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 				params1.setMargins(36, 0, 0, 0);
@@ -143,7 +144,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 					if (multipleSelect) {
 						if(this.isItemChecked(position)){
-							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+							holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 							holder.imageView.setImageResource(R.drawable.ic_select_folder);
 						}
 						else{
@@ -161,7 +162,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
 					if (multipleSelect) {
 						if(this.isItemChecked(position)){
-							holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+							holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 							holder.imageView.setImageResource(R.drawable.ic_select_folder);
 						}
 						else{
@@ -188,13 +189,13 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 			if (document.isFolder()){	
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				Util.setViewAlpha(holder.imageView, 1);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 			}
 			else{
 				//Document is FILE
 				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());	
 				Util.setViewAlpha(holder.imageView, .4f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 			}			
 			
 		}		

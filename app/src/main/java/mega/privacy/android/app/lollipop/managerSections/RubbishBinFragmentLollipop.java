@@ -49,10 +49,10 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -197,6 +197,32 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					hideMultipleSelect();
 					break;
 				}
+				case R.id.cab_menu_restore_from_rubbish:{
+
+					if(documents!=null){
+						if(documents.size()>1){
+							log("restore multiple: "+documents.size());
+							MultipleRequestListener moveMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_RESTORED_FROM_RUBBISH, (ManagerActivityLollipop) context);
+							for (int i=0;i<documents.size();i++){
+								MegaNode newParent = megaApi.getNodeByHandle(documents.get(i).getRestoreHandle());
+								if(newParent !=null){
+									megaApi.moveNode(documents.get(i), newParent, moveMultipleListener);
+								}
+								else{
+									log("restoreFromRubbish:The restore folder no longer exists");
+								}
+							}
+						}
+						else{
+							log("restore single item");
+							((ManagerActivityLollipop) context).restoreFromRubbish(documents.get(0));
+
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
 			}
 			return false;
 		}
@@ -224,6 +250,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
+			boolean showRestore = true;
 			showRename = false;
 			showLink = false;
 
@@ -258,10 +285,33 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
 				}
+
+				for(int i = 0; i<selected.size();i++){
+					long restoreHandle = selected.get(i).getRestoreHandle();
+					if(restoreHandle!=-1){
+						MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+						if((!megaApi.isInRubbish(selected.get(i))) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
+							showRestore = false;
+							break;
+						}
+					}
+					else{
+						showRestore = false;
+						break;
+					}
+				}
+
+				if(showRestore){
+					menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(true);
+				}
+				else{
+					menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
+				}
 			}
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				menu.findItem(R.id.cab_menu_restore_from_rubbish).setVisible(false);
 			}
 
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
@@ -734,10 +784,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
@@ -752,19 +798,24 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent mediaIntent;
+					boolean internalIntent;
+					boolean opusFile = false;
 					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
+						internalIntent = false;
+						String[] s = file.getName().split("\\.");
+						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+							opusFile = true;
+						}
 					}
 					else {
+						internalIntent = true;
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}
@@ -780,7 +831,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -811,16 +862,24 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					imageDrag = imageView;
-					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+					if (opusFile){
+						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+					}
+					if (internalIntent) {
 						context.startActivity(mediaIntent);
 					}
-					else{
-						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+					else {
+						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+							context.startActivity(mediaIntent);
+						}
+						else {
+							((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							adapter.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(nodes.get(position).getHandle());
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
+						}
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -833,10 +892,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
 					pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);
@@ -848,7 +904,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{

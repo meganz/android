@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
+import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -48,6 +49,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
     long participantHandle = -1;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
     public TextView titleNameContactChatPanel;
@@ -119,6 +121,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.participant_item_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         //Sliding CHAT panel
         titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.group_participants_chat_name_text);
@@ -301,14 +304,16 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         dialog.setContentView(contentView);
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
+//        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//        }
+//        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//        }
+        mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-        }
-        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-        }
     }
 
     public void addAvatarParticipantPanel(long handle, String email, String name){
@@ -388,7 +393,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
         else{
             log("Default color to the avatar");
-            p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;

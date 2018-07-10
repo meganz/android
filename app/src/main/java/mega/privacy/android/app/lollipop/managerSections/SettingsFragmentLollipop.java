@@ -1099,7 +1099,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 						@Override
 						public void run() {
 //						listView.requestFocusFromTouch();
-							listView.setSelection(finalI+8);
+
+							listView.setSelection(finalI + 8);
 //						listView.requestFocus();
 						}
 					}, 200);

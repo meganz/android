@@ -37,34 +37,39 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish()");
+        log("onRequestFinish(): "+e.getErrorCode());
         if (e.getErrorCode() == MegaError.API_OK){
             boolean avatarExists = false;
 
             if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                if (((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail().compareTo(request.getEmail()) == 0){
-                    File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
-                    }
-                    Bitmap bitmap = null;
-                    if (avatar.exists()){
-                        if (avatar.length() > 0){
-                            BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                            bOpts.inPurgeable = true;
-                            bOpts.inInputShareable = true;
-                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                            if (bitmap == null) {
-                                avatar.delete();
-                            }
-                            else{
-                                ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).setImageView(bitmap);
+                if(((MegaListChatLollipopAdapter.ViewHolderChatList)holder)!=null && ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail()!=null && request.getEmail()!=null){
+                    if (((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail().compareTo(request.getEmail()) == 0){
+                        File avatar = null;
+                        if (context.getExternalCacheDir() != null){
+                            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
+                        }
+                        else{
+                            avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
+                        }
+                        Bitmap bitmap = null;
+                        if (avatar.exists()){
+                            if (avatar.length() > 0){
+                                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+                                bOpts.inPurgeable = true;
+                                bOpts.inInputShareable = true;
+                                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                                if (bitmap == null) {
+                                    avatar.delete();
+                                }
+                                else{
+                                    ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).setImageView(bitmap);
+                                }
                             }
                         }
                     }
+                }
+                else{
+                    log("Adapter cannot be updated - null");
                 }
             }
         }

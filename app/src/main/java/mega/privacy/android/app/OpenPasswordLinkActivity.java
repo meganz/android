@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -141,7 +142,7 @@ public class OpenPasswordLinkActivity extends PinActivityLollipop implements Meg
 		layout.addView(input, params);
 
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.password_text));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
