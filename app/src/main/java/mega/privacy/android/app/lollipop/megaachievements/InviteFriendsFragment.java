@@ -195,7 +195,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener{
 	private void setError(){
 		log("setError");
 		emailErrorLayout.setVisibility(View.VISIBLE);
-		PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+		PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 		Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
 		background.setColorFilter(porterDuffColorFilter);
 		editTextMail.setBackground(background);

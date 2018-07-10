@@ -300,7 +300,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         p.setAntiAlias(true);
 
         if(chat.isGroup()){
-            p.setColor(getResources().getColor(R.color.divider_upgrade_account));
+            p.setColor(ContextCompat.getColor(context, R.color.divider_upgrade_account));
         }
         else{
             MegaUser contact = megaApi.getContact(contactMail);
@@ -311,11 +311,11 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     p.setColor(Color.parseColor(color));
                 } else {
                     log("Default color to the avatar");
-                    p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                    p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
                 }
             } else {
                 log("Contact is NULL");
-                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
 
