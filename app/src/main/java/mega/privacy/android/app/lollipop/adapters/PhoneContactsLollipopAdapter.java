@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -282,10 +283,10 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		Paint p = new Paint();
 		p.setAntiAlias(true);
 		if (isMegaContact){
-			p.setColor(mContext.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(mContext, R.color.lollipop_primary_color));
 		}
 		else{
-			p.setColor(mContext.getResources().getColor(R.color.color_default_avatar_phone));
+			p.setColor(ContextCompat.getColor(mContext, R.color.color_default_avatar_phone));
 		}
 		
 		int radius; 

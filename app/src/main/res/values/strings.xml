@@ -3,9 +3,9 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.6 (199)</string>
-    <string name="sdk_version" context="Not translate">0c4ad49</string>
-    <string name="karere_version" context="Not translate">f6d537a</string>
+    <string name="app_version" context="Not translate">3.3.7 (201)</string>
+    <string name="sdk_version" context="Not translate">b5e58bd</string>
+    <string name="karere_version" context="Not translate">bbefbfd</string>
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users\' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
@@ -396,7 +396,8 @@
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Remove from Offline</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
-    <string name="context_send_file" context="menu item">Send file</string>
+    <string name="context_send_file" context="menu item">Send file to chat</string>
+    <string name="context_send_contact" context="menu item">Send contact to chat</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <!--
@@ -637,8 +638,9 @@
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">WiFi or data plan</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
+    <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera uploads?</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
@@ -1431,7 +1433,7 @@
 
     <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%s was already invited. Consult your pending requests.</string>
 
-    <string name="confirm_email_misspelled" context="Hint text explaining that you can change the email and resend the create account link to the new email address">If you have misspelled your email address, correct it and click \'Resend\'</string>
+    <string name="confirm_email_misspelled" context="Hint text explaining that you can change the email and resend the create account link to the new email address">If you have misspelled your email address, correct it and click [A]Resend[A].</string>
     <string name="confirm_email_misspelled_resend" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Resend</string>
     <string name="confirm_email_misspelled_email_sent" context="Text shown after the confirmation email has been sent to the new email address">Email sent</string>
 
@@ -1788,13 +1790,21 @@
 
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
-    <string name="messages_forwarded_error_not_available" context="Error non existing resource after forwarding one or several messages to several chats">Error. The resource is no longer available</string>
+    <plurals name="messages_forwarded_partial_error" formatted="false" context="Error message if any of the forwarded messages fails">
+        <item context="message item" quantity="one">Error. %1$d message not correctly forwarded</item>
+        <item context="message items" quantity="other">Error. %1$d messages not correctly forwarded</item>
+    </plurals>
+    <plurals name="messages_forwarded_error_not_available" formatted="false" context="Error non existing resource after forwarding one or several messages to several chats">
+        <item context="message item" quantity="one">Error. The resource is no longer available</item>
+        <item context="message items" quantity="other">Error. The resources are no longer available</item>
+    </plurals>
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
     <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
-    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone</string>
-    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Apps &amp; notifications</string>
-    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">App notifications</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone [A]Settings[/A]</string>
+    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Open [A]Apps &amp; notifications[/A]</string>
+    <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">Select [A]MEGA[/A]</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">Open [A]App notifications[/A]</string>
     <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">Switch to On and select your preferences</string>
 
     <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
@@ -1917,38 +1927,34 @@
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
     <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
 
+    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Missed call[/A]</string>
+    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was rejected[/A]</string>
+    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was cancelled[/A]</string>
+    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call failed[/A]</string>
+    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was not answered[/A]</string>
+
     <string name="contact_email" context="Indicates that can type a contact email">Contact\'s email</string>
     <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">Contact not added, is already added.</string>
 
     <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minute[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minutes[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minutes[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d second[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d second[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d second[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d second[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d seconds[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d seconds[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d seconds[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d seconds[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
-        <item context="one second" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d second[/C]</item>
-        <item context="more seconds" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d seconds[/C]</item>
+        <item context="one second" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d seconds[/B]</item>
     </plurals>
-
-    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was[/A][B] cancelled[/B]</string>
-
-    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was[/A][B] not answered[/B]</string>
-
-    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Call[/A][B] missed[/B]</string>
-
-    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was[/A][B] rejected[/B]</string>
-
-    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call[/A][B] failed[/B]</string>
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
@@ -1956,6 +1962,25 @@
     <string name="add_to_cloud_import" context="Menu option">Add to Cloud</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error ocurred trying to create the streaming</string>
+
+    <string name="context_restore" context="Menu option to restore an item from the Rubbish bin">Restore</string>
+
+    <string name="context_correctly_node_restored" context="success message when a node was restore from Rubbish bin">Restored to %s</string>
+    <string name="context_no_restored" context="error message when a node was restore from Rubbish bin">Error. Not restored</string>
+
+    <string name="context_send_message" context="menu item from contact section to send a message to a contact">Send message</string>
+
+    <plurals name="plural_contact_sent_to_chats" context="Message shown when a contact is successfully sent to several chats">
+        <item context="one contact" quantity="one">Contact sent to chats successfully</item>
+        <item context="more contacts" quantity="other">Contacts sent to chats successfully</item>
+    </plurals>
+
+    <string name="error_MEGAdrop_not_supported" context="Error message on opening a MEGAdrop folder link">MEGAdrop folders are not supported yet</string>
+
+    <string name="pre_overquota_alert_text" context="Pre overquota error dialog when trying to copy or import a file">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
+
+    <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
+    <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
 
     <string name="invite_contacts" context="Label shown when the user wants to add contacts into his MEGA account">Invite contacts</string>
     <string name="share_with" cotext="Label shown when the user wants to share something with other contacts">Share with</string>

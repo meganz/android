@@ -883,8 +883,6 @@ public final class ChatAdvancedNotificationBuilder {
             notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
         }
 
-        notificationBuilder.setFullScreenIntent(pendingIntent, true);
-
         if(chat.getPeerEmail(0)!=null){
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){

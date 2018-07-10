@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -73,7 +72,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncListAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -1685,10 +1683,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							else{
 								intent.putExtra("parentNodeHandle", megaApi.getParentNode(psHMegaNode).getHandle());
 							}
-							MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-							if(accountInfo!=null){
-								intent.putExtra("typeAccount", accountInfo.getAccountType());
-							}
+
 							intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCamera);
 							intent.putExtra("screenPosition", screenPosition);
 							startActivity(intent);
@@ -1701,11 +1696,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							log("FILENAME: " + psHMegaNode.getName());
 
 							Intent mediaIntent;
+							boolean internalIntent;
 							if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideoNotSupported()){
 								mediaIntent = new Intent(Intent.ACTION_VIEW);
+								internalIntent = false;
 							}
 							else {
 								mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+								internalIntent = true;
 							}
 							mediaIntent.putExtra("position", positionInNodes);
 							if (megaApi.getParentNode(psHMegaNode).getType() == MegaNode.TYPE_ROOT){
@@ -1765,17 +1763,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								String url = megaApi.httpServerGetLocalLink(psHMegaNode);
 								mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 							}
-					  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-					  			startActivity(mediaIntent);
-					  		}
-					  		else{
-					  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-					  			adapterList.notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(psHMegaNode.getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList);
-					  		}
+							if (internalIntent) {
+								context.startActivity(mediaIntent);
+							}
+							else {
+								if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+									context.startActivity(mediaIntent);
+								} else {
+									((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+									adapterList.notifyDataSetChanged();
+									ArrayList<Long> handleList = new ArrayList<Long>();
+									handleList.add(psHMegaNode.getHandle());
+									NodeController nC = new NodeController(context);
+									nC.prepareForDownload(handleList);
+								}
+							}
 							((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 							imageDrag = imageView;
 						}

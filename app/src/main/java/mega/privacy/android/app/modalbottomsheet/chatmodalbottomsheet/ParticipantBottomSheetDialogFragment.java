@@ -393,7 +393,7 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
         else{
             log("Default color to the avatar");
-            p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;
