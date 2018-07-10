@@ -1111,10 +1111,13 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         log("FILENAME: " + file.getName());
 
                         Intent mediaIntent;
+                        boolean internalIntent;
                         if (MimeTypeThumbnail.typeForName(n.getName()).isVideoNotSupported()){
                             mediaIntent = new Intent(Intent.ACTION_VIEW);
+                            internalIntent = false;
                         }
                         else {
+                            internalIntent = true;
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         }
 
@@ -1175,17 +1178,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             String url = megaApi.httpServerGetLocalLink(file);
                             mediaIntent.setDataAndType(Uri.parse(url), mimeType);
                         }
-                        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                        if (internalIntent) {
                             context.startActivity(mediaIntent);
                         }
-                        else{
-                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-                            ArrayList<Long> handleList = new ArrayList<Long>();
-                            handleList.add(n.getHandle());
-                            NodeController nC = new NodeController(context);
-                            nC.prepareForDownload(handleList);
+                        else {
+                            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+                                context.startActivity(mediaIntent);
+                            } else {
+                                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                ArrayList<Long> handleList = new ArrayList<Long>();
+                                handleList.add(n.getHandle());
+                                NodeController nC = new NodeController(context);
+                                nC.prepareForDownload(handleList);
+                            }
                         }
-                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
                         CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else{

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -220,9 +221,11 @@ public class PlaylistFragment extends Fragment{
                 }
             }
         });
+        scrollTo(((AudioVideoPlayerLollipop) context).getCurrentWindowIndex());
         fastScroller.setRecyclerView(recyclerView);
 
         visibilityFastScroller();
+        ((AudioVideoPlayerLollipop) context).showToolbar();
         if (player != null) {
             player.setPlayWhenReady(((AudioVideoPlayerLollipop) context).playWhenReady);
         }
@@ -231,6 +234,12 @@ public class PlaylistFragment extends Fragment{
             setNodesSearch(((AudioVideoPlayerLollipop) context).querySearch);
         }
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ((AudioVideoPlayerLollipop) context).showToolbar();
     }
 
     @Override
@@ -255,8 +264,7 @@ public class PlaylistFragment extends Fragment{
         containerPlayer.setVisibility(View.VISIBLE);
         containerPlayer.animate().translationY(0).setDuration(200L).start();
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        ((AudioVideoPlayerLollipop) context).getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (scroll){
@@ -362,9 +370,8 @@ public class PlaylistFragment extends Fragment{
     }
 
     public void scrollTo(final int position) {
-        Handler handler = new Handler();
 
-        handler.postDelayed(new Runnable() {
+        ((AudioVideoPlayerLollipop) context).getHandler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mLayoutManager.scrollToPosition(position);
