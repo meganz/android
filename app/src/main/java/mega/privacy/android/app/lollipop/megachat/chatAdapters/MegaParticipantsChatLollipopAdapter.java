@@ -235,7 +235,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			} else {
 
 				if (this.isItemChecked(position)) {
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_file_list_selected_row));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_file_list_selected_row));
 				} else {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 				}
@@ -386,7 +386,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		}
 		else{
 			log("Default color to the avatar");
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
 		int radius;

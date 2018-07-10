@@ -51,7 +51,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -894,10 +893,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					intent.putExtra("fromShared", true);
@@ -913,10 +908,18 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
+					boolean internalIntent;
+					boolean opusFile = false;
 					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
+						internalIntent = false;
+						String[] s = file.getName().split("\\.");
+						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+							opusFile = true;
+						}
 					}
 					else {
+						internalIntent = true;
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("position", position);
@@ -929,10 +932,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					mediaIntent.putExtra("fromShared", true);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
@@ -946,8 +946,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -976,16 +975,24 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						String url = megaApi.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
-			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-			  			context.startActivity(mediaIntent);
-			  		}
-			  		else{
-			  			Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-			  			adapter.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+					if (opusFile){
+						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+					}
+					if (internalIntent) {
+						context.startActivity(mediaIntent);
+					}
+					else {
+						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+							context.startActivity(mediaIntent);
+						}
+						else {
+							((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+							adapter.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(nodes.get(position).getHandle());
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
+						}
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
@@ -995,10 +1002,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("fromShared", true);
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
@@ -1010,8 +1014,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
