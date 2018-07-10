@@ -670,9 +670,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						if (!fromMV) {
 							Intent mediaIntent;
+							boolean internalIntent;
+							boolean opusFile = false;
 							if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(currentFile.getName()).isAudioNotSupported()) {
 								mediaIntent = new Intent(Intent.ACTION_VIEW);
+								internalIntent = false;
+								String[] s = currentFile.getName().split("\\.");
+								if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
+									opusFile = true;
+								}
 							} else {
+								internalIntent = true;
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
 
@@ -684,9 +692,33 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							} else {
 								mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							}
+							if (opusFile) {
+								mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+							}
 							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							startActivity(mediaIntent);
+
+							if (internalIntent) {
+								startActivity(mediaIntent);
+							}
+							else {
+								if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+									startActivity(mediaIntent);
+								}
+								else {
+									Intent intentShare = new Intent(Intent.ACTION_SEND);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
+										intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+									} else {
+										intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+									}
+									intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+									intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+									if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+										startActivity(intentShare);
+									}
+								}
+							}
 						}
 						else {
 							log("Show notification 2");

@@ -3285,9 +3285,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                                         Intent mediaIntent;
                                         boolean internalIntent;
+                                        boolean opusFile = false;
                                         if (MimeTypeList.typeForName(node.getName()).isVideoNotSupported() || MimeTypeList.typeForName(node.getName()).isAudioNotSupported()){
                                             mediaIntent = new Intent(Intent.ACTION_VIEW);
                                             internalIntent=false;
+                                            String[] s = node.getName().split("\\.");
+                                            if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+                                                opusFile = true;
+                                            }
                                         }
                                         else {
                                             log("itemClick:setIntentToAudioVideoPlayer");
@@ -3325,8 +3330,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
                                             File mediaFile = new File(localPath);
                                             //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-                                                    && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                                 log("itemClick:FileProviderOption");
                                                 Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                                 if(mediaFileUri==null){
@@ -3393,7 +3397,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             }
                                         }
                                         mediaIntent.putExtra("HANDLE", node.getHandle());
-
+                                        if (opusFile){
+                                            mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                                        }
                                         if(internalIntent){
                                             startActivity(mediaIntent);
                                         }
@@ -3445,8 +3451,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         log("isOnMegaDownloads: "+isOnMegaDownloads);
                                         if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
                                             File mediaFile = new File(localPath);
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-                                                    && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                                 log("itemClick:FileProviderOption");
                                                 Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                                                 if(mediaFileUri==null){
