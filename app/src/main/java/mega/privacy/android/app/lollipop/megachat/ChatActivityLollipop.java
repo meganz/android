@@ -7106,20 +7106,31 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         switch (getResources().getDisplayMetrics().densityDpi) {
             case DisplayMetrics.DENSITY_LOW:
                 screen = 1;
+                log("***** DENSITY_LOW");
                 break;
             case DisplayMetrics.DENSITY_MEDIUM:
+                log("***** DENSITY_MEDIUM");
+
                 screen = 1;
                 break;
             case DisplayMetrics.DENSITY_HIGH:
+                log("***** DENSITY_HIGH");
+
                 screen = 1;
                 break;
             case DisplayMetrics.DENSITY_XHIGH:
+                log("***** DENSITY_XHIGH");
+
                 screen = 0;
                 break;
             case DisplayMetrics.DENSITY_XXHIGH:
+                log("***** DENSITY_XXHIGH");
+
                 screen = 0;
                 break;
             case DisplayMetrics.DENSITY_XXXHIGH:
+                log("***** DENSITY_XXXHIGH");
+
                 screen = 0;
                 break;
             default:

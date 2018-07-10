@@ -65,10 +65,11 @@
 
                 <ImageView
                     android:id="@+id/own_management_message_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
+                    android:layout_marginRight="14dp"
                     android:visibility="gone"/>
 
                 <TextView
@@ -937,10 +938,11 @@
 
                     <ImageView
                         android:id="@+id/contact_management_message_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="16dp"
+                        android:layout_marginRight="14dp"
                         android:src="@drawable/ic_call_started"
                         android:visibility="gone"/>
 
