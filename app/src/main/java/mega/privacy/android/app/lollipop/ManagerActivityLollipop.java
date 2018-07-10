@@ -210,6 +210,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
@@ -4804,6 +4805,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void selectDrawerItemAccount(){
 		log("selectDrawerItemAccount");
+
+		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
+			megaApi.getFolderInfo(megaApi.getRootNode(), this);
+		}
 
 		tabLayoutContacts.setVisibility(View.GONE);
 		viewPagerContacts.setVisibility(View.GONE);
@@ -14721,6 +14726,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if (e.getErrorCode() != MegaError.API_OK) {
 				showSnackbar(getString(R.string.context_link_action_error));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				MegaFolderInfo info = request.getMegaFolderInfo();
+				int numVersions = info.getNumVersions();
+				log("Num versions: " + numVersions);
+				long previousVersions = info.getVersionsSize();
+				log("Previous versions: " + previousVersions);
+
+				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
+					((MegaApplication) getApplication()).getMyAccountInfo().setNumVersions(numVersions);
+					((MegaApplication) getApplication()).getMyAccountInfo().setPreviousVersionsSize(previousVersions);
+				}
+
+			} else {
+				log("ERROR requesting version info of the account");
+			}
+
+			//Refresh My Storage if it is shown
+			String myStorageTag = getFragmentTag(R.id.my_account_tabs_pager, 1);
+			mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myStorageTag);
+			if(mStorageFLol!=null && mStorageFLol.isAdded()){
+				mStorageFLol.refreshVersionsInfo();
 			}
 		}
 	}
