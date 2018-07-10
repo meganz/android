@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
+import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -206,128 +207,6 @@ public class NodeController {
         else if (context instanceof AudioVideoPlayerLollipop){
             ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
-    }
-
-    public void selectContactToSendNode(MegaNode node){
-        log("sentToInbox MegaNode");
-
-        ((ManagerActivityLollipop) context).setSendToInbox(true);
-
-        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
-        intent.setClass(context, AddContactActivityLollipop.class);
-        //Multiselect=0
-        intent.putExtra("MULTISELECT", 0);
-        intent.putExtra("SEND_FILE",1);
-        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
-    }
-
-    public void sendToInbox(long fileHandle, ArrayList<String> selectedContacts){
-        log("sendToInbox");
-
-        if(!Util.isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            return;
-        }
-
-        MultipleRequestListener sendMultipleListener = null;
-        MegaNode node = megaApi.getNodeByHandle(fileHandle);
-        if(node!=null)
-        {
-            ((ManagerActivityLollipop) context).setSendToInbox(true);
-            log("File to send: "+node.getName());
-            if(selectedContacts.size()>1){
-                log("File to multiple contacts");
-                sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SEND_INBOX, context);
-                for (int i=0;i<selectedContacts.size();i++){
-                    MegaUser user= megaApi.getContact(selectedContacts.get(i));
-
-                    if(user!=null){
-                        log("Send File to contact: "+user.getEmail());
-                        megaApi.sendFileToUser(node, user, sendMultipleListener);
-                    }
-                    else{
-                        log("Send File to a NON contact! ");
-                        megaApi.sendFileToUser(node, selectedContacts.get(i), sendMultipleListener);
-                    }
-                }
-            }
-            else{
-                log("File to a single contact");
-                MegaUser user= megaApi.getContact(selectedContacts.get(0));
-                if(user!=null){
-                    log("Send File to contact: "+user.getEmail());
-                    megaApi.sendFileToUser(node, user, (ManagerActivityLollipop) context);
-                }
-                else{
-                    log("Send File to a NON contact! ");
-                    megaApi.sendFileToUser(node, selectedContacts.get(0), (ManagerActivityLollipop) context);
-                }
-            }
-        }
-
-    }
-
-    public void sendToInbox(long[] nodeHandles, ArrayList<String> selectedContacts) {
-
-        if (!Util.isOnline(context)) {
-            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-            return;
-        }
-
-        if(nodeHandles!=null){
-            MultipleRequestListener sendMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILES_SEND_INBOX, context);
-            MegaUser u = megaApi.getContact(selectedContacts.get(0));
-            if(nodeHandles.length>1){
-                log("many files to one contact");
-                for(int j=0; j<nodeHandles.length;j++){
-
-                    final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-
-                    if(u!=null){
-                        log("Send: "+ node.getName() + " to "+ u.getEmail());
-                        megaApi.sendFileToUser(node, u, sendMultipleListener);
-                    }
-                    else{
-                        log("Send File to a NON contact! ");
-                        megaApi.sendFileToUser(node, selectedContacts.get(0), sendMultipleListener);
-                    }
-                }
-            }
-            else{
-                log("one file to many contacts");
-
-                final MegaNode node = megaApi.getNodeByHandle(nodeHandles[0]);
-                if(u!=null){
-                    log("Send: "+ node.getName() + " to "+ u.getEmail());
-                    megaApi.sendFileToUser(node, u, (ManagerActivityLollipop)context);
-                }
-                else{
-                    log("Send File to a NON contact! ");
-                    megaApi.sendFileToUser(node, selectedContacts.get(0), (ManagerActivityLollipop)context);
-                }
-            }
-        }
-    }
-
-    public void selectContactToSendNodes(ArrayList<Long> handleList){
-        log("sendToInboxNodes handleList");
-
-        ((ManagerActivityLollipop) context).setSendToInbox(true);
-
-        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
-        intent.setClass(context, AddContactActivityLollipop.class);
-        //Multiselect=1
-        intent.putExtra("MULTISELECT", 1);
-        intent.putExtra("SEND_FILE",1);
-        long[] handles=new long[handleList.size()];
-        int j=0;
-        for(int i=0; i<handleList.size();i++){
-            handles[j] = handleList.get(i);
-            j++;
-        }
-        intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, handles);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
     public void prepareForDownload(ArrayList<Long> handleList){
@@ -885,12 +764,6 @@ public class NodeController {
                 service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                 if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                     service.putExtra("fromMV", true);
-                    if (context instanceof AudioVideoPlayerLollipop){
-                        service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                    }
-                    else if (context instanceof PdfViewerActivityLollipop){
-                        service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                    }
                 }
                 context.startService(service);
             }
@@ -951,7 +824,7 @@ public class NodeController {
 
                                 Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
                                 pdfIntent.putExtra("HANDLE", tempNode.getHandle());
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 } else {
                                     pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -972,15 +845,22 @@ public class NodeController {
                                 File mediaFile = new File(localPath);
 
                                 Intent mediaIntent;
-                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported()) {
+                                boolean internalIntent;
+                                boolean opusFile = false;
+                                if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(mediaFile.getName()).isAudioNotSupported()) {
                                     mediaIntent = new Intent(Intent.ACTION_VIEW);
-
+                                    internalIntent = false;
+                                    String[] s = mediaFile.getName().split("\\.");
+                                    if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+                                        opusFile = true;
+                                    }
                                 } else {
+                                    internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
                                 mediaIntent.putExtra("isPlayList", false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
 
                                 } else {
@@ -988,7 +868,40 @@ public class NodeController {
                                 }
                                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                context.startActivity(mediaIntent);
+                                if (opusFile){
+                                    mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                                }
+                                if (internalIntent) {
+                                    context.startActivity(mediaIntent);
+                                }
+                                else {
+                                    if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                                        context.startActivity(mediaIntent);
+                                    }
+                                    else {
+                                        if(context instanceof ManagerActivityLollipop){
+                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        else if(context instanceof FileInfoActivityLollipop){
+                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        else if(context instanceof ContactFileListActivityLollipop){
+                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        else {
+                                            intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+                                            log("call to startActivity(intentShare)");
+                                            context.startActivity(intentShare);
+                                        }
+                                    }
+                                }
                             }
                         }
                         else {
@@ -1103,12 +1016,6 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                                 service.putExtra("fromMV", true);
-                                if (context instanceof AudioVideoPlayerLollipop){
-                                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                                }
-                                else if (context instanceof PdfViewerActivityLollipop){
-                                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                                }
                             }
                             context.startService(service);
                         }
@@ -1124,12 +1031,6 @@ public class NodeController {
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
                     if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                         service.putExtra("fromMV", true);
-                        if (context instanceof AudioVideoPlayerLollipop){
-                            service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                        }
-                        else if (context instanceof PdfViewerActivityLollipop){
-                            service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                        }
                     }
                     context.startService(service);
                 }
@@ -1338,7 +1239,7 @@ public class NodeController {
             return;
         }
 
-        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+        Intent intent = new Intent();
         intent.setClass(context, AddContactActivityLollipop.class);
         intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 
@@ -1351,19 +1252,17 @@ public class NodeController {
         intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, handles);
         //Multiselect=1 (multiple folders)
         intent.putExtra("MULTISELECT", 1);
-        intent.putExtra("SEND_FILE",0);
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
 
     public void selectContactToShareFolder(MegaNode node){
         log("shareFolder");
 
-        Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+        Intent intent = new Intent();
         intent.setClass(context, AddContactActivityLollipop.class);
         intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
         //Multiselect=0
         intent.putExtra("MULTISELECT", 0);
-        intent.putExtra("SEND_FILE",0);
         intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
         ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
     }
@@ -1807,6 +1706,14 @@ public class NodeController {
                 File file = new File(path);
                 if (file.exists()) {
                     file.delete();
+
+                    if(context instanceof ManagerActivityLollipop){
+                        ((ManagerActivityLollipop) context).invalidateOptionsMenu();
+                        MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
+                        if(mAF!=null && mAF.isAdded()){
+                            mAF.setMkButtonText();
+                        }
+                    }
 
                     ArrayList<MegaOffline> mOffList = dbH.findByPath(pathNavigation);
 

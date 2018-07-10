@@ -43,7 +43,6 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -119,7 +118,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	HashMap<Long, Uri> storeToAdvacedDevices;
 	HashMap<Long, Boolean> fromMediaViewers;
-	int typeAccount;
 
 	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
@@ -223,7 +221,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
             contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
         }
-		typeAccount = intent.getIntExtra("typeAccount", MegaAccountDetails.ACCOUNT_TYPE_FREE);
 
         boolean fromMV = intent.getBooleanExtra("fromMV", false);
         log("fromMV: "+fromMV);
@@ -643,7 +640,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (!fromMV) {
 							Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
 
-							pdfIntent.putExtra("typeAccount", typeAccount);
 							pdfIntent.putExtra("HANDLE", handle);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								pdfIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
@@ -652,6 +648,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							pdfIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							pdfIntent.putExtra("fromDownloadService", true);
 							pdfIntent.putExtra("inside", true);
 							pdfIntent.putExtra("isUrl", false);
 							startActivity(pdfIntent);
@@ -673,22 +670,55 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						if (!fromMV) {
 							Intent mediaIntent;
+							boolean internalIntent;
+							boolean opusFile = false;
 							if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(currentFile.getName()).isAudioNotSupported()) {
 								mediaIntent = new Intent(Intent.ACTION_VIEW);
+								internalIntent = false;
+								String[] s = currentFile.getName().split("\\.");
+								if (s != null && s.length > 1 && s[s.length - 1].equals("opus")) {
+									opusFile = true;
+								}
 							} else {
+								internalIntent = true;
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
-							mediaIntent.putExtra("typeAccount", typeAccount);
+
 							mediaIntent.putExtra("isPlayList", false);
 							mediaIntent.putExtra("HANDLE", handle);
+							mediaIntent.putExtra("fromDownloadService", true);
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							} else {
 								mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							}
+							if (opusFile) {
+								mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+							}
 							mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 							mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							startActivity(mediaIntent);
+
+							if (internalIntent) {
+								startActivity(mediaIntent);
+							}
+							else {
+								if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+									startActivity(mediaIntent);
+								}
+								else {
+									Intent intentShare = new Intent(Intent.ACTION_SEND);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
+										intentShare.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+									} else {
+										intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+									}
+									intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+									intentShare.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+									if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+										startActivity(intentShare);
+									}
+								}
+							}
 						}
 						else {
 							log("Show notification 2");

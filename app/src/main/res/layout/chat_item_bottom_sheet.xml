@@ -91,126 +91,139 @@
         android:layout_marginLeft="72dp"
         android:background="@color/chat_sliding_panel_separator"/>
 
-    <LinearLayout
-        android:id="@+id/chat_list_info_chat_layout"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:scrollbars="vertical">
 
-        <ImageView
-            android:id="@+id/chat_list_info_chat_image"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:paddingBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/info_ic"
-            android:visibility="visible" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/chat_list_info_chat_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/chat_list_info_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/chat_list_leave_chat_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/chat_list_info_chat_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/file_leave_chat_image"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_leave_chat"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/chat_list_info_chat_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/chat_list_leave_chat_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/general_leave"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/chat_list_clear_history_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/chat_list_clear_history_chat_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/file_clear_history_chat_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.64"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_clear_history"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/file_clear_history_chat_image"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.64"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_clear_history"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/chat_list_clear_history_chat_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/title_properties_chat_clear"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/chat_list_clear_history_chat_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/general_clear"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/chat_list_mute_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/chat_list_mute_chat_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/chat_list_mute_chat_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:alpha="0.54"
+                    android:src="@drawable/ic_mute"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/chat_list_mute_chat_image"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:alpha="0.54"
-            android:src="@drawable/ic_mute"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/chat_list_mute_chat_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/general_mute"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/chat_list_mute_chat_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/general_mute"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/chat_list_leave_chat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_leave_chat_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_leave_chat"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/chat_list_leave_chat_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/general_leave"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

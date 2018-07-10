@@ -34,6 +34,7 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -767,13 +768,13 @@ public class Util {
 
 	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
 	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(dialog.getContext().getResources().getColor(R.color.mega)); // change title text color
+	        	alertTitle.setTextColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change title text color
 	        }
 
 	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
 	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(dialog.getContext().getResources().getColor(R.color.mega)); // change divider color
+	        	titleDivider.setBackgroundColor(ContextCompat.getColor(dialog.getContext(), R.color.mega)); // change divider color
 	        }
 	    } catch (Exception ex) {
 	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
