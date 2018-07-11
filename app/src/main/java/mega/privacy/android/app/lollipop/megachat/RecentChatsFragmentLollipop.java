@@ -135,7 +135,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
 
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
-        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
+        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
         listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
         listView.setClipToPadding(false);
         listView.addItemDecoration(new ChatDividerItemDecoration(context, outMetrics));
@@ -280,6 +280,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             listView.setAdapter(adapterList);
                             fastScroller.setRecyclerView(listView);
                             visibilityFastScroller();
+
                             adapterList.setPositionClicked(-1);
 
                             listView.setVisibility(View.VISIBLE);
@@ -1648,9 +1649,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
-    public RecyclerView getRecyclerView(){
-       return listView;
-    }
     public void visibilityFastScroller(){
         if(chats == null){
            fastScroller.setVisibility(View.GONE);

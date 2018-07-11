@@ -137,7 +137,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		TextView textViewContactName;
 		EmojiconTextView textViewContent;
 		TextView textViewDate;
-		String textFastScroller;
+		String textFastScroller = "";
 		ImageButton imageButtonThreeDots;
 		RelativeLayout circlePendingMessages;
 
@@ -2205,7 +2205,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public String getSectionTitle(int position) {
-		return ((ViewHolderNormalChatList)holder).textFastScroller;
+		if(((ViewHolderNormalChatList)holder).textFastScroller.isEmpty()){
+			return  null;
+		}else{
+			return ((ViewHolderNormalChatList)holder).textFastScroller;
+		}
 	}
 
 	public void modifyChat(ArrayList<MegaChatListItem> chats, int position){
