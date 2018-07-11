@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/container_2fa">
+    android:id="@+id/container_2fa"
+    android:background="@color/camera_uploads_list_view">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -109,15 +110,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
-        android:background="@color/white"
-        android:visibility="gone">
+        android:background="@color/white">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <RelativeLayout
-                android:id="@+id/container_qr_2fa"
+                android:id="@+id/container_qr_seed_2fa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -127,8 +127,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/explain_qr_seed_2fa"
                     android:textColor="@color/name_my_account"
-                    android:textSize="14sp"
-                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="24dp"
+                    android:paddingBottom="24dp"
                     android:fontFamily="roboto"
                     android:background="@color/camera_uploads_list_view"/>
 
@@ -159,33 +162,205 @@
 
                 </RelativeLayout>
 
-                <TextView
+                <TableLayout
                     android:id="@+id/seed_2fa"
+                    android:layout_below="@id/layout_qr_2fa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginRight="26dp"
+                    android:stretchColumns="0, 1, 2, 3, 4">
+
+                    <TableRow
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:gravity="center"
+                        android:layout_gravity="center">
+
+                        <TextView
+                            android:id="@+id/seed_2fa_1"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_3"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_4"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_5"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:layout_gravity="center">
+
+                        <TextView
+                            android:id="@+id/seed_2fa_6"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_7"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_8"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_9"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_10"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:layout_gravity="center">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_11"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_12"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:id="@+id/seed_2fa_13"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:textSize="20sp"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:textColor="@color/name_my_account"
+                            android:fontFamily="roboto"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <Button
+                    android:id="@+id/button_copy_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:textColor="@color/name_my_account"
-                    android:fontFamily="roboto"
-                    android:layout_below="@id/layout_qr_2fa"
+                    android:layout_below="@+id/seed_2fa"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="22dp"
-                    android:layout_marginRight="82dp"
-                    android:layout_marginLeft="82dp"/>
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/background_button"
+                    android:elevation="8dp"
+                    android:textColor="@color/white"
+                    android:text="@string/context_copy"/>
 
                 <Button
                     android:id="@+id/button_next_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/seed_2fa"
+                    android:layout_below="@+id/button_copy_2fa"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="41dp"
-                    android:background="@drawable/background_button"
-                    android:elevation="8dp"
-                    android:textColor="@color/white"
+                    android:layout_marginTop="24dp"
+                    android:background="@color/white"
+                    android:elevation="0dp"
+                    android:textColor="@color/accentColor"
                     android:text="@string/general_next"
-                    android:visibility="gone"/>
+                    style="?android:attr/borderlessButtonStyle"/>
 
             </RelativeLayout>
 
@@ -193,7 +368,8 @@
                 android:id="@+id/container_confirm_2fa"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/container_qr_2fa">
+                android:layout_below="@+id/container_qr_seed_2fa"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/explain_confirm_2fa"
@@ -201,8 +377,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/explain_confirm_2fa"
                     android:textColor="@color/name_my_account"
-                    android:textSize="14sp"
-                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="24dp"
+                    android:paddingBottom="24dp"
                     android:fontFamily="roboto"
                     android:background="@color/camera_uploads_list_view"/>
 
@@ -211,7 +390,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/explain_confirm_2fa"
-                    android:layout_marginTop="44dp"
+                    android:layout_marginTop="81dp"
                     android:layout_centerHorizontal="true"
                     android:orientation="horizontal">
 
@@ -307,7 +486,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="10dp"/>
 
-                <Button
+                <!--<Button
                     android:id="@+id/button_verify_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -319,7 +498,7 @@
                     android:elevation="8dp"
                     android:textColor="@color/white"
                     android:text="@string/general_verify"
-                    android:visibility="gone"/>
+                    android:visibility="gone"/>-->
 
             </RelativeLayout>
 
@@ -332,7 +511,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:background="@color/white">
 
         <RelativeLayout
             android:layout_width="match_parent"

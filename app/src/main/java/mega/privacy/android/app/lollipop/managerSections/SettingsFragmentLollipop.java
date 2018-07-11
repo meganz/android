@@ -329,7 +329,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			twoFASwitch = (SwitchPreference) findPreference(KEY_2FA);
 			twoFASwitch.setOnPreferenceClickListener(this);
-			twoFASwitch.setChecked(false);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -346,7 +345,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			twoFACheck = (TwoLineCheckPreference) findPreference(KEY_2FA);
 			twoFACheck.setOnPreferenceClickListener(this);
-			twoFACheck.setChecked(false);
 		}
 
 		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
@@ -2008,7 +2006,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivity(intent);
 		}
 		else if (preference.getKey().compareTo(KEY_2FA) == 0){
-//			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				twoFASwitch.setChecked(false);
 //				if (twoFASwitch.isChecked()){
