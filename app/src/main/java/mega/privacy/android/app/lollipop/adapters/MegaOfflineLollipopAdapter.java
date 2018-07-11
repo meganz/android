@@ -37,6 +37,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
@@ -518,19 +519,19 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.currentPosition = position;
 
 		if (!multipleSelect) {
-			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-			holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 
 		}
 		else {
 
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_long_click_lollipop));
 				holder.separator.setBackgroundColor(Color.WHITE);
 			}
 			else{
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+				holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 			}
 		}
 				
@@ -547,14 +548,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				nodeSize = file.length();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			}
-			holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+			holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
 			holder.iconView.setVisibility(View.VISIBLE);
 			holder.imageView.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setTag(holder);
 			holder.imageButtonThreeDots.setOnClickListener(this);
 
-			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-			holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 
 //			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			return;
@@ -624,12 +625,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 		}
 
-		holder.iconView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+		holder.iconView.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
 		holder.imageView.setVisibility(View.GONE);
 		holder.iconView.setVisibility(View.VISIBLE);
 
 		if (currentFile.isFile()){
-			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
+			if (MimeTypeThumbnail.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
 								
 				if (currentFile.exists()){
@@ -653,7 +654,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 		else{
-			holder.iconView.setImageResource(R.drawable.ic_folder_list);
+			holder.iconView.setImageResource(R.drawable.ic_folder);
 			holder.imageView.setVisibility(View.GONE);
 			holder.iconView.setVisibility(View.VISIBLE);
 		}
@@ -769,11 +770,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if(this.isItemChecked(position)){
 					//MegaOffline nodeTemp = (MegaOffline) getItem(position);
 //					if(isRecoveryKey(nodeTemp)){
-//						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+//						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 //					}else{
-//						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+//						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 //					}
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -837,7 +838,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			else{
 				log("multiselect ON");
 				if(this.isItemChecked(position)){
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -847,7 +848,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
 					holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
 					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();

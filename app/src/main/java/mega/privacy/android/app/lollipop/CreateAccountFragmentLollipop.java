@@ -237,7 +237,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     toggleButtonPasswd.setVisibility(View.VISIBLE);
-                    toggleButtonPasswd.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
                 }
                 else {
                     toggleButtonPasswd.setVisibility(View.GONE);
@@ -272,7 +272,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     toggleButtonConfirmPasswd.setVisibility(View.VISIBLE);
-                    toggleButtonConfirmPasswd.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
                 }
                 else {
                     toggleButtonConfirmPasswd.setVisibility(View.GONE);
@@ -336,7 +336,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.VISIBLE);
         creatingAccountLayout.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.GONE);
 
@@ -357,21 +357,21 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_very_weak));
-                secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
-                tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
-                fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
-                fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_very_weak));
+                secondShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                tirdShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fourthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fifthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
             } else{
-                firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_very_weak));
-                secondShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
-                tirdShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
-                fourthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
-                fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_very_weak));
+                secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fourthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
             }
 
             passwdType.setText(getString(R.string.pass_very_weak));
-            passwdType.setTextColor(getResources().getColor(R.color.login_warning));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
@@ -379,21 +379,21 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK){
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_weak));
-                secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_weak));
-                tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
-                fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
-                fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
+                secondShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
+                tirdShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fourthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fifthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
             } else{
-                firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_weak));
-                secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_weak));
-                tirdShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
-                fourthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
-                fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
+                secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_weak));
+                tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fourthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
             }
 
             passwdType.setText(getString(R.string.pass_weak));
-            passwdType.setTextColor(getResources().getColor(R.color.pass_weak));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.pass_weak));
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
@@ -401,21 +401,21 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_medium));
-                secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_medium));
-                tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_medium));
-                fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
-                fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
+                secondShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
+                tirdShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
+                fourthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fifthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
             } else{
-                firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_medium));
-                secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_medium));
-                tirdShape.setBackground(getResources().getDrawable(R.drawable.passwd_medium));
-                fourthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
-                fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
+                secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
+                tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
+                fourthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
+                fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
             }
 
             passwdType.setText(getString(R.string.pass_medium));
-            passwdType.setTextColor(getResources().getColor(R.color.green_unlocked_rewards));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.green_unlocked_rewards));
 
             passwdAdvice.setText(getString(R.string.passwd_medium));
 
@@ -423,21 +423,21 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD){
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
-                secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
-                tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
-                fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_good));
-                fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                secondShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                tirdShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                fourthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                fifthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.shape_password));
             } else{
-                firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
-                secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
-                tirdShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
-                fourthShape.setBackground(getResources().getDrawable(R.drawable.passwd_good));
-                fifthShape.setBackground(getResources().getDrawable(R.drawable.shape_password));
+                firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                fourthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
+                fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
             }
 
             passwdType.setText(getString(R.string.pass_good));
-            passwdType.setTextColor(getResources().getColor(R.color.pass_good));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.pass_good));
 
             passwdAdvice.setText(getString(R.string.passwd_good));
 
@@ -445,21 +445,21 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         else {
             if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                firstShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
-                secondShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
-                tirdShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
-                fourthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
-                fifthShape.setBackgroundDrawable(getResources().getDrawable(R.drawable.passwd_strong));
+                firstShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                secondShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                tirdShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                fourthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                fifthShape.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
             } else{
-                firstShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
-                secondShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
-                tirdShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
-                fourthShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
-                fifthShape.setBackground(getResources().getDrawable(R.drawable.passwd_strong));
+                firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                secondShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                tirdShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                fourthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
+                fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
             }
 
             passwdType.setText(getString(R.string.pass_strong));
-            passwdType.setTextColor(getResources().getColor(R.color.blue_unlocked_rewards));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.blue_unlocked_rewards));
 
             passwdAdvice.setText(getString(R.string.passwd_strong));
 
@@ -528,12 +528,12 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             case R.id.toggle_button_passwd:
                 if (passwdVisibility) {
-                    toggleButtonPasswd.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
                     passwdVisibility = false;
                     showHidePassword(false);
                 }
                 else {
-                    toggleButtonPasswd.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
+                    toggleButtonPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
                     passwdVisibility = true;
                     showHidePassword(false);
                 }
@@ -541,12 +541,12 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
             case R.id.toggle_button_confirm_passwd:
                 if (passwdVisibility) {
-                    toggleButtonConfirmPasswd.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
                     passwdVisibility = false;
                     showHidePassword(true);
                 }
                 else {
-                    toggleButtonConfirmPasswd.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
+                    toggleButtonConfirmPasswd.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
                     passwdVisibility = true;
                     showHidePassword(true);
                 }
@@ -584,7 +584,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.GONE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
 
@@ -595,7 +595,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
         log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
@@ -685,7 +685,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         createAccountLayout.setVisibility(View.GONE);
         creatingAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         creatingAccountTextView.setVisibility(View.VISIBLE);
         createAccountProgressBar.setVisibility(View.VISIBLE);
         log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
@@ -801,7 +801,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_email_text:{
                 email_error_layout.setVisibility(View.VISIBLE);
                 email_error_text.setText(error);
-                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = email_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
@@ -818,7 +818,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text_confirm:{
                 password_confirm_error_layout.setVisibility(View.VISIBLE);
                 password_confirm_error_text.setText(error);
-                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = password_confirm_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
@@ -835,7 +835,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_name_text:{
                 name_error_layout.setVisibility(View.VISIBLE);
                 name_error_text.setText(error);
-                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = name_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
@@ -852,7 +852,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.create_account_password_text:{
                 password_error_layout.setVisibility(View.VISIBLE);
                 password_error_text.setText(error);
-                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);

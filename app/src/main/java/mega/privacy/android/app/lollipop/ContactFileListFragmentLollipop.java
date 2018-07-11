@@ -75,14 +75,14 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	CoordinatorLayout mainLayout;
 
 	RecyclerView listView;
-	public static LinearLayoutManager mLayoutManager;
+	LinearLayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 
 	MegaUser contact;
 	ArrayList<MegaNode> contactNodes;
 
-	public static MegaBrowserLollipopAdapter adapter;
+	MegaBrowserLollipopAdapter adapter;
 
 	FloatingActionButton fab;
 
@@ -113,6 +113,26 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null && mLayoutManager != null){
+			mLayoutManager.scrollToPosition(position);
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null && mLayoutManager != null) {
+			View v = mLayoutManager.findViewByPosition(position);
+			if (v != null) {
+				return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+			}
+		}
+
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -658,7 +678,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					intent.putExtra("screenPosition", screenPosition);
 					((ContactFileListActivityLollipop)context).startActivity(intent);
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 					imageDrag = imageView;
 				} 
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoReproducible()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
@@ -668,10 +688,18 @@ public class ContactFileListFragmentLollipop extends Fragment{
 
 					//Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					Intent mediaIntent;
+					boolean internalIntent;
+					boolean opusFile = false;
 					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
+						internalIntent = false;
+						String[] s = file.getName().split("\\.");
+						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+							opusFile = true;
+						}
 					}
 					else {
+						internalIntent = true;
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("position", position);
@@ -696,8 +724,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -726,16 +753,24 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						String url = megaApi.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
-					if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-			  			startActivity(mediaIntent);
-			  		}
-			  		else{
-						((ContactFileListActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
-						adapter.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(contactNodes.get(position).getHandle());
-						((ContactFileListActivityLollipop)context).onFileClick(handleList);
-			  		}
+					if (opusFile){
+						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+					}
+					if (internalIntent){
+						startActivity(mediaIntent);
+					}
+					else {
+						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+							startActivity(mediaIntent);
+						}
+						else{
+							((ContactFileListActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							adapter.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(contactNodes.get(position).getHandle());
+							((ContactFileListActivityLollipop)context).onFileClick(handleList);
+						}
+					}
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isPdf()){
 					MegaNode file = contactNodes.get(position);
@@ -754,8 +789,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 					}
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N	&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -798,7 +832,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						NodeController nC = new NodeController(context);
 						nC.prepareForDownload(handleList);
 					}
-					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else {
 					adapter.notifyDataSetChanged();

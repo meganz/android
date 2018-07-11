@@ -17,18 +17,18 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="25dp"
-			android:layout_marginBottom="8dp">
+			android:layout_marginBottom="4dp">
 
 			<RelativeLayout
 				android:id="@+id/my_storage_account_plan_icon_rl"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
 				android:layout_marginLeft="20dp">
 				<ImageView
 					android:id="@+id/my_storage_account_plan_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_centerInParent="true"
 					android:layout_gravity="center_horizontal"/>
 			</RelativeLayout>
 			<TextView
@@ -38,8 +38,7 @@
 				android:textSize="16sp"
 				android:layout_marginLeft="72dp"
 				android:textColor="@color/name_my_account"
-				android:layout_centerVertical="true"
-				android:gravity="center_vertical"/>
+				android:layout_alignParentTop="true"/>
 		</RelativeLayout>
 
 		<!--Progress bar-->
@@ -77,7 +76,7 @@
 		<!--Expiration-->
 		<RelativeLayout
 			android:id="@+id/my_storage_account_expiration_layout"
-			android:layout_width="fill_parent"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:layout_marginLeft="72dp"
@@ -122,12 +121,13 @@
 				android:id="@+id/my_storage_account_transfer_icon_rl"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
 				android:layout_marginLeft="20dp">
 				<ImageView
 					android:id="@+id/my_storage_account_transfer_icon"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_centerInParent="true"
+					android:layout_alignParentTop="true"
 					android:layout_gravity="center_horizontal"
 					android:src="@drawable/ic_transfers_quota_storage"
 					android:background="@null"/>
@@ -137,6 +137,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="72dp"
 				android:layout_alignParentLeft="true"
+				android:layout_alignParentTop="true"
 				android:orientation="vertical">
 				<TextView
 					android:id="@+id/my_storage_account_transfer_title"
@@ -332,7 +333,7 @@
 
 			<!--Previous versions-->
 			<RelativeLayout
-				android:id="@+id/my_storage_account_available_storage_layout"
+				android:id="@+id/my_storage_account_previous_versions_layout"
 				android:layout_width="match_parent"
 				android:layout_height="32dp">
 				<ImageView
@@ -350,7 +351,7 @@
 					android:layout_marginRight="16dp"
 					android:layout_centerVertical="true">
 					<TextView
-						android:id="@+id/my_storage_account_available_storage_title"
+						android:id="@+id/my_storage_account_previous_versions_title"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_alignParentLeft="true"
@@ -358,7 +359,7 @@
 						android:textSize="14sp"
 						android:textColor="@color/mail_my_account" />
 					<TextView
-						android:id="@+id/my_storage_account_available_storage_text"
+						android:id="@+id/my_storage_account_previous_versions_text"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_alignParentRight="true"

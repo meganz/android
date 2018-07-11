@@ -23,46 +23,52 @@ public class MimeTypeThumbnail {
 		resourcesCache = new HashMap<String, Integer>();
 		resources = new SparseArray<String[]>();
 		resources.put(R.drawable.ic_3d_thumbnail, new String[] {"3ds", "3dm", "max", "obj", });
-		resources.put(R.drawable.after_effects_thumbnail, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
-		resources.put(R.drawable.audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", });
-		resources.put(R.drawable.cad_thumbnail, new String[] {"dwg", "dxf", });
-		resources.put(R.drawable.compressed_thumbnail, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
+		resources.put(R.drawable.ic_aftereffects_thumbnail, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
+		resources.put(R.drawable.ic_audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", });
+		resources.put(R.drawable.ic_cad_thumbnail, new String[] {"dwg", "dxf", });
+		resources.put(R.drawable.ic_compressed_thumbnail, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
 		resources.put(R.drawable.database_thumbnail, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
-		resources.put(R.drawable.dmg_thumbnail, new String[]{"dmg", });
+		resources.put(R.drawable.ic_dmg_thumbnail, new String[]{"dmg", });
 		resources.put(R.drawable.dreamweaver_thumbnail, new String[] {"dwt", });
-		resources.put(R.drawable.excell_thumbnail, new String[] {"xls", "xlsx", "xlt", "xltm", "xltx", });
-		resources.put(R.drawable.exe_thumbnail, new String[] {"apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf", });
-		resources.put(R.drawable.fla_lang_thumbnail, new String[] {"as", "asc", "ascs", });
+		resources.put(R.drawable.ic_excel_thumbnail, new String[] {"xls", "xlsx", "xlt", "xltm", "xltx", });
+		resources.put(R.drawable.ic_executabe_thumbnail, new String[] {"apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf", });
+		resources.put(R.drawable.ic_web_lang_thumbnail, new String[] {"as", "asc", "ascs", });
 		resources.put(R.drawable.flash_thumbnail, new String[] {"fla", });
-		resources.put(R.drawable.font_thumbnail, new String[] {"fnt", "fon", "otf", "ttf", });
+		resources.put(R.drawable.ic_font_thumbnail, new String[] {"fnt", "fon", "otf", "ttf", });
 		resources.put(R.drawable.gis_thumbnail, new String[] {"gpx", "kml", "kmz", });
-		resources.put(R.drawable.graphic_thumbnail, new String[] {"tga", "tif", "tiff", "bmp", "gif", "png", });
 		resources.put(R.drawable.html_thumbnail, new String[] {"dhtml", "htm", "html", "shtml", "xhtml", });
-		resources.put(R.drawable.illustrator_thumbnail, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
-		resources.put(R.drawable.image_thumbnail, new String[] {"jpg", "jpeg", });
-		resources.put(R.drawable.indesign_thumbnail, new String[] {"indd", });
+		resources.put(R.drawable.ic_illustrator_thumbnail, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
+		resources.put(R.drawable.ic_image_thumbnail, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png",});
+		resources.put(R.drawable.ic_indesign_thumbnail, new String[] {"indd", });
 		resources.put(R.drawable.java_thumbnail, new String[] {"class", "jar", "java", });
 		resources.put(R.drawable.midi_thumbnail, new String[] {"mid", "midi", });
-		resources.put(R.drawable.pdf_thumbnail, new String[] {"pdf", });
-		resources.put(R.drawable.photoshop_thumbnail, new String[] {"abr", "csh", "psb", "psd", });
+		resources.put(R.drawable.ic_pdf_thumbnail, new String[] {"pdf", });
+		resources.put(R.drawable.ic_photoshop_thumbnail, new String[] {"abr", "csh", "psb", "psd", });
 		resources.put(R.drawable.playlist_thumbnail, new String[] {"asx", "m3u", "pls", });
 		resources.put(R.drawable.podcast_thumbnail, new String[] {"pcast", });
-		resources.put(R.drawable.powerpoint_thumbnail, new String[] {"ppc", "ppt", "pptx", "pps",  });
-		resources.put(R.drawable.premiere_thumbnail, new String[] {"plb", "ppj", "prproj", "prtpset", });
-		resources.put(R.drawable.raw_thumbnail, new String[] {"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf", });
+		resources.put(R.drawable.ic_powerpoint_thumbnail, new String[] {"ppc", "ppt", "pptx", "pps",  });
+		resources.put(R.drawable.ic_premiere_thumbnail, new String[] {"plb", "ppj", "prproj", "prtpset", });
+		resources.put(R.drawable.ic_raw_thumbnail, new String[] {"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf", });
 		resources.put(R.drawable.real_audio_thumbnail, new String[] {"ra", "ram", "rm", });
 		resources.put(R.drawable.source_thumbnail, new String[] {"c", "cc", "cgi", "cpp", "cxx", "dll", "h", "hpp", "pl", "py", "sh", });
-		resources.put(R.drawable.spreadsheet_thumbnail, new String[] {"123", "gsheet", "nb", "ods", "ots", "sxc", "xlr", });
+		resources.put(R.drawable.ic_spreadsheet_thumbnail, new String[] {"123", "gsheet", "nb", "ots", "sxc", "xlr", });
 		resources.put(R.drawable.subtitles_thumbnail, new String[] {"srt", });
 		resources.put(R.drawable.swf_thumbnail, new String[] {"swf", "flv", });
-		resources.put(R.drawable.text_thumbnail, new String[] {"ans", "ascii", "log", "odt", "rtf", "txt", "wpd", });
-		resources.put(R.drawable.torrent_thumbnail, new String[] {"torrent", });
+		resources.put(R.drawable.ic_text_thumbnail, new String[] {"ans", "ascii", "log",  "rtf", "txt", "wpd", });
+		resources.put(R.drawable.ic_torrent_thumbnail, new String[] {"torrent", });
 		resources.put(R.drawable.vcard_thumbnail, new String[] {"vcard", "vcf", });
-		resources.put(R.drawable.vector_thumbnail, new String[] {"cdr", "eps", "ps", "svg", "svgz", });
-		resources.put(R.drawable.video_thumbnail, new String[] {"3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mkv", "mk3d", "vob", "movie", });
+		resources.put(R.drawable.ic_vector_thumbnail, new String[] {"cdr", "eps", "ps", "svg", "svgz", });
+		resources.put(R.drawable.ic_video_thumbnail, new String[] {"3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mkv", "mk3d", "vob", "movie", });
 		resources.put(R.drawable.video_vob_thumbnail, new String[]{"vob", });
-		resources.put(R.drawable.web_data_thumbnail, new String[] {"asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml", });
-		resources.put(R.drawable.word_thumbnail, new String[] {"doc", "docx", "dotx", "wps", });
+		resources.put(R.drawable.ic_web_data_thumbnail, new String[] {"asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml", });
+		resources.put(R.drawable.ic_word_thumbnail, new String[] {"doc", "docx", "dotx", "wps", });
+		resources.put(R.drawable.ic_pages_thumbnail, new String[] {"pages", });
+		resources.put(R.drawable.ic_experiencedesign_thumbnail, new String[] {"Xd", });
+		resources.put(R.drawable.ic_keynote_thumbnail, new String[] {"key", });
+		resources.put(R.drawable.ic_numbers_thumbnail, new String[] {"numbers", });
+		resources.put(R.drawable.ic_openoffice_thumbnail, new String[] {"odp", "odt", "ods"});
+		resources.put(R.drawable.ic_sketch_thumbnail, new String[] {"sketch", });
+
 	}
 
 	private String type;
@@ -199,7 +205,7 @@ public class MimeTypeThumbnail {
 				}
 			}
 			if (resId == -1) {
-				resId = R.drawable.generic_thumbnail;
+				resId = R.drawable.ic_generic_thumbnail;
 			}
 		}
 		return resId;

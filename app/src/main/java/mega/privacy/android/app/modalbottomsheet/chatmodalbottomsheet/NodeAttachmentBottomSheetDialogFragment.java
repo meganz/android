@@ -30,6 +30,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
+import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -52,6 +53,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     ChatController chatC;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     LinearLayout mainLinearLayout;
     CoordinatorLayout coordinatorLayout;
@@ -67,6 +69,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
     LinearLayout optionImport;
     LinearLayout optionSaveOffline;
     LinearLayout optionRemove;
+    LinearLayout optionForwardLayout;
 
     DisplayMetrics outMetrics;
 
@@ -143,6 +146,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.node_attachment_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         nodeThumb = (ImageView) contentView.findViewById(R.id.node_attachment_thumbnail);
         nodeName = (TextView) contentView.findViewById(R.id.node_attachment_name_text);
@@ -154,6 +158,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionViewText = (TextView) contentView.findViewById(R.id.option_view_text);
         optionSaveOffline = (LinearLayout) contentView.findViewById(R.id.option_save_offline_layout);
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
+        optionForwardLayout = (LinearLayout) contentView.findViewById(R.id.option_forward_layout);
 
         if(message.getMessage()==null){
             return;
@@ -179,6 +184,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionSaveOffline.setOnClickListener(this);
         optionRemove.setOnClickListener(this);
         optionImport.setOnClickListener(this);
+        optionForwardLayout.setOnClickListener(this);
 
         nodeIconLayout.setVisibility(View.GONE);
 
@@ -316,14 +322,17 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                 dialog.setContentView(contentView);
 
                 mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
-                mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//                mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                    mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//                }
+//                else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//                    mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//                }
 
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-                }
-                else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                    mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-                }
+                mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
+                mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
             else{
                 log("node is NULL");
@@ -355,6 +364,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         else{
             switch(v.getId()){
 
+                case R.id.option_forward_layout: {
+                    if(context instanceof ChatActivityLollipop){
+                        ((ChatActivityLollipop)context).prepareMessageToForward(messageId);
+                    }
+                    break;
+                }
                 case R.id.option_download_layout:{
                     log("Download option");
                     if(node==null){

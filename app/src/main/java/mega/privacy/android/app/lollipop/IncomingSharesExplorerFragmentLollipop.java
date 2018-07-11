@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -192,7 +193,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			optionButton.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-			optionButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));
+			optionButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -796,9 +797,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	public void activateButton(boolean show){
 		optionButton.setEnabled(show);
 		if(show){
-			optionButton.setTextColor(getResources().getColor(R.color.accentColor));
+			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 		}else{
-			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 		}
 	}
 }

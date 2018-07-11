@@ -34,6 +34,7 @@ public class Constants {
 	public static int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
 	public static int ACTION_SEARCH_BY_DATE = 1024;
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
+	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -44,6 +45,8 @@ public class Constants {
 	public static String ACTION_FORWARD_MESSAGES = "ACTION_FORWARD_MESSAGES";
 
 	public static String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
+
+	public static String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
 
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
@@ -62,6 +65,9 @@ public class Constants {
 
 	final public static int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = MULTIPLE_LEAVE_SHARE+1;
 	final public static int MULTIPLE_CHAT_IMPORT = MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER+1;
+	final public static int MULTIPLE_FORWARD_MESSAGES = MULTIPLE_CHAT_IMPORT+1;
+
+	final public static int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES+1;
 
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -87,6 +93,13 @@ public class Constants {
 	final public static int BONUSES_FRAGMENT = 8001;
 	final public static int INVITE_FRIENDS_FRAGMENT = 8002;
 	final public static int INFO_ACHIEVEMENTS_FRAGMENT = 8003;
+
+	final public static int SCROLL_TO_POSITION = 9000;
+	final public static int UPDATE_IMAGE_DRAG = 9001;
+	final public static int UPDATE_GET_PRICING = 9002;
+	final public static int UPDATE_ACCOUNT_DETAILS = 9003;
+	final public static int UPDATE_CREDIT_CARD_SUBSCRIPTION = 9004;
+	final public static int UPDATE_PAYMENT_METHODS = 9005;
 
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
@@ -143,6 +156,7 @@ public class Constants {
 	public static String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
 	public static String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
 	public static String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
+	public static String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
 
 	public static String ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES";
 	public static String ACTION_NEW_CHAT = "NEW_CHAT";
@@ -156,6 +170,10 @@ public class Constants {
 
 	public static String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
 	public static String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
+
+	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
+	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
+	public static String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -176,6 +194,8 @@ public class Constants {
 	final public static int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
 	final public static int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
 	final public static int SEARCH_BY_ADAPTER = 2018;
+	final public static int FILE_LINK_ADAPTER = 2019;
+	final public static int FROM_CHAT = 2020;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -211,6 +231,10 @@ public class Constants {
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
 	public static String CHAT_FOLDER = "My chat files";
+
+	public static int RICH_WARNING_TRUE = 1;
+	public static int RICH_WARNING_FALSE= 0;
+	public static int RICH_WARNING_CONFIRMATION = 2;
 
 	public static int TAKE_PICTURE_OPTION = 0;
 	public static int TAKE_PROFILE_PICTURE = 1;

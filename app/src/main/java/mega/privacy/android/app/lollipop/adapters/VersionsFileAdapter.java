@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.DisplayMetrics;
@@ -423,13 +424,13 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		else {
 			log("Multiselection ON");
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 
 				holder.imageView.setLayoutParams(paramsLarge);
 				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
 			else{
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
 				log("Check the thumb");
 				holder.imageView.setLayoutParams(paramsLarge);

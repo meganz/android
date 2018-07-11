@@ -34,6 +34,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -638,18 +639,18 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.videoInfoLayout.setVisibility(View.GONE);
 
 		if (!multipleSelect) {
-			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-			holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+			holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 		} 
 		else {
 
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_long_click_lollipop));
 				holder.separator.setBackgroundColor(Color.WHITE);
 			}
 			else{
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
-				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.new_background_fragment));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
+				holder.separator.setBackgroundColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 			}
 		}
 		
@@ -678,7 +679,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
 			if(type==Constants.INCOMING_SHARES_ADAPTER){
-				holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming_list);
+				holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming);
 				//Show the owner of the shared folder
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
 				for(int j=0; j<sharesIncoming.size();j++){
@@ -707,7 +708,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 			else if (type==Constants.OUTGOING_SHARES_ADAPTER){
-				holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
+				holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing);
 				//Show the number of contacts who shared the folder
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 				if (sl != null) {
@@ -715,16 +716,29 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 					}
 				}
-			}
-			else{
+			}else if (type==Constants.FILE_BROWSER_ADAPTER) {
 				if (node.isOutShare()||megaApi.isPendingShare(node)){
-					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing_list);
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing);
 				}
 				else if(node.isInShare()){
-					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming_list);
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming);
 				}
 				else{
-					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_list);
+					if(((ManagerActivityLollipop) context).isCameraUploads(node)){
+						holder.imageViewIcon.setImageResource(R.drawable.ic_folder_image);
+					}else{
+						holder.imageViewIcon.setImageResource(R.drawable.ic_folder);
+					}
+				}
+			}else{
+				if (node.isOutShare()||megaApi.isPendingShare(node)){
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_outgoing);
+				}
+				else if(node.isInShare()){
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder_incoming);
+				}
+				else{
+					holder.imageViewIcon.setImageResource(R.drawable.ic_folder);
 				}
 
 
@@ -733,11 +747,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //					if (sl.size() > 0) {
 //						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing);
 //					} else {
-//						holder.imageView.setImageResource(R.drawable.ic_folder_list);
+//						holder.imageView.setImageResource(R.drawable.ic_folder);
 //					}
 //				}
 //				else {
-//					holder.imageView.setImageResource(R.drawable.ic_folder_list);
+//					holder.imageView.setImageResource(R.drawable.ic_folder);
 //				}
 			}			
 		}
@@ -746,7 +760,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 
 			holder.imageViewIcon.setVisibility(View.VISIBLE);
-			holder.imageViewIcon.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+			holder.imageViewIcon.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 			holder.imageViewThumb.setVisibility(View.GONE);
 			holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
@@ -949,13 +963,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //			holder.propertiesText.setText(R.string.general_folder_info);
 			holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 
-			if(type==Constants.FOLDER_LINK_ADAPTER){
+			if(type == Constants.FOLDER_LINK_ADAPTER){
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context, megaApi));
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
-				}
-				else {
+				}else {
 
 					if(this.isItemChecked(position)){
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -963,7 +976,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
@@ -971,8 +984,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.imageView.setImageResource(R.drawable.ic_folder_list);
 					}
 				}
-			}
-			else if(type==Constants.CONTACT_FILE_ADAPTER){
+			}else if(type==Constants.CONTACT_FILE_ADAPTER){
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 					holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
@@ -980,7 +992,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else {
 
 					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1023,7 +1035,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else {
 
 					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1093,7 +1105,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else {
 
 					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1113,8 +1125,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.textViewFileSize.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 					}										
 				}
-			}
-			else{
+			}else if (type==Constants.FILE_BROWSER_ADAPTER){
 
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -1123,15 +1134,57 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 					else if(node.isInShare()){
 						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+					}else{
+						if(((ManagerActivityLollipop) context).isCameraUploads(node)){
+							log("**** cu");
+							holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
+						}else{
+							holder.imageView.setImageResource(R.drawable.ic_folder_list);
+						}
+					}
+				}else {
+
+					if(this.isItemChecked(position)){
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
+						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+						paramsMultiselect.setMargins(0, 0, 0, 0);
+						holder.imageView.setLayoutParams(paramsMultiselect);
+						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
+						holder.itemLayout.setBackgroundColor(Color.WHITE);
+						if (node.isOutShare()||megaApi.isPendingShare(node)){
+							holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+						}else if(node.isInShare()){
+							holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+						}else{
+							if(((ManagerActivityLollipop) context).isCameraUploads(node)){
+								holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
+							}else{
+								holder.imageView.setImageResource(R.drawable.ic_folder_list);
+							}
+						}
+					}
+				}
+
+			}else{
+				if (!multipleSelect) {
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					if (node.isOutShare()||megaApi.isPendingShare(node)){
+						holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
+					}
+					else if(node.isInShare()){
+						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
+					}else{
 						holder.imageView.setImageResource(R.drawable.ic_folder_list);
 					}
 				}
 				else {
 
 					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 						paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 						paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1243,7 +1296,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			else {
 				log("Multiselection ON");
 				if(this.isItemChecked(position)){
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 					paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 					paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -1252,7 +1305,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
 					log("Check the thumb");
 
@@ -1555,7 +1608,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					log("Node attachment adapter");
 				}
 				else{
-					log("click layout FileBrowserFragmentLollipop!");
+					log("layout FileBrowserFragmentLollipop!");
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				break;

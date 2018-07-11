@@ -309,9 +309,12 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
     }
 
     public void clearSelections() {
-        if(adapter.isMultipleSelect()){
-            adapter.clearSelections();
+        if(adapter != null){
+            if(adapter.isMultipleSelect()){
+                adapter.clearSelections();
+            }
         }
+
     }
 
     public void hideMultipleSelect() {

@@ -51,6 +51,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
     private long[] nodeHandles;
     private long[] messagesIds;
+    private long[] userHandles;
 
     MenuItem createFolderMenuItem;
     MenuItem newChatMenuItem;
@@ -137,6 +138,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                 nodeHandles = intent.getLongArrayExtra("NODE_HANDLES");
                 if(nodeHandles!=null){
                     log("Node handle is: "+nodeHandles[0]);
+                }
+                userHandles = intent.getLongArrayExtra("USER_HANDLES");
+                if(userHandles!=null){
+                    log("User handles size: "+userHandles.length);
                 }
             }
         }
@@ -277,6 +282,10 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
         if(nodeHandles!=null){
             intent.putExtra("NODE_HANDLES", nodeHandles);
+        }
+
+        if(userHandles!=null){
+            intent.putExtra("USER_HANDLES", userHandles);
         }
 
         if(messagesIds!=null){

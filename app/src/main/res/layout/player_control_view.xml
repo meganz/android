@@ -25,10 +25,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/audio_imageview"
+            android:gravity="center"
             android:text="@string/audio_play"
             android:textStyle="bold"
             android:textSize="30sp"
-            android:layout_margin="20dp"
+            android:layout_marginTop="20dp"
             android:textColor="@color/white"
             android:layout_centerHorizontal="true"/>
 
@@ -89,7 +90,9 @@
                 android:layout_below="@id/exo_duration"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="14dp"/>
+                android:layout_marginBottom="14dp"
+                android:singleLine="true"
+                android:ellipsize="middle"/>
 
             <RelativeLayout
                 android:id="@+id/container_control_buttons"
@@ -176,6 +179,15 @@
                     android:src="@drawable/ic_list_white"
                     android:background="@android:color/transparent"
                     android:padding="10dp"/>
+
+                <ProgressBar
+                    android:id="@+id/create_playlist_progress_bar"
+                    style="?android:attr/progressBarStyleLargeInverse"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"/>
 
             </RelativeLayout>
 

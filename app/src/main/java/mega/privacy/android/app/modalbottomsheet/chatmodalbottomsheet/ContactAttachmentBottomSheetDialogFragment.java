@@ -13,15 +13,12 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -30,7 +27,6 @@ import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -41,19 +37,15 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
+import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
-import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -71,6 +63,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
     int position;
 
     private BottomSheetBehavior mBehavior;
+    private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
     public TextView titleNameContactChatPanel;
@@ -160,6 +153,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
         View contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.contact_attachment_bottom_sheet);
+        items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = (TextView) contentView.findViewById(R.id.contact_attachment_chat_name_text);
         stateIcon = (ImageView) contentView.findViewById(R.id.contact_attachment_state_circle);
@@ -235,7 +229,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
                     stateIcon.setVisibility(View.GONE);
                 }
 
-                if(userHandle != megaApi.getMyUser().getHandle()){
+                if(userHandle != megaChatApi.getMyUserHandle()){
 //                    addAvatarParticipantPanel(userHandle, megaChatApi.getMyEmail());
 
                     String userName = message.getMessage().getUserName(0);
@@ -419,15 +413,17 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             dialog.setContentView(contentView);
 
             mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
+//            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//
+//
+//            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
+//            }
+//            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
+//            }
+            mBehavior.setPeekHeight(UtilsModalBottomSheet.getPeekHeight(items_layout, heightDisplay, context, 81));
             mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-
-
-            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mBehavior.setPeekHeight((heightDisplay / 4) * 2);
-            }
-            else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-                mBehavior.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO);
-            }
         }
     }
 
@@ -475,7 +471,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             }
             else{
                 log("Default color to the avatar");
-                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
 
             int radius;
@@ -515,7 +511,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             Canvas c = new Canvas(defaultAvatar);
             Paint p = new Paint();
             p.setAntiAlias(true);
-            p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 
 
             int radius;
@@ -595,31 +591,31 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
 
                 if (!Util.isOnline(context)){
                     ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                    return;
-                }
-
-                ContactController cC = new ContactController(context);
-                ArrayList<String> contactEmails;
-                long numUsers = message.getMessage().getUsersCount();
-
-                if(context instanceof ChatActivityLollipop){
-                    if(numUsers==1){
-                        cC.inviteContact(message.getMessage().getUserEmail(0));
-                    }
-                    else{
-                        log("Num users to invite: "+numUsers);
-                        contactEmails = new ArrayList<>();
-
-                        for(int i=0;i<numUsers;i++){
-                            String userMail = message.getMessage().getUserEmail(i);
-                            contactEmails.add(userMail);
-                        }
-                        cC.inviteMultipleContacts(contactEmails);
-                    }
                 }
                 else{
-                    if(email!=null){
-                        cC.inviteContact(email);
+                    ContactController cC = new ContactController(context);
+                    ArrayList<String> contactEmails;
+                    long numUsers = message.getMessage().getUsersCount();
+
+                    if(context instanceof ChatActivityLollipop){
+                        if(numUsers==1){
+                            cC.inviteContact(message.getMessage().getUserEmail(0));
+                        }
+                        else{
+                            log("Num users to invite: "+numUsers);
+                            contactEmails = new ArrayList<>();
+
+                            for(int i=0;i<numUsers;i++){
+                                String userMail = message.getMessage().getUserEmail(i);
+                                contactEmails.add(userMail);
+                            }
+                            cC.inviteMultipleContacts(contactEmails);
+                        }
+                    }
+                    else{
+                        if(email!=null){
+                            cC.inviteContact(email);
+                        }
                     }
                 }
 

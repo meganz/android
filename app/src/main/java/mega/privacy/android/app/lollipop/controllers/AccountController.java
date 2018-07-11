@@ -25,7 +25,6 @@ import android.widget.Button;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -50,7 +49,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaUser;
 
 public class AccountController implements View.OnClickListener{
 
@@ -113,50 +111,45 @@ public class AccountController implements View.OnClickListener{
     }
 
     public boolean existsAvatar(){
-        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
-        String myEmail = myContact.getEmail();
-        if(myEmail!=null){
-            File avatar = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
 
-            if (avatar.exists()) {
-                log("avatar exists in: " + avatar.getAbsolutePath());
-                return true;
-            }
+
+        File avatar = null;
+        if (context.getExternalCacheDir() != null){
+            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
         }
+        else{
+            avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail()+ ".jpg");
+        }
+
+        if (avatar.exists()) {
+            log("avatar exists in: " + avatar.getAbsolutePath());
+            return true;
+        }
+
         return false;
     }
 
     public void removeAvatar(){
         log("removeAvatar");
 
-        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
-        String myEmail = myContact.getEmail();
-        if(myEmail!=null){
-            File avatar = null;
-            File qrFile = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
+        File avatar = null;
+        File qrFile = null;
+        if (context.getExternalCacheDir() != null){
+            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
+            qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
+        }
+        else{
+            avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
+            qrFile = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
+        }
 
-            if (avatar.exists()) {
-                log("avatar to delete: " + avatar.getAbsolutePath());
-                avatar.delete();
-            }
+        if (avatar.exists()) {
+            log("avatar to delete: " + avatar.getAbsolutePath());
+            avatar.delete();
+        }
 
-            if (qrFile.exists()){
-                qrFile.delete();
-            }
+        if (qrFile.exists()){
+            qrFile.delete();
         }
 
         megaApi.setAvatar(null, (ManagerActivityLollipop)context);
@@ -297,15 +290,20 @@ public class AccountController implements View.OnClickListener{
     public void copyMK(boolean logout){
         log("copyMK");
         String key = megaApi.exportMasterKey();
-        megaApi.masterKeyExported((ManagerActivityLollipop) context);
-        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
-        clipboard.setPrimaryClip(clip);
-        if (logout){
-            showConfirmDialogRecoveryKeySaved();
+        if (key != null) {
+            megaApi.masterKeyExported((ManagerActivityLollipop) context);
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", key);
+            clipboard.setPrimaryClip(clip);
+            if (logout){
+                showConfirmDialogRecoveryKeySaved();
+            }
+            else {
+                Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+            }
         }
         else {
-            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.copy_MK_confirmation), null);
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
         }
     }
 
@@ -349,19 +347,25 @@ public class AccountController implements View.OnClickListener{
 
         Bitmap rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
         String key = megaApi.exportMasterKey();
-        Canvas canvas = new Canvas(rKBitmap);
-        Paint paint = new Paint();
 
-        paint.setTextSize(40);
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-        float height = paint.measureText("yY");
-        float width = paint.measureText(key);
-        float x = (rKBitmap.getWidth()-width)/2;
-        canvas.drawText(key, x, height+15f, paint);
+        if (key != null) {
+            Canvas canvas = new Canvas(rKBitmap);
+            Paint paint = new Paint();
 
-        if (rKBitmap != null){
-            return rKBitmap;
+            paint.setTextSize(40);
+            paint.setColor(Color.BLACK);
+            paint.setStyle(Paint.Style.FILL);
+            float height = paint.measureText("yY");
+            float width = paint.measureText(key);
+            float x = (rKBitmap.getWidth() - width) / 2;
+            canvas.drawText(key, x, height + 15f, paint);
+
+            if (rKBitmap != null) {
+                return rKBitmap;
+            }
+        }
+        else {
+            Util.showAlert(((ManagerActivityLollipop) context), context.getString(R.string.email_verification_text_error), null);
         }
 
         return null;
@@ -396,8 +400,8 @@ public class AccountController implements View.OnClickListener{
         String message = context.getString(R.string.toast_master_key_removed);
         ((ManagerActivityLollipop) context).invalidateOptionsMenu();
         MyAccountFragmentLollipop mAF = ((ManagerActivityLollipop) context).getMyAccountFragment();
-        if(mAF!=null){
-            mAF.setMkButtonText();;
+        if(mAF!=null && mAF.isAdded()){
+            mAF.setMkButtonText();
         }
         Util.showAlert(((ManagerActivityLollipop) context), message, null);
     }

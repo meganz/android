@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -9,35 +10,36 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -86,19 +88,28 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	ProgressDialog statusDialog;
 	AlertDialog decryptionKeyDialog;
 
+	MenuItem shareMenuItem;
+
+	File previewFile = null;
+	Bitmap preview = null;
+
 	long toHandle = 0;
 	long fragmentHandle = -1;
 	int cont = 0;
 	MultipleRequestListenerLink importLinkMultipleListener = null;
 
-	RelativeLayout fragmentContainer;
+	CoordinatorLayout fragmentContainer;
+	CollapsingToolbarLayout collapsingToolbar;
 	ImageView iconView;
-	TextView nameView;
+	ImageView imageView;
+	RelativeLayout iconViewLayout;
+	RelativeLayout imageViewLayout;
+
 	ScrollView scrollView;
 	TextView sizeTextView;
-	TextView sizeTitleView;
 	TextView importButton;
 	TextView downloadButton;
+	Button buttonPreviewContent;
 	LinearLayout optionsBar;
 	MegaNode document = null;
 	RelativeLayout infoLayout;
@@ -177,111 +188,58 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 
 		setContentView(R.layout.activity_file_link);
-		
-		//Set toolbar
+		fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_link_fragment_container);
+
+		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_link_info_collapse_toolbar);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(60, outMetrics));
+		}else{
+			collapsingToolbar.setExpandedTitleMarginBottom(Util.scaleHeightPx(35, outMetrics));
+		}
+		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
 		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		if(aB!=null){
-			//		aB.setLogo(R.drawable.ic_arrow_back_black);
-			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setDisplayShowHomeEnabled(true);
-			aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-			aB.setDisplayShowTitleEnabled(false);
+		aB.setDisplayShowTitleEnabled(false);
+
+		aB.setHomeButtonEnabled(true);
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = this.getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
 		}
 
-		fragmentContainer = (RelativeLayout) findViewById(R.id.file_link_fragment_container);
-		
-		infoLayout = (RelativeLayout) findViewById(R.id.file_link_layout);
 
-		scrollView = (ScrollView) findViewById(R.id.file_link_scroll_layout);
+		/*Icon & image in Toolbar*/
+		iconViewLayout = (RelativeLayout) findViewById(R.id.file_link_icon_layout);
+		iconView = (ImageView) findViewById(R.id.file_link_icon);
 
-		FrameLayout.LayoutParams infoLayoutParams = (FrameLayout.LayoutParams)infoLayout.getLayoutParams();
-		infoLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(80, outMetrics)); 		
-		infoLayout.setLayoutParams(infoLayoutParams);
-		
-		iconView = (ImageView) findViewById(R.id.file_link_icon);		
-		iconView.getLayoutParams().width = Util.scaleWidthPx(200, outMetrics);
-		iconView.getLayoutParams().height = Util.scaleHeightPx(200, outMetrics);		
-		
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iconView.getLayoutParams();
-		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		iconView.setLayoutParams(params);
+		imageViewLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
+		imageView = (ImageView) findViewById(R.id.file_info_toolbar_image);
+		imageViewLayout.setVisibility(View.GONE);
 
-//		((RelativeLayout.LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
-		
-//		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//		lp.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics));
-//		iconView.setLayoutParams(lp);
-		
-		float scaleText;
-		if (scaleH < scaleW){
-			scaleText = scaleH;
-		}
-		else{
-			scaleText = scaleW;
-		}
-			
-		nameView = (TextView) findViewById(R.id.file_link_name);
-		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-		nameView.setSingleLine();
-		nameView.setTypeface(null, Typeface.BOLD);
-		//Left margin
-		RelativeLayout.LayoutParams nameViewParams = (RelativeLayout.LayoutParams)nameView.getLayoutParams();
-		nameViewParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(20, outMetrics)); 		
-		nameView.setLayoutParams(nameViewParams);
-		
-//		lp.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics));
-//		nameView.setLayoutParams(lp);
-		sizeTitleView = (TextView) findViewById(R.id.file_link_info_menu_size);
-		//Left margin, Top margin
-		RelativeLayout.LayoutParams sizeTitleParams = (RelativeLayout.LayoutParams)sizeTitleView.getLayoutParams();
-		sizeTitleParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, 0); 		
-		sizeTitleView.setLayoutParams(sizeTitleParams);
-				
+		/*Elements*/
 		sizeTextView = (TextView) findViewById(R.id.file_link_size);
-		//Bottom margin
-		RelativeLayout.LayoutParams sizeTextParams = (RelativeLayout.LayoutParams)sizeTextView.getLayoutParams();
-		sizeTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(15, outMetrics)); 		
-		sizeTextView.setLayoutParams(sizeTextParams);		
-		
-		optionsBar = (LinearLayout) findViewById(R.id.options_file_link_layout);
+		buttonPreviewContent = (Button) findViewById(R.id.button_preview_content);
+		buttonPreviewContent.setOnClickListener(this);
+		buttonPreviewContent.setEnabled(false);
+
+		buttonPreviewContent.setVisibility(View.GONE);
 
 		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
-		downloadButton.setOnClickListener(this);
 		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-//		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();
-//		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
-//		downloadButton.setLayoutParams(paramsb1);
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		downloadButton.setLayoutParams(cancelTextParams);
-		
-		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
-		importButton.setOnClickListener(this);
-//		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();
-//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
-//		importButton.setLayoutParams(paramsb2);
-		//Left and Right margin
-		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)importButton.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		importButton.setLayoutParams(optionTextParams);
+		downloadButton.setOnClickListener(this);
+		downloadButton.setVisibility(View.INVISIBLE);
 
-//		RelativeLayout.LayoutParams paramsScroll = (RelativeLayout.LayoutParams) scrollView.getLayoutParams();
-//		paramsScroll.height =  fragmentContainer.getHeight()-tB.getHeight()-optionsBar.getHeight();
-//		scrollView.setLayoutParams(paramsScroll);
-				
-//		iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
-//		((LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
-//		
-//		((LayoutParams) sizeTextView.getLayoutParams()).setMargins(Util.px2dp((75*scaleW), outMetrics), 0, 0, 0);
-		
-		importButton.setVisibility(View.INVISIBLE);
+		importButton = (TextView) findViewById(R.id.file_link_button_import);
+		importButton.setText(getString(R.string.add_to_cloud_import).toUpperCase(Locale.getDefault()));
+		importButton.setOnClickListener(this);
+		importButton.setVisibility(View.GONE);
 
 		try{
 			statusDialog.dismiss();
@@ -298,7 +256,47 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
-	public void askForDecryptionKeyDialog(){
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.file_link_action, menu);
+		shareMenuItem = menu.findItem(R.id.share_link);
+		shareMenuItem.setVisible(true);
+		menu.findItem(R.id.share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+		collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
+		collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+//		collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+
+		return super.onCreateOptionsMenu(menu);
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+		int id = item.getItemId();
+		switch (id) {
+			case android.R.id.home: {
+				finish();
+				break;
+			}
+			case R.id.share_link: {
+				if(url!=null){
+					shareLink(url);
+				}else{
+					log("url NULL");
+				}
+				break;
+			}
+		}
+		return true;
+	}
+
+		public void askForDecryptionKeyDialog(){
 		log("askForDecryptionKeyDialog");
 
 		LinearLayout layout = new LinearLayout(this);
@@ -310,7 +308,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		layout.addView(input, params);
 
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.password_text));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -458,9 +456,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("onRequestFinish: " + request.getRequestString()+ " code: "+e.getErrorCode());
 		if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
 			try { 
 				statusDialog.dismiss();	
@@ -472,44 +469,73 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				
 				if (document == null){
 					log("documment==null --> Intent to ManagerActivityLollipop");
-					Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
-	    			startActivity(backIntent);
+					boolean closedChat = MegaApplication.isClosedChat();
+					if(closedChat){
+						Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
+						startActivity(backIntent);
+					}
+
 	    			finish();
 					return;
 				}
 
-				nameView.setText(document.getName());
+//				nameView.setText(document.getName());
+				collapsingToolbar.setTitle(document.getName());
+
 				sizeTextView.setText(Formatter.formatFileSize(this, document.getSize()));
 
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-
+				iconViewLayout.setVisibility(View.VISIBLE);
 				downloadButton.setVisibility(View.VISIBLE);
 
 				if(dbH.getCredentials() == null){
-					importButton.setVisibility(View.INVISIBLE);
+					importButton.setVisibility(View.GONE);
 				}
 				else{
 					importButton.setVisibility(View.VISIBLE);
 				}
 
-				Bitmap preview = null;
 				preview = PreviewUtils.getPreviewFromCache(document);
 				if (preview != null){
 					PreviewUtils.previewCache.put(document.getHandle(), preview);
-					iconView.setImageBitmap(preview);
-					iconView.setOnClickListener(this);
-				}
-				else{
+					imageView.setImageBitmap(preview);
+					imageViewLayout.setVisibility(View.VISIBLE);
+					iconViewLayout.setVisibility(View.GONE);
+					buttonPreviewContent.setVisibility(View.VISIBLE);
+					buttonPreviewContent.setEnabled(true);
+
+				}else{
+
 					preview = PreviewUtils.getPreviewFromFolder(document, this);
 					if (preview != null){
 						PreviewUtils.previewCache.put(document.getHandle(), preview);
-						iconView.setImageBitmap(preview);
-						iconView.setOnClickListener(this);
-					}
-					else{
+						imageView.setImageBitmap(preview);
+						imageViewLayout.setVisibility(View.VISIBLE);
+						iconViewLayout.setVisibility(View.GONE);
+						buttonPreviewContent.setVisibility(View.VISIBLE);
+						buttonPreviewContent.setEnabled(true);
+
+					}else{
+
 						if (document.hasPreview()) {
-							File previewFile = new File(PreviewUtils.getPreviewFolder(this), document.getBase64Handle() + ".jpg");
+							previewFile = new File(PreviewUtils.getPreviewFolder(this), document.getBase64Handle() + ".jpg");
 							megaApi.getPreview(document, previewFile.getAbsolutePath(), this);
+							buttonPreviewContent.setVisibility(View.VISIBLE);
+						}else{
+							if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() || MimeTypeList.typeForName(document.getName()).isPdf()){
+								imageViewLayout.setVisibility(View.GONE);
+								iconViewLayout.setVisibility(View.VISIBLE);
+
+								buttonPreviewContent.setVisibility(View.VISIBLE);
+								buttonPreviewContent.setEnabled(true);
+							}
+							else{
+								buttonPreviewContent.setEnabled(false);
+								buttonPreviewContent.setVisibility(View.GONE);
+
+								imageViewLayout.setVisibility(View.GONE);
+								iconViewLayout.setVisibility(View.VISIBLE);
+							}
 						}
 					}
 				}
@@ -564,8 +590,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
-									Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-									startActivity(backIntent);
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+										startActivity(backIntent);
+									}
+
 									finish();
 								}
 							});
@@ -590,8 +620,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
 							PreviewUtils.previewCache.put(document.getHandle(), bitmap);
 							if (iconView != null) {
-								iconView.setImageBitmap(bitmap);
-								iconView.setOnClickListener(this);
+								imageView.setImageBitmap(bitmap);
+								buttonPreviewContent.setEnabled(true);
+								imageViewLayout.setVisibility(View.VISIBLE);
+								iconViewLayout.setVisibility(View.GONE);
 							}
 						}
 					}
@@ -615,6 +647,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					startActivity(intent);
 					finish();
 
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+
+					log("PRE OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
 				}
 				else
 				{
@@ -654,18 +694,168 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				importNode();
 				break;
 			}
-			case R.id.file_link_icon:{
-
+			case R.id.button_preview_content:{
+				showFile();
 				break;
 			}
 		}
 	}
 	
-	void importNode(){
+	public void importNode(){
 
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
 		startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER);
+	}
+
+	public void showFile(){
+		log("showFile");
+		String serializeString = document.serialize();
+		if(MimeTypeList.typeForName(document.getName()).isImage()){
+			log("showFile:image");
+			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
+			intent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
+			intent.putExtra("position", 0);
+			intent.putExtra("urlFileLink",url);
+			intent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+			intent.putExtra("parentNodeHandle", -1L);
+			intent.putExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+			intent.putExtra("isFileLink", true);
+			startActivity(intent);
+
+		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){
+			log("showFile:video");
+
+			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
+			log("showFile:FILENAME: " + document.getName() + " TYPE: " + mimeType);
+
+			Intent mediaIntent;
+			boolean internalIntent;
+			boolean opusFile = false;
+			if (MimeTypeList.typeForName(document.getName()).isVideoNotSupported() || MimeTypeList.typeForName(document.getName()).isAudioNotSupported()) {
+				mediaIntent = new Intent(Intent.ACTION_VIEW);
+				internalIntent = false;
+				String[] s = document.getName().split("\\.");
+				if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+					opusFile = true;
+				}
+			} else {
+				log("showFile:setIntentToAudioVideoPlayer");
+				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				mediaIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+				mediaIntent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
+				internalIntent = true;
+			}
+			mediaIntent.putExtra("FILENAME", document.getName());
+
+			if (megaApi.httpServerIsRunning() == 0) {
+				megaApi.httpServerStart();
+			} else {
+				log("showFile:ERROR:httpServerAlreadyRunning");
+			}
+
+			ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+			ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+			activityManager.getMemoryInfo(mi);
+
+			if (mi.totalMem > Constants.BUFFER_COMP) {
+				log("showFile:total mem: " + mi.totalMem + " allocate 32 MB");
+				megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+			} else {
+				log("showFile:total mem: " + mi.totalMem + " allocate 16 MB");
+				megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+			}
+
+			String url = megaApi.httpServerGetLocalLink(document);
+			if (url != null) {
+				Uri parsedUri = Uri.parse(url);
+				if (parsedUri != null) {
+					mediaIntent.setDataAndType(parsedUri, mimeType);
+				} else {
+					log("showFile:ERROR:httpServerGetLocalLink");
+					showSnackbar(getString(R.string.email_verification_text_error));
+				}
+			} else {
+				log("showFile:ERROR:httpServerGetLocalLink");
+				showSnackbar(getString(R.string.email_verification_text_error));
+			}
+
+			mediaIntent.putExtra("HANDLE", document.getHandle());
+			if (opusFile){
+				mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+			}
+			if (internalIntent) {
+				startActivity(mediaIntent);
+			} else {
+				log("showFile:externalIntent");
+				if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
+					startActivity(mediaIntent);
+				} else {
+					log("showFile:noAvailableIntent");
+					showSnackbar("NoApp available");
+				}
+			}
+
+		}else if(MimeTypeList.typeForName(document.getName()).isPdf()){
+			log("showFile:pdf");
+
+			String mimeType = MimeTypeList.typeForName(document.getName()).getType();
+			log("showFile:FILENAME: " + document.getName() + " TYPE: "+mimeType);
+			Intent pdfIntent = new Intent(this, PdfViewerActivityLollipop.class);
+			pdfIntent.putExtra("adapterType", Constants.FILE_LINK_ADAPTER);
+			pdfIntent.putExtra(Constants.EXTRA_SERIALIZE_STRING, serializeString);
+			pdfIntent.putExtra("inside", true);
+			pdfIntent.putExtra("FILENAME", document.getName());
+
+			if (Util.isOnline(this)){
+				if (megaApi.httpServerIsRunning() == 0) {
+					megaApi.httpServerStart();
+				}
+				else{
+					log("showFile:ERROR:httpServerAlreadyRunning");
+				}
+				ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+				ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+				activityManager.getMemoryInfo(mi);
+				if(mi.totalMem>Constants.BUFFER_COMP){
+					log("showFile:total mem: "+mi.totalMem+" allocate 32 MB");
+					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+				}
+				else{
+					log("showFile:total mem: "+mi.totalMem+" allocate 16 MB");
+					megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+				}
+				String url = megaApi.httpServerGetLocalLink(document);
+				if(url!=null){
+					Uri parsedUri = Uri.parse(url);
+					if(parsedUri!=null){
+						pdfIntent.setDataAndType(parsedUri, mimeType);
+					}
+					else{
+						log("showFile:ERROR:httpServerGetLocalLink");
+						showSnackbar(getString(R.string.email_verification_text_error));
+					}
+				}
+				else{
+					log("showFile:ERROR:httpServerGetLocalLink");
+					showSnackbar(getString(R.string.email_verification_text_error));
+				}
+			}
+			else {
+				showSnackbar(getString(R.string.error_server_connection_problem)+". "+ getString(R.string.no_network_connection_on_play_file));
+			}
+
+			pdfIntent.putExtra("HANDLE", document.getHandle());
+
+			if (MegaApiUtils.isIntentAvailable(this, pdfIntent)){
+				startActivity(pdfIntent);
+			}
+			else{
+				log("showFile:noAvailableIntent");
+			}
+		}else{
+			log("none");
+		}
 	}
 	
 	String urlM;
@@ -674,7 +864,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	MegaNode documentM;
 	
 	@SuppressLint("NewApi") 
-	void downloadNode(){
+	public void downloadNode(){
 		
 		if (document == null){
 			try{ 
@@ -687,8 +877,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.dismiss();
-							Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
-			    			startActivity(backIntent);
+							boolean closedChat = MegaApplication.isClosedChat();
+							if(closedChat){
+								Intent backIntent = new Intent(fileLinkActivity, ManagerActivityLollipop.class);
+								startActivity(backIntent);
+							}
+
 			    			finish();
 						}
 					});
@@ -916,18 +1110,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		}
 	}
 	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-	    	// Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	finish();
-		    	return true;
-		    }
-		}
-		
-		return super.onOptionsItemSelected(item);
-	}
+
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -1220,10 +1403,10 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 			}
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
-			finish();
-		}
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//			log("Build.VERSION_CODES.LOLLIPOP --> Finish this!!!");
+//			finish();
+//		}
 	}
 
 	public void showSnackbar(String s){
@@ -1502,6 +1685,21 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 		startActivity(intent);
 		finish();
+	}
+
+	public void errorPreOverquota() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+		startActivity(intent);
+		finish();
+	}
+
+	public void shareLink(String link){
+		log("shareLink");
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.setType("text/plain");
+		intent.putExtra(Intent.EXTRA_TEXT, link);
+		startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 	}
 
 }

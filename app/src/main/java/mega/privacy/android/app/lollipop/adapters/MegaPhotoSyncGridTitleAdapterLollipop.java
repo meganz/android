@@ -45,8 +45,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -1017,7 +1015,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     continue;
                 }
 
-                if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
+                if (!MimeTypeThumbnail.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeThumbnail.typeForName(nodes.get(i).getName()).isVideo())){
                     continue;
                 }
                 checkedItems.append(i, true);
@@ -1094,10 +1092,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             intent.putExtra("handlesNodesSearch",arrayHandles);
                         }
 
-                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                        if(accountInfo!=null){
-                            intent.putExtra("typeAccount", accountInfo.getAccountType());
-                        }
                         log("Position in nodes: "+positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             intent.putExtra("parentNodeHandle", -1L);
@@ -1113,20 +1107,20 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     else if (MimeTypeThumbnail.typeForName(n.getName()).isVideoReproducible()){
                         MegaNode file = n;
 
-                        String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+                        String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
                         log("FILENAME: " + file.getName());
 
                         Intent mediaIntent;
-                        if (MimeTypeList.typeForName(n.getName()).isVideoNotSupported()){
+                        boolean internalIntent;
+                        if (MimeTypeThumbnail.typeForName(n.getName()).isVideoNotSupported()){
                             mediaIntent = new Intent(Intent.ACTION_VIEW);
+                            internalIntent = false;
                         }
                         else {
+                            internalIntent = true;
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         }
-                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                        if(accountInfo!=null){
-                            mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-                        }
+
                         mediaIntent.putExtra("position", positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             mediaIntent.putExtra("parentNodeHandle", -1L);
@@ -1159,7 +1153,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                                 mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                             }
                             else{
-                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeThumbnail.typeForName(file.getName()).getType());
                             }
                             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         }
@@ -1184,17 +1178,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             String url = megaApi.httpServerGetLocalLink(file);
                             mediaIntent.setDataAndType(Uri.parse(url), mimeType);
                         }
-                        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                        if (internalIntent) {
                             context.startActivity(mediaIntent);
                         }
-                        else{
-                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-                            ArrayList<Long> handleList = new ArrayList<Long>();
-                            handleList.add(n.getHandle());
-                            NodeController nC = new NodeController(context);
-                            nC.prepareForDownload(handleList);
+                        else {
+                            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+                                context.startActivity(mediaIntent);
+                            } else {
+                                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                ArrayList<Long> handleList = new ArrayList<Long>();
+                                handleList.add(n.getHandle());
+                                NodeController nC = new NodeController(context);
+                                nC.prepareForDownload(handleList);
+                            }
                         }
-                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
                         CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else{
