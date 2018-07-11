@@ -93,7 +93,7 @@ public class AccountController implements View.OnClickListener{
     public void deleteAccount(){
         log("deleteAccount");
         if (((ManagerActivityLollipop) context).is2FAEnabled()){
-            ((ManagerActivityLollipop) context).showVerifyPin2FA(true);
+            ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CANCEL_ACCOUNT_2FA);
         }
         else {
             megaApi.cancelAccount((ManagerActivityLollipop) context);
@@ -568,7 +568,7 @@ public class AccountController implements View.OnClickListener{
             log("Changes in mail, new mail: "+newMail);
             if (((ManagerActivityLollipop) context).is2FAEnabled()){
                 ((ManagerActivityLollipop) context).setNewMail(newMail);
-                ((ManagerActivityLollipop) context).showVerifyPin2FA(false);
+                ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CHANGE_MAIL_2FA);
             }
             else {
                 megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);

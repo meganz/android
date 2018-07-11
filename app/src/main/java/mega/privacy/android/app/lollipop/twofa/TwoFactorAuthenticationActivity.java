@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -79,7 +80,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private Button setup2FAButton;
     private Button copySeedButton;
     private Button next2FAButton;
-//    private Button verify2FAButton;
     private Button exportRKButton;
     private Button dismissRKButton;
     private ImageView qrImage;
@@ -184,8 +184,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         copySeedButton.setOnClickListener(this);
         next2FAButton = (Button) findViewById(R.id.button_next_2fa);
         next2FAButton.setOnClickListener(this);
-//        verify2FAButton = (Button) findViewById(R.id.button_verify_2fa);
-//        verify2FAButton.setOnClickListener(this);
         exportRKButton = (Button) findViewById(R.id.button_export_rk);
         exportRKButton.setOnClickListener(this);
         dismissRKButton  =(Button) findViewById(R.id.button_dismiss_rk);
@@ -249,7 +247,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     if (isErrorShown){
                         quitError();
                     }
-//                    verify2FAButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -288,7 +285,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     if (isErrorShown){
                         quitError();
                     }
-//                    verify2FAButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -326,7 +322,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     if (isErrorShown){
                         quitError();
                     }
-//                    verify2FAButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -363,7 +358,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     if (isErrorShown){
                         quitError();
                     }
-//                    verify2FAButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -399,7 +393,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     if (isErrorShown){
                         quitError();
                     }
-//                    verify2FAButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -430,7 +423,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     if (isErrorShown){
                         quitError();
                     }
-//                    verify2FAButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -480,15 +472,25 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainer2FAEnabled.setVisibility(View.GONE);
         }
 
-        megaApi.multiFactorAuthDisable("814604", this);
         megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isEnabled2FA) {
+            update2FASetting();
+        }
+    }
+
+    void update2FASetting () {
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
+        intent.putExtra("enabled", true);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     void permitVerify(){
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-//            if (!isErrorShown) {
-//                verify2FAButton.setVisibility(View.VISIBLE);
-//            }
             hideKeyboard();
             if (sb.length()>0) {
                 sb.delete(0, sb.length());
@@ -655,19 +657,14 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 copySeed();
                 break;
             }
-//            case R.id.button_verify_2fa: {
-//                hideKeyboard();
-//                if (pin != null){
-//                    megaApi.multiFactorAuthEnable(pin, this);
-//                }
-//                break;
-//            }
             case R.id.button_export_rk:{
+                update2FASetting();
                 AccountController aC = new AccountController(this);
                 aC.saveRkToFileSystem(false);
                 break;
             }
             case R.id.button_dismiss_rk:{
+                update2FASetting();
                 this.finish();
                 break;
             }
@@ -761,7 +758,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     void showError(){
         firstTime = false;
         isErrorShown = true;
-//        verify2FAButton.setVisibility(View.GONE);
         pinError.setVisibility(View.VISIBLE);
         firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
         secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));

@@ -75,7 +75,7 @@ import nz.mega.sdk.MegaUser;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener {
 
     private Context context;
     private AlertDialog insertMailDialog;
@@ -183,7 +183,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String pin = null;
     private TextView pinError;
     private RelativeLayout lostYourDeviceButton;
-    private Button verifyButton;
 
     private boolean isFirstTime = true;
     private boolean isErrorShown = false;
@@ -473,14 +472,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
         lostYourDeviceButton.setOnClickListener(this);
-        verifyButton = (Button) v.findViewById(R.id.button_verify_2fa);
-        verifyButton.setOnClickListener(this);
         pinError = (TextView) v.findViewById(R.id.pin_2fa_error_login);
         pinError.setVisibility(View.GONE);
 
         imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 
         firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_login);
+        firstPin.setOnFocusChangeListener(this);
         imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
         firstPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -514,12 +512,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    verifyButton.setVisibility(View.GONE);
+                    permitVerify();
                 }
             }
         });
 
         secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_login);
+        secondPin.setOnFocusChangeListener(this);
         imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
         secondPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -552,12 +551,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    verifyButton.setVisibility(View.GONE);
+                    permitVerify();
                 }
             }
         });
 
         thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_login);
+        thirdPin.setOnFocusChangeListener(this);
         imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
         thirdPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -589,12 +589,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    verifyButton.setVisibility(View.GONE);
                 }
             }
         });
 
         fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_login);
+        fourthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
         fourthPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -625,12 +625,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    verifyButton.setVisibility(View.GONE);
                 }
             }
         });
 
         fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_login);
+        fifthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
         fifthPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -660,12 +660,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    verifyButton.setVisibility(View.GONE);
                 }
             }
         });
 
         sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_login);
+        sixthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
         sixthPin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -690,7 +690,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (isErrorShown){
                         verifyQuitError();
                     }
-                    verifyButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -977,7 +976,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     void returnToLogin() {
-
         ((LoginActivityLollipop) context).hideAB();
 
         loginVerificationLayout.setVisibility(View.GONE);
@@ -995,6 +993,48 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         serversBusyText.setVisibility(View.GONE);
     }
 
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        switch (v.getId()) {
+            case R.id.pin_first_login:{
+                if (hasFocus) {
+                    firstPin.setText("");
+                }
+                break;
+            }
+            case R.id.pin_second_login:{
+                if (hasFocus) {
+                    secondPin.setText("");
+                }
+                break;
+            }
+            case R.id.pin_third_login:{
+                if (hasFocus) {
+                    thirdPin.setText("");
+                }
+                break;
+            }
+            case R.id.pin_fouth_login:{
+                if (hasFocus) {
+                    fourthPin.setText("");
+                }
+                break;
+            }
+            case R.id.pin_fifth_login:{
+                if (hasFocus) {
+                    fifthPin.setText("");
+                }
+                break;
+            }
+            case R.id.pin_sixth_login:{
+                if (hasFocus) {
+                    sixthPin.setText("");
+                }
+                break;
+            }
+        }
+    }
+
     void verifyQuitError(){
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
@@ -1009,7 +1049,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     void verifyShowError(){
         isFirstTime = false;
         isErrorShown = true;
-        verifyButton.setVisibility(View.GONE);
         pinError.setVisibility(View.VISIBLE);
         firstPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
         secondPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
@@ -1021,9 +1060,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     void permitVerify(){
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-            if (!isErrorShown) {
-                verifyButton.setVisibility(View.VISIBLE);
-            }
             hideKeyboard();
             if (sb.length()>0) {
                 sb.delete(0, sb.length());
@@ -1036,6 +1072,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             sb.append(sixthPin.getText());
             pin = sb.toString();
             log("PIN: "+pin);
+            if (!isErrorShown && pin != null){
+                megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
+            }
         }
     }
 
@@ -1642,13 +1681,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.lost_authentication_device: {
 
-                break;
-            }
-            case R.id.button_verify_2fa: {
-                hideKeyboard();
-                if (pin != null){
-                    megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
-                }
                 break;
             }
         }
