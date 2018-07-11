@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -12,12 +13,14 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -45,7 +48,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 @SuppressLint("NewApi")
-public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface{
+public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener{
 	
 	ChangePasswordActivityLollipop changePasswordActivity = this;
 
@@ -89,7 +92,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private TextView passwdAdvice;
 	private boolean passwdValid;
 
-	LinearLayout changePasswordVerificationLayout;
+	AlertDialog verify2FADialog;
+	boolean verify2FADialogIsShown = false;
 	InputMethodManager imm;
 	private EditTextPIN firstPin;
 	private EditTextPIN secondPin;
@@ -101,8 +105,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private String pin = null;
 	private TextView pinError;
 	private RelativeLayout lostYourDeviceButton;
-	private Button verifyButton;
 
+	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
 	private boolean is2FAEnabled = false;
 	private boolean firstTime = true;
@@ -245,232 +249,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		tB  =(Toolbar) findViewById(R.id.toolbar);
 		hideAB();
 
-		changePasswordVerificationLayout = (LinearLayout) findViewById(R.id.change_password_2fa);
-		changePasswordVerificationLayout.setVisibility(View.GONE);
-		lostYourDeviceButton = (RelativeLayout) findViewById(R.id.lost_authentication_device);
-		lostYourDeviceButton.setOnClickListener(this);
-		verifyButton = (Button) findViewById(R.id.button_verify_2fa);
-		verifyButton.setOnClickListener(this);
-		pinError = (TextView) findViewById(R.id.pin_2fa_error_change_password);
-		pinError.setVisibility(View.GONE);
-
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
-		firstPin = (EditTextPIN) findViewById(R.id.pin_first_change_password);
-		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
-		firstPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+		if (savedInstanceState != null) {
+			verify2FADialogIsShown =  savedInstanceState.getBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
+			if (verify2FADialogIsShown) {
+				showVerifyPin2FA();
 			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if(firstPin.length() != 0){
-					secondPin.requestFocus();
-					secondPin.setCursorVisible(true);
-
-					if (firstTime){
-						secondPin.setText("");
-						thirdPin.setText("");
-						fourthPin.setText("");
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else  {
-						permitVerify();
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-					verifyButton.setVisibility(View.GONE);
-				}
-			}
-		});
-
-		secondPin = (EditTextPIN) findViewById(R.id.pin_second_change_password);
-		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
-		secondPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (secondPin.length() != 0){
-					thirdPin.requestFocus();
-					thirdPin.setCursorVisible(true);
-
-					if (firstTime) {
-						thirdPin.setText("");
-						fourthPin.setText("");
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else  {
-						permitVerify();
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-					verifyButton.setVisibility(View.GONE);
-				}
-			}
-		});
-
-		thirdPin = (EditTextPIN) findViewById(R.id.pin_third_change_password);
-		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
-		thirdPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (thirdPin.length()!= 0){
-					fourthPin.requestFocus();
-					fourthPin.setCursorVisible(true);
-
-					if (firstTime) {
-						fourthPin.setText("");
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else  {
-						permitVerify();
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-					verifyButton.setVisibility(View.GONE);
-				}
-			}
-		});
-
-		fourthPin = (EditTextPIN) findViewById(R.id.pin_fouth_change_password);
-		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
-		fourthPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (fourthPin.length()!=0){
-					fifthPin.requestFocus();
-					fifthPin.setCursorVisible(true);
-
-					if (firstTime) {
-						fifthPin.setText("");
-						sixthPin.setText("");
-					}
-					else  {
-						permitVerify();
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-					verifyButton.setVisibility(View.GONE);
-				}
-			}
-		});
-
-		fifthPin = (EditTextPIN) findViewById(R.id.pin_fifth_change_password);
-		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
-		fifthPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (fifthPin.length()!=0){
-					sixthPin.requestFocus();
-					sixthPin.setCursorVisible(true);
-
-					if (firstTime) {
-						sixthPin.setText("");
-					}
-					else  {
-						permitVerify();
-					}
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-					verifyButton.setVisibility(View.GONE);
-				}
-			}
-		});
-
-		sixthPin = (EditTextPIN) findViewById(R.id.pin_sixth_change_password);
-		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
-		sixthPin.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (sixthPin.length()!=0){
-					sixthPin.setCursorVisible(true);
-					hideKeyboard();
-
-					permitVerify();
-				}
-				else {
-					if (isErrorShown){
-						verifyQuitError();
-					}
-					verifyButton.setVisibility(View.GONE);
-				}
-			}
-		});
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		}
 
 		Intent intentReceived = getIntent();
 		if (intentReceived != null) {
@@ -509,6 +295,302 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
+	}
+
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		switch (v.getId()) {
+			case R.id.pin_first_verify:{
+				if (hasFocus) {
+					firstPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_second_verify:{
+				if (hasFocus) {
+					secondPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_third_verify:{
+				if (hasFocus) {
+					thirdPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fouth_verify:{
+				if (hasFocus) {
+					fourthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fifth_verify:{
+				if (hasFocus) {
+					fifthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_sixth_verify:{
+				if (hasFocus) {
+					sixthPin.setText("");
+				}
+				break;
+			}
+		}
+	}
+	public void showVerifyPin2FA(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_verify_2fa, null);
+		builder.setView(v);
+
+		TextView titleDialog = (TextView) v.findViewById(R.id.title_dialog_verify);
+		titleDialog.setText(getString(R.string.change_password_verification));
+
+		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
+		lostYourDeviceButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+			}
+		});
+
+		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
+		pinError.setVisibility(View.GONE);
+
+		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+		firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_verify);
+		firstPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
+		firstPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(firstPin.length() != 0){
+					secondPin.requestFocus();
+					secondPin.setCursorVisible(true);
+
+					if (isFirstTime){
+						secondPin.setText("");
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_verify);
+		secondPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
+		secondPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (secondPin.length() != 0){
+					thirdPin.requestFocus();
+					thirdPin.setCursorVisible(true);
+
+					if (isFirstTime) {
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_verify);
+		thirdPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
+		thirdPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (thirdPin.length()!= 0){
+					fourthPin.requestFocus();
+					fourthPin.setCursorVisible(true);
+
+					if (isFirstTime) {
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_verify);
+		fourthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
+		fourthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fourthPin.length()!=0){
+					fifthPin.requestFocus();
+					fifthPin.setCursorVisible(true);
+
+					if (isFirstTime) {
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_verify);
+		firstPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
+		fifthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fifthPin.length()!=0){
+					sixthPin.requestFocus();
+					sixthPin.setCursorVisible(true);
+
+					if (isFirstTime) {
+						sixthPin.setText("");
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_verify);
+		sixthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
+		sixthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (sixthPin.length()!=0){
+					sixthPin.setCursorVisible(true);
+					hideKeyboard();
+
+					permitVerify();
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+		verify2FADialog = builder.create();
+		verify2FADialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				verify2FADialogIsShown = false;
+			}
+		});
+		verify2FADialog.show();
+		verify2FADialogIsShown = true;
+		imm.showSoftInput(this.getCurrentFocus(), InputMethodManager.SHOW_IMPLICIT);
+	}
+
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
@@ -523,7 +605,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	void verifyShowError(){
 		firstTime = false;
 		isErrorShown = true;
-		verifyButton.setVisibility(View.GONE);
 		pinError.setVisibility(View.VISIBLE);
 		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
 		secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
@@ -535,9 +616,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 	void permitVerify(){
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
-			if (!isErrorShown) {
-				verifyButton.setVisibility(View.VISIBLE);
-			}
 			hideKeyboard();
 			if (sb.length()>0) {
 				sb.delete(0, sb.length());
@@ -550,6 +628,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			sb.append(sixthPin.getText());
 			pin = sb.toString();
 			log("PIN: "+pin);
+			if (!isErrorShown && pin != null) {
+				changePassword(newPassword1View.getText().toString());
+			}
 		}
 	}
 
@@ -567,15 +648,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	    switch (item.getItemId()) {
 	    // Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
-		    	if (isOnVerifyScreen){
-		    		isOnVerifyScreen = false;
-		    		fragmentContainer.setVisibility(View.VISIBLE);
-		    		hideAB();
-		    		changePasswordVerificationLayout.setVisibility(View.GONE);
-				}
-				else {
 					finish();
-				}
 		    	return true;
 		    }
 		}	    
@@ -632,10 +705,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					passwdVisibility = true;
 					showHidePassword(R.id.toggle_button_new_passwd2);
 				}
-				break;
-			}
-			case R.id.button_verify_2fa: {
-				changePassword(newPassword1View.getText().toString());
 				break;
 			}
 //			case R.id.cancel_change_password:{
@@ -989,25 +1058,30 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					progress.dismiss();
 				} catch(Exception ex) {};
 
-				//Intent to MyAccount
-				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				if(e.getErrorCode()!=MegaError.API_OK){
-					log("Error, request: "+e.getErrorString());
-					if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
-						if (is2FAEnabled){
-							verifyShowError();
+				if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
+					verifyShowError();
+				}
+				else {
+					//Intent to MyAccount
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					if (e.getErrorCode() != MegaError.API_OK) {
+						log("Error, request: " + e.getErrorString());
+						if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
+							if (is2FAEnabled) {
+								verifyShowError();
+							}
+						}
+						else {
+							showSnackbar(getString(R.string.email_verification_text_error));
 						}
 					}
 					else {
-						showSnackbar(getString(R.string.email_verification_text_error));
+						resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+						log("General Error");
+						resetPassIntent.putExtra("RESULT", -1);
+						startActivity(resetPassIntent);
+						finish();
 					}
-				}
-				else{
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-					log("General Error");
-					resetPassIntent.putExtra("RESULT", -1);
-					startActivity(resetPassIntent);
-					finish();
 				}
 			}
 			else{
@@ -1015,7 +1089,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};
-				
+				imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 				//Intent to MyAccount
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
@@ -1108,10 +1182,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (request.getFlag()){
 					is2FAEnabled = true;
-					fragmentContainer.setVisibility(View.GONE);
-					showAB();
-					isOnVerifyScreen = true;
-					changePasswordVerificationLayout.setVisibility(View.VISIBLE);
+					showVerifyPin2FA();
 				}
 				else {
 					is2FAEnabled = false;
@@ -1218,23 +1289,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
-	}
-
-	void showAB(){
-		setSupportActionBar(tB);
-		if (aB == null){
-			aB = getSupportActionBar();
-		}
-		aB.show();
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayHomeAsUpEnabled(true);
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
 	}
 
 	void hideAB(){

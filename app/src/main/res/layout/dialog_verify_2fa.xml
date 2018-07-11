@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <LinearLayout
+        android:id="@+id/verify_2fa"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title_dialog_verify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:fontFamily="roboto"
+            android:elevation="4dp"
+            android:padding="10dp"
+            android:background="@color/lollipop_primary_color"/>
+
+        <RelativeLayout
+            android:id="@+id/container_confirm_2fa_verify"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp"
+            android:layout_below="@+id/toolbar">
+
+            <TextView
+                android:id="@+id/explain_confirm_2fa_verify"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/explain_confirm_2fa"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:fontFamily="roboto"
+                android:layout_marginTop="40dp"
+                android:layout_centerHorizontal="true"/>
+
+            <LinearLayout
+                android:id="@+id/six_pin_verify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/explain_confirm_2fa_verify"
+                android:layout_marginTop="36dp"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal">
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:id="@+id/pin_first_verify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:textSize="32sp"
+                    android:textColor="@color/name_my_account"
+                    android:layout_marginRight="16dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:maxLength="1" />
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:id="@+id/pin_second_verify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:textSize="32sp"
+                    android:textColor="@color/name_my_account"
+                    android:layout_marginRight="16dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:maxLength="1" />
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:id="@+id/pin_third_verify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:textSize="32sp"
+                    android:textColor="@color/name_my_account"
+                    android:layout_marginRight="38dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:maxLength="1" />
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:id="@+id/pin_fouth_verify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:textSize="32sp"
+                    android:textColor="@color/name_my_account"
+                    android:layout_marginRight="16dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:maxLength="1" />
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:id="@+id/pin_fifth_verify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:textSize="32sp"
+                    android:textColor="@color/name_my_account"
+                    android:layout_marginRight="16dp"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:maxLength="1" />
+
+                <mega.privacy.android.app.components.EditTextPIN
+                    android:id="@+id/pin_sixth_verify"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:textSize="32sp"
+                    android:textColor="@color/name_my_account"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:maxLength="1" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/pin_2fa_error_verify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginBottom="40dp"
+                android:text="@string/pin_error_2fa"
+                android:textColor="@color/login_warning"
+                android:fontFamily="roboto"
+                android:layout_below="@+id/six_pin_verify"
+                android:layout_alignLeft="@id/six_pin_verify"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"/>
+
+            <RelativeLayout
+                android:id="@+id/lost_authentication_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/six_pin_verify"
+                android:padding="10dp"
+                android:layout_marginTop="29dp"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lost_your_authenticator_device"
+                    android:textColor="@color/file_playlist_state"
+                    android:textSize="13sp"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+            <!--<Button
+                android:id="@+id/button_verify_2fa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lost_authentication_device"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/background_button"
+                android:elevation="8dp"
+                android:textColor="@color/white"
+                android:text="@string/general_verify"
+                android:visibility="gone"/>-->
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</ScrollView>

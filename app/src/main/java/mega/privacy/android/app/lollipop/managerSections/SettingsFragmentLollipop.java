@@ -1102,6 +1102,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		setAutoaccept = false;
 		autoAccept = false;
 		megaApi.getContactLinksOption(this);
+		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 	}
 
 	@Override
@@ -2066,47 +2067,32 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivity(intent);
 		}
 		else if (preference.getKey().compareTo(KEY_2FA) == 0){
-			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				twoFASwitch.setChecked(false);
-//				if (twoFASwitch.isChecked()){
-//					log("2FA is Checked");
-//                    twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
-//                    twoFACategory.addPreference(twoFASeeRK);
-//                    twoFACategory.addPreference(twoFaResetAuthenticationApp);
-//                    Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
-//                    startActivity(intent);
-////                    twoFACategory.addPreference(twoFAEnableSms);
-//				}
-//				else {
-//					log("2FA is NOT Checked");
-//                    twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa));
-//					twoFACategory.removePreference(twoFASeeRK);
-//					twoFACategory.removePreference(twoFaResetAuthenticationApp);
-////					twoFACategory.removePreference(twoFAEnableSms);
-//				}
+				if (((ManagerActivityLollipop) context).is2FAEnabled()){
+					log("2FA is Checked");
+					twoFASwitch.setChecked(true);
+					((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.DISABLE_2FA);
+				}
+				else {
+					log("2FA is NOT Checked");
+					twoFASwitch.setChecked(false);
+					Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
+					startActivity(intent);
+				}
 			}
 			else{
-				twoFACheck.setChecked(false);
-//				if (twoFACheck.isChecked()){
-//					log("2FA is Checked");
-//                    twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
-//					twoFACategory.addPreference(twoFASeeRK);
-//					twoFACategory.addPreference(twoFaResetAuthenticationApp);
-//					Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
-//					startActivity(intent);
-////					twoFACategory.addPreference(twoFAEnableSms);
-//				}
-//				else {
-//					log("2FA is NOT Checked");
-//					twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa));
-//					twoFACategory.removePreference(twoFASeeRK);
-//					twoFACategory.removePreference(twoFaResetAuthenticationApp);
-////					twoFACategory.removePreference(twoFAEnableSms);
-//				}
+				if (((ManagerActivityLollipop) context).is2FAEnabled()){
+					log("2FA is Checked");
+					twoFACheck.setChecked(true);
+					((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.DISABLE_2FA);
+				}
+				else {
+					log("2FA is NOT Checked");
+					twoFACheck.setChecked(false);
+					Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
+					startActivity(intent);
+				}
 			}
-			Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
-			startActivity(intent);
 		}
 		else if (preference.getKey().compareTo(KEY_2FA_SEE_RK) == 0){
 
@@ -2356,6 +2342,40 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.setEnabled(false);
 		}
 		super.onResume();
+	}
+
+	public void update2FAPreference(boolean enabled) {
+		log("update2FAPreference");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			twoFASwitch.setChecked(enabled);
+			if (enabled) {
+				twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
+//                    twoFACategory.addPreference(twoFASeeRK);
+//                    twoFACategory.addPreference(twoFaResetAuthenticationApp);
+//                    twoFACategory.addPreference(twoFAEnableSms);
+			}
+			else {
+				twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa));
+//					twoFACategory.removePreference(twoFASeeRK);
+//					twoFACategory.removePreference(twoFaResetAuthenticationApp);
+//					twoFACategory.removePreference(twoFAEnableSms);
+			}
+		}
+		else{
+			twoFACheck.setChecked(enabled);
+			if (enabled) {
+				twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
+//					twoFACategory.addPreference(twoFASeeRK);
+//					twoFACategory.addPreference(twoFaResetAuthenticationApp);
+//					twoFACategory.addPreference(twoFAEnableSms);
+			}
+			else {
+				twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa));
+//					twoFACategory.removePreference(twoFASeeRK);
+//					twoFACategory.removePreference(twoFaResetAuthenticationApp);
+//					twoFACategory.removePreference(twoFAEnableSms);
+			}
+		}
 	}
 	
 	public void afterSetPinLock(){

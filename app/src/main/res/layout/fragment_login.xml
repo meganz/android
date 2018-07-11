@@ -217,7 +217,7 @@
                     android:id="@+id/explain_confirm_2fa_login"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/description_login_2fa_verification"
+                    android:text="@string/explain_confirm_2fa"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"
                     android:gravity="center"
@@ -344,20 +344,6 @@
                         android:layout_centerHorizontal="true"/>
 
                 </RelativeLayout>
-
-                <Button
-                    android:id="@+id/button_verify_2fa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/lost_authentication_device"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginBottom="40dp"
-                    android:background="@drawable/background_button"
-                    android:elevation="8dp"
-                    android:textColor="@color/white"
-                    android:text="@string/general_verify"
-                    android:visibility="gone"/>
 
             </RelativeLayout>
 
