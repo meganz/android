@@ -89,7 +89,7 @@
                 android:choiceMode="multipleChoice" />
 
             <mega.privacy.android.app.components.scrollBar.FastScroller
-                android:id="@+id/fastscroll"
+                android:id="@+id/fastscroll_chat"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
