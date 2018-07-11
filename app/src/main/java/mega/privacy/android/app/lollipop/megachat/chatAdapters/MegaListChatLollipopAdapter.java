@@ -42,6 +42,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -64,7 +65,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
 
-public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener {
+public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
 
 	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
 	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
@@ -115,7 +116,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			multipleSelect = true;
 		}
 	}
-	
+
+
+
 	/*public view holder class*/
     public static class ViewHolderChatList extends ViewHolder {
 		public ViewHolderChatList(View arg0) {
@@ -134,6 +137,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		TextView textViewContactName;
 		EmojiconTextView textViewContent;
 		TextView textViewDate;
+		String textFastScroller;
 		ImageButton imageButtonThreeDots;
 		RelativeLayout circlePendingMessages;
 
@@ -1123,8 +1127,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				log("ChatRoom title: "+chat.getTitle());
 				log("chat timestamp: "+chat.getLastTimestamp());
 				String date = TimeChatUtils.formatDateAndTime(chat.getLastTimestamp(), TimeChatUtils.DATE_LONG_FORMAT);
+				String dateFS = TimeChatUtils.formatDate(chat.getLastTimestamp(), TimeChatUtils.DATE_SHORT_SHORT_FORMAT);
 				log("date timestamp: "+date);
 				((ViewHolderNormalChatList)holder).textViewDate.setText(date);
+				((ViewHolderNormalChatList)holder).textFastScroller = dateFS;
 				((ViewHolderNormalChatList)holder).textViewDate.setVisibility(View.VISIBLE);
 			}
 		}
@@ -2195,6 +2201,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 //			notifyItemChanged(pos);
 //			notifyItemChanged(pos+1);
 		}
+	}
+
+	@Override
+	public String getSectionTitle(int position) {
+		return ((ViewHolderNormalChatList)holder).textFastScroller;
 	}
 
 	public void modifyChat(ArrayList<MegaChatListItem> chats, int position){
