@@ -603,6 +603,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if(upAFL!=null && upAFL.isAdded()){
 							upAFL.showAvailableAccount();
 						}
+
+
+						if(sttFLol!=null && sttFLol.isAdded()){
+							sttFLol.setRubbishInfo();
+						}
 					}
 				}
 				else if(actionType == Constants.UPDATE_CREDIT_CARD_SUBSCRIPTION){
@@ -5340,6 +5345,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     			break;
     		}
     		case SETTINGS:{
+
+				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
+					megaApi.getFolderInfo(megaApi.getRootNode(), this);
+				}
+
 				aB.setSubtitle(null);
 				tB.setVisibility(View.VISIBLE);
 
@@ -7781,7 +7791,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //	        }
 	        case R.id.action_menu_clear_rubbish_bin:{
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		showClearRubbishBinDialog(null);
+	        		showClearRubbishBinDialog();
 	        	}
 	        	return true;
 	        }
@@ -10582,7 +10592,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
-	public void showClearRubbishBinDialog(String editText){
+	public void showClearRubbishBinDialog(){
 		log("showClearRubbishBinDialog");
 
 		if (rubbishBinFLol != null) {
@@ -10591,23 +10601,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-		String text;
-		if ((editText == null) || (editText.compareTo("") == 0)){
-			text = getString(R.string.context_clear_rubbish);
-		}
-		else{
-			text = editText;
-		}
-
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(getString(R.string.context_clear_rubbish));
+		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 		/*builder.setPositiveButton(getString(R.string.context_delete),new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nC.cleanRubbishBin();
 					}
 				});*/
-		builder.setPositiveButton(getString(R.string.context_remove),
+		builder.setPositiveButton(getString(R.string.general_clear),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nC.cleanRubbishBin();
@@ -10618,7 +10620,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		clearRubbishBinDialog.show();
 	}
 
+	public void showConfirmationClearAllVersions(){
+		log("showConfirmationClearAllVersions");
 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.settings_file_management_delete_versions));
+		builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
+
+		builder.setPositiveButton(getString(R.string.context_delete),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						nC.clearAllVersions();
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		clearRubbishBinDialog = builder.create();
+		clearRubbishBinDialog.show();
+	}
 
 //	public void upgradeAccountButton(){
 //		log("upgradeAccountButton");
@@ -14720,9 +14738,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
 				showSnackbar(getString(R.string.rubbish_bin_emptied));
+				//Get storage figures again
+				((MegaApplication) getApplication()).askForAccountDetails();
 			}
 			else{
 				showSnackbar(getString(R.string.rubbish_bin_no_emptied));
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_REMOVE_VERSIONS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK MegaRequest.TYPE_REMOVE_VERSIONS");
+				showSnackbar(getString(R.string.success_delete_versions));
+
+				if(sttFLol!=null && sttFLol.isAdded()) {
+					sttFLol.resetVersionsInfo();
+				}
+				//Get info of the version again (after 10 seconds)
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						updateAccountStorageInfo();
+					}
+				}, 8000);
+			}
+			else{
+				showSnackbar(getString(R.string.error_delete_versions));
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION){
@@ -14765,7 +14806,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(mStorageFLol!=null && mStorageFLol.isAdded()){
 				mStorageFLol.refreshVersionsInfo();
 			}
+
+			//Refresh Settings if it is shown
+			if(sttFLol!=null && sttFLol.isAdded()) {
+				sttFLol.setVersionsInfo();
+			}
 		}
+	}
+
+	public void updateAccountStorageInfo(){
+		log("updateAccountStorageInfo");
+		megaApi.getFolderInfo(megaApi.getRootNode(), this);
 	}
 
 	@Override
