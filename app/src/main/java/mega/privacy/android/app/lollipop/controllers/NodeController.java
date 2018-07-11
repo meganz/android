@@ -1634,6 +1634,11 @@ public class NodeController {
         megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
     }
 
+    public void clearAllVersions(){
+        log("clearAllVersions");
+        megaApi.removeVersions((ManagerActivityLollipop) context);
+    }
+
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){
         log("deleteOffline");
         if (selectedNode == null){
