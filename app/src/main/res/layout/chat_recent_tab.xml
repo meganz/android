@@ -66,11 +66,36 @@
                     android:stateListAnimator="@anim/button_upgrade_elevation"/>-->
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/chat_recent_list_view"
-        android:clipToPadding="false"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="multipleChoice" />
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/chat_recent_list_view"-->
+        <!--android:clipToPadding="false"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:choiceMode="multipleChoice" />-->
+
+    <LinearLayout
+        android:id="@+id/linear_layout_recycler"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/chat_recent_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="multipleChoice" />
+
+            <mega.privacy.android.app.components.scrollBar.FastScroller
+                android:id="@+id/fastscroll"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:gravity="right"/>
+        </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>
