@@ -26,7 +26,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,7 +51,6 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -72,15 +70,15 @@ public class SearchFragmentLollipop extends Fragment{
 
 	Context context;
 	RecyclerView recyclerView;
-	public static LinearLayoutManager mLayoutManager;
-	public static CustomizedGridLayoutManager gridLayoutManager;
+	LinearLayoutManager mLayoutManager;
+	CustomizedGridLayoutManager gridLayoutManager;
 	FastScroller fastScroller;
 
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	public static MegaBrowserLollipopAdapter adapter;
+	MegaBrowserLollipopAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -111,6 +109,38 @@ public class SearchFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
+	}
+
+	public void updateScrollPosition(int position) {
+		log("updateScrollPosition");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				mLayoutManager.scrollToPosition(position);
+			}
+			else if (gridLayoutManager != null) {
+				gridLayoutManager.scrollToPosition(position);
+			}
+		}
+	}
+
+
+	public ImageView getImageDrag(int position) {
+		log("getImageDrag");
+		if (adapter != null) {
+			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+				View v = mLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
+				}
+			}
+			else if (gridLayoutManager != null){
+				View v = gridLayoutManager.findViewByPosition(position);
+				if (v != null) {
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+				}
+			}
+		}
+		return null;
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -534,7 +564,6 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 		else{
 			((ManagerActivityLollipop)context).textSubmitted = true;
-			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
 				MegaNode n = nodes.get(position);
@@ -643,10 +672,6 @@ public class SearchFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						intent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
 
 					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					intent.putExtra("screenPosition", screenPosition);
@@ -661,10 +686,18 @@ public class SearchFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
+					boolean internalIntent;
+					boolean opusFile = false;
 					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
+						internalIntent = false;
+						String[] s = file.getName().split("\\.");
+						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+							opusFile = true;
+						}
 					}
 					else {
+						internalIntent = true;
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("position", position);
@@ -678,10 +711,7 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("screenPosition", screenPosition);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					imageDrag = imageView;
@@ -694,8 +724,7 @@ public class SearchFragmentLollipop extends Fragment{
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -724,17 +753,25 @@ public class SearchFragmentLollipop extends Fragment{
 						String url = megaApi.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
-			  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-			  			context.startActivity(mediaIntent);
-			  		}
-			  		else{
-			  			Toast.makeText(context, context.getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-			  			adapter.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
-			  		}
+					if (opusFile){
+						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+					}
+					if (internalIntent) {
+						context.startActivity(mediaIntent);
+					}
+					else {
+						if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+							context.startActivity(mediaIntent);
+						}
+						else {
+							((ManagerActivityLollipop) context).showSnackbar(context.getResources().getString(R.string.intent_not_available));
+							adapter.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(nodes.get(position).getHandle());
+							NodeController nC = new NodeController(context);
+							nC.prepareForDownload(handleList);
+						}
+					}
 			  		((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
 					MegaNode file = nodes.get(position);
@@ -743,10 +780,7 @@ public class SearchFragmentLollipop extends Fragment{
 					log("FILENAME: " + file.getName() + "TYPE: "+mimeType);
 
 					Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
-					MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-					if(accountInfo!=null){
-						pdfIntent.putExtra("typeAccount", accountInfo.getAccountType());
-					}
+
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
 					boolean isOnMegaDownloads = false;
@@ -757,8 +791,7 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-								&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{

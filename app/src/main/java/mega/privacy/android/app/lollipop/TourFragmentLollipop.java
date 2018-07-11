@@ -95,10 +95,10 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(0);
 
-        bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
-        bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-        bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-        bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
 
         viewPager.getLayoutParams().height = metrics.widthPixels-70;
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
@@ -123,31 +123,31 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 tourText2.setText(barTexts[position]);
                 switch(position){
                     case 0:{
-                        bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
-                        bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         break;
                     }
                     case 1:{
-                        bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
-                        bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         break;
                     }
                     case 2:{
-                        bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
-                        bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
+                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
                         break;
                     }
                     case 3:{
-                        bar1.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar2.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar3.setBackgroundColor(getResources().getColor(R.color.tour_bar_grey));
-                        bar4.setBackgroundColor(getResources().getColor(R.color.tour_bar_red));
+                        bar1.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar2.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar3.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_grey));
+                        bar4.setBackgroundColor(ContextCompat.getColor(context, R.color.tour_bar_red));
                         break;
                     }
                 }

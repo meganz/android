@@ -7,150 +7,144 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <!-- Title -->
-    <LinearLayout
-        android:id="@+id/my_account_title_layout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/my_account_title_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/title_options_avatar_panel"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp"/>
-    </LinearLayout>
-
-    <!-- Options -->
-    <LinearLayout
-        android:id="@+id/my_account_my_QR_code"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:scrollbars="vertical">
 
-        <ImageView
-            android:id="@+id/my_account_my_QR_code_photo"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:paddingBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_b_qr"
-            android:visibility="visible" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/my_account_my_QR_code_photo_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:text="@string/choose_qr_option_panel"
-            android:layout_marginLeft="18dp"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <!-- Options -->
+            <LinearLayout
+                android:id="@+id/my_account_my_QR_code"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/my_account_choose_photo_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/my_account_my_QR_code_photo"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_b_qr"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/my_account_option_choose_photo"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:paddingBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_choose_photo"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/my_account_my_QR_code_photo_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/choose_qr_option_panel"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/my_account_option_choose_photo_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:text="@string/choose_photo_avatar_panel"
-            android:layout_marginLeft="18dp"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/my_account_choose_photo_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/my_account_take_photo_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/my_account_option_choose_photo"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_choose_photo"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/my_account_option_take_photo"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_take_photo"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/my_account_option_choose_photo_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/choose_photo_avatar_panel"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/contacts_list_option_take_photo_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/take_photo_avatar_panel"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/my_account_take_photo_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-    <LinearLayout
-        android:id="@+id/my_account_delete_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/my_account_option_take_photo"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_take_photo"
+                    android:visibility="visible" />
 
-        <ImageView
-            android:id="@+id/my_account_option_delete"
-            style="@style/dialogActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:alpha="0.54"
-            android:layout_marginLeft="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:src="@drawable/ic_remove"
-            android:visibility="visible" />
+                <TextView
+                    android:id="@+id/contacts_list_option_take_photo_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/take_photo_avatar_panel"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/my_account_option_delete_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:text="@string/delete_avatar_panel"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"/>
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/my_account_delete_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/my_account_option_delete"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_remove"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/my_account_option_delete_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/delete_avatar_panel"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>

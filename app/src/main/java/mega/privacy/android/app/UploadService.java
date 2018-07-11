@@ -19,6 +19,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 
@@ -94,7 +95,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private HashMap<String, String> transfersCopy;
 
-	boolean isOverquota = false;
+	//0 - not overquota, not pre-overquota
+	//1 - overquota
+	//2 - pre-overquota
+	int isOverquota = 0;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -112,7 +116,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		isForeground = false;
 		canceled = false;
-		isOverquota = false;
+		isOverquota = 0;
 
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -169,7 +173,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 
-		isOverquota = false;
+		isOverquota = 0;
 
 		onHandleIntent(intent);
 
@@ -314,7 +318,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 
-		if(isOverquota){
+		if(isOverquota!=0){
 			showStorageOverquotaNotification();
 		}
 		else{
@@ -355,7 +359,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void showCompleteNotification() {
 		log("showCompleteNotification");
 
-		if(!isOverquota){
+		if(isOverquota==0){
 			String notificationTitle, size;
 
 			int totalUploads = megaApi.getTotalUploads();
@@ -381,7 +385,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
 
 			mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify_upload)
+					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 					.setAutoCancel(true).setTicker(notificationTitle)
 					.setContentTitle(notificationTitle).setContentText(size)
@@ -394,7 +398,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@SuppressLint("NewApi")
 	private void updateProgressNotification() {
 
-		if(!isOverquota){
+		if(isOverquota==0){
 			int pendingTransfers = megaApi.getNumPendingUploads();
 			int totalTransfers = megaApi.getTotalUploads();
 
@@ -429,10 +433,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
 			Notification notification = null;
-			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this, R.color.mega))
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
@@ -440,29 +445,33 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						.setOnlyAlertOnce(true);
 				notification = mBuilder.build();
 			}
-			else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
+			else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
 
 				mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
+						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(getString(R.string.download_touch_to_show))
 						.setOnlyAlertOnce(true);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+					mBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+				}
+
 				notification = mBuilder.getNotification();
 			}
 			else
 			{
-				notification = new Notification(R.drawable.ic_stat_notify_upload, null, 1);
+				notification = new Notification(R.drawable.ic_stat_notify, null, 1);
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
 				notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
 				notification.contentIntent = pendingIntent;
-				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_upload);
+				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 				notification.contentView.setTextViewText(R.id.status_text, message);
 				notification.contentView.setTextViewText(R.id.progress_text, info);
 				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
 			}
-
 
 			if (!isForeground) {
 				log("starting foreground");
@@ -504,7 +513,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			transfersCount--;
 
 			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-					isOverquota = true;
+				isOverquota = 1;
+			}
+			else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+				isOverquota = 2;
 			}
 
 			if (!transfer.isFolderTransfer()) {
@@ -706,7 +718,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (isOverquota) {
+				if (isOverquota!=0) {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				}
 
@@ -746,7 +758,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					return;
 				}
 
-				if(isOverquota){
+				if(isOverquota!=0){
 					log("after overquota alert");
 					return;
 				}
@@ -769,10 +781,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		String message = getString(R.string.overquota_alert_title);
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
-		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		if(isOverquota==1){
+			intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
+		}
+		else{
+			intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+		}
 
 		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify_upload)
+				.setSmallIcon(R.drawable.ic_stat_notify)
 				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 				.setAutoCancel(true).setTicker(contentText)
 				.setContentTitle(message).setContentText(contentText)
@@ -823,7 +840,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
-				isOverquota = true;
+				isOverquota = 1;
+
+				onQueueComplete();
+			}
+			else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+				log("OVERQUOTA ERROR: "+e.getErrorCode());
+				isOverquota = 2;
 
 				onQueueComplete();
 			}

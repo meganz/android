@@ -94,7 +94,8 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,7 +104,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_info_contact_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -134,7 +135,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_start_conversation_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -157,7 +158,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:text="@string/group_chat_start_conversation_label"
+                    android:text="@string/context_send_message"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
@@ -165,7 +166,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_send_file_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -194,9 +195,39 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/contact_list_option_send_contact_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/contact_list_option_send_contact"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_send_contact"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/contacts_list_option_send_contact_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/context_send_contact"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/contact_list_option_share_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -227,7 +258,7 @@
             <LinearLayout
                 android:id="@+id/contact_list_option_remove_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 

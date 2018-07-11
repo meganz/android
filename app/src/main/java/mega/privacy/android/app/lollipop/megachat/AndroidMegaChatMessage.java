@@ -15,6 +15,8 @@ public class AndroidMegaChatMessage {
     boolean showAvatar = true;
     boolean uploading = false;
 
+    AndroidMegaRichLinkMessage richLinkMessage = null;
+
     public AndroidMegaChatMessage(MegaChatMessage message) {
         this.message = message;
     }
@@ -33,6 +35,7 @@ public class AndroidMegaChatMessage {
     }
 
     public MegaChatMessage getMessage() {
+
         return message;
     }
 
@@ -62,5 +65,13 @@ public class AndroidMegaChatMessage {
 
     public void setShowAvatar(boolean showAvatar) {
         this.showAvatar = showAvatar;
+    }
+
+    public AndroidMegaRichLinkMessage getRichLinkMessage() {
+        return richLinkMessage;
+    }
+
+    public void setRichLinkMessage(AndroidMegaRichLinkMessage richLinkMessage) {
+        this.richLinkMessage = richLinkMessage;
     }
 }

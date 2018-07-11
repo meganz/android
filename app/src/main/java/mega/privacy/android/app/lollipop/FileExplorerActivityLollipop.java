@@ -99,6 +99,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	public static String ACTION_MULTISELECT_FILE = "ACTION_MULTISELECT_FILE";
+	public static String ACTION_UPLOAD_TO_CLOUD = "ACTION_UPLOAD_TO_CLOUD";
 
 	public static int UPLOAD = 0;
 	public static int MOVE = 1;
@@ -466,7 +467,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 
-				log("SESSION: " + gSession);
 				megaApi.fastLogin(gSession, this);
 			}
 			else{
@@ -727,6 +727,33 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							}
 						}
 					}
+				}
+				else if ((intent.getAction().equals(ACTION_UPLOAD_TO_CLOUD))){
+					log("action = UPLOAD to Cloud Drive");
+					mode = UPLOAD;
+					selectFile = false;
+
+					cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
+
+					if(cDriveExplorer==null){
+						cDriveExplorer = new CloudDriveExplorerFragmentLollipop();
+					}
+
+					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+					ft.replace(R.id.cloudDriveFrameLayout, cDriveExplorer, "cDriveExplorer");
+					ft.commitNow();
+
+					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+
+					if(fileExplorerSectionLayout!=null){
+						fileExplorerSectionLayout.setVisibility(View.GONE);
+					}
+					else{
+						fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
+						fileExplorerSectionLayout.setVisibility(View.GONE);
+					}
+
+					tabShown=NO_TABS;
 				}
 				else{
 					log("action = UPLOAD");
@@ -1119,7 +1146,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								}
 								else{
 									File previewDir = PreviewUtils.getPreviewFolder(this);
-									String nameFilePreview = idChat+"_"+info.getTitle();
+									String nameFilePreview = info.getTitle();
 									File preview = new File(previewDir, nameFilePreview);
 
 									boolean isPreview = megaApi.createPreview(info.getFileAbsolutePath(), preview.getAbsolutePath());
@@ -1524,6 +1551,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}	
 			}
 		}
+		else if (tabShown == NO_TABS){
+			if (cDriveExplorer != null){
+				parentHandle = cDriveExplorer.getParentHandle();
+				log("1)cDriveExplorer != null: " + parentHandle);
+			}
+			else{
+				String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+				if (cDriveExplorer != null){
+					parentHandle = cDriveExplorer.getParentHandle();
+					log("2)cDriveExplorer != null: " + parentHandle);
+				}
+			}
+		}
+
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 		
 		if (parentNode != null){
@@ -1629,7 +1671,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			if (error.getErrorCode() == MegaError.API_OK){
 
 				if(tabShown==CLOUD_TAB){
-
 					String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (cDriveExplorer != null){
@@ -1637,6 +1678,21 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						parentHandleCloud = request.getNodeHandle();
 						log("The handle of the created folder is: "+parentHandleCloud);
 					}						
+				}
+				else if (tabShown == NO_TABS){
+					if (cDriveExplorer != null){
+						cDriveExplorer.navigateToFolder(request.getNodeHandle());
+						parentHandleCloud = request.getNodeHandle();
+					}
+					else{
+						String gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+						cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+						if (cDriveExplorer != null){
+							cDriveExplorer.navigateToFolder(request.getNodeHandle());
+							parentHandleCloud = request.getNodeHandle();
+						}
+					}
+					log("The handle of the created folder is: "+parentHandleCloud);
 				}
 				else{
 
@@ -1707,7 +1763,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
 				
-				log("Logged in: " + gSession);
+				log("Logged in with session");
 
 				megaApi.fetchNodes(this);
 			}
@@ -1958,7 +2014,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-		error_icon.setImageDrawable(FileExplorerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -1982,7 +2038,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1999,13 +2055,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
 
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
@@ -2015,7 +2071,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					String value = v.getText().toString().trim();
 
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -2023,7 +2079,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}else{
 						boolean result=matches(regex, value);
 						if(result){
-							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
 							error_layout.setVisibility(View.VISIBLE);
 							input.requestFocus();
@@ -2076,14 +2132,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
 				}else{
 					boolean result=matches(regex, value);
 					if(result){
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -2119,25 +2175,94 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		this.chatListItems = chatListItems;
 
-		if (filePreparedInfos == null){
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(getIntent());
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
-				temp.show();
+		if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
+			if ("text/plain".equals(intent.getType())) {
+				log("Handle intent of text plain");
+				Bundle extras = intent.getExtras();
+				if (extras != null) {
+					if (!extras.containsKey(Intent.EXTRA_STREAM)) {
+						StringBuilder body = new StringBuilder();
+						String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+						if (sharedText2 != null) {
+							body.append(getString(R.string.new_file_subject_when_uploading) + ": ");
+							body.append(sharedText2);
+						}
+						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+						if (sharedText != null) {
+							body.append("\n");
+							body.append(getString(R.string.new_file_content_when_uploading) + ": ");
+							body.append(sharedText);
+						}
+						String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
+						if (sharedText3 != null) {
+							body.append("\n");
+							body.append(getString(R.string.new_file_email_when_uploading) + ": ");
+							body.append(sharedText3);
+						}
+
+						for(int i=0; i < chatListItems.size();i++){
+							megaChatApi.sendMessage(chatListItems.get(i).getChatId(), body.toString());
+						}
+
+						if(chatListItems.size()==1){
+							MegaChatListItem chatItem = chatListItems.get(0);
+							long idChat = chatItem.getChatId();
+							if(chatItem!=null){
+								Intent intent = new Intent(this, ManagerActivityLollipop.class);
+								intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
+								intent.putExtra("CHAT_ID", idChat);
+								startActivity(intent);
+							}
+						}
+						else{
+							Intent chatIntent = new Intent(this, ManagerActivityLollipop.class);
+							chatIntent.setAction(Constants.ACTION_CHAT_SUMMARY);
+							startActivity(chatIntent);
+						}
+					}
+				}
 			}
-			catch(Exception e){
-				return;
+			else{
+				if (filePreparedInfos == null){
+					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+					filePrepareTask.execute(getIntent());
+					ProgressDialog temp = null;
+					try{
+						temp = new ProgressDialog(this);
+						temp.setMessage(getString(R.string.upload_prepare));
+						temp.show();
+					}
+					catch(Exception e){
+						return;
+					}
+					statusDialog = temp;
+				}
+				else{
+//			onIntentProcessed();
+				}
 			}
-			statusDialog = temp;
 		}
 		else{
+			if (filePreparedInfos == null){
+				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+				filePrepareTask.execute(getIntent());
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.upload_prepare));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
+			}
+			else{
 //			onIntentProcessed();
+			}
 		}
 	}
-
 
 	public void showNewFileDialog(final MegaNode parentNode, final String data){
 		log("showNewFileDialog");
@@ -2156,7 +2281,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-		error_icon.setImageDrawable(FileExplorerActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -2179,7 +2304,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2196,13 +2321,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
 
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
 		input.setHint(getString(R.string.context_new_file_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -2213,14 +2338,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 					}else{
 						boolean result=matches(regex, value);
 						if(result){
-							input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
 							error_layout.setVisibility(View.VISIBLE);
 							input.requestFocus();
@@ -2275,14 +2400,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
 				}else{
 					boolean result=matches(regex, value);
 					if(result){
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
