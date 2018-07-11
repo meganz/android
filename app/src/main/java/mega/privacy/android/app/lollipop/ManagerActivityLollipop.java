@@ -1397,8 +1397,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outState.putString("searchQuery", searchQuery);
 			textsearchQuery = true;
 			outState.putBoolean("textsearchQuery", textsearchQuery);
-		}
-		else {
+		}else {
 			textsearchQuery = false;
 		}
 		if (passwordReminderDialogBlocked){
@@ -1472,6 +1471,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
+
 		}
 		else{
 			log("Bundle is NULL");
@@ -4102,10 +4102,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
-				if(parentHandleSearch==-1){
+				if(textsearchQuery){
 					sFLol.setAllowedMultiselect(true);
+				}
+				if(parentHandleSearch==-1){
 					firstNavigationLevel = true;
-
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
@@ -4115,6 +4116,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}else{
 						aB.setTitle(getString(R.string.action_search)+": "+"");
 					}
+
 				}else{
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSearch);
 					if (parentNode != null){
@@ -5628,7 +5630,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
-				log("On collapse search menu item");
+				log("onMenuItemActionCollapse()");
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
 				textSubmitted = true;
@@ -5637,7 +5639,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				log("onQueryTextSubmit: "+query);
@@ -5652,10 +5653,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
+
 				if(textSubmitted){
+					sFLol.setAllowedMultiselect(true);
+
 					textSubmitted = false;
-				}
-				else if (textsearchQuery) {
+				}else if (textsearchQuery) {
 					selectDrawerItemLollipop(DrawerItem.SEARCH);
 				}else{
 					searchQuery = newText;

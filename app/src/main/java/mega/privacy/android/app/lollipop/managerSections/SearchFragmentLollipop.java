@@ -105,7 +105,7 @@ public class SearchFragmentLollipop extends Fragment{
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
-	boolean multiselectBoolean = false;
+	boolean multiselectBoolean=false;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -378,6 +378,7 @@ public class SearchFragmentLollipop extends Fragment{
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+
 		if(recyclerView.getLayoutManager()!=null){
 			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
 		}
@@ -405,12 +406,10 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
-		log("onCreate");		
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 
 		if (megaApi == null){
@@ -570,6 +569,7 @@ public class SearchFragmentLollipop extends Fragment{
 			((ManagerActivityLollipop)context).textSubmitted = true;
 			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
+				log("is a folder");
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
@@ -597,7 +597,7 @@ public class SearchFragmentLollipop extends Fragment{
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 
-				((ManagerActivityLollipop)context).levelsSearch++;
+				((ManagerActivityLollipop)context).levelsSearch ++;
 
 				visibilityFastScroller();
 
@@ -655,6 +655,7 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 				}
 				else{
+					log("folder with files");
 					recyclerView.setVisibility(View.VISIBLE);
 					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
@@ -1221,6 +1222,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public boolean isAllowedMultiselect(){
 		return multiselectBoolean;
 	}
+
 	public void setAllowedMultiselect(boolean option){
 		multiselectBoolean = option;
 	}
