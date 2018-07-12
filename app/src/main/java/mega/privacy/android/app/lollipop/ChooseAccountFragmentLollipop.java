@@ -725,8 +725,10 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             return;
 
         MegaPricing p = myAccountInfo.getPricing();
-        if(p==null)
+        if(p==null){
+            log("Return - getPricing NULL");
             return;
+        }
 
         freePriceInteger.setText("0");
         freePriceDecimal.setText("." + "00 €");
