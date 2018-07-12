@@ -16,6 +16,7 @@ public class TimeChatUtils implements Comparator<Calendar> {
 
     public static int DATE_LONG_FORMAT=0;
     public static int DATE_SHORT_FORMAT=1;
+    public static int DATE_SHORT_SHORT_FORMAT=2;
 
     int type;
 
@@ -124,8 +125,10 @@ public class TimeChatUtils implements Comparator<Calendar> {
         java.text.DateFormat df;
         if(format == DATE_LONG_FORMAT){
             df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-        }
-        else{
+        }else if(format == DATE_SHORT_SHORT_FORMAT){
+            df = new SimpleDateFormat("d MMM");
+
+        }else{
             df = new SimpleDateFormat("EEE d MMM");
 
             //df = SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, Locale.getDefault());

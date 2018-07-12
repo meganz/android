@@ -42,6 +42,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -65,11 +66,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
     Context context;
     ActionBar aB;
-    RecyclerView listView;
     MegaListChatLollipopAdapter adapterList;
     RelativeLayout mainRelativeLayout;
 
+    RecyclerView listView;
     LinearLayoutManager mLayoutManager;
+    FastScroller fastScroller;
 
     ArrayList<MegaChatListItem> chats;
 
@@ -133,13 +135,15 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         View v = inflater.inflate(R.layout.chat_recent_tab, container, false);
 
         listView = (RecyclerView) v.findViewById(R.id.chat_recent_list_view);
-
+        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_chat);
+        listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+        listView.setClipToPadding(false);
         listView.addItemDecoration(new ChatDividerItemDecoration(context, outMetrics));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
-        listView.setClipToPadding(false);
+//        listView.setClipToPadding(false);
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
@@ -274,6 +278,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
 
                             listView.setAdapter(adapterList);
+                            fastScroller.setRecyclerView(listView);
+                            visibilityFastScroller();
+
                             adapterList.setPositionClicked(-1);
 
                             listView.setVisibility(View.VISIBLE);
@@ -323,6 +330,8 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         }
 
                         listView.setAdapter(adapterList);
+                        fastScroller.setRecyclerView(listView);
+                        visibilityFastScroller();
                         adapterList.setPositionClicked(-1);
 
                         listView.setVisibility(View.VISIBLE);
@@ -1637,6 +1646,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         if (savedInstanceState != null) {
             Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             listView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+        }
+    }
+
+    public void visibilityFastScroller(){
+        if(chats == null){
+           fastScroller.setVisibility(View.GONE);
+        }else{
+           if(chats.size() < Constants.MIN_ITEMS_SCROLLBAR_CHAT) {
+                fastScroller.setVisibility(View.GONE);
+           }else{
+               fastScroller.setVisibility(View.VISIBLE);
+           }
         }
     }
 
