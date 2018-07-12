@@ -340,6 +340,13 @@ public class AccountController implements View.OnClickListener{
             context.startActivity(intent);
             ((TestPasswordActivity) context).finish();
         }
+        else if (context instanceof TwoFactorAuthenticationActivity) {
+            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            context.startActivity(intent);
+            ((TwoFactorAuthenticationActivity) context).finish();
+        }
     }
 
     public Bitmap createRkBitmap (){

@@ -137,41 +137,9 @@
                 android:textColor="@color/login_warning"
                 android:fontFamily="roboto"
                 android:layout_below="@+id/six_pin_verify"
-                android:layout_alignLeft="@id/six_pin_verify"
+                android:layout_centerHorizontal="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"/>
-
-            <RelativeLayout
-                android:id="@+id/lost_authentication_device"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/six_pin_verify"
-                android:padding="10dp"
-                android:layout_marginTop="29dp"
-                android:layout_centerHorizontal="true">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lost_your_authenticator_device"
-                    android:textColor="@color/file_playlist_state"
-                    android:textSize="13sp"
-                    android:layout_centerHorizontal="true"/>
-
-            </RelativeLayout>
-
-            <!--<Button
-                android:id="@+id/button_verify_2fa"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/lost_authentication_device"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/background_button"
-                android:elevation="8dp"
-                android:textColor="@color/white"
-                android:text="@string/general_verify"
-                android:visibility="gone"/>-->
 
         </RelativeLayout>
 

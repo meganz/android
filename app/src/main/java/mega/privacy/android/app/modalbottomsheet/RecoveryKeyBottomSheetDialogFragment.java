@@ -1,9 +1,12 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.print.PrintHelper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -14,6 +17,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.lollipop.twofa.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -29,6 +33,7 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
     public TextView titleText;
     public LinearLayout optionCopyToClipboard;
     public LinearLayout optionSaveToFileSystem;
+    public LinearLayout optionPrint;
 
     MegaApiAndroid megaApi;
 
@@ -51,6 +56,9 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
                 if (getContext() instanceof TestPasswordActivity){
                     ((TestPasswordActivity) getContext()).finish();
                 }
+                else if (getContext() instanceof TwoFactorAuthenticationActivity) {
+                    ((TwoFactorAuthenticationActivity) getContext()).finish();
+                }
                 AccountController aC = new AccountController(getContext());
                 aC.copyRkToClipboard();
                 break;
@@ -61,10 +69,27 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
                 aC.saveRkToFileSystem(false);
                 break;
             }
+            case R.id.recovery_key_print_layout:{
+                log("Option print rK");
+                printRK();
+                break;
+            }
         }
 
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    public void printRK(){
+        Bitmap rKBitmap = null;
+        AccountController aC = new AccountController(getContext());
+        rKBitmap = aC.createRkBitmap();
+
+        if (rKBitmap != null){
+            PrintHelper printHelper = new PrintHelper(getActivity());
+            printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+            printHelper.printBitmap("rKPrint", rKBitmap);
+        }
     }
 
     @Override
@@ -84,11 +109,20 @@ public class RecoveryKeyBottomSheetDialogFragment extends BottomSheetDialogFragm
 
         titleText = (TextView) contentView.findViewById(R.id.recovery_key_title_text);
 
+        optionPrint = (LinearLayout) contentView.findViewById(R.id.recovery_key_print_layout);
         optionCopyToClipboard= (LinearLayout) contentView.findViewById(R.id.recovery_key_copytoclipboard_layout);
         optionSaveToFileSystem = (LinearLayout) contentView.findViewById(R.id.recovery_key_saveTo_fileSystem_layout);
 
+        optionPrint.setOnClickListener(this);
         optionCopyToClipboard.setOnClickListener(this);
         optionSaveToFileSystem.setOnClickListener(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            optionPrint.setVisibility(View.VISIBLE);
+        }
+        else {
+            optionPrint.setVisibility(View.GONE);
+        }
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());

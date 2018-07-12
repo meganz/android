@@ -3,12 +3,10 @@ package mega.privacy.android.app.lollipop.twofa;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
@@ -48,7 +46,7 @@ import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -516,19 +514,19 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             arraySeed.add(seed.substring(index, index+4));
             index += 4;
         }
-        seedText1.setText(arraySeed.get(0).toUpperCase());
-        seedText2.setText(arraySeed.get(1).toUpperCase());
-        seedText3.setText(arraySeed.get(2).toUpperCase());
-        seedText4.setText(arraySeed.get(3).toUpperCase());
-        seedText5.setText(arraySeed.get(4).toUpperCase());
-        seedText6.setText(arraySeed.get(5).toUpperCase());
-        seedText7.setText(arraySeed.get(6).toUpperCase());
-        seedText8.setText(arraySeed.get(7).toUpperCase());
-        seedText9.setText(arraySeed.get(8).toUpperCase());
-        seedText10.setText(arraySeed.get(9).toUpperCase());
-        seedText11.setText(arraySeed.get(10).toUpperCase());
-        seedText12.setText(arraySeed.get(11).toUpperCase());
-        seedText13.setText(arraySeed.get(12).toUpperCase());
+        seedText1.setText(arraySeed.get(0));
+        seedText2.setText(arraySeed.get(1));
+        seedText3.setText(arraySeed.get(2));
+        seedText4.setText(arraySeed.get(3));
+        seedText5.setText(arraySeed.get(4));
+        seedText6.setText(arraySeed.get(5));
+        seedText7.setText(arraySeed.get(6));
+        seedText8.setText(arraySeed.get(7));
+        seedText9.setText(arraySeed.get(8));
+        seedText10.setText(arraySeed.get(9));
+        seedText11.setText(arraySeed.get(10));
+        seedText12.setText(arraySeed.get(11));
+        seedText13.setText(arraySeed.get(12));
     }
 
     void generate2FAQR (){
@@ -659,8 +657,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             }
             case R.id.button_export_rk:{
                 update2FASetting();
-                AccountController aC = new AccountController(this);
-                aC.saveRkToFileSystem(false);
+                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
+                recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
                 break;
             }
             case R.id.button_dismiss_rk:{
