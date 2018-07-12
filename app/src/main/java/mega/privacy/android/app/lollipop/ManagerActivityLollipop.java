@@ -1173,8 +1173,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			if (isProLiteMonthly){
 				log("PRO LITE IS SUBSCRIPTED: ORDERID: ***____" + proLiteMonthly.getOrderId() + "____*****");
-			}
-			else{
+			}else{
 				log("PRO LITE IS NOT SUBSCRIPTED");
 			}
 
@@ -1481,8 +1480,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			outState.putString("searchQuery", searchQuery);
 			textsearchQuery = true;
 			outState.putBoolean("textsearchQuery", textsearchQuery);
-		}
-		else {
+		}else {
 			textsearchQuery = false;
 		}
 		if (passwordReminderDialogBlocked){
@@ -1556,6 +1554,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
+
 		}
 		else{
 			log("Bundle is NULL");
@@ -4180,24 +4179,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			case SEARCH:{
 				aB.setSubtitle(null);
-
+				if(textsearchQuery){
+					sFLol.setAllowedMultiselect(true);
+				}
 				if(parentHandleSearch==-1){
+					firstNavigationLevel = true;
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
 							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
-							firstNavigationLevel = true;
-						}
-						else{
+						}else{
 							aB.setTitle(getString(R.string.action_search)+": "+"");
-							firstNavigationLevel = true;
 						}
-					}
-					else{
+					}else{
 						aB.setTitle(getString(R.string.action_search)+": "+"");
-						firstNavigationLevel = true;
 					}
-				}
-				else{
+
+				}else{
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSearch);
 					if (parentNode != null){
 						aB.setTitle(parentNode.getName());
@@ -5723,7 +5720,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
-				log("On collapse search menu item");
+				log("onMenuItemActionCollapse()");
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
 				textSubmitted = true;
@@ -5732,9 +5729,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 		searchView.setMaxWidth(Integer.MAX_VALUE);
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
 			@Override
 			public boolean onQueryTextSubmit(String query) {
+				log("onQueryTextSubmit: "+query);
 				searchQuery = "" + query;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
 				setToolbarTitle();
@@ -5746,20 +5743,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-                log("Searching by text: "+newText);
+
 				if(textSubmitted){
+					sFLol.setAllowedMultiselect(true);
+
 					textSubmitted = false;
-				}
-				else if (textsearchQuery) {
+				}else if (textsearchQuery) {
 					selectDrawerItemLollipop(DrawerItem.SEARCH);
-				}
-				else{
+				}else{
 					searchQuery = newText;
 					selectDrawerItemLollipop(DrawerItem.SEARCH);
 				}
 				return true;
 			}
-
     	});
 
 		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
@@ -6600,7 +6596,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									thumbViewMenuItem.setVisible(true);
 								}else{
 									thumbViewMenuItem.setVisible(false);
-								}								if (isList){
+								}
+								if (isList){
 									thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 								}
 								else{
@@ -7001,6 +6998,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected() ");
 		fromTakePicture = -1;
 		log("onOptionsItemSelected");
 		if (megaApi == null){
@@ -8679,6 +8677,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
+		}else if(drawerItem == DrawerItem.SEARCH){
+			if(sFLol!=null){
+				if(sFLol.isAdded()){
+					sFLol.hideMultipleSelect();
+					sFLol.refresh();
+				}
+			}
+			//Refresh Rubbish Fragment
+			if(cloudPageAdapter!=null){
+				rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+				if (rubbishBinFLol != null){
+					if(rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes;
+						if(parentHandleRubbish == -1){
+							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
+						}
+						else{
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						}
+
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
+					}
+				}
+			}
+
 		}
 		setToolbarTitle();
 	}
@@ -8738,6 +8762,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(cloudPageAdapter!=null){
 				cloudPageAdapter.notifyDataSetChanged();
 			}
+		}else if(drawerItem == DrawerItem.SEARCH){
+			if (sFLol != null && sFLol.isAdded()){
+
+				sFLol.hideMultipleSelect();
+				sFLol.refresh();
+			}
 		}
 
 		setToolbarTitle();
@@ -8785,6 +8815,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //							rubbishBinFLol.setNodes(nodes);
 				iFLol.hideMultipleSelect();
 				iFLol.refresh();
+			}
+		}else if(drawerItem == DrawerItem.SEARCH){
+			if (sFLol != null && sFLol.isAdded()){
+				sFLol.hideMultipleSelect();
+				sFLol.refresh();
 			}
 		}
 	}
@@ -14453,6 +14488,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
 
 					if (moveToRubbish){
+						log("moveToRubbish ");
 						//Update both tabs
         				//Rubbish bin
 						log("Move to Rubbish");
@@ -15156,6 +15192,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	public void onNodesSearchUpdate() {
+		log("onNodesSearchUpdate");
+		if (sFLol != null){
+			if(sFLol.isAdded()){
+				sFLol.refresh();
+			}
+		}
+	}
+
 	public void onNodesSharedUpdate() {
 		log("onNodesSharedUpdate");
 
@@ -15218,9 +15263,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		onNodesCloudDriveUpdate();
 
-		if (sFLol != null && sFLol.isAdded()){
-			sFLol.refresh();
-		}
+//		if (sFLol != null && sFLol.isAdded()){
+//			sFLol.refresh();
+//		}
+
+		onNodesSearchUpdate();
 
 		onNodesSharedUpdate();
 
