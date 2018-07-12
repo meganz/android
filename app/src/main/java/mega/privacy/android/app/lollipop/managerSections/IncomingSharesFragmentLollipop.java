@@ -104,7 +104,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	public ActionMode actionMode;
 
 	public void activateActionMode(){
-		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -253,7 +252,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
@@ -270,8 +268,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				showMove = false;
 				showTrash =false;
 				showRename=false;
-
-
 				if(selected.size()==adapter.getItemCount()){
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -801,8 +797,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				((ManagerActivityLollipop)context).parentHandleIncoming = n.getHandle();
-
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				
@@ -1199,6 +1193,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		log("clearSelections");
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
