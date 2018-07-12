@@ -177,6 +177,11 @@
 			android:key="settings_file_management_rubbish"
 			android:title="@string/context_clear_rubbish" />
 
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_file_versioning_switch"
+			android:title="@string/settings_enable_file_versioning_title"
+			android:summary="@string/settings_enable_file_versioning_subtitle"/>
+
 		<Preference
 			android:key="settings_file_management_file_version"
 			android:title="@string/settings_file_management_file_versions_title" />

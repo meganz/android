@@ -1993,4 +1993,7 @@
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">File versions deleted successfully</string>
     <string name="error_delete_versions" context="error message when deleting all the versions of the account">Error. The file versions have not been deleted</string>
 
+    <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File versioning</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
+
 </resources>

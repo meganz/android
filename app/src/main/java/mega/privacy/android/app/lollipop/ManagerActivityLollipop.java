@@ -14008,6 +14008,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
+				MegaApplication.setDisableFileVersions(Boolean.valueOf(request.getText()));
+
+				if (e.getErrorCode() != MegaError.API_OK) {
+					log("ERROR:USER_ATTR_DISABLE_VERSIONS");
+					if(sttFLol!=null && sttFLol.isAdded()){
+						sttFLol.updateEnabledFileVersions();
+					}
+				}
+				else{
+					log("File versioning attribute changed correctly");
+				}
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
@@ -14160,18 +14173,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
 				}
 				else if(request.getNumDetails()==0){
-					log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:");
-					boolean flag = request.getFlag();
+
+					log("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:"+request.getFlag());
 
 					MegaApplication.setEnabledRichLinks(request.getFlag());
 
-//                    if(sttFLol!=null){
-//                        if(sttFLol.isAdded()){
-//                            sttFLol.updateEnabledRichLinks();
-//                        }
-//                    }
+                    if(sttFLol!=null){
+                        if(sttFLol.isAdded()){
+                            sttFLol.updateEnabledRichLinks();
+                        }
+                    }
 				}
             }
+            else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
+				MegaApplication.setDisableFileVersions(request.getFlag());
+				if(sttFLol!=null && sttFLol.isAdded()){
+					sttFLol.updateEnabledFileVersions();
+				}
+			}
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
@@ -14847,6 +14866,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						log("NOT OWN change: "+user.isOwnChange());
+
+						if(user.getHandle()==megaApi.getMyUser().getHandle()){
+							log("Change on my account from another client");
+							if(user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)){
+								log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
+								megaApi.getFileVersionsOption(this);
+							}
+						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
 							log("The user: "+user.getEmail()+"changed his first name");
