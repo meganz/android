@@ -40,8 +40,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_2fa"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
                     android:layout_centerHorizontal="true"/>
 
             </RelativeLayout>
@@ -56,8 +56,8 @@
                     android:id="@+id/title_2fa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginLeft="16dp"
                     android:text="@string/title_2fa"
@@ -73,7 +73,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title_2fa"
-                    android:text="Ivdvsdbvsdbsv your friends and for every successful signup you will reveive 10 GB of additional storage quota plus 20 GB of transfer quota, valid for 12 months.This bonus requires that your friends install app."
+                    android:text="@string/two_factor_authentication_explain"
                     android:textAlignment="center"
                     android:gravity="center"
                     android:layout_centerHorizontal="true"
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/content_2fa"
-                    android:layout_marginBottom="32dp"
+                    android:layout_marginBottom="72dp"
                     android:layout_centerHorizontal="true"
                     android:background="@drawable/background_button"
                     android:elevation="8dp"
@@ -131,17 +131,14 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="24dp"
-                    android:paddingBottom="24dp"
-                    android:fontFamily="roboto"
-                    android:background="@color/camera_uploads_list_view"/>
+                    android:fontFamily="roboto"/>
 
                 <RelativeLayout
                     android:id="@+id/layout_qr_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
                     android:layout_below="@+id/explain_qr_seed_2fa">
 
                     <ImageView
@@ -167,8 +164,11 @@
                     android:layout_below="@id/layout_qr_2fa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="26dp"
-                    android:layout_marginRight="26dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:padding="22dp"
+                    android:background="@drawable/background_seed_2fa"
                     android:stretchColumns="0, 1, 2, 3, 4">
 
                     <TableRow
@@ -181,7 +181,7 @@
                             android:id="@+id/seed_2fa_1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -191,7 +191,7 @@
                             android:id="@+id/seed_2fa_2"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -201,7 +201,7 @@
                             android:id="@+id/seed_2fa_3"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -211,7 +211,7 @@
                             android:id="@+id/seed_2fa_4"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -221,7 +221,7 @@
                             android:id="@+id/seed_2fa_5"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -240,7 +240,7 @@
                             android:id="@+id/seed_2fa_6"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -250,7 +250,7 @@
                             android:id="@+id/seed_2fa_7"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -260,7 +260,7 @@
                             android:id="@+id/seed_2fa_8"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -270,7 +270,7 @@
                             android:id="@+id/seed_2fa_9"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -280,7 +280,7 @@
                             android:id="@+id/seed_2fa_10"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -303,7 +303,7 @@
                             android:id="@+id/seed_2fa_11"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -313,7 +313,7 @@
                             android:id="@+id/seed_2fa_12"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -323,7 +323,7 @@
                             android:id="@+id/seed_2fa_13"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
                             android:textColor="@color/name_my_account"
@@ -482,23 +482,9 @@
                     android:textColor="@color/login_warning"
                     android:fontFamily="roboto"
                     android:layout_below="@+id/six_pin_2fa_layout"
-                    android:layout_alignLeft="@id/six_pin_2fa_layout"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="10dp"/>
-
-                <!--<Button
-                    android:id="@+id/button_verify_2fa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/six_pin_2fa_layout"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginBottom="40dp"
-                    android:background="@drawable/background_button"
-                    android:elevation="8dp"
-                    android:textColor="@color/white"
-                    android:text="@string/general_verify"
-                    android:visibility="gone"/>-->
 
             </RelativeLayout>
 
@@ -518,20 +504,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/image_2fa"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:id="@+id/container_2fa_image_enabled"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_2fa"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
-                android:layout_centerHorizontal="true"/>
+                android:background="@color/camera_uploads_list_view">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_2fa"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="32dp"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/title_2fa_enabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginLeft="16dp"
                 android:text="@string/title_2fa_enabled"
@@ -541,7 +534,7 @@
                 android:textAlignment="center"
                 android:gravity="center"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@id/image_2fa"/>
+                android:layout_below="@id/container_2fa_image_enabled"/>
 
             <TextView
                 android:id="@+id/content_2fa_enabled"
@@ -550,6 +543,8 @@
                 android:layout_below="@id/title_2fa_enabled"
                 android:text="@string/description_2fa_enabled"
                 android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:layout_marginTop="20dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginBottom="32dp"
@@ -569,38 +564,46 @@
                     android:layout_height="wrap_content"
                     android:text="@string/recommendation_2fa_enabled"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="24dp"
+                    android:gravity="center"
+                    android:layout_marginTop="15dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_marginBottom="38dp"
                     android:textSize="16sp"
                     android:fontFamily="roboto"
                     android:textColor="@color/name_my_account"/>
 
-                <Button
-                    android:id="@+id/button_export_rk"
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:paddingBottom="40dp"
                     android:layout_below="@+id/recommendation_2fa_enabled"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/background_button"
-                    android:elevation="8dp"
-                    android:textColor="@color/white"
-                    android:text="@string/general_export"/>
+                    android:layout_centerHorizontal="true">
 
-                <Button
-                    android:id="@+id/button_dismiss_rk"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/recommendation_2fa_enabled"
-                    android:layout_toRightOf="@+id/button_export_rk"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/background_button_white"
-                    android:elevation="8dp"
-                    android:textColor="@color/name_my_account"
-                    android:text="@string/general_dismiss"/>
+                    <Button
+                        android:id="@+id/button_export_rk"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/background_button"
+                        android:elevation="8dp"
+                        android:layout_margin="10dp"
+                        android:textColor="@color/white"
+                        android:text="@string/general_export"/>
+
+                    <Button
+                        android:id="@+id/button_dismiss_rk"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/button_export_rk"
+                        android:layout_marginLeft="20dp"
+                        android:background="@drawable/background_button_white"
+                        android:elevation="8dp"
+                        android:layout_margin="10dp"
+                        android:textColor="@color/name_my_account"
+                        android:text="@string/general_dismiss"/>
+
+
+                </RelativeLayout>
 
             </RelativeLayout>
 

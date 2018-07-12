@@ -222,6 +222,8 @@
                     android:textSize="16sp"
                     android:gravity="center"
                     android:fontFamily="roboto"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     android:layout_marginTop="40dp"
                     android:layout_centerHorizontal="true"/>
 
@@ -322,7 +324,7 @@
                     android:textColor="@color/login_warning"
                     android:fontFamily="roboto"
                     android:layout_below="@+id/six_pin_login_layout"
-                    android:layout_alignLeft="@id/six_pin_login_layout"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="10dp"/>
 

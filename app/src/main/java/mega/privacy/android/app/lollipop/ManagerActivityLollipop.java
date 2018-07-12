@@ -564,8 +564,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private String pin = null;
 	private String newMail = null;
 	private TextView pinError;
-	private RelativeLayout lostYourDeviceButton;
-//	private Button verifyButton;
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
@@ -10025,13 +10023,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		else if (type == Constants.DISABLE_2FA) {
 			titleDialog.setText(getString(R.string.disable_2fa_verification));
 		}
-		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
-		lostYourDeviceButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-
-			}
-		});
 
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
 		pinError.setVisibility(View.GONE);

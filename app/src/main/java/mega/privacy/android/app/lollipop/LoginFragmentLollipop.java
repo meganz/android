@@ -1376,25 +1376,22 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
 
-//        loginLogin.setVisibility(View.GONE);
-//        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-//        loginCreateAccount.setVisibility(View.GONE);
-//        loginLoggingIn.setVisibility(View.VISIBLE);
-//        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-//        generatingKeysText.setVisibility(View.VISIBLE);
-//        loginProgressBar.setVisibility(View.VISIBLE);
-//        loginFetchNodesProgressBar.setVisibility(View.GONE);
-//        queryingSignupLinkText.setVisibility(View.GONE);
-//        confirmingAccountText.setVisibility(View.GONE);
+        loginLogin.setVisibility(View.GONE);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        loginCreateAccount.setVisibility(View.GONE);
+        loginLoggingIn.setVisibility(View.VISIBLE);
+        generatingKeysText.setVisibility(View.VISIBLE);
+        loginProgressBar.setVisibility(View.VISIBLE);
+        loginFetchNodesProgressBar.setVisibility(View.GONE);
+        queryingSignupLinkText.setVisibility(View.GONE);
+        confirmingAccountText.setVisibility(View.GONE);
 
         lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
         lastPassword = et_password.getText().toString();
 
         log("generating keys");
 
-//        new HashTask().execute(lastEmail, lastPassword);
-
-        megaApi.multiFactorAuthCheck(lastEmail, this);
+        new HashTask().execute(lastEmail, lastPassword);
     }
 
     private void onKeysGenerated(String privateKey, String publicKey) {
@@ -1680,7 +1677,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
             case R.id.lost_authentication_device: {
-
+                try {
+                    String url = "https://mega.nz/recovery";
+                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(url));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    startActivity(viewIntent);
+                }
                 break;
             }
         }
@@ -2033,8 +2041,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
 
-                String errorMessage;
+                String errorMessage = null;
                 if (error.getErrorCode() == MegaError.API_ENOENT) {
+                    if (is2FAEnabled) {
+                        returnToLogin();
+                    }
                     errorMessage = getString(R.string.error_incorrect_email_or_password);
                 }
                 else if (error.getErrorCode() == MegaError.API_ESID){
@@ -2048,6 +2059,28 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else if (error.getErrorCode() == MegaError.API_EBLOCKED){
                     errorMessage = getString(R.string.error_account_suspended);
+                }
+                else if (error.getErrorCode() == MegaError.API_EMFAREQUIRED){
+                    is2FAEnabled = true;
+                    ((LoginActivityLollipop) context).showAB(tB);
+                    loginLogin.setVisibility(View.GONE);
+                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+                    loginCreateAccount.setVisibility(View.GONE);
+                    loginLoggingIn.setVisibility(View.GONE);
+                    generatingKeysText.setVisibility(View.GONE);
+                    loginProgressBar.setVisibility(View.GONE);
+                    loginFetchNodesProgressBar.setVisibility(View.GONE);
+                    queryingSignupLinkText.setVisibility(View.GONE);
+                    confirmingAccountText.setVisibility(View.GONE);
+                    fetchingNodesText.setVisibility(View.GONE);
+                    prepareNodesText.setVisibility(View.GONE);
+                    serversBusyText.setVisibility(View.GONE);
+                    loginVerificationLayout.setVisibility(View.VISIBLE);
+                    firstPin.requestFocus();
+                    firstPin.setCursorVisible(true);
+                }
+                else if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED) {
+                    verifyShowError();
                 }
                 else{
                     errorMessage = error.getErrorString();
@@ -2070,17 +2103,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     dbH.setEnabledChat(true + "");
                 }
 
-
-                if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED){
-                    verifyShowError();
-                }
-                else {
-                    if (is2FAEnabled){
-                        loginVerificationLayout.setVisibility(View.GONE);
-                    }
+                if (!is2FAEnabled) {
                     loginLoggingIn.setVisibility(View.GONE);
                     loginLogin.setVisibility(View.VISIBLE);
-                    scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                     loginCreateAccount.setVisibility(View.VISIBLE);
                     queryingSignupLinkText.setVisibility(View.GONE);
                     confirmingAccountText.setVisibility(View.GONE);
@@ -2090,14 +2116,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     prepareNodesText.setVisibility(View.GONE);
                     serversBusyText.setVisibility(View.GONE);
 
-                    ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    ((LoginActivityLollipop) context).showSnackbar(errorMessage);
 
 //				DatabaseHandler dbH = new DatabaseHandler(this);
                     DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                     dbH.clearCredentials();
                     dbH.clearEphemeral();
-                    if (dbH.getPreferences() != null){
-                        ((LoginActivityLollipop)context).stopCameraSyncService();
+                    if (dbH.getPreferences() != null) {
+                        ((LoginActivityLollipop) context).stopCameraSyncService();
                     }
                 }
             }
@@ -2284,49 +2310,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
-                }
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
-            if (error.getErrorCode() == MegaError.API_OK){
-                if (request.getFlag()){
-                    is2FAEnabled = true;
-
-                    ((LoginActivityLollipop) context).showAB(tB);
-
-                    loginLogin.setVisibility(View.GONE);
-                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-                    loginCreateAccount.setVisibility(View.GONE);
-                    loginLoggingIn.setVisibility(View.GONE);
-                    generatingKeysText.setVisibility(View.GONE);
-                    loginProgressBar.setVisibility(View.GONE);
-                    loginFetchNodesProgressBar.setVisibility(View.GONE);
-                    queryingSignupLinkText.setVisibility(View.GONE);
-                    confirmingAccountText.setVisibility(View.GONE);
-                    fetchingNodesText.setVisibility(View.GONE);
-                    prepareNodesText.setVisibility(View.GONE);
-                    serversBusyText.setVisibility(View.GONE);
-                    loginVerificationLayout.setVisibility(View.VISIBLE);
-                    firstPin.requestFocus();
-                    firstPin.setCursorVisible(true);
-                }
-                else {
-                    is2FAEnabled = false;
-                    loginVerificationLayout.setVisibility(View.GONE);
-
-                    loginLogin.setVisibility(View.GONE);
-                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-                    loginCreateAccount.setVisibility(View.GONE);
-                    loginLoggingIn.setVisibility(View.VISIBLE);
-                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
-                    generatingKeysText.setVisibility(View.VISIBLE);
-                    loginProgressBar.setVisibility(View.VISIBLE);
-                    loginFetchNodesProgressBar.setVisibility(View.GONE);
-                    queryingSignupLinkText.setVisibility(View.GONE);
-                    confirmingAccountText.setVisibility(View.GONE);
-
-                    log("generating keys");
-                    new HashTask().execute(lastEmail, lastPassword);
                 }
             }
         }
