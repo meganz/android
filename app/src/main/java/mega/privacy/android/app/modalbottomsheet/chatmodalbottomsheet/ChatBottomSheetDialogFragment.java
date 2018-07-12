@@ -169,7 +169,12 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             infoChatText.setText(getString(R.string.group_chat_info_label));
             optionInfoChat.setVisibility(View.GONE);
 
-            optionLeaveChat.setVisibility(View.VISIBLE);
+            if(chat.isActive()){
+                optionLeaveChat.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionLeaveChat.setVisibility(View.GONE);
+            }
 		}
 		else{
 			iconStateChatPanel.setVisibility(View.VISIBLE);
@@ -228,11 +233,17 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             }
 		}
 
+
         if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
             optionClearHistory.setVisibility(View.GONE);
         }
         else{
-            optionClearHistory.setVisibility(View.VISIBLE);
+            if(chat.isActive()){
+                optionClearHistory.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionClearHistory.setVisibility(View.GONE);
+            }
         }
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));

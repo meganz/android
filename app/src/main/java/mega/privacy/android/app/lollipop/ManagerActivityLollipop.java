@@ -2807,7 +2807,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						if (megaChatApi == null){
 							megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
 						}
-						if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getActiveChatListItems().size() >= 1)){
+						if ((megaApi.getContacts().size() >= 1) || (megaChatApi.getChatListItems().size() >= 1)){
 							setTurnOnNotificationsFragment();
 						}
 					}

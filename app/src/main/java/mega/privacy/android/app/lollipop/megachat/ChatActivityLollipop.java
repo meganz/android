@@ -1206,8 +1206,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     pickCloudDriveButton.setVisibility(View.GONE);
                     pickFileStorageButton.setVisibility(View.GONE);
 
-                    aB.setSubtitle(null);
-
+                    if(!chatRoom.isActive()){
+                        aB.setSubtitle(getString(R.string.inactive_chat));
+                    }
+                    else{
+                        aB.setSubtitle(null);
+                    }
                 }
                 else{
                     log("permission: "+permission);
