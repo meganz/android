@@ -14979,6 +14979,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 								log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
 								megaApi.getFileVersionsOption(this);
 							}
+							else if(user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)){
+								log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
+								megaApi.getContactLinksOption(this);
+							}
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
