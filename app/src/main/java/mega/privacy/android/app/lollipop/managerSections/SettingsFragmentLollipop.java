@@ -138,6 +138,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_RUBBISH = "settings_file_management_rubbish";
 	public static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
 	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
+	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
@@ -224,6 +225,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference rubbishFileManagement;
 	Preference fileVersionsFileManagement;
 	Preference clearVersionsFileManagement;
+	SwitchPreference enableVersionsSwitch;
+	TwoLineCheckPreference enableVersionsCheck;
 
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
@@ -449,6 +452,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		fileVersionsFileManagement = findPreference(KEY_FILE_VERSIONS);
 		clearVersionsFileManagement = findPreference(KEY_CLEAR_VERSIONS);
 		clearVersionsFileManagement.setOnPreferenceClickListener(this);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch = (SwitchPreference) findPreference(KEY_ENABLE_VERSIONS);
+		}
+		else{
+			enableVersionsCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_VERSIONS);
+		}
+
+		updateEnabledFileVersions();
 
 		recoveryKey = findPreference(KEY_RECOVERY_KEY);
 		recoveryKey.setOnPreferenceClickListener(this);
@@ -1101,6 +1113,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		setAutoaccept = false;
 		autoAccept = false;
 		megaApi.getContactLinksOption(this);
+		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
 	}
 
 	public void setVersionsInfo(){
@@ -1919,6 +1932,31 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_VERSIONS) == 0){
+			log("Change KEY_ENABLE_VERSIONS");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableVersionsSwitch.isChecked()){
+					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
+				}
+				else{
+					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
+				}
+			}
+			else{
+				if(!enableVersionsCheck.isChecked()){
+					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
+				}
+				else{
+					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
+				}
+			}
+		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
@@ -2426,6 +2464,49 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				richLinksCheck.setChecked(MegaApplication.isEnabledRichLinks());
 				richLinksCheck.setOnPreferenceClickListener(this);
 			}
+		}
+	}
+
+	public void updateEnabledFileVersions(){
+		log("updateEnabledFileVersions: "+MegaApplication.isDisableFileVersions());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch.setOnPreferenceClickListener(null);
+			if(MegaApplication.isDisableFileVersions() == 1){
+				//disable = true - off versions
+				if(enableVersionsSwitch.isChecked()){
+					enableVersionsSwitch.setChecked(false);
+				}
+			}
+			else if(MegaApplication.isDisableFileVersions() == 0){
+				//disable = false - on versions
+				if(!enableVersionsSwitch.isChecked()){
+					enableVersionsSwitch.setChecked(true);
+				}
+			}
+			else{
+				enableVersionsSwitch.setChecked(false);
+			}
+			enableVersionsSwitch.setOnPreferenceClickListener(this);
+		}
+		else{
+			enableVersionsCheck.setOnPreferenceClickListener(null);
+			if(MegaApplication.isDisableFileVersions() == 1){
+				//disable = true - off versions
+				if(enableVersionsCheck.isChecked()){
+					enableVersionsCheck.setChecked(false);
+				}
+			}
+			else if(MegaApplication.isDisableFileVersions() == 0){
+				//disable = false - on versions
+				if(!enableVersionsCheck.isChecked()){
+					enableVersionsCheck.setChecked(true);
+				}
+			}
+			else{
+				enableVersionsCheck.setChecked(false);
+			}
+			enableVersionsCheck.setOnPreferenceClickListener(this);
 		}
 	}
 
