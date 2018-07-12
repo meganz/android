@@ -2205,10 +2205,15 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public String getSectionTitle(int position) {
-		if(((ViewHolderNormalChatList)holder).textFastScroller.isEmpty()){
-			return  null;
-		}else{
-			return ((ViewHolderNormalChatList)holder).textFastScroller;
+		if(holder instanceof ViewHolderNormalChatList){
+			if(((ViewHolderNormalChatList)holder).textFastScroller.isEmpty()){
+				return null;
+			}else{
+				return ((ViewHolderNormalChatList)holder).textFastScroller;
+			}
+		}
+		else{
+			return null;
 		}
 	}
 
