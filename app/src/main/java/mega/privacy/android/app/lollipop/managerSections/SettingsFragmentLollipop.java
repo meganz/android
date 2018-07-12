@@ -46,6 +46,7 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -95,6 +96,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 	public static String CATEGORY_QR_CODE = "settings_qrcode";
 	public static String CATEGORY_SECURITY = "settings_security";
+	public static String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
 
 	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
 
@@ -132,7 +134,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
 	
 	public static String KEY_CACHE = "settings_advanced_features_cache";
-	public static String KEY_OFFLINE = "settings_advanced_features_offline";
+	public static String KEY_OFFLINE = "settings_file_management_offline";
+	public static String KEY_RUBBISH = "settings_file_management_rubbish";
+	public static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
+	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
+	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
@@ -157,7 +163,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public final static int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;
 
-
 	PreferenceCategory qrCodeCategory;
 	SwitchPreference qrCodeAutoAcceptSwitch;
 	TwoLineCheckPreference qrCodeAutoAcceptCheck;
@@ -174,6 +179,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory autoawayChatCategory;
 	PreferenceCategory persistenceChatCategory;
 	PreferenceCategory securityCategory;
+	PreferenceCategory fileManagementCategory;
 
 	SwitchPreference pinLockEnableSwitch;
 	TwoLineCheckPreference pinLockEnableCheck;
@@ -200,6 +206,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference localCameraUploadFolderSDCard;
 	Preference megaCameraFolder;
 	Preference helpSendFeedback;
+	Preference cacheAdvancedOptions;
 	Preference cancelAccount;
 
 	Preference aboutPrivacy;
@@ -212,8 +219,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference secondaryMediaFolderOn;
 	Preference localSecondaryFolder;
 	Preference megaSecondaryFolder;
-	Preference advancedFeaturesCache;
-	Preference advancedFeaturesOffline;
+
+	//File management
+	Preference offlineFileManagement;
+	Preference rubbishFileManagement;
+	Preference fileVersionsFileManagement;
+	Preference clearVersionsFileManagement;
+	SwitchPreference enableVersionsSwitch;
+	TwoLineCheckPreference enableVersionsCheck;
 
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
@@ -301,6 +314,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
 		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
 		securityCategory = (PreferenceCategory) findPreference(CATEGORY_SECURITY);
+		fileManagementCategory = (PreferenceCategory) findPreference(CATEGORY_FILE_MANAGEMENT);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			pinLockEnableSwitch = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -428,11 +442,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			storageCategory.removePreference(downloadLocationPreference);
 		}
 		
-		advancedFeaturesCache = findPreference(KEY_CACHE);	
-		advancedFeaturesCache.setOnPreferenceClickListener(this);
-		advancedFeaturesOffline = findPreference(KEY_OFFLINE);
-		advancedFeaturesOffline.setOnPreferenceClickListener(this);
+		cacheAdvancedOptions = findPreference(KEY_CACHE);
+		cacheAdvancedOptions.setOnPreferenceClickListener(this);
+		offlineFileManagement = findPreference(KEY_OFFLINE);
+		offlineFileManagement.setOnPreferenceClickListener(this);
+		rubbishFileManagement = findPreference(KEY_RUBBISH);
+		rubbishFileManagement.setOnPreferenceClickListener(this);
 
+		fileVersionsFileManagement = findPreference(KEY_FILE_VERSIONS);
+		clearVersionsFileManagement = findPreference(KEY_CLEAR_VERSIONS);
+		clearVersionsFileManagement.setOnPreferenceClickListener(this);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch = (SwitchPreference) findPreference(KEY_ENABLE_VERSIONS);
+		}
+		else{
+			enableVersionsCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_VERSIONS);
+		}
+
+		updateEnabledFileVersions();
 
 		recoveryKey = findPreference(KEY_RECOVERY_KEY);
 		recoveryKey.setOnPreferenceClickListener(this);
@@ -879,9 +907,24 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 		}
 
-		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
-		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_calculating));
-		
+		cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_calculating));
+		offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+		if(((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo()==null){
+			fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+			rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+			fileManagementCategory.removePreference(clearVersionsFileManagement);
+		}
+		else{
+			rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
+			if(((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getNumVersions() == -1){
+				fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+				fileManagementCategory.removePreference(clearVersionsFileManagement);
+			}
+			else{
+				setVersionsInfo();
+			}
+		}
+
 		taskGetSizeCache();
 		taskGetSizeOffline();
 
@@ -1070,6 +1113,41 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		setAutoaccept = false;
 		autoAccept = true;
 		megaApi.getContactLinksOption((ManagerActivityLollipop) context);
+		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
+	}
+
+	public void setVersionsInfo(){
+		log("setVersionsInfo");
+
+		MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+
+		if(myAccountInfo!=null){
+			int numVersions = myAccountInfo.getNumVersions();
+			log("Num versions: " + numVersions);
+			String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
+			String text = getString(R.string.settings_file_management_file_versions_subtitle, numVersions, previousVersions);
+			log("Previous versions: " + previousVersions);
+			fileVersionsFileManagement.setSummary(text);
+			if(numVersions>0){
+				fileManagementCategory.addPreference(clearVersionsFileManagement);
+			}
+			else{
+				fileManagementCategory.removePreference(clearVersionsFileManagement);
+			}
+		}
+	}
+
+	public void resetVersionsInfo(){
+		log("resetVersionsInfo");
+
+		String text = getString(R.string.settings_file_management_file_versions_subtitle, 0, "0 B");
+		fileVersionsFileManagement.setSummary(text);
+		fileManagementCategory.removePreference(clearVersionsFileManagement);
+	}
+
+	public void setRubbishInfo(){
+		log("setRubbishInfo");
+		rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
 	}
 
 	@Override
@@ -1284,13 +1362,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public void setCacheSize(String size){
 		if(isAdded()){
-			advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, size));
+			cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_size, size));
 		}
 	}
 	
 	public void setOfflineSize(String size){
 		if(isAdded()){
-			advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, size));
+			offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_size, size));
 		}
 	}
 
@@ -1465,6 +1543,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			ClearOfflineTask clearOfflineTask = new ClearOfflineTask(context);
 			clearOfflineTask.execute();
+		}
+		else if(preference.getKey().compareTo(KEY_RUBBISH) == 0){
+			((ManagerActivityLollipop)context).showClearRubbishBinDialog();
+		}
+		else if(preference.getKey().compareTo(KEY_CLEAR_VERSIONS) == 0){
+			((ManagerActivityLollipop)context).showConfirmationClearAllVersions();
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
 			log("Changing the secondary uploads");
@@ -1871,6 +1955,31 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				else{
 					log("Disable rich links");
 					megaApi.enableRichPreviews(false, (ManagerActivityLollipop)context);
+				}
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_VERSIONS) == 0){
+			log("Change KEY_ENABLE_VERSIONS");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableVersionsSwitch.isChecked()){
+					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
+				}
+				else{
+					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
+				}
+			}
+			else{
+				if(!enableVersionsCheck.isChecked()){
+					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
+				}
+				else{
+					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
 				}
 			}
 		}
@@ -2385,6 +2494,49 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 	}
 
+	public void updateEnabledFileVersions(){
+		log("updateEnabledFileVersions: "+MegaApplication.isDisableFileVersions());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch.setOnPreferenceClickListener(null);
+			if(MegaApplication.isDisableFileVersions() == 1){
+				//disable = true - off versions
+				if(enableVersionsSwitch.isChecked()){
+					enableVersionsSwitch.setChecked(false);
+				}
+			}
+			else if(MegaApplication.isDisableFileVersions() == 0){
+				//disable = false - on versions
+				if(!enableVersionsSwitch.isChecked()){
+					enableVersionsSwitch.setChecked(true);
+				}
+			}
+			else{
+				enableVersionsSwitch.setChecked(false);
+			}
+			enableVersionsSwitch.setOnPreferenceClickListener(this);
+		}
+		else{
+			enableVersionsCheck.setOnPreferenceClickListener(null);
+			if(MegaApplication.isDisableFileVersions() == 1){
+				//disable = true - off versions
+				if(enableVersionsCheck.isChecked()){
+					enableVersionsCheck.setChecked(false);
+				}
+			}
+			else if(MegaApplication.isDisableFileVersions() == 0){
+				//disable = false - on versions
+				if(!enableVersionsCheck.isChecked()){
+					enableVersionsCheck.setChecked(true);
+				}
+			}
+			else{
+				enableVersionsCheck.setChecked(false);
+			}
+			enableVersionsCheck.setOnPreferenceClickListener(this);
+		}
+	}
+
 	public void waitPresenceConfig(){
 		log("waitPresenceConfig: ");
 
@@ -2507,6 +2659,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public void setSetAutoaccept (boolean autoAccept) {
 		this.setAutoaccept = autoAccept;
 	}
+
 
 	public boolean getSetAutoaccept () {
 		return setAutoaccept;
