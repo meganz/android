@@ -383,8 +383,8 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     -->
     <string name="context_download_to" context="Menu item">Save to</string>
-    <string name="context_clear_rubbish" context="Menu option title">Empty rubbish bin</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside your rubbish bin will be deleted.</string>
+    <string name="context_clear_rubbish" context="Menu option title">Clear rubbish bin</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">You are about to permanently remove all items from your Rubbish bin.</string>
 
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
@@ -655,10 +655,9 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear offline files</string>
 
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
-
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating</string>
@@ -2013,5 +2012,19 @@
     <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
     <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
 
+    <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">File versions</string>
+    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1d file versions, taking a total of %2s</string>
+
+    <string name="settings_file_management_category" context="Title of the section File management on Settings section">File management</string>
+
+    <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">Delete all file versions</string>
+
+    <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
+
+    <string name="success_delete_versions" context="success message when deleting all the versions of the account">File versions deleted successfully</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Error. The file versions have not been deleted</string>
+
+    <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File versioning</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
 
 </resources>

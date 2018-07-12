@@ -171,6 +171,35 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory
+		android:key="settings_file_management"
+		android:layout="@layout/my_category_preference"
+		android:title="@string/settings_file_management_category">
+
+		<Preference
+			android:key="settings_file_management_offline"
+			android:title="@string/settings_advanced_features_offline" />
+
+		<Preference
+			android:key="settings_file_management_rubbish"
+			android:title="@string/context_clear_rubbish" />
+
+		<SwitchPreference
+			android:key="settings_file_versioning_switch"
+			android:title="@string/settings_enable_file_versioning_title"
+			android:summary="@string/settings_enable_file_versioning_subtitle"/>
+
+		<Preference
+			android:key="settings_file_management_file_version"
+			android:title="@string/settings_file_management_file_versions_title" />
+
+		<Preference
+			android:key="settings_file_management_clear_version"
+			android:layout="@layout/delete_versions_preferences_v21"
+			android:title="@string/settings_file_management_delete_versions"/>
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
 		android:key="settings_security"
 		android:title="@string/settings_security_options_title"
 		android:layout="@layout/my_category_preference">
@@ -234,14 +263,10 @@
 			android:key="settings_use_https_only"
 			android:title="@string/setting_title_use_https_only"
 			android:summary="@string/setting_subtitle_use_https_only"/>
-		
-	    <Preference
-	        android:key="settings_advanced_features_cache"
-	        android:title="@string/settings_advanced_features_cache" />
-	    
-	    <Preference
-	        android:key="settings_advanced_features_offline"
-	        android:title="@string/settings_advanced_features_offline" />
+
+		<Preference
+			android:key="settings_advanced_features_cache"
+			android:title="@string/settings_advanced_features_cache" />
 
 		<Preference
 			android:key="settings_advanced_features_cancel_account"

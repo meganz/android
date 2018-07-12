@@ -541,8 +541,8 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         log("DENSITY: " + density + ":::: " + avatarTextSize);
 
         String fullName = "";
-        if(contactName.getText() != null){
-            fullName = contactName.getText().toString();
+        if(contactNameContent != null){
+            fullName = contactNameContent;
         }
         else{
             //No name, ask for it and later refresh!!
@@ -686,6 +686,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
             handleContactLink = request.getNodeHandle();
             contactNameContent = request.getName() + " " + request.getText();
+            myEmail = request.getEmail();
             userQuery = queryIfIsContact();
             showInviteDialog();
         } else if (e.getErrorCode() == MegaError.API_EEXIST) {
