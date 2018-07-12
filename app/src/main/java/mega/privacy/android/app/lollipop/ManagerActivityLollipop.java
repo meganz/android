@@ -325,6 +325,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
     public boolean openFolderFromSearch = false;
 
     public boolean openSettingsStorage = false;
+    public boolean openSettingsQR = false;
 
     int orientationSaved;
 
@@ -1757,11 +1758,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		getOverflowMenu();
 
 		handler = new Handler();
-
-//		Bundle bundle = getIntent().getExtras();
-//		if (bundle != null) {
-//			drawerItem = (DrawerItem) bundle.getSerializable("drawerItem");
-//		}
 
 		log("Set view");
 		setContentView(R.layout.activity_manager);
@@ -5374,6 +5370,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (openSettingsStorage){
 						sttFLol.goToCategoryStorage();
 					}
+					else if (openSettingsQR){
+						log ("goToCategoryQR");
+						sttFLol.goToCategoryQR();
+					}
 				}
 				else {
 					sttFLol = new SettingsFragmentLollipop();
@@ -5480,6 +5480,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void moveToSettingsSectionStorage(){
 		openSettingsStorage = true;
+		drawerItem=DrawerItem.SETTINGS;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	public void moveToSettingsSectionQR(){
+		openSettingsQR = true;
 		drawerItem=DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
 	}
@@ -11816,18 +11822,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	protected void onNewIntent(Intent intent){
     	log("onNewIntent");
 
-    	if ((intent != null) && Intent.ACTION_SEARCH.equals(intent.getAction())){
-    		searchQuery = intent.getStringExtra(SearchManager.QUERY);
-    		log("searchQuery: "+searchQuery);
-    		parentHandleSearch = -1;
-    		setToolbarTitle();
-    		isSearching = true;
+    	if(intent != null) {
+			if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+				searchQuery = intent.getStringExtra(SearchManager.QUERY);
+				parentHandleSearch = -1;
+				setToolbarTitle();
+				isSearching = true;
 
-    		if (searchMenuItem != null) {
-    			MenuItemCompat.collapseActionView(searchMenuItem);
+				if (searchMenuItem != null) {
+					MenuItemCompat.collapseActionView(searchMenuItem);
+				}
+				return;
 			}
-    		return;
-    	}
+//			When the user clicks on settings option in QR section, set drawerItem to SETTINGS and scroll to auto-accept setting
+			else if (intent.getBooleanExtra("fromQR", false)){
+				Bundle bundle = intent.getExtras();
+				if (bundle.getSerializable("drawerItemQR") != null){
+					if (DrawerItem.SETTINGS.equals(bundle.getSerializable("drawerItemQR"))){
+						log ("From QR Settings");
+						moveToSettingsSectionQR();
+					}
+				}
+				return;
+			}
+
+		}
      	super.onNewIntent(intent);
     	setIntent(intent);
     	return;
@@ -14044,6 +14063,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 			}
+			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
+				log("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
+				if (e.getErrorCode() == MegaError.API_OK) {
+					log("OK setContactLinkOption: " + request.getText());
+					if (sttFLol != null && sttFLol.isAdded()) {
+						sttFLol.setSetAutoaccept(false);
+						if (sttFLol.getAutoacceptSetting()) {
+							sttFLol.setAutoacceptSetting(false);
+						} else {
+							sttFLol.setAutoacceptSetting(true);
+						}
+						sttFLol.setValueOfAutoaccept(sttFLol.getAutoacceptSetting());
+						log("autoacept: " + sttFLol.getAutoacceptSetting());
+					}
+				} else {
+					log("Error setContactLinkOption");
+				}
+			}
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(Boolean.valueOf(request.getText()));
 
@@ -14221,6 +14258,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
                     }
 				}
             }
+            else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
+				log("Type: GET_ATTR_USER ParamType: USER_ATTR_CONTACT_LINK_VERIFICATION --> getContactLinkOption");
+				if (e.getErrorCode() == MegaError.API_OK) {
+					if (sttFLol != null && sttFLol.isAdded()) {
+						sttFLol.setAutoacceptSetting(request.getFlag());
+						log("OK getContactLinkOption: " + request.getFlag());
+//						If user request to set QR autoaccept
+						if (sttFLol.getSetAutoaccept()) {
+							if (sttFLol.getAutoacceptSetting()) {
+								log("setAutoaccept false");
+//								If autoaccept is enabled -> request to disable
+								megaApi.setContactLinksOption(true, this);
+							} else {
+								log("setAutoaccept true");
+//								If autoaccept is disabled -> request to enable
+								megaApi.setContactLinksOption(false, this);
+							}
+						} else {
+							sttFLol.setValueOfAutoaccept(sttFLol.getAutoacceptSetting());
+						}
+						log("autoacept: " + sttFLol.getAutoacceptSetting());
+					}
+				} else if (e.getErrorCode() == MegaError.API_ENOENT) {
+					log("Error MegaError.API_ENOENT getContactLinkOption: " + request.getFlag());
+					if (sttFLol != null && sttFLol.isAdded()) {
+						sttFLol.setAutoacceptSetting(request.getFlag());
+					}
+					megaApi.setContactLinksOption(false, this);
+				} else {
+					log("Error getContactLinkOption: " + e.getErrorString());
+				}
+			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
 				if(sttFLol!=null && sttFLol.isAdded()){
@@ -14909,6 +14978,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 							if(user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)){
 								log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
 								megaApi.getFileVersionsOption(this);
+							}
+							else if(user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)){
+								log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
+								megaApi.getContactLinksOption(this);
 							}
 						}
 
