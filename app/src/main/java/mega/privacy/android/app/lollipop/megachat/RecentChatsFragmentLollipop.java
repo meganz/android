@@ -240,7 +240,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         }
 
                         if(context instanceof ManagerActivityLollipop){
-                            chats = megaChatApi.getActiveChatListItems();
+                            chats = megaChatApi.getChatListItems();
                         }
                         else{
                             chats = megaChatApi.getArchivedChatListItems();
@@ -301,7 +301,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         chats = new ArrayList<MegaChatListItem>();
                     }
 
-                    chats = megaChatApi.getActiveChatListItems();
+                    if(context instanceof ManagerActivityLollipop){
+                        chats = megaChatApi.getChatListItems();
+                    }
+                    else{
+                        chats = megaChatApi.getArchivedChatListItems();
+                    }
 
                     if(chats==null || chats.isEmpty()){
                         showNoConnectionScreen();
