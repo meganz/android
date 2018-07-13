@@ -1136,7 +1136,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 					}else{
 						if(((ManagerActivityLollipop) context).isCameraUploads(node)){
-							log("**** cu");
 							holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
 						}else{
 							holder.imageView.setImageResource(R.drawable.ic_folder_list);
