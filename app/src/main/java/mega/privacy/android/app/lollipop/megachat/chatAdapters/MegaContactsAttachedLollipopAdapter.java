@@ -333,15 +333,15 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 		if (!multipleSelect) {
 
-			holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
 		}
 		else {
 
 			if(this.isItemChecked(position)){
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_long_click_lollipop));
 			}
 			else{
-				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
 			}
 		}
 
@@ -501,7 +501,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 			if(this.isItemChecked(position)){
 				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -608,7 +608,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 			}
 			else{
 				log("Default color to the avatar");
-				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+				p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			}
 
 			p.setStyle(Paint.Style.FILL);

@@ -50,12 +50,16 @@ public class MyStorageFragmentLollipop extends Fragment {
 	ImageView transferQuotaUsedIcon;
 	TextView transferQuotaUsedText;
 
+	RelativeLayout inboxStorageLayout;
+
 	TextView totalUsedSpace;
 	TextView cloudDriveUsedText;
 	TextView inboxUsedText;
 	TextView incomingUsedText;
 	TextView rubbishUsedText;
-	TextView availableSpaceText;
+	TextView previousVersionsText;
+
+	RelativeLayout previousVersionsLayout;
 
 	ProgressBar progressBar;
 	
@@ -115,12 +119,13 @@ public class MyStorageFragmentLollipop extends Fragment {
 		transferQuotaUsedText = (TextView) v.findViewById(R.id.my_storage_account_transfer_text);
 
 		/* Usage storage */
+		inboxStorageLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_inbox_storage_layout);
 		cloudDriveUsedText = (TextView) v.findViewById(R.id.my_storage_account_cloud_storage_text);
 		inboxUsedText = (TextView) v.findViewById(R.id.my_storage_account_inbox_storage_text);
 		incomingUsedText = (TextView) v.findViewById(R.id.my_storage_account_incoming_storage_text);
 		rubbishUsedText = (TextView) v.findViewById(R.id.my_storage_account_rubbish_storage_text);
-		availableSpaceText = (TextView) v.findViewById(R.id.my_storage_account_available_storage_text);
-
+		previousVersionsText = (TextView) v.findViewById(R.id.my_storage_account_previous_versions_text);
+		previousVersionsLayout = (RelativeLayout) v.findViewById(R.id.my_storage_account_previous_versions_layout);
 
 //		storageAvailableText = (TextView) v.findViewById(R.id.my_storage_account_space_text);
 //		RelativeLayout.LayoutParams bottomParams = (RelativeLayout.LayoutParams)progressBar.getLayoutParams();
@@ -184,14 +189,14 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 0:{
 					typeAccountText.setText(R.string.free_account);
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_free_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_free_crest));
 					expirationAccountLayout.setVisibility(View.GONE);
 					break;
 				}
 				case 1:{
 					typeAccountText.setText(getString(R.string.pro1_account));
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_1_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_1_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -205,7 +210,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 2:{
 					typeAccountText.setText(getString(R.string.pro2_account));
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_2_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_2_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -219,7 +224,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 				case 3:{
 					typeAccountText.setText(getString(R.string.pro3_account));
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_pro_3_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_pro_3_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -234,7 +239,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 					String textLite = getString(R.string.prolite_account);
 					typeAccountText.setText(textLite.toUpperCase());
 					typeAccountIcon.setVisibility(View.VISIBLE);
-					typeAccountIcon.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_lite_crest));
+					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_lite_crest));
 					if(myAccountInfo.getAccountInfo().getSubscriptionStatus()== MegaAccountDetails.SUBSCRIPTION_STATUS_VALID){
 						expirationAccountTitle.setText(getString(R.string.renews_on));
 						expirationAccountText.setText(Util.getDateString(myAccountInfo.getAccountInfo().getSubscriptionRenewTime()));
@@ -298,10 +303,26 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		//Check size of the different nodes
 		cloudDriveUsedText.setText(myAccountInfo.getFormattedUsedCloud());
-		inboxUsedText.setText(myAccountInfo.getFormattedUsedInbox());
+
+		String inboxStorage = myAccountInfo.getFormattedUsedInbox();
+		if(inboxStorage == null || inboxStorage.isEmpty()){
+			inboxStorageLayout.setVisibility(View.GONE);
+		}
+		else{
+			inboxStorageLayout.setVisibility(View.VISIBLE);
+			inboxUsedText.setText(inboxStorage);
+		}
+
 		rubbishUsedText.setText(myAccountInfo.getFormattedUsedRubbish());
 		incomingUsedText.setText(myAccountInfo.getFormattedUsedIncoming());
-		availableSpaceText.setText(myAccountInfo.getFormattedAvailableSpace());
+
+		if(myAccountInfo.getPreviousVersionsSize()>0){
+			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
+			previousVersionsLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			previousVersionsLayout.setVisibility(View.GONE);
+		}
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
@@ -334,18 +355,29 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		int usedPerc = myAccountInfo.getUsedPerc();
 		if (usedPerc < 90){
-			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
+			progressBar.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.custom_progress_bar_horizontal_ok));
 		}
 		else if ((usedPerc >= 90) && (usedPerc <= 95)){
-			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
+			progressBar.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.custom_progress_bar_horizontal_warning));
 		}
 		else{
 			if (usedPerc > 100){
 				myAccountInfo.setUsedPerc(100);
 			}
-			progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));
+			progressBar.setProgressDrawable(ContextCompat.getDrawable(context, R.drawable.custom_progress_bar_horizontal_exceed));
 		}
 		progressBar.setProgress(usedPerc);
+	}
+
+
+	public void refreshVersionsInfo(){
+		if(myAccountInfo.getPreviousVersionsSize()>0){
+			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
+			previousVersionsLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			previousVersionsLayout.setVisibility(View.GONE);
+		}
 	}
 
 	@Override

@@ -232,6 +232,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     MegaNode nodeChat;
     MegaChatMessage msgChat;
 
+    boolean notChangePage = false;
     MegaNode currentDocument;
 
     @Override
@@ -257,9 +258,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             uri = Uri.parse(savedInstanceState.getString("uri"));
             renamed = savedInstanceState.getBoolean("renamed");
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+            toolbarVisible = savedInstanceState.getBoolean("toolbarVisible", toolbarVisible);
         }
         else {
-            currentPage = 0;
+            currentPage = 1;
             isDeleteDialogShow = false;
             handle = intent.getLongExtra("HANDLE", -1);
             uri = intent.getData();
@@ -327,6 +329,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         screenWidth = outMetrics.widthPixels;
 
         setContentView(R.layout.activity_pdfviewer);
+
+        pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
 
         if (Build.VERSION.SDK_INT >= 26) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -525,7 +529,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         });
 
-        pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
+        if (!toolbarVisible) {
+            setToolbarVisibilityHide(0L);
+        }
 
         if (savedInstanceState == null){
             ViewTreeObserver observer = pdfView.getViewTreeObserver();
@@ -653,7 +659,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
-            currentPage = 0;
+            currentPage = 1;
             inside = false;
             if (type == Constants.OFFLINE_ADAPTER){
                 isOffLine = true;
@@ -850,6 +856,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putString("uri", uri.toString());
         outState.putBoolean("renamed", renamed);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
+        outState.putBoolean("toolbarVisible", toolbarVisible);
     }
 
     @Override
@@ -913,7 +920,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             log("onPostExecute");
             try {
                 pdfView.fromStream(inputStream)
-                        .defaultPage(currentPage)
+                        .defaultPage(currentPage-1)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
                         .onLoad(PdfViewerActivityLollipop.this)
@@ -942,7 +949,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         progressBar.setVisibility(View.VISIBLE);
         try {
             pdfView.fromUri(uri)
-                    .defaultPage(currentPage)
+                    .defaultPage(currentPage-1)
                     .onPageChange(this)
                     .enableAnnotationRendering(true)
                     .onLoad(this)
@@ -1330,20 +1337,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    public void setToolbarVisibilityHide () {
+    public void setToolbarVisibilityHide (long duration) {
         log("setToolbarVisibilityHide");
         toolbarVisible = false;
         if(tB != null) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            tB.animate().translationY(-220).setDuration(200L).withEndAction(new Runnable() {
+            tB.animate().translationY(-220).setDuration(duration).withEndAction(new Runnable() {
                 @Override
                 public void run() {
                     aB.hide();
                 }
             }).start();
-            bottomLayout.animate().translationY(220).setDuration(200L).start();
-            uploadContainer.animate().translationY(220).setDuration(200L).start();
-            pageNumber.animate().translationY(0).setDuration(200L).start();
+            bottomLayout.animate().translationY(220).setDuration(duration).start();
+            uploadContainer.animate().translationY(220).setDuration(duration).start();
+            pageNumber.animate().translationY(0).setDuration(duration).start();
         }
         else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -1360,11 +1367,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         int page = pdfView.getCurrentPage();
 
         if (queryIfPdfIsHorizontal(page) &&  getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !pdfView.isZooming()) {
+            notChangePage = true;
             pdfView.jumpTo(page - 1);
         }
 
         if (aB != null && aB.isShowing()) {
-            setToolbarVisibilityHide();
+            setToolbarVisibilityHide(200L);
         } else if (aB != null && !aB.isShowing()){
             setToolbarVisibilityShow();
         }
@@ -2069,7 +2077,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         layout.addView(error_layout, params1);
 
         final ImageView error_icon = new ImageView(PdfViewerActivityLollipop.this);
-        error_icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_input_warning));
+        error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
         error_layout.addView(error_icon);
         RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -2598,9 +2606,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     @Override
     public void onPageChanged(int page, int pageCount) {
-        currentPage = page;
-        actualPage.setText(""+(currentPage+1));
-        setTitle(String.format("%s %s / %s", pdfFileName, page + 1, pageCount));
+        log("page: "+page);
+        if (!notChangePage) {
+            currentPage = page+1;
+            actualPage.setText(String.valueOf(currentPage));
+            setTitle(String.format("%s %s / %s", pdfFileName, currentPage, pageCount));
+        }
+        else {
+            notChangePage = false;
+        }
     }
 
     @Override
@@ -2622,10 +2636,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         log("modDate = " + meta.getModDate());
         printBookmarksTree(pdfView.getTableOfContents(), "-");
 
-        new Handler().postDelayed(new Runnable() {
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                setToolbarVisibilityHide();
+                if (toolbarVisible)
+                    setToolbarVisibilityHide(200L);
             }
         }, 2000);
     }
@@ -2967,6 +2982,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             megaApi.httpServerStop();
         }
 
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+
         super.onDestroy();
     }
 
@@ -3146,7 +3165,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 

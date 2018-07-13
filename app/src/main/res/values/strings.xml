@@ -383,8 +383,8 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     -->
     <string name="context_download_to" context="Menu item">Save to</string>
-    <string name="context_clear_rubbish" context="Menu option title">Empty rubbish bin</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">All items inside your rubbish bin will be deleted.</string>
+    <string name="context_clear_rubbish" context="Menu option title">Clear rubbish bin</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">You are about to permanently remove all items from your Rubbish bin.</string>
 
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
@@ -655,10 +655,9 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear offline files</string>
 
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
-
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating</string>
@@ -1801,9 +1800,10 @@
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
     <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
-    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone</string>
-    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Apps &amp; notifications</string>
-    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">App notifications</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone [A]Settings[/A]</string>
+    <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Open [A]Apps &amp; notifications[/A]</string>
+    <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">Select [A]MEGA[/A]</string>
+    <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">Open [A]App notifications[/A]</string>
     <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">Switch to On and select your preferences</string>
 
     <plurals name="files_send_to_chat_success" context="Alert message after sending to chat one or several messages to several chats">
@@ -1926,35 +1926,34 @@
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
     <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
 
+    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Missed call[/A]</string>
+    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was rejected[/A]</string>
+    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was cancelled[/A]</string>
+    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call failed[/A]</string>
+    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was not answered[/A]</string>
+
+    <string name="contact_email" context="Indicates that can type a contact email">Contact\'s email</string>
+    <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">Contact not added, is already added.</string>
+
     <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minute[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$s minutes[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minute[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minutes[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_with_one_second" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d second[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d second[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d second[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d second[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_with_more_seconds" context="Message shown when a call ends.">
-        <item context="one minute" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minute, %2$d seconds[/C]</item>
-        <item context="more minutes" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d minutes, %2$d seconds[/C]</item>
+        <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minute, %2$d seconds[/B]</item>
+        <item context="more minutes" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d minutes, %2$d seconds[/B]</item>
     </plurals>
 
     <plurals name="plural_call_ended_messages_just_seconds" context="Message shown when a call ends.">
-        <item context="one second" quantity="one">[A]Call [/A][B]ended[/B][C]. Duration: %1$d second[/C]</item>
-        <item context="more seconds" quantity="other">[A]Call [/A][B]ended[/B][C]. Duration: %1$d seconds[/C]</item>
+        <item context="one second" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$d second[/B]</item>
+        <item context="more seconds" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d seconds[/B]</item>
     </plurals>
-
-    <string name="call_cancelled_messages" context="Message shown when a call ends.">[A]Call was[/A][B] cancelled[/B]</string>
-
-    <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was[/A][B] not answered[/B]</string>
-
-    <string name="call_missed_messages" context="Message shown when a call ends.">[A]Call[/A][B] missed[/B]</string>
-
-    <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was[/A][B] rejected[/B]</string>
-
-    <string name="call_failed_messages" context="Message shown when a call ends.">[A]Call[/A][B] failed[/B]</string>
 
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
@@ -1998,5 +1997,23 @@
 
     <string name="inactive_chat" context="Subtitle of chat screen when the chat is inactive">Inactive chat</string>
     <string name="archived_chat" context="Subtitle of chat screen when the chat is archived">Archived chat</string>
+
+    <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
+    <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
+
+    <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">File versions</string>
+    <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1d file versions, taking a total of %2s</string>
+
+    <string name="settings_file_management_category" context="Title of the section File management on Settings section">File management</string>
+
+    <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">Delete all file versions</string>
+
+    <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
+
+    <string name="success_delete_versions" context="success message when deleting all the versions of the account">File versions deleted successfully</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Error. The file versions have not been deleted</string>
+
+    <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File versioning</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
 
 </resources>

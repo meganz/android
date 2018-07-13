@@ -1696,11 +1696,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							log("FILENAME: " + psHMegaNode.getName());
 
 							Intent mediaIntent;
+							boolean internalIntent;
 							if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideoNotSupported()){
 								mediaIntent = new Intent(Intent.ACTION_VIEW);
+								internalIntent = false;
 							}
 							else {
 								mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+								internalIntent = true;
 							}
 							mediaIntent.putExtra("position", positionInNodes);
 							if (megaApi.getParentNode(psHMegaNode).getType() == MegaNode.TYPE_ROOT){
@@ -1760,17 +1763,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								String url = megaApi.httpServerGetLocalLink(psHMegaNode);
 								mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 							}
-					  		if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-					  			startActivity(mediaIntent);
-					  		}
-					  		else{
-					  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-					  			adapterList.notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(psHMegaNode.getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList);
-					  		}
+							if (internalIntent) {
+								context.startActivity(mediaIntent);
+							}
+							else {
+								if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+									context.startActivity(mediaIntent);
+								} else {
+									((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+									adapterList.notifyDataSetChanged();
+									ArrayList<Long> handleList = new ArrayList<Long>();
+									handleList.add(psHMegaNode.getHandle());
+									NodeController nC = new NodeController(context);
+									nC.prepareForDownload(handleList);
+								}
+							}
 							((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 							imageDrag = imageView;
 						}

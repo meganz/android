@@ -610,10 +610,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
                     offlineSwitch.setOnClickListener(this);
-                    availableOfflineView.setTextColor(getResources().getColor(R.color.name_my_account));
+                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
                 }else{
                     offlineSwitch.setEnabled(false);
-                    availableOfflineView.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
 
                 }
 
@@ -2056,7 +2056,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 //		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -2101,7 +2101,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		layout.addView(error_layout, params1);
 
 		final ImageView error_icon = new ImageView(FileInfoActivityLollipop.this);
-		error_icon.setImageDrawable(FileInfoActivityLollipop.this.getResources().getDrawable(R.drawable.ic_input_warning));
+		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
 		error_layout.addView(error_icon);
 		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -2126,7 +2126,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2143,7 +2143,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -2155,7 +2155,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -2197,7 +2197,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -3068,7 +3068,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -3117,7 +3117,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 

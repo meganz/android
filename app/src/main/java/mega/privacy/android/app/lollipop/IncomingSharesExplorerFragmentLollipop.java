@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -796,9 +797,9 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	public void activateButton(boolean show){
 		optionButton.setEnabled(show);
 		if(show){
-			optionButton.setTextColor(getResources().getColor(R.color.accentColor));
+			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 		}else{
-			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 		}
 	}
 }
