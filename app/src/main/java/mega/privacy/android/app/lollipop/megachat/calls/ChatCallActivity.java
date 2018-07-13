@@ -103,7 +103,7 @@ import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
-public class ChatCallActivity extends AppCompatActivity implements MegaChatRequestListenerInterface,View.OnTouchListener, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
+public class ChatCallActivity extends AppCompatActivity implements MegaChatRequestListenerInterface, MegaChatCallListenerInterface, MegaRequestListenerInterface, View.OnClickListener, SensorEventListener, KeyEvent.Callback {
 
     DatabaseHandler dbH = null;
     ChatItemPreferences chatPrefs = null;
@@ -1337,6 +1337,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onClick");
 
         switch (v.getId()) {
+            case R.id.call_chat_contact_image_layout:{
+                remoteCameraClick();
+                break;
+            }
             case R.id.video_fab:{
 
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
@@ -1720,8 +1724,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
                     ft.commitNowAllowingStateLoss();
 
+//                    contactAvatarLayout.setOnTouchListener(null);
+                    contactAvatarLayout.setOnClickListener(null);
                     contactAvatarLayout.setVisibility(GONE);
-                    contactAvatarLayout.setOnTouchListener(null);
                     parentRemoteFS.setVisibility(View.VISIBLE);
                     fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
 
@@ -1742,7 +1747,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         remoteCameraFragmentFS = null;
                     }
                 contactAvatarLayout.setVisibility(View.VISIBLE);
-                contactAvatarLayout.setOnTouchListener(this);
+                contactAvatarLayout.setOnClickListener(this);
             }
         }else{
             log("Change on remote video");
@@ -1758,7 +1763,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     remoteCameraFragmentFS = null;
                 }
                 contactAvatarLayout.setVisibility(View.VISIBLE);
-                contactAvatarLayout.setOnTouchListener(this);
+                contactAvatarLayout.setOnClickListener(this);
 
             }else if((isRemoteVideo==REMOTE_VIDEO_DISABLED)&&(userSession.hasVideo())){
 
@@ -1769,8 +1774,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
                     ft.commitNowAllowingStateLoss();
 
+                    contactAvatarLayout.setOnClickListener(null);
                     contactAvatarLayout.setVisibility(GONE);
-                    contactAvatarLayout.setOnTouchListener(null);
                     parentRemoteFS.setVisibility(View.VISIBLE);
                     fragmentContainerRemoteCameraFS.setVisibility(View.VISIBLE);
 
@@ -1838,33 +1843,46 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
-    @Override
-    public boolean onTouch(View view, MotionEvent event){
+    public void remoteCameraClick(){
 
-            final int X = (int) event.getRawX();
-            final int Y = (int) event.getRawY();
+        if(aB.isShowing()){
+            hideActionBar();
+            hideFABs();
+        }else{
+            showActionBar();
+            showInitialFABConfiguration();
+        }
 
-            switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                case MotionEvent.ACTION_DOWN:
-                    if(view.getId() == R.id.call_chat_contact_image_layout){
-                        if(aB.isShowing()){
-                            hideActionBar();
-                            hideFABs();
-                        }else{
-                            showActionBar();
-                            showInitialFABConfiguration();
-                        }
-                    }
-                    break;
 
-                case MotionEvent.ACTION_MOVE:
-                    break;
-
-                default:
-                    return false;
-            }
-            return true;
     }
+
+//    @Override
+//    public boolean onTouch(View view, MotionEvent event){
+//
+//            final int X = (int) event.getRawX();
+//            final int Y = (int) event.getRawY();
+//
+//            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+//                case MotionEvent.ACTION_DOWN:
+//                    if((view.getId() == R.id.parent_layout_remote_camera_FS)||(view.getId() == R.id.call_chat_contact_image_layout)){
+//                        if(aB.isShowing()){
+//                            hideActionBar();
+//                            hideFABs();
+//                        }else{
+//                            showActionBar();
+//                            showInitialFABConfiguration();
+//                        }
+//                    }
+//                    break;
+//
+//                case MotionEvent.ACTION_MOVE:
+//                    break;
+//
+//                default:
+//                    return false;
+//            }
+//            return true;
+//    }
 
 
 
