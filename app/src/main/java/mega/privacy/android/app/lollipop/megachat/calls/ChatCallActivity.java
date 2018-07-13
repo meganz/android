@@ -1168,6 +1168,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if(call.getPeerSessionStatusChange()==chat.getPeerHandle(0)){
                     updateSubTitle();
                 }
+                updateRemoteVideoStatus();
+                updateRemoteAudioStatus();
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
                 log("Remote flags have changed");
