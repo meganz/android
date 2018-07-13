@@ -16,13 +16,14 @@ import java.nio.ByteBuffer;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 
-public class RemoteCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface {
+public class RemoteCameraCallFullScreenFragment extends Fragment implements MegaChatVideoListenerInterface, View.OnClickListener {
 
     int width = 0;
     int height = 0;
@@ -56,8 +57,6 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         this.userHandle = args.getLong("userHandle", -1);
-        log("**** 1 userHandle: "+userHandle);
-
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -73,11 +72,11 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
         View v = inflater.inflate(R.layout.fragment_remote_camera_call_full_screen, container, false);
 
         remoteFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_remote_video);
+        remoteFullScreenSurfaceView.setOnClickListener(this);
         remoteFullScreenSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder remoteSurfaceHolder = remoteFullScreenSurfaceView.getHolder();
         remoteSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         remoteRenderer = new MegaSurfaceRenderer(remoteFullScreenSurfaceView);
-        log("**** 2 userHandle: "+userHandle);
         megaChatApi.addChatRemoteVideoListener(chatId, userHandle, this);
 
         return v;
@@ -156,5 +155,10 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
     private static void log(String log) {
         Util.log("RemoteCameraCallFullScreenFragment", log);
+    }
+
+    @Override
+    public void onClick(View v) {
+        ((ChatCallActivity)context).remoteCameraClick();
     }
 }
