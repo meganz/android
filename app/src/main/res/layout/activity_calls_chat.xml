@@ -54,9 +54,6 @@
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
                     android:layout_alignParentEnd="true"
                     android:background="@android:color/transparent">
                     <FrameLayout

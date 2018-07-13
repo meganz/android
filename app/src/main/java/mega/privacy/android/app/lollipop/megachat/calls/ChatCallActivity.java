@@ -1724,7 +1724,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     ft.replace(R.id.fragment_container_remote_cameraFS, remoteCameraFragmentFS, "remoteCameraFragmentFS");
                     ft.commitNowAllowingStateLoss();
 
-//                    contactAvatarLayout.setOnTouchListener(null);
                     contactAvatarLayout.setOnClickListener(null);
                     contactAvatarLayout.setVisibility(GONE);
                     parentRemoteFS.setVisibility(View.VISIBLE);
