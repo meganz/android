@@ -34,7 +34,7 @@
 
                 <!-- Background -->
                 <RelativeLayout
-                    android:id="@+id/parentLayoutFS"
+                    android:id="@+id/parent_layout_local_camera_FS"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
@@ -47,14 +47,29 @@
                         android:layout_height="match_parent"
                         android:background="@android:color/transparent"/>
                 </RelativeLayout>
-                <SurfaceView
-                    android:id="@+id/surface_remote_video"
+
+                <RelativeLayout
+                    android:id="@+id/parent_layout_remote_camera_FS"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true">
-                </SurfaceView>
+                    android:layout_alignParentEnd="true"
+                    android:background="@android:color/transparent">
+                    <FrameLayout
+                        android:id="@+id/fragment_container_remote_cameraFS"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"/>
+                </RelativeLayout>
+                <!--<SurfaceView-->
+                    <!--android:id="@+id/surface_remote_video"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_alignParentTop="true"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:layout_alignParentEnd="true">-->
+                <!--</SurfaceView>-->
 
 
                 <RelativeLayout
@@ -109,7 +124,7 @@
                     android:fitsSystemWindows="true"/>
 
                 <RelativeLayout
-                    android:id="@+id/parentLayout"
+                    android:id="@+id/parent_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="5dp"
