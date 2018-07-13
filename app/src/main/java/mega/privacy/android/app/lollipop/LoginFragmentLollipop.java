@@ -183,6 +183,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String pin = null;
     private TextView pinError;
     private RelativeLayout lostYourDeviceButton;
+    private ProgressBar verify2faProgressBar;
 
     private boolean isFirstTime = true;
     private boolean isErrorShown = false;
@@ -474,6 +475,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         lostYourDeviceButton.setOnClickListener(this);
         pinError = (TextView) v.findViewById(R.id.pin_2fa_error_login);
         pinError.setVisibility(View.GONE);
+        verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
 
         imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 
@@ -1073,6 +1075,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             pin = sb.toString();
             log("PIN: "+pin);
             if (!isErrorShown && pin != null){
+                verify2faProgressBar.setVisibility(View.VISIBLE);
                 megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
             }
         }
@@ -2080,6 +2083,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     firstPin.setCursorVisible(true);
                 }
                 else if (error.getErrorCode() == MegaError.API_EFAILED || error.getErrorCode() == MegaError.API_EEXPIRED) {
+                    if (verify2faProgressBar != null) {
+                        verify2faProgressBar.setVisibility(View.GONE);
+                    }
                     verifyShowError();
                 }
                 else{

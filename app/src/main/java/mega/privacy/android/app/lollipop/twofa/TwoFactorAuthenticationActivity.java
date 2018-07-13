@@ -116,6 +116,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private boolean isEnabled2FA = false;
     private boolean isErrorShown = false;
     private boolean firstTime = true;
+    private boolean newAccount = false;
 
     MegaApiAndroid megaApi;
 
@@ -170,6 +171,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             confirm2FAIsShown = false;
             scanOrCopyIsShown = false;
             isEnabled2FA = false;
+            if (getIntent() != null) {
+                newAccount = getIntent().getBooleanExtra("newAccount", false);
+            }
         }
 
         container2FA = (RelativeLayout) findViewById(R.id.container_2fa);
@@ -426,7 +430,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        if (scanOrCopyIsShown){
+        if (scanOrCopyIsShown || newAccount){
+            scanOrCopyIsShown = true;
             qrSeedContainer.setVisibility(View.VISIBLE);
             confirmContainer.setVisibility(View.GONE);
             scrollContainer2FA.setVisibility(View.GONE);
@@ -640,6 +645,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             }
             case R.id.button_next_2fa:{
                 scanOrCopyIsShown = false;
+                newAccount = false;
                 confirm2FAIsShown = true;
                 isEnabled2FA = false;
                 qrSeedContainer.setVisibility(View.GONE);
