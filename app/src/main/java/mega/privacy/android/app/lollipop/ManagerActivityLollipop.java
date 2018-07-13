@@ -173,6 +173,7 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.lollipop.twofa.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -327,6 +328,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
+	boolean newAccount = false;
 
     int orientationSaved;
 
@@ -550,6 +552,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Button dismissButton;
 	private boolean rememberPasswordLogout = false;
 
+	AlertDialog enable2FADialog;
+	boolean isEnable2FADialogShown = false;
+	Button enable2FAButton;
+	Button skip2FAButton;
 	AlertDialog verify2FADialog;
 	boolean verify2FADialogIsShown = false;
 	int verifyPin2FADialogType;
@@ -565,6 +571,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private String pin = null;
 	private String newMail = null;
 	private TextView pinError;
+	private ProgressBar verify2faProgressBar;
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
@@ -1532,6 +1539,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		outState.putInt("orientationSaved", orientationSaved);
 		outState.putBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
 		outState.putInt("verifyPin2FADialogType", verifyPin2FADialogType);
+		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 	}
 
 	@Override
@@ -1591,7 +1599,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
 			verify2FADialogIsShown = savedInstanceState.getBoolean("verify2FADialogIsShown", false);
 			verifyPin2FADialogType = savedInstanceState.getInt("verifyPin2FADialogType");
-
+			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -2590,6 +2598,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	Intent intent = getIntent();
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
+					newAccount = getIntent().getBooleanExtra("newAccount", false);
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -2652,6 +2661,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
+					newAccount = getIntent().getBooleanExtra("newAccount", false);
 					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
@@ -2737,11 +2747,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		megaApi.shouldShowPasswordReminderDialog(false, this);
 //		showRememberPasswordDialog(false);
-		log("END onCreate");
 //		showTransferOverquotaDialog();
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
+		log("END onCreate");
 	}
 
 	public void showRememberPasswordDialog(boolean logout){
@@ -5516,6 +5526,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
     	}
+
+    	if (newAccount || isEnable2FADialogShown) {
+    		showEnable2FADialog();
+		}
+	}
+
+	void showEnable2FADialog () {
+		log ("showEnable2FADialog newaccount: "+newAccount);
+		newAccount = false;
+		if (getIntent() != null) {
+			getIntent().putExtra("newAccount", false);
+		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
+		builder.setView(v);
+
+		enable2FAButton = (Button) v.findViewById(R.id.enable_2fa_button);
+		enable2FAButton.setOnClickListener(this);
+		skip2FAButton = (Button) v.findViewById(R.id.skip_enable_2fa_button);
+		skip2FAButton.setOnClickListener(this);
+
+		enable2FADialog = builder.create();
+		enable2FADialog.setCanceledOnTouchOutside(false);
+		try {
+			enable2FADialog.show();
+		}catch (Exception e){};
+		isEnable2FADialogShown = true;
 	}
 
 	public void moveToSettingsSection(){
@@ -10075,6 +10113,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			titleDialog.setText(getString(R.string.disable_2fa_verification));
 		}
 
+		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
+
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
 		pinError.setVisibility(View.GONE);
 
@@ -10294,6 +10334,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		});
+
 		verify2FADialog = builder.create();
 		verify2FADialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
@@ -10309,6 +10350,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		View v = getCurrentFocus();
 		if (v != null){
+			if (imm == null) {
+				imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+			}
 			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 		}
 	}
@@ -10325,6 +10369,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	void verifyShowError(){
+		log("Pin not correct verifyShowError");
 		isFirstTime = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
@@ -10351,6 +10396,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			pin = sb.toString();
 			log("PIN: "+pin);
 			if (!isErrorShown && pin != null) {
+				verify2faProgressBar.setVisibility(View.VISIBLE);
 				verify2FA(type);
 			}
 		}
@@ -12358,6 +12404,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (rememberPasswordLogout){
 					AccountController ac = new AccountController(this);
 					ac.logout(this, megaApi);
+				}
+				break;
+			}
+			case R.id.enable_2fa_button: {
+				if (enable2FADialog != null) {
+					enable2FADialog.dismiss();
+				}
+				isEnable2FADialogShown = false;
+				Intent intent = new Intent(this, TwoFactorAuthenticationActivity.class);
+				intent.putExtra("newAccount", true);
+				startActivity(intent);
+				break;
+			}
+			case R.id.skip_enable_2fa_button: {
+				isEnable2FADialogShown = false;
+				if (enable2FADialog != null) {
+					enable2FADialog.dismiss();
 				}
 				break;
 			}
@@ -14698,8 +14761,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
+			if (verify2faProgressBar != null) {
+				verify2faProgressBar.setVisibility(View.GONE);
+			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The change link has been sent");
+				hideKeyboard();
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -14707,6 +14774,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				log("The new mail already exists");
+				hideKeyboard();
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -14720,6 +14788,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				log("Error when asking for change mail link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
+				hideKeyboard();
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
@@ -14773,10 +14845,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
             log("TYPE_GET_CANCEL_LINK");
-
+			if (verify2faProgressBar != null) {
+				verify2faProgressBar.setVisibility(View.GONE);
+			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("cancelation link received!");
 				log(e.getErrorString() + "___" + e.getErrorCode());
+				hideKeyboard();
 				if (verify2FADialog != null && verify2FADialog.isShowing()) {
 					verify2FADialog.dismiss();
 				}
@@ -14790,6 +14865,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			else{
 				log("Error when asking for the cancelation link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
+				hideKeyboard();
 				if (verify2FADialog != null && verify2FADialog.isShowing()){
 					verify2FADialog.dismiss();
 				}
@@ -15343,25 +15419,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET){
 			log("TYPE_MULTI_FACTOR_AUTH_SET: "+e.getErrorCode());
+			if (verify2faProgressBar != null) {
+				verify2faProgressBar.setVisibility(View.GONE);
+			}
 			if (!request.getFlag() && e.getErrorCode() == MegaError.API_OK){
 				log("Pin correct: Two-Factor Authentication disabled");
 				is2FAEnabled = false;
 				if (sttFLol != null && sttFLol.isAdded()) {
 					sttFLol.update2FAPreference(false);
 				}
+				hideKeyboard();
 				if (verify2FADialog != null) {
 					verify2FADialog.dismiss();
 				}
 			}
 			else if (e.getErrorCode() == MegaError.API_EFAILED){
 				log("Pin not correct");
-				if (request.getFlag()){
-//					showError();
-					verifyShowError();
-				}
+				verifyShowError();
 			}
 			else {
-				log("An error ocurred trying to enable Two-Factor Authentication");
+				hideKeyboard();
+				if (verify2FADialog != null) {
+					verify2FADialog.dismiss();
+				}
+				showSnackbar(getString(R.string.error_disable_2fa));
+				log("An error ocurred trying to disable Two-Factor Authentication");
 			}
 
 			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);

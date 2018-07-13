@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -104,7 +105,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private StringBuilder sb = new StringBuilder();
 	private String pin = null;
 	private TextView pinError;
-	private RelativeLayout lostYourDeviceButton;
+	private ProgressBar verify2faProgressBar;
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
@@ -352,16 +353,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		TextView titleDialog = (TextView) v.findViewById(R.id.title_dialog_verify);
 		titleDialog.setText(getString(R.string.change_password_verification));
 
-		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
-		lostYourDeviceButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-
-			}
-		});
-
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
 		pinError.setVisibility(View.GONE);
+
+		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
 
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -629,6 +624,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			pin = sb.toString();
 			log("PIN: "+pin);
 			if (!isErrorShown && pin != null) {
+				verify2faProgressBar.setVisibility(View.VISIBLE);
 				changePassword(newPassword1View.getText().toString());
 			}
 		}
@@ -1058,7 +1054,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					progress.dismiss();
 				} catch(Exception ex) {};
 
+
 				if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
+					if (verify2faProgressBar != null) {
+						verify2faProgressBar.setVisibility(View.GONE);
+					}
 					verifyShowError();
 				}
 				else {
@@ -1089,7 +1089,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};
-				imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 				//Intent to MyAccount
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);

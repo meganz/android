@@ -25,7 +25,7 @@
             android:id="@+id/container_confirm_2fa_verify"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="40dp"
+            android:paddingBottom="40dp"
             android:layout_below="@+id/toolbar">
 
             <TextView
@@ -132,7 +132,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:layout_marginBottom="40dp"
                 android:text="@string/pin_error_2fa"
                 android:textColor="@color/login_warning"
                 android:fontFamily="roboto"
@@ -140,6 +139,15 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"/>
+
+            <ProgressBar
+                android:id="@+id/progressbar_verify_2fa"
+                style="?android:attr/progressBarStyleLargeInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 

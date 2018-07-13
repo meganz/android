@@ -1912,7 +1912,7 @@
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Two-Factor Authentication</string>
-    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Two-Factor Authentication helps to keep your account more secure.</string>
+    <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Two-Factor Authentication is a second layer of security four your account.</string>
     <string name="see_recovery_key" context="Preference on Two-Factor Authentication setting that permits see the Recovery Key">SEE RECOVERY KEY</string>
     <string name="reset_authentication_app" context="Preference on Two-Factor Authentication setting that permits reset the Authentication app">Reset Authentication App</string>
     <string name="peference_enable_sms_2fa" context="Preference on Two-Factor Authentication setting that permits enable sms token authentication">Enable SMS Token authentication</string>
@@ -1941,6 +1941,8 @@
     <string name="text_yes_lost_authenticator_device" context="Explanation of screen Lost device device to yes button">If you have your Recovery Key, you can reset your authenticator app by selecting <A>YES</A>.</string>
     <string name="text_no_lost_authenticator_device" context="Explanation of screen Lost authenticator decive to no button">You can still export your Recovery Key now if you have an active MEGA session in any other browser on this or any other device. If you don\'t, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting <A>NO</A>.</string>
     <string name="hint_type_rk" context="Hint of an edittext that indicates user has to type the 22-digit code of Recovery Key">Enter the 22-digit code</string>
+    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">An error ocurred trying to disable Two-Factor Authentication</string>
+    <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Enable Two-Factor Authentication</string>
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d files were not shared</string>
