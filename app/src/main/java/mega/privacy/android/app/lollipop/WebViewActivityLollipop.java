@@ -44,8 +44,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.OldPreferences;
-import mega.privacy.android.app.OldUserCredentials;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.providers.FileProviderActivity;

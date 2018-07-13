@@ -46,8 +46,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.OldPreferences;
-import mega.privacy.android.app.OldUserCredentials;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
@@ -132,8 +130,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private String lastEmail;
     private String lastPassword;
-    private String gPublicKey;
-    private String gPrivateKey;
     private String gSession;
     private boolean resumeSesion = false;
 
@@ -193,26 +189,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
-    }
-
-    /*
-     * Task to process email and password
-     */
-    private class HashTask extends AsyncTask<String, Void, String[]> {
-
-        @Override
-        protected String[] doInBackground(String... args) {
-            String privateKey = megaApi.getBase64PwKey(args[1]);
-            String publicKey = megaApi.getStringHash(privateKey, args[0]);
-            return new String[]{new String(privateKey), new String(publicKey)};
-        }
-
-
-        @Override
-        protected void onPostExecute(String[] key) {
-            onKeysGenerated(key[0], key[1]);
-        }
-
     }
 
     @Override
@@ -964,9 +940,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
             }
-            if (OldPreferences.getOldCredentials(context) != null) {
-                oldCredentialsLogin();
-            }
         }
 
         if ((passwdTemp != null) && (emailTemp != null)){
@@ -1207,29 +1180,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
-    public void oldCredentialsLogin(){
-        log("oldCredentialsLogin");
-        loginLogin.setVisibility(View.GONE);
-        loginCreateAccount.setVisibility(View.GONE);
-        queryingSignupLinkText.setVisibility(View.GONE);
-        confirmingAccountText.setVisibility(View.GONE);
-        loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-//				generatingKeysText.setVisibility(View.VISIBLE);
-        loginProgressBar.setVisibility(View.VISIBLE);
-        loginFetchNodesProgressBar.setVisibility(View.GONE);
-        loggingInText.setVisibility(View.VISIBLE);
-        fetchingNodesText.setVisibility(View.GONE);
-        prepareNodesText.setVisibility(View.GONE);
-        serversBusyText.setVisibility(View.GONE);
-
-        OldUserCredentials oldCredentials = OldPreferences.getOldCredentials(context);
-        lastEmail = oldCredentials.getEmail();
-        OldPreferences.clearCredentials(context);
-        onKeysGeneratedLogin(oldCredentials.getPrivateKey(), oldCredentials.getPublicKey());
-
-    }
-
     public void startFastLogin(){
         log("startFastLogin");
         UserCredentials credentials = dbH.getCredentials();
@@ -1350,7 +1300,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("generating keys");
 
-        new HashTask().execute(lastEmail, lastPassword);
+        onKeysGenerated(lastEmail, lastPassword);
     }
 
     private void submitForm() {
@@ -1394,17 +1344,17 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         log("generating keys");
 
-        new HashTask().execute(lastEmail, lastPassword);
+        onKeysGenerated(lastEmail, lastPassword);
     }
 
-    private void onKeysGenerated(String privateKey, String publicKey) {
+    private void onKeysGenerated(String email, String password) {
         log("onKeysGenerated");
 
-        this.gPrivateKey = privateKey;
-        this.gPublicKey = publicKey;
+        this.lastEmail = email;
+        this.lastPassword = password;
 
         if (confirmLink == null) {
-            onKeysGeneratedLogin(privateKey, publicKey);
+            onKeysGeneratedLogin(email, password);
         }
         else{
             if(!Util.isOnline(context)){
@@ -1427,11 +1377,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             serversBusyText.setVisibility(View.GONE);
 
             log("fastConfirm");
-            megaApi.fastConfirmAccount(confirmLink, privateKey, this);
+            megaApi.confirmAccount(confirmLink, lastPassword, this);
         }
     }
 
-    private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
+    private void onKeysGeneratedLogin(final String email, final String password) {
         log("onKeysGeneratedLogin");
 
         if(!Util.isOnline(context)){
@@ -1471,7 +1421,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 log("onKeysGeneratedLogin: result of init ---> "+ret);
                 if (ret ==MegaChatApi.INIT_WAITING_NEW_SESSION){
                     log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                    megaApi.login(lastEmail, lastPassword, this);
                 }
                 else{
                     log("ERROR INIT CHAT: " + ret);
@@ -1488,12 +1438,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         dbH.setEnabledChat(false + "");
                     }
 
-                    megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                    megaApi.login(lastEmail, lastPassword, this);
                 }
             }
             else{
                 log("onKeysGeneratedLogin: Chat is NOT ENABLED");
-                megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+                megaApi.login(lastEmail, lastPassword, this);
             }
         }
     }
@@ -2297,7 +2247,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT){
             if (error.getErrorCode() == MegaError.API_OK){
                 log("fastConfirm finished - OK");
-                onKeysGeneratedLogin(gPrivateKey, gPublicKey);
+                onKeysGeneratedLogin(lastEmail, lastPassword);
             }
             else{
                 loginLogin.setVisibility(View.VISIBLE);
