@@ -118,7 +118,6 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
-import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -1692,14 +1691,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 	    if (dbH.getCredentials() == null){
-	    	if (OldPreferences.getOldCredentials(this) != null){
-	    		Intent loginWithOldCredentials = new Intent(this, LoginActivityLollipop.class);
-				loginWithOldCredentials.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-	    		startActivity(loginWithOldCredentials);
-	    		finish();
-	    		return;
-		    }
-
 	    	Intent newIntent = getIntent();
 
 	    	if (newIntent != null){
