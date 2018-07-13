@@ -52,7 +52,7 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         }
 
         Bundle args = getArguments();
-        this.chatId = args.getInt("chatId", -1);
+        this.chatId = args.getLong("chatId", -1);
 
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
