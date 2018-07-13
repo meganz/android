@@ -1997,5 +1997,6 @@
     <string name="archived_chats_empty" context="Message shown when the user has no archived chats">[A]No[/A] [B]Archived Chats[/B]</string>
 
     <string name="inactive_chat" context="Subtitle of chat screen when the chat is inactive">Inactive chat</string>
+    <string name="archived_chat" context="Subtitle of chat screen when the chat is archived">Archived chat</string>
 
 </resources>
