@@ -266,7 +266,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (credentials == null){
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
-				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
 			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
@@ -307,7 +307,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
 					if(scrollView!=null){
-						scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+						scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 					}
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -929,7 +929,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
-				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
 			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
@@ -950,7 +950,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
 		if(scrollView!=null){
-			scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+			scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 		}
 		generatingKeysText.setVisibility(View.VISIBLE);
 		loginProgressBar.setVisibility(View.VISIBLE);
@@ -1031,7 +1031,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
-				scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
 			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
@@ -1166,7 +1166,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				if(scrollView!=null){
-					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
 				}
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				queryingSignupLinkText.setVisibility(View.GONE);
@@ -1223,7 +1223,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				if(scrollView!=null){
-					scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
 				}
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				generatingKeysText.setVisibility(View.GONE);
@@ -1591,10 +1591,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void activateButton (Boolean show){
 		attachButton.setEnabled(show);
 		if(show){
-			attachButton.setTextColor(getResources().getColor(R.color.accentColor));
+			attachButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 		}
 		else{
-			attachButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+			attachButton.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
 		}
 	}
 

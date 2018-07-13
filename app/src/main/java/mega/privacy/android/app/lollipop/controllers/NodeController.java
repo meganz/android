@@ -824,7 +824,7 @@ public class NodeController {
 
                                 Intent pdfIntent = new Intent(context, PdfViewerActivityLollipop.class);
                                 pdfIntent.putExtra("HANDLE", tempNode.getHandle());
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && pdfFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 } else {
                                     pdfIntent.setDataAndType(Uri.fromFile(pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
@@ -845,15 +845,22 @@ public class NodeController {
                                 File mediaFile = new File(localPath);
 
                                 Intent mediaIntent;
+                                boolean internalIntent;
+                                boolean opusFile = false;
                                 if (MimeTypeList.typeForName(mediaFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(mediaFile.getName()).isAudioNotSupported()) {
                                     mediaIntent = new Intent(Intent.ACTION_VIEW);
-
+                                    internalIntent = false;
+                                    String[] s = mediaFile.getName().split("\\.");
+                                    if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+                                        opusFile = true;
+                                    }
                                 } else {
+                                    internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
                                 mediaIntent.putExtra("isPlayList", false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
 
                                 } else {
@@ -861,7 +868,40 @@ public class NodeController {
                                 }
                                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 mediaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                context.startActivity(mediaIntent);
+                                if (opusFile){
+                                    mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                                }
+                                if (internalIntent) {
+                                    context.startActivity(mediaIntent);
+                                }
+                                else {
+                                    if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                                        context.startActivity(mediaIntent);
+                                    }
+                                    else {
+                                        if(context instanceof ManagerActivityLollipop){
+                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        else if(context instanceof FileInfoActivityLollipop){
+                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        else if(context instanceof ContactFileListActivityLollipop){
+                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        else {
+                                            intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+                                            log("call to startActivity(intentShare)");
+                                            context.startActivity(intentShare);
+                                        }
+                                    }
+                                }
                             }
                         }
                         else {
@@ -1592,6 +1632,11 @@ public class NodeController {
     public void cleanRubbishBin(){
         log("cleanRubbishBin");
         megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
+    }
+
+    public void clearAllVersions(){
+        log("clearAllVersions");
+        megaApi.removeVersions((ManagerActivityLollipop) context);
     }
 
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){

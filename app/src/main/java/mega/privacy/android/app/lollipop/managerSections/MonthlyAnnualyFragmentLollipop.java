@@ -94,7 +94,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		super.onCreate(savedInstanceState);
 	}
 	
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -103,6 +102,8 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -731,10 +732,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 	public void setInfo (int _paymentMethod, int _type){
 		this.paymentMethod = _paymentMethod;
 		this.parameterType = _type;
-
-		if(myAccountInfo==null){
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
 	}
 
 	public String sizeTranslation(long size, int type) {

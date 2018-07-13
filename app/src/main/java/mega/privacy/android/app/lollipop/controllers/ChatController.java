@@ -1782,23 +1782,61 @@ public class ChatController {
                                 File mediaFile = new File(localPath);
 
                                 Intent mediaIntent;
+                                boolean internalIntent;
+                                boolean opusFile = false;
                                 if (MimeTypeList.typeForName(tempNode.getName()).isVideoNotSupported() || MimeTypeList.typeForName(tempNode.getName()).isAudioNotSupported()){
                                     mediaIntent = new Intent(Intent.ACTION_VIEW);
+                                    internalIntent = false;
+                                    String[] s = tempNode.getName().split("\\.");
+                                    if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+                                        opusFile = true;
+                                    }
                                 }
                                 else {
+                                    internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
                                 mediaIntent.putExtra("isPlayList", false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
                                 else{
                                     mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
                                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                context.startActivity(mediaIntent);
+                                if (opusFile){
+                                    mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                                }
+                                if (internalIntent) {
+                                    context.startActivity(mediaIntent);
+                                }
+                                else {
+                                    if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                                        context.startActivity(mediaIntent);
+                                    }
+                                    else {
+                                        if(context instanceof  ChatActivityLollipop){
+                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        else if(context instanceof  NodeAttachmentActivityLollipop){
+                                            ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        else {
+                                            intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+                                            log("call to startActivity(intentShare)");
+                                            context.startActivity(intentShare);
+                                        }
+                                    }
+                                }
                             }
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
@@ -1813,7 +1851,7 @@ public class ChatController {
                                 pdfIntent.putExtra("inside", true);
                                 pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                                 pdfIntent.putExtra("adapterType", Constants.FROM_CHAT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
                                 else{
