@@ -3371,7 +3371,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             isOnMegaDownloads = true;
                                         }
                                         log("isOnMegaDownloads: "+isOnMegaDownloads);
-                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
                                             File mediaFile = new File(localPath);
                                             //mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -3493,7 +3493,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             isOnMegaDownloads = true;
                                         }
                                         log("isOnMegaDownloads: "+isOnMegaDownloads);
-                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
+                                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))))){
                                             File mediaFile = new File(localPath);
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                                 log("itemClick:FileProviderOption");
