@@ -84,9 +84,33 @@
 				android:layout_width="wrap_content"
 				android:layout_height="match_parent"
 				android:orientation="horizontal"
-				android:layout_centerHorizontal="true">
+				android:layout_centerHorizontal="true"/>
 
-			</android.support.v7.widget.RecyclerView>
+			<android.support.design.widget.FloatingActionButton
+				android:id="@+id/image_group_floating_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:elevation="@dimen/elevation_low"
+				android:layout_marginLeft="16sp"
+				android:layout_marginRight="16dp"
+				android:layout_centerVertical="true"
+				android:src="@drawable/ic_w_take_photo"/>
+
+			<EditText
+				android:id="@+id/name_group_edittext"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:maxLines="1"
+				android:background="@android:color/transparent"
+				android:layout_centerVertical="true"
+				android:layout_toRightOf="@+id/image_group_floating_button"
+				android:layout_marginRight="16dp"
+				android:hint="@string/hint_type_group"
+				android:textSize="16sp"
+				android:textColorHint="@color/mail_my_account"
+				android:textColor="@color/name_my_account"
+				android:fontFamily="roboto"
+				android:visibility="gone"/>
 
 		</RelativeLayout>
 
