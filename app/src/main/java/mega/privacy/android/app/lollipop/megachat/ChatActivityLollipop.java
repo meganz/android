@@ -1176,39 +1176,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("karere connection state: "+megaChatApi.getConnectionState());
             log("chat connection state: "+megaChatApi.getChatConnectionState(idChat));
             int permission = chatRoom.getOwnPrivilege();
-            if(chatRoom.isArchived()){
-                log("Chat is archived");
-                aB.setSubtitle(getString(R.string.archived_chat));
-            }
-            else{
-                if (chatRoom.isGroup()) {
-                    tB.setOnClickListener(this);
 
-                    log("Check permissions group chat");
+            if (chatRoom.isGroup()) {
+                tB.setOnClickListener(this);
 
-                    if(permission==MegaChatRoom.PRIV_RO) {
-                        log("Permission RO");
-                        writingContainerLayout.setVisibility(View.GONE);
+                log("Check permissions group chat");
 
-                        mediaButton.setVisibility(View.GONE);
-                        sendContactButton.setVisibility(View.GONE);
-                        pickFileSystemButton.setVisibility(View.GONE);
-                        pickCloudDriveButton.setVisibility(View.GONE);
-                        pickFileStorageButton.setVisibility(View.GONE);
+                if(permission==MegaChatRoom.PRIV_RO) {
+                    log("Permission RO");
+                    writingContainerLayout.setVisibility(View.GONE);
 
-                        aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                    mediaButton.setVisibility(View.GONE);
+                    sendContactButton.setVisibility(View.GONE);
+                    pickFileSystemButton.setVisibility(View.GONE);
+                    pickCloudDriveButton.setVisibility(View.GONE);
+                    pickFileStorageButton.setVisibility(View.GONE);
 
+                    if(chatRoom.isArchived()){
+                        log("Chat is archived");
+                        aB.setSubtitle(getString(R.string.archived_chat));
                     }
-                    else if(permission==MegaChatRoom.PRIV_RM) {
-                        log("Permission RM");
-                        writingContainerLayout.setVisibility(View.GONE);
+                    else{
+                        aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                    }
+                }
+                else if(permission==MegaChatRoom.PRIV_RM) {
+                    log("Permission RM");
+                    writingContainerLayout.setVisibility(View.GONE);
 
-                        mediaButton.setVisibility(View.GONE);
-                        sendContactButton.setVisibility(View.GONE);
-                        pickFileSystemButton.setVisibility(View.GONE);
-                        pickCloudDriveButton.setVisibility(View.GONE);
-                        pickFileStorageButton.setVisibility(View.GONE);
+                    mediaButton.setVisibility(View.GONE);
+                    sendContactButton.setVisibility(View.GONE);
+                    pickFileSystemButton.setVisibility(View.GONE);
+                    pickCloudDriveButton.setVisibility(View.GONE);
+                    pickFileStorageButton.setVisibility(View.GONE);
 
+                    if(chatRoom.isArchived()){
+                        log("Chat is archived");
+                        aB.setSubtitle(getString(R.string.archived_chat));
+                    }
+                    else{
                         if(!chatRoom.isActive()){
                             aB.setSubtitle(getString(R.string.inactive_chat));
                         }
@@ -1216,85 +1222,108 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             aB.setSubtitle(null);
                         }
                     }
+                }
+                else{
+                    log("permission: "+permission);
+                    writingContainerLayout.setVisibility(View.VISIBLE);
+
+                    mediaButton.setVisibility(View.VISIBLE);
+                    sendContactButton.setVisibility(View.VISIBLE);
+                    pickFileSystemButton.setVisibility(View.VISIBLE);
+                    pickCloudDriveButton.setVisibility(View.VISIBLE);
+                    pickFileStorageButton.setVisibility(View.VISIBLE);
+
+                    if(chatRoom.isArchived()){
+                        log("Chat is archived");
+                        aB.setSubtitle(getString(R.string.archived_chat));
+                    }
                     else{
-                        log("permission: "+permission);
-                        writingContainerLayout.setVisibility(View.VISIBLE);
-
-                        mediaButton.setVisibility(View.VISIBLE);
-                        sendContactButton.setVisibility(View.VISIBLE);
-                        pickFileSystemButton.setVisibility(View.VISIBLE);
-                        pickCloudDriveButton.setVisibility(View.VISIBLE);
-                        pickFileStorageButton.setVisibility(View.VISIBLE);
-
                         aB.setSubtitle(null);
                     }
                 }
-                else{
-                    log("Check permissions one to one chat");
-                    if(permission==MegaChatRoom.PRIV_RO) {
-                        log("Permission RO");
+            }
+            else{
+                log("Check permissions one to one chat");
+                if(permission==MegaChatRoom.PRIV_RO) {
+                    log("Permission RO");
 
-                        if(megaApi!=null){
-                            if(megaApi.getRootNode()!=null){
-                                long chatHandle = chatRoom.getChatId();
-                                MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
-                                long userHandle = chat.getPeerHandle(0);
-                                String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-                                MegaUser user = megaApi.getContact(userHandleEncoded);
+                    if(megaApi!=null){
+                        if(megaApi.getRootNode()!=null){
+                            long chatHandle = chatRoom.getChatId();
+                            MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+                            long userHandle = chat.getPeerHandle(0);
+                            String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
+                            MegaUser user = megaApi.getContact(userHandleEncoded);
 
-                                if(user!=null){
-                                    if(user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
-                                        tB.setOnClickListener(this);
-                                    }else{
-                                        tB.setOnClickListener(null);
-                                    }
-                                }
-                                else{
+                            if(user!=null){
+                                if(user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                                    tB.setOnClickListener(this);
+                                }else{
                                     tB.setOnClickListener(null);
                                 }
                             }
-                        }else{
-                            tB.setOnClickListener(null);
+                            else{
+                                tB.setOnClickListener(null);
+                            }
                         }
-
-                        writingContainerLayout.setVisibility(View.GONE);
-
-                        mediaButton.setVisibility(View.GONE);
-                        sendContactButton.setVisibility(View.GONE);
-                        pickFileSystemButton.setVisibility(View.GONE);
-                        pickCloudDriveButton.setVisibility(View.GONE);
-                        pickFileStorageButton.setVisibility(View.GONE);
-
-                        aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
+                    }else{
+                        tB.setOnClickListener(null);
                     }
-                    else if(permission==MegaChatRoom.PRIV_RM) {
-                        tB.setOnClickListener(this);
 
-                        log("Permission RM");
-                        writingContainerLayout.setVisibility(View.GONE);
+                    writingContainerLayout.setVisibility(View.GONE);
 
-                        mediaButton.setVisibility(View.GONE);
-                        sendContactButton.setVisibility(View.GONE);
-                        pickFileSystemButton.setVisibility(View.GONE);
-                        pickCloudDriveButton.setVisibility(View.GONE);
-                        pickFileStorageButton.setVisibility(View.GONE);
+                    mediaButton.setVisibility(View.GONE);
+                    sendContactButton.setVisibility(View.GONE);
+                    pickFileSystemButton.setVisibility(View.GONE);
+                    pickCloudDriveButton.setVisibility(View.GONE);
+                    pickFileStorageButton.setVisibility(View.GONE);
 
-                        aB.setSubtitle(null);
+                    if(chatRoom.isArchived()){
+                        log("Chat is archived");
+                        aB.setSubtitle(getString(R.string.archived_chat));
                     }
                     else{
-                        tB.setOnClickListener(this);
-
-                        long userHandle = chatRoom.getPeerHandle(0);
-                        setStatus(userHandle);
-                        writingContainerLayout.setVisibility(View.VISIBLE);
-
-                        mediaButton.setVisibility(View.VISIBLE);
-                        sendContactButton.setVisibility(View.VISIBLE);
-                        pickFileSystemButton.setVisibility(View.VISIBLE);
-                        pickCloudDriveButton.setVisibility(View.VISIBLE);
-                        pickFileStorageButton.setVisibility(View.VISIBLE);
-
+                        aB.setSubtitle(getString(R.string.observer_permission_label_participants_panel));
                     }
+                }
+                else if(permission==MegaChatRoom.PRIV_RM) {
+                    tB.setOnClickListener(this);
+
+                    log("Permission RM");
+                    writingContainerLayout.setVisibility(View.GONE);
+
+                    mediaButton.setVisibility(View.GONE);
+                    sendContactButton.setVisibility(View.GONE);
+                    pickFileSystemButton.setVisibility(View.GONE);
+                    pickCloudDriveButton.setVisibility(View.GONE);
+                    pickFileStorageButton.setVisibility(View.GONE);
+
+                    if(chatRoom.isArchived()){
+                        log("Chat is archived");
+                        aB.setSubtitle(getString(R.string.archived_chat));
+                    }
+                    else{
+                        if(!chatRoom.isActive()){
+                            aB.setSubtitle(getString(R.string.inactive_chat));
+                        }
+                        else{
+                            aB.setSubtitle(null);
+                        }
+                    }
+                }
+                else{
+                    tB.setOnClickListener(this);
+
+                    long userHandle = chatRoom.getPeerHandle(0);
+                    setStatus(userHandle);
+                    writingContainerLayout.setVisibility(View.VISIBLE);
+
+                    mediaButton.setVisibility(View.VISIBLE);
+                    sendContactButton.setVisibility(View.VISIBLE);
+                    pickFileSystemButton.setVisibility(View.VISIBLE);
+                    pickCloudDriveButton.setVisibility(View.VISIBLE);
+                    pickFileStorageButton.setVisibility(View.VISIBLE);
+
                 }
             }
         }
@@ -1306,31 +1335,38 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             aB.setSubtitle(getString(R.string.invalid_connection_state));
         }
         else{
-            int state = megaChatApi.getUserOnlineStatus(userHandle);
 
-            if(state == MegaChatApi.STATUS_ONLINE){
-                log("This user is connected");
-                aB.setSubtitle(getString(R.string.online_status));
-            }
-            else if(state == MegaChatApi.STATUS_AWAY){
-                log("This user is away");
-                aB.setSubtitle(getString(R.string.away_status));
-            }
-            else if(state == MegaChatApi.STATUS_BUSY){
-                log("This user is busy");
-                aB.setSubtitle(getString(R.string.busy_status));
-            }
-            else if(state == MegaChatApi.STATUS_OFFLINE){
-                log("This user is offline");
-                aB.setSubtitle(getString(R.string.offline_status));
-            }
-            else if(state == MegaChatApi.STATUS_INVALID){
-                log("INVALID status: "+state);
-                aB.setSubtitle(null);
+            if(chatRoom.isArchived()){
+                log("Chat is archived");
+                aB.setSubtitle(getString(R.string.archived_chat));
             }
             else{
-                log("This user status is: "+state);
-                aB.setSubtitle(null);
+                int state = megaChatApi.getUserOnlineStatus(userHandle);
+
+                if(state == MegaChatApi.STATUS_ONLINE){
+                    log("This user is connected");
+                    aB.setSubtitle(getString(R.string.online_status));
+                }
+                else if(state == MegaChatApi.STATUS_AWAY){
+                    log("This user is away");
+                    aB.setSubtitle(getString(R.string.away_status));
+                }
+                else if(state == MegaChatApi.STATUS_BUSY){
+                    log("This user is busy");
+                    aB.setSubtitle(getString(R.string.busy_status));
+                }
+                else if(state == MegaChatApi.STATUS_OFFLINE){
+                    log("This user is offline");
+                    aB.setSubtitle(getString(R.string.offline_status));
+                }
+                else if(state == MegaChatApi.STATUS_INVALID){
+                    log("INVALID status: "+state);
+                    aB.setSubtitle(null);
+                }
+                else{
+                    log("This user status is: "+state);
+                    aB.setSubtitle(null);
+                }
             }
         }
     }
