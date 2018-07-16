@@ -689,7 +689,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 		}
 		visibilityFastScroller();
-
+		clearSelections();
+		hideMultipleSelect();
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
