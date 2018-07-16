@@ -1731,7 +1731,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 							}
 							String localPath = findLocalPath(psHMegaNode.getName(), psHMegaNode.getSize(), psHMegaNode);
-							if (localPath != null  && (megaApi.getFingerprint(psHMegaNode).equals(megaApi.getFingerprint(localPath)))){
+							if (localPath != null  && (megaApi.getFingerprint(psHMegaNode) != null && megaApi.getFingerprint(psHMegaNode).equals(megaApi.getFingerprint(localPath)))){
 								File mediaFile = new File(localPath);
 
 								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1813,7 +1813,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if(f.exists() && (f.length() == file.getSize())){
 				isOnMegaDownloads = true;
 			}
-			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+			if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 				return localPath;
 			}
 		}
@@ -1844,7 +1844,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						if (f.exists() && (f.length() == file.getSize())) {
 							isOnMegaDownloads = true;
 						}
-						if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))) {
+						if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))) {
 							log("path number X: " + path);
 							return path;
 						}
