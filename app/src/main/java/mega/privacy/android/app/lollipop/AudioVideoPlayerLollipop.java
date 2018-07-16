@@ -1590,7 +1590,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             playWhenReady = player.getPlayWhenReady();
             currentTime = player.getCurrentPosition();
         }
-        if (createPlayList.getStatus() == AsyncTask.Status.RUNNING){
+        if (createPlayList != null && createPlayList.getStatus() == AsyncTask.Status.RUNNING){
             createPlayList.cancel(true);
         }
         outState.putLong("currentTime", currentTime);
@@ -2193,7 +2193,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 longArray[0] = handle;
 
                 if(nC ==null){
-                    nC = new NodeController(this);
+                    nC = new NodeController(this, isFolderLink);
                 }
                 nC.selectChatsToSendNodes(longArray);
 
@@ -2905,7 +2905,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             handleList.add(node.getHandle());
 
             if(nC==null){
-                nC = new NodeController(this);
+                nC = new NodeController(this, isFolderLink);
             }
             nC.prepareForDownload(handleList);
         }
@@ -3239,7 +3239,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 log("URL: " + url + "___SIZE: " + size);
 
                 if(nC==null){
-                    nC = new NodeController(this);
+                    nC = new NodeController(this, isFolderLink);
                 }
                 nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
             }
@@ -3479,10 +3479,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
                     }
-                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-                                && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                         }
                         else{
@@ -3915,7 +3914,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             dbH.setAttrAskSizeDownload("false");
                         }
                         if(nC==null){
-                            nC = new NodeController(AudioVideoPlayerLollipop.this);
+                            nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
                         }
                         nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
                     }
@@ -3963,7 +3962,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             dbH.setAttrAskNoAppDownload("false");
                         }
                         if(nC==null){
-                            nC = new NodeController(AudioVideoPlayerLollipop.this);
+                            nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
                         }
                         nC.download(parentPathC, urlC, sizeC, hashesC);
                     }
@@ -4207,6 +4206,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 Uri mediaUri;
                 File mediaFile;
                 mediaUris = new ArrayList<>();
+                getDownloadLocation();
                 if (isOffLine) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);
@@ -4221,8 +4221,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         else {
                             mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + currentNode.getPath() + "/" + currentNode.getName());
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-                                && currentNode.getPath().contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && currentNode.getPath().contains(Environment.getExternalStorageDirectory().getPath())) {
                             mediaUri = FileProvider.getUriForFile(audioVideoPlayerLollipop, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                         }
                         else {
@@ -4245,10 +4244,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if (f.exists() && (f.length() == n.getSize())) {
                             isOnMegaDownloads = true;
                         }
-                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(n).equals(megaApi.getFingerprint(localPath))))) {
+                        if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(n) != null && megaApi.getFingerprint(n).equals(megaApi.getFingerprint(localPath))))) {
                             mediaFile = new File(localPath);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())
-                                    && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                 mediaUri = FileProvider.getUriForFile(audioVideoPlayerLollipop, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                             }
                             else {

@@ -938,7 +938,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1007,7 +1007,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
