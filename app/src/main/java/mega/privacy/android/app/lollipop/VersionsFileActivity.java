@@ -79,7 +79,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	ArrayList<MegaNode> nodeVersions;
 	
-	long nodeHandle;
+	long nodeHandle = -1;
 	MegaNode node;
 	
 	VersionsFileAdapter adapter;
@@ -300,10 +300,20 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		emptyText = (TextView) findViewById(R.id.versions_file_empty_text);
 		emptyImage.setImageResource(R.drawable.ic_empty_contacts);
 		emptyText.setText(R.string.contacts_list_empty_text);
-	    
+
+		if (savedInstanceState != null){
+			nodeHandle = savedInstanceState.getLong("nodeHandle");
+		}
+		else{
+			nodeHandle = -1;
+		}
+
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			nodeHandle = extras.getLong("handle");
+			if(nodeHandle==-1){
+				nodeHandle = extras.getLong("handle");
+			}
+
 			node=megaApi.getNodeByHandle(nodeHandle);
 
 			if(node!=null){
@@ -872,6 +882,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		log("onSaveInstanceState");
+		super.onSaveInstanceState(outState);
+		outState.putLong("nodeHandle", nodeHandle);
 	}
 }
 
