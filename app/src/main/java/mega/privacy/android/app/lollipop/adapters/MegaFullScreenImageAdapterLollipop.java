@@ -476,7 +476,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				boolean isOnMegaDownloads = false;
 				String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), downloadLocationDefaultPath);
 				log("isOnMegaDownloads: " + isOnMegaDownloads + " nodeName: " + node.getName() + " localPath: " + localPath);
-				if (localPath != null && (megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath)))) {
+				if (localPath != null && megaApi.getFingerprint(node) != null && megaApi.getFingerprint(node).equals(megaApi.getFingerprint(localPath))) {
 
 					final ProgressBar pb = holder.progressBar;
 
