@@ -5250,15 +5250,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         long userHandleToCompare = -1;
         long previousUserHandleToCompare = -1;
 
-        if (msg.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED){
-            msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME);
-            return AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME;
-        }
-
         if(msg.isUploading()){
             userHandleToCompare = myUserHandle;
         }
         else{
+            if (msg.getMessage().getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                msg.setInfoToShow(AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME);
+                return AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_TIME;
+            }
+
             if ((msg.getMessage().getType() == MegaChatMessage.TYPE_PRIV_CHANGE) || (msg.getMessage().getType() == MegaChatMessage.TYPE_ALTER_PARTICIPANTS)) {
                 userHandleToCompare = msg.getMessage().getHandleOfAction();
             } else {
