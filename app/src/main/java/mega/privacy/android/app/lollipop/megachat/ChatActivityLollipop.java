@@ -1531,6 +1531,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 inviteMenuItem.setVisible(false);
             }
             else{
+                int callsInProgress = megaChatApi.getNumCalls();
+                if(megaChatApi.getNumCalls()<=0){
+                    callMenuItem.setVisible(true);
+                    videoMenuItem.setVisible(true);
+                }
+                else{
+                    callMenuItem.setVisible(false);
+                    videoMenuItem.setVisible(false);
+                }
+
                 int permission = chatRoom.getOwnPrivilege();
                 log("Permission in the chat: "+permission);
                 if(chatRoom.isGroup()){
@@ -1580,10 +1590,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         clearHistoryMenuItem.setVisible(false);
                         inviteMenuItem.setVisible(false);
                     }
-
-                    callMenuItem.setVisible(false);
-                    videoMenuItem.setVisible(false);
-
                     contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
                     contactInfoMenuItem.setVisible(true);
                 }
@@ -1599,8 +1605,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         clearHistoryMenuItem.setVisible(true);
                         contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
                         contactInfoMenuItem.setVisible(true);
-                        callMenuItem.setVisible(true);
-                        videoMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
                 }
@@ -1634,18 +1638,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.cab_menu_call_chat:{
 
+                startVideo = false;
+                if(checkPermissionsCall()){
+                    startCall();
+                }
 
-                if (chatRoom.isGroup())
-                {
-                    showSnackbar("Coming soon...!");
-                }
-                else
-                {
-                    startVideo = false;
-                    if(checkPermissionsCall()){
-                        startCall();
-                    }
-                }
                 break;
             }
             case R.id.cab_menu_video_chat:{
