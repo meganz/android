@@ -411,13 +411,13 @@
                 android:background="@color/accentColor">
 
                 <TextView
+                    android:id="@+id/call_in_progress_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:text="Tap to return to call"/>
+                    android:layout_centerHorizontal="true"/>
 
             </RelativeLayout>
             <!--<android.support.design.widget.CoordinatorLayout-->
