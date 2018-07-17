@@ -1,12 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
-
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
-import nz.mega.sdk.MegaUser;
 
 /**
  * Created by mega on 20/02/18.

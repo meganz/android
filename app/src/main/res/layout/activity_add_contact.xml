@@ -190,13 +190,19 @@
 
 			</RelativeLayout>
 
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/add_contact_list"
+			<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:choiceMode="multipleChoice"
-				android:orientation="vertical"
-				android:layout_below="@+id/header_list"/>
+				android:layout_below="@+id/header_list">
+
+				<android.support.v7.widget.RecyclerView
+					android:id="@+id/add_contact_list"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:choiceMode="multipleChoice"
+					android:orientation="vertical"/>
+
+			</FrameLayout>
 
 			<mega.privacy.android.app.components.scrollBar.FastScroller
 				android:id="@+id/fastscroll"
