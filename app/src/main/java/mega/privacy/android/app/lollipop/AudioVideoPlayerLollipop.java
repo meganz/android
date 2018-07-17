@@ -367,12 +367,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             onPlaylist = false;
             currentTime = 0;
             currentWindowIndex = 0;
-
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                handle = bundle.getLong("HANDLE");
-                fileName = bundle.getString("FILENAME");
-            }
+            handle = getIntent().getLongExtra("HANDLE", -1);
+            fileName = getIntent().getStringExtra("FILENAME");
             currentPosition = intent.getIntExtra("position", 0);
             playWhenReady = true;
         }
@@ -385,14 +381,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
-        isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
-        String extension = fileName.substring(fileName.length() - 3, fileName.length());
-        log("Extension: " + extension);
-        if (extension.equals("mp4")) {
-            isMP4 = true;
-        } else {
-            isMP4 = false;
-        }
         fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
@@ -477,17 +465,22 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
         }
 
+        if (fileName == null) {
+            fileName = getFileName(uri);
+        }
         if (fileName != null) {
             aB.setTitle(" ");
             exoPlayerName.setText(fileName);
             setTitle(fileName);
+            isVideo = MimeTypeList.typeForName(fileName).isVideoReproducible();
+            String extension = fileName.substring(fileName.length() - 3, fileName.length());
+            log("Extension: " + extension);
+            if (extension.equals("mp4")) {
+                isMP4 = true;
+            } else {
+                isMP4 = false;
+            }
         }
-        else {
-            aB.setTitle(" ");
-            exoPlayerName.setText(fileName);
-            setTitle(getFileName(uri));
-        }
-
         containerAudioVideoPlayer = (RelativeLayout) findViewById(R.id.audiovideoplayer_container);
         playerLayout = (RelativeLayout) findViewById(R.id.player_layout);
 
