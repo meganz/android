@@ -72,6 +72,7 @@ dependencies {
     compile 'com.budiyev.android:code-scanner:1.8.3'
     compile "com.squareup.picasso:picasso:2.4.0"
     compile 'me.leolin:ShortcutBadger:1.1.21@aar'
+    compile 'com.brandongogetap:stickyheaders:0.5.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
