@@ -1983,4 +1983,6 @@
     <string name="number_incorrectly_restored_from_rubbish" context="error message when restoring several nodes from rubbish">%d items were not restored successfully</string>
     <string name="number_correctly_restored_from_rubbish" context="success message when restoring several nodes from rubbish">%d items restored successfully</string>
 
+    <string name="call_in_progress_layout" context="Title of the layout to return to a call from the chat screen">Tap to return to the call</string>
+    <string name="join_call_layout" context="Title of the layout to join a group call from the chat screen">Tap to join to the call</string>
 </resources>
