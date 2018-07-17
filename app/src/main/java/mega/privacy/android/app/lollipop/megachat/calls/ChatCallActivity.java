@@ -311,6 +311,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         else if(callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS){
             if(chat.isGroup()){
                 startClock();
+                int totalParticipants = callChat.getNumParticipants() + 1;
+                log("update subtitle: "+totalParticipants +" of "+chat.getPeerCount());
             }
             else{
                 MegaChatSession userSession = callChat.getMegaChatSession(chat.getPeerHandle(0));
@@ -1163,6 +1165,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                         log(userHandle+": joined the group call - create fragment!");
+                        updateSubTitle();
                     }
                     updateRemoteVideoStatus(userHandle);
                     updateRemoteAudioStatus(userHandle);
