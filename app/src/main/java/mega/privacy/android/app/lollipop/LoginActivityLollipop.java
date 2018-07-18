@@ -360,6 +360,25 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         alert.show();
     }
 
+    public void showAlertLoggedOut() {
+        log("showAlertLoggedOut");
+        final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+
+        dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
+        dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
+
+        dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+        alert.show();
+    }
+
     public void showTransferOverquotaDialog() {
         log("showTransferOverquotaDialog");
 
@@ -842,13 +861,14 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
         if(request.getType() == MegaRequest.TYPE_LOGOUT){
+
             if(accountBlocked!=null){
                 showSnackbar(accountBlocked);
             }
             accountBlocked=null;
-        }
 
-        if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
+        }
+        else if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
             try {
                 if (request.getParamType() == 1) {
                     if (e.getErrorCode() == MegaError.API_OK) {
