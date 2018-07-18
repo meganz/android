@@ -104,7 +104,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	public ActionMode actionMode;
 
 	public void activateActionMode(){
-		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -253,7 +252,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
@@ -270,8 +268,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				showMove = false;
 				showTrash =false;
 				showRename=false;
-
-
 				if(selected.size()==adapter.getItemCount()){
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -693,7 +689,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 		}
 		visibilityFastScroller();
-
+		clearSelections();
+		hideMultipleSelect();
 		//If folder has no files
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
@@ -801,8 +798,6 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				lastPositionStack.push(lastFirstVisiblePosition);
 
 				((ManagerActivityLollipop)context).parentHandleIncoming = n.getHandle();
-
-//				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				
@@ -943,7 +938,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1012,7 +1007,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -1199,6 +1194,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		log("clearSelections");
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}

@@ -42,14 +42,14 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
             boolean avatarExists = false;
 
             if(holder instanceof MegaListChatLollipopAdapter.ViewHolderChatList){
-                if(((MegaListChatLollipopAdapter.ViewHolderChatList)holder)!=null && ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail()!=null && request.getEmail()!=null){
-                    if (((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail().compareTo(request.getEmail()) == 0){
+                if(((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder)!=null && ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail()!=null && request.getEmail()!=null){
+                    if (((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail().compareTo(request.getEmail()) == 0){
                         File avatar = null;
                         if (context.getExternalCacheDir() != null){
-                            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
+                            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail() + ".jpg");
                         }
                         else{
-                            avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).getContactMail() + ".jpg");
+                            avatar = new File(context.getCacheDir().getAbsolutePath(), ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).getContactMail() + ".jpg");
                         }
                         Bitmap bitmap = null;
                         if (avatar.exists()){
@@ -62,7 +62,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
                                     avatar.delete();
                                 }
                                 else{
-                                    ((MegaListChatLollipopAdapter.ViewHolderChatList)holder).setImageView(bitmap);
+                                    ((MegaListChatLollipopAdapter.ViewHolderNormalChatList)holder).setImageView(bitmap);
                                 }
                             }
                         }

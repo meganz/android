@@ -103,6 +103,8 @@ public class SearchFragmentLollipop extends Fragment{
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
+	boolean multiselectBoolean=false;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -374,6 +376,7 @@ public class SearchFragmentLollipop extends Fragment{
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+
 		if(recyclerView.getLayoutManager()!=null){
 			outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
 		}
@@ -401,12 +404,10 @@ public class SearchFragmentLollipop extends Fragment{
 		}
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
-		log("onCreate");		
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 
 		if (megaApi == null){
@@ -566,6 +567,7 @@ public class SearchFragmentLollipop extends Fragment{
 			((ManagerActivityLollipop)context).textSubmitted = true;
 			log("nodes.size(): "+nodes.size());
 			if (nodes.get(position).isFolder()){
+				log("is a folder");
 				MegaNode n = nodes.get(position);
 
 				int lastFirstVisiblePosition = 0;
@@ -584,17 +586,16 @@ public class SearchFragmentLollipop extends Fragment{
 				lastPositionStack.push(lastFirstVisiblePosition);
 				
 				contentText.setText(MegaApiUtils.getInfoFolder(n, context));
-				
-				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-			
+
 				((ManagerActivityLollipop)context).parentHandleSearch= n.getHandle();
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 
-				((ManagerActivityLollipop)context).levelsSearch++;
+				((ManagerActivityLollipop)context).levelsSearch ++;
 
 				visibilityFastScroller();
 
@@ -652,6 +653,7 @@ public class SearchFragmentLollipop extends Fragment{
 					}
 				}
 				else{
+					log("folder with files");
 					recyclerView.setVisibility(View.VISIBLE);
 					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
@@ -721,7 +723,7 @@ public class SearchFragmentLollipop extends Fragment{
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -789,7 +791,7 @@ public class SearchFragmentLollipop extends Fragment{
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
@@ -1062,13 +1064,14 @@ public class SearchFragmentLollipop extends Fragment{
 		log("refresh ");
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
-		}
-		else{
+		}else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
 			if(parentNode!=null){
 				log("parentNode: "+parentNode.getName());
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+			}else{
+				nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
 			}
 		}
 		setNodes(nodes);
@@ -1076,7 +1079,31 @@ public class SearchFragmentLollipop extends Fragment{
 		if(adapter != null){
 			adapter.notifyDataSetChanged();
 		}
+
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		visibilityFastScroller();
+
 	}
+
+//	public void refresh(){
+//		log("refresh ");
+//		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
+//			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+//		}
+//		else{
+//			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
+//			if(parentNode!=null){
+//				log("parentNode: "+parentNode.getName());
+//				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+//				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
+//			}
+//		}
+//		setNodes(nodes);
+//
+//		if(adapter != null){
+//			adapter.notifyDataSetChanged();
+//		}
+//	}
 
 	public RecyclerView getRecyclerView(){
 		return recyclerView;
@@ -1192,6 +1219,14 @@ public class SearchFragmentLollipop extends Fragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
+	}
+
+	public boolean isAllowedMultiselect(){
+		return multiselectBoolean;
+	}
+
+	public void setAllowedMultiselect(boolean option){
+		multiselectBoolean = option;
 	}
 
 }

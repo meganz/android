@@ -1136,7 +1136,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
 					}else{
 						if(((ManagerActivityLollipop) context).isCameraUploads(node)){
-							log("**** cu");
 							holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
 						}else{
 							holder.imageView.setImageResource(R.drawable.ic_folder_list);
@@ -1650,10 +1649,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			((FolderLinkActivityLollipop) context).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.SEARCH_ADAPTER){
-			((SearchFragmentLollipop) fragment).activateActionMode();
-			((SearchFragmentLollipop) fragment).itemClick(currentPosition, null, null);
-		}
-		else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
+			if(((SearchFragmentLollipop) fragment).isAllowedMultiselect()) {
+				((SearchFragmentLollipop) fragment).activateActionMode();
+				((SearchFragmentLollipop) fragment).itemClick(currentPosition, null, null);
+			}
+		}else if(type==Constants.NODE_ATTACHMENT_ADAPTER){
 			log("NODE_ATTACHMENT_ADAPTER - no multiselect");
 		}
 		else{
@@ -1703,5 +1703,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	private static void log(String log) {
 		Util.log("MegaBrowserLollipopAdapter", log);
+	}
+
+	public void allowMultiselect(){
+
 	}
 }
