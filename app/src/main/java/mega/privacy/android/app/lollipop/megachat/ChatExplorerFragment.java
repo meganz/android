@@ -122,6 +122,7 @@ public class ChatExplorerFragment extends Fragment{
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.setClipToPadding(false);
+        listView.setPadding(0,Util.scaleHeightPx(8, outMetrics),0, 0);
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);
         emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);

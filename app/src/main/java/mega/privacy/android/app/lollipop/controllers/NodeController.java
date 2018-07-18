@@ -63,11 +63,30 @@ public class NodeController {
     DatabaseHandler dbH;
     MegaPreferences prefs = null;
 
+    boolean isFolderLink = false;
+
     public NodeController(Context context){
         log("NodeController created");
         this.context = context;
         if (megaApi == null){
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(context);
+        }
+    }
+
+    public NodeController(Context context, boolean isFolderLink){
+        log("NodeController created");
+        this.context = context;
+        this.isFolderLink = isFolderLink;
+        if (megaApi == null){
+            if (isFolderLink) {
+                megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
+            }
+            else {
+                megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
+            }
         }
         if (dbH == null){
             dbH = DatabaseHandler.getDbHandler(context);
@@ -762,6 +781,7 @@ public class NodeController {
                 service.putExtra(DownloadService.EXTRA_URL, url);
                 service.putExtra(DownloadService.EXTRA_SIZE, size);
                 service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                 if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                     service.putExtra("fromMV", true);
                 }
@@ -1014,6 +1034,7 @@ public class NodeController {
                             service.putExtra(DownloadService.EXTRA_URL, url);
                             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
                             service.putExtra(DownloadService.EXTRA_PATH, path);
+                            service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                                 service.putExtra("fromMV", true);
                             }
@@ -1029,6 +1050,7 @@ public class NodeController {
                     service.putExtra(DownloadService.EXTRA_URL, url);
                     service.putExtra(DownloadService.EXTRA_SIZE, size);
                     service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+                    service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
                     if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof FullScreenImageViewerLollipop){
                         service.putExtra("fromMV", true);
                     }
@@ -1632,6 +1654,11 @@ public class NodeController {
     public void cleanRubbishBin(){
         log("cleanRubbishBin");
         megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
+    }
+
+    public void clearAllVersions(){
+        log("clearAllVersions");
+        megaApi.removeVersions((ManagerActivityLollipop) context);
     }
 
     public void deleteOffline(MegaOffline selectedNode, String pathNavigation){

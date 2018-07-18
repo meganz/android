@@ -549,7 +549,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void setChatPermissions(){
-        log("setChatPermissions");
+        log("setChatSubtitle");
         if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
             editImageView.setVisibility(View.VISIBLE);
             dividerClearLayout.setVisibility(View.VISIBLE);
