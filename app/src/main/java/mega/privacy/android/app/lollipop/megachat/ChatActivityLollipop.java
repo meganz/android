@@ -1648,17 +1648,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.cab_menu_video_chat:{
-
-                if (chatRoom.isGroup())
-                {
-                    showSnackbar("Coming soon...!");
-                }
-                else
-                {
-                    startVideo = true;
-                    if(checkPermissionsCall()){
-                        startCall();
-                    }
+                startVideo = true;
+                if(checkPermissionsCall()){
+                    startCall();
                 }
                 break;
             }
@@ -2224,8 +2216,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                break;
 //			}
             case R.id.call_in_progress_layout:{
-                log("onClick:call_in_progress_layout");
-
                 MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                 if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
                     megaChatApi.answerChatCall(idChat, false, null);
