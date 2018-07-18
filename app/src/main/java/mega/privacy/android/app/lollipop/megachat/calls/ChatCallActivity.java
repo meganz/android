@@ -173,6 +173,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     FrameLayout fragmentContainerLocalCameraFS;
     FrameLayout fragmentContainerRemoteCameraFS;
 
+    //pruebas colores:
+    ViewGroup parentColorFS;
+    private ColorFragment colorFragmentFS = null;
+    FrameLayout fragmentContainerColorFS;
+
     ViewGroup parent;
     ViewGroup parentFS;
     ViewGroup parentRemoteFS;
@@ -540,6 +545,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         fragmentContainerRemoteCameraFS.setOnTouchListener(new OnDragTouchListener(fragmentContainerRemoteCameraFS, parentRemoteFS));
         parentRemoteFS.setVisibility(View.GONE);
         fragmentContainerRemoteCameraFS.setVisibility(View.GONE);
+
+        //Colors FULL SCREEN:
+        parentColorFS = (ViewGroup) findViewById(R.id.parent_layout_group_call_camera_FS);
+        fragmentContainerColorFS = (FrameLayout) findViewById(R.id.fragment_container_group_call_cameraFS);
+        RelativeLayout.LayoutParams paramsColorFS = (RelativeLayout.LayoutParams)fragmentContainerColorFS.getLayoutParams();
+        paramsColorFS.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+        paramsColorFS.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+        fragmentContainerColorFS.setLayoutParams(paramsColorFS);
+        parentColorFS.setVisibility(View.GONE);
+        fragmentContainerColorFS.setVisibility(View.GONE);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -1720,8 +1735,25 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
             if(userSession!=null && userSession.hasVideo()) {
                 log(userHandle+": Video remote connected");
+                if(colorFragmentFS == null){
+                    colorFragmentFS = ColorFragment.newInstance(chatId, chat.getPeerHandle(0), 1);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.fragment_container_group_call_cameraFS, colorFragmentFS, "colorFragmentFS");
+                    ft.commitNowAllowingStateLoss();
+                    parentColorFS.setVisibility(View.VISIBLE);
+                    fragmentContainerColorFS.setVisibility(View.VISIBLE);
+                }
+
             }else {
                 log(userHandle+": Video remote NOT connected");
+
+                parentColorFS.setVisibility(View.GONE);
+                fragmentContainerColorFS.setVisibility(View.GONE);
+                if (colorFragmentFS != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.remove(colorFragmentFS);
+                    colorFragmentFS = null;
+                }
             }
         }
         else{

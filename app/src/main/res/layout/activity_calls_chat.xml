@@ -62,6 +62,20 @@
                         android:layout_height="match_parent"
                         android:background="@android:color/transparent"/>
                 </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/parent_layout_group_call_camera_FS"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@android:color/transparent">
+                    <FrameLayout
+                        android:id="@+id/fragment_container_group_call_cameraFS"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"/>
+                </RelativeLayout>
                 <!--<SurfaceView-->
                     <!--android:id="@+id/surface_remote_video"-->
                     <!--android:layout_width="match_parent"-->
