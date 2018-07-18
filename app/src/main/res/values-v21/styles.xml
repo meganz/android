@@ -176,4 +176,15 @@
         <item name="tabPaddingEnd">12dp</item>
     </style>
 
+    <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/white</item>
+        <item name="android:positiveButtonText">@color/file_playlist_state</item>
+        <item name="android:negativeButtonText">@color/file_playlist_state</item>
+        <item name="android:content">@color/mail_my_account</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
+        <item name="android:textColorPrimary">@color/mail_my_account</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
 </resources>

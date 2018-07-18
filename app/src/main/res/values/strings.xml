@@ -1988,4 +1988,5 @@
     <string name="title_new_group" context="Title of the screen New Group">New Group</string>
     <string name="subtitle_new_group" context="Subtitle of the screen New Group">Type group name</string>
     <string name="hint_type_group" context="Hint of edittext shown when it is creating a new group to guide user to type the name of the group">Name your group</string>
+    <string name="confirmation_delete_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">Remove %s from this chat?</string>
 </resources>
