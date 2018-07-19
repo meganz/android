@@ -79,6 +79,7 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
 	MyAccountInfo myAccountInfo;
+	boolean esid = false;
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
@@ -149,16 +150,17 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				if (e.getErrorCode() == MegaError.API_ESID){
 					log("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
+
+					esid = true;
+
+					if(!Util.isChatEnabled()){
+						log("Chat is not enable - proceed to show login");
+						if(activityVisible){
+							launchExternalLogout();
+						}
+					}
+
 					AccountController.localLogoutApp(getApplicationContext());
-
-					if(Util.isChatEnabled()){
-						log("Intent to login - no chat enabled");
-					}
-					else{
-						log("Intent to login - no chat enabled");
-					}
-
-
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_LOGIN){
@@ -291,6 +293,13 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 			log("BackgroundRequestListener: onRequestTemporaryError: " + request.getRequestString());
 		}
 		
+	}
+
+	public void launchExternalLogout(){
+		log("launchExternalLogout");
+		Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+		loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		startActivity(loginIntent);
 	}
 
 	private final int interval = 3000;
@@ -871,7 +880,7 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish (CHAT): " + request.getRequestString());
+		log("onRequestFinish (CHAT): " + request.getRequestString() + "_"+e.getErrorCode());
 		if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
 			log("SET_BACKGROUND_STATUS: " + request.getFlag());
 		}
@@ -916,10 +925,13 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 							startActivity(confirmIntent);
 						}
 						else{
-							log("Launch intent to tour screen");
-							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-							this.startActivity(tourIntent);
+
+							if(esid){
+								log("Launch intent to login activity");
+								Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+								tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+								this.startActivity(tourIntent);
+							}
 						}
 					}
 					else{
@@ -1261,6 +1273,14 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		else{
 			MegaApplication.disableFileVersions = 0;
 		}
+	}
+
+	public boolean isEsid() {
+		return esid;
+	}
+
+	public void setEsid(boolean esid) {
+		this.esid = esid;
 	}
 
 	public static boolean isClosedChat() {
