@@ -1004,7 +1004,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             handleList.add(node.getHandle());
 
             if(nC==null){
-                nC = new NodeController(this);
+                nC = new NodeController(this, isFolderLink);
             }
             nC.prepareForDownload(handleList);
         }
@@ -1778,7 +1778,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 longArray[0] = handle;
 
                 if(nC ==null){
-                    nC = new NodeController(this);
+                    nC = new NodeController(this, isFolderLink);
                 }
 
                 nC.selectChatsToSendNodes(longArray);
@@ -2392,9 +2392,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     if(f.exists() && (f.length() == file.getSize())){
                         isOnMegaDownloads = true;
                     }
-                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+                    if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
                         File mediaFile = new File(localPath);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && prefs.getStorageDownloadLocation().contains(Environment.getExternalStorageDirectory().getPath())) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                             uri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
                         }
                         else{
@@ -2498,7 +2498,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 log("URL: " + url + "___SIZE: " + size);
 
                 if(nC==null){
-                    nC = new NodeController(this);
+                    nC = new NodeController(this, isFolderLink);
                 }
                 nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
             }
@@ -3225,7 +3225,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             dbH.setAttrAskSizeDownload("false");
                         }
                         if(nC==null){
-                            nC = new NodeController(PdfViewerActivityLollipop.this);
+                            nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
                         }
                         nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
                     }
@@ -3273,7 +3273,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             dbH.setAttrAskNoAppDownload("false");
                         }
                         if(nC==null){
-                            nC = new NodeController(PdfViewerActivityLollipop.this);
+                            nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
                         }
                         nC.download(parentPathC, urlC, sizeC, hashesC);
                     }
