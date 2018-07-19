@@ -22,6 +22,7 @@
 
             <!-- Background -->
             <RelativeLayout
+                android:id="@+id/big_elements_individual_call"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black">
@@ -88,66 +89,6 @@
 
             </RelativeLayout>
 
-
-
-            <!--<RelativeLayout-->
-                <!--android:id="@+id/parent_layout_group_call_camera_FS"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:layout_alignParentTop="true"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:layout_alignParentEnd="true"-->
-                <!--android:background="@android:color/transparent">-->
-                <!--<FrameLayout-->
-                    <!--android:id="@+id/fragment_container_group_call_cameraFS"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:background="@android:color/transparent"/>-->
-            <!--</RelativeLayout>-->
-
-
-
-            <!--<RelativeLayout-->
-                <!--android:id="@+id/call_chat_contact_image_layout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:background="@color/black">-->
-                <!--<ImageView-->
-                    <!--android:id="@+id/call_chat_contact_video"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:adjustViewBounds="true"-->
-                    <!--android:background="@android:color/transparent"-->
-                    <!--android:visibility="gone"/>-->
-
-                <!--<RelativeLayout-->
-                    <!--android:id="@+id/call_chat_contact_image_rl"-->
-                    <!--android:layout_centerInParent="true"-->
-                    <!--android:layout_width="120dp"-->
-                    <!--android:layout_height="120dp"-->
-                    <!--android:gravity="center_horizontal|center_vertical"-->
-                    <!--android:background="@android:color/transparent">-->
-                    <!--<mega.privacy.android.app.components.RoundedImageView-->
-                        <!--android:id="@+id/call_chat_contact_image"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:scaleType="fitCenter"-->
-                        <!--android:layout_centerInParent="true"-->
-                        <!--rounded:border_color="#4DFFFFFF"-->
-                        <!--rounded:border_width="3dp"-->
-                        <!--rounded:corner_radius="60dp" />-->
-                    <!--<TextView-->
-                        <!--android:id="@+id/call_chat_contact_image_initial_letter"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:layout_centerInParent="true"-->
-                        <!--android:gravity="center_horizontal|center_vertical"-->
-                        <!--android:paddingBottom="3dp"-->
-                        <!--android:visibility="gone"/>-->
-                <!--</RelativeLayout>-->
-
-            <!--</RelativeLayout>-->
-
             <!-- Toolbar -->
             <android.support.v7.widget.Toolbar
                 android:id="@+id/call_toolbar"
@@ -159,6 +100,7 @@
                 android:fitsSystemWindows="true"/>
 
             <RelativeLayout
+                android:id="@+id/small_elements_individual_call"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
