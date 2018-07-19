@@ -609,7 +609,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				longArray[0] = imageHandles.get(positionG);
 
 				if(nC ==null){
-					nC = new NodeController(this);
+					nC = new NodeController(this, isFolderLink);
 				}
 
 				nC.selectChatsToSendNodes(longArray);
@@ -759,7 +759,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(node.getHandle());
 					if(nC==null){
-						nC = new NodeController(this);
+						nC = new NodeController(this, isFolderLink);
 					}
 					nC.prepareForDownload(handleList);
 
@@ -1907,7 +1907,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (hasStoragePermission) {
 					if(nC==null){
-						nC = new NodeController(this);
+						nC = new NodeController(this, isFolderLink);
 					}
 					if (adapterType == Constants.FILE_LINK_ADAPTER) {
 						downloadNode();
@@ -2538,7 +2538,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				log("URL: " + url + "___SIZE: " + size);
 
 				if(nC==null){
-					nC = new NodeController(this);
+					nC = new NodeController(this, isFolderLink);
 				}
 				nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
 			}
@@ -2735,7 +2735,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							dbH.setAttrAskSizeDownload("false");
 						}
 						if(nC==null){
-							nC = new NodeController(fullScreenImageViewer);
+							nC = new NodeController(fullScreenImageViewer, isFolderLink);
 						}
 						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
 					}
@@ -2783,7 +2783,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 							dbH.setAttrAskNoAppDownload("false");
 						}
 						if(nC==null){
-							nC = new NodeController(fullScreenImageViewer);
+							nC = new NodeController(fullScreenImageViewer, isFolderLink);
 						}
 						nC.download(parentPathC, urlC, sizeC, hashesC);
 					}

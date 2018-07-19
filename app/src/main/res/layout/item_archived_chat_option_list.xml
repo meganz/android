@@ -1,0 +1,20 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_archived_chat_option_list_layout"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:gravity="center"
+    android:descendantFocusability="blocksDescendants" >
+
+    <TextView
+        android:id="@+id/archived_chat_option_text"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/archived_chats_show_option"
+        android:textColor="@color/accentColor"
+        android:ellipsize="end"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:maxLines="1"/>
+
+</RelativeLayout>

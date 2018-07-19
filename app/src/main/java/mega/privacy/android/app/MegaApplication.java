@@ -154,7 +154,9 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 			else if(request.getType() == MegaRequest.TYPE_LOGIN){
 				log("BackgroundRequestListener:onRequestFinish:TYPE_LOGIN");
-				askForFullAccountInfo();
+				if (e.getErrorCode() == MegaError.API_OK){
+					askForFullAccountInfo();
+				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (e.getErrorCode() == MegaError.API_OK){
