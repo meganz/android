@@ -1994,16 +1994,18 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
 
-                String errorMessage = null;
+                String errorMessage = "";
+
                 if (error.getErrorCode() == MegaError.API_ENOENT) {
                     if (is2FAEnabled) {
                         returnToLogin();
                     }
                     errorMessage = getString(R.string.error_incorrect_email_or_password);
                 }
-                else if (error.getErrorCode() == MegaError.API_ESID){
-                    errorMessage = getString(R.string.error_server_expired_session);
-                }
+//                else if (error.getErrorCode() == MegaError.API_ESID){
+//                    log(getString(R.string.error_server_expired_session));
+//                    ((LoginActivityLollipop)context).showAlertLoggedOut();
+//                }
                 else if (error.getErrorCode() == MegaError.API_ETOOMANY){
                     errorMessage = getString(R.string.too_many_attempts_login);
                 }
@@ -2072,9 +2074,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     prepareNodesText.setVisibility(View.GONE);
                     serversBusyText.setVisibility(View.GONE);
 
-                    ((LoginActivityLollipop) context).showSnackbar(errorMessage);
+                    if(!errorMessage.isEmpty()){
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
 
-//				DatabaseHandler dbH = new DatabaseHandler(this);
+    //				DatabaseHandler dbH = new DatabaseHandler(this);
                     DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                     dbH.clearCredentials();
                     dbH.clearEphemeral();

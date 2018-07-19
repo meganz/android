@@ -418,8 +418,8 @@ public class AccountController implements View.OnClickListener{
         megaApi.killSession(-1, (ManagerActivityLollipop) context);
     }
 
-    static public void logout(Context context, MegaApiAndroid megaApi) {
-        log("logout");
+    static public void localLogoutApp(Context context){
+        log("localLogoutApp");
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -428,26 +428,6 @@ public class AccountController implements View.OnClickListener{
         }
         catch(Exception e){
             log("EXCEPTION removing all the notifications");
-        }
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if (context instanceof ManagerActivityLollipop){
-            megaApi.logout((ManagerActivityLollipop)context);
-        }
-        else if (context instanceof OpenLinkActivity){
-            megaApi.logout((OpenLinkActivity)context);
-        }
-        else if (context instanceof PinLockActivityLollipop){
-            megaApi.logout((PinLockActivityLollipop)context);
-        }
-        else if (context instanceof TestPasswordActivity){
-            megaApi.logout(((TestPasswordActivity)context));
-        }
-        else{
-            megaApi.logout();
         }
 
         File offlineDirectory = null;
@@ -528,6 +508,32 @@ public class AccountController implements View.OnClickListener{
         dbH.clearPendingMessage();
 
         dbH.clearAttributes();
+    }
+
+    static public void logout(Context context, MegaApiAndroid megaApi) {
+        log("logout");
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
+
+        if (context instanceof ManagerActivityLollipop){
+            megaApi.logout((ManagerActivityLollipop)context);
+        }
+        else if (context instanceof OpenLinkActivity){
+            megaApi.logout((OpenLinkActivity)context);
+        }
+        else if (context instanceof PinLockActivityLollipop){
+            megaApi.logout((PinLockActivityLollipop)context);
+        }
+        else if (context instanceof TestPasswordActivity){
+            megaApi.logout(((TestPasswordActivity)context));
+        }
+        else{
+            megaApi.logout();
+        }
+
+        localLogoutApp(context);
     }
 
     static public void logoutConfirmed(Context context){

@@ -15516,7 +15516,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 				if(user!=null){
 					if(user.isOwnChange()>0){
-						log("isOwnChange!!!: "+user.isOwnChange());
+						log("isOwnChange!!!: "+user.getEmail());
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)){
 							log("Change on CHANGE_TYPE_RICH_PREVIEWS");
 							if(Util.isChatEnabled()){
@@ -15526,17 +15526,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 					else{
-						log("NOT OWN change: "+user.isOwnChange());
+						log("NOT OWN change: "+user.getEmail());
 
-						if(user.getHandle()==megaApi.getMyUser().getHandle()){
-							log("Change on my account from another client");
-							if(user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)){
-								log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
-								megaApi.getFileVersionsOption(this);
-							}
-							else if(user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)){
-								log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
-								megaApi.getContactLinksOption(this);
+						log("Changes: "+user.getChanges());
+
+						if(megaApi.getMyUser()!=null) {
+							if (user.getHandle() == megaApi.getMyUser().getHandle()) {
+								log("Change on my account from another client");
+								if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
+									log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
+									megaApi.getFileVersionsOption(this);
+								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
+									log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
+									megaApi.getContactLinksOption(this);
+								}
 							}
 						}
 
