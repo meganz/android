@@ -14329,7 +14329,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				log("The new mail already exists");
-				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.general_error_word));
 			}
 			else{
 				log("Error when asking for change mail link");
@@ -14342,6 +14342,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			if(e.getErrorCode() == MegaError.API_OK){
 				log("Email changed");
 				updateMyEmail(request.getEmail());
+			}
+			else if(e.getErrorCode() == MegaError.API_EEXIST){
+				log("The new mail already exists");
+				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.general_error_word));
 			}
 			else if(e.getErrorCode() == MegaError.API_ENOENT){
 				log("Email not changed -- API_ENOENT");
