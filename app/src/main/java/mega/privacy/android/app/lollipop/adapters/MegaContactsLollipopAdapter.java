@@ -164,11 +164,13 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				//holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(290, outMetrics));
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
 				holderList.textViewContactName.setMaxWidth((int) width);
+				holderList.textViewContent.setMaxWidth((int) width);
 			}
 			else{
 				//holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(240, outMetrics));
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
 				holderList.textViewContactName.setMaxWidth((int) width);
+				holderList.textViewContent.setMaxWidth((int) width);
 			}
 
 		    holderList.itemLayout.setTag(holderList);
@@ -194,9 +196,11 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				holderGrid.textViewContactName.setMaxWidth(Util.scaleWidthPx(70, outMetrics));
+				holderGrid.textViewContent.setMaxWidth(Util.scaleWidthPx(70, outMetrics));
 			}
 			else{
 				holderGrid.textViewContactName.setMaxWidth(Util.scaleWidthPx(120, outMetrics));
+				holderGrid.textViewContent.setMaxWidth(Util.scaleWidthPx(120, outMetrics));
 			}
 
 		    holderGrid.itemLayout.setTag(holderGrid);
@@ -215,16 +219,19 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
+			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 			holderList.declineLayout.setVisibility(View.GONE);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
 				holderList.textViewContactName.setMaxWidth((int) width);
+				holderList.textViewContent.setMaxWidth((int) width);
 			}
 			else{
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
 				holderList.textViewContactName.setMaxWidth((int) width);
+				holderList.textViewContent.setMaxWidth((int) width);
 			}
 
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
@@ -252,15 +259,18 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);
 			holderList.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
+			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_LAND, context.getResources().getDisplayMetrics());
 				holderList.textViewContactName.setMaxWidth((int) width);
+				holderList.textViewContent.setMaxWidth((int) width);
 			}
 			else{
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_CONTACT_NAME_PORT, context.getResources().getDisplayMetrics());
 				holderList.textViewContactName.setMaxWidth((int) width);
+				holderList.textViewContent.setMaxWidth((int) width);
 			}
 
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
@@ -505,7 +515,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	}
 
 	public void onBindViewHolderListGroupChat(ViewHolderContactsList holder, int position){
-		log("onBindViewHolderListAddContact");
+		log("onBindViewHolderListGroupChat");
 
 		holder.imageView.setImageBitmap(null);
 		holder.contactInitialLetter.setText("");
