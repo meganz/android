@@ -549,6 +549,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Button dismissButton;
 	private boolean rememberPasswordLogout = false;
 
+	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			addContactFromPhone();
+		}
+	};
+
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1574,6 +1581,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+		LocalBroadcastManager.getInstance(this).registerReceiver(inviteContactsReceiver, new IntentFilter(AddContactActivityLollipop.BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -3918,6 +3926,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(inviteContactsReceiver);
 
     	super.onDestroy();
 	}
