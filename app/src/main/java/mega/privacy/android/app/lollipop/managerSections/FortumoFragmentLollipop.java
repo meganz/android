@@ -105,15 +105,15 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 			getPaymentId();
 		}
 
-		if(myAccountInfo==null){
-			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-		}
-
 		return v;
 	}
 
 	public void getPaymentId(){
 		log("getPaymentId");
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
+
 		ArrayList<Product> p = myAccountInfo.getProductAccounts();
 		for (int i=0;i<p.size();i++){
 			Product account = p.get(i);
