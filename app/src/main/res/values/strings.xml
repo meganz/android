@@ -2018,4 +2018,6 @@
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Logged out</string>
 
+    <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">There’s no need to add your own email address</string>
+
 </resources>
