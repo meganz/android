@@ -13936,7 +13936,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					finish();
 				}
 			}
-			else{
+			else if (e.getErrorCode() != MegaError.API_ESID){
 				showSnackbar(getString(R.string.email_verification_text_error));
 			}
 		}

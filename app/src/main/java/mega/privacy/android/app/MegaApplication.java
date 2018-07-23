@@ -56,17 +56,16 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
-import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
+public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 
 	static final public String USER_AGENT = "MEGAAndroid/3.3.7_201";
@@ -80,6 +79,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
 	MyAccountInfo myAccountInfo;
+	boolean esid = false;
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
@@ -145,11 +145,22 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			log("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
-			if (e.getErrorCode() == MegaError.API_ESID){
-				if (request.getType() == MegaRequest.TYPE_LOGOUT){
-					log("type_logout");
+
+			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+				if (e.getErrorCode() == MegaError.API_ESID){
+					log("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
-					AccountController.logout(getApplicationContext(), getMegaApi());
+
+					esid = true;
+
+					if(!Util.isChatEnabled()){
+						log("Chat is not enable - proceed to show login");
+						if(activityVisible){
+							launchExternalLogout();
+						}
+					}
+
+					AccountController.localLogoutApp(getApplicationContext());
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_LOGIN){
@@ -282,6 +293,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("BackgroundRequestListener: onRequestTemporaryError: " + request.getRequestString());
 		}
 		
+	}
+
+	public void launchExternalLogout(){
+		log("launchExternalLogout");
+		Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+		loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		startActivity(loginIntent);
 	}
 
 	private final int interval = 3000;
@@ -632,7 +650,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			requestListener = new BackgroundRequestListener();
 			log("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
-			megaApi.addListener(this);
 
 //			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //			if (dbH.getCredentials() != null){
@@ -783,37 +800,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_LOGOUT){
-			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
-			myAccountInfo = new MyAccountInfo(this);
-			if (e.getErrorCode() == MegaError.API_ESID){
-				log("calling ManagerActivity.logout");
-				AccountController.logout(getApplicationContext(), getMegaApi());
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");
 	}
@@ -828,42 +814,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		// TODO Auto-generated method stub
-	}
-	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
-			byte[] buffer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		log("onAccountUpdate");
 
-		megaApi.getPaymentMethods(this);
-		megaApi.getAccountDetails(this);
-		megaApi.getPricing(this);
-		megaApi.creditCardQuerySubscriptions(this);
+		megaApi.getPaymentMethods(null);
+		megaApi.getAccountDetails(null);
+		megaApi.getPricing(null);
+		megaApi.creditCardQuerySubscriptions(null);
 		dbH.resetExtendedAccountDetailsTimestamp();
 	}
 
@@ -912,17 +871,16 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-		log("onRequestStart: " + request.getRequestString());
+		log("onRequestStart (CHAT): " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-		log("onRequestUpdate: Chat");
 	}
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish: Chat " + request.getRequestString());
+		log("onRequestFinish (CHAT): " + request.getRequestString() + "_"+e.getErrorCode());
 		if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
 			log("SET_BACKGROUND_STATUS: " + request.getFlag());
 		}
@@ -967,10 +925,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 							startActivity(confirmIntent);
 						}
 						else{
-							log("Launch intent to tour screen");
-							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-							this.startActivity(tourIntent);
+
+							if(esid){
+								log("Launch intent to login activity");
+								Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+								tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+								this.startActivity(tourIntent);
+							}
 						}
 					}
 					else{
@@ -1025,7 +986,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestTemporaryError: Chat");
+		log("onRequestTemporaryError (CHAT): "+e.getErrorString());
 	}
 
 	@Override
@@ -1312,6 +1273,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		else{
 			MegaApplication.disableFileVersions = 0;
 		}
+	}
+
+	public boolean isEsid() {
+		return esid;
+	}
+
+	public void setEsid(boolean esid) {
+		this.esid = esid;
 	}
 
 	public static boolean isClosedChat() {
