@@ -20,6 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
+
             <!-- Background -->
             <RelativeLayout
                 android:id="@+id/big_elements_individual_call"
