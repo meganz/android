@@ -2218,7 +2218,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.call_in_progress_layout:{
                 MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                 if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
-                    megaChatApi.answerChatCall(idChat, false, null);
+                    megaChatApi.startChatCall(idChat, false, null);
                 }
                 else{
                     Intent intent = new Intent(this, ChatCallActivity.class);
