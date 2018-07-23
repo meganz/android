@@ -14472,6 +14472,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					{
 						showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
 					}
+					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
+					{
+						showSnackbar(getString(R.string.error_own_email_as_contact));
+					}
 					else{
 						showSnackbar(getString(R.string.general_error));
 					}
