@@ -33,7 +33,7 @@ public class PinActivity extends AppCompatActivity{
 	protected void onResume() {
 		log("onResume");
 		super.onResume();
-        Util.setAppFontSize(this);
+		Util.setAppFontSize(this);
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
