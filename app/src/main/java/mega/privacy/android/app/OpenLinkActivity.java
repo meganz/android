@@ -486,7 +486,7 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 		}
 
 		//Contact link
-		if (url != null && (url.matches("^https://mega\\.co\\.nz/C!.+$") || url.matches("^https://mega\\.nz/C!.+$"))) { //https://mega.nz/C!
+		if (url != null && url.matches("^https://mega\\.nz/C!.+$")) { //https://mega.nz/C!
 			if (dbH == null){
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 			}
