@@ -1698,6 +1698,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public void addShareContact (ShareContactInfo contact) {
         log("addShareContact");
 
+        if (searchExpand && searchMenuItem != null) {
+            searchMenuItem.collapseActionView();
+        }
+        if (!typeContactEditText.getText().toString().equals("")){
+            typeContactEditText.getText().clear();
+        }
+        typeContactEditText.clearFocus();
+        hideKeyboard();
+
         addedContactsShare.add(contact);
         adapterShare.setContacts(addedContactsShare);
         mLayoutManager.scrollToPosition(adapterShare.getItemCount()-1);
@@ -1739,6 +1748,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public void addContactMEGA (MegaContactAdapter contact) {
         log("addContactMEGA: " + contact.getFullName());
 
+        if (searchExpand && searchMenuItem != null) {
+            searchMenuItem.collapseActionView();
+        }
+        hideKeyboard();
+
         addedContactsMEGA.add(contact);
         adapterMEGAContacts.setContacts(addedContactsMEGA);
         mLayoutManager.scrollToPosition(adapterMEGAContacts.getItemCount()-1);
@@ -1776,6 +1790,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     public void addContact (PhoneContactInfo contact){
         log("addContact: " + contact.getName()+" mail: " + contact.getEmail());
+
+        if (searchExpand && searchMenuItem != null) {
+            searchMenuItem.collapseActionView();
+        }
+        if (!typeContactEditText.getText().toString().equals("")){
+            typeContactEditText.getText().clear();
+        }
+        typeContactEditText.clearFocus();
+        hideKeyboard();
 
         addedContactsPhone.add(contact);
         adapterContacts.setContacts(addedContactsPhone);
@@ -2414,13 +2437,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     case DialogInterface.BUTTON_POSITIVE: {
                         addMEGAFilteredContact(contact);
                         addedContactsMEGA.remove(contact);
-                        adapterMEGA.setContacts(addedContactsMEGA);
+                        if (addedContactsMEGA.size() == 0) {
+                            returnToAddContacts();
+                            setSeparatorVisibility();
+                        }
+                        else {
+                            adapterMEGA.setContacts(addedContactsMEGA);
+                            textHeader.setText(addedContactsMEGA.size()+" "+getString(R.string.participants_chat_label));
+                        }
                         adapterMEGAContacts.setContacts(addedContactsMEGA);
 
-                        if (addedContactsMEGA.size() == 0) {
-                            setSendInvitationVisibility();
-                        }
-                        textHeader.setText(addedContactsMEGA.size()+" "+getString(R.string.participants_chat_label));
                         break;
                     }
 
