@@ -359,6 +359,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 break;
             }
         }
+
+        if( ((MegaApplication) getApplication()).isEsid()){
+            showAlertLoggedOut();
+        }
     }
 
     public void showAlertIncorrectRK() {
@@ -383,21 +387,24 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
     public void showAlertLoggedOut() {
         log("showAlertLoggedOut");
-        final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        ((MegaApplication) getApplication()).setEsid(false);
+        if(!isFinishing()){
+            final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
 
-        dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
-        dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
+            dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
+            dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
 
-        dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+            dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
 
-        android.support.v7.app.AlertDialog alert = dialogBuilder.create();
-        alert.show();
+            android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+            alert.show();
+        }
     }
 
     public void showTransferOverquotaDialog() {

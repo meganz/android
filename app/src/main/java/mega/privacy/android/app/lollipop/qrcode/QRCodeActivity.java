@@ -434,6 +434,11 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
                 }
+                else if (e.getErrorCode() == MegaError.API_EARGS){
+                    scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
+                    scanCodeFragment.dialogTextContent = R.string.error_own_email_as_contact;
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                }
             }
         }
         //        megaApi.contactLinkQuery(request.getNodeHandle(), this);

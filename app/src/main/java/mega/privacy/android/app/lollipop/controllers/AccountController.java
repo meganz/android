@@ -508,6 +508,9 @@ public class AccountController implements View.OnClickListener{
         dbH.clearPendingMessage();
 
         dbH.clearAttributes();
+
+        dbH.clearChatSettings();
+        dbH.setEnabledChat(true + "");
     }
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
