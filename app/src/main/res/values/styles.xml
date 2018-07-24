@@ -200,7 +200,7 @@
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="CollapsingToolbarContactInfo" parent="ThemeOverlay.AppCompat.Light">

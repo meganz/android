@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -1865,6 +1866,29 @@ public class Util {
 		bitmap.recycle();
 
 		return output;
+	}
+
+	//restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
+	public static void setAppFontSize(Activity activity){
+		float scale = activity.getResources().getConfiguration().fontScale;
+		log("system font size scale is " + scale);
+
+		float newScale;
+
+		if(scale <= 1.1){
+			newScale = scale;
+		}else{
+			newScale = (float)1.1;
+		}
+
+		log("new font size new scale is " + newScale);
+		Configuration configuration = activity.getResources().getConfiguration();
+		configuration.fontScale = newScale;
+
+		DisplayMetrics metrics = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		metrics.scaledDensity = configuration.fontScale * metrics.density;
+		activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
 	}
 
 	private static void log(String message) {
