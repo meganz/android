@@ -925,13 +925,10 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 							startActivity(confirmIntent);
 						}
 						else{
-
-							if(esid){
-								log("Launch intent to login activity");
-								Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-								tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-								this.startActivity(tourIntent);
-							}
+							log("Launch intent to login activity");
+							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+							this.startActivity(tourIntent);
 						}
 					}
 					else{
