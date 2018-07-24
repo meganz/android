@@ -2020,4 +2020,6 @@
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">There’s no need to add your own email address</string>
 
+    <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Invalid code</string>
+
 </resources>
