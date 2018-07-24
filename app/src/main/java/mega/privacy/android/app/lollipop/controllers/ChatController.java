@@ -254,7 +254,9 @@ public class ChatController {
     }
 
     public void changeTitle(long chatid, String title){
-        megaChatApi.setChatTitle(chatid, title, (GroupChatInfoActivityLollipop) context);
+        if(context instanceof GroupChatInfoActivityLollipop){
+            megaChatApi.setChatTitle(chatid, title, (GroupChatInfoActivityLollipop) context);
+        }
     }
 
     public void muteChats(ArrayList<MegaChatListItem> chats){

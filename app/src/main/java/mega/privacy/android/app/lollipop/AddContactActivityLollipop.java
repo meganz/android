@@ -78,7 +78,6 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
-import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -164,6 +163,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
     public static String EXTRA_CONTACTS = "extra_contacts";
     public static String EXTRA_NODE_HANDLE = "node_handle";
+    public static String EXTRA_CHAT_TITLE = "chatTitle";
 
     private MenuItem sendInvitationMenuItem;
 
@@ -2421,7 +2421,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else {
                 ArrayList<String> contacts = new ArrayList<>();
                 contacts.add(email);
-                startConversation(contacts, true);
+                startConversation(contacts, true, null);
             }
         }
     }
@@ -2674,7 +2674,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("contacts selected: "+contactsSelected.size());
 
         if (onNewGroup) {
-            startConversation(contactsSelected, megaContacts);
+            String chatTitle = "";
+            if(nameGroup!=null && (nameGroup.getText()).length()>0){
+                chatTitle = nameGroup.getText().toString();
+                startConversation(contactsSelected, megaContacts, chatTitle);
+            }
+            else{
+                startConversation(contactsSelected, megaContacts, null);
+            }
         }
         else {
             newGroup();
@@ -2698,6 +2705,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     }
 
     private void newGroup () {
+        log("newGroup");
+
         if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
             filterContactsTask.cancel(true);
         }
@@ -2725,20 +2734,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
     }
 
-    private void startConversation (ArrayList<String> contacts, boolean megaContacts) {
+    private void startConversation (ArrayList<String> contacts, boolean megaContacts, String chatTitle) {
         Intent intent = new Intent();
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contacts);
 
-        if(multipleSelectIntent==0){
-            intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
-            intent.putExtra("MULTISELECT", 0);
-        }
-        else if(multipleSelectIntent==1){
-            intent.putExtra(EXTRA_NODE_HANDLE, nodeHandles);
-            intent.putExtra("MULTISELECT", 1);
+        intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
+
+        if(chatTitle!=null){
+            intent.putExtra(EXTRA_CHAT_TITLE, chatTitle);
         }
 
-        intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
         setResult(RESULT_OK, intent);
         hideKeyboard();
         finish();
