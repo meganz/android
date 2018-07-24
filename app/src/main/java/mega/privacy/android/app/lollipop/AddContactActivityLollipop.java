@@ -164,6 +164,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public static String EXTRA_CONTACTS = "extra_contacts";
     public static String EXTRA_NODE_HANDLE = "node_handle";
     public static String EXTRA_CHAT_TITLE = "chatTitle";
+    public static String EXTRA_GROUP_CHAT = "groupChat";
 
     private MenuItem sendInvitationMenuItem;
 
@@ -2742,6 +2743,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if(chatTitle!=null){
             intent.putExtra(EXTRA_CHAT_TITLE, chatTitle);
+        }
+
+        if(onNewGroup){
+            intent.putExtra(EXTRA_GROUP_CHAT, onNewGroup);
         }
 
         setResult(RESULT_OK, intent);

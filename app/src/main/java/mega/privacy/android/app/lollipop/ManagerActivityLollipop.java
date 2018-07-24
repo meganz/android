@@ -12945,8 +12945,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
+			final boolean isGroup = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false);
+
 			if (contactsData != null){
-				if(contactsData.size()==1){
+				if(!isGroup){
+					log("Create one to one chat");
 					MegaUser user = megaApi.getContact(contactsData.get(0));
 					if(user!=null){
 						log("Chat with contact: "+contactsData.size());
@@ -12954,6 +12957,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else{
+					log("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
 					for (int i=0; i<contactsData.size(); i++){
 						MegaUser user = megaApi.getContact(contactsData.get(i));
