@@ -4385,6 +4385,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         isOpeningChat = false;
 
         if(bufferMessages.size()!=0){
+            log("fullHistoryReceivedOnLoad:buffer size: "+bufferMessages.size());
             loadBufferMessages();
 
             if(lastSeenReceived==false){
