@@ -193,7 +193,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		holder.gifImgDisplay = (ImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
 		holder.gifImgDisplay.setOnClickListener(this);
 
-		if (isGIF(mOffList.get(position).getName())){
+		boolean isGIF = isGIF(currentFile.getName());
+
+		if (isGIF){
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -202,13 +204,15 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 
 			Bitmap thumb = null;
 			Bitmap preview = null;
-			try {
-				holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
+			if (!zipImage) {
+				try {
+					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
 
-				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
-				preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+					preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+				} catch (Exception e) {
+				}
 			}
-			catch (Exception e){}
 
 			Drawable drawable = null;
 			if (preview != null){
@@ -220,12 +224,12 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 			if (drawable == null) {
 				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId());
 			}
-			File file = getOfflineFile(position);
-			if (file != null){
+//			File file = getOfflineFile(position);
+			if (currentFile != null){
 				final ProgressBar pb = holder.progressBar;
 
 				if (drawable != null){
-					Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
+					Glide.with(context).load(currentFile).listener(new RequestListener<File, GlideDrawable>() {
 						@Override
 						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
 							return false;
@@ -239,7 +243,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 					}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 				}
 				else {
-					Glide.with(context).load(file).listener(new RequestListener<File, GlideDrawable>() {
+					Glide.with(context).load(currentFile).listener(new RequestListener<File, GlideDrawable>() {
 						@Override
 						public boolean onException(Exception e, File model, Target<GlideDrawable> target, boolean isFirstResource) {
 							return false;
@@ -379,41 +383,41 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		return false;
 	}
 
-	public File getOfflineFile (int position){
-
-		File file = null;
-		MegaOffline checkOffline = mOffList.get(position);
-
-		if(checkOffline.getOrigin()==MegaOffline.INCOMING){
-			log("isIncomingOffline");
-
-			if (Environment.getExternalStorageDirectory() != null){
-				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
-				log("offlineDirectory: "+file);
-			}
-			else{
-				file = context.getFilesDir();
-			}
-		}
-		else if(checkOffline.getOrigin()==MegaOffline.INBOX){
-			if (Environment.getExternalStorageDirectory() != null){
-				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
-				log("offlineDirectory: "+file);
-			}
-			else{
-				file = context.getFilesDir();
-			}
-		}
-		else{
-			log("NOT isIncomingOffline");
-			if (Environment.getExternalStorageDirectory() != null){
-				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
-			}
-			else{
-				file = context.getFilesDir();
-			}
-		}
-
-		return file;
-	}
+//	public File getOfflineFile (int position){
+//
+//		File file = null;
+//		MegaOffline checkOffline = mOffList.get(position);
+//
+//		if(checkOffline.getOrigin()==MegaOffline.INCOMING){
+//			log("isIncomingOffline");
+//
+//			if (Environment.getExternalStorageDirectory() != null){
+//				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
+//				log("offlineDirectory: "+file);
+//			}
+//			else{
+//				file = context.getFilesDir();
+//			}
+//		}
+//		else if(checkOffline.getOrigin()==MegaOffline.INBOX){
+//			if (Environment.getExternalStorageDirectory() != null){
+//				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + checkOffline.getPath()+checkOffline.getName());
+//				log("offlineDirectory: "+file);
+//			}
+//			else{
+//				file = context.getFilesDir();
+//			}
+//		}
+//		else{
+//			log("NOT isIncomingOffline");
+//			if (Environment.getExternalStorageDirectory() != null){
+//				file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+//			}
+//			else{
+//				file = context.getFilesDir();
+//			}
+//		}
+//
+//		return file;
+//	}
 }
