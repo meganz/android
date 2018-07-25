@@ -156,7 +156,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     RelativeLayout bigElementsGroupCallLayout;
 
     RecyclerView recyclerView;
-    LinearLayoutManager mLayoutManager;
+//    CustomizedGridRecyclerView recyclerView;
+
+//    LinearLayoutManager mLayoutManager;
     GroupCallAdapter adapter;
 
     int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
@@ -547,28 +549,36 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         bigElementsGroupCallLayout.setVisibility(GONE);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_cameras);
-
-        //******************************
         recyclerView.setPadding(0, 0, 0, 0);
         recyclerView.setClipToPadding(false);
         recyclerView.setHasFixedSize(true);
-        ((CustomizedGridRecyclerView) recyclerView).setWrapContent();
-        final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return 1;
-            }
-        });
-
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //***************************+
 
+//        recyclerView = (CustomizedGridRecyclerView) findViewById(R.id.recycler_view_cameras);
 
+//        //******************************
+//        recyclerView.setPadding(0, 0, 0, 0);
+//        recyclerView.setClipToPadding(false);
+//        recyclerView.setHasFixedSize(true);
+//        ((CustomizedGridRecyclerView) recyclerView).setWrapContent();
+//        final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+//        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                return 1;
+//            }
+//        });
+//
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        //***************************+
+
+//
 //        recyclerView.setPadding(0, 0, 0,0);
 //        recyclerView.setClipToPadding(false);
-//        mLayoutManager = new LinearLayoutManager(context);
-//        recyclerView.setLayoutManager(mLayoutManager);
+////        LinearLayoutManager mLayoutManager = new LinearLayoutManager(context);
+//        recyclerView.setLayoutManager(new GridLayoutManager(this,1));
 //        recyclerView.setHasFixedSize(true);
 
         //Local camera small
@@ -695,10 +705,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(chat.isGroup()){
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
+                        relativeVideo.requestLayout();
+
 
                     }else{
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
+                        relativeVideo.requestLayout();
+
 
                         myAvatarLayout.setVisibility(View.VISIBLE);
                         contactAvatarLayout.setVisibility(View.VISIBLE);
@@ -728,8 +742,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(chat.isGroup()){
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
+                        relativeVideo.requestLayout();
 
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), true, false, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
                         peersOnCall.add(myPeer);
 
                         if (adapter == null){
@@ -739,6 +754,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             adapter.setNodes(peersOnCall);
                             adapter.setAdapterType(GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
                         }
+                        adapter.notifyDataSetChanged();
+
 
                         recyclerView.setAdapter(adapter);
                         adapter.setNodes(peersOnCall);
@@ -751,6 +768,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }else{
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+                        relativeVideo.requestLayout();
+
                         flagMyAvatar = false;
                         setProfileMyAvatar();
                         flagContactAvatar = true;
@@ -1284,10 +1303,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                         log(userHandle+": joined the group call - create fragment!");
                         updateSubTitle();
-                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  "Monica Garcia",true, false, null);
+                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  "Monica Garcia",false, false, null);
                         log("userHandle added: "+userHandle);
                         peersOnCall.add(0,userPeer);
                         adapter.setNodes(peersOnCall);
+                        adapter.notifyDataSetChanged();
+
                     }
                     updateRemoteVideoStatus(userHandle);
                     updateRemoteAudioStatus(userHandle);

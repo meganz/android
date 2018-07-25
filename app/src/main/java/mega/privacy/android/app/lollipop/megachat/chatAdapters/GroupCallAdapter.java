@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -47,6 +48,8 @@ import nz.mega.sdk.MegaNode;
 
 import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
+import static mega.privacy.android.app.utils.Util.deleteFolderAndSubfolders;
+import static mega.privacy.android.app.utils.Util.percScreenLogin;
 
 
 public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall>  {
@@ -141,29 +144,13 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-        if (viewType == GroupCallAdapter.ITEM_VIEW_TYPE_GRID){
-//            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
-//            GroupCallAdapter.ViewHolderGroupCall holder = new GroupCallAdapter.ViewHolderGroupCall(v);
-//
-//            holder.rLayout = (RelativeLayout) v.findViewById(R.id.rl);
-//            holder.rLayout.setVisibility(View.VISIBLE);
-//            holder.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
-//            holder.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
-//            holder.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
-//
-//            holder.localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-//            holder.localFullScreenSurfaceView.setZOrderMediaOverlay(true);
-//            SurfaceHolder localSurfaceHolder =  holder.localFullScreenSurfaceView.getHolder();
-//            localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-//            holder.localRenderer = new MegaSurfaceRenderer( holder.localFullScreenSurfaceView);
-//
-//            v.setTag(holder);
-//            return holder;
 
+        if (viewType == GroupCallAdapter.ITEM_VIEW_TYPE_GRID){
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
 
             holderGrid = new ViewHolderGroupCallGrid(v);
             holderGrid.rLayout = (RelativeLayout) v.findViewById(R.id.rl);
+
             holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
             holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
             holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
@@ -172,7 +159,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             SurfaceHolder localSurfaceHolder =  holderGrid.localFullScreenSurfaceView.getHolder();
             localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
             holderGrid.localRenderer = new MegaSurfaceRenderer( holderGrid.localFullScreenSurfaceView);
-
             v.setTag(holderGrid);
             return holderGrid;
 
@@ -208,6 +194,28 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
         if (peer == null){
             return;
         }
+
+        int numPeersOnCall = getItemCount();
+
+        if(numPeersOnCall < 4){
+            log("**** peers: : "+numPeersOnCall);
+            holderGrid.rLayout.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
+
+            //calculate height for 1 element:
+            int heightCameras = (int)(heightScreenPX/numPeersOnCall);
+            heightCameras = heightCameras - 80;
+            holderGrid.rLayout.getLayoutParams().height = heightCameras;
+            log("**** heightScreenPX: "+heightScreenPX+", heightCameras: "+heightCameras);
+
+            if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                holderGrid.rLayout.setBackgroundColor(Color.BLUE);
+            }else{
+                holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
+
+            }
+
+        }
+
         log("Peer in position: "+position+", handle("+peer.getHandle()+"), name("+peer.getName()+"), videoOn("+peer.isVideoOn()+"), audioOn("+peer.isAudioOn()+")");
         if(peer.isVideoOn()){
             log("video on");
@@ -246,10 +254,7 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
     public void setNodes(ArrayList<InfoPeerGroupCall> peers) {
         log("setNodes() -> peers: "+peers.size());
         this.peers = peers;
-        for(int i=0; i<peers.size();i++){
-log("handle "+peers.get(i).getHandle());
-        }
-        notifyDataSetChanged();
+
     }
 
 
@@ -266,6 +271,23 @@ log("handle "+peers.get(i).getHandle());
         }
 
     }
+
+//    public void modifyScreenPosition(){
+//
+//        for(int i=0; i< getItemCount();i++){
+//            getItem(i)
+//        }
+//        int numPeersOnCall = getItemCount();
+//
+//        if(numPeersOnCall < 4){
+//            log("**** peers: : "+numPeersOnCall);
+//            holderGrid.rLayout.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
+//            //calculate height for 1 element:
+//            int heightCameras = (int)(heightScreenPX/numPeersOnCall);
+//            holderGrid.rLayout.getLayoutParams().height = heightCameras;
+//            log("**** heightScreenPX: "+heightScreenPX+", heightCameras: "+heightCameras);
+//        }
+//    }
 
     public Object getItem(int position) {
         log("getItem()");
@@ -401,7 +423,6 @@ log("handle "+peers.get(i).getHandle());
         Bitmap bitmap = null;
         File avatar = null;
         String contactMail = megaChatApi.getContactEmail(userHandle);
-        log("contactMail: "+contactMail);
         if (context.getExternalCacheDir() != null) {
             avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
         } else {
@@ -479,10 +500,8 @@ log("handle "+peers.get(i).getHandle());
 
         String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
         if (color != null) {
-            log("The color to set the avatar is " + color);
             p.setColor(Color.parseColor(color));
         } else {
-            log("Default color to the avatar");
             p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 

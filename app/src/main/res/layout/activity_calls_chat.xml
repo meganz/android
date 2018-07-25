@@ -26,16 +26,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black">
-                <!--<android.support.v7.widget.RecyclerView-->
-                    <!--android:id="@+id/recycler_view_cameras"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="match_parent"/>-->
-                <mega.privacy.android.app.components.CustomizedGridRecyclerView
+                <android.support.v7.widget.RecyclerView
                     android:id="@+id/recycler_view_cameras"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:choiceMode="multipleChoice"
-                    android:layout_centerInParent="true"/>
+                    android:choiceMode="multipleChoice"/>
+
+                <!--<mega.privacy.android.app.components.CustomizedGridRecyclerView-->
+                    <!--android:id="@+id/recycler_view_cameras"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:choiceMode="multipleChoice"-->
+                    <!--android:layout_below="@id/contact_content_grid_text_layout"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:layout_centerInParent="true"-->
+                    <!--android:numColumns="1"-->
+                    <!--android:gravity=""/>-->
             </RelativeLayout>
 
             <!-- Background -->
