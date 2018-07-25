@@ -2050,6 +2050,8 @@
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Logged out</string>
+    <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Your account has already been confirmed. Please login</string>
+    <string name="confirm_account" context="Text shown to indicate user that his account should be confirmed typing his password">Your account must be confirmed. Please enter your password</string>
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">There’s no need to add your own email address</string>
 

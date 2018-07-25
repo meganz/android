@@ -184,6 +184,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean isFirstTime = true;
     private boolean isErrorShown = false;
     private boolean is2FAEnabled = false;
+    private boolean accountConfirmed = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -207,6 +208,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         log("onCreateView");
 
         is2FAEnabled = false;
+        accountConfirmed = false;
 
         loginClicked = false;
         backWhileLogin = false;
@@ -1794,7 +1796,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void readyToManager(){
-        if(confirmLink==null){
+        if(confirmLink==null && !accountConfirmed){
             log("confirmLink==null");
 
             log("OK fetch nodes");
@@ -1959,9 +1961,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //                    initizalizingChatText.setVisibility(View.VISIBLE);
 //                    serversBusyText.setVisibility(View.GONE);
         }
-
         else{
             log("Go to ChooseAccountFragment");
+            accountConfirmed = false;
             ((LoginActivityLollipop)context).showFragment(Constants.CHOOSE_ACCOUNT_FRAGMENT);
         }
     }
@@ -2235,11 +2237,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             serversBusyText.setVisibility(View.GONE);
 
             if(error.getErrorCode() == MegaError.API_OK){
+                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK");
+                if (request.getFlag()) {
+                    bForgotPass.setVisibility(View.VISIBLE);
+                    loginProgressBar.setVisibility(View.GONE);
+
+                    loginTitle.setText(R.string.login_text);
+                    bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
+                    confirmLink = null;
+                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.account_confirmed));
+                    accountConfirmed = true;
+                }
+                else {
+                    accountConfirmed = false;
+                    ((LoginActivityLollipop)context).showSnackbar(getString(R.string.confirm_account));
+                }
                 s = request.getEmail();
                 et_user.setText(s);
                 et_password.requestFocus();
             }
             else{
+                log("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError not API_OK "+error.getErrorCode());
                 ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 confirmLink = null;
             }
