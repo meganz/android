@@ -103,7 +103,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -1660,7 +1660,6 @@ public class Util {
 		log("isVideoFile: "+path);
 		try{
 			String mimeType = URLConnection.guessContentTypeFromName(path);
-		    log("The mimeType is: "+mimeType);
 		    return mimeType != null && mimeType.indexOf("video") == 0;
 		}
 		catch(Exception e){
