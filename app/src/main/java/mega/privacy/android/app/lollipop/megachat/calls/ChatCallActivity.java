@@ -35,6 +35,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -71,9 +74,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -136,13 +143,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     boolean avatarRequested = false;
 
-    ArrayList<Long> peersOnCall = new ArrayList<>();
+    ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
 
     Timer timer = null;
     Timer ringerTimer = null;
     long milliseconds = 0;
+
     RelativeLayout smallElementsIndividualCallLayout;
     RelativeLayout bigElementsIndividualCallLayout;
+    RelativeLayout bigElementsGroupCallLayout;
+
+    RecyclerView recyclerView;
+    LinearLayoutManager mLayoutManager;
+    GroupCallAdapter adapter;
 
     int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
 
@@ -175,11 +188,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     FrameLayout fragmentContainerLocalCamera;
     FrameLayout fragmentContainerLocalCameraFS;
     FrameLayout fragmentContainerRemoteCameraFS;
-
-//    //pruebas colores:
-//    ViewGroup parentColorFS;
-//    private ColorFragment colorFragmentFS = null;
-//    FrameLayout fragmentContainerColorFS;
 
     ViewGroup parentLocal;
     ViewGroup parentLocalFS;
@@ -483,8 +491,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         aB.setTitle(" ");
         myChrono = new Chronometer(context);
 
-        peersOnCall.add(megaChatApi.getMyUserHandle());
-
         smallElementsIndividualCallLayout = (RelativeLayout) findViewById(R.id.small_elements_individual_call);
         smallElementsIndividualCallLayout.setVisibility(GONE);
 
@@ -533,6 +539,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         shake = AnimationUtils.loadAnimation(this, R.anim.shake);
         rtcAudioManager = AppRTCAudioManager.create(getApplicationContext());
+
+        //Cameras in Group call
+        bigElementsGroupCallLayout = (RelativeLayout) findViewById(R.id.big_elements_group_call);
+        bigElementsGroupCallLayout.setVisibility(GONE);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view_cameras);
+        recyclerView.setPadding(0, 0, 0,0);
+        recyclerView.setClipToPadding(false);
+//        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+        mLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setHasFixedSize(true);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //Local camera small
         parentLocal = (ViewGroup) findViewById(R.id.parent_layout_local_camera);
@@ -628,12 +647,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if(chat.isGroup()){
                     smallElementsIndividualCallLayout.setVisibility(View.GONE);
                     bigElementsIndividualCallLayout.setVisibility(View.GONE);
+                    bigElementsGroupCallLayout.setVisibility(View.VISIBLE);
 
                 }else{
                     smallElementsIndividualCallLayout.setVisibility(View.VISIBLE);
                     bigElementsIndividualCallLayout.setVisibility(View.VISIBLE);
-
-
+                    bigElementsGroupCallLayout.setVisibility(View.GONE);
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
@@ -658,8 +677,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(chat.isGroup()){
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
-                    }
-                    else{
+
+                    }else{
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
 
@@ -689,13 +708,27 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                     if(chat.isGroup()){
-                        log("is Group");
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-                        myAvatarLayout.setVisibility(View.GONE);
-                        flagMyAvatar = false;
-                        setProfileMyAvatar();
 
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
+                        peersOnCall.add(myPeer);
+
+                        if (adapter == null){
+                            adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
+                        }
+                        else{
+                            adapter.setNodes(peersOnCall);
+                            adapter.setAdapterType(GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
+                        }
+
+                        recyclerView.setAdapter(adapter);
+                        adapter.setNodes(peersOnCall);
+                        if (adapter.getItemCount() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                        }else{
+                            recyclerView.setVisibility(View.VISIBLE);
+                        }
 
                     }else{
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -760,11 +793,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
+            radius = defaultAvatar.getWidth() / 2;
+        }else {
+            radius = defaultAvatar.getHeight() / 2;
+        }
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         if(flagContactAvatar){
             myImage.setImageBitmap(defaultAvatar);
@@ -1233,6 +1266,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                         log(userHandle+": joined the group call - create fragment!");
                         updateSubTitle();
+                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  "Monica Garcia",true, false, null);
+                        log("userHandle added: "+userHandle);
+                        peersOnCall.add(0,userPeer);
+                        adapter.setNodes(peersOnCall);
                     }
                     updateRemoteVideoStatus(userHandle);
                     updateRemoteAudioStatus(userHandle);
@@ -1339,70 +1376,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         toneGenerator = null;
         timer = null;
         ringerTimer = null;
-    }
-
-    public Bitmap createDefaultAvatar(){
-        log("createDefaultAvatar()");
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint paintText = new Paint();
-        Paint paintCircle = new Paint();
-
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(150);
-        paintText.setAntiAlias(true);
-        paintText.setTextAlign(Paint.Align.CENTER);
-        Typeface face = Typeface.SANS_SERIF;
-        paintText.setTypeface(face);
-        paintText.setAntiAlias(true);
-        paintText.setSubpixelText(true);
-        paintText.setStyle(Paint.Style.FILL);
-
-        if(chat.isGroup()){
-            paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
-        }
-        else{
-            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(chat.getPeerHandle(0)));
-            if(color!=null){
-                log("The color to set the avatar is "+color);
-                paintCircle.setColor(Color.parseColor(color));
-                paintCircle.setAntiAlias(true);
-            }
-            else{
-                log("Default color to the avatar");
-                paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-                paintCircle.setAntiAlias(true);
-            }
-        }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-            radius = defaultAvatar.getWidth()/2;
-        else
-            radius = defaultAvatar.getHeight()/2;
-
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
-
-        if(chat.getTitle()!=null){
-            if(!chat.getTitle().isEmpty()){
-                char title = chat.getTitle().charAt(0);
-                String firstLetter = new String(title+"");
-
-                if(!firstLetter.equals("(")){
-
-                    log("Draw letter: "+firstLetter);
-                    Rect bounds = new Rect();
-
-                    paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
-                    int xPos = (c.getWidth()/2);
-                    int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
-                    c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
-                }
-
-            }
-        }
-        return defaultAvatar;
     }
 
     int width = 0;
@@ -1716,7 +1689,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if(chat.isGroup()){
             log("is group");
             if(callChat !=null){
-
 
             }
         }else{
