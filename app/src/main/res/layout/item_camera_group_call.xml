@@ -4,14 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_margin="6dp"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_centerInParent="true"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/orange">
         <!--camera FS-->
         <SurfaceView
