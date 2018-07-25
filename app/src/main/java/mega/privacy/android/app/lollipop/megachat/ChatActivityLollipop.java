@@ -1876,6 +1876,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
                     in.putExtra("chatId", idChat);
+                    in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
                     startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
                 }
             }
@@ -1906,6 +1907,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     Intent in = new Intent(this, AddContactActivityLollipop.class);
                     in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
+                    in.putExtra("aBtitle", getString(R.string.add_contacts));
                     startActivityForResult(in, Constants.REQUEST_SEND_CONTACTS);
                 }
             }

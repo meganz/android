@@ -6421,7 +6421,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}else{
 						thumbViewMenuItem.setVisible(false);
 					}					upgradeAccountMenuItem.setVisible(true);
-					searchMenuItem.setVisible(true);
+					searchMenuItem.setVisible(false);
 					scanQRcode.setVisible(true);
 
 					if (cFLol != null && cFLol.isAdded()) {
@@ -10826,7 +10826,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-						in.putExtra("chat", true);
 						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 					}
 				}

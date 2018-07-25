@@ -731,6 +731,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
                     in.putExtra("chatId", chatHandle);
+                    in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
                     startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
                 }
             }
