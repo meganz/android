@@ -69,7 +69,7 @@ import nz.mega.sdk.MegaUser;
 public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.8_204";
+	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
