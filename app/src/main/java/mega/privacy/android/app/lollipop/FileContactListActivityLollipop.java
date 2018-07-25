@@ -109,8 +109,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	
 	ProgressDialog statusDialog;
 	AlertDialog permissionsDialog;
-	
-	public static int REQUEST_CODE_SELECT_CONTACT = 1000;
 
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -552,7 +550,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		    	intent.setClass(this, AddContactActivityLollipop.class);
 		    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
-		    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+				intent.putExtra("MULTISELECT", 0);
+		    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 		    	
 	        	return true;
 	        }
@@ -792,8 +791,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				Intent intent = new Intent();
 				intent.setClass(this, AddContactActivityLollipop.class);
 				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
+				intent.putExtra("MULTISELECT", 0);
 				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+				startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
 				break;
 			}
 		}
@@ -927,7 +927,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 		
-		if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+		if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
 				showSnackbar(getString(R.string.error_server_connection_problem));
 				return;
