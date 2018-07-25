@@ -14053,7 +14053,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 									newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyEmail() + ".jpg";
 								}
 								File newFile = new File(newPath);
-								oldFile.renameTo(newFile);
+								boolean result = oldFile.renameTo(newFile);
+								if(result){
+									log("The avatar file was correctly renamed");
+								}
 							}
 						}
 						log("User avatar changed!");
@@ -15005,6 +15008,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				MegaUser user=users.get(i);
 
 				if(user!=null){
+					// 0 if the change is external.
+					// >0 if the change is the result of an explicit request
+					// -1 if the change is the result of an implicit request made by the SDK internally
+
 					if(user.isOwnChange()>0){
 						log("isOwnChange!!!: "+user.isOwnChange());
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)){
@@ -15155,8 +15162,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	public void updateMyEmail(String email){
-		log("updateMyEmail");
+		log("updateMyEmail:newEmail: "+email);
 		nVEmail.setText(email);
+		String oldEmail = dbH.getMyEmail();
+		if(oldEmail!=null){
+			log("updateMyEmail:oldEmail: "+oldEmail);
+
+			try{
+				File avatarFile = null;
+				if (getExternalCacheDir() != null){
+					avatarFile = new File(getExternalCacheDir().getAbsolutePath(), oldEmail + ".jpg");
+				}
+				else{
+					avatarFile = new File(getCacheDir().getAbsolutePath(), oldEmail + ".jpg");
+				}
+
+				if(avatarFile!=null){
+					if(avatarFile.exists()){
+						String newPath = null;
+						if (getExternalCacheDir() != null){
+							newPath = getExternalCacheDir().getAbsolutePath() + "/" + email + ".jpg";
+						}
+						else{
+							log("getExternalCacheDir() is NULL");
+							newPath = getCacheDir().getAbsolutePath() + "/" + email + ".jpg";
+						}
+						File newFile = new File(newPath);
+						boolean result = avatarFile.renameTo(newFile);
+						if(result){
+							log("The avatar file was correctly renamed");
+						}
+					}
+				}
+			}
+			catch(Exception e){
+				log("EXCEPTION renaming the avatar on changing email");
+			}
+		}
+		else{
+			log("ERROR. Old email is NULL");
+		}
+
 		dbH.saveMyEmail(email);
 
 		String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
