@@ -279,23 +279,6 @@ log("handle "+peers.get(i).getHandle());
         return null;
     }
 
-//    public int getGridWidth() {
-//        log("getGridWidth()");
-//        return gridWidth;
-//    }
-//
-//    public void setGridWidth(int gridWidth, ViewHolderGroupCall holder) {
-//        log("setGridWidth()");
-//
-//        if(this.gridWidth != gridWidth){
-//            this.gridWidth = gridWidth;
-////            ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) holder.contentLayout.getLayoutParams();
-////            params.height = gridWidth;
-////            params.width = gridWidth;
-////            holder.contentLayout.setLayoutParams(params);
-//
-//        }
-//    }
 
    //My AVATAR
    public void setProfileMyAvatar(ViewHolderGroupCall holder) {
