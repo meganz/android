@@ -36,6 +36,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -72,6 +73,7 @@ import java.util.TimerTask;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -545,13 +547,29 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         bigElementsGroupCallLayout.setVisibility(GONE);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_cameras);
-        recyclerView.setPadding(0, 0, 0,0);
+
+        //******************************
+        recyclerView.setPadding(0, 0, 0, 0);
         recyclerView.setClipToPadding(false);
-//        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-        mLayoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setHasFixedSize(true);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        ((CustomizedGridRecyclerView) recyclerView).setWrapContent();
+        final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return 1;
+            }
+        });
+
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        //***************************+
+
+
+//        recyclerView.setPadding(0, 0, 0,0);
+//        recyclerView.setClipToPadding(false);
+//        mLayoutManager = new LinearLayoutManager(context);
+//        recyclerView.setLayoutManager(mLayoutManager);
+//        recyclerView.setHasFixedSize(true);
 
         //Local camera small
         parentLocal = (ViewGroup) findViewById(R.id.parent_layout_local_camera);
@@ -711,7 +729,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
 
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), true, false, null);
                         peersOnCall.add(myPeer);
 
                         if (adapter == null){
@@ -740,7 +758,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         myAvatarLayout.setVisibility(View.VISIBLE);
 
                     }
-
+                    log("**** updateLocalVideo");
                     updateLocalVideoStatus();
 
 

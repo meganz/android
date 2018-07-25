@@ -49,7 +49,7 @@ import static android.view.View.GONE;
 import static mega.privacy.android.app.utils.Util.context;
 
 
-public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> {
+public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall>  {
 
     public static final int ITEM_VIEW_TYPE_GRID = 1;
 
@@ -141,8 +141,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-
-
         if (viewType == GroupCallAdapter.ITEM_VIEW_TYPE_GRID){
 //            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
 //            GroupCallAdapter.ViewHolderGroupCall holder = new GroupCallAdapter.ViewHolderGroupCall(v);
@@ -213,19 +211,32 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
         log("Peer in position: "+position+", handle("+peer.getHandle()+"), name("+peer.getName()+"), videoOn("+peer.isVideoOn()+"), audioOn("+peer.isAudioOn()+")");
         if(peer.isVideoOn()){
             log("video on");
+            holderGrid.localFullScreenSurfaceView.setVisibility(View.VISIBLE);
             this.width=0;
             this.height=0;
             GroupCallListener listenerPeer = new GroupCallListener(context,holder);
             peer.setListener(listenerPeer);
-            megaChatApi.addChatLocalVideoListener(chatId, listenerPeer);
+            if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                log("me");
+                megaChatApi.addChatLocalVideoListener(chatId, listenerPeer);
+            }else{
+                log("contact----------> handle("+peer.getHandle()+"), name("+peer.getName()+")");
+                megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), listenerPeer);
+            }
             holder.avatarLayout.setVisibility(GONE);
+
         }else{
             log("video off");
-
             holder.avatarLayout.setVisibility(View.VISIBLE);
+            holderGrid.localFullScreenSurfaceView.setVisibility(View.GONE);
+
             if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                log("me");
+
                 setProfileMyAvatar(holder);
             }else{
+                log("contact----------> handle("+peer.getHandle()+"), name("+peer.getName()+")");
+
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
         }
@@ -278,6 +289,33 @@ log("handle "+peers.get(i).getHandle());
         }
         return null;
     }
+
+//    @Override
+//    public View getView(int position, View convertView, ViewGroup parent) {
+//        Viewholder holder;
+//        if (convertView == null) {
+//
+//            holder = new Viewholder();
+//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            convertView = inflater.inflate(R.layout.grid_list_item, null);
+//
+//            holder.textView = (TextView) convertView.findViewById(R.id.txtTitle);
+//            holder.imageView = (ImageView)convertView.findViewById(R.id.imgGrid);
+//
+//
+//            convertView.setTag(holder);
+//
+//        } else {
+//
+//            holder = (Viewholder) convertView.getTag();
+//        }
+//
+//        holder.textView.setText(web[position]);
+//        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//        Glide.with(mContext).load(Imageid[position]).into(holder.imageView);
+//
+//        return convertView;
+//    }
 
 
    //My AVATAR
@@ -363,6 +401,7 @@ log("handle "+peers.get(i).getHandle());
         Bitmap bitmap = null;
         File avatar = null;
         String contactMail = megaChatApi.getContactEmail(userHandle);
+        log("contactMail: "+contactMail);
         if (context.getExternalCacheDir() != null) {
             avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
         } else {
@@ -470,6 +509,14 @@ log("handle "+peers.get(i).getHandle());
     }
     private static void log(String log) {
         Util.log("GroupCallAdapter", log);
+    }
+
+    public RecyclerView getListFragment() {
+        return recyclerViewFragment;
+    }
+
+    public void setListFragment(RecyclerView recyclerViewFragment) {
+        this.recyclerViewFragment = recyclerViewFragment;
     }
 
 }

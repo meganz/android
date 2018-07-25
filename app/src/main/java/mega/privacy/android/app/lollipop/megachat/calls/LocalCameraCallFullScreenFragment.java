@@ -119,6 +119,8 @@ public class LocalCameraCallFullScreenFragment extends Fragment implements MegaC
         }
     }
 
+
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
