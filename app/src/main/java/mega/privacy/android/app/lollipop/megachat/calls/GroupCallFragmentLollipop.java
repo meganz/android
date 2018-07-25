@@ -2,7 +2,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,34 +11,30 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatVideoListenerInterface;
 
 
-public class ColorFragment extends Fragment {
+public class GroupCallFragmentLollipop extends Fragment implements MegaChatVideoListenerInterface {
     int width = 0;
     int height = 0;
+    Bitmap bitmap;
     MegaChatApiAndroid megaChatApi;
     Context context;
     long chatId;
-    long userHandle;
-    int color;
 
-    public RelativeLayout remoteFullScreenSurfaceView;
 
-    public static ColorFragment newInstance(long chatId, long userHandle, int color) {
+    public static GroupCallFragmentLollipop newInstance(long chatId) {
         log("newInstance");
-        ColorFragment f = new ColorFragment();
+        GroupCallFragmentLollipop f = new GroupCallFragmentLollipop();
 
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
-        args.putLong("userHandle",userHandle);
-        args.putInt("color",color);
         f.setArguments(args);
         return f;
     }
@@ -52,8 +48,7 @@ public class ColorFragment extends Fragment {
 
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
-        this.userHandle = args.getLong("userHandle", -1);
-        this.color = args.getInt("color",0);
+
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -66,21 +61,19 @@ public class ColorFragment extends Fragment {
             return null;
         }
 
-        View v = inflater.inflate(R.layout.fragment_color, container, false);
-
-        remoteFullScreenSurfaceView = (RelativeLayout)v.findViewById(R.id.surface_remote_video);
-
-        if(color == 1){
-            remoteFullScreenSurfaceView.setBackgroundColor(Color.BLUE);
-        }else if (color == 2){
-            remoteFullScreenSurfaceView.setBackgroundColor(Color.YELLOW);
-        }else if (color == 3){
-            remoteFullScreenSurfaceView.setBackgroundColor(Color.GREEN);
-        }else{
-            remoteFullScreenSurfaceView.setBackgroundColor(Color.MAGENTA);
-        }
+        View v = inflater.inflate(R.layout.fragment_group_call, container, false);
 
         return v;
+    }
+
+    @Override
+    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
+
+    }
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        context = activity;
     }
 
 
@@ -92,6 +85,7 @@ public class ColorFragment extends Fragment {
 
     @Override
     public void onDestroy(){
+        megaChatApi.removeChatVideoListener(chatId, -1, this);
         super.onDestroy();
     }
     @Override
@@ -101,10 +95,8 @@ public class ColorFragment extends Fragment {
         this.height=0;
         super.onResume();
     }
-
     private static void log(String log) {
-        Util.log("ColorFragment", log);
+        Util.log("GroupCallFragmentLollipop", log);
     }
-
 
 }

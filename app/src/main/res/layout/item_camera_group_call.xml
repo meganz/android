@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_margin="6dp"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl"
+        android:layout_centerInParent="true"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@color/orange">
+        <!--camera FS-->
+        <SurfaceView
+            android:id="@+id/surface_local_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:background="@android:color/transparent" />
+
+        <!--Big Avatar-->
+        <RelativeLayout
+            android:id="@+id/avatar_rl"
+            android:layout_centerInParent="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@android:color/transparent">
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/avatar_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:layout_centerInParent="true"
+                rounded:border_color="#4DFFFFFF"
+                rounded:border_width="3dp"
+                rounded:corner_radius="60dp" />
+            <TextView
+                android:id="@+id/avatar_initial_letter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center_horizontal|center_vertical"
+                android:paddingBottom="3dp"
+                android:visibility="gone"/>
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

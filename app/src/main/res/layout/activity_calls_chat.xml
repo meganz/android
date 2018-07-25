@@ -20,7 +20,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-
+            <!-- Layout for group call -->
+            <RelativeLayout
+                android:id="@+id/big_elements_group_call"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/black">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view_cameras"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </RelativeLayout>
 
             <!-- Background -->
             <RelativeLayout
