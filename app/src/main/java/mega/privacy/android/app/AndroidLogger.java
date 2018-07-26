@@ -1,72 +1,34 @@
 package mega.privacy.android.app;
 
 
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.util.Log;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaLoggerInterface;
 
 
-public class AndroidLogger implements MegaLoggerInterface {
+public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
+
     public static final String LOG_FILE_NAME = "logSDK.txt";
-    protected static ConcurrentLinkedDeque<String> logQueue;
-    protected static String separator = "&&";
-    protected SimpleDateFormat simpleDateFormat;
-    protected File logFile;
-    protected String dir;
+    protected static ConcurrentLinkedDeque<String> fileLogQueue;
 
     public AndroidLogger(String fileName, boolean fileLogger) {
-        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        logFile = null;
-        dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
-        logQueue = new ConcurrentLinkedDeque<>();
-
-        if (fileLogger) {
-
-            //check if log file exist, create one if not
-            File dirFile = new File(dir);
-            if (!dirFile.exists()) {
-                dirFile.mkdirs();
-            }
-
-            logFile = new File(dirFile, fileName);
-            if (!logFile.exists()) {
-                try {
-                    logFile.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        startAsyncLogger();
+        super(fileName, fileLogger);
+        fileLogQueue = new ConcurrentLinkedDeque<>();
+        logToFile();
     }
 
     @Override
-    public synchronized void log(String time, int logLevel, String source, String message) {
+    public void log(String time, int logLevel, String source, String message) {
         //display to console
         if (Util.DEBUG) {
             logQueue.add("AndroidLogger" + separator + createSourceMessage(message) + ": " + createMessage(message));
         }
 
         //save to log file
-        if (logFile != null && logFile.exists()) {
-            Util.appendStringToFile(createSourceMessage(message) + ": " + createMessage(message) + "\n", logFile);
+        if (isReadyToWriteToFile(Util.getFileLoggerSDK())) {
+            fileLogQueue.add(createSourceMessage(message) + ": " + createMessage(message) + "\n");
         }
-    }
-
-    protected String createMessage(String message) {
-        String currentDateAndTime = simpleDateFormat.format(new Date());
-        message = "(" + currentDateAndTime + ") - " + message;
-        return message;
     }
 
     protected String createSourceMessage(String source) {
@@ -85,25 +47,25 @@ public class AndroidLogger implements MegaLoggerInterface {
         return sourceMessage;
     }
 
-    protected synchronized static void startAsyncLogger() {
-        AsyncTask<Void, Void, Void> myTask = new AsyncTask<Void, Void, Void>() {
+    @Override
+    protected void logToFile(){
+        Thread thread = new Thread(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 while (true) {
-                    String log = logQueue.pollFirst();
+                    String log = fileLogQueue.pollFirst();
                     if (log != null) {
-                        String[] combined = log.split(separator);
-                        Log.d(combined[0], combined[1]);
+                        writeToFile(log);
                     } else {
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
                 }
             }
-        };
-        myTask.execute();
+        });
+        thread.start();
     }
 }
