@@ -145,6 +145,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RelativeLayout layoutPendingMessages;
 		ImageView muteIcon;
 		ImageView contactStateIcon;
+		ImageView callInProgressIcon;
 		String contactMail;
 		String fullName = "";
 
@@ -336,6 +337,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnClickListener(this);
 				holder.itemLayout.setOnLongClickListener(this);
 			}
+
+			if(chat.isCallInProgress()){
+				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
+			}
+			else{
+				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+			}
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
 			((ViewHolderArchivedChatList)holder).textViewArchived.setOnClickListener(this);
@@ -505,6 +513,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 			((ViewHolderNormalChatList)holder).contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
+			((ViewHolderNormalChatList)holder).callInProgressIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_in_progress);
 		}
 		else if(viewType == ITEM_VIEW_TYPE_ARCHIVED_CHATS){
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_archived_chat_option_list, parent, false);
