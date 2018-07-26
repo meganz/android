@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black">
-                <mega.privacy.android.app.components.CustomizedGridRecyclerView
+                <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
                     android:id="@+id/recycler_view_cameras"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

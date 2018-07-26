@@ -207,13 +207,14 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
             log("rLayout---> heightCameras("+heightCameras+")/heightScreenPX("+heightScreenPX+") ");
             log("rLayout---> widthScreenPX("+widthScreenPX+")");
 
-            if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                holderGrid.rLayout.setBackgroundColor(Color.BLUE);
-//                holderGrid.localFullScreenSurfaceView.setBackgroundColor(Color.BLUE);
-            }else{
-                holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
-//                holderGrid.localFullScreenSurfaceView.setBackgroundColor(Color.YELLOW);
-            }
+
+//            if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+//                holderGrid.rLayout.setBackgroundColor(Color.BLUE);
+////                holderGrid.localFullScreenSurfaceView.setBackgroundColor(Color.BLUE);
+//            }else{
+//                holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
+////                holderGrid.localFullScreenSurfaceView.setBackgroundColor(Color.YELLOW);
+//            }
 
 //            holderGrid.localFullScreenSurfaceView.getHolder().setFixedSize(holderGrid.rLayout.getWidth(),holderGrid.rLayout.getHeight());
 //            log("surfaceview---> height: "+holderGrid.rLayout.getHeight()+", width: "+holderGrid.rLayout.getWidth());
@@ -225,8 +226,9 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
             log("video on");
             holderGrid.localFullScreenSurfaceView.setVisibility(View.VISIBLE);
             holder.avatarLayout.setVisibility(GONE);
+            holderGrid.localFullScreenSurfaceView.setZOrderOnTop(false);
 
-            holderGrid.localFullScreenSurfaceView.setZOrderMediaOverlay(true);
+//            holderGrid.localFullScreenSurfaceView.setZOrderMediaOverlay(true);
             SurfaceHolder localSurfaceHolder =  holderGrid.localFullScreenSurfaceView.getHolder();
             localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
             holderGrid.localRenderer = new MegaSurfaceRenderer( holderGrid.localFullScreenSurfaceView);

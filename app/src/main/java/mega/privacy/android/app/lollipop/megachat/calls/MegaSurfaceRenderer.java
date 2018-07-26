@@ -55,9 +55,11 @@ public class MegaSurfaceRenderer implements Callback {
     PorterDuffXfermode modesrcin;
     int surfaceWidth = 0;
     int surfaceHeight = 0;
+    SurfaceView surf;
 
 
     public MegaSurfaceRenderer(SurfaceView view) {
+        this.surf = view;
         surfaceHolder = view.getHolder();
         if(surfaceHolder == null)
             return;
@@ -104,7 +106,10 @@ public class MegaSurfaceRenderer implements Callback {
     public void surfaceChanged(SurfaceHolder holder, int format,
             int in_width, int in_height) {
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
-
+        android.view.ViewGroup.LayoutParams lp = surf.getLayoutParams();
+        lp.width = in_width;
+        lp.height = in_height;
+        surf.setLayoutParams(lp);
         changeDestRect(in_width, in_height);
 
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged" +
