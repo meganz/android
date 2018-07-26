@@ -46,6 +46,9 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
+    public static final int ITEM_VIEW_TYPE_NODE= 0;
+    public static final int ITEM_VIEW_TYPE_HEADER = 1;
+
     DatabaseHandler dbH = null;
     public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
     public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
@@ -78,7 +81,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
 
     public ShareContactInfo getItem(int position)
     {
-        if(position < shareContacts.size()){
+        if(position < shareContacts.size() && position >= 0){
             return shareContacts.get(position);
         }
 
@@ -103,6 +106,17 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         return null;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        ShareContactInfo contact = getItem(position);
+        if (contact.isHeader()){
+            return ITEM_VIEW_TYPE_HEADER;
+        }
+        else{
+            return ITEM_VIEW_TYPE_NODE;
+        }
+    }
+
     public class ViewHolderShareContactsLollipop extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         RelativeLayout itemHeader;
@@ -113,7 +127,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         public String mail;
         public RoundedImageView avatar;
         ImageView contactStateIcon;
-        LinearLayout itemDecoration;
         int currentPosition;
 
         public ViewHolderShareContactsLollipop(View itemView) {
@@ -155,7 +168,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
         holder.emailTextView = (TextView) rowView.findViewById(R.id.contact_mail);
         holder.avatar = (RoundedImageView) rowView.findViewById(R.id.contact_avatar);
         holder.contactStateIcon = (ImageView) rowView.findViewById(R.id.contact_state);
-        holder.itemDecoration = (LinearLayout) rowView.findViewById(R.id.separator);
 
         return holder;
     }
@@ -276,13 +288,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                         megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(), mContext.getCacheDir().getAbsolutePath() + "/" + mail + ".jpg", listener);
                     }
                 }
-
-                if (contact.isLastItem()) {
-                    holder.itemDecoration.setVisibility(View.GONE);
-                }
-                else {
-                    holder.itemDecoration.setVisibility(View.VISIBLE);
-                }
             }
         }
         else if (contact.isPhoneContact()){
@@ -300,7 +305,6 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 holder.emailTextView.setText(contact.getPhoneContactInfo().getEmail());
 
                 holder.avatar.setImageBitmap(createDefaultAvatar(holder.emailTextView.getText().toString(), contact));
-                holder.itemDecoration.setVisibility(View.VISIBLE);
             }
         }
     }
