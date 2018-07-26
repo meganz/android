@@ -58,15 +58,6 @@
             android:maxLines="1"
             android:textColor="@color/file_list_second_row" />
 
-        <LinearLayout
-            android:id="@+id/separator"
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/sliding_panel_separator"
-            android:orientation="vertical"/>
-
     </RelativeLayout>
 
     <RelativeLayout

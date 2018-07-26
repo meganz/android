@@ -216,19 +216,11 @@
 
 	</LinearLayout>
 
-	<LinearLayout
-		android:id="@+id/separator"
-		android:layout_below="@+id/container_linear_layout"
-		android:layout_width="match_parent"
-		android:layout_height="1dp"
-		android:background="@color/sliding_panel_separator"
-		android:orientation="vertical"/>
-
 	<RelativeLayout
 		android:id="@+id/add_contact_list_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/separator"
+		android:layout_below="@id/container_linear_layout"
 		android:background="@color/white">
 
 		<ImageView

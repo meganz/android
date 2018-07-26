@@ -14,7 +14,6 @@ public class ShareContactInfo{
     boolean isPhoneContact;
     boolean isMegaContact;
     boolean isHeader;
-    boolean isLastItem;
 
     public ShareContactInfo(PhoneContactInfo phoneContactInfo, MegaContactAdapter megaContactAdapter, String mail) {
         this.phoneContactInfo = phoneContactInfo;
@@ -35,7 +34,6 @@ public class ShareContactInfo{
 
         this.mail = mail;
         isHeader = false;
-        isLastItem = false;
     }
 
     public ShareContactInfo(boolean isHeader, boolean isMegaContact, boolean isPhoneContact){
@@ -66,14 +64,6 @@ public class ShareContactInfo{
 
     public boolean isHeader () {
         return isHeader;
-    }
-
-    public void setLastItem (boolean isLastItem){
-        this.isLastItem = isLastItem;
-    }
-
-    public boolean isLastItem (){
-        return isLastItem;
     }
 
     public boolean isPhoneContact () {
