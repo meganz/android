@@ -549,7 +549,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void setChatPermissions(){
-        log("setChatPermissions");
+        log("setChatSubtitle");
         if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
             editImageView.setVisibility(View.VISIBLE);
             dividerClearLayout.setVisibility(View.VISIBLE);
@@ -1249,7 +1249,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSingleLine();
         input.setText(chat.getTitle());
         input.setSelectAllOnFocus(true);
-        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -1616,6 +1616,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     if(e.getErrorCode()==MegaError.API_EEXIST)
                     {
                         showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
+                    }
+                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
+                    {
+                        showSnackbar(getString(R.string.error_own_email_as_contact));
                     }
                     else{
                         showSnackbar(getString(R.string.general_error));

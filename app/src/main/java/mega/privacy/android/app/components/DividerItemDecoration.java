@@ -3,6 +3,7 @@ package mega.privacy.android.app.components;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -20,8 +21,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     public DividerItemDecoration(Context context, DisplayMetrics outMetrics) {
 
-        mDividerNode = context.getResources().getDrawable(R.drawable.line_divider);
-        mDividerMonth = context.getResources().getDrawable(R.drawable.line_divider_camera_uploads_list);
+        mDividerNode = ContextCompat.getDrawable(context, R.drawable.line_divider);
+        mDividerMonth = ContextCompat.getDrawable(context, R.drawable.line_divider_camera_uploads_list);
 
         this.outMetrics = outMetrics;
         this.context = context;

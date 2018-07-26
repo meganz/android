@@ -1447,7 +1447,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				Resources resources = permissionsDialog.getContext().getResources();
 				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				alertTitle.setTextColor(resources.getColor(R.color.black));
+				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
 				/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/

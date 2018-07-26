@@ -1098,10 +1098,18 @@ public class OfflineFragmentLollipop extends Fragment{
 						log("Video file");
 
 						Intent mediaIntent;
+						boolean internalIntent;
+						boolean opusFile = false;
 						if (MimeTypeList.typeForName(currentFile.getName()).isVideoNotSupported() || MimeTypeList.typeForName(currentFile.getName()).isAudioNotSupported()) {
 							mediaIntent = new Intent(Intent.ACTION_VIEW);
+							internalIntent = false;
+							String[] s = currentFile.getName().split("\\.");
+							if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+								opusFile = true;
+							}
 						}
 						else {
+							internalIntent = true;
 							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						}
 
@@ -1123,7 +1131,33 @@ public class OfflineFragmentLollipop extends Fragment{
 						else{
 							mediaIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 						}
-						startActivity(mediaIntent);
+						if (opusFile){
+							mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+						}
+						if (internalIntent){
+							startActivity(mediaIntent);
+						}
+						else {
+							if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+								startActivity(mediaIntent);
+							}
+							else {
+								((ManagerActivityLollipop)context).showSnackbar(getString(R.string.intent_not_available));
+
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+									intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								}
+								else {
+									intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								}
+								intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+								if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+									log("call to startActivity(intentShare)");
+									context.startActivity(intentShare);
+								}
+							}
+						}
 						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 						imageDrag = imageView;
 					}

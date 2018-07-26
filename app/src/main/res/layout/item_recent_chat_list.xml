@@ -58,6 +58,15 @@
         android:background="@null"
         android:src="@drawable/circle_status_contact_offline" />
 
+    <ImageView
+        android:id="@+id/recent_chat_list_call_in_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/recent_chat_list_contact_state"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="4dp"
+        android:background="@null"
+        android:src="@drawable/ic_g_call_started" />
 
     <ImageView
         android:id="@+id/recent_chat_list_mute_icon"

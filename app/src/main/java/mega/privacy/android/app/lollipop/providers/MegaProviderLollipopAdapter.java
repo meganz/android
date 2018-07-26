@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -164,7 +165,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 		holder.textViewFileName.setText(node.getName());
 		
 		Util.setViewAlpha(holder.imageView, 1);
-		holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+		holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 
 		if (node.isFolder()){
 
@@ -229,7 +230,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
@@ -255,7 +256,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 						paramsMultiselect.setMargins(0, 0, 0, 0);
 						holder.imageView.setLayoutParams(paramsMultiselect);
 
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 					}
 					else{
@@ -362,11 +363,11 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 					paramsMultiselect.setMargins(0, 0, 0, 0);
 					holder.imageView.setLayoutParams(paramsMultiselect);
 
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 					holder.imageView.setImageResource(R.drawable.ic_select_folder);
 				}
 				else{
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 
 					if (node.hasThumbnail()){
 

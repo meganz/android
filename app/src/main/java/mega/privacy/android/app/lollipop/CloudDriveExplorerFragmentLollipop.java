@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -1121,9 +1122,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public void activateButton(boolean show){
 		optionButton.setEnabled(show);
 		if(show){
-			optionButton.setTextColor(getResources().getColor(R.color.accentColor));
+			optionButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 		}else{
-			optionButton.setTextColor(getResources().getColor(R.color.invite_button_deactivated));
+			optionButton.setTextColor(ContextCompat.getColor(context, R.color.invite_button_deactivated));
 		}
 	}
 

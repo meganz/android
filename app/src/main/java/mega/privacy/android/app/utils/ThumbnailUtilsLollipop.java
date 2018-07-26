@@ -96,7 +96,7 @@ public class ThumbnailUtilsLollipop {
 		final float roundPx = pixels*densityMultiplier;
 		paint.setAntiAlias(true);
 		canvas.drawARGB(0, 0, 0, 0);
-		paint.setColor(context.getResources().getColor(R.color.new_background_fragment));
+		paint.setColor(ContextCompat.getColor(context, R.color.new_background_fragment));
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
 		//draw rectangles over the corners we want to be square
