@@ -313,7 +313,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
                     toggleButton.setVisibility(View.VISIBLE);
-                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
                 }
                 else {
                     toggleButton.setVisibility(View.GONE);
@@ -747,7 +747,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 //					generatingKeysText.setVisibility(View.VISIBLE);
 //					megaApi.fastLogin(gSession, this);
 
@@ -776,7 +776,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
             loginLoggingIn.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 //					generatingKeysText.setVisibility(View.VISIBLE);
 //					megaApi.fastLogin(gSession, this);
 
@@ -849,7 +849,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 //				generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -872,7 +872,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         gSession = credentials.getSession();
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -959,7 +959,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -974,10 +974,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1001,7 +1001,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         {
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1016,10 +1016,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.VISIBLE);
         loginProgressBar.setVisibility(View.VISIBLE);
         loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1050,10 +1050,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             loginLogin.setVisibility(View.GONE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
             loginCreateAccount.setVisibility(View.GONE);
             loginLoggingIn.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
             generatingKeysText.setVisibility(View.VISIBLE);
             loginProgressBar.setVisibility(View.VISIBLE);
             loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1074,7 +1074,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if(!Util.isOnline(context)){
             loginLoggingIn.setVisibility(View.GONE);
             loginLogin.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             loginCreateAccount.setVisibility(View.VISIBLE);
             queryingSignupLinkText.setVisibility(View.GONE);
             confirmingAccountText.setVisibility(View.GONE);
@@ -1305,12 +1305,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             case R.id.toggle_button: {
                 if (passwdVisibility) {
-                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_shared_read));
+                    toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_shared_read));
                     passwdVisibility = false;
                     showHidePassword();
                 }
                 else {
-                    toggleButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_b_see));
+                    toggleButton.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_see));
                     passwdVisibility = true;
                     showHidePassword();
                 }
@@ -1326,7 +1326,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginLogin.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
     public void hideForgotPassLayout(){
@@ -1335,7 +1335,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
     }
 
     public void showParkAccountLayout(){
@@ -1344,7 +1344,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         loginLogin.setVisibility(View.GONE);
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
     public void hideParkAccountLayout(){
@@ -1353,7 +1353,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         forgotPassLayout.setVisibility(View.GONE);
         parkAccountLayout.setVisibility(View.GONE);
         loginLogin.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
     }
 
     /*
@@ -1366,10 +1366,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         loginLogin.setVisibility(View.GONE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         loginCreateAccount.setVisibility(View.GONE);
         loginLoggingIn.setVisibility(View.VISIBLE);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+        scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
         generatingKeysText.setVisibility(View.GONE);
         queryingSignupLinkText.setVisibility(View.VISIBLE);
         confirmingAccountText.setVisibility(View.GONE);
@@ -1619,7 +1619,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //                    queryingSignupLinkText.setVisibility(View.GONE);
 //                    confirmingAccountText.setVisibility(View.GONE);
 //                    loginLoggingIn.setVisibility(View.VISIBLE);
-//                    scrollView.setBackgroundColor(getResources().getColor(R.color.white));
+//                    scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
 ////				generatingKeysText.setVisibility(View.VISIBLE);
 //                    loginProgressBar.setVisibility(View.VISIBLE);
 //                    loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1666,46 +1666,53 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
 
-                String errorMessage;
-                if (error.getErrorCode() == MegaError.API_ENOENT) {
-                    errorMessage = getString(R.string.error_incorrect_email_or_password);
-                }
-                else if (error.getErrorCode() == MegaError.API_ESID){
-                    errorMessage = getString(R.string.error_server_expired_session);
-                }
-                else if (error.getErrorCode() == MegaError.API_ETOOMANY){
-                    errorMessage = getString(R.string.too_many_attempts_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
-                    errorMessage = getString(R.string.account_not_validated_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                    errorMessage = getString(R.string.error_account_suspended);
+                String errorMessage = "";
+                if (error.getErrorCode() == MegaError.API_ESID){
+                    log("MegaError.API_ESID "+getString(R.string.error_server_expired_session));
+                    ((LoginActivityLollipop)context).showAlertLoggedOut();
                 }
                 else{
-                    errorMessage = error.getErrorString();
-                }
-                log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
-
-                if (Util.isChatEnabled()) {
-                    if (megaChatApi != null) {
-                        megaChatApi.logout(this);
+                    if (error.getErrorCode() == MegaError.API_ENOENT) {
+                        errorMessage = getString(R.string.error_incorrect_email_or_password);
                     }
-                }
+                    else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+                        errorMessage = getString(R.string.too_many_attempts_login);
+                    }
+                    else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+                        errorMessage = getString(R.string.account_not_validated_login);
+                    }
+                    else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+                        errorMessage = getString(R.string.error_account_suspended);
+                    }
+                    else{
+                        errorMessage = error.getErrorString();
+                    }
+                    log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
 
-                if(chatSettings==null) {
-                    log("1 - Reset chat setting enable");
-                    chatSettings = new ChatSettings();
-                    dbH.setChatSettings(chatSettings);
-                }
-                else{
-                    log("2 - Reset chat setting enable");
-                    dbH.setEnabledChat(true + "");
+                    if (Util.isChatEnabled()) {
+                        if (megaChatApi != null) {
+                            megaChatApi.logout(this);
+                        }
+                    }
+
+                    if(!errorMessage.isEmpty()){
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
+
+                    if(chatSettings==null) {
+                        log("1 - Reset chat setting enable");
+                        chatSettings = new ChatSettings();
+                        dbH.setChatSettings(chatSettings);
+                    }
+                    else{
+                        log("2 - Reset chat setting enable");
+                        dbH.setEnabledChat(true + "");
+                    }
                 }
 
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 queryingSignupLinkText.setVisibility(View.GONE);
                 confirmingAccountText.setVisibility(View.GONE);
@@ -1714,16 +1721,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 fetchingNodesText.setVisibility(View.GONE);
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
-
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
-
-//				DatabaseHandler dbH = new DatabaseHandler(this);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                dbH.clearCredentials();
-                dbH.clearEphemeral();
-                if (dbH.getPreferences() != null){
-                    ((LoginActivityLollipop)context).stopCameraSyncService();
-                }
             }
             else{
 
@@ -1819,7 +1816,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 loginLoggingIn.setVisibility(View.GONE);
                 loginLogin.setVisibility(View.VISIBLE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 generatingKeysText.setVisibility(View.GONE);
                 loggingInText.setVisibility(View.GONE);
@@ -1858,7 +1855,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             log("MegaRequest.TYPE_QUERY_SIGNUP_LINK");
             String s = "";
             loginLogin.setVisibility(View.VISIBLE);
-            scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
             bForgotPass.setVisibility(View.INVISIBLE);
             loginCreateAccount.setVisibility(View.VISIBLE);
             loginLoggingIn.setVisibility(View.GONE);
@@ -1886,7 +1883,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
             else{
                 loginLogin.setVisibility(View.VISIBLE);
-                scrollView.setBackgroundColor(getResources().getColor(R.color.background_create_account));
+                scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.background_create_account));
                 loginCreateAccount.setVisibility(View.VISIBLE);
                 loginLoggingIn.setVisibility(View.GONE);
                 generatingKeysText.setVisibility(View.GONE);
@@ -2006,7 +2003,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         layout.addView(error_layout, params1);
 
         final ImageView error_icon = new ImageView(context);
-        error_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_input_warning));
+        error_icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_input_warning));
         error_layout.addView(error_icon);
         RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
 
@@ -2032,7 +2029,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
 //		input.setId(EDIT_TEXT_ID);
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2049,13 +2046,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if(error_layout.getVisibility() == View.VISIBLE){
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mail));
-        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2070,7 +2067,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (emailError != null) {
                         log("mail incorrect");
 //                        input.setError(emailError);
-                        input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(emailError);
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2154,7 +2151,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (emailError != null) {
                     log("mail incorrect");
 //                    input.setError(emailError);
-                    input.getBackground().mutate().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(emailError);
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -2248,7 +2245,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //		input.setId(EDIT_TEXT_ID);
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mk));
-        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2440,7 +2437,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.login_email_text:{
                 loginEmailErrorLayout.setVisibility(View.VISIBLE);
                 loginEmailErrorText.setText(error);
-                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 //                et_user.getBackground().mutate().setColorFilter(porterDuffColorFilter);
                 Drawable background = login_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
@@ -2454,8 +2451,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.login_password_text:{
                 loginPasswordErrorLayout.setVisibility(View.VISIBLE);
                 loginPasswordErrorText.setText(error);
-                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-//                et_password.getBackground().setColorFilter(getResources().getColor(R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+//                et_password.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                 Drawable background = password_background.mutate().getConstantState().newDrawable();
                 background.setColorFilter(porterDuffColorFilter);
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {

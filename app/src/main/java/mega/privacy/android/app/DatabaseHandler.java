@@ -676,6 +676,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
+
+	public String getMyEmail() {
+		String selectQuery = "SELECT "+KEY_EMAIL+" FROM " + TABLE_CREDENTIALS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		String email = null;
+		if (cursor!= null && cursor.moveToFirst()){
+			email = decrypt(cursor.getString(0));
+		}
+
+		cursor.close();
+		return email;
+	}
 	
 	public static String decrypt(String encodedString) {
 		if (encodedString == null) {

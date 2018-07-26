@@ -24,6 +24,7 @@ import java.util.Date;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -34,6 +35,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -44,6 +46,7 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     Toolbar tB;
     ActionBar aB;
     int visibleFragment;
+    int achievementType;
     private AchievementsFragment achievementsFragment;
     private ReferralBonusesFragment referralBonusesFragment;
     private InviteFriendsFragment inviteFriendsFragment;
@@ -56,6 +59,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     MegaChatApiAndroid megaChatApi;
 
     private android.support.v7.app.AlertDialog successDialog;
+
+    ArrayList<String> mails;
+    ArrayList<String> pendingContacts;
+    boolean pendingAttaches = false;
 
     protected void onCreate(Bundle savedInstanceState) {
         log("onCreate");
@@ -118,6 +125,25 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
 
         referralBonuses = new ArrayList<>();
         megaApi.getAccountAchievements(this);
+
+        if (savedInstanceState != null) {
+            visibleFragment = savedInstanceState.getInt("visibleFragment", Constants.ACHIEVEMENTS_FRAGMENT);
+            achievementType = savedInstanceState.getInt("achievementType", -1);
+            mails = savedInstanceState.getStringArrayList("mails");
+            pendingContacts = savedInstanceState.getStringArrayList("pendingContacts");
+            pendingAttaches = savedInstanceState.getBoolean("pendingAttaches", false);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("visibleFragment", visibleFragment);
+        outState.putInt("achievementType", achievementType);
+        outState.putStringArrayList("mails", mails);
+        outState.putStringArrayList("pendingContacts", pendingContacts);
+        outState.putBoolean("pendingAttaches", pendingAttaches);
     }
 
     @Override
@@ -140,9 +166,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
         return super.onOptionsItemSelected(item);
     }
 
-    public void showFragment(int fragment, int achievementType){
+    public void showFragment(int fragment, int type){
         log("showFragment: "+fragment+" type: "+achievementType);
         visibleFragment = fragment;
+        achievementType = type;
 
         if(visibleFragment==Constants.ACHIEVEMENTS_FRAGMENT){
 
@@ -241,6 +268,12 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                             achievementsFragment.updateValues();
                         }
                     }
+                    else {
+                        showFragment(visibleFragment, achievementType);
+                    }
+                    if (pendingAttaches){
+                        attachPendig();
+                    }
                 }
             }
             else{
@@ -259,6 +292,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 if(e.getErrorCode()==MegaError.API_EEXIST)
                 {
                     showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+                }
+                else if(request.getNumber()== MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
+                {
+                    showSnackbar(getString(R.string.error_own_email_as_contact));
                 }
                 else{
                     showSnackbar(getString(R.string.general_error));
@@ -347,5 +384,51 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        log("onActivityResult");
+        if (requestCode == Constants.REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK){
+            log("REQUEST_CODE_GET_CONTACTS");
+            ArrayList<String> contacts = data.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+            if (contacts != null){
+                if (inviteFriendsFragment != null && inviteFriendsFragment.isAdded()){
+                    for (int i=0; i<contacts.size(); i++){
+                        inviteFriendsFragment.addMail(contacts.get(i));
+                    }
+                }
+                else {
+                    megaApi.getAccountAchievements(this);
+                    pendingAttaches = true;
+                    pendingContacts = contacts;
+                    visibleFragment = Constants.INVITE_FRIENDS_FRAGMENT;
+                    achievementType = -1;
+                }
+            }
+        }
+        else{
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    void attachPendig () {
+        if (pendingContacts != null) {
+            if (inviteFriendsFragment != null && inviteFriendsFragment.isAdded()) {
+                for (int i = 0; i < pendingContacts.size(); i++) {
+                    inviteFriendsFragment.addMail(pendingContacts.get(i));
+                }
+                pendingAttaches = false;
+                pendingContacts.clear();
+            }
+        }
+    }
+
+    void setMails (ArrayList<String> mails){
+        this.mails = mails;
+    }
+
+    ArrayList<String> getMails(){
+        return mails;
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -210,21 +211,21 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				if (disabledNodes.contains(node.getHandle())){
 					log("Disabled!");
 					holder.imageView.setAlpha(.4f);
-					holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+					holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 					holder.permissionsIcon.setAlpha(.2f);
 					holder.itemView.setOnClickListener(null);
 				}
 				else{
 					log("Full access");
 					holder.imageView.setAlpha(1.0f);
-					holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+					holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 					holder.itemView.setOnClickListener(holder);
 					holder.permissionsIcon.setAlpha(.35f);
 				}
 			}
 			else{
 				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 				holder.itemView.setOnClickListener(holder);
 			}
 
@@ -304,12 +305,12 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			if(selectFile){
 
 				holder.imageView.setAlpha(1.0f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, android.R.color.black));
 				holder.itemView.setOnClickListener(holder);
 
 				if (multipleSelect) {
 					if(this.isItemChecked(position)){
-						holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+						holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 						holder.imageView.setImageResource(R.drawable.ic_select_folder);
 						log("Do not show thumb");
 						return;
@@ -326,7 +327,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			}
 			else{
 				holder.imageView.setAlpha(.4f);
-				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+				holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
 				holder.itemView.setOnClickListener(null);
 			}
 

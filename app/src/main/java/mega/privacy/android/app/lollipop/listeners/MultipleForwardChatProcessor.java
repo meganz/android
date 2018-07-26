@@ -62,6 +62,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
     public void forward(){
 
         if(chatHandles.length==1){
+            log("Forward to one chat");
             for(int i=0;i<idMessages.length;i++){
                 MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
                 if(messageToForward!=null){
@@ -157,10 +158,11 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
             }
         }
         else{
-
+            log("Forward to many chats");
             for(int k=0;k<chatHandles.length;k++){
                 for(int i=0;i<idMessages.length;i++){
                     MegaChatMessage messageToForward = megaChatApi.getMessage(idChat, idMessages[i]);
+                    log("Forward: "+ idMessages[i] + " chat id: "+chatHandles[k]);
                     if(messageToForward!=null){
                         int type = messageToForward.getType();
                         log("Type of message to forward: "+type);
@@ -178,7 +180,7 @@ public class MultipleForwardChatProcessor implements MegaChatRequestListenerInte
                             }
                             case MegaChatMessage.TYPE_CONTACT_ATTACHMENT:{
 
-                                MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[0]);
+                                MegaChatMessage contactMessage = megaChatApi.forwardContact(idChat, messageToForward.getMsgId(),chatHandles[k]);
                                 if(chatHandles[k]==idChat){
                                     if(contactMessage!=null){
                                         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(contactMessage);

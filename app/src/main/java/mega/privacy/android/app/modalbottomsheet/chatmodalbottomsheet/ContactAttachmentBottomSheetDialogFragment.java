@@ -471,7 +471,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             }
             else{
                 log("Default color to the avatar");
-                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
 
             int radius;
@@ -511,7 +511,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BottomSheetDialo
             Canvas c = new Canvas(defaultAvatar);
             Paint p = new Paint();
             p.setAntiAlias(true);
-            p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 
 
             int radius;

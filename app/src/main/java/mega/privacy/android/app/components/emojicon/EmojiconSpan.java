@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.text.style.DynamicDrawableSpan;
 
 import java.lang.ref.WeakReference;
@@ -56,7 +57,7 @@ class EmojiconSpan extends DynamicDrawableSpan {
     public Drawable getDrawable() {
         if (mDrawable == null) {
             try {
-                mDrawable = mContext.getResources().getDrawable(mResourceId);
+                mDrawable = ContextCompat.getDrawable(mContext, mResourceId);
                 mHeight = mSize;
                 mWidth = mHeight * mDrawable.getIntrinsicWidth() / mDrawable.getIntrinsicHeight();
                 mTop = (mTextSize - mHeight) / 2;

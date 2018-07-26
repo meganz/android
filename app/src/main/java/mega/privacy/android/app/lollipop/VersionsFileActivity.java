@@ -78,8 +78,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	TextView emptyText;
 
 	ArrayList<MegaNode> nodeVersions;
-	
-	long nodeHandle;
+
 	MegaNode node;
 	
 	VersionsFileAdapter adapter;
@@ -300,43 +299,55 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		emptyText = (TextView) findViewById(R.id.versions_file_empty_text);
 		emptyImage.setImageResource(R.drawable.ic_empty_contacts);
 		emptyText.setText(R.string.contacts_list_empty_text);
-	    
+
+		long nodeHandle = -1;
+
+		if (savedInstanceState != null){
+			nodeHandle = savedInstanceState.getLong("nodeHandle", -1);
+		}
+
 	    Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			nodeHandle = extras.getLong("handle");
+			if(nodeHandle==-1){
+				nodeHandle = extras.getLong("handle");
+			}
+
 			node=megaApi.getNodeByHandle(nodeHandle);
 
 			if(node!=null){
 				nodeVersions = megaApi.getVersions(node);
-			}
 
-			GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
-			getVersionsSizeTask.execute();
+				GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
+				getVersionsSizeTask.execute();
 
-			if (nodeVersions.size() != 0){
-				emptyImage.setVisibility(View.GONE);
-				emptyText.setVisibility(View.GONE);
-				listView.setVisibility(View.VISIBLE);
-			}			
-			else{
-				emptyImage.setVisibility(View.VISIBLE);
-				emptyText.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
-			}
-			
-			if (adapter == null){
-				
-				adapter = new VersionsFileAdapter(this, nodeVersions, listView);
+				if (nodeVersions.size() != 0){
+					emptyImage.setVisibility(View.GONE);
+					emptyText.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
+				}
+				else{
+					emptyImage.setVisibility(View.VISIBLE);
+					emptyText.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.GONE);
+				}
+
+				if (adapter == null){
+
+					adapter = new VersionsFileAdapter(this, nodeVersions, listView);
+					listView.setAdapter(adapter);
+				}
+				else{
+					adapter.setNodes(nodeVersions);
+					//adapter.setParentHandle(-1);
+				}
+
+				adapter.setMultipleSelect(false);
+
 				listView.setAdapter(adapter);
 			}
 			else{
-				adapter.setNodes(nodeVersions);
-				//adapter.setParentHandle(-1);
+				log("ERROR: node is NULL");
 			}
-						
-			adapter.setMultipleSelect(false);
-			
-			listView.setAdapter(adapter);
 
 			((MegaApplication) getApplication()).sendSignalPresenceActivity();
 		}
@@ -872,6 +883,13 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		builder.setMessage(message).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		log("onSaveInstanceState");
+		super.onSaveInstanceState(outState);
+		outState.putLong("nodeHandle", node.getHandle());
 	}
 }
 

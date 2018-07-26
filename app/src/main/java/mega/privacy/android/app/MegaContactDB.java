@@ -1,6 +1,9 @@
 package mega.privacy.android.app;
 
-public class MegaContactDB {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class MegaContactDB{
 	String handle;
 	String name;
 	String lastName;

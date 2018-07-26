@@ -602,6 +602,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             contactInitialLetter = (TextView) findViewById(R.id.call_chat_contact_image_initial_letter);
 
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
+
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_video_off));
 
             //Contact's avatar
@@ -915,6 +916,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
         else{
             log("Default color to the avatar");
+
             p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
         }
 
@@ -1167,7 +1169,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                    }
 //                    else{
 //                        log("Disable audio");
-//                        microFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+//                        microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
 //                    }
 //                }
 //                else if(request.getParamType()==MegaChatRequest.VIDEO){
@@ -1175,7 +1177,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                        log("Enable video");
 //                        myAvatarLayout.setVisibility(View.VISIBLE);
 //                        myImageBorder.setVisibility(GONE);
-//                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+//                        videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
 //                    }
 //                    else{
 //                        log("Disable video");
@@ -1482,6 +1484,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             relativeVideo.setVisibility(View.VISIBLE);
             linearArrowVideo.setVisibility(GONE);
             videoFAB.setVisibility(View.VISIBLE);
+
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this,R.color.accentColor)));
             videoFAB.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_videocam_white));
 
@@ -1682,8 +1685,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
-
-
     public void updateLocalVideoStatus(){
         log("updateLocalVideoStatus: ");
         int callStatus = callChat.getStatus();
@@ -1698,32 +1699,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             if (callChat.hasLocalVideo()) {
                 log("Video local connected");
-                    videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
-                    videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
+                videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
+                videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
 
-                    if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
-                        if(localCameraFragmentFS == null){
-                            localCameraFragmentFS = LocalCameraCallFullScreenFragment.newInstance(chatId);
-                            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-                            ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
-                            ftFS.commitNowAllowingStateLoss();
-                        }
-                        contactAvatarLayout.setVisibility(GONE);
-                        parentLocalFS.setVisibility(View.VISIBLE);
-                        fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
-
-                    }else{
-                        if(localCameraFragment == null){
-                            localCameraFragment = LocalCameraCallFragment.newInstance(chatId);
-                            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                            ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                            ft.commitNowAllowingStateLoss();
-                        }
-
-                        myAvatarLayout.setVisibility(GONE);
-                        parentLocal.setVisibility(View.VISIBLE);
-                        fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
+                if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
+                    if(localCameraFragmentFS == null){
+                        localCameraFragmentFS = LocalCameraCallFullScreenFragment.newInstance(chatId);
+                        FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+                        ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
+                        ftFS.commitNowAllowingStateLoss();
                     }
+                    contactAvatarLayout.setVisibility(GONE);
+                    parentLocalFS.setVisibility(View.VISIBLE);
+                    fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
+
+                }else{
+                    if(localCameraFragment == null){
+                        localCameraFragment = LocalCameraCallFragment.newInstance(chatId);
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+                        ft.commitNowAllowingStateLoss();
+                    }
+
+                    myAvatarLayout.setVisibility(GONE);
+                    parentLocal.setVisibility(View.VISIBLE);
+                    fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
+                }
 
             }else {
                 log("Video local NOT connected");
@@ -1755,11 +1756,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     parentLocal.setVisibility(View.GONE);
                     fragmentContainerLocalCamera.setVisibility(View.GONE);
                 }
-
             }
         }
-
-
     }
 
     public void updateLocalAudioStatus(){
