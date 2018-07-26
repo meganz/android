@@ -1750,7 +1750,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         typeContactEditText.clearFocus();
         hideKeyboard();
 
-        if (addedContactsShare.contains(contact)){
+        boolean found = false;
+        for (int i=0; i<addedContactsShare.size(); i++) {
+            found = false;
+            if (getShareContactMail(addedContactsShare.get(i)).equals(getShareContactMail(contact))) {
+                found = true;
+                break;
+            }
+        }
+        if (found){
             showSnackbar(getString(R.string.contact_not_added));
         }
         else {
@@ -1857,12 +1865,21 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         typeContactEditText.clearFocus();
         hideKeyboard();
 
-        if (addedContactsPhone.contains(contact)){
+        boolean found = false;
+        for (int i=0; i<addedContactsPhone.size(); i++) {
+            found = false;
+            if (addedContactsPhone.get(i).getEmail().equals(contact.getEmail())) {
+                found = true;
+                break;
+            }
+        }
+        if (found){
             showSnackbar(getString(R.string.contact_not_added));
         }
         else {
             addedContactsPhone.add(contact);
         }
+
         adapterContacts.setContacts(addedContactsPhone);
         if (adapterContacts.getItemCount()-1 >= 0) {
             mLayoutManager.scrollToPosition(adapterContacts.getItemCount() - 1);
