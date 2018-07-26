@@ -1087,6 +1087,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("onBindViewHolderUploading: " + position);
 
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
 
         ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
         ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
@@ -1254,6 +1256,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("onBindViewHolderMessage: " + position);
 
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams paramsDefault = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(paramsDefault);
 
         ((ViewHolderMessageChat) holder).currentPosition = position;
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
@@ -1295,6 +1299,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
         }
         else{
+            log("Not known message: disable click - position: "+position);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(null);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(null);
         }
@@ -1442,11 +1447,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case MegaChatMessage.TYPE_CHAT_TITLE:
             case MegaChatMessage.TYPE_TRUNCATE:
             case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:
-            case MegaChatMessage.TYPE_CALL_ENDED:
-            case MegaChatMessage.TYPE_INVALID: {
+            case MegaChatMessage.TYPE_CALL_ENDED:{
                 return true;
             }
             case MegaChatMessage.TYPE_UNKNOWN:
+            case MegaChatMessage.TYPE_INVALID:
             default: {
                 return false;
             }
@@ -6338,6 +6343,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void hideMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("hideMessage");
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.GONE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(0, 0);
+        params.height = 0;
+        ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
     }
 
     public void bindNoTypeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -6404,7 +6412,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
-
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 
