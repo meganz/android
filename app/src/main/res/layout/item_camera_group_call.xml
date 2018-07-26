@@ -4,22 +4,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_gravity="center_horizontal"
     android:layout_height="wrap_content">
 
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:background="@color/orange"
-        android:gravity="center">
-        <!--camera FS-->
-        <SurfaceView
-            android:id="@+id/surface_local_video"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:visibility="gone"
-            android:background="@android:color/transparent" />
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@android:color/transparent">
+
+            <!--camera FS-->
+            <SurfaceView
+                android:id="@+id/surface_local_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:layout_marginLeft="20dp"
+                android:layout_centerInParent="true"
+                android:background="@android:color/transparent" />
 
         <!--Big Avatar-->
         <RelativeLayout

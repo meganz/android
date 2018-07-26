@@ -30,7 +30,6 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
-        Log.d("*******","**** onChatVideoData()");
         if((width == 0) || (height == 0)){
             return;
         }

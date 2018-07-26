@@ -11,8 +11,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -36,9 +34,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -73,13 +68,11 @@ import java.util.TimerTask;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
@@ -155,10 +148,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     RelativeLayout bigElementsIndividualCallLayout;
     RelativeLayout bigElementsGroupCallLayout;
 
-    RecyclerView recyclerView;
-//    CustomizedGridRecyclerView recyclerView;
-
-//    LinearLayoutManager mLayoutManager;
+    CustomizedGridCallRecyclerView recyclerView;
     GroupCallAdapter adapter;
 
     int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
@@ -413,7 +403,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         display.getMetrics(outMetrics);
         widthScreenPX = outMetrics.widthPixels;
         heightScreenPX = outMetrics.heightPixels;
-
         density = getResources().getDisplayMetrics().density;
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
@@ -548,38 +537,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         bigElementsGroupCallLayout = (RelativeLayout) findViewById(R.id.big_elements_group_call);
         bigElementsGroupCallLayout.setVisibility(GONE);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view_cameras);
+        recyclerView = (CustomizedGridCallRecyclerView) findViewById(R.id.recycler_view_cameras);
         recyclerView.setPadding(0, 0, 0, 0);
         recyclerView.setClipToPadding(false);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setColumnWidth((int) widthScreenPX);
+        CustomizedGridLayoutManager gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-//        recyclerView = (CustomizedGridRecyclerView) findViewById(R.id.recycler_view_cameras);
-
-//        //******************************
-//        recyclerView.setPadding(0, 0, 0, 0);
-//        recyclerView.setClipToPadding(false);
-//        recyclerView.setHasFixedSize(true);
-//        ((CustomizedGridRecyclerView) recyclerView).setWrapContent();
-//        final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-//        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//            @Override
-//            public int getSpanSize(int position) {
-//                return 1;
-//            }
-//        });
-//
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        //***************************+
-
-//
-//        recyclerView.setPadding(0, 0, 0,0);
-//        recyclerView.setClipToPadding(false);
-////        LinearLayoutManager mLayoutManager = new LinearLayoutManager(context);
-//        recyclerView.setLayoutManager(new GridLayoutManager(this,1));
-//        recyclerView.setHasFixedSize(true);
 
         //Local camera small
         parentLocal = (ViewGroup) findViewById(R.id.parent_layout_local_camera);
@@ -744,13 +708,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.requestLayout();
 
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), true, false, null);
                         peersOnCall.add(myPeer);
 
                         if (adapter == null){
                             adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
-                        }
-                        else{
+                        }else{
                             adapter.setNodes(peersOnCall);
                             adapter.setAdapterType(GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
                         }
@@ -1303,7 +1266,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                         log(userHandle+": joined the group call - create fragment!");
                         updateSubTitle();
-                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  "Monica Garcia",false, false, null);
+                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  "Monica Garcia",true, false, null);
                         log("userHandle added: "+userHandle);
                         peersOnCall.add(0,userPeer);
                         adapter.setNodes(peersOnCall);
