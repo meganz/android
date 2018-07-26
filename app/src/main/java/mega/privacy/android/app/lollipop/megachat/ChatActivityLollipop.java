@@ -5658,7 +5658,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("There is already a chat, open it!");
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.setAction(Constants.ACTION_NEW_CHAT);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
             this.startActivity(intentOpenChat);
             finish();
@@ -5906,8 +5906,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     return;
                 }
-                else if(intent.getAction().equals(Constants.ACTION_NEW_CHAT)){
-                    log("Intent to open new chat");
+                else if((intent.getAction().equals(Constants.ACTION_NEW_CHAT)) || (intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES))){
+                    log("Intent to open new chat: "+intent.getAction());
                     finish();
                     long chatIdIntent = intent.getLongExtra("CHAT_ID", -1);
                     if(chatIdIntent!=-1){
