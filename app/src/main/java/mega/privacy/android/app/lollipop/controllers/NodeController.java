@@ -1333,7 +1333,14 @@ public class NodeController {
             return;
         }
 
-        MultipleRequestListener shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILE_SHARE, context);
+        MultipleRequestListener shareMultipleListener = null;
+
+        if(nodeHandles.length>1){
+            shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_FILE_SHARE, context);
+        }
+        else{
+            shareMultipleListener = new MultipleRequestListener(Constants.MULTIPLE_CONTACTS_SHARE, context);
+        }
 
         for (int i=0;i<contactsData.size();i++){
             MegaUser u = megaApi.getContact(contactsData.get(i));
@@ -1360,6 +1367,7 @@ public class NodeController {
             }
             else{
                 log("one folder to many contacts");
+
                 for(int j=0; j<nodeHandles.length;j++){
 
                     final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
