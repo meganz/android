@@ -35,6 +35,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -178,13 +179,105 @@ public final class ChatAdvancedNotificationBuilder {
 
         notificationBuilder.setShowWhen(true);
 
-        if(uriParameter!=null){
-            notificationBuilder.setSound(uriParameter);
-        }
+        long lastChatId = chats.get(0).getChatId();
+        MegaChatRoom chat = megaChatApi.getChatRoom(lastChatId);
 
-        if(vibration!=null){
-            if(vibration.equals("true")){
-                notificationBuilder.setVibrate(new long[] {0, 500});
+        log("buildNotificationPreN:title: "+chat.getTitle());
+
+        if(chat.isGroup()){
+            if(uriParameter!=null && vibration!=null && vibration.equals("true")){
+
+                MegaHandleList handleListUnread = request.getMegaHandleListByChat(lastChatId);
+
+                long lastMessageHandle = handleListUnread.get(0);
+
+                MegaChatMessage message = megaChatApi.getMessage(lastChatId, lastMessageHandle);
+                if(message!=null){
+                    log("Last message content: "+message.getContent());
+
+                    long tsLastMessage = message.getTimestamp();
+
+                    String tsLastBeepDb = dbH.getLastBeepItem(Long.toString(lastChatId));
+                    if(tsLastBeepDb==null){
+
+                        if(uriParameter!=null){
+                            notificationBuilder.setSound(uriParameter);
+                        }
+
+                        if(vibration!=null){
+                            if(vibration.equals("true")){
+                                notificationBuilder.setVibrate(new long[] {0, 500});
+                            }
+                        }
+                        dbH.setLastBeepItem(Long.toString(lastChatId), Long.toString(tsLastMessage));
+                    }
+                    else{
+                        if(tsLastBeepDb.isEmpty()){
+
+                            if(uriParameter!=null){
+                                notificationBuilder.setSound(uriParameter);
+                            }
+
+                            if(vibration!=null){
+                                if(vibration.equals("true")){
+                                    notificationBuilder.setVibrate(new long[] {0, 500});
+                                }
+                            }
+
+                            dbH.setLastBeepItem(Long.toString(lastChatId), Long.toString(tsLastMessage));
+                        }
+                        else{
+                            //Compare ts
+                            long timestampMinDifference = TimeChatUtils.calculateTimestampDifference(tsLastMessage, tsLastBeepDb);
+                            log("Last message beeped: "+ timestampMinDifference + " min ago");
+                            if(timestampMinDifference > Constants.SETTING_CHAT_GROUP_NOTIF){
+
+                                if(uriParameter!=null){
+                                    notificationBuilder.setSound(uriParameter);
+                                }
+
+                                if(vibration!=null){
+                                    if(vibration.equals("true")){
+                                        notificationBuilder.setVibrate(new long[] {0, 500});
+                                    }
+                                }
+
+                                dbH.setLastBeepItem(Long.toString(lastChatId), Long.toString(tsLastMessage));
+
+                            }
+                            else{
+                                log("This message should NOT BEEP");
+                            }
+                        }
+                    }
+                }
+                else{
+                    log("ERROR: message is NULL");
+
+                    if(uriParameter!=null){
+                        notificationBuilder.setSound(uriParameter);
+                    }
+
+                    if(vibration!=null){
+                        if(vibration.equals("true")){
+                            notificationBuilder.setVibrate(new long[] {0, 500});
+                        }
+                    }
+                }
+            }
+            else{
+                log("NOT BEEP Notification for chat: "+lastChatId);
+            }
+        }
+        else{
+            if(uriParameter!=null){
+                notificationBuilder.setSound(uriParameter);
+            }
+
+            if(vibration!=null){
+                if(vibration.equals("true")){
+                    notificationBuilder.setVibrate(new long[] {0, 500});
+                }
             }
         }
 
@@ -282,7 +375,7 @@ public final class ChatAdvancedNotificationBuilder {
                                 inboxStyle.addLine(cs);
                             }
                             else{
-                                log("ERROR:message is NULL");
+                                log("Message is NULL because unread count is: "+unreadCount);
                                 break;
                             }
                         }
@@ -1039,21 +1132,21 @@ public final class ChatAdvancedNotificationBuilder {
     }
 
     public void showChatNotificationPreN(MegaChatRequest request, boolean beep, long lastChatId){
-        log("showChatNotification");
 
         if(beep){
+            log("showChatNotification:BEEP");
             ChatSettings chatSettings = dbH.getChatSettings();
 
             if (chatSettings != null) {
 
                 if (chatSettings.getNotificationsEnabled()==null){
                     log("getNotificationsEnabled NULL --> Notifications ON");
-                    checkNotificationsSoundPreN(request, beep, lastChatId);
+                    checkNotificationsSoundPreN(request, lastChatId);
                 }
                 else{
                     if (chatSettings.getNotificationsEnabled().equals("true")) {
                         log("Notifications ON for all chats");
-                        checkNotificationsSoundPreN(request, beep, lastChatId);
+                        checkNotificationsSoundPreN(request, lastChatId);
                     } else {
                         log("Notifications OFF");
                     }
@@ -1067,18 +1160,23 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
         else{
+            log("showChatNotification:noBeep");
             buildNotificationPreN(null, "false", request);
         }
     }
 
-    public void checkNotificationsSoundPreN(MegaChatRequest request, boolean beep, long lastChatId) {
-        log("checkNotificationsSound: " + beep);
+    public void checkNotificationsSoundPreN(MegaChatRequest request, long lastChatId) {
+        log("checkNotificationsSound: ");
 
         ChatSettings chatSettings = dbH.getChatSettings();
         ChatItemPreferences chatItemPreferences = dbH.findChatPreferencesByHandle(String.valueOf(lastChatId));
 
         if (chatItemPreferences == null) {
             log("No preferences for this item");
+
+            //Create preferences to manage lastBeep
+            ChatItemPreferences newChatItemPreferences = new ChatItemPreferences(Long.toString(lastChatId), Boolean.toString(true), "", "", "", "");
+            dbH.setChatItemPreferences(newChatItemPreferences);
 
             if (chatSettings.getNotificationsSound() == null){
                 log("Notification sound is NULL");
@@ -1122,7 +1220,7 @@ public final class ChatAdvancedNotificationBuilder {
                     Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                     buildNotificationPreN(defaultSoundUri2, chatSettings.getVibrationEnabled(), request);
                 } else if (soundString.equals("-1")) {
-                    log("Silent notification");
+                    log("Silent setting");
                     buildNotificationPreN(null, chatSettings.getVibrationEnabled(), request);
                 } else {
                     Uri uri = Uri.parse(soundString);

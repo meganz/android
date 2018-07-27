@@ -26,7 +26,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 40;
+	private static final int DATABASE_VERSION = 41;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -109,6 +109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_ITEM_RINGTONE = "chatitemringtone";
 	private static final String KEY_CHAT_ITEM_SOUND_NOTIFICATIONS = "chatitemnotificationsound";
 	private static final String KEY_CHAT_ITEM_WRITTEN_TEXT = "chatitemwrittentext";
+	private static final String KEY_CHAT_ITEM_LAST_BEEP = "lastbeep";
 
 	private static final String KEY_NONCONTACT_HANDLE = "noncontacthandle";
 	private static final String KEY_NONCONTACT_FULLNAME = "noncontactfullname";
@@ -214,7 +215,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_ITEMS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_HANDLE + " TEXT, " + KEY_CHAT_ITEM_NOTIFICATIONS + " BOOLEAN, " +
-				KEY_CHAT_ITEM_RINGTONE+ " TEXT, "+KEY_CHAT_ITEM_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_ITEM_WRITTEN_TEXT+ " TEXT"+")";
+				KEY_CHAT_ITEM_RINGTONE+ " TEXT, "+KEY_CHAT_ITEM_SOUND_NOTIFICATIONS+ " TEXT, "+KEY_CHAT_ITEM_WRITTEN_TEXT+ " TEXT, "+KEY_CHAT_ITEM_LAST_BEEP+" TEXT"+")";
 		db.execSQL(CREATE_CHAT_ITEM_TABLE);
 
 		String CREATE_NONCONTACT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NON_CONTACTS + "("
@@ -560,6 +561,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 39){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SMALL_GRID_CAMERA + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + " = '" + encrypt("false") + "';");
+		}
+
+		if (oldVersion <= 40){
+			db.execSQL("ALTER TABLE " + TABLE_CHAT_ITEMS + " ADD COLUMN " + KEY_CHAT_ITEM_LAST_BEEP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_CHAT_ITEMS + " SET " + KEY_CHAT_ITEM_LAST_BEEP + " = '" + encrypt("") + "';");
 		}
 	}
 	
@@ -1292,6 +1298,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(chatPrefs.getRingtone()));
 		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsSound()));
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(chatPrefs.getWrittenText()));
+		values.put(KEY_CHAT_ITEM_LAST_BEEP, encrypt(chatPrefs.getWrittenText()));
 
 		db.insert(TABLE_CHAT_ITEMS, null, values);
 	}
@@ -1302,6 +1309,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(text));
 		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+	}
+
+	public int setLastBeepItem(String handle, String ts){
+		log("setWrittenTextItem: "+ts+" "+handle);
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHAT_ITEM_LAST_BEEP, encrypt(ts));
+		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+	}
+
+	public String getLastBeepItem(String handle) {
+		String selectQuery = "SELECT "+KEY_CHAT_ITEM_LAST_BEEP+" FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		String lastBeep = null;
+		if (cursor!= null && cursor.moveToFirst()){
+			lastBeep = decrypt(cursor.getString(0));
+		}
+
+		cursor.close();
+		return lastBeep;
 	}
 
 	public int setRingtoneChatItem(String ringtone, String handle){
@@ -1346,8 +1374,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String ringtone = decrypt(cursor.getString(3));
 				String notificationsSound = decrypt(cursor.getString(4));
 				String writtenText = decrypt(cursor.getString(5));
+				String lastBeep = decrypt(cursor.getString(6));
 
-				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound, writtenText);
+				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound, writtenText, lastBeep);
 				cursor.close();
 				return prefs;
 			}
