@@ -738,9 +738,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
-            holder.contentOwnMessageText.setTag(holder);
-            holder.contentOwnMessageText.setOnClickListener(this);
-            holder.contentOwnMessageText.setOnLongClickListener(this);
 
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
@@ -912,10 +909,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 paramsContactMessage.leftMargin = Util.scaleWidthPx(CONTACT_MESSAGE_PORT, outMetrics);
             }
             holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
-
-            holder.contentContactMessageText.setTag(holder);
-            holder.contentContactMessageText.setOnClickListener(this);
-            holder.contentContactMessageText.setOnLongClickListener(this);
 
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
@@ -1297,11 +1290,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setTag(holder);
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnClickListener(this);
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnLongClickListener(this);
+
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setTag(holder);
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnClickListener(this);
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnLongClickListener(this);
+
         }
         else{
             log("Not known message: disable click - position: "+position);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(null);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(null);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnClickListener(null);
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnLongClickListener(null);
+
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnClickListener(null);
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnLongClickListener(null);
         }
 
         switch (messageType) {
