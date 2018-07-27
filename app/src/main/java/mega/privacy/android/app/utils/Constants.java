@@ -202,6 +202,8 @@ public class Constants {
 	final public static int PRICING_MIN_DIFFERENCE = 720;
 	final public static int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
 
+	final public static int SETTING_CHAT_GROUP_NOTIF = 5;
+
 	final public static int CONTACT_TYPE_MEGA = 0;
 	final public static int CONTACT_TYPE_DEVICE = 1;
 	final public static int CONTACT_TYPE_BOTH = 2;
