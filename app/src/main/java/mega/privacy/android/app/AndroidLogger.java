@@ -1,3 +1,7 @@
+/*
+ * Created by Yuan Gao on 27/07/18.
+ * Copyright (c) 2018 mega.co.nz
+ */
 package mega.privacy.android.app;
 
 
@@ -10,12 +14,11 @@ import nz.mega.sdk.MegaLoggerInterface;
 public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
-    protected static ConcurrentLinkedDeque<String> fileLogQueue;
+    private static ConcurrentLinkedDeque<String> fileLogQueue;
 
     public AndroidLogger(String fileName, boolean fileLogger) {
         super(fileName, fileLogger);
         fileLogQueue = new ConcurrentLinkedDeque<>();
-        logToFile();
     }
 
     @Override
@@ -31,7 +34,8 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
         }
     }
 
-    protected String createSourceMessage(String source) {
+    //create SDK specific log prefix
+    private String createSourceMessage(String source) {
         String sourceMessage = "";
         if (source != null) {
             String[] s = source.split("jni/mega");
@@ -47,6 +51,7 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
         return sourceMessage;
     }
 
+    //save logs to file in new thread
     @Override
     protected void logToFile(){
         Thread thread = new Thread(new Runnable() {
@@ -58,7 +63,7 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
                         writeToFile(log);
                     } else {
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
