@@ -1,3 +1,7 @@
+/*
+ * Created by Yuan Gao on 27/07/18.
+ * Copyright (c) 2018 mega.co.nz
+ */
 package mega.privacy.android.app;
 
 import android.os.Environment;
@@ -14,10 +18,15 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import mega.privacy.android.app.utils.Util;
 
+/**
+ * Used to display console log from app, SDK and chatSDK,
+ * and also save logs to corresponding log file
+ */
+
 public abstract class MegaLogger {
-    protected static ConcurrentLinkedDeque<String> logQueue = new ConcurrentLinkedDeque<>();
+    static ConcurrentLinkedDeque<String> logQueue = new ConcurrentLinkedDeque<>();
     protected static String separator = "&&";
-    protected SimpleDateFormat simpleDateFormat;
+    private SimpleDateFormat simpleDateFormat;
     protected File logFile;
     protected String dir, fileName;
 
@@ -27,6 +36,7 @@ public abstract class MegaLogger {
         dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
         this.fileName = fileName;
         startAsyncLogger();
+        logToFile();
     }
 
     protected String createMessage(String message) {

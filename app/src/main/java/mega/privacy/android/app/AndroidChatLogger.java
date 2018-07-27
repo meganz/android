@@ -1,3 +1,7 @@
+/*
+ * Created by Yuan Gao on 27/07/18.
+ * Copyright (c) 2018 mega.co.nz
+ */
 package mega.privacy.android.app;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -8,12 +12,11 @@ import nz.mega.sdk.MegaChatLoggerInterface;
 
 public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInterface{
     public static final String LOG_FILE_NAME = "logKarere.txt";
-    protected static ConcurrentLinkedDeque<String> chatFileLogQueue;
+    private static ConcurrentLinkedDeque<String> chatFileLogQueue;
 
     public AndroidChatLogger(String fileName, boolean fileLogger) {
         super(fileName, fileLogger);
         chatFileLogQueue = new ConcurrentLinkedDeque<>();
-        logToFile();
     }
 
     @Override
@@ -29,6 +32,7 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
         }
     }
 
+    //save logs to file in new thread
     @Override
     protected void logToFile(){
         Thread thread = new Thread(new Runnable() {
@@ -40,7 +44,7 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
                         writeToFile(log);
                     } else {
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
