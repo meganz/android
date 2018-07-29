@@ -24,8 +24,6 @@ import mega.privacy.android.app.utils.Util;
  */
 
 public abstract class MegaLogger {
-    static ConcurrentLinkedDeque<String> logQueue = new ConcurrentLinkedDeque<>();
-    protected static String separator = "&&";
     private SimpleDateFormat simpleDateFormat;
     protected File logFile;
     protected String dir, fileName;
@@ -35,7 +33,6 @@ public abstract class MegaLogger {
         logFile = null;
         dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
         this.fileName = fileName;
-        startAsyncLogger();
         logToFile();
     }
 
@@ -43,28 +40,6 @@ public abstract class MegaLogger {
         String currentDateAndTime = simpleDateFormat.format(new Date());
         message = "(" + currentDateAndTime + ") - " + message;
         return message;
-    }
-
-    protected static void startAsyncLogger() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    String log = logQueue.pollFirst();
-                    if (log != null) {
-                        String[] combined = log.split(separator);
-                        Log.d(combined[0], combined[1]);
-                    } else {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        });
-        thread.start();
     }
 
     protected boolean isReadyToWriteToFile(boolean enabled){
