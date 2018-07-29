@@ -27,12 +27,14 @@ public abstract class MegaLogger {
     private SimpleDateFormat simpleDateFormat;
     protected File logFile;
     protected String dir, fileName;
+    protected ConcurrentLinkedDeque<String> fileLogQueue;
 
     public MegaLogger(String fileName, boolean fileLogger) {
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         logFile = null;
         dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
         this.fileName = fileName;
+        fileLogQueue = new ConcurrentLinkedDeque<>();
         logToFile();
     }
 

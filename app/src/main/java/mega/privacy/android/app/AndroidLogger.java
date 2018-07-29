@@ -7,8 +7,6 @@ package mega.privacy.android.app;
 
 import android.util.Log;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
-
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaLoggerInterface;
 
@@ -17,11 +15,9 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
     private final String TAG =  "AndroidLogger";
-    private static ConcurrentLinkedDeque<String> fileLogQueue;
 
     public AndroidLogger(String fileName, boolean fileLogger) {
         super(fileName, fileLogger);
-        fileLogQueue = new ConcurrentLinkedDeque<>();
     }
 
     @Override
