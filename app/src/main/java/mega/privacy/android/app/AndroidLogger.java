@@ -5,6 +5,8 @@
 package mega.privacy.android.app;
 
 
+import android.util.Log;
+
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import mega.privacy.android.app.utils.Util;
@@ -14,6 +16,7 @@ import nz.mega.sdk.MegaLoggerInterface;
 public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
 
     public static final String LOG_FILE_NAME = "logSDK.txt";
+    private final String TAG =  "AndroidLogger";
     private static ConcurrentLinkedDeque<String> fileLogQueue;
 
     public AndroidLogger(String fileName, boolean fileLogger) {
@@ -25,7 +28,7 @@ public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
     public void log(String time, int logLevel, String source, String message) {
         //display to console
         if (Util.DEBUG) {
-            logQueue.add("AndroidLogger" + separator + createSourceMessage(message) + ": " + createMessage(message));
+			Log.d(TAG,createSourceMessage(message) + ": " + createMessage(message));
         }
 
         //save to log file

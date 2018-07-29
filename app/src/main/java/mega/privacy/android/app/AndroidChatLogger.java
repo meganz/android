@@ -4,6 +4,8 @@
  */
 package mega.privacy.android.app;
 
+import android.util.Log;
+
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import mega.privacy.android.app.utils.Util;
@@ -12,6 +14,7 @@ import nz.mega.sdk.MegaChatLoggerInterface;
 
 public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInterface{
     public static final String LOG_FILE_NAME = "logKarere.txt";
+    private final String TAG = "AndroidChatLogger";
     private static ConcurrentLinkedDeque<String> chatFileLogQueue;
 
     public AndroidChatLogger(String fileName, boolean fileLogger) {
@@ -23,7 +26,7 @@ public class AndroidChatLogger extends MegaLogger implements MegaChatLoggerInter
     public void log(int logLevel, String message) {
         //display to console
         if (Util.DEBUG) {
-            logQueue.add("AndroidChatLogger" + separator + createMessage(message));
+            Log.d(TAG,  createMessage(message));
         }
 
         //save to log file
