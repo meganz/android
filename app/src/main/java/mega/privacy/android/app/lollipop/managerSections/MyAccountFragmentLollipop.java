@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -43,9 +44,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener{
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -472,13 +474,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				log("Logout button");
-
-				((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
-				megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
-//				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
-
-//				AccountController aC = new AccountController(this);
-//				aC.logout(this, megaApi);
+				Util.checkPendingTransfer(megaApi, getContext(), this);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -745,5 +741,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				setDefaultAvatar();
 			}
 		}
+	}
+
+	@Override
+	public void onAbortConfirm() {
+		log("onAbortConfirm");
+		megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+		megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+		((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
+		megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
+	}
+
+	@Override
+	public void onAbortCancel() {
+		log("onAbortCancel");
 	}
 }
