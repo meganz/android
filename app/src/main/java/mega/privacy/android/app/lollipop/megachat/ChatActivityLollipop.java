@@ -996,6 +996,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
 
                     boolean result = megaChatApi.openChatRoom(idChat, this);
+                    if(result){
+                        MegaApplication.setClosedChat(false);
+                    }
 
                     if(!result){
                         log("----Error on openChatRoom");
@@ -1016,9 +1019,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
                     else{
-                        MegaApplication.setClosedChat(false);
-                        dbH.setLastBeepItem(Long.toString(idChat), "");
-
                         int chatConnection = megaChatApi.getChatConnectionState(idChat);
                         log("Chat connection (" + idChat+ ") is: "+chatConnection);
 
