@@ -92,7 +92,7 @@ public final class ChatAdvancedNotificationBuilder {
                 unreadMessages.add(message);
             }
             else{
-                log("ERROR:message is NULL");
+                log("sendBundledNotification: Message cannot be recovered");
             }
         }
 
@@ -282,7 +282,7 @@ public final class ChatAdvancedNotificationBuilder {
                                 inboxStyle.addLine(cs);
                             }
                             else{
-                                log("ERROR:message is NULL");
+                                log("Message cannot be recovered because unreadCount: "+unreadCount);
                                 break;
                             }
                         }
