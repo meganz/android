@@ -230,20 +230,6 @@ public class TimeChatUtils implements Comparator<Calendar> {
         }
     }
 
-    public static long calculateTimestampDifference(long msgTimestamp, String dBTimestampString) {
-        log("calculateTimestampDifference");
-
-//        Long msgTimestamp = Long.parseLong(msgTimestampString);
-
-        Long dBTimestamp = Long.parseLong(dBTimestampString);
-
-        Long difference = msgTimestamp - dBTimestamp;
-
-        difference = difference/60;
-
-        return difference;
-    }
-
     private static void log(String message) {
         Util.log("TimeChatUtils", message);
     }
