@@ -2020,4 +2020,6 @@
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">There’s no need to add your own email address</string>
 
+    <string name="warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be aborted, do you want to continue?</string>
+
 </resources>

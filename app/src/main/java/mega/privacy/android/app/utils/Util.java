@@ -86,6 +86,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1865,6 +1866,29 @@ public class Util {
 		bitmap.recycle();
 
 		return output;
+	}
+
+	//Notice user that any transfer prior to login will be destroyed
+	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
+		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+			builder.setMessage(R.string.warning_abort_transfers);
+			builder.setPositiveButton(R.string.general_yes, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					callback.onAbortConfirm();
+				}
+			});
+			builder.setNegativeButton(R.string.general_no, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					callback.onAbortCancel();
+				}
+			});
+			builder.show();
+		}else{
+			callback.onAbortConfirm();
+		}
 	}
 
 	private static void log(String message) {
