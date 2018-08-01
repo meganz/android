@@ -138,7 +138,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         widthScreenPX = outMetrics.widthPixels;
-        heightScreenPX = outMetrics.heightPixels;
+        heightScreenPX = outMetrics.heightPixels -80;
 
         density = ((Activity) context).getResources().getDisplayMetrics().density;
 
@@ -248,12 +248,56 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
             holder.avatarLayout.setVisibility(View.VISIBLE);
             holderGrid.localFullScreenSurfaceView.setVisibility(View.GONE);
 
+
+
             if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 log("me");
+//                holderGrid.rLayout.setBackgroundColor(Color.BLUE);
+                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
+
+                if(numPeersOnCall == 1){
+                    log("1 (me) -> center in parent");
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                    layoutParams.setMargins(0, 0, 0, 0);
+                }else if(numPeersOnCall == 2) {
+                    log("2 (me)-> align parent top");
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    layoutParams.setMargins(0, 80, 0, 0);
+                }else{
+                    log("3 (me)-> center in parent");
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+                    layoutParams.setMargins(0, 0, 0, 0);
+                }
+                holderGrid.avatarLayout.setLayoutParams(layoutParams);
 
                 setProfileMyAvatar(holder);
             }else{
                 log("contact----------> handle("+peer.getHandle()+"), name("+peer.getName()+")");
+//                holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
+                if(numPeersOnCall == 1){
+                    log("1 (contact)-> center in parent");
+
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                    layoutParams.setMargins(0,0,0,0);
+                }else if(numPeersOnCall == 2){
+                    log("2 (contact)-> align parent bottom");
+
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT,0);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    layoutParams.setMargins(0,0,0,80);
+                }else{
+                    log("3 (contact)-> center in parent");
+
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+                    layoutParams.setMargins(0,0,0,0);
+                }
+                holderGrid.avatarLayout.setLayoutParams(layoutParams);
 
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }

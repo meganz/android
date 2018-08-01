@@ -11,7 +11,6 @@
         android:id="@+id/rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:background="@android:color/transparent">
 
             <!--camera FS-->
@@ -20,15 +19,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:layout_centerInParent="true"
                 android:background="@android:color/transparent" />
 
         <!--Big Avatar-->
         <RelativeLayout
             android:id="@+id/avatar_rl"
-            android:layout_centerInParent="true"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:gravity="center_horizontal|center_vertical"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             android:background="@android:color/transparent">
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/avatar_image"
