@@ -92,6 +92,7 @@
                 android:layout_centerInParent="true"
                 android:choiceMode="multipleChoice"
                 android:columnWidth ="172dp"
+
                 android:paddingRight="4dp"
                 android:paddingLeft="4dp"/>
 

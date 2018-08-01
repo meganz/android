@@ -591,7 +591,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             emptyImageView = (ImageView)v.findViewById(R.id.file_list_empty_image);
             emptyTextView = (LinearLayout)v.findViewById(R.id.file_list_empty_text);
             emptyTextViewFirst = (TextView)v.findViewById(R.id.file_list_empty_text_first);
-            
+
 //            contentTextLayout = (RelativeLayout)v.findViewById(R.id.content_text_layout);
 //            contentText = (TextView)v.findViewById(R.id.content_text);
             
@@ -665,7 +665,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             emptyImageView = (ImageView)v.findViewById(R.id.file_grid_empty_image);
             emptyTextView = (LinearLayout)v.findViewById(R.id.file_grid_empty_text);
             emptyTextViewFirst = (TextView)v.findViewById(R.id.file_grid_empty_text_first);
-            
+
 //            contentTextLayout = (RelativeLayout)v.findViewById(R.id.content_grid_text_layout);
 //            contentTextLayout.setVisibility(View.GONE);
 //            contentText = (TextView)v.findViewById(R.id.content_grid_text);
@@ -690,7 +690,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             
             recyclerView.setAdapter(adapter);
             fastScroller.setRecyclerView(recyclerView);
-            addSectionTitle(nodes);
+            addSectionTitle(nodes,MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
             setNodes(nodes);
             
             if (adapter.getItemCount() == 0) {
@@ -1178,14 +1178,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         ((ManagerActivityLollipop)context).parentHandleBrowser = n.getHandle();
         
         ((ManagerActivityLollipop)context).setToolbarTitle();
-        
-        MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
+
+//        MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
 
 //        contentText.setText(MegaApiUtils.getInfoFolder(infoNode,context));
         
         adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
         nodes = megaApi.getChildren(n,((ManagerActivityLollipop)context).orderCloud);
-        addSectionTitle(nodes);
+        addSectionTitle(nodes,adapter.getAdapterType());
         adapter.setNodes(nodes);
         recyclerView.scrollToPosition(0);
         
@@ -1362,7 +1362,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 ((ManagerActivityLollipop)context).setToolbarTitle();
                 
                 nodes = megaApi.getChildren(parentNode,((ManagerActivityLollipop)context).orderCloud);
-                addSectionTitle(nodes);
+                addSectionTitle(nodes,adapter.getAdapterType());
                 adapter.setNodes(nodes);
                 
                 visibilityFastScroller();
@@ -1400,7 +1400,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         return recyclerView;
     }
     
-    public void addSectionTitle(List<MegaNode> nodes) {
+    public void addSectionTitle(List<MegaNode> nodes,int type) {
         Map<Integer, String> sections = new HashMap<>();
         int folderCount = 0;
         int fileCount = 0;
@@ -1412,12 +1412,26 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 fileCount++;
             }
         }
-        sections.put(0,folderCount + " " + context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount));
-        sections.put(folderCount,fileCount + " " + context.getResources().getQuantityString(R.plurals.general_num_files,fileCount));
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID) {
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(1,folderCount + " " + folderStr);
+            sections.put(folderCount + 1,fileCount + " " + fileStr);
+            if (folderCount % 2 == 0) {
+                sections.put(folderCount,fileCount + " " + fileStr);
+            } else {
+                sections.put(folderCount+2,fileCount + " " + fileStr);
+            }
+        } else {
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
         if (floatingItemDecoration == null) {
             floatingItemDecoration = new FloatingItemDecoration(context);
             recyclerView.addItemDecoration(floatingItemDecoration);
         }
+        floatingItemDecoration.setType(type);
         floatingItemDecoration.setKeys(sections);
     }
     
@@ -1428,7 +1442,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         this.nodes = nodes;
         if (((ManagerActivityLollipop)context).isList) {
             if (adapter != null) {
-                addSectionTitle(nodes);
+                addSectionTitle(nodes,MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
                 adapter.setNodes(nodes);
                 
                 if (adapter.getItemCount() == 0) {
@@ -1493,7 +1507,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         } else {
             if (adapter != null) {
-                addSectionTitle(nodes);
+                addSectionTitle(nodes,MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
                 adapter.setNodes(nodes);
                 
                 if (adapter.getItemCount() == 0) {

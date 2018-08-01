@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -24,11 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 
 public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
     
     private final static int TEXT_SIZE = 14;
-    private final static int LEFT_OFFSET = 73;
+    private static int LEFT_OFFSET = 73;
     private final static int TITLE_HEIGHT = 40;
     
     private Map<Integer, String> keys = new HashMap<>();
@@ -47,10 +50,14 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
     
     private Context mContext;
     
-    private boolean showFloatingHeaderOnScrolling = true;
+    private int type;
     
     public FloatingItemDecoration(Context context) {
         init(context);
+    }
+    
+    public void setType(int type) {
+        this.type = type;
     }
     
     private void init(Context mContext) {
@@ -79,9 +86,7 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c,RecyclerView parent,RecyclerView.State state) {
         super.onDrawOver(c,parent,state);
-        if (!showFloatingHeaderOnScrolling) {
-            return;
-        }
+     
         int firstVisiblePos = ((LinearLayoutManager)parent.getLayoutManager()).findFirstVisibleItemPosition();
         if (firstVisiblePos == RecyclerView.NO_POSITION) {
             return;
@@ -90,26 +95,19 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
         if (TextUtils.isEmpty(title)) {
             return;
         }
-        boolean flag = false;
-        if (getTitle(firstVisiblePos + 1) != null && !title.equals(getTitle(firstVisiblePos + 1))) {
-            View child = parent.findViewHolderForAdapterPosition(firstVisiblePos).itemView;
-            if (child.getTop() + child.getMeasuredHeight() < mTitleHeight) {
-                c.save();
-                flag = true;
-                c.translate(0,child.getTop() + child.getMeasuredHeight() - mTitleHeight);
-            }
-        }
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
         int top = parent.getPaddingTop();
         int bottom = top + mTitleHeight;
         c.drawRect(left,top,right,bottom,mBackgroundPaint);
+        if (type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+            LEFT_OFFSET = 73;
+        } else {
+            LEFT_OFFSET = 17;
+        }
         float x = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
         float y = bottom - (mTitleHeight - mTextHeight) / 2 - mTextBaselineOffset;
         c.drawText(title,x,y,mTextPaint);
-        if (flag) {
-            c.restore();
-        }
     }
     
     @Override
@@ -119,7 +117,7 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
         if (keys.containsKey(pos)) {
             outRect.set(0,mTitleHeight,0,0);
         } else {
-            outRect.set(0,1,0,0);
+            outRect.set(0,mDivider.getIntrinsicHeight(),0,0);
         }
     }
     
@@ -141,6 +139,11 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
         for (int i = 0;i < parent.getChildCount();i++) {
             View child = parent.getChildAt(i);
             final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)child.getLayoutParams();
+            if(type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+                LEFT_OFFSET = 73;
+            }else{
+                LEFT_OFFSET = 17;
+            }
             if (keys.containsKey(params.getViewLayoutPosition())) {
                 top = child.getTop() - params.topMargin - mTitleHeight;
                 bottom = top + mTitleHeight;
@@ -149,11 +152,13 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
                 float y = bottom - (mTitleHeight - mTextHeight) / 2 - mTextBaselineOffset;//
                 c.drawText(keys.get(params.getViewLayoutPosition()),x,y,mTextPaint);
             } else {
-                top = child.getTop() - params.topMargin - 1;
-                bottom = top + 1;
-                float leftOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
-                mDivider.setBounds((int)(left + leftOffset),top,right,bottom);
-                mDivider.draw(c);
+                if (type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+                    top = child.getTop() - params.topMargin - mDivider.getIntrinsicHeight();
+                    bottom = top + mDivider.getIntrinsicHeight();
+                    float leftOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
+                    mDivider.setBounds((int)(left + leftOffset),top,right,bottom);
+                    mDivider.draw(c);
+                }
             }
         }
     }
