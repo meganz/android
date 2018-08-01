@@ -649,7 +649,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
-                    log("Incoming call");
+                    log("*****Incoming call");
 
                     ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
 
@@ -672,8 +672,33 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
                         relativeVideo.requestLayout();
 
+                        long numParticipants = chat.getPeerCount()-1;
+                        long contactHandle = chat.getPeerHandle(numParticipants);
+                        String contactName = chat.getPeerFullnameByHandle(contactHandle);
+
+                        InfoPeerGroupCall contactPeer = new InfoPeerGroupCall(contactHandle,  contactName, false, false, null);
+                        peersOnCall.add(contactPeer);
+
+                        if (adapter == null){
+                            adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
+                        }else{
+                            adapter.setNodes(peersOnCall);
+                            adapter.setAdapterType(GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
+                        }
+                        adapter.notifyDataSetChanged();
+
+
+                        recyclerView.setAdapter(adapter);
+                        adapter.setNodes(peersOnCall);
+                        if (adapter.getItemCount() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                        }else{
+                            recyclerView.setVisibility(View.VISIBLE);
+                        }
+
 
                     }else{
+                        log("*** individual call");
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
                         relativeVideo.requestLayout();
@@ -709,7 +734,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.requestLayout();
 
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), true, false, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
                         peersOnCall.add(myPeer);
 
                         if (adapter == null){
@@ -1259,7 +1284,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_SESSION_STATUS)){
-                log("Session status have changed");
+                log("************Session status have changed");
 
                 if(chat.isGroup()){
                     long userHandle = call.getPeerSessionStatusChange();
@@ -1268,8 +1293,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                         log(userHandle+": joined the group call - create fragment!");
                         updateSubTitle();
-                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  "Monica Garcia",true, false, null);
-                        log("userHandle added: "+userHandle);
+                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle),false, false, null);
+                        log("**********userHandle added: "+userHandle);
                         peersOnCall.add(0,userPeer);
                         adapter.setNodes(peersOnCall);
                         adapter.notifyDataSetChanged();
