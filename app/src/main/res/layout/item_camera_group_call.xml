@@ -4,14 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_gravity="center_horizontal"
+    android:gravity="center_horizontal"
     android:layout_height="wrap_content">
 
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/holo_blue_light">
 
             <!--camera FS-->
             <SurfaceView
@@ -20,32 +22,36 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
                 android:background="@android:color/transparent" />
 
         <!--Big Avatar-->
         <RelativeLayout
             android:id="@+id/avatar_rl"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
             android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:textAlignment="center"
             android:background="@android:color/transparent">
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/avatar_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitCenter"
-                android:layout_centerInParent="true"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 rounded:border_color="#4DFFFFFF"
                 rounded:border_width="3dp"
                 rounded:corner_radius="60dp" />
             <TextView
                 android:id="@+id/avatar_initial_letter"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:textSize="80sp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/white"
                 android:gravity="center_horizontal|center_vertical"
-                android:paddingBottom="3dp"
                 android:visibility="gone"/>
         </RelativeLayout>
     </RelativeLayout>

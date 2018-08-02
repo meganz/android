@@ -238,8 +238,9 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
 
             if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 log("me");
-//                holderGrid.rLayout.setBackgroundColor(Color.BLUE);
-                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
+                holderGrid.rLayout.setBackgroundColor(Color.BLUE);
+
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
 
                 if(numPeersOnCall == 1){
@@ -263,7 +264,7 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
                 setProfileMyAvatar(holder);
             }else{
                 log("contact----------> handle("+peer.getHandle()+"), name("+peer.getName()+")");
-//                holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
+                holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
 
