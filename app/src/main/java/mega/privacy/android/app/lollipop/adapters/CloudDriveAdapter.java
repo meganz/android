@@ -62,7 +62,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider {
+public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnClickListener, View.OnLongClickListener{
     
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -95,22 +95,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 //	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     
-    /* public static view holder class */
-    public static class ViewHolderBrowser extends ViewHolder {
-        
-        public ViewHolderBrowser(View v) {
-            super(v);
-        }
-        
-        public ImageView savedOffline;
-        public ImageView publicLinkImage;
-        public TextView textViewFileName;
-        public TextView textViewFileSize;
-        public long document;
-        public RelativeLayout itemLayout;
-    }
-    
-    public static class ViewHolderBrowserList extends ViewHolderBrowser {
+    public static class ViewHolderBrowserList extends MegaBrowserLollipopAdapter.ViewHolderBrowserList {
         
         public ViewHolderBrowserList(View v) {
             super(v);
@@ -121,7 +106,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         public RelativeLayout threeDotsLayout;
     }
     
-    public static class ViewHolderBrowserGrid extends ViewHolderBrowser {
+    public static class ViewHolderBrowserGrid extends MegaBrowserLollipopAdapter.ViewHolderBrowserGrid {
         
         public ViewHolderBrowserGrid(View v) {
             super(v);
@@ -158,7 +143,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         
         if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
             log("adapter type is LIST");
-            MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
+            CloudDriveAdapter.ViewHolderBrowserList view = (CloudDriveAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
                 log("Start animation: " + pos + " multiselection state: " + isMultipleSelect());
                 Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
@@ -244,7 +229,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         
         if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
             log("adapter type is LIST");
-            MegaBrowserLollipopAdapter.ViewHolderBrowserList view = (MegaBrowserLollipopAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
+            CloudDriveAdapter.ViewHolderBrowserList view = (CloudDriveAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
             if (view != null) {
                 log("Start animation: " + pos);
                 Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
@@ -429,7 +414,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         return placeholderInserted;
     }
     
-    public MegaBrowserLollipopAdapter(Context _context,Object fragment,ArrayList<MegaNode> _nodes,long _parentHandle,RecyclerView recyclerView,ActionBar aB,int type,int adapterType) {
+    public CloudDriveAdapter(Context _context,Object fragment,ArrayList<MegaNode> _nodes,long _parentHandle,RecyclerView recyclerView,ActionBar aB,int type,int adapterType) {
+        super(_context,fragment,_nodes,_parentHandle,recyclerView,aB,type,adapterType);
         this.context = _context;
         this.nodes = _nodes;
         this.parentHandle = _parentHandle;
@@ -508,8 +494,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         return adapterType;
     }
     
-    @Override
-    public ViewHolderBrowser onCreateViewHolder(ViewGroup parent,int viewType) {
+    public MegaBrowserLollipopAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent,int viewType) {
         log("onCreateViewHolder");
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -547,13 +532,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
             holderList.threeDotsLayout.setOnClickListener(this);
             
             v.setTag(holderList);
-            
             return holderList;
         } else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID) {
             log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
             
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
-            ViewHolderBrowserGrid holderGrid = new ViewHolderBrowserGrid(v);
+            CloudDriveAdapter.ViewHolderBrowserGrid holderGrid = new CloudDriveAdapter.ViewHolderBrowserGrid(v);
             
             holderGrid.folderLayout = v.findViewById(R.id.item_file_grid_folder);
             holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);
@@ -605,15 +589,14 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         }
     }
     
-    @Override
-    public void onBindViewHolder(ViewHolderBrowser holder,int position) {
+    public void onBindViewHolder(MegaBrowserLollipopAdapter.ViewHolderBrowser holder,int position) {
         log("onBindViewHolder");
         
         if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
-            ViewHolderBrowserList holderList = (ViewHolderBrowserList)holder;
+            CloudDriveAdapter.ViewHolderBrowserList holderList = (CloudDriveAdapter.ViewHolderBrowserList)holder;
             onBindViewHolderList(holderList,position);
         } else if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID) {
-            ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid)holder;
+            CloudDriveAdapter.ViewHolderBrowserGrid holderGrid = (CloudDriveAdapter.ViewHolderBrowserGrid)holder;
             onBindViewHolderGrid(holderGrid,position);
         }
     }
@@ -624,6 +607,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         
         MegaNode node = (MegaNode)getItem(position);
+        //Placeholder for folder.
         if (node == null) {
             holder.folderLayout.setVisibility(View.INVISIBLE);
             holder.fileLayout.setVisibility(View.GONE);
@@ -1451,6 +1435,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
         }
         
         final MegaNode n = (MegaNode)getItem(currentPosition);
+        //Reset the placeholder flag.
+        if(n.isFolder()) {
+            placeholderInserted = false;
+        }
         switch (v.getId()) {
             case R.id.file_list_three_dots_layout:
             case R.id.file_grid_three_dots: {
@@ -1501,6 +1489,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
             }
         }
     }
+    
+    
     
     private void threeDotsClicked(int currentPosition,MegaNode n) {
         log("onClick: file_list_three_dots: " + currentPosition);
@@ -1627,7 +1617,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
     }
     
     private static void log(String log) {
-        Util.log("MegaBrowserLollipopAdapter",log);
+        Util.log("CloudDriveAdapter",log);
     }
     
     public void allowMultiselect() {
