@@ -885,6 +885,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 if (MimeTypeList.typeForName(nodeName).isImage()) {
                     log("itemClick:isFile:isImage");
                     Intent intent = new Intent(context,FullScreenImageViewerLollipop.class);
+                    intent.putExtra("placeholder",true );
                     intent.putExtra("position",position);
                     intent.putExtra("adapterType",Constants.FILE_BROWSER_ADAPTER);
                     intent.putExtra("isFolderLink",false);

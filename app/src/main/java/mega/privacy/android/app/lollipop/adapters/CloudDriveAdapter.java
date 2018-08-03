@@ -92,18 +92,12 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     int adapterType;
     
     static boolean placeholderInserted;
-
-//	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     
     public static class ViewHolderBrowserList extends MegaBrowserLollipopAdapter.ViewHolderBrowserList {
         
         public ViewHolderBrowserList(View v) {
             super(v);
         }
-        
-        public ImageView imageView;
-        public ImageView permissionsIcon;
-        public RelativeLayout threeDotsLayout;
     }
     
     public static class ViewHolderBrowserGrid extends MegaBrowserLollipopAdapter.ViewHolderBrowserGrid {
@@ -111,19 +105,11 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         public ViewHolderBrowserGrid(View v) {
             super(v);
         }
-        
+
         public View folderLayout;
         public View fileLayout;
-        public ImageView imageViewThumb;
-        public ImageView imageViewIcon;
-        public RelativeLayout thumbLayout;
         public RelativeLayout thumbLayoutForFile;
-        public View separator;
-        public ImageView imageViewVideoIcon;
         public ImageView fileGridIconForFile;
-        public TextView videoDuration;
-        public RelativeLayout videoInfoLayout;
-        public ImageButton imageButtonThreeDots;
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
     }
@@ -401,7 +387,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 folderCount++;
             }
         }
-        if (folderCount > 0 && folderCount % 2 == 1) {
+        if (folderCount > 0 && folderCount % 2 == 1 && adapterType == ITEM_VIEW_TYPE_GRID) {
             nodes.add(folderCount,null);
             placeholderInserted = true;
         } else {
