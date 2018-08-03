@@ -862,10 +862,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
-		//If inserted a placehoder in MegaBrowserLollipopAdapter,here the position need to be -1.
-		if(CloudDriveAdapter.isPlaceholderInserted() && intent.getBooleanExtra("placeholder",false )) {
-			positionG -= 1;
-		}
+		//If inserted a placehoder in CloudDriveAdapter,here the position need to be -1.
+        if (CloudDriveAdapter.isPlaceholderInserted() && intent.getBooleanExtra("placeholder",false)) {
+            positionG -= 1;
+        }
 		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
 		isFileLink = intent.getBooleanExtra("isFileLink",false);

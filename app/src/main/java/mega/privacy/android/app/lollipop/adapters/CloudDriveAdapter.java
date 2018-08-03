@@ -62,7 +62,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnClickListener, View.OnLongClickListener{
+public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnClickListener, View.OnLongClickListener {
     
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
@@ -105,7 +105,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         public ViewHolderBrowserGrid(View v) {
             super(v);
         }
-
+        
         public View folderLayout;
         public View fileLayout;
         public RelativeLayout thumbLayoutForFile;
@@ -212,7 +212,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             selectedItems.put(pos,true);
         }
         notifyItemChanged(pos);
-        
+        //TODO from here
         if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
             log("adapter type is LIST");
             CloudDriveAdapter.ViewHolderBrowserList view = (CloudDriveAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
@@ -228,24 +228,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         if (selectedItems.size() <= 0) {
-                            
-                            if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                                ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INBOX_ADAPTER) {
-                                ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                                ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                                ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                                ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                            } else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                                ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                            } else if (type == Constants.SEARCH_ADAPTER) {
-                                ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                            } else {
-                                ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                            }
+                            ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
                         }
                     }
                     
@@ -260,23 +243,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             } else {
                 log("view is null - not animation");
                 if (selectedItems.size() <= 0) {
-                    if (type == Constants.RUBBISH_BIN_ADAPTER) {
-                        ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.INBOX_ADAPTER) {
-                        ((InboxFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.INCOMING_SHARES_ADAPTER) {
-                        ((IncomingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
-                        ((OutgoingSharesFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.CONTACT_FILE_ADAPTER) {
-                        ((ContactFileListFragmentLollipop)fragment).hideMultipleSelect();
-                    } else if (type == Constants.FOLDER_LINK_ADAPTER) {
-                        ((FolderLinkActivityLollipop)context).hideMultipleSelect();
-                    } else if (type == Constants.SEARCH_ADAPTER) {
-                        ((SearchFragmentLollipop)fragment).hideMultipleSelect();
-                    } else {
-                        ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
-                    }
+                    ((FileBrowserFragmentLollipop)fragment).hideMultipleSelect();
                 }
             }
         } else {
@@ -380,6 +347,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         return nodes;
     }
     
+    /**
+     * In grid view.
+     * For folder count is odd. Insert null element as placeholder.
+     *
+     * @param nodes Origin nodes to show.
+     * @return Nodes list with placeholder.
+     */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
         for (MegaNode node : nodes) {
@@ -396,6 +370,11 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         return nodes;
     }
     
+    /**
+     * Whether current nodes list has a null element as placeholder.
+     *
+     * @return
+     */
     public static boolean isPlaceholderInserted() {
         return placeholderInserted;
     }
@@ -1422,7 +1401,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         
         final MegaNode n = (MegaNode)getItem(currentPosition);
         //Reset the placeholder flag.
-        if(n.isFolder()) {
+        if (n.isFolder()) {
             placeholderInserted = false;
         }
         switch (v.getId()) {
@@ -1475,7 +1454,6 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
         }
     }
-    
     
     
     private void threeDotsClicked(int currentPosition,MegaNode n) {
