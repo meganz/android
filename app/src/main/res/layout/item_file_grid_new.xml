@@ -5,7 +5,8 @@
 	android:layout_height="wrap_content"
 	android:layout_margin="2dp"
 	android:background="@drawable/background_item_grid"
-	android:descendantFocusability="blocksDescendants">
+	android:descendantFocusability="blocksDescendants"
+	android:padding="1dp">
 	<RelativeLayout
 		android:id="@+id/item_file_grid_folder"
 		android:layout_width="match_parent"
@@ -55,15 +56,23 @@
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout_for_file"
 			android:layout_width="match_parent"
-			android:layout_height="170dp"
-			android:background="@drawable/background_item_grid">
+			android:layout_height="172dp">
 			<ImageView
 				android:id="@+id/file_grid_thumbnail"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:layout_centerHorizontal="true"
-				android:layout_centerVertical="true"
+				android:layout_centerInParent="true"
 				android:scaleType="fitXY"/>
+			<ImageView
+				android:id="@+id/file_grid_selected"
+				android:layout_width="23dp"
+				android:layout_height="23dp"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentTop="true"
+				android:layout_marginLeft="7dp"
+				android:layout_marginTop="7dp"
+				android:src="@drawable/ic_select_folder"
+				android:visibility="gone"/>
 			<ImageView
 				android:id="@+id/file_grid_icon_for_file"
 				android:layout_width="88dp"
@@ -100,8 +109,7 @@
 		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="47dp"
-			android:layout_below="@+id/file_grid_thumbnail_layout_for_file"
-			android:background="@drawable/background_item_grid">
+			android:layout_below="@+id/file_grid_thumbnail_layout_for_file">
 			<TextView
 				android:id="@+id/file_grid_filename_for_file"
 				android:layout_width="110dp"
