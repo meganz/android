@@ -1,10 +1,15 @@
-package mega.privacy.android.app.lollipop.twofa;
+package mega.privacy.android.app.lollipop;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -48,6 +53,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -65,6 +71,7 @@ import static android.graphics.Color.WHITE;
 public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener, View.OnFocusChangeListener{
 
     final int LENGTH_SEED = 13;
+    final int WIDTH = 700;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -76,7 +83,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private RelativeLayout qrSeedContainer;
     private RelativeLayout confirmContainer;
     private Button setup2FAButton;
-    private Button copySeedButton;
+    private Button openWithButton;
     private Button next2FAButton;
     private Button exportRKButton;
     private Button dismissRKButton;
@@ -117,12 +124,14 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private boolean isErrorShown = false;
     private boolean firstTime = true;
     private boolean newAccount = false;
+    private boolean pinLongClick = false;
 
     MegaApiAndroid megaApi;
 
     Bitmap qr = null;
 
     DisplayMetrics outMetrics;
+    String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,8 +191,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         scrollContainer2FAEnabled = (ScrollView) findViewById(R.id.container_2fa_enabled);
         setup2FAButton = (Button) findViewById(R.id.button_enable_2fa);
         setup2FAButton.setOnClickListener(this);
-        copySeedButton = (Button) findViewById(R.id.button_copy_2fa);
-        copySeedButton.setOnClickListener(this);
+        openWithButton = (Button) findViewById(R.id.button_open_with_2fa);
+        openWithButton.setOnClickListener(this);
         next2FAButton = (Button) findViewById(R.id.button_next_2fa);
         next2FAButton.setOnClickListener(this);
         exportRKButton = (Button) findViewById(R.id.button_export_rk);
@@ -215,6 +224,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
         firstPin = (EditTextPIN) findViewById(R.id.pass_first);
+        firstPin.setOnLongClickListener(this);
         imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
         firstPin.setOnFocusChangeListener(this);
         firstPin.addTextChangedListener(new TextWatcher() {
@@ -234,12 +244,15 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     secondPin.requestFocus();
                     secondPin.setCursorVisible(true);
 
-                    if (firstTime){
+                    if (firstTime && !pinLongClick){
                         secondPin.setText("");
                         thirdPin.setText("");
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pastleClipboard();
                     }
                     else  {
                         permitVerify();
@@ -254,6 +267,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
 
         secondPin = (EditTextPIN) findViewById(R.id.pass_second);
+        secondPin.setOnLongClickListener(this);
         imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
         secondPin.setOnFocusChangeListener(this);
         secondPin.addTextChangedListener(new TextWatcher() {
@@ -273,11 +287,14 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     thirdPin.requestFocus();
                     thirdPin.setCursorVisible(true);
 
-                    if (firstTime) {
+                    if (firstTime && !pinLongClick) {
                         thirdPin.setText("");
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pastleClipboard();
                     }
                     else  {
                         permitVerify();
@@ -292,6 +309,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
 
         thirdPin = (EditTextPIN) findViewById(R.id.pass_third);
+        thirdPin.setOnLongClickListener(this);
         imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
         thirdPin.setOnFocusChangeListener(this);
         thirdPin.addTextChangedListener(new TextWatcher() {
@@ -311,10 +329,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     fourthPin.requestFocus();
                     fourthPin.setCursorVisible(true);
 
-                    if (firstTime) {
+                    if (firstTime && !pinLongClick) {
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pastleClipboard();
                     }
                     else  {
                         permitVerify();
@@ -329,6 +350,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
 
         fourthPin = (EditTextPIN) findViewById(R.id.pass_fourth);
+        fourthPin.setOnLongClickListener(this);
         imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
         fourthPin.setOnFocusChangeListener(this);
         fourthPin.addTextChangedListener(new TextWatcher() {
@@ -348,9 +370,12 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     fifthPin.requestFocus();
                     fifthPin.setCursorVisible(true);
 
-                    if (firstTime) {
+                    if (firstTime && !pinLongClick) {
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pastleClipboard();
                     }
                     else  {
                         permitVerify();
@@ -365,6 +390,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
 
         fifthPin = (EditTextPIN) findViewById(R.id.pass_fifth);
+        firstPin.setOnLongClickListener(this);
         imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
         fifthPin.setOnFocusChangeListener(this);
         fifthPin.addTextChangedListener(new TextWatcher() {
@@ -384,8 +410,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     sixthPin.requestFocus();
                     sixthPin.setCursorVisible(true);
 
-                    if (firstTime) {
+                    if (firstTime && !pinLongClick) {
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pastleClipboard();
                     }
                     else  {
                         permitVerify();
@@ -400,6 +429,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
 
         sixthPin = (EditTextPIN) findViewById(R.id.pass_sixth);
+        sixthPin.setOnLongClickListener(this);
         imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
         sixthPin.setOnFocusChangeListener(this);
         sixthPin.addTextChangedListener(new TextWatcher() {
@@ -419,7 +449,12 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     sixthPin.setCursorVisible(true);
                     hideKeyboard();
 
-                    permitVerify();
+                    if (pinLongClick) {
+                        pastleClipboard();
+                    }
+                    else {
+                        permitVerify();
+                    }
                 }
                 else {
                     if (isErrorShown){
@@ -492,6 +527,43 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    void pastleClipboard () {
+        log("pastleClipboard");
+        pinLongClick = false;
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clipData = clipboard.getPrimaryClip();
+        if (clipData != null) {
+            String code = clipData.getItemAt(0).getText().toString();
+            log("code: "+code);
+            if (code != null && code.length() == 6) {
+                boolean areDigits = true;
+                for (int i=0; i<6; i++) {
+                    if (!Character.isDigit(code.charAt(i))) {
+                        areDigits = false;
+                        break;
+                    }
+                }
+                if (areDigits) {
+                    firstPin.setText(""+code.charAt(0));
+                    secondPin.setText(""+code.charAt(1));
+                    thirdPin.setText(""+code.charAt(2));
+                    fourthPin.setText(""+code.charAt(3));
+                    fifthPin.setText(""+code.charAt(4));
+                    sixthPin.setText(""+code.charAt(5));
+                    permitVerify();
+                }
+                else {
+                    firstPin.setText("");
+                    secondPin.setText("");
+                    thirdPin.setText("");
+                    fourthPin.setText("");
+                    fifthPin.setText("");
+                    sixthPin.setText("");
+                }
+            }
+        }
+    }
+
     void permitVerify(){
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
             hideKeyboard();
@@ -504,7 +576,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             sb.append(fourthPin.getText());
             sb.append(fifthPin.getText());
             sb.append(sixthPin.getText());
-            pin = sb.toString();
+            pin = sb.toString().trim();
             log("PIN: "+pin);
             if (pin != null){
                 megaApi.multiFactorAuthEnable(pin, this);
@@ -537,35 +609,84 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     void generate2FAQR (){
         log("generate2FAQR");
 
-        Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
-        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-
-        BitMatrix bitMatrix = null;
-        String url = null;
+        url = null;
         String myEmail = megaApi.getMyEmail();
         if (myEmail != null & seed != null){
             url = getString(R.string.url_qr_2fa, myEmail, seed);
             setSeed();
         }
-        if (url != null){
+        if (url != null) {
+            BitMatrix bitMatrix = null;
             try {
-                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 500, 500, null);
+                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, null);
             } catch (WriterException e) {
                 e.printStackTrace();
+                return;
             }
             int w = bitMatrix.getWidth();
             int h = bitMatrix.getHeight();
             int[] pixels = new int[w * h];
+            float resize = 15;
+
+            qr = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(qr);
+            Paint paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setColor(WHITE);
+            c.drawRect(0, 0, WIDTH, WIDTH, paint);
+            paint.setColor(BLACK);
 
             for (int y = 0; y < h; y++) {
                 int offset = y * w;
                 for (int x = 0; x < w; x++) {
                     pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
+                    if (pixels[offset + x] == BLACK){
+                        c.drawCircle(x*resize, y*resize, 5, paint);
+                    }
                 }
             }
+            paint.setColor(WHITE);
+            c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
+            c.drawRect(36.5f*resize, 3*resize, 45*resize, 11.5f*resize, paint);
+            c.drawRect(3*resize, 36.5f*resize, 11.5f*resize, 45*resize, paint);
 
-            qr = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            qr.setPixels(pixels, 0, w, 0, 0, w, h);
+            paint.setColor(BLACK);
+
+            if (Build.VERSION.SDK_INT >= 21) {
+                c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 30, 30, paint);
+                c.drawRoundRect(37.25f * resize, 3.75f * resize, 44.25f * resize, 10.75f * resize, 30, 30, paint);
+                c.drawRoundRect(3.75f * resize, 37.25f * resize, 10.75f * resize, 44.25f * resize, 30, 30, paint);
+
+                paint.setColor(WHITE);
+                c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
+                c.drawRoundRect(38.25f * resize, 4.75f * resize, 43.25f * resize, 9.75f * resize, 25, 25, paint);
+                c.drawRoundRect(4.75f * resize, 38.25f * resize, 9.75f * resize, 43.25f * resize, 25, 25, paint);
+            }
+            else {
+                c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 30, 30, paint);
+                c.drawRoundRect(new RectF(37.25f * resize, 3.75f * resize, 44.25f * resize, 10.75f * resize), 30, 30, paint);
+                c.drawRoundRect(new RectF(3.75f * resize, 37.25f * resize, 10.75f * resize, 44.25f * resize), 30, 30, paint);
+
+                paint.setColor(WHITE);
+                c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
+                c.drawRoundRect(new RectF(38.25f * resize, 4.75f * resize, 43.25f * resize, 9.75f * resize), 25, 25, paint);
+                c.drawRoundRect(new RectF(4.75f * resize, 38.25f * resize, 9.75f * resize, 43.25f * resize), 25, 25, paint);
+            }
+
+            paint.setColor(BLACK);
+            c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
+            c.drawCircle(40.75f*resize, 7.25f*resize, 17.5f, paint);
+            c.drawCircle(7.25f*resize, 40.75f*resize, 17.5f, paint);
+
+//            for (int y = 0; y < h; y++) {
+//                int offset = y * w;
+//                for (int x = 0; x < w; x++) {
+//                    pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
+//                }
+//            }
+//
+//            qr = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+//            qr.setPixels(pixels, 0, w, 0, 0, w, h);
 
             if (qr != null){
                 qrImage.setImageBitmap(qr);
@@ -657,8 +778,23 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
                 break;
             }
-            case R.id.button_copy_2fa: {
-                copySeed();
+            case R.id.button_open_with_2fa: {
+                if (url == null) {
+                    String myEmail = megaApi.getMyEmail();
+                    if (myEmail != null & seed != null){
+                        url = getString(R.string.url_qr_2fa, myEmail, seed);
+                    }
+                }
+                if (url != null) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    log("URL: "+url+" seed: " + seed);
+                    if (MegaApiUtils.isIntentAvailable(this, intent)) {
+                        startActivity(intent);
+                    }
+                    else {
+                        showSnackbar(getString(R.string.intent_not_available_2fa));
+                    }
+                }
                 break;
             }
             case R.id.button_export_rk:{
@@ -725,7 +861,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 log("Pin correct: Two-Factor Authentication disabled");
             }
             else if (e.getErrorCode() == MegaError.API_EFAILED){
-                log("Pin not correct");
+                log("Pin not correct: "+request.getPassword());
                 if (request.getFlag()){
                     showError();
                 }
@@ -779,6 +915,16 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 copySeed();
                 return true;
             }
+            case R.id.pass_first:
+            case R.id.pass_second:
+            case R.id.pass_third:
+            case R.id.pass_fourth:
+            case R.id.pass_fifth:
+            case R.id.pass_sixth: {
+                pinLongClick = true;
+                v.requestFocus();
+            }
+
         }
         return false;
     }

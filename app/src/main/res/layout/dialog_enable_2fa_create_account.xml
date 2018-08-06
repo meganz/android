@@ -8,8 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="20dp"
-        android:layout_marginRight="28dp"
-        android:layout_marginLeft="28dp">
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp">
 
         <TextView
             android:layout_width="match_parent"
@@ -63,7 +63,7 @@
             android:layout_gravity="center"
             android:text="@string/cam_sync_skip"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="12dp"
             style="?android:attr/borderlessButtonStyle"/>
 
     </LinearLayout>

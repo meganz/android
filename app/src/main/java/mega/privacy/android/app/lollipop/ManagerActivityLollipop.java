@@ -172,7 +172,6 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
-import mega.privacy.android.app.lollipop.twofa.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -3190,7 +3189,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else  if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
 					AccountController ac = new AccountController(this);
-					ac.copyMK(true);
+					if (getIntent().getBooleanExtra("logout", false)) {
+						ac.copyMK(true);
+					}
+					else {
+						ac.copyMK(false);
+					}
 				}
 
     			intent.setAction(null);
@@ -15465,6 +15469,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				is2FAEnabled = false;
 				if (sttFLol != null && sttFLol.isAdded()) {
 					sttFLol.update2FAPreference(false);
+					showSnackbar(getString(R.string.label_2fa_disabled));
 				}
 				hideKeyboard();
 				if (verify2FADialog != null) {

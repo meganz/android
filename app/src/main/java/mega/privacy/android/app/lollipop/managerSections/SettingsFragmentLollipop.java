@@ -54,21 +54,15 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.lollipop.twofa.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION;
 
 
 //import android.support.v4.preference.PreferenceFragment;
@@ -2484,33 +2478,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("update2FAPreference");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			twoFASwitch.setChecked(enabled);
-			if (enabled) {
-				twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
-//                    twoFACategory.addPreference(twoFASeeRK);
-//                    twoFACategory.addPreference(twoFaResetAuthenticationApp);
-//                    twoFACategory.addPreference(twoFAEnableSms);
-			}
-			else {
-				twoFASwitch.setSummary(getString(R.string.setting_subtitle_2fa));
-//					twoFACategory.removePreference(twoFASeeRK);
-//					twoFACategory.removePreference(twoFaResetAuthenticationApp);
-//					twoFACategory.removePreference(twoFAEnableSms);
-			}
 		}
 		else{
 			twoFACheck.setChecked(enabled);
-			if (enabled) {
-				twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa_enabled));
-//					twoFACategory.addPreference(twoFASeeRK);
-//					twoFACategory.addPreference(twoFaResetAuthenticationApp);
-//					twoFACategory.addPreference(twoFAEnableSms);
-			}
-			else {
-				twoFACheck.setSummary(getString(R.string.setting_subtitle_2fa));
-//					twoFACategory.removePreference(twoFASeeRK);
-//					twoFACategory.removePreference(twoFaResetAuthenticationApp);
-//					twoFACategory.removePreference(twoFAEnableSms);
-			}
 		}
 	}
 	

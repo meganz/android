@@ -41,7 +41,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.lollipop.twofa.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -337,6 +337,7 @@ public class AccountController implements View.OnClickListener{
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            intent.putExtra("logout", true);
             context.startActivity(intent);
             ((TestPasswordActivity) context).finish();
         }
@@ -344,6 +345,7 @@ public class AccountController implements View.OnClickListener{
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            intent.putExtra("logout", false);
             context.startActivity(intent);
             ((TwoFactorAuthenticationActivity) context).finish();
         }
