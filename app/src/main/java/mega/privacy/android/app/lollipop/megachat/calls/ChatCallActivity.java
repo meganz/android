@@ -135,7 +135,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     AppBarLayout appBarLayout;
     Toolbar tB;
     ActionBar aB;
-
+    boolean isMe = true;
     boolean avatarRequested = false;
 
     ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
@@ -673,11 +673,14 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
                         relativeVideo.requestLayout();
 
-                        long numParticipants = chat.getPeerCount()-1;
-                        long contactHandle = chat.getPeerHandle(numParticipants);
+//                        long numParticipants = chat.getPeerCount()-1;
+                        long contactHandle = chat.getPeerHandle(0);
                         String contactName = chat.getPeerFullnameByHandle(contactHandle);
+                        for(int i=0;i<chat.getPeerCount();i++){
+                            log("***** contactName: "+chat.getPeerFullnameByHandle(chat.getPeerHandle(i)));
+                        }
 
-                        InfoPeerGroupCall contactPeer = new InfoPeerGroupCall(contactHandle,  contactName, false, false, null);
+                        InfoPeerGroupCall contactPeer = new InfoPeerGroupCall(contactHandle,  contactName, true, false, null);
                         peersOnCall.add(contactPeer);
 
                         if (adapter == null){
@@ -734,9 +737,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.requestLayout();
 
-                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
+                        InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), true, false, null);
                         peersOnCall.add(myPeer);
-
+                        isMe = false;
                         if (adapter == null){
                             adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
                         }else{
@@ -1290,14 +1293,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
                         log(userHandle+": joined the group call - create fragment!");
                         updateSubTitle();
-                        if(isIncoming){
-                            InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), false, false, null);
+                        if(isIncoming && isMe){
+                            InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), true, false, null);
                             int position = peersOnCall.size();
                             peersOnCall.add(myPeer);
                             adapter.setNodes(peersOnCall);
                             adapter.notifyDataSetChanged();
+                            isMe = false;
                         }else{
-                            InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle),false, false, null);
+                            InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle),true, false, null);
                             peersOnCall.add(0,userPeer);
                             adapter.setNodes(peersOnCall);
                             adapter.notifyDataSetChanged();

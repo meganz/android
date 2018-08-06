@@ -5,26 +5,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:gravity="center_horizontal"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
         android:background="@android:color/holo_blue_light">
-
+        <RelativeLayout
+            android:id="@+id/rl_surface"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"
+            android:visibility="gone">
             <!--camera FS-->
             <SurfaceView
                 android:id="@+id/surface_local_video"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:background="@android:color/transparent" />
+        </RelativeLayout>
+
+
 
         <!--Big Avatar-->
         <RelativeLayout

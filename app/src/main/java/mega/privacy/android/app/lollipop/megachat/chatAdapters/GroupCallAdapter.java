@@ -113,6 +113,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         public RelativeLayout avatarLayout;
         public RoundedImageView avatarImage;
         public TextView avatarInitialLetter;
+        public RelativeLayout rLlocalFullScreenSurfaceView;
+
         public SurfaceView localFullScreenSurfaceView;
         public MegaSurfaceRenderer localRenderer;
 
@@ -155,6 +157,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
             holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
             holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
+            holderGrid.rLlocalFullScreenSurfaceView = (RelativeLayout) v.findViewById(R.id.rl_surface);
+
             holderGrid.localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
 
             v.setTag(holderGrid);
@@ -195,24 +199,10 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
 
         int numPeersOnCall = getItemCount();
 
-        if(numPeersOnCall < 4){
-
-//            holderGrid.rLayout.getLayoutParams().width = RelativeLayout.LayoutParams.MATCH_PARENT;
-
-            //calculate height for 1 element:
-            int heightCameras = (int)(heightScreenPX/numPeersOnCall);
-            holderGrid.rLayout.getLayoutParams().height = heightCameras;
-            holderGrid.rLayout.getLayoutParams().width = (int) widthScreenPX;
-
-            log("rLayout---> heightCameras("+heightCameras+")/heightScreenPX("+heightScreenPX+") ");
-            log("rLayout---> widthScreenPX("+widthScreenPX+")");
-
-        }
-
         log("Peer in position: "+position+", handle("+peer.getHandle()+"), name("+peer.getName()+"), videoOn("+peer.isVideoOn()+"), audioOn("+peer.isAudioOn()+")");
         if(peer.isVideoOn()){
             log("video on");
-            holderGrid.localFullScreenSurfaceView.setVisibility(View.VISIBLE);
+            holderGrid.rLlocalFullScreenSurfaceView.setVisibility(View.VISIBLE);
             holder.avatarLayout.setVisibility(GONE);
             holderGrid.localFullScreenSurfaceView.setZOrderOnTop(false);
 
@@ -233,8 +223,17 @@ public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
 
         }else{
             log("video off");
+            if(numPeersOnCall < 4){
+                //calculate height for 1 element:
+                int heightCameras = (int)(heightScreenPX/numPeersOnCall);
+                holderGrid.rLayout.getLayoutParams().height = heightCameras;
+                holderGrid.rLayout.getLayoutParams().width = (int) widthScreenPX;
+
+                log("****height: "+heightCameras+"/"+heightScreenPX);
+                log("****width: "+widthScreenPX);
+            }
             holder.avatarLayout.setVisibility(View.VISIBLE);
-            holderGrid.localFullScreenSurfaceView.setVisibility(View.GONE);
+            holderGrid.rLlocalFullScreenSurfaceView.setVisibility(View.GONE);
 
             if(peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 log("me");
