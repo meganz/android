@@ -5,17 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:gravity="center_horizontal"
+    android:id="@+id/general"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/rl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_blue_light">
+        android:background="@color/black">
         <RelativeLayout
             android:id="@+id/rl_surface"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:visibility="gone">
             <!--camera FS-->
@@ -41,6 +42,7 @@
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:textAlignment="center"
+            android:visibility="gone"
             android:background="@android:color/transparent">
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/avatar_image"

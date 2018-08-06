@@ -38,10 +38,12 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             this.width = width;
             this.height = height;
 
-            SurfaceHolder Sholder = holder.localFullScreenSurfaceView.getHolder();
+            SurfaceHolder Sholder = holder.surfaceView.getHolder();
             if (Sholder != null) {
-                int viewWidth = holder.localFullScreenSurfaceView.getWidth();
-                int viewHeight = holder.localFullScreenSurfaceView.getHeight();
+                int viewWidth = holder.surfaceView.getWidth();
+                int viewHeight = holder.surfaceView.getHeight();
+//                Log.d("**GroupCallListener*","***** viewWidth("+viewWidth+"), viewHeight("+viewHeight+") ");
+
                 if ((viewWidth != 0) && (viewHeight != 0)) {
                     int holderWidth = viewWidth < width ? viewWidth : width;
                     int holderHeight = holderWidth * viewHeight / viewWidth;
