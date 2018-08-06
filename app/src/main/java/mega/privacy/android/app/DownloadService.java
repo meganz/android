@@ -20,6 +20,7 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -1234,6 +1236,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else{
 							saveOfflineChatFile(transfer);
 						}
+
+						refreshOfflineFragment();
 					}
 				}
 				else
@@ -2035,5 +2039,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	private void refreshOfflineFragment(){
+		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }
