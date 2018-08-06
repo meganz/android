@@ -215,8 +215,22 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         log("*****Peer in position: "+position+", handle("+peer.getHandle()+"), name("+peer.getName()+"), videoOn("+peer.isVideoOn()+"), audioOn("+peer.isAudioOn()+")");
         if(peer.isVideoOn()){
             log("**** video on->SurfaceView VISIBLE, avatarLayout GONE");
+            if(numPeersOnCall == 1 ){
+                holderGrid.rlGeneral.getLayoutParams().width= RelativeLayout.LayoutParams.MATCH_PARENT;
+                holderGrid.rlGeneral.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
+
+            }else if (numPeersOnCall < 4) {
+                log("*** numPeersOnCall < 4 ");
+                //calculate height for 1 element:
+                int heightCameras = (int) (heightScreenPX / numPeersOnCall);
+                holderGrid.rlGeneral.getLayoutParams().height = heightCameras;
+//                holderGrid.rlGeneral.getLayoutParams().width = (int) widthScreenPX;
+                holderGrid.rlGeneral.getLayoutParams().width= RelativeLayout.LayoutParams.MATCH_PARENT;
+
+                log("****height: " + heightCameras + "/" + heightScreenPX);
+            }
             holderGrid.surfaceViewLayout.setVisibility(View.VISIBLE);
-            holderGrid.surfaceView.setZOrderOnTop(true);
+            holderGrid.surfaceView.setZOrderMediaOverlay(true);
             SurfaceHolder localSurfaceHolder = holderGrid.surfaceView.getHolder();
             localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
             holderGrid.localRenderer = new MegaSurfaceRenderer(holderGrid.surfaceView);
@@ -240,17 +254,18 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 //calculate height for 1 element:
                 int heightCameras = (int) (heightScreenPX / numPeersOnCall);
                 holderGrid.rlGeneral.getLayoutParams().height = heightCameras;
-                holderGrid.rlGeneral.getLayoutParams().width = (int) widthScreenPX;
+//                holderGrid.rlGeneral.getLayoutParams().width = (int) widthScreenPX;
+                holderGrid.rlGeneral.getLayoutParams().width= RelativeLayout.LayoutParams.MATCH_PARENT;
 
                 log("****height: " + heightCameras + "/" + heightScreenPX);
-                log("****width: " + widthScreenPX);
+//                log("****width: " + widthScreenPX);
             }
                 holderGrid.avatarLayout.setVisibility(View.VISIBLE);
                 holderGrid.surfaceViewLayout.setVisibility(View.GONE);
 
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                     log("me");
-                    holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
+//                    holderGrid.rLayout.setBackgroundColor(Color.YELLOW);
 
                     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
                     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
@@ -276,7 +291,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
                 } else {
                     log("contact");
-                    holderGrid.rLayout.setBackgroundColor(Color.RED);
+//                    holderGrid.rLayout.setBackgroundColor(Color.RED);
 
                     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holderGrid.avatarLayout.getLayoutParams();
                     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
