@@ -127,7 +127,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     protected void onDestroy() {
         log("onDestroy");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-        megaApi.removeGlobalListener(this);
+        if (megaApi != null) {
+            megaApi.removeGlobalListener(this);
+            megaApi.removeRequestListener(this);
+        }
         super.onDestroy();
     }
 

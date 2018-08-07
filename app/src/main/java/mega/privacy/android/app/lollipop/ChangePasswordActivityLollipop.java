@@ -2,6 +2,8 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -49,7 +51,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 @SuppressLint("NewApi")
-public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener{
+public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
 	
 	ChangePasswordActivityLollipop changePasswordActivity = this;
 
@@ -110,8 +112,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
 	private boolean is2FAEnabled = false;
-	private boolean firstTime = true;
-	private boolean isOnVerifyScreen = false;
+	private boolean pinLongClick = false;
+
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -344,6 +346,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 	}
+
 	public void showVerifyPin2FA(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
@@ -361,6 +364,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
 		firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_verify);
+		firstPin.setOnLongClickListener(this);
 		firstPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
 		firstPin.addTextChangedListener(new TextWatcher() {
@@ -380,12 +384,15 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					secondPin.requestFocus();
 					secondPin.setCursorVisible(true);
 
-					if (isFirstTime){
+					if (isFirstTime && !pinLongClick){
 						secondPin.setText("");
 						thirdPin.setText("");
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify();
@@ -400,6 +407,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		});
 
 		secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_verify);
+		secondPin.setOnLongClickListener(this);
 		secondPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
 		secondPin.addTextChangedListener(new TextWatcher() {
@@ -419,11 +427,14 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					thirdPin.requestFocus();
 					thirdPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						thirdPin.setText("");
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify();
@@ -438,6 +449,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		});
 
 		thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_verify);
+		thirdPin.setOnLongClickListener(this);
 		thirdPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
 		thirdPin.addTextChangedListener(new TextWatcher() {
@@ -457,10 +469,13 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					fourthPin.requestFocus();
 					fourthPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify();
@@ -475,6 +490,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		});
 
 		fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_verify);
+		fourthPin.setOnLongClickListener(this);
 		fourthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
 		fourthPin.addTextChangedListener(new TextWatcher() {
@@ -494,9 +510,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					fifthPin.requestFocus();
 					fifthPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify();
@@ -511,7 +530,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		});
 
 		fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_verify);
-		firstPin.setOnFocusChangeListener(this);
+		fifthPin.setOnLongClickListener(this);
+		fifthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
 		fifthPin.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -530,8 +550,11 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					sixthPin.requestFocus();
 					sixthPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify();
@@ -546,6 +569,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		});
 
 		sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_verify);
+		sixthPin.setOnLongClickListener(this);
 		sixthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
 		sixthPin.addTextChangedListener(new TextWatcher() {
@@ -565,7 +589,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					sixthPin.setCursorVisible(true);
 					hideKeyboard();
 
-					permitVerify();
+					if (pinLongClick) {
+						pasteClipboard();
+					}
+					else {
+						permitVerify();
+					}
 				}
 				else {
 					if (isErrorShown){
@@ -598,7 +627,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	void verifyShowError(){
-		firstTime = false;
+		isFirstTime = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
 		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
@@ -610,6 +639,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	void permitVerify(){
+		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
 			hideKeyboard();
 			if (sb.length()>0) {
@@ -626,6 +656,42 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			if (!isErrorShown && pin != null) {
 				verify2faProgressBar.setVisibility(View.VISIBLE);
 				changePassword(newPassword1View.getText().toString());
+			}
+		}
+	}
+
+	void pasteClipboard() {
+		log("pasteClipboard");
+		pinLongClick = false;
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		ClipData clipData = clipboard.getPrimaryClip();
+		if (clipData != null) {
+			String code = clipData.getItemAt(0).getText().toString();
+			log("code: "+code);
+			if (code != null && code.length() == 6) {
+				boolean areDigits = true;
+				for (int i=0; i<6; i++) {
+					if (!Character.isDigit(code.charAt(i))) {
+						areDigits = false;
+						break;
+					}
+				}
+				if (areDigits) {
+					firstPin.setText(""+code.charAt(0));
+					secondPin.setText(""+code.charAt(1));
+					thirdPin.setText(""+code.charAt(2));
+					fourthPin.setText(""+code.charAt(3));
+					fifthPin.setText(""+code.charAt(4));
+					sixthPin.setText(""+code.charAt(5));
+				}
+				else {
+					firstPin.setText("");
+					secondPin.setText("");
+					thirdPin.setText("");
+					fourthPin.setText("");
+					fifthPin.setText("");
+					sixthPin.setText("");
+				}
 			}
 		}
 	}
@@ -1301,5 +1367,21 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		}
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()){
+			case R.id.pin_first_verify:
+			case R.id.pin_second_verify:
+			case R.id.pin_third_verify:
+			case R.id.pin_fouth_verify:
+			case R.id.pin_fifth_verify:
+			case R.id.pin_sixth_verify: {
+				pinLongClick = true;
+				v.requestFocus();
+			}
+		}
+		return false;
 	}
 }

@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -34,23 +35,16 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -104,6 +98,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private TextView seedText13;
     private ProgressBar qrProgressBar;
     private TextView pinError;
+    private TextView suggestionRK;
+    private LinearLayout saveRKButton;
 
     private String seed = null;
     private ArrayList<String> arraySeed;
@@ -125,6 +121,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     private boolean firstTime = true;
     private boolean newAccount = false;
     private boolean pinLongClick = false;
+    private boolean rkSaved = false;
 
     MegaApiAndroid megaApi;
 
@@ -169,6 +166,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             isEnabled2FA = savedInstanceState.getBoolean("isEnabled2FA", false);
             isErrorShown = savedInstanceState.getBoolean("isErrorShown", false);
             firstTime = savedInstanceState.getBoolean("firstTime", true);
+            rkSaved = savedInstanceState.getBoolean("rkSaved", false);
             seed = savedInstanceState.getString("seed");
             arraySeed = savedInstanceState.getStringArrayList("arraySeed");
             byte[] qrByteArray = savedInstanceState.getByteArray("qr");
@@ -177,6 +175,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             }
         }
         else {
+            rkSaved = false;
             confirm2FAIsShown = false;
             scanOrCopyIsShown = false;
             isEnabled2FA = false;
@@ -197,7 +196,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         next2FAButton.setOnClickListener(this);
         exportRKButton = (Button) findViewById(R.id.button_export_rk);
         exportRKButton.setOnClickListener(this);
-        dismissRKButton  =(Button) findViewById(R.id.button_dismiss_rk);
+        dismissRKButton  = (Button) findViewById(R.id.button_dismiss_rk);
         dismissRKButton.setOnClickListener(this);
         qrSeedContainer = (RelativeLayout) findViewById(R.id.container_qr_seed_2fa);
         confirmContainer = (RelativeLayout) findViewById(R.id.container_confirm_2fa);
@@ -252,7 +251,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                         sixthPin.setText("");
                     }
                     else if (pinLongClick) {
-                        pastleClipboard();
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -294,7 +293,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                         sixthPin.setText("");
                     }
                     else if (pinLongClick) {
-                        pastleClipboard();
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -335,7 +334,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                         sixthPin.setText("");
                     }
                     else if (pinLongClick) {
-                        pastleClipboard();
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -375,7 +374,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                         sixthPin.setText("");
                     }
                     else if (pinLongClick) {
-                        pastleClipboard();
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -390,7 +389,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
 
         fifthPin = (EditTextPIN) findViewById(R.id.pass_fifth);
-        firstPin.setOnLongClickListener(this);
+        fifthPin.setOnLongClickListener(this);
         imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
         fifthPin.setOnFocusChangeListener(this);
         fifthPin.addTextChangedListener(new TextWatcher() {
@@ -414,7 +413,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                         sixthPin.setText("");
                     }
                     else if (pinLongClick) {
-                        pastleClipboard();
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -450,7 +449,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     hideKeyboard();
 
                     if (pinLongClick) {
-                        pastleClipboard();
+                        pasteClipboard();
                     }
                     else {
                         permitVerify();
@@ -465,27 +464,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
+        suggestionRK = (TextView) findViewById(R.id.recommendation_2fa_enabled);
+        saveRKButton = (LinearLayout) findViewById(R.id.container_rk_2fa);
+        saveRKButton.setOnClickListener(this);
+
+
         if (scanOrCopyIsShown || newAccount){
-            scanOrCopyIsShown = true;
-            qrSeedContainer.setVisibility(View.VISIBLE);
-            confirmContainer.setVisibility(View.GONE);
-            scrollContainer2FA.setVisibility(View.GONE);
-            scrollContainerVerify.setVisibility(View.VISIBLE);
-            scrollContainer2FAEnabled.setVisibility(View.GONE);
-            if (seed != null){
-                log("seed no null");
-                setSeed();
-                if (qr != null){
-                    log("qr no null");
-                    qrImage.setImageBitmap(qr);
-                }
-                else {
-                    generate2FAQR();
-                }
-            }
-            else {
-                megaApi.multiFactorAuthGetCode(this);
-            }
+            showScanOrCopyLayout();
         }
         else if (confirm2FAIsShown){
             qrSeedContainer.setVisibility(View.GONE);
@@ -502,6 +487,16 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainer2FA.setVisibility(View.GONE);
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
+            if (rkSaved) {
+                suggestionRK.setVisibility(View.GONE);
+                exportRKButton.setVisibility(View.GONE);
+                saveRKButton.setVisibility(View.GONE);
+            }
+            else {
+                suggestionRK.setVisibility(View.VISIBLE);
+                exportRKButton.setVisibility(View.VISIBLE);
+                saveRKButton.setVisibility(View.VISIBLE);
+            }
         }
         else {
             megaApi.multiFactorAuthGetCode(this);
@@ -510,14 +505,51 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainer2FAEnabled.setVisibility(View.GONE);
         }
 
-        megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+//        megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+    }
+
+    void showScanOrCopyLayout () {
+        scanOrCopyIsShown = true;
+        qrSeedContainer.setVisibility(View.VISIBLE);
+        confirmContainer.setVisibility(View.GONE);
+        scrollContainer2FA.setVisibility(View.GONE);
+        scrollContainerVerify.setVisibility(View.VISIBLE);
+        scrollContainer2FAEnabled.setVisibility(View.GONE);
+        if (seed != null){
+            log("seed no null");
+            setSeed();
+            if (qr != null){
+                log("qr no null");
+                qrImage.setImageBitmap(qr);
+            }
+            else {
+                generate2FAQR();
+            }
+        }
+        else {
+            megaApi.multiFactorAuthGetCode(this);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (megaApi != null) {
+            megaApi.removeRequestListener(this);
+        }
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (isEnabled2FA) {
-            update2FASetting();
+        if (confirm2FAIsShown) {
+            confirm2FAIsShown = false;
+            showScanOrCopyLayout();
+        }
+        else {
+            super.onBackPressed();
+            if (isEnabled2FA) {
+                update2FASetting();
+            }
         }
     }
 
@@ -527,8 +559,8 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    void pastleClipboard () {
-        log("pastleClipboard");
+    void pasteClipboard() {
+        log("pasteClipboard");
         pinLongClick = false;
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clipData = clipboard.getPrimaryClip();
@@ -550,7 +582,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                     fourthPin.setText(""+code.charAt(3));
                     fifthPin.setText(""+code.charAt(4));
                     sixthPin.setText(""+code.charAt(5));
-                    permitVerify();
                 }
                 else {
                     firstPin.setText("");
@@ -565,7 +596,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     }
 
     void permitVerify(){
-        if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+        log("permitVerify");
+        if (confirm2FAIsShown && firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1
+                && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
             hideKeyboard();
             if (sb.length()>0) {
                 sb.delete(0, sb.length());
@@ -678,16 +711,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             c.drawCircle(40.75f*resize, 7.25f*resize, 17.5f, paint);
             c.drawCircle(7.25f*resize, 40.75f*resize, 17.5f, paint);
 
-//            for (int y = 0; y < h; y++) {
-//                int offset = y * w;
-//                for (int x = 0; x < w; x++) {
-//                    pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
-//                }
-//            }
-//
-//            qr = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-//            qr.setPixels(pixels, 0, w, 0, 0, w, h);
-
             if (qr != null){
                 qrImage.setImageBitmap(qr);
                 qrProgressBar.setVisibility(View.GONE);
@@ -716,6 +739,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         outState.putBoolean("isEnabled2FA", isEnabled2FA);
         outState.putBoolean("isErrorShown", isErrorShown);
         outState.putBoolean("firstTime", firstTime);
+        outState.putBoolean("rkSaved", rkSaved);
 
         if (scanOrCopyIsShown){
             log("scanOrCopyIsShown");
@@ -797,10 +821,19 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
                 break;
             }
-            case R.id.button_export_rk:{
+            case R.id.container_rk_2fa: {
                 update2FASetting();
                 RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
                 recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
+                break;
+            }
+            case R.id.button_export_rk:{
+                update2FASetting();
+                Intent intent = new Intent(this, ManagerActivityLollipop.class);
+                intent.setAction(Constants.ACTION_RECOVERY_KEY_EXPORTED);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
                 break;
             }
             case R.id.button_dismiss_rk:{
@@ -809,10 +842,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 break;
             }
         }
-    }
-
-    public static void log(String message) {
-        Util.log("TwoFactorAuthenticationActivity", message);
     }
 
     @Override
@@ -849,16 +878,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         }
         else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET){
             log("TYPE_MULTI_FACTOR_AUTH_SET: "+e.getErrorCode());
-            if (request.getFlag() && e.getErrorCode() == MegaError.API_OK){
+            if (request.getFlag() && e.getErrorCode() == MegaError.API_OK) {
                 log("Pin correct: Two-Factor Authentication enabled");
                 confirm2FAIsShown = false;
                 isEnabled2FA = true;
-                scrollContainer2FA.setVisibility(View.GONE);
-                scrollContainerVerify.setVisibility(View.GONE);
-                scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
-            }
-            else if (!request.getFlag() && e.getErrorCode() == MegaError.API_OK){
-                log("Pin correct: Two-Factor Authentication disabled");
+                megaApi.isMasterKeyExported(this);
             }
             else if (e.getErrorCode() == MegaError.API_EFAILED){
                 log("Pin not correct: "+request.getPassword());
@@ -868,13 +892,40 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             }
             else {
                 log("An error ocurred trying to enable Two-Factor Authentication");
+                showSnackbar(getString(R.string.error_enable_2fa));
             }
 
-            megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+//            megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
         }
         else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
             if (e.getErrorCode() == MegaError.API_OK){
                 log("TYPE_MULTI_FACTOR_AUTH_CHECK: "+request.getFlag());
+            }
+        }
+        else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
+            log("TYPE_GET_ATTR_USER");
+            if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
+                log("TYPE_GET_ATTR_USER API_OK");
+
+                scrollContainer2FA.setVisibility(View.GONE);
+                scrollContainerVerify.setVisibility(View.GONE);
+                scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
+
+                if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
+                    rkSaved = true;
+                    suggestionRK.setVisibility(View.GONE);
+                    exportRKButton.setVisibility(View.GONE);
+                    saveRKButton.setVisibility(View.GONE);
+                }
+                else {
+                    rkSaved = false;
+                    suggestionRK.setVisibility(View.VISIBLE);
+                    exportRKButton.setVisibility(View.VISIBLE);
+                    saveRKButton.setVisibility(View.VISIBLE);
+                }
+            }
+            else {
+                log("TYPE_GET_ATTR_USER error: " + e.getErrorString());
             }
         }
     }
@@ -1009,5 +1060,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 break;
             }
         }
+    }
+
+    public static void log(String message) {
+        Util.log("TwoFactorAuthenticationActivity", message);
     }
 }
