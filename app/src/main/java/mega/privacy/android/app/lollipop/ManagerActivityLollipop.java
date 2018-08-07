@@ -8,6 +8,8 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -224,7 +226,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener{
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
 
 	public int accountFragment;
 
@@ -573,6 +575,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
+	private boolean pinLongClick = false;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -10092,6 +10095,58 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 	}
 
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()){
+			case R.id.pin_first_verify:
+			case R.id.pin_second_verify:
+			case R.id.pin_third_verify:
+			case R.id.pin_fouth_verify:
+			case R.id.pin_fifth_verify:
+			case R.id.pin_sixth_verify: {
+				pinLongClick = true;
+				v.requestFocus();
+			}
+		}
+		return false;
+	}
+
+	void pasteClipboard() {
+		log("pasteClipboard");
+		pinLongClick = false;
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		ClipData clipData = clipboard.getPrimaryClip();
+		if (clipData != null) {
+			String code = clipData.getItemAt(0).getText().toString();
+			log("code: "+code);
+			if (code != null && code.length() == 6) {
+				boolean areDigits = true;
+				for (int i=0; i<6; i++) {
+					if (!Character.isDigit(code.charAt(i))) {
+						areDigits = false;
+						break;
+					}
+				}
+				if (areDigits) {
+					firstPin.setText(""+code.charAt(0));
+					secondPin.setText(""+code.charAt(1));
+					thirdPin.setText(""+code.charAt(2));
+					fourthPin.setText(""+code.charAt(3));
+					fifthPin.setText(""+code.charAt(4));
+					sixthPin.setText(""+code.charAt(5));
+				}
+				else {
+					firstPin.setText("");
+					secondPin.setText("");
+					thirdPin.setText("");
+					fourthPin.setText("");
+					fifthPin.setText("");
+					sixthPin.setText("");
+				}
+			}
+		}
+	}
+
 	public void showVerifyPin2FA(final int type){
 		verifyPin2FADialogType = type;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -10118,6 +10173,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
 		firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_verify);
+		firstPin.setOnLongClickListener(this);
 		firstPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
 		firstPin.addTextChangedListener(new TextWatcher() {
@@ -10137,12 +10193,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					secondPin.requestFocus();
 					secondPin.setCursorVisible(true);
 
-					if (isFirstTime){
+					if (isFirstTime && !pinLongClick){
 						secondPin.setText("");
 						thirdPin.setText("");
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify(type);
@@ -10157,6 +10216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 
 		secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_verify);
+		secondPin.setOnLongClickListener(this);
 		secondPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
 		secondPin.addTextChangedListener(new TextWatcher() {
@@ -10176,11 +10236,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					thirdPin.requestFocus();
 					thirdPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						thirdPin.setText("");
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify(type);
@@ -10195,6 +10258,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 
 		thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_verify);
+		thirdPin.setOnLongClickListener(this);
 		thirdPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
 		thirdPin.addTextChangedListener(new TextWatcher() {
@@ -10214,10 +10278,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					fourthPin.requestFocus();
 					fourthPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						fourthPin.setText("");
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify(type);
@@ -10232,6 +10299,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 
 		fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_verify);
+		fourthPin.setOnLongClickListener(this);
 		fourthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
 		fourthPin.addTextChangedListener(new TextWatcher() {
@@ -10251,9 +10319,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					fifthPin.requestFocus();
 					fifthPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						fifthPin.setText("");
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify(type);
@@ -10268,6 +10339,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 
 		fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_verify);
+		fifthPin.setOnLongClickListener(this);
 		fifthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
 		fifthPin.addTextChangedListener(new TextWatcher() {
@@ -10287,8 +10359,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sixthPin.requestFocus();
 					sixthPin.setCursorVisible(true);
 
-					if (isFirstTime) {
+					if (isFirstTime && !pinLongClick) {
 						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
 					}
 					else  {
 						permitVerify(type);
@@ -10303,6 +10378,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		});
 
 		sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_verify);
+		sixthPin.setOnLongClickListener(this);
 		sixthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
 		sixthPin.addTextChangedListener(new TextWatcher() {
@@ -10322,7 +10398,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					sixthPin.setCursorVisible(true);
 					hideKeyboard();
 
-					permitVerify(type);
+					if (pinLongClick) {
+						pasteClipboard();
+					}
+					else {
+						permitVerify(type);
+					}
 				}
 				else {
 					if (isErrorShown){
@@ -10379,6 +10460,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	}
 
 	void permitVerify(int type){
+		log("permitVerify");
 		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
 			hideKeyboard();
 			if (sb.length()>0) {

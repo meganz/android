@@ -557,7 +557,6 @@
                 android:id="@+id/recommendation_2fa_enabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/recommendation_2fa_enabled"
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:layout_marginTop="20dp"
@@ -565,12 +564,41 @@
                 android:layout_marginRight="16dp"
                 android:textSize="16sp"
                 android:fontFamily="roboto"
+                android:text="@string/recommendation_2fa_enabled"
                 android:textColor="@color/name_my_account"/>
+            
+            <LinearLayout
+                android:id="@+id/container_rk_2fa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/background_button_border_white"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="27dp">
+                
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_text_thumbnail"
+                    android:layout_margin="13dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textSize="16sp"
+                    android:textColor="@color/name_my_account"
+                    android:fontFamily="roboto"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="25dp"
+                    android:text="@string/general_rk"/>
+                
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="37dp"
                 android:paddingBottom="40dp"
                 android:layout_below="@+id/recommendation_2fa_enabled"
                 android:layout_gravity="center">
@@ -589,13 +617,12 @@
                     android:id="@+id/button_dismiss_rk"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/accentColor"
                     android:layout_toRightOf="@+id/button_export_rk"
                     android:layout_marginLeft="20dp"
-                    android:background="@drawable/background_button_white"
-                    android:elevation="8dp"
                     android:layout_margin="10dp"
-                    android:textColor="@color/name_my_account"
-                    android:text="@string/general_dismiss"/>
+                    android:text="@string/general_close"
+                    style="?android:attr/borderlessButtonStyle"/>
 
 
             </RelativeLayout>

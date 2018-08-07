@@ -1,6 +1,8 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +11,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -70,10 +71,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
     private Context context;
     private AlertDialog insertMailDialog;
@@ -185,6 +187,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean isErrorShown = false;
     private boolean is2FAEnabled = false;
     private boolean accountConfirmed = false;
+    private boolean pinLongClick = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -460,6 +463,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
 
         firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_login);
+        firstPin.setOnLongClickListener(this);
         firstPin.setOnFocusChangeListener(this);
         imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
         firstPin.addTextChangedListener(new TextWatcher() {
@@ -479,12 +483,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     secondPin.requestFocus();
                     secondPin.setCursorVisible(true);
 
-                    if (isFirstTime){
+                    if (isFirstTime && !pinLongClick){
                         secondPin.setText("");
                         thirdPin.setText("");
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -500,6 +507,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_login);
+        secondPin.setOnLongClickListener(this);
         secondPin.setOnFocusChangeListener(this);
         imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
         secondPin.addTextChangedListener(new TextWatcher() {
@@ -519,11 +527,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     thirdPin.requestFocus();
                     thirdPin.setCursorVisible(true);
 
-                    if (isFirstTime) {
+                    if (isFirstTime && !pinLongClick) {
                         thirdPin.setText("");
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -539,6 +550,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_login);
+        thirdPin.setOnLongClickListener(this);
         thirdPin.setOnFocusChangeListener(this);
         imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
         thirdPin.addTextChangedListener(new TextWatcher() {
@@ -558,10 +570,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     fourthPin.requestFocus();
                     fourthPin.setCursorVisible(true);
 
-                    if (isFirstTime) {
+                    if (isFirstTime && !pinLongClick) {
                         fourthPin.setText("");
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -576,6 +591,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_login);
+        fourthPin.setOnLongClickListener(this);
         fourthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
         fourthPin.addTextChangedListener(new TextWatcher() {
@@ -595,9 +611,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     fifthPin.requestFocus();
                     fifthPin.setCursorVisible(true);
 
-                    if (isFirstTime) {
+                    if (isFirstTime && !pinLongClick) {
                         fifthPin.setText("");
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -612,6 +631,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_login);
+        fifthPin.setOnLongClickListener(this);
         fifthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
         fifthPin.addTextChangedListener(new TextWatcher() {
@@ -631,8 +651,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     sixthPin.requestFocus();
                     sixthPin.setCursorVisible(true);
 
-                    if (isFirstTime) {
+                    if (isFirstTime && !pinLongClick) {
                         sixthPin.setText("");
+                    }
+                    else if (pinLongClick) {
+                        pasteClipboard();
                     }
                     else  {
                         permitVerify();
@@ -647,6 +670,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
 
         sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_login);
+        sixthPin.setOnLongClickListener(this);
         sixthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
         sixthPin.addTextChangedListener(new TextWatcher() {
@@ -666,7 +690,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     sixthPin.setCursorVisible(true);
                     hideKeyboard();
 
-                    permitVerify();
+                    if (pinLongClick) {
+                        pasteClipboard();
+                    }
+                    else {
+                        permitVerify();
+                    }
                 }
                 else {
                     if (isErrorShown){
@@ -1038,6 +1067,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     void permitVerify(){
+        log("permitVerify");
         if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
             hideKeyboard();
             if (sb.length()>0) {
@@ -2872,6 +2902,58 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
         }
+    }
+
+    void pasteClipboard() {
+        log("pasteClipboard");
+        pinLongClick = false;
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+        ClipData clipData = clipboard.getPrimaryClip();
+        if (clipData != null) {
+            String code = clipData.getItemAt(0).getText().toString();
+            log("code: "+code);
+            if (code != null && code.length() == 6) {
+                boolean areDigits = true;
+                for (int i=0; i<6; i++) {
+                    if (!Character.isDigit(code.charAt(i))) {
+                        areDigits = false;
+                        break;
+                    }
+                }
+                if (areDigits) {
+                    firstPin.setText(""+code.charAt(0));
+                    secondPin.setText(""+code.charAt(1));
+                    thirdPin.setText(""+code.charAt(2));
+                    fourthPin.setText(""+code.charAt(3));
+                    fifthPin.setText(""+code.charAt(4));
+                    sixthPin.setText(""+code.charAt(5));
+                }
+                else {
+                    firstPin.setText("");
+                    secondPin.setText("");
+                    thirdPin.setText("");
+                    fourthPin.setText("");
+                    fifthPin.setText("");
+                    sixthPin.setText("");
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()){
+            case R.id.pin_first_login:
+            case R.id.pin_second_login:
+            case R.id.pin_third_login:
+            case R.id.pin_fouth_login:
+            case R.id.pin_fifth_login:
+            case R.id.pin_sixth_login: {
+                pinLongClick = true;
+                v.requestFocus();
+            }
+        }
+        return false;
     }
 
     private static void log(String log) {

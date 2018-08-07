@@ -160,4 +160,5 @@
     <color name="file_playlist_state">#FF00BFA5</color>
 
     <color name="background_button_white">#FFFAFAFA</color>
+    <color name="border_button_white">#FFE1E1E1</color>
 </resources>
