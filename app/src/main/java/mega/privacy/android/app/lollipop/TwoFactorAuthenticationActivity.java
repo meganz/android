@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -20,6 +21,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -464,6 +466,89 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
+        firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
+        android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+        }
+        else {
+            paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+        }
+        firstPin.setLayoutParams(paramsb1);
+        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        firstPin.setLayoutParams(textParams);
+
+        secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
+        android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+        }
+        else {
+            paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+        }
+        secondPin.setLayoutParams(paramsb2);
+        textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        secondPin.setLayoutParams(textParams);
+        secondPin.setEt(firstPin);
+
+        thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
+        android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+        }
+        else {
+            paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+        }
+        thirdPin.setLayoutParams(paramsb3);
+        textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+        thirdPin.setLayoutParams(textParams);
+        thirdPin.setEt(secondPin);
+
+        fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+        android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+        }
+        else {
+            paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+        }
+        fourthPin.setLayoutParams(paramsb4);
+        textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        fourthPin.setLayoutParams(textParams);
+        fourthPin.setEt(thirdPin);
+
+        fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+        android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+        }
+        else {
+            paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+        }
+        fifthPin.setLayoutParams(paramsb5);
+        textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
+        textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+        fifthPin.setLayoutParams(textParams);
+        fifthPin.setEt(fourthPin);
+
+        sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+        android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+        }
+        else {
+            paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+        }
+        sixthPin.setLayoutParams(paramsb6);
+        textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
+        textParams.setMargins(0, 0, 0, 0);
+        sixthPin.setLayoutParams(textParams);
+        sixthPin.setEt(fifthPin);
+
         suggestionRK = (TextView) findViewById(R.id.recommendation_2fa_enabled);
         saveRKButton = (LinearLayout) findViewById(R.id.container_rk_2fa);
         saveRKButton.setOnClickListener(this);
@@ -488,14 +573,10 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
             if (rkSaved) {
-                suggestionRK.setVisibility(View.GONE);
-                exportRKButton.setVisibility(View.GONE);
-                saveRKButton.setVisibility(View.GONE);
+                dismissRKButton.setVisibility(View.VISIBLE);
             }
             else {
-                suggestionRK.setVisibility(View.VISIBLE);
-                exportRKButton.setVisibility(View.VISIBLE);
-                saveRKButton.setVisibility(View.VISIBLE);
+                dismissRKButton.setVisibility(View.GONE);
             }
         }
         else {
@@ -546,9 +627,17 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             showScanOrCopyLayout();
         }
         else {
-            super.onBackPressed();
             if (isEnabled2FA) {
+                if (rkSaved) {
+                    super.onBackPressed();
+                }
+                else {
+                    showSnackbar(getString(R.string.backup_rk_2fa_end));
+                }
                 update2FASetting();
+            }
+            else {
+                super.onBackPressed();
             }
         }
     }
@@ -913,15 +1002,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
                 if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
                     rkSaved = true;
-                    suggestionRK.setVisibility(View.GONE);
-                    exportRKButton.setVisibility(View.GONE);
-                    saveRKButton.setVisibility(View.GONE);
+                    dismissRKButton.setVisibility(View.VISIBLE);
                 }
                 else {
                     rkSaved = false;
-                    suggestionRK.setVisibility(View.VISIBLE);
-                    exportRKButton.setVisibility(View.VISIBLE);
-                    saveRKButton.setVisibility(View.VISIBLE);
+                    dismissRKButton.setVisibility(View.GONE);
                 }
             }
             else {

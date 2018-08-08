@@ -10413,6 +10413,89 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		});
 
+		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		firstPin.setLayoutParams(paramsb1);
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		firstPin.setLayoutParams(textParams);
+
+		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		secondPin.setLayoutParams(paramsb2);
+		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		secondPin.setLayoutParams(textParams);
+		secondPin.setEt(firstPin);
+
+		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		thirdPin.setLayoutParams(paramsb3);
+		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+		thirdPin.setLayoutParams(textParams);
+		thirdPin.setEt(secondPin);
+
+		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fourthPin.setLayoutParams(paramsb4);
+		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fourthPin.setLayoutParams(textParams);
+		fourthPin.setEt(thirdPin);
+
+		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fifthPin.setLayoutParams(paramsb5);
+		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fifthPin.setLayoutParams(textParams);
+		fifthPin.setEt(fourthPin);
+
+		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		sixthPin.setLayoutParams(paramsb6);
+		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
+		textParams.setMargins(0, 0, 0, 0);
+		sixthPin.setLayoutParams(textParams);
+		sixthPin.setEt(fifthPin);
+
 		verify2FADialog = builder.create();
 		verify2FADialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override

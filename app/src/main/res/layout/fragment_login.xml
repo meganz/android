@@ -238,78 +238,67 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_first_login"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_second_login"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_third_login"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="38dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fouth_login"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fifth_login"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_sixth_login"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:imeOptions="actionDone"
+                        android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
                 </LinearLayout>

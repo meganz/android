@@ -95,8 +95,8 @@
                     android:elevation="8dp"
                     android:textColor="@color/white"
                     android:fontFamily="roboto"
-                    android:paddingLeft="16.65dp"
-                    android:paddingRight="16.65dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     android:text="@string/button_setup_2fa"/>
 
             </RelativeLayout>
@@ -344,6 +344,8 @@
                     android:layout_below="@+id/seed_2fa"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="32dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     android:background="@drawable/background_button"
                     android:elevation="8dp"
                     android:textColor="@color/white"
@@ -356,6 +358,8 @@
                     android:layout_below="@+id/button_open_with_2fa"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="24dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     android:background="@color/white"
                     android:elevation="0dp"
                     android:textColor="@color/accentColor"
@@ -396,78 +400,67 @@
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_first"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_second"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_third"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="38dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_fourth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_fifth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:layout_marginRight="16dp"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_sixth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
-                        android:gravity="center"
                         android:textSize="32sp"
                         android:textColor="@color/name_my_account"
-                        android:imeOptions="actionDone"
+                        android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1" />
                 </LinearLayout>
@@ -611,7 +604,9 @@
                     android:elevation="8dp"
                     android:layout_margin="10dp"
                     android:textColor="@color/white"
-                    android:text="@string/general_export"/>
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:text="@string/option_export_recovery_key"/>
 
                 <Button
                     android:id="@+id/button_dismiss_rk"
@@ -620,6 +615,8 @@
                     android:textColor="@color/accentColor"
                     android:layout_toRightOf="@+id/button_export_rk"
                     android:layout_marginLeft="20dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     android:layout_margin="10dp"
                     android:text="@string/general_close"
                     style="?android:attr/borderlessButtonStyle"/>
