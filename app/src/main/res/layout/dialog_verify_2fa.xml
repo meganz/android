@@ -25,7 +25,7 @@
             android:id="@+id/container_confirm_2fa_verify"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="40dp"
+            android:paddingBottom="80dp"
             android:layout_below="@+id/toolbar">
 
             <TextView
@@ -38,6 +38,8 @@
                 android:gravity="center"
                 android:fontFamily="roboto"
                 android:layout_marginTop="40dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:layout_centerHorizontal="true"/>
 
             <LinearLayout
@@ -51,78 +53,67 @@
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_first_verify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
-                    android:gravity="center"
                     android:textSize="32sp"
                     android:textColor="@color/name_my_account"
-                    android:layout_marginRight="16dp"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_second_verify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
-                    android:gravity="center"
                     android:textSize="32sp"
                     android:textColor="@color/name_my_account"
-                    android:layout_marginRight="16dp"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_third_verify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
-                    android:gravity="center"
                     android:textSize="32sp"
                     android:textColor="@color/name_my_account"
-                    android:layout_marginRight="38dp"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_fouth_verify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
-                    android:gravity="center"
                     android:textSize="32sp"
                     android:textColor="@color/name_my_account"
-                    android:layout_marginRight="16dp"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_fifth_verify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
-                    android:gravity="center"
                     android:textSize="32sp"
                     android:textColor="@color/name_my_account"
-                    android:layout_marginRight="16dp"
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_sixth_verify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
-                    android:gravity="center"
                     android:textSize="32sp"
                     android:textColor="@color/name_my_account"
-                    android:imeOptions="actionDone"
+                    android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1" />
             </LinearLayout>

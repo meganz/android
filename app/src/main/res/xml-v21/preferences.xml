@@ -225,21 +225,6 @@
 			android:title="@string/settings_2fa"
 			android:summary="@string/setting_subtitle_2fa"/>
 
-		<Preference
-			android:key="settings_2fa_see_rk"
-			android:layout="@layout/see_rk_preferences_v21"
-			android:title="@string/see_recovery_key"/>
-
-		<Preference
-			android:key="settings_2fa_reset_authentication_app"
-			android:layout="@layout/reset_authentication_app_preferences_v21"
-			android:title="@string/reset_authentication_app"/>
-
-		<!--<Preference
-			android:key="settings_2fa_enable_sms"
-			android:title="@string/peference_enable_sms_2fa"
-			android:summary="@string/summary_preference_2fa_enable_sms" />-->
-
 	</PreferenceCategory>
 
 	<PreferenceCategory
