@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -42,6 +43,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -573,6 +575,15 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
             if (rkSaved) {
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                log("Exists MK in: "+path);
+                File file= new File(path);
+                if(file.exists()){
+                    exportRKButton.setVisibility(View.GONE);
+                }
+                else{
+                    exportRKButton.setVisibility(View.VISIBLE);
+                }
                 dismissRKButton.setVisibility(View.VISIBLE);
             }
             else {
@@ -1002,6 +1013,15 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
                 if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
                     rkSaved = true;
+                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                    log("Exists MK in: "+path);
+                    File file= new File(path);
+                    if(file.exists()){
+                        exportRKButton.setVisibility(View.GONE);
+                    }
+                    else{
+                        exportRKButton.setVisibility(View.VISIBLE);
+                    }
                     dismissRKButton.setVisibility(View.VISIBLE);
                 }
                 else {
