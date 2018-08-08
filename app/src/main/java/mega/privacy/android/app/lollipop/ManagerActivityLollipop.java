@@ -4370,6 +4370,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 			}
 		}
+
+		usedSpaceLayout.setVisibility(View.VISIBLE);
 	}
 
 	public void showConfirmationConnect(){
