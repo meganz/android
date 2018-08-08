@@ -20,21 +20,35 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Layout for group call -->
-            <RelativeLayout
-                android:id="@+id/big_elements_group_call"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/black">
 
-                <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-                    android:id="@+id/recycler_view_cameras"
+                <!-- Layout for group call -->
+                <RelativeLayout
+                    android:id="@+id/big_elements_group_call"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerInParent="true"
-                    android:choiceMode="multipleChoice"/>
-            </RelativeLayout>
+                    android:background="@color/black">
+
+                    <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
+                        android:id="@+id/recycler_view_cameras"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbars="horizontal"
+                        android:layout_centerHorizontal="true"
+                        android:nestedScrollingEnabled="false"/>
+                    <!--<android.support.v7.widget.RecyclerView-->
+                        <!--android:id="@+id/recycler_view_cameras"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:scrollbars="horizontal"/>-->
+
+                    <!--<mega.privacy.android.app.components.CustomizedGridCallRecyclerView-->
+                        <!--android:id="@+id/recycler_view_cameras"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:overScrollMode="never"-->
+                        <!--android:choiceMode="multipleChoice"/>-->
+
+                </RelativeLayout>
 
             <!-- Background -->
             <RelativeLayout

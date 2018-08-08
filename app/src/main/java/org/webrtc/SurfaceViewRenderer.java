@@ -284,7 +284,6 @@ public class SurfaceViewRenderer
   @Override
   public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
     ThreadUtils.checkIsOnMainThread();
-    logD("******surfaceChanged: format: " + format + " size: " + width + "x" + height);
   }
 
   private String getResourceName() {

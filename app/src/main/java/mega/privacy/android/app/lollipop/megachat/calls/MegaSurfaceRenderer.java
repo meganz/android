@@ -28,6 +28,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -81,9 +82,13 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     private void adjustAspectRatio() {
+        Log.d("***********","******** adjustAspectRatio:");
+
         if (bitmap != null && dstRect.height() != 0) {
             float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
+            Log.d("***********","******** srcaspectratio:"+srcaspectratio+", dstaspectratio: "+dstaspectratio);
+
 
             if (srcaspectratio != 0 && dstaspectratio != 0) {
                 if (srcaspectratio > dstaspectratio) {
@@ -104,12 +109,24 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
+        Log.d("***********","******** surfaceChanged: in_width("+in_width+"), in_height("+in_height+")");
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
 //        android.view.ViewGroup.LayoutParams lp = surf.getLayoutParams();
 //        lp.width = in_width;
 //        lp.height = in_height;
 //        surf.setLayoutParams(lp);
         changeDestRect(in_width, in_height);
+
+        Log.d("******", "****ViESurfaceRender::surfaceChanged" +
+                " in_width:" + in_width + " in_height:" + in_height +
+                " srcRect.left:" + srcRect.left +
+                " srcRect.top:" + srcRect.top +
+                " srcRect.right:" + srcRect.right +
+                " srcRect.bottom:" + srcRect.bottom +
+                " dstRect.left:" + dstRect.left +
+                " dstRect.top:" + dstRect.top +
+                " dstRect.right:" + dstRect.right +
+                " dstRect.bottom:" + dstRect.bottom);
 
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged" +
                 " in_width:" + in_width + " in_height:" + in_height +
