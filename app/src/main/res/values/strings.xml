@@ -2022,4 +2022,12 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Invalid code</string>
 
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage is almost full">Cloud Drive is almost full. Upgrade to Pro and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
+    <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
+    <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get bonus</string>
+
+    <string name="title_mail_upgrade_plan" context="Mail title to upgrade to a custom plan">Upgrade to a custom plan</string>
+    <string name="subject_mail_upgrade_plan" context="Mail subject to upgrade to a custom plan">Ask us how you can upgrade to a custom plan:</string>
+
 </resources>
