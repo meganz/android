@@ -1942,6 +1942,7 @@
     <string name="general_close" context="Text button">Close</string>
     <string name="general_rk" context ="Text of the file name where the Recovery Key is saved">MEGARecoveryKey.txt</string>
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">Export your Recovery Key to finish</string>
+    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Would you want to open Google Play to install some authenticator app?</string>
 
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>

@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -916,7 +918,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                         startActivity(intent);
                     }
                     else {
-                        showSnackbar(getString(R.string.intent_not_available_2fa));
+                        showAlertNotAppAvailable();
                     }
                 }
                 break;
@@ -942,6 +944,36 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 break;
             }
         }
+    }
+
+    void showAlertNotAppAvailable () {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(15, outMetrics), Util.scaleWidthPx(15, outMetrics), 0);
+
+        final TextView text = new TextView(this);
+        text.setText(getString(R.string.intent_not_available_2fa)+".\n\n"+getString(R.string.open_play_store_2fa));
+        text.setTextSize(15);
+        text.setGravity(Gravity.CENTER_HORIZONTAL);
+        text.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+        confirmationLayout.addView(text, params);
+        builder.setView(confirmationLayout);
+
+        builder.setPositiveButton(getString(R.string.context_open_link),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
+                        startActivity(intent);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
     @Override

@@ -7884,43 +7884,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        }
 	        case R.id.action_menu_refresh:{
 	        	switch(drawerItem){
-		        	case CLOUD_DRIVE:{
-		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			    		intent.setAction(Constants.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-		        		break;
-		        	}
-		        	case CONTACTS:{
-		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			    		intent.setAction(Constants.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-			    		break;
-		        	}
-		        	case SHARED_ITEMS:{
-
-		        		int index = viewPagerShares.getCurrentItem();
-		    			if(index==1){
-		    				//OUTGOING
-							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-							intent.setAction(Constants.ACTION_REFRESH);
-							intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
-							startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-		    			}
-		    			else{
-		    				//InCOMING
-
-							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-							intent.setAction(Constants.ACTION_REFRESH);
-							intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
-							startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-		    			}
-		        	}
 		        	case ACCOUNT:{
 						//Refresh all the info of My Account
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
