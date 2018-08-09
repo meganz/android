@@ -949,8 +949,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         recyclerViewList.setAdapter(adapterMEGA);
 
         if (adapterMEGA.getItemCount() == 0) {
-
-            emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
             String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
@@ -996,7 +994,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         if (adapterShareHeader.getItemCount() == 0){
-            emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
             String textToShow = String.format(getString(R.string.context_empty_contacts), getString(R.string.section_contacts));
             try{
                 textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
@@ -1536,7 +1533,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         emptyImageView = (ImageView) findViewById(R.id.add_contact_list_empty_image);
         emptyTextView = (TextView) findViewById(R.id.add_contact_list_empty_text);
-        emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+        }
+        else {
+            emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+        }
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
 
         progressBar = (ProgressBar) findViewById(R.id.add_contact_progress_bar);

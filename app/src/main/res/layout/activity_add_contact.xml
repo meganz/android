@@ -223,42 +223,36 @@
 		android:layout_below="@id/container_linear_layout"
 		android:background="@color/white">
 
-		<ImageView
-			android:id="@+id/add_contact_list_empty_image"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_centerHorizontal="true"
-			android:layout_marginTop="25dp"
-			android:gravity="center_horizontal" />
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:layout_centerInParent="true">
 
-        <LinearLayout
-            android:id="@+id/contact_list_empty_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@id/add_contact_list_empty_image"
-            android:layout_centerHorizontal="true">
+			<ImageView
+				android:id="@+id/add_contact_list_empty_image"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"/>
 
             <TextView
                 android:id="@+id/add_contact_list_empty_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:gravity="center_horizontal"
+                android:gravity="center"
+				android:layout_gravity="center_horizontal"
                 android:textColor="@color/text_secondary"
-                android:textSize="18sp" />
-        </LinearLayout>
+                android:textSize="18sp"/>
 
-		<ProgressBar
-			android:id="@+id/add_contact_progress_bar"
-			style="?android:attr/progressBarStyleLargeInverse"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
-			android:layout_below="@id/contact_list_empty_text"
-			android:layout_centerHorizontal="true"
-			android:visibility="gone"
-			android:layout_marginTop="10dp" />
+			<ProgressBar
+				android:id="@+id/add_contact_progress_bar"
+				style="?android:attr/progressBarStyleLargeInverse"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:visibility="gone"
+				android:layout_marginTop="10dp" />
+        </LinearLayout>
 
 		<RelativeLayout
 			android:id="@+id/container_list_contacts"
