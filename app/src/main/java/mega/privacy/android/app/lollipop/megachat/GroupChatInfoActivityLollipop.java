@@ -1618,6 +1618,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     {
                         showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
                     }
+                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
+                    {
+                        showSnackbar(getString(R.string.error_own_email_as_contact));
+                    }
                     else{
                         showSnackbar(getString(R.string.general_error));
                     }

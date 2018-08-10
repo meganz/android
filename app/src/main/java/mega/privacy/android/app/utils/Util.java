@@ -1661,7 +1661,6 @@ public class Util {
 		log("isVideoFile: "+path);
 		try{
 			String mimeType = URLConnection.guessContentTypeFromName(path);
-		    log("The mimeType is: "+mimeType);
 		    return mimeType != null && mimeType.indexOf("video") == 0;
 		}
 		catch(Exception e){
