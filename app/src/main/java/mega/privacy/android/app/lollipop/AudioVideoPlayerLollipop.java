@@ -1047,7 +1047,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             fileName = n.getName();
                             handle = Long.parseLong(n.getHandle());
                         }
-                        if (isZip) {
+                        else if (isZip) {
                             File zip = zipMediaFiles.get(currentWindowIndex);
                             fileName = zip.getName();
                             handle = -1;
