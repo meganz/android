@@ -183,7 +183,7 @@ public class PendingMessageBottomSheetDialogFragment extends BottomSheetDialogFr
 //                    log("onClick: Chat or message are NULL");
 //                }
 
-                ((ChatActivityLollipop) context).showSnackbar("Coming soon");
+                ((ChatActivityLollipop) context).retryPendingMessage(messageId);
                 break;
             }
 

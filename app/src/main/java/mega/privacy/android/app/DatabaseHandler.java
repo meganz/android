@@ -829,6 +829,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return idMessages;
 	}
 
+	public PendingMessage findPendingMessagesById(long messageId){
+		log("findPendingMessagesById");
+//		String id = messageId+"";
+		PendingMessage pendMsg = null;
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " +KEY_ID + " ='"+ messageId+"'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()) {
+//				long id = Integer.parseInt(cursor.getString(0));
+				long chatId = Long. parseLong(decrypt(cursor.getString(1)));
+				long timestamp = Long. parseLong(decrypt(cursor.getString(2)));
+				String idKarereString = decrypt(cursor.getString(3));
+				long idTempKarere = -1;
+				if(idKarereString!=null && (!idKarereString.isEmpty())){
+					idTempKarere = Long. parseLong(idKarereString);
+				}
+				int state = cursor.getInt(4);
+
+				pendMsg = new PendingMessage(messageId, chatId, timestamp, idTempKarere, state);
+			}
+		}
+
+		cursor.close();
+
+		ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(messageId);
+		pendMsg.setNodeAttachment(nodes.get(0));
+
+		return pendMsg;
+	}
+
 	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(int sent, long idChat){
 		log("findPendingMessageBySent");
 		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
