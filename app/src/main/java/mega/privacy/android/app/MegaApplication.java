@@ -68,7 +68,7 @@ import nz.mega.sdk.MegaUser;
 public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.8_204";
+	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -925,13 +925,10 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 							startActivity(confirmIntent);
 						}
 						else{
-
-							if(esid){
-								log("Launch intent to login activity");
-								Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
-								tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-								this.startActivity(tourIntent);
-							}
+							log("Launch intent to login activity");
+							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
+							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+							this.startActivity(tourIntent);
 						}
 					}
 					else{

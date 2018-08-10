@@ -4319,10 +4319,14 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if (mediaSourcePlaylist == null) {
                     mediaSourcePlaylist = new ArrayList<>();
                 }
+                else {
+                    mediaSourcePlaylist.clear();
+                }
                 getDownloadLocation();
                 if (isOffline) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);
+                        mSource = null;
                         if (currentNode.getOrigin() == MegaOffline.INCOMING) {
                             String handleString = currentNode.getHandleIncoming();
                             mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/" + currentNode.getPath() + "/" + currentNode.getName());
@@ -4344,7 +4348,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             mediaUris.add(mediaUri);
                             mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                         }
-                        mediaSourcePlaylist.add(mSource);
+                        if(mSource != null) {
+                            mediaSourcePlaylist.add(mSource);
+                        }
                     }
                 }
                 else if (isZip) {
@@ -4364,6 +4370,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     MegaNode n;
                     for (int i = 0; i < mediaHandles.size(); i++) {
                         n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                        mSource = null;
                         boolean isOnMegaDownloads = false;
                         localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, n.getName());
@@ -4391,7 +4398,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                 mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                             }
                         }
-                        mediaSourcePlaylist.add(mSource);
+                        if (mSource != null) {
+                            mediaSourcePlaylist.add(mSource);
+                        }
                     }
                 }
 
