@@ -195,9 +195,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
-    static int TYPE_UPLOAD = 0;
-    static int TYPE_DOWNLOAD = 1;
-
     private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
     private String path;
