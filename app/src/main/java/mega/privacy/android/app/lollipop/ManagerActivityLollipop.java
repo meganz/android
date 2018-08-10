@@ -239,13 +239,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	TransfersBottomSheetDialogFragment transfersBottomSheet = null;
 
-	//OVERQUOTA WARNING
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceTextFirst;
-	TextView outSpaceTextSecond;
-	TextView outSpaceButtonUpgrade;
-	TextView outSpaceButtonCancel;
-
 	//GET PRO ACCOUNT PANEL
 	LinearLayout getProLayout=null;
 	TextView getProText;
@@ -324,6 +317,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
+
+	boolean showStorageAlmostFullDialog = true;
 
     int orientationSaved;
 
@@ -1849,13 +1844,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
 		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
 
-		//OVERQUOTA WARNING PANEL
-		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
-		outSpaceTextFirst =  (TextView) findViewById(R.id.overquota_alert_text_first);
-		outSpaceTextSecond =  (TextView) findViewById(R.id.overquota_alert_text_second);
-		outSpaceButtonUpgrade = (TextView) findViewById(R.id.overquota_alert_btnRight_upgrade);
-		outSpaceButtonCancel = (TextView) findViewById(R.id.overquota_alert_btnLeft_cancel);
-
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
 		String getProTextString = getString(R.string.get_pro_account);
@@ -2690,6 +2678,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	}
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}
+
+			showStorageAlmostFullDialog();
 
 	        //INITIAL FRAGMENT
 			if(selectDrawerItemPending){
@@ -3914,6 +3904,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(networkStateReceiver!=null){
 			this.unregisterReceiver(networkStateReceiver);
 		}
+
+		showStorageAlmostFullDialog = true;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
@@ -11623,20 +11615,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 
-//		showStorageAlmostFullDialog();
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc()>=95){
-			showStorageAlmostFullDialog();
-		}
-		else{
-			outSpaceLayout.setVisibility(View.GONE);
-			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-				log("usedSpacePerc<95");
-				if(Util.showMessageRandom()){
-					log("Random: TRUE");
-					showProPanel();
-				}
-			}
-		}
+		showStorageAlmostFullDialog();
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc() < 90){
 			usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
@@ -11861,7 +11840,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			resetNavigationViewMenu(nVMenu);
 			hidden.setChecked(true);
 		}
-		outSpaceLayout.setVisibility(View.GONE);
+
 		getProLayout.setVisibility(View.GONE);
 		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
@@ -11878,7 +11857,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			resetNavigationViewMenu(nVMenu);
 			hidden.setChecked(true);
 		}
-		outSpaceLayout.setVisibility(View.GONE);
+
 		getProLayout.setVisibility(View.GONE);
 		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
@@ -11907,13 +11886,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 //			}
 			case R.id.btnLeft_cancel:{
 				getProLayout.setVisibility(View.GONE);
-				outSpaceLayout.setVisibility(View.GONE);
 				break;
 			}
-			case R.id.btnRight_upgrade:
-			case R.id.overquota_alert_btnRight_upgrade:{
+			case R.id.btnRight_upgrade:{
 				//Add navigation to Upgrade Account
-				log("click on Upgrade in overquota or pro panel!");
+				log("click on Upgrade in pro panel!");
 				navigateToUpgradeAccount();
 				break;
 			}
@@ -13395,122 +13372,146 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void showStorageAlmostFullDialog(){
 		log("showStorageAlmostFullDialog");
 
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-		LayoutInflater inflater = this.getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.storage_almost_full_layout, null);
-		dialogBuilder.setView(dialogView);
-
-		TextView title = (TextView) dialogView.findViewById(R.id.storage_almost_full_title);
-		title.setText(getString(R.string.action_upgrade_account));
-
-		TextView text = (TextView) dialogView.findViewById(R.id.text_storage_almost_full);
-		text.setText(getString(R.string.text_almost_full_warning));
-
-		LinearLayout horizontalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.horizontal_buttons_storage_almost_full_layout);
-		LinearLayout verticalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.vertical_buttons_storage_almost_full_layout);
-		Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_dissmiss);
-		Button horizontalDismissButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_dissmiss);
-		Button verticalActionButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_action);
-		Button horizontalActionButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_payment);
-		Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_achievements);
-
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-			log("FREE USER");
-
-			if(megaApi.isAchievementsEnabled()){
-				horizontalButtonsLayout.setVisibility(View.GONE);
-				verticalButtonsLayout.setVisibility(View.VISIBLE);
-				verticalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
-
-				verticalDismissButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-					}
-
-				});
-
-				achievementsButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						log("Go to achievements section");
-						navigateToAchievements();
-					}
-
-				});
-
-				verticalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						navigateToUpgradeAccount();
-					}
-
-				});
-			}
-			else{
-				horizontalButtonsLayout.setVisibility(View.VISIBLE);
-				verticalButtonsLayout.setVisibility(View.GONE);
-				horizontalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
-
-				horizontalDismissButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-					}
-				});
-
-				horizontalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						navigateToUpgradeAccount();
-					}
-
-				});
-			}
-
+		if(((MegaApplication) getApplication()).getMyAccountInfo()==null || ((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==-1){
+			log("Do not show dialog, not info of the account received yet");
+			return;
 		}
-		else{
-			horizontalButtonsLayout.setVisibility(View.VISIBLE);
-			verticalButtonsLayout.setVisibility(View.GONE);
 
-			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>=MegaAccountDetails.ACCOUNT_TYPE_PROIII){
-				log("USER PRO III");
-				horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
+		if(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc()>=95){
+			if(showStorageAlmostFullDialog){
 
-				horizontalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						askForCustomizedPlan();
+				showStorageAlmostFullDialog = false;
+
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+				LayoutInflater inflater = this.getLayoutInflater();
+				View dialogView = inflater.inflate(R.layout.storage_almost_full_layout, null);
+				dialogBuilder.setView(dialogView);
+
+				TextView title = (TextView) dialogView.findViewById(R.id.storage_almost_full_title);
+				title.setText(getString(R.string.action_upgrade_account));
+
+				TextView text = (TextView) dialogView.findViewById(R.id.text_storage_almost_full);
+				text.setText(getString(R.string.text_almost_full_warning));
+
+				LinearLayout horizontalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.horizontal_buttons_storage_almost_full_layout);
+				LinearLayout verticalButtonsLayout = (LinearLayout) dialogView.findViewById(R.id.vertical_buttons_storage_almost_full_layout);
+				Button verticalDismissButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_dissmiss);
+				Button horizontalDismissButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_dissmiss);
+				Button verticalActionButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_action);
+				Button horizontalActionButton = (Button) dialogView.findViewById(R.id.horizontal_storage_almost_full_button_payment);
+				Button achievementsButton = (Button) dialogView.findViewById(R.id.vertical_storage_almost_full_button_achievements);
+
+				if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
+					log("show StorageAlmostFull Dialog for FREE USER");
+
+					if(megaApi.isAchievementsEnabled()){
+						horizontalButtonsLayout.setVisibility(View.GONE);
+						verticalButtonsLayout.setVisibility(View.VISIBLE);
+						verticalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+
+						verticalDismissButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+							}
+
+						});
+
+						achievementsButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+								log("Go to achievements section");
+								navigateToAchievements();
+							}
+
+						});
+
+						verticalActionButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+								navigateToUpgradeAccount();
+							}
+
+						});
+					}
+					else{
+						horizontalButtonsLayout.setVisibility(View.VISIBLE);
+						verticalButtonsLayout.setVisibility(View.GONE);
+						horizontalActionButton.setText(getString(R.string.button_plans_almost_full_warning));
+
+						horizontalDismissButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+							}
+						});
+
+						horizontalActionButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+								navigateToUpgradeAccount();
+							}
+
+						});
 					}
 
-				});
-			}
-			else{
-				log("USER PRO");
-				horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
+				}
+				else{
+					horizontalButtonsLayout.setVisibility(View.VISIBLE);
+					verticalButtonsLayout.setVisibility(View.GONE);
 
-				horizontalActionButton.setOnClickListener(new OnClickListener(){
-					public void onClick(View v) {
-						alertDialogStorageAlmostFull.dismiss();
-						navigateToUpgradeAccount();
+					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>=MegaAccountDetails.ACCOUNT_TYPE_PROIII){
+						log("show StorageAlmostFull Dialog for USER PRO III");
+						horizontalActionButton.setText(getString(R.string.button_custom_almost_full_warning));
+
+						horizontalActionButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+								askForCustomizedPlan();
+							}
+
+						});
+					}
+					else{
+						log("show StorageAlmostFull Dialog for USER PRO");
+						horizontalActionButton.setText(getString(R.string.my_account_upgrade_pro));
+
+						horizontalActionButton.setOnClickListener(new OnClickListener(){
+							public void onClick(View v) {
+								alertDialogStorageAlmostFull.dismiss();
+								navigateToUpgradeAccount();
+							}
+
+						});
 					}
 
-				});
-			}
+					horizontalDismissButton.setOnClickListener(new OnClickListener(){
+						public void onClick(View v) {
+							alertDialogStorageAlmostFull.dismiss();
+						}
 
-			horizontalDismissButton.setOnClickListener(new OnClickListener(){
-				public void onClick(View v) {
-					alertDialogStorageAlmostFull.dismiss();
+					});
+
 				}
 
-			});
+				alertDialogStorageAlmostFull = dialogBuilder.create();
 
+				alertDialogStorageAlmostFull.setCancelable(false);
+				alertDialogStorageAlmostFull.setCanceledOnTouchOutside(false);
+				alertDialogStorageAlmostFull.show();
+			}
+			else{
+				log("Storage almost full dialog already shown");
+			}
 		}
-
-		alertDialogStorageAlmostFull = dialogBuilder.create();
-
-		alertDialogStorageAlmostFull.setCancelable(false);
-		alertDialogStorageAlmostFull.setCanceledOnTouchOutside(false);
-		alertDialogStorageAlmostFull.show();
+		else{
+			if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
+				log("usedSpacePerc<95");
+				if(Util.showMessageRandom()){
+					log("Random: TRUE");
+					showProPanel();
+				}
+			}
+		}
 	}
 
 	public void askForCustomizedPlan(){
