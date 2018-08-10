@@ -995,6 +995,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         dbH.setChatItemPreferences(prefs);
                     }
 
+                    megaChatApi.closeChatRoom(idChat, null);
                     boolean result = megaChatApi.openChatRoom(idChat, this);
                     if(result){
                         MegaApplication.setClosedChat(false);
