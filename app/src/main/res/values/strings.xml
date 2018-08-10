@@ -3,9 +3,9 @@
 
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="pdf_app_name" context="Not translate">MEGA PDF Viewer</string>
-    <string name="app_version" context="Not translate">3.3.7 (201)</string>
-    <string name="sdk_version" context="Not translate">b5e58bd</string>
-    <string name="karere_version" context="Not translate">bbefbfd</string>
+    <string name="app_version" context="Not translate">3.3.8 (205)</string>
+    <string name="sdk_version" context="Not translate">8271d27</string>
+    <string name="karere_version" context="Not translate">903f3d3</string>
 
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven\'t already done so) and then click on the MEGA app. You\'ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users\' confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
@@ -927,7 +927,7 @@
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
     -->
 
-    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">This email address is already in use.</string>
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Change email</string>
@@ -2032,5 +2032,19 @@
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Share with %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">New group chat</string>
     <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Add contacts</string>
+
+    <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Logged out</string>
+
+    <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">There’s no need to add your own email address</string>
+
+    <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Invalid code</string>
+
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage is almost full">Cloud Drive is almost full. Upgrade to Pro and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
+    <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
+    <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get bonus</string>
+
+    <string name="title_mail_upgrade_plan" context="Mail title to upgrade to a custom plan">Upgrade to a custom plan</string>
+    <string name="subject_mail_upgrade_plan" context="Mail subject to upgrade to a custom plan">Ask us how you can upgrade to a custom plan:</string>
 
 </resources>

@@ -1025,19 +1025,23 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
             long chatHandleToUpdate = item.getChatId();
             int indexToReplace = -1;
-            ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-            while (itrReplace.hasNext()) {
-                MegaChatListItem chat = itrReplace.next();
-                if(chat!=null){
-                    if(chat.getChatId()==chatHandleToUpdate){
-                        indexToReplace = itrReplace.nextIndex()-1;
+
+            if(chats!=null && !chats.isEmpty()){
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if(chat!=null){
+                        if(chat.getChatId()==chatHandleToUpdate){
+                            indexToReplace = itrReplace.nextIndex()-1;
+                            break;
+                        }
+                    }
+                    else{
                         break;
                     }
                 }
-                else{
-                    break;
-                }
             }
+
             if(indexToReplace!=-1){
                 log("Index to replace: "+indexToReplace);
                 chats.set(indexToReplace, item);
@@ -1276,6 +1280,35 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             }
                         }
                     }
+                }
+            }
+        }
+        else if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_CALL)){
+            log("listItemUpdate: Change: MegaChatListItem.CHANGE_TYPE_CALL");
+
+            if (adapterList == null || adapterList.getItemCount()==0){
+                setChats();
+            }
+            else{
+                long chatHandleToUpdate = item.getChatId();
+                int indexToReplace = -1;
+                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatListItem chat = itrReplace.next();
+                    if(chat!=null){
+                        if(chat.getChatId()==chatHandleToUpdate){
+                            indexToReplace = itrReplace.nextIndex()-1;
+                            break;
+                        }
+                    }
+                    else{
+                        break;
+                    }
+                }
+                if(indexToReplace!=-1){
+                    log("Index to replace: "+indexToReplace);
+                    chats.set(indexToReplace, item);
+                    adapterList.notifyItemChanged(indexToReplace);
                 }
             }
         }

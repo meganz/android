@@ -1666,41 +1666,48 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (error.getErrorCode() != MegaError.API_OK) {
                 MegaApplication.setLoggingIn(false);
 
-                String errorMessage;
-                if (error.getErrorCode() == MegaError.API_ENOENT) {
-                    errorMessage = getString(R.string.error_incorrect_email_or_password);
-                }
-                else if (error.getErrorCode() == MegaError.API_ESID){
-                    errorMessage = getString(R.string.error_server_expired_session);
-                }
-                else if (error.getErrorCode() == MegaError.API_ETOOMANY){
-                    errorMessage = getString(R.string.too_many_attempts_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
-                    errorMessage = getString(R.string.account_not_validated_login);
-                }
-                else if (error.getErrorCode() == MegaError.API_EBLOCKED){
-                    errorMessage = getString(R.string.error_account_suspended);
+                String errorMessage = "";
+                if (error.getErrorCode() == MegaError.API_ESID){
+                    log("MegaError.API_ESID "+getString(R.string.error_server_expired_session));
+                    ((LoginActivityLollipop)context).showAlertLoggedOut();
                 }
                 else{
-                    errorMessage = error.getErrorString();
-                }
-                log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
-
-                if (Util.isChatEnabled()) {
-                    if (megaChatApi != null) {
-                        megaChatApi.logout(this);
+                    if (error.getErrorCode() == MegaError.API_ENOENT) {
+                        errorMessage = getString(R.string.error_incorrect_email_or_password);
                     }
-                }
+                    else if (error.getErrorCode() == MegaError.API_ETOOMANY){
+                        errorMessage = getString(R.string.too_many_attempts_login);
+                    }
+                    else if (error.getErrorCode() == MegaError.API_EINCOMPLETE){
+                        errorMessage = getString(R.string.account_not_validated_login);
+                    }
+                    else if (error.getErrorCode() == MegaError.API_EBLOCKED){
+                        errorMessage = getString(R.string.error_account_suspended);
+                    }
+                    else{
+                        errorMessage = error.getErrorString();
+                    }
+                    log("LOGIN_ERROR: "+error.getErrorCode()+ " "+error.getErrorString());
 
-                if(chatSettings==null) {
-                    log("1 - Reset chat setting enable");
-                    chatSettings = new ChatSettings();
-                    dbH.setChatSettings(chatSettings);
-                }
-                else{
-                    log("2 - Reset chat setting enable");
-                    dbH.setEnabledChat(true + "");
+                    if (Util.isChatEnabled()) {
+                        if (megaChatApi != null) {
+                            megaChatApi.logout(this);
+                        }
+                    }
+
+                    if(!errorMessage.isEmpty()){
+                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                    }
+
+                    if(chatSettings==null) {
+                        log("1 - Reset chat setting enable");
+                        chatSettings = new ChatSettings();
+                        dbH.setChatSettings(chatSettings);
+                    }
+                    else{
+                        log("2 - Reset chat setting enable");
+                        dbH.setEnabledChat(true + "");
+                    }
                 }
 
                 loginLoggingIn.setVisibility(View.GONE);
@@ -1714,16 +1721,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 fetchingNodesText.setVisibility(View.GONE);
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
-
-                ((LoginActivityLollipop)context).showSnackbar(errorMessage);
-
-//				DatabaseHandler dbH = new DatabaseHandler(this);
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
-                dbH.clearCredentials();
-                dbH.clearEphemeral();
-                if (dbH.getPreferences() != null){
-                    ((LoginActivityLollipop)context).stopCameraSyncService();
-                }
             }
             else{
 

@@ -309,7 +309,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     boolean creatingPlaylist = true;
     boolean playListCreated = false;
     CreatePlayList createPlayList;
-    final List<MediaSource> mediaSourcePlaylist = new ArrayList<>();
+    List<MediaSource> mediaSourcePlaylist = new ArrayList<>();
+    int createPlayListErrorCounter = 0;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -917,6 +918,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         //Create a default LoadControl
         LoadControl loadControl = new DefaultLoadControl();
 
+        createPlayListErrorCounter = 0;
         //Create the player
         player = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
         simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.player_view);
@@ -4188,6 +4190,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public class CreatePlayList extends AsyncTask<Void, Void, Void> {
 
+        boolean errorCreatingPlaylist = false;
+
         @Override
         protected Void doInBackground(Void... voids) {
             log("CreatePlayList doInBackground");
@@ -4199,10 +4203,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 Uri mediaUri;
                 File mediaFile;
                 mediaUris = new ArrayList<>();
+                if (mediaSourcePlaylist == null) {
+                    mediaSourcePlaylist = new ArrayList<>();
+                }
+                else {
+                    mediaSourcePlaylist.clear();
+                }
                 getDownloadLocation();
                 if (isOffLine) {
                     for (int i = 0; i < mediaOffList.size(); i++) {
                         MegaOffline currentNode = mediaOffList.get(i);
+                        mSource = null;
                         if (currentNode.getOrigin() == MegaOffline.INCOMING) {
                             String handleString = currentNode.getHandleIncoming();
                             mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offLineDIR + "/" + handleString + "/" + currentNode.getPath() + "/" + currentNode.getName());
@@ -4224,13 +4235,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             mediaUris.add(mediaUri);
                             mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                         }
-                        mediaSourcePlaylist.add(mSource);
+                        if(mSource != null) {
+                            mediaSourcePlaylist.add(mSource);
+                        }
                     }
                 }
                 else {
                     MegaNode n;
                     for (int i = 0; i < mediaHandles.size(); i++) {
                         n = megaApi.getNodeByHandle(mediaHandles.get(i));
+                        mSource = null;
                         boolean isOnMegaDownloads = false;
                         localPath = mega.privacy.android.app.utils.Util.getLocalFile(audioVideoPlayerLollipop, n.getName(), n.getSize(), downloadLocationDefaultPath);
                         File f = new File(downloadLocationDefaultPath, n.getName());
@@ -4258,11 +4272,27 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                 mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                             }
                         }
-                        mediaSourcePlaylist.add(mSource);
+                        if (mSource != null) {
+                            mediaSourcePlaylist.add(mSource);
+                        }
                     }
                 }
 
-                concatenatingMediaSource = new ConcatenatingMediaSource(mediaSourcePlaylist.toArray(new MediaSource[mediaSourcePlaylist.size()]));
+//                concatenatingMediaSource = new ConcatenatingMediaSource(mediaSourcePlaylist.toArray(new MediaSource[mediaSourcePlaylist.size()]));
+
+                if (!mediaSourcePlaylist.isEmpty()) {
+                    MediaSource[] arrayMediaSource = mediaSourcePlaylist.toArray(new MediaSource[mediaSourcePlaylist.size()]);
+                    if (arrayMediaSource != null) {
+                        concatenatingMediaSource = new ConcatenatingMediaSource(arrayMediaSource);
+                    }
+                    else {
+                        errorCreatingPlaylist = true;
+                    }
+                }
+                else {
+                    errorCreatingPlaylist = true;
+                }
+
                 //            loopingMediaSource = new LoopingMediaSource(concatenatingMediaSource);
                 //            player.prepare(loopingMediaSource);
             }
@@ -4273,13 +4303,24 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         protected void onPostExecute(Void avoid) {
             super.onPostExecute(avoid);
             log("CreatePlayList onPostExecute");
-            new FindSelected().execute();
-            createPlaylistProgressBar.setVisibility(View.GONE);
-            playListCreated = true;
-            enableNextButton();
-            playList.setVisibility(View.VISIBLE);
-            if (playbackStateSaved == Player.STATE_ENDED){
-                initPlaylist(currentWindowIndex+1, 0);
+            if (errorCreatingPlaylist && createPlayListErrorCounter < 2) {
+                createPlayListErrorCounter++;
+                log("errorCreatingPlaylist num: "+createPlayListErrorCounter);
+                createPlayList = new CreatePlayList();
+                createPlayList.execute();
+            }
+            else if (errorCreatingPlaylist && createPlayListErrorCounter == 2) {
+                createPlaylistProgressBar.setVisibility(View.GONE);
+            }
+            else {
+                new FindSelected().execute();
+                createPlaylistProgressBar.setVisibility(View.GONE);
+                playListCreated = true;
+                enableNextButton();
+                playList.setVisibility(View.VISIBLE);
+                if (playbackStateSaved == Player.STATE_ENDED){
+                    initPlaylist(currentWindowIndex+1, 0);
+                }
             }
         }
     }
