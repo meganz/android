@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 
 public class ArchivedChatsActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
@@ -252,25 +253,39 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
 
         if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
             long chatHandle = request.getChatHandle();
-            MegaChatListItem chatItem = megaChatApi.getChatListItem(chatHandle);
+            MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+
+            String chatTitle = chat.getTitle();
+
+            if(chatTitle==null){
+                chatTitle = "";
+            }
+            else if(!chatTitle.isEmpty() && chatTitle.length()>60){
+                chatTitle = chatTitle.substring(0,59)+"...";
+            }
+
+            if(!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()){
+                chatTitle = "\""+chatTitle+"\"";
+            }
+
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getFlag()){
                     log("Chat archived");
-                    showSnackbar(getString(R.string.success_archive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.success_archive_chat, chatTitle));
                 }
                 else{
                     log("Chat unarchived");
-                    showSnackbar(getString(R.string.success_unarchive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
                 }
             }
             else{
                 if(request.getFlag()){
                     log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
-                    showSnackbar(getString(R.string.error_archive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.error_archive_chat, chatTitle));
                 }
                 else{
                     log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
-                    showSnackbar(getString(R.string.error_unarchive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
                 }
             }
         }
