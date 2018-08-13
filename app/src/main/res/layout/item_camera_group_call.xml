@@ -2,21 +2,23 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/green_free_account"
+    android:gravity="center"
+    android:background="@android:color/holo_green_light"
     android:id="@+id/general">
 
 
             <RelativeLayout
                 android:id="@+id/rl_surface"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="@android:color/transparent"
                 android:visibility="gone">
                 <!--camera FS-->
                 <SurfaceView
                     android:id="@+id/surface_local_video"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </RelativeLayout>
 
             <!--Big Avatar-->
@@ -42,7 +44,7 @@
                     android:id="@+id/avatar_initial_letter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="50sp"
+                    android:textSize="20sp"
                     android:background="@android:color/transparent"
                     android:textColor="@color/white"
                     android:layout_centerInParent="true"
