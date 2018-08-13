@@ -51,6 +51,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -1080,7 +1081,16 @@ public class OfflineFragmentLollipop extends Fragment{
 				if(currentFile.exists() && currentFile.isFile()){			
 					
 					//Open it!
-					if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+					if(MimeTypeList.typeForName(currentFile.getName()).isZip()){
+						log("MimeTypeList ZIP");
+						Intent intentZip = new Intent();
+						intentZip.setClass(context, ZipBrowserActivityLollipop.class);
+						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathNavigation);
+						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						context.startActivity(intentZip);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
