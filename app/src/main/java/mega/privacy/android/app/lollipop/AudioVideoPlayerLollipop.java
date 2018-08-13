@@ -189,8 +189,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private Uri uri;
     private TextView exoPlayerName;
     private ProgressBar progressBar;
-    private RelativeLayout playPauseButton;
     private RelativeLayout containerControls;
+    private RelativeLayout controlsButtonsLayout;
 
     private AppBarLayout appBarLayout;
     private Toolbar tB;
@@ -458,7 +458,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
 
-
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
         }
@@ -489,8 +488,21 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         audioContainer.setVisibility(View.GONE);
 
         progressBar = (ProgressBar) findViewById(R.id.full_video_viewer_progress_bar);
-        playPauseButton = (RelativeLayout) findViewById(R.id.play_pause_button);
         containerControls = (RelativeLayout) findViewById(R.id.container_exo_controls);
+        controlsButtonsLayout = (RelativeLayout) findViewById(R.id.container_control_buttons);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
+            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
+            RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
+            params1.setMargins(0, 0, 0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
+            params2.setMargins(0,0,0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
+            params3.addRule(RelativeLayout.ABOVE, containerControls.getId());
+            exoPlayerName.setLayoutParams(params1);
+            controlsButtonsLayout.setLayoutParams(params2);
+            audioContainer.setLayoutParams(params3);
+        }
+
         previousButton = (ImageButton) findViewById(R.id.exo_prev);
         previousButton.setOnTouchListener(this);
         nextButton = (ImageButton) findViewById(R.id.exo_next);
