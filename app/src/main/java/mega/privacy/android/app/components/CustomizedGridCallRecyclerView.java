@@ -12,7 +12,6 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
 
     private CustomizedGridLayoutManager manager;
     public int columnWidth = -1;
-    public int rowHeight = -1;
     private boolean isWrapContent = false;
     private int widthTotal = 0;
 
@@ -35,13 +34,9 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         if (attrs != null) {
             int[] attrsArray = {
                     android.R.attr.columnWidth,
-                    android.R.attr.rowHeight
-
             };
             TypedArray array = context.obtainStyledAttributes(attrs, attrsArray);
             columnWidth = array.getDimensionPixelSize(0, -1);
-            rowHeight = array.getDimensionPixelSize(0, -1);
-
             array.recycle();
         }
 
@@ -55,8 +50,6 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
         super.onMeasure(widthSpec, heightSpec);
         if(!isWrapContent){
             log("columnWidth :"+columnWidth);
-            log("rowHeight :"+rowHeight);
-
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
                 log("spanCount: "+spanCount);
@@ -66,8 +59,6 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
 
             ViewGroup.LayoutParams params = getLayoutParams();
             log("columnWidth :"+columnWidth);
-            log("rowHeight :"+rowHeight);
-
             if (columnWidth > 0) {
                 int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
                 log("spanCount: "+spanCount);
@@ -98,17 +89,8 @@ public class CustomizedGridCallRecyclerView extends RecyclerView {
     public int getColumnWidth() {
         return columnWidth;
     }
-
     public void setColumnWidth(int columnWidth) {
         this.columnWidth = columnWidth;
-    }
-
-    public int getRowHeight() {
-        return rowHeight;
-    }
-
-    public void setRowHeight(int rowHeight) {
-        this.rowHeight = rowHeight;
     }
 
     @Override

@@ -20,13 +20,10 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
     public GroupCallListener(Context context, GroupCallAdapter.ViewHolderGroupCall holder) {
         this.context = context;
         this.holder = holder;
+        this.width = 0;
+        this.height = 0;
 
     }
-
-    public GroupCallListener(Context context) {
-        this.context = context;
-    }
-
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
@@ -42,7 +39,6 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             if (Sholder != null) {
                 int viewWidth = holder.surfaceView.getWidth();
                 int viewHeight = holder.surfaceView.getHeight();
-//                Log.d("**GroupCallListener*","***** viewWidth("+viewWidth+"), viewHeight("+viewHeight+") ");
 
                 if ((viewWidth != 0) && (viewHeight != 0)) {
                     int holderWidth = viewWidth < width ? viewWidth : width;
