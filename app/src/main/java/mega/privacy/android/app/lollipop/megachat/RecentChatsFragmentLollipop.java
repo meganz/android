@@ -160,13 +160,13 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         emptyImageView = (ImageView) v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
+
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
-            emptyTextView.setVisibility(View.GONE);
         }else{
             emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
-            emptyTextView.setVisibility(View.VISIBLE);
         }
+
         inviteButton = (Button) v.findViewById(R.id.invite_button);
         inviteButton.setOnClickListener(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -397,9 +397,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             inviteButton.setText(getString(R.string.menu_add_contact));
             inviteButton.setVisibility(View.VISIBLE);
 
-            textToShowB = String.format(context.getString(R.string.recent_chat_empty));
+
         }
 
+        textToShowB = String.format(context.getString(R.string.recent_chat_empty));
         try{
             textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -413,7 +414,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         } else {
             resultB = Html.fromHtml(textToShowB);
         }
-
         emptyTextView.setText(resultB);
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             emptyTextView.setVisibility(View.GONE);
@@ -454,6 +454,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
 
         inviteButton.setText(getString(R.string.recent_chat_enable_chat_button));
         inviteButton.setVisibility(View.VISIBLE);
+
         emptyTextView.setText(R.string.recent_chat_enable_chat);
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             emptyTextView.setVisibility(View.GONE);
@@ -494,7 +495,6 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         inviteButton.setVisibility(View.GONE);
 
         String textToShowB = String.format(context.getString(R.string.recent_chat_loading_conversations));
-
         try{
             textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -505,10 +505,9 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         Spanned resultB = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-        } else {
+        }else{
             resultB = Html.fromHtml(textToShowB);
         }
-
         emptyTextView.setText(resultB);
         emptyTextView.setVisibility(View.VISIBLE);
     }
@@ -524,6 +523,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         emptyTextViewInvite.setVisibility(View.VISIBLE);
         inviteButton.setVisibility(View.GONE);
+
         emptyTextView.setText(R.string.recent_chat_empty_no_connection_text);
         if(Util.isChatEnabled()){
             emptyTextView.setVisibility(View.GONE);
