@@ -112,7 +112,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if(aB!=null){
-            aB.setTitle("Choose chat");
+            aB.setTitle(getString(R.string.choose_chat));
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
             aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);

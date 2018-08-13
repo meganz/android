@@ -2015,5 +2015,6 @@
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File versioning</string>
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
+    <string name="choose_chat" context="section title to select a chat to send a file">Choose chat</string>
 
 </resources>
