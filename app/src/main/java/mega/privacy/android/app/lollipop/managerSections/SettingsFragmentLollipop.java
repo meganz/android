@@ -1120,7 +1120,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		setAutoaccept = false;
 		autoAccept = true;
-		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+		if (megaApi.multiFactorAuthAvailable()) {
+			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+		}
+		else {
+			preferenceScreen.removePreference(twoFACategory);
+		}
 		megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
 	}
