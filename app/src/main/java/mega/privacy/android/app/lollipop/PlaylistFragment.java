@@ -281,7 +281,7 @@ public class PlaylistFragment extends Fragment{
 
     public void itemClick(int position) {
         log("item click position: " + position);
-        if (player != null) {
+        if (player != null && !((AudioVideoPlayerLollipop) context).isCreatingPlaylist()) {
             player.seekTo(position, 0);
         }
     }
