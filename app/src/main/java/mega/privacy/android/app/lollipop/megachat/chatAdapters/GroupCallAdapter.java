@@ -167,21 +167,20 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     ViewHolderGroupCallGrid holderGrid = null;
 
     @Override public GroupCallAdapter.ViewHolderGroupCall onCreateViewHolder(ViewGroup parent, int viewType) {
-        log("onCreateViewHolder()");
+        log(" onCreateViewHolder()");
 
-//        display = ((Activity) context).getWindowManager().getDefaultDisplay();
-//        outMetrics = new DisplayMetrics();
-//        display.getMetrics(outMetrics);
-//        widthScreenPX = outMetrics.widthPixels;
-//        heightScreenPX = outMetrics.heightPixels;
-//        density = ((Activity) context).getResources().getDisplayMetrics().density;
-//        scaleW = Util.getScaleW(outMetrics, density);
-//        scaleH = Util.getScaleH(outMetrics, density);
+        display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+        widthScreenPX = outMetrics.widthPixels;
+        heightScreenPX = outMetrics.heightPixels;
+        density = ((Activity) context).getResources().getDisplayMetrics().density;
+        scaleW = Util.getScaleW(outMetrics, density);
+        scaleH = Util.getScaleH(outMetrics, density);
 
 
         maxScreenHeight = parent.getMeasuredHeight();
         maxScreenWidth = parent.getMeasuredWidth();
-
 //        log("onCreateViewHolder-> maxScreenHeight("+maxScreenHeight+"), maxScreenWidth("+maxScreenWidth+")");
 
 
@@ -210,14 +209,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
             holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
             holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
-            holderGrid.surfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-            holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
-            holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth;
+//            holderGrid.surfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
+//            holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
+//            holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth;
+//
+//            holderGrid.surfaceView.setZOrderMediaOverlay(true);
+//            SurfaceHolder localSurfaceHolder = holderGrid.surfaceView.getHolder();
+//            localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+//            holderGrid.localRenderer = new MegaSurfaceRenderer(holderGrid.surfaceView);
 
-            holderGrid.surfaceView.setZOrderMediaOverlay(true);
-            SurfaceHolder localSurfaceHolder = holderGrid.surfaceView.getHolder();
-            localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-            holderGrid.localRenderer = new MegaSurfaceRenderer(holderGrid.surfaceView);
+
             v.setTag(holderGrid);
             return holderGrid;
 
@@ -242,7 +243,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
-        log("onBindViewHolderGrid()");
+        log("* onBindViewHolderGrid()");
 
         InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
@@ -250,10 +251,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         int numPeersOnCall = getItemCount();
-//        if((listenerPeer==null)&&(peer.getListener()==null)){
-//            listenerPeer = new GroupCallListener(context, holder);
-//            peer.setListener(listenerPeer);
-//        }
+
+
 //        if(numPeersOnCall<=3){
 //            holderGrid.rlGeneral.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
 //            holderGrid.rlGeneral.getLayoutParams().width= maxScreenWidth;
@@ -267,9 +266,31 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 //        holderGrid.rlGeneral.getLayoutParams().height = maxScreenHeight;
 //        holderGrid.rlGeneral.getLayoutParams().width= maxScreenWidth;
+
+
+
+
         if(peer.isVideoOn()){
+            log("Video ON-> for "+peer.getName());
             holder.avatarLayout.setVisibility(GONE);
             holderGrid.surfaceViewLayout.setVisibility(View.VISIBLE);
+            log(" Video ON-> surfaceViewLayout.child: "+holderGrid.surfaceViewLayout.getChildCount());
+
+            if(holderGrid.surfaceViewLayout.getChildCount() == 0){
+                log(" Video ON-> Create New SurfaceView ");
+                holderGrid.surfaceView = new SurfaceView(context);
+
+                holderGrid.surfaceView.setZOrderMediaOverlay(true);
+                SurfaceHolder localSurfaceHolder = holderGrid.surfaceView.getHolder();
+                localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+                holderGrid.localRenderer = new MegaSurfaceRenderer(holderGrid.surfaceView);
+
+                holderGrid.surfaceViewLayout.addView(holderGrid.surfaceView);
+                holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
+                holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth;
+            }
+
+
 //            holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight;
 //            holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth/numPeersOnCall;
 
@@ -288,44 +309,44 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-//                if(peer.getListener()==null){
-                    log("Video ON -> create listener Peer (YO) ");
+                if(peer.getListener()==null){
+                    log(" Video ON-> Create listener for me ");
                     GroupCallListener listenerPeer = new GroupCallListener(context, holderGrid);
                     peer.setListener(listenerPeer);
                     megaChatApi.addChatLocalVideoListener(chatId, listenerPeer);
-//                }
-//              megaChatApi.addChatLocalVideoListener(chatId, listenerPeer);
+                }
             }else{
-//                if(peer.getListener()==null){
-                    log(" Video ON -> create listener Peer ("+peer.getName()+") ");
+                if(peer.getListener()==null){
+                    log(" Video ON-> Create listener for "+peer.getName());
                     GroupCallListener listenerPeer = new GroupCallListener(context, holderGrid);
                     peer.setListener(listenerPeer);
                     megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), listenerPeer);
-//                }
-//               megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), listenerPeer);
+                }
             }
 
         }else{
+            log("Video OFF-> for "+peer.getName());
             holderGrid.avatarLayout.setVisibility(View.VISIBLE);
+            log("Video OFF-> Remove all views of SurfaceView ");
+            holderGrid.surfaceViewLayout.removeAllViews();
             holderGrid.surfaceViewLayout.setVisibility(View.GONE);
 
-
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-
-//                if(peer.getListener()!=null){
-//                    log(" Video OFF -> remove listener Peer (YO) ");
-//                    megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
-//                    peer.setListener(null);
-//                }
+                if(peer.getListener()!=null){
+                    log("Video OFF-> Remove listener for me ");
+                    megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
+                    peer.setListener(null);
+                }
                 holderGrid.rlGeneral.setBackgroundColor(Color.BLUE);
                 setProfileMyAvatar(holder);
 
             }else{
-//                if(peer.getListener()!=null){
-//                    log(" Video OFF -> remove listener Peer ("+peer.getName()+") ");
-//                    megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
-//                    peer.setListener(null);
-//                }
+                if(peer.getListener()!=null){
+                    log("Video OFF-> Remove listener for "+peer.getName());
+
+                    megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
+                    peer.setListener(null);
+                }
                 holderGrid.rlGeneral.setBackgroundColor(Color.YELLOW);
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
@@ -499,8 +520,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
         holder.avatarImage.setImageBitmap(defaultAvatar);
         holder.avatarInitialLetter.setText(myFirstLetter);
-//        holder.avatarInitialLetter.setTextSize(40);
-        holder.avatarInitialLetter.setTextColor(Color.WHITE);
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
 
     }
@@ -605,8 +624,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         String contactFirstLetter = fullName.charAt(0) + "";
         contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
         holder.avatarInitialLetter.setText(contactFirstLetter);
-//        holder.avatarInitialLetter.setTextSize(60);
-        holder.avatarInitialLetter.setTextColor(Color.WHITE);
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
 
     }
