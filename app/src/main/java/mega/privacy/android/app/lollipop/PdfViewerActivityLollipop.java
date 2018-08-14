@@ -195,9 +195,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
-    static int TYPE_UPLOAD = 0;
-    static int TYPE_DOWNLOAD = 1;
-
     private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
     private String path;
@@ -336,7 +333,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
-        if (!isOffLine) {
+        if (!isOffLine && type != Constants.ZIP_ADAPTER) {
             app = (MegaApplication) getApplication();
             if (isFolderLink){
                 megaApi = app.getMegaApiFolder();
@@ -632,6 +629,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (type == Constants.OFFLINE_ADAPTER){
             OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
         }
+        else if (type == Constants.ZIP_ADAPTER) {
+            ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+        }
     }
 
     @Override
@@ -664,6 +664,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (type == Constants.OFFLINE_ADAPTER){
                 isOffLine = true;
                 pathNavigation = intent.getStringExtra("pathNavigation");
+            }
+            else if (type == Constants.FILE_LINK_ADAPTER) {
+                String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
+                if(serialize!=null) {
+                    currentDocument = MegaNode.unserialize(serialize);
+                    if (currentDocument != null) {
+                        log("currentDocument NOT NULL");
+                    }
+                    else {
+                        log("currentDocument is NULL");
+                    }
+                }
+                isOffLine = false;
+                fromChat = false;
             }
             else {
                 isOffLine = false;
@@ -698,7 +712,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             setContentView(R.layout.activity_pdfviewer);
 
-            if (!isOffLine){
+            if (!isOffLine && type != Constants.ZIP_ADAPTER){
                 app = (MegaApplication)getApplication();
                 if (isFolderLink){
                     megaApi = app.getMegaApiFolder();
@@ -1565,6 +1579,22 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 moveToTrashMenuItem.setVisible(false);
                 removeMenuItem.setVisible(false);
                 chatMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+            }
+            else if (type == Constants.ZIP_ADAPTER) {
+                propertiesMenuItem.setVisible(false);
+                chatMenuItem.setVisible(false);
+                shareMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
@@ -2958,7 +2988,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         super.onResume();
         log("onResume");
         if (!isOffLine && !fromChat && !isFolderLink
-                && type != Constants.FILE_LINK_ADAPTER){
+                && type != Constants.FILE_LINK_ADAPTER
+                && type != Constants.ZIP_ADAPTER){
             if (megaApi.getNodeByHandle(handle) == null && inside && !fromDownload){
                 finish();
             }

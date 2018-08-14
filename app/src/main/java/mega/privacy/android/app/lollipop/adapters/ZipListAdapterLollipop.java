@@ -166,7 +166,16 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
-		((ZipBrowserActivityLollipop) context).itemClick(currentPosition);
+		int[] screenPosition = new int[2];
+		ImageView imageView;
+		imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+		imageView.getLocationOnScreen(screenPosition);
+		int[] dimens = new int[4];
+		dimens[0] = screenPosition[0];
+		dimens[1] = screenPosition[1];
+		dimens[2] = imageView.getWidth();
+		dimens[3] = imageView.getHeight();
+		((ZipBrowserActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
 	}
 
 	private static void log(String log) {
