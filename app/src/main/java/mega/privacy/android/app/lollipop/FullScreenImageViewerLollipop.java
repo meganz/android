@@ -61,6 +61,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -227,6 +228,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	RelativeLayout relativeImageViewerLayout;
 	ImageView ivShadow;
 
+	ArrayList<File> zipFiles = new ArrayList<>();
+
 	@Override
 	public void onDestroy(){
 
@@ -310,8 +313,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			removelinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			shareIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			shareIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -692,7 +695,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					String fileName = offlineDirectory + mOffListImages.get(positionG).getPath() + mOffListImages.get(positionG).getName();
 					previewFile = new File(fileName);
 				}else if (adapterType == Constants.ZIP_ADAPTER){
-
 					String fileName = paths.get(positionG);
 					previewFile = new File(fileName);
 				}else{
@@ -1091,7 +1093,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 		}else if (adapterType == Constants.ZIP_ADAPTER){
-			File offlineDirectory = new File(offlinePathDirectory);
+			offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
+			File currentImage = new File(offlinePathDirectory);
+			File offlineDirectory = new File(currentImage.getParent());
 //			if (Environment.getExternalStorageDirectory() != null){
 //				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 //			}
@@ -1110,9 +1114,24 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				finish();
 				return;
 			}
+			for (int i=0; i<fList.length; i++) {
+				zipFiles.add(fList[i]);
+			}
+			Collections.sort(zipFiles, new Comparator<File>(){
 
-			log("SIZE: " + fList.length);
-			for (File f : fList){
+				public int compare(File z1, File z2) {
+					String name1 = z1.getName();
+					String name2 = z2.getName();
+					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+					if (res == 0) {
+						res = name1.compareTo(name2);
+					}
+					return res;
+				}
+			});
+
+			log("SIZE: " + zipFiles.size());
+			for (File f : zipFiles){
 				log("F: " + f.getAbsolutePath());
 				if (MimeTypeList.typeForName(f.getName()).isImage()){
 					paths.add(f.getAbsolutePath());
@@ -1438,6 +1457,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
 			}
 		}
+		else if (adapterType == Constants.ZIP_ADAPTER) {
+			if (ZipBrowserActivityLollipop.imageDrag != null) {
+				ZipBrowserActivityLollipop.imageDrag.setVisibility(visibility);
+			}
+		}
 	}
 
 	void getLocationOnScreen(int[] location){
@@ -1490,6 +1514,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (adapterType == Constants.OFFLINE_ADAPTER){
 			if (OfflineFragmentLollipop.imageDrag != null){
 				OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+			}
+		}
+		else if (adapterType == Constants.ZIP_ADAPTER) {
+			if (ZipBrowserActivityLollipop.imageDrag != null) {
+				ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
 			}
 		}
 	}
@@ -1565,6 +1594,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			Long handle = adapterMega.getImageHandle(positionG);
 			getImageView(0, handle);
 		}
+		else if (adapterType == Constants.ZIP_ADAPTER) {
+			String name = new File(paths.get(positionG)).getName();
+			for (int i = 0; i< zipFiles.size(); i++) {
+				if (zipFiles.get(i).getName().equals(name)) {
+					getImageView(i, -1);
+				}
+			}
+		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
@@ -1618,6 +1655,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (adapterType == Constants.SEARCH_ADAPTER){
 			Long handle = adapterMega.getImageHandle(positionG);
 			scrollToPosition(0, handle);
+		}
+		else if (adapterType == Constants.ZIP_ADAPTER) {
+			String name = new File(paths.get(positionG)).getName();
+			for (int i = 0; i< zipFiles.size(); i++) {
+				if (zipFiles.get(i).getName().equals(name)) {
+					scrollToPosition(i, -1);
+				}
+			}
 		}
         else {
             Long handle = adapterMega.getImageHandle(positionG);
@@ -1881,7 +1926,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						fileNameTextView.setText(mOffListImages.get(positionG).getName());
 					}
 					else if(adapterType == Constants.ZIP_ADAPTER){
-
+						fileNameTextView.setText(new File(paths.get(positionG)).getName());
 					}
 					else{
 						TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
@@ -2844,7 +2889,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	protected void onResume(){
 		log("onResume");
 		super.onResume();
-		if ((adapterType != Constants.OFFLINE_ADAPTER)&&(adapterType != Constants.FILE_LINK_ADAPTER)){
+		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.FILE_LINK_ADAPTER && adapterType != Constants.ZIP_ADAPTER){
 			if (imageHandles.get(positionG) != -1){
 				log("node updated");
 				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
@@ -3037,6 +3082,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			if (adapterType == Constants.OFFLINE_ADAPTER){
+				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
+			}
+			else if (adapterType == Constants.ZIP_ADAPTER) {
 				draggableView.setCurrentView(adapterOffline.getVisibleImage(positionG));
 			}
 			else {
