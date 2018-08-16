@@ -2190,8 +2190,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             else{
                 log("The file was not uploaded yet");
 
-                ////////////////////
-                //Remove the old message from the UI
+                ////Retry to send
 
                 Intent intent = new Intent(this, ChatUploadService.class);
 
@@ -2205,6 +2204,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     PendingNodeAttachment nodeAttachment = null;
 
                     String filePath = pendMsg.getFilePath();
+
+                    File f = new File(filePath);
+                    if (!f.exists()) {
+                        showSnackbar(getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1));
+                        return;
+                    }
+
+                    //Remove the old message from the UI and DB
+                    removePendingMsg(idMessage);
 
                     if (MimeTypeList.typeForName(filePath).isImage()) {
 
@@ -2264,9 +2272,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(newPendingMsg, true);
                     sendMessageToUI(newNodeAttachmentMsg);
 
-//                ArrayList<String> filePaths = newPendingMsg.getFilePaths();
-//                filePaths.add("/home/jfjf.jpg");
-
                     intent.putExtra(ChatUploadService.EXTRA_FILEPATH, newPendingMsg.getFilePath());
                     intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
@@ -2275,13 +2280,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     log("Error when adding pending msg to the database");
                 }
-
-                /////////////
             }
         }
         else{
             log("Pending message does not exist");
-            showSnackbar("Error. The message cannot be recovered");
+            showSnackbar(getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1));
         }
     }
 

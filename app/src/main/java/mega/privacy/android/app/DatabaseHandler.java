@@ -902,10 +902,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			PendingMessage pendMsg = pendMsgs.get(i);
 			long id = pendMsg.getId();
 			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-			pendMsg.setNodeAttachment(nodes.get(0));
+			if(nodes!=null && (!nodes.isEmpty())){
+				pendMsg.setNodeAttachment(nodes.get(0));
 
-			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
-			messages.add(androidMsg);
+				AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
+				messages.add(androidMsg);
+			}
+			else{
+				log("Error. Not nodes found any chat");
+			}
 		}
 
 		log("Found: "+ messages.size());
