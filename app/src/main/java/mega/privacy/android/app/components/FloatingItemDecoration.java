@@ -1,9 +1,7 @@
 /*
- * android2
- * mega.privacy.android.app.components
+ * https://github.com/husuxing/newiyi
  *
- * Created by Ash Wu on 31/07/18 11:42 AM.
- * Copyright (c) 2018 mega.co.nz
+ * husuxing
  */
 package mega.privacy.android.app.components;
 
