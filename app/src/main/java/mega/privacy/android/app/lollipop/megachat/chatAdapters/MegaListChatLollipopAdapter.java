@@ -2024,7 +2024,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
-					Spannable me = new SpannableString("Me: ");
+					Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
 					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if(lastMessageString!=null) {
