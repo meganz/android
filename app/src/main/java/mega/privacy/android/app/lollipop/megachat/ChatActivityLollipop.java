@@ -4886,9 +4886,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(indexToChange!=-1) {
             messages.remove(indexToChange);
-            log("Removed index: " + indexToChange);
-            log("deleteMessage: messages size: " + messages.size());
+            log("Removed index: " + indexToChange + " positionNewMessagesLayout: "+ positionNewMessagesLayout +" messages size: " + messages.size());
 //                adapter.notifyDataSetChanged();
+
+            if(positionNewMessagesLayout<=indexToChange){
+                if(generalUnreadCount==1 || generalUnreadCount==-1){
+                    log("Reset generalUnread:Position where new messages layout is show: " + positionNewMessagesLayout);
+                    generalUnreadCount = 0;
+                    lastIdMsgSeen = -1;
+                }
+                else{
+                    log("Decrease generalUnread:Position where new messages layout is show: " + positionNewMessagesLayout);
+                    generalUnreadCount--;
+                }
+
+                adapter.notifyItemChanged(positionNewMessagesLayout);
+            }
+
             adapter.removeMessage(indexToChange+1, messages);
 
             if(!messages.isEmpty()){
