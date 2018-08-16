@@ -2030,4 +2030,6 @@
     <string name="title_mail_upgrade_plan" context="Mail title to upgrade to a custom plan">Upgrade to a custom plan</string>
     <string name="subject_mail_upgrade_plan" context="Mail subject to upgrade to a custom plan">Ask us how you can upgrade to a custom plan:</string>
 
+    <string name="word_me" context="Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message">Me:</string>
+
 </resources>
