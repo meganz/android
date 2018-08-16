@@ -23,6 +23,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -1864,6 +1865,15 @@ public class Util {
 		bitmap.recycle();
 
 		return output;
+	}
+
+	public static Drawable mutateIcon (Context context, int idDrawable, int idColor) {
+
+		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+		icon = icon.mutate();
+		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
+
+		return icon;
 	}
 
 	private static void log(String message) {

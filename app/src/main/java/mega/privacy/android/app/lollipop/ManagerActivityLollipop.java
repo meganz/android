@@ -137,6 +137,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToSendFileListener;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -542,6 +543,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Button recoveryKeyButton;
 	private Button dismissButton;
 	private boolean rememberPasswordLogout = false;
+
+	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			addContactFromPhone();
+		}
+	};
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1568,6 +1576,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+		LocalBroadcastManager.getInstance(this).registerReceiver(inviteContactsReceiver, new IntentFilter(AddContactActivityLollipop.BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -3909,6 +3918,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(inviteContactsReceiver);
 
     	super.onDestroy();
 	}
@@ -6404,7 +6414,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}else{
 						thumbViewMenuItem.setVisible(false);
 					}					upgradeAccountMenuItem.setVisible(true);
-					searchMenuItem.setVisible(true);
+					searchMenuItem.setVisible(false);
 					scanQRcode.setVisible(true);
 
 					if (cFLol != null && cFLol.isAdded()) {
@@ -10809,7 +10819,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 					else{
 						in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-						in.putExtra("chat", true);
 						startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
 					}
 				}
@@ -12923,8 +12932,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
+			final boolean isGroup = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_GROUP_CHAT, false);
+
 			if (contactsData != null){
-				if(contactsData.size()==1){
+				if(!isGroup){
+					log("Create one to one chat");
 					MegaUser user = megaApi.getContact(contactsData.get(0));
 					if(user!=null){
 						log("Chat with contact: "+contactsData.size());
@@ -12932,6 +12944,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					}
 				}
 				else{
+					log("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
 					for (int i=0; i<contactsData.size(); i++){
 						MegaUser user = megaApi.getContact(contactsData.get(i));
@@ -12940,7 +12953,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 					log("create group chat with participants: "+peers.size());
-					megaChatApi.createChat(true, peers, this);
+
+					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
+					if(chatTitle!=null){
+						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
+						megaChatApi.createChat(true, peers, listener);
+					}
+					else{
+						megaChatApi.createChat(true, peers, this);
+					}
 				}
 			}
 		}
@@ -13866,48 +13887,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			log("Create chat request finish.");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				log("Chat CREATED.");
-
-				//Update chat view
-				if(rChatFL!=null && rChatFL.isAdded()){
-
-					if(selectMenuItem!=null){
-						selectMenuItem.setVisible(true);
-					}
-				}
-
-				log("open new chat: " + request.getChatHandle());
-				Intent intent = new Intent(this, ChatActivityLollipop.class);
-				intent.setAction(Constants.ACTION_NEW_CHAT);
-				intent.putExtra("CHAT_ID", request.getChatHandle());
-				this.startActivity(intent);
-
-//				log("open new chat");
-//				Intent intent = new Intent(this, ChatActivityLollipop.class);
-//				intent.setAction(Constants.ACTION_CHAT_NEW);
-//				String myMail = getMyAccountInfo().getMyUser().getEmail();
-//				intent.putExtra("CHAT_ID", request.getChatHandle());
-//				intent.putExtra("MY_MAIL", myMail);
-//
-//				boolean isGroup = request.getFlag();
-//				if(isGroup){
-//					log("GROUP");
-//					MegaChatPeerList list = request.getMegaChatPeerList();
-//					log("Size: "+list.size());
-//
-//				}
-//				else{
-//					log("NOT group");
-//				}
-//
-//				this.startActivity(intent);
-			}
-			else{
-				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
-				showSnackbar(getString(R.string.create_chat_error));
-			}
+			log("Create chat request finish");
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
 			log("remove from chat finish!!!");
@@ -14021,6 +14002,56 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean loadMessages){
+		if(errorCode==MegaChatError.ERROR_OK){
+			log("Chat CREATED.");
+
+			//Update chat view
+			if(rChatFL!=null && rChatFL.isAdded()){
+
+				if(selectMenuItem!=null){
+					selectMenuItem.setVisible(true);
+				}
+			}
+
+			log("open new chat: " + chatHandle);
+			Intent intent = new Intent(this, ChatActivityLollipop.class);
+			if(loadMessages){
+				intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+			}
+			else{
+				intent.setAction(Constants.ACTION_NEW_CHAT);
+			}
+
+			intent.putExtra("CHAT_ID", chatHandle);
+			this.startActivity(intent);
+
+//				log("open new chat");
+//				Intent intent = new Intent(this, ChatActivityLollipop.class);
+//				intent.setAction(Constants.ACTION_CHAT_NEW);
+//				String myMail = getMyAccountInfo().getMyUser().getEmail();
+//				intent.putExtra("CHAT_ID", request.getChatHandle());
+//				intent.putExtra("MY_MAIL", myMail);
+//
+//				boolean isGroup = request.getFlag();
+//				if(isGroup){
+//					log("GROUP");
+//					MegaChatPeerList list = request.getMegaChatPeerList();
+//					log("Size: "+list.size());
+//
+//				}
+//				else{
+//					log("NOT group");
+//				}
+//
+//				this.startActivity(intent);
+		}
+		else{
+			log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
+			showSnackbar(getString(R.string.create_chat_error));
+		}
 	}
 
 	@Override
