@@ -99,6 +99,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
     
     Stack<Integer> lastPositionStack;
     
+    private boolean hasPlaceholder;
+    
     MegaApiAndroid megaApi;
     RelativeLayout transfersOverViewLayout;
     TextView transfersTitleText;
@@ -886,7 +888,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                     log("itemClick:isFile:isImage");
                     Intent intent = new Intent(context,FullScreenImageViewerLollipop.class);
                     //Put flag to notify FullScreenImageViewerLollipop.
-                    intent.putExtra("placeholder",CloudDriveAdapter.placeholderInserted);
+                    intent.putExtra("placeholder",hasPlaceholder);
                     intent.putExtra("position",position);
                     intent.putExtra("adapterType",Constants.FILE_BROWSER_ADAPTER);
                     intent.putExtra("isFolderLink",false);
@@ -1419,12 +1421,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             sections.put(folderCount + 1,fileCount + " " + fileStr);
             if (folderCount % 2 == 0) {
                 sections.put(folderCount,fileCount + " " + fileStr);
+                hasPlaceholder = false;
             } else {
                 sections.put(folderCount+2,fileCount + " " + fileStr);
+                hasPlaceholder = true;
             }
         } else {
             sections.put(0,folderCount + " " + folderStr);
             sections.put(folderCount,fileCount + " " + fileStr);
+            hasPlaceholder = false;
         }
         if (floatingItemDecoration == null) {
             floatingItemDecoration = new FloatingItemDecoration(context);

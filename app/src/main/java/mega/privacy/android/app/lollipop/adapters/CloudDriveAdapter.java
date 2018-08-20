@@ -90,8 +90,6 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     int type = Constants.FILE_BROWSER_ADAPTER;
     int adapterType;
     
-    public static boolean placeholderInserted;
-    
     public static class ViewHolderBrowserList extends MegaBrowserLollipopAdapter.ViewHolderBrowserList {
         
         public ViewHolderBrowserList(View v) {
@@ -459,6 +457,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
         for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
             if (node.isFolder()) {
                 folderCount++;
             }
@@ -466,9 +467,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         if (folderCount > 0 && folderCount % 2 == 1 && adapterType == ITEM_VIEW_TYPE_GRID) {
             //Add placeholder between folders and filse.
             nodes.add(folderCount,null);
-            placeholderInserted = true;
         } else {
-            placeholderInserted = false;
         }
         return nodes;
     }
@@ -535,32 +534,6 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             megaApi = ((MegaApplication)((Activity)context).getApplication())
                     .getMegaApi();
         }
-    }
-    
-    /**
-     * When the nodes re-order by name,
-     * need to re-organize by type.
-     *
-     * @param nodes The nodes re-ordered.
-     * @return new nodes list divided by type.
-     */
-    private ArrayList<MegaNode> orderByType(List<MegaNode> nodes) {
-        ArrayList<MegaNode> newList = new ArrayList<>(nodes.size());
-        ArrayList<MegaNode> folders = new ArrayList<>();
-        ArrayList<MegaNode> files = new ArrayList<>();
-        for (MegaNode node : nodes) {
-            if (node != null) {
-                if (node.isFolder()) {
-                    folders.add(node);
-                }
-                if (node.isFile()) {
-                    files.add(node);
-                }
-            }
-        }
-        newList.addAll(folders);
-        newList.addAll(files);
-        return newList;
     }
     
     public void setNodes(ArrayList<MegaNode> nodes) {
