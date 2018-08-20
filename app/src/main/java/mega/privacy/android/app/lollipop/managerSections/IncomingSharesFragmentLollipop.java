@@ -102,6 +102,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
+	
+	private boolean hasPlaceholder;
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
@@ -168,11 +170,14 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			sections.put(1,folderCount + " " + folderStr);
 			sections.put(folderCount + 1,fileCount + " " + fileStr);
 			if (folderCount % 2 == 0) {
+				hasPlaceholder = false;
 				sections.put(folderCount,fileCount + " " + fileStr);
 			} else {
+				hasPlaceholder = true;
 				sections.put(folderCount+2,fileCount + " " + fileStr);
 			}
 		} else {
+			hasPlaceholder = false;
 			sections.put(0,folderCount + " " + folderStr);
 			sections.put(folderCount,fileCount + " " + fileStr);
 		}
@@ -925,7 +930,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					//Put flag to notify FullScreenImageViewerLollipop.
-					intent.putExtra("placeholder",CloudDriveAdapter.placeholderInserted);
+					intent.putExtra("placeholder",hasPlaceholder);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
@@ -1424,6 +1429,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
 
 		for (int i=0;i<nodes.size();i++){
+			if(nodes.get(i) == null) {
+				continue;
+			}
 			if (nodes.get(i).isFolder()){
 				folderNodes.add(nodes.get(i));
 			}
