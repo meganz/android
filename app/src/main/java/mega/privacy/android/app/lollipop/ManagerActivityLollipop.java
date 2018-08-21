@@ -95,7 +95,9 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12251,6 +12253,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					log("Return.....");
 					return;
 				}
+				
+				boolean isImageAvailable = checkProfileImageExistence(intent.getData());
+				if(!isImageAvailable){
+					log("error when changing avatar: image not exist");
+					showSnackbar(getString(R.string.error_changing_user_avatar_image_not_available));
+					return;
+				}
+				
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(intent);
@@ -17073,5 +17083,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 		}
 		return false;
+	}
+	
+	//need to check image existence before use due to android content provider issue.
+	//Can not check query count - still get count = 1 even file does not exist
+	private boolean checkProfileImageExistence(Uri uri){
+		boolean isFileExist = false;
+		InputStream inputStream;
+		try {
+			inputStream = this.getContentResolver().openInputStream(uri);
+			if(inputStream != null){
+				isFileExist = true;
+			}
+			inputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return isFileExist;
 	}
 }
