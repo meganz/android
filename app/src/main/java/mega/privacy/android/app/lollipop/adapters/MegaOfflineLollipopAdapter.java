@@ -44,6 +44,7 @@ import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaNode;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
@@ -103,6 +104,16 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     	}
 		ImageButton imageButtonThreeDots;
     	public View separator;
+	
+		public TextView videoDuration;
+		public RelativeLayout videoInfoLayout;
+		public View folderLayout;
+		public View fileLayout;
+		public RelativeLayout thumbLayoutForFile;
+		public ImageView fileGridIconForFile;
+		public ImageButton imageButtonThreeDotsForFile;
+		public TextView textViewFileNameForFile;
+		public ImageView fileGridSelected;
 	}
     
     private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
@@ -465,9 +476,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
 			ViewHolderOfflineGrid holder = null;
 			
-			View v = inflater.inflate(R.layout.item_offline_grid, parent, false);	
+			View v = inflater.inflate(R.layout.item_offline_grid, parent, false);
 			
 			holder = new ViewHolderOfflineGrid(v);
+			holder.folderLayout = v.findViewById(R.id.item_file_grid_folder);
+			holder.fileLayout = v.findViewById(R.id.item_file_grid_file);
 			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_grid_item_layout);
 			holder.thumbLayout = (RelativeLayout) v.findViewById(R.id.file_grid_thumbnail_layout);
 			holder.imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
@@ -477,7 +490,15 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
-
+			
+			holder.fileGridIconForFile = (ImageView)v.findViewById(R.id.file_grid_icon_for_file);
+			holder.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
+			holder.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
+			holder.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
+			holder.videoDuration = (TextView)v.findViewById(R.id.file_grid_title_video_duration);
+			holder.videoInfoLayout = (RelativeLayout)v.findViewById(R.id.item_file_videoinfo_layout);
+			holder.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
+			
 			holder.itemLayout.setOnClickListener(this);
 			holder.itemLayout.setOnLongClickListener(this);
 			holder.itemLayout.setTag(holder);
@@ -507,7 +528,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	public void onBindViewHolderGrid (ViewHolderOfflineGrid holder, int position){
 		log("onBindViewHolderGrid");
-		
+	
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -536,7 +557,13 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
-		
+		//Placeholder for folder when folder count is odd.
+		if (currentNode == null) {
+			holder.folderLayout.setVisibility(View.INVISIBLE);
+			holder.fileLayout.setVisibility(View.GONE);
+			holder.itemLayout.setVisibility(View.INVISIBLE);
+			return;
+		}
 		if(currentNode.getHandle().equals("0")){
 			//The node is the MasterKey File
 			holder.textViewFileName.setText(currentNode.getName());
