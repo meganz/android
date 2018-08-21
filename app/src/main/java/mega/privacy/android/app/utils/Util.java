@@ -744,22 +744,22 @@ public class Util {
 //			}
 //		}
 	}
-	
+
 	public static boolean appendStringToFile(final String appendContents, final File file) {
-	      boolean result = false;
-	      try {
-            if (file != null && file.canWrite()) {
-               file.createNewFile(); // ok if returns false, overwrite
-               Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
-               out.write(appendContents);
-               out.close();   
-               result = true;
-            }
-	      } catch (IOException e) {
-	      //   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
-	      }
-	      return result;
-	   }
+		boolean result = false;
+		try {
+			if (file != null && file.canWrite()) {
+				file.createNewFile(); // ok if returns false, overwrite
+				Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
+				out.write(appendContents);
+				out.close();
+				result = true;
+			}
+		} catch (IOException e) {
+			//   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
+		}
+		return result;
+	}
 	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
@@ -1805,7 +1805,7 @@ public class Util {
 
 	public static void resetAndroidLogger(){
 
-		MegaApiAndroid.addLoggerObject(new AndroidLogger());
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		boolean fileLogger = false;
