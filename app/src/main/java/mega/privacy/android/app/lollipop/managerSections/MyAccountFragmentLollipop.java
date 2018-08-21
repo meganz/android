@@ -71,7 +71,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button mkButton;
 	Button changePassButton;
 
-	RelativeLayout typeLayout;
+	LinearLayout typeLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
 
@@ -183,16 +183,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			achievementsSeparator.setVisibility(View.GONE);
 		}
 
-		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
+		typeLayout = (LinearLayout) v.findViewById(R.id.my_account_account_type_layout);
 
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
 
 		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
 
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			upgradeButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-		}
+
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
 		upgradeButton.setOnClickListener(this);
 		upgradeButton.setVisibility(View.VISIBLE);
@@ -205,13 +203,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-		}
-		else{
-			logoutButton.setBackgroundResource(R.drawable.black_button_border);
-//			logoutButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
+
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
 
