@@ -461,7 +461,6 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         if (folderCount > 0 && folderCount % 2 == 1 && adapterType == ITEM_VIEW_TYPE_GRID) {
             //Add placeholder between folders and filse.
             nodes.add(folderCount,null);
-        } else {
         }
         return nodes;
     }
