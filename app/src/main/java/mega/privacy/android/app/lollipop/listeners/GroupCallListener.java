@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import java.nio.ByteBuffer;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
@@ -22,7 +23,6 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
         this.holder = holder;
         this.width = 0;
         this.height = 0;
-
     }
 
     @Override
@@ -65,5 +65,9 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             holder.localRenderer.DrawBitmap(false);
         }
     }
+    private static void log(String log) {
+        Util.log("GroupCallListener", log);
+    }
+
 }
 
