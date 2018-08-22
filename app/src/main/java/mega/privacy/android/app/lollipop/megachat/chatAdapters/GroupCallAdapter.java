@@ -72,21 +72,22 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     float widthScreenPX, heightScreenPX;
 
     RecyclerView recyclerViewFragment;
+
+    public ArrayList<InfoPeerGroupCall> getPeers() {
+        return peers;
+    }
+
+    public void setPeers(ArrayList<InfoPeerGroupCall> peers) {
+        this.peers = peers;
+    }
+
     ArrayList<InfoPeerGroupCall> peers;
     long chatId;
 
-    int width = 0;
-    int height = 0;
-    Bitmap bitmap;
-//    int heightMeasure, widthMeasure;
-//    int heightReal, widthReal;
     int maxScreenWidth, maxScreenHeight;
 
-    private int numberOfCells;
-    private int gridWidth = 50;
     boolean avatarRequested = false;
     private int adapterType;
-    private boolean isCreated = false;
 
     public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, int adapterType) {
         log("GroupCallAdapter( peers: "+peers.size()+")");
@@ -112,19 +113,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             megaChatApi = app.getMegaChatApi();
         }
 
-//        display = ((Activity) context).getWindowManager().getDefaultDisplay();
-//        outMetrics = new DisplayMetrics();
-//        display.getMetrics(outMetrics);
-//        widthScreenPX = outMetrics.widthPixels;
-//        heightScreenPX = outMetrics.heightPixels;
-//        maxScreenWidth = (int) widthScreenPX;
-//        maxScreenHeight = ((int) heightScreenPX) - 50;
-//        if (peers.size() < 4) {
-//            heightReal = maxScreenHeight/peers.size();
-//            widthReal = maxScreenWidth/peers.size();
-//        }
-
-
     }
 
     @Override
@@ -147,10 +135,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         public RoundedImageView avatarImage;
         public TextView avatarInitialLetter;
         public RelativeLayout surfaceViewLayout;
-
         public SurfaceView surfaceView;
         public MegaSurfaceRenderer localRenderer;
-
         public ViewHolderGroupCall(View itemView) {
             super(itemView);
         }
@@ -167,48 +153,54 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     ViewHolderGroupCallGrid holderGrid = null;
 
     @Override public GroupCallAdapter.ViewHolderGroupCall onCreateViewHolder(ViewGroup parent, int viewType) {
-        log(" onCreateViewHolder()");
+        log("onCreateViewHolder()");
 
-        display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        display = ((ChatCallActivity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         widthScreenPX = outMetrics.widthPixels;
         heightScreenPX = outMetrics.heightPixels;
-        density = ((Activity) context).getResources().getDisplayMetrics().density;
+        density = context.getResources().getDisplayMetrics().density;
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-
         maxScreenHeight = parent.getMeasuredHeight();
         maxScreenWidth = parent.getMeasuredWidth();
-//        log("onCreateViewHolder-> maxScreenHeight("+maxScreenHeight+"), maxScreenWidth("+maxScreenWidth+")");
-
 
         if (viewType == GroupCallAdapter.ITEM_VIEW_TYPE_GRID){
 
-//            View itemView = mLayoutInflater.inflate(R.layout.view_item, parent, false);
-//            int height = parent.getMeasuredHeight() / 4;
-//            itemView.setMinimumHeight(height);
-//            return new ItemViewHolder(itemView);
-
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
-
             int numPeersOnCall = getItemCount();
+
             CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) v.getLayoutParams();
-            lp.height =parent.getMeasuredHeight() / numPeersOnCall;
-            lp.width = parent.getMeasuredWidth();
-            log("onCreateViewHolder() -> height: "+maxScreenHeight+"/"+numPeersOnCall+" = "+height);
-            log("onCreateViewHolder() -> width: "+maxScreenWidth);
+            if(numPeersOnCall <= 3){
+
+                lp.height = maxScreenHeight / numPeersOnCall;
+                lp.width = maxScreenWidth;
+
+            }else if(numPeersOnCall == 4){
+                lp.height = maxScreenHeight / 2;
+                lp.width = maxScreenWidth/2;
+
+            }else if((numPeersOnCall > 4)&&(numPeersOnCall<7)){
+                lp.height = maxScreenHeight / 3;
+                lp.width = maxScreenWidth/2;
+
+            }
 
             v.setLayoutParams(lp);
 
             holderGrid = new ViewHolderGroupCallGrid(v);
             holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
             holderGrid.rlGeneral.setOnClickListener(this);
+            holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
             holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)holderGrid.avatarLayout.getLayoutParams();
+            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+            holderGrid.avatarLayout.setLayoutParams(layoutParams);
             holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
             holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
-            holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
+
 //            holderGrid.surfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
 //            holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
 //            holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth;
@@ -243,7 +235,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
-        log("* onBindViewHolderGrid()");
+        log("onBindViewHolderGrid()");
 
         InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
@@ -269,26 +261,33 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
 
-
         if(peer.isVideoOn()){
             log("Video ON-> for "+peer.getName());
-            holder.avatarLayout.setVisibility(GONE);
+            holderGrid.avatarLayout.setVisibility(GONE);
             holderGrid.surfaceViewLayout.setVisibility(View.VISIBLE);
-            log(" Video ON-> surfaceViewLayout.child: "+holderGrid.surfaceViewLayout.getChildCount());
+            log("Video ON-> surfaceViewLayout.child: "+holderGrid.surfaceViewLayout.getChildCount());
 
-            if(holderGrid.surfaceViewLayout.getChildCount() == 0){
-                log(" Video ON-> Create New SurfaceView ");
+//            if(holderGrid.surfaceViewLayout.getChildCount() == 0){
+                log("Video ON-> Create New SurfaceView ");
                 holderGrid.surfaceView = new SurfaceView(context);
+                holderGrid.surfaceViewLayout.addView(holderGrid.surfaceView);
+                holderGrid.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
 
                 holderGrid.surfaceView.setZOrderMediaOverlay(true);
                 SurfaceHolder localSurfaceHolder = holderGrid.surfaceView.getHolder();
                 localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
                 holderGrid.localRenderer = new MegaSurfaceRenderer(holderGrid.surfaceView);
 
-                holderGrid.surfaceViewLayout.addView(holderGrid.surfaceView);
-                holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
-                holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth;
-            }
+                if(peer.getListener() == null){
+                    GroupCallListener listenerPeer = new GroupCallListener(context, holderGrid);
+                    peer.setListener(listenerPeer);
+                }
+
+                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                    megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
+                }else{
+                    megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), peer.getListener());
+                }
 
 
 //            holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight;
@@ -308,48 +307,37 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
 
-            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                if(peer.getListener()==null){
-                    log(" Video ON-> Create listener for me ");
-                    GroupCallListener listenerPeer = new GroupCallListener(context, holderGrid);
-                    peer.setListener(listenerPeer);
-                    megaChatApi.addChatLocalVideoListener(chatId, listenerPeer);
-                }
-            }else{
-                if(peer.getListener()==null){
-                    log(" Video ON-> Create listener for "+peer.getName());
-                    GroupCallListener listenerPeer = new GroupCallListener(context, holderGrid);
-                    peer.setListener(listenerPeer);
-                    megaChatApi.addChatRemoteVideoListener(chatId, peer.getHandle(), listenerPeer);
-                }
-            }
+
 
         }else{
             log("Video OFF-> for "+peer.getName());
-            holderGrid.avatarLayout.setVisibility(View.VISIBLE);
-            log("Video OFF-> Remove all views of SurfaceView ");
-            holderGrid.surfaceViewLayout.removeAllViews();
-            holderGrid.surfaceViewLayout.setVisibility(View.GONE);
-
+//            if(holderGrid.surfaceViewLayout.getChildCount() != 0){
+                log("Video OFF-> Remove all views of SurfaceView ");
+                holderGrid.surfaceViewLayout.removeAllViewsInLayout();
+//            }
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                 if(peer.getListener()!=null){
-                    log("Video OFF-> Remove listener for me ");
                     megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
                     peer.setListener(null);
+                }else{
                 }
                 holderGrid.rlGeneral.setBackgroundColor(Color.BLUE);
                 setProfileMyAvatar(holder);
 
             }else{
                 if(peer.getListener()!=null){
-                    log("Video OFF-> Remove listener for "+peer.getName());
-
                     megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
                     peer.setListener(null);
+                }else{
                 }
                 holderGrid.rlGeneral.setBackgroundColor(Color.YELLOW);
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
+
+            holderGrid.avatarLayout.setVisibility(View.VISIBLE);
+            holderGrid.surfaceViewLayout.setVisibility(View.GONE);
+
+
 
 //            if (numPeersOnCall < 4) {
 //                holderGrid.rlGeneral.getLayoutParams().height = (heightMeasure / numPeersOnCall);
@@ -398,23 +386,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         }
     }
-
-//    public void setNodes(ArrayList<InfoPeerGroupCall> peers) {
-//        log("setNodes() -> peers: "+peers.size()+" && notifyDataSetChanged()");
-//        this.peers = peers;
-//        display = ((Activity) context).getWindowManager().getDefaultDisplay();
-//        outMetrics = new DisplayMetrics();
-//        display.getMetrics(outMetrics);
-//        widthScreenPX = outMetrics.widthPixels;
-//        heightScreenPX = outMetrics.heightPixels;
-//        maxScreenWidth = (int) widthScreenPX;
-//        maxScreenHeight = ((int) heightScreenPX) - 50;
-//        if (peers.size() < 4) {
-//            heightReal = maxScreenHeight/peers.size();
-//            widthReal = maxScreenWidth/peers.size();
-//        }
-//        notifyDataSetChanged();
-//    }
 
     @Override
     public int getItemCount() {

@@ -85,50 +85,82 @@ public class MegaSurfaceRenderer implements Callback {
         adjustAspectRatio();
     }
 
-    private void adjustAspectRatio() {
+//    private void adjustAspectRatio() {
+//        Log.d("####","#### adjustAspectRatio()");
+//
+//        if (bitmap != null && dstRect.height() != 0 && dstRect.width() != 0) {
+//            Log.d("####","#### bitmap.getWidth(): "+bitmap.getWidth()+", bitmap.getHeight(): "+bitmap.getHeight());
+//            Log.d("####","#### dstRect.width(): "+dstRect.width()+", dstRect.height(): "+dstRect.height());
+//            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
+//            float dstaspectratio = (float) dstRect.width() / dstRect.height();
+//            Log.d("####","#### srcaspectratio("+srcaspectratio+") = "+bitmap.getWidth()+" / "+bitmap.getHeight());
+//            Log.d("####","#### dstaspectratio("+dstaspectratio+") = "+dstRect.width()+" / "+dstRect.height());
+//
+//            if ((srcaspectratio != 0 && dstaspectratio != 0)) {
+//                if (srcaspectratio > dstaspectratio) {
+//                    Log.d("####","#### A -> newHeight ");
+//
+//                    float newHeight = dstRect.width() / srcaspectratio;
+//                    Log.d("####","#### A -> newHeight("+newHeight+")=  dstRect.width("+dstRect.width()+") / srcaspectratio("+srcaspectratio+")");
+//
+//                    float decrease = dstRect.height() - newHeight;
+//                    Log.d("####","#### A -> decrease("+decrease+")=  dstRect.height("+dstRect.height()+") - newHeight("+newHeight+")");
+//
+//                    dstRect.top += decrease / 2;
+//                    dstRect.bottom -= decrease / 2;
+//                    Log.d("####","#### A -> top("+dstRect.top+"), bottom("+dstRect.bottom+"), left("+dstRect.left+"), right("+dstRect.right+")");
+//                    dstRectf = new RectF(dstRect);
+//
+//                } else {
+//
+//
+//                    float newWidth = dstRect.height() * srcaspectratio;
+//                    Log.d("####","#### B -> newWidth("+newWidth+")=  dstRect.height("+dstRect.height()+") * srcaspectratio ("+srcaspectratio+")");
+//
+//                    float decrease = dstRect.width() - newWidth;
+//                    Log.d("####","#### B -> decrease("+decrease+")= dstRect.width("+dstRect.width()+") - newWidth("+newWidth+")");
+//
+//                    dstRect.left = -40;
+//                    dstRect.right = -40 + ((int)newWidth);
+//
+////                    dstRect.left += decrease / 2;
+////                    dstRect.right -= decrease / 2;
+//
+//                    Log.d("####","#### B -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
+//                    dstRectf = new RectF(dstRect);
+//                }
+//            }
+//        }
+//    }
 
-        if (bitmap != null && dstRect.height() != 0 && dstRect.width() != 0) {
+    private void adjustAspectRatio() {
+        if (bitmap != null && dstRect.height() != 0) {
             float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
 
-//            Log.d("####","#### bitmap.getWidth(): "+bitmap.getWidth()+", bitmap.getHeight(): "+bitmap.getHeight());
-//            Log.d("####","#### dstRect.width(): "+dstRect.width()+", dstRect.height(): "+dstRect.height());
-            if ((srcaspectratio != 0 && dstaspectratio != 0)) {
+            if (srcaspectratio != 0 && dstaspectratio != 0) {
                 if (srcaspectratio > dstaspectratio) {
-//                    Log.d("####","#### A -> newHeight ");
-
                     float newHeight = dstRect.width() / srcaspectratio;
-//                    Log.d("####","#### A -> newHeight("+newHeight+")=  dstRect.width("+dstRect.width()+") / srcaspectratio("+srcaspectratio+")");
-
                     float decrease = dstRect.height() - newHeight;
-//                    Log.d("####","#### A -> decrease("+decrease+")=  dstRect.height("+dstRect.height()+") - newHeight("+newHeight+")");
-
                     dstRect.top += decrease / 2;
                     dstRect.bottom -= decrease / 2;
-//                    Log.d("####","#### A -> top("+dstRect.top+"), bottom("+dstRect.bottom+"), left("+dstRect.left+"), right("+dstRect.right+")");
                     dstRectf = new RectF(dstRect);
-
                 } else {
-
-
                     float newWidth = dstRect.height() * srcaspectratio;
-//                    Log.d("####","#### B -> newWidth("+newWidth+")=  dstRect.height("+dstRect.height()+") * srcaspectratio ("+srcaspectratio+")");
-
                     float decrease = dstRect.width() - newWidth;
 //                    Log.d("####","#### B -> decrease("+decrease+")= dstRect.width("+dstRect.width()+") - newWidth("+newWidth+")");
+//                    float decrease = 0;
 
-                    dstRect.left = -40;
-                    dstRect.right = -40 + ((int)newWidth);
+                    dstRect.left += decrease / 2;
+                    dstRect.right -= decrease / 2;
+                    Log.d("####","#### B -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
 
-//                    dstRect.left += decrease / 2;
-//                    dstRect.right -= decrease / 2;
-
-//                    Log.d("####","#### B -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
                     dstRectf = new RectF(dstRect);
                 }
             }
         }
     }
+
 
 //    private void adjustAspectRatio() {
 //        if (bitmap != null && dstRect.height() != 0) {
