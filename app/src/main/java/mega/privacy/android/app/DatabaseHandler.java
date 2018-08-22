@@ -1327,8 +1327,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_HANDLE, encrypt(chatPrefs.getChatHandle()));
 		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsEnabled()));
-		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(chatPrefs.getRingtone()));
-		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsSound()));
+		values.put(KEY_CHAT_ITEM_RINGTONE, "");
+		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, "");
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(chatPrefs.getWrittenText()));
 
 		db.insert(TABLE_CHAT_ITEMS, null, values);
@@ -1342,21 +1342,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
 	}
 
-	public int setRingtoneChatItem(String ringtone, String handle){
-		log("setRingtoneChatItem: "+ringtone+" "+handle);
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(ringtone));
-		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-	}
-
-	public int setNotificationSoundChatItem(String sound, String handle){
-		log("setNotificationSoundChatItem: "+sound+" "+handle);
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(sound));
-		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-	}
+//	public int setRingtoneChatItem(String ringtone, String handle){
+//		log("setRingtoneChatItem: "+ringtone+" "+handle);
+//
+//		ContentValues values = new ContentValues();
+//		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(ringtone));
+//		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+//	}
+//
+//	public int setNotificationSoundChatItem(String sound, String handle){
+//		log("setNotificationSoundChatItem: "+sound+" "+handle);
+//
+//		ContentValues values = new ContentValues();
+//		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(sound));
+//		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+//	}
 
 	public int setNotificationEnabledChatItem(String enabled, String handle){
 		log("setNotificationEnabledChatItem: "+enabled+" "+handle);
@@ -1385,7 +1385,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String notificationsSound = decrypt(cursor.getString(4));
 				String writtenText = decrypt(cursor.getString(5));
 
-				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound, writtenText);
+				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, writtenText);
 				cursor.close();
 				return prefs;
 			}
