@@ -991,7 +991,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
                     else{
-                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "", "");
+                        prefs = new ChatItemPreferences(Long.toString(idChat), Boolean.toString(true), "");
                         dbH.setChatItemPreferences(prefs);
                     }
 
