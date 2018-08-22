@@ -103,7 +103,7 @@ public class MegaSurfaceRenderer implements Callback {
 //                    Log.d("####","#### B -> decrease("+decrease+")= dstRect.width("+dstRect.width()+") - newWidth("+newWidth+")");
 //                    Log.d("####","####  dstREct.left: "+dstRect.left+", dstRect.right: "+dstRect.right);
                     dstRect.left -= decrease/2;
-                    dstRect.right += decrease/2 - ((int)newWidth);;
+                    dstRect.right -= decrease/2 + ((int)newWidth);;
 //                    Log.d("####","#### B -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
 
                     dstRectf = new RectF(dstRect);

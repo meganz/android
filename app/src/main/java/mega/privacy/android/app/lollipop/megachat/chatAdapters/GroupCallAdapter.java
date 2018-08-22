@@ -252,7 +252,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             if(holder.surfaceViewLayout.getChildCount() == 0){
                 log("Video ON-> Create New SurfaceView ");
                 holder.surfaceView = new SurfaceView(context);
-                holder.surfaceViewLayout.addView(holderGrid.surfaceView);
+                holder.surfaceViewLayout.addView(holder.surfaceView);
                 holder.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
 
                 holder.surfaceView.setZOrderMediaOverlay(true);
@@ -286,7 +286,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
                     peer.setListener(null);
                 }
-                holder.rlGeneral.setBackgroundColor(Color.BLUE);
                 setProfileMyAvatar(holder);
             }else{
                 if(peer.getListener()!=null){
@@ -294,7 +293,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
                     peer.setListener(null);
                 }
-                holder.rlGeneral.setBackgroundColor(Color.YELLOW);
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
 
