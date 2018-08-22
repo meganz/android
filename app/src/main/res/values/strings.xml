@@ -1142,7 +1142,7 @@
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Group info</string>
     <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">Start conversation</string>
     <string name="group_chat_edit_profile_label" context="Label for the option of the sliding panel to edit the profile">Edit profile</string>
-    <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Leave chat</string>
+    <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Leave group</string>
     <string name="participants_chat_label" context="Label for participants of a group chat">Participants</string>
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">Remove %s from this chat?</string>
@@ -1986,6 +1986,7 @@
     <string name="unarchive_chat_option" context="Title of the option on the chat list to unarchive a chat">Unarchive chat</string>
 
     <string name="general_archive" context="Confirmation button of the dialog to archive a chat">Archive</string>
+    <string name="general_unarchive" context="Confirmation button of the dialog to unarchive a chat">Unarchive</string>
 
     <string name="success_archive_chat" context="Message shown when a chat is successfully archived, it shows the name of the chat">%s chat was archived.</string>
     <string name="error_archive_chat" context="Error message shown when a chat has not be archived, it shows the name of the chat">Error. %s chat was not archived.</string>

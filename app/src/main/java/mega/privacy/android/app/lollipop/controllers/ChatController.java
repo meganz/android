@@ -178,6 +178,19 @@ public class ChatController {
         }
     }
 
+    public void archiveChat(MegaChatRoom chat){
+        log("archiveChat: "+chat.getChatId());
+        if(context instanceof GroupChatInfoActivityLollipop){
+
+            if(chat.isArchived()){
+                megaChatApi.archiveChat(chat.getChatId(), false,(GroupChatInfoActivityLollipop) context);
+            }
+            else{
+                megaChatApi.archiveChat(chat.getChatId(), true, (GroupChatInfoActivityLollipop) context);
+            }
+        }
+    }
+
     public void archiveChats(ArrayList<MegaChatListItem> chats){
         log("archiveChats: "+chats.size());
         if(context instanceof ManagerActivityLollipop){
