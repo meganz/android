@@ -12447,7 +12447,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					megaChatApi.createChat(false, peers, listener);
 				}
 			}
-
 		}
 		else if(requestCode == Constants.ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK){
 			if (intent == null) {

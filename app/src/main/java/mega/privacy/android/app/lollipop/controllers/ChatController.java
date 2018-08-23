@@ -103,7 +103,7 @@ public class ChatController {
     }
 
     public void selectChatsToAttachContact(MegaUser contact){
-        log("selectChatsToSendNode");
+        log("selectChatsToAttachContact");
 
         long[] longArray = new long[1];
         longArray[0] = contact.getHandle();
@@ -113,6 +113,9 @@ public class ChatController {
 
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+        else if(context instanceof ContactInfoActivityLollipop){
+            ((ContactInfoActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
     }
 
