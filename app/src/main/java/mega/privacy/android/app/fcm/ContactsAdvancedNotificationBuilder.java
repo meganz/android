@@ -129,7 +129,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public void newIncomingContactRequest(ArrayList<MegaContactRequest> contacts){
         log("newIncomingContactRequest: "+contacts.size());
 
-        for(int i=0;i<contacts.size();i++)
+        for(int i=contacts.size()-1;i>=0;i--)
         {
             log("-----------------REQUEST: "+i);
             MegaContactRequest contactRequest = contacts.get(i);
