@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -1145,7 +1146,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_share_contact_layout: {
 				log("Share contact option");
-				showSnackbar("Coming soon...");
+				if(user==null){
+					log("Selected contact NULL");
+					return;
+				}
+
+				ChatController cC = new ChatController(this);
+
+				cC.selectChatsToAttachContact(user);
 				break;
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
@@ -1291,6 +1299,30 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				MegaChatPeerList peers = MegaChatPeerList.createInstance();
 				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 				megaChatApi.createChat(false, peers, listener);
+			}
+		}
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+			log("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
+
+			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			log("Send to "+chatHandles.length+" chats");
+
+			int countChat = chatHandles.length;
+			log("Selected: "+countChat+" chats to send");
+
+			for(int i=0;i<chatHandles.length;i++){
+
+				MegaHandleList handleList = MegaHandleList.createInstance();
+				handleList.addMegaHandle(user.getHandle());
+				megaChatApi.attachContacts(chatHandles[i], handleList);
+			}
+
+			if(countChat==1){
+				openChat(chatHandles[0], null);
+			}
+			else{
+				String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, 1);
+				showSnackbar(message);
 			}
 		}
 
