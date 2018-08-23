@@ -397,7 +397,7 @@
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Remove from Offline</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
     <string name="context_send_file" context="menu item">Send file to chat</string>
-    <string name="context_send_contact" context="menu item">Send contact to chat</string>
+    <string name="context_send_contact" context="menu item">Share contact to chat</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <!--
