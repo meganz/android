@@ -57,6 +57,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="172dp">
 			<ImageView
+				android:padding="0.5dp"
 				android:id="@+id/file_grid_thumbnail"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
@@ -80,30 +81,6 @@
 				android:layout_centerVertical="true"
 				android:background="@null"
 				android:scaleType="fitCenter"/>
-			<RelativeLayout
-				android:id="@+id/item_file_videoinfo_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_alignParentBottom="true"
-				android:layout_marginBottom="3dp">
-				<TextView
-					android:id="@+id/file_grid_title_video_duration"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:layout_centerVertical="true"
-					android:layout_marginLeft="33dp"
-					android:text="00:00"
-					android:textColor="@color/white"
-					android:textSize="14sp"/>
-				<ImageView
-					android:id="@+id/file_grid_video_icon"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:background="@null"
-					android:src="@drawable/ic_play_arrow_white_24dp"/>
-			</RelativeLayout>
 		</RelativeLayout>
 		<RelativeLayout
 			android:layout_width="match_parent"

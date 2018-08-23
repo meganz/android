@@ -7648,7 +7648,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        }
 	        case R.id.action_grid:{
 	        	log("action_grid selected");
-
+	        	//Redraw the section headers.
+	        	if(oFLol != null) {
+                    oFLol.floatingItemDecoration = null;
+                }
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		log("action_grid_list in CameraUploads");
 	        		isListCameraUploads = !isListCameraUploads;
@@ -7718,7 +7721,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if(sharesPageAdapter!=null){
 						sharesPageAdapter.notifyDataSetChanged();
 					}
-
+					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
+					if (oFLol != null) {
+						oFLol.getRecyclerView().removeItemDecoration(oFLol.floatingItemDecoration);
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+//						fragTransaction.commitNowAllowingStateLoss();
+						oFLol.setPathNavigation(pathNavigationOffline);
+						//Add section header.
+						oFLol.floatingItemDecoration = null;
+//						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commitNowAllowingStateLoss();
+					}
+					
 	    			if(drawerItem == DrawerItem.INBOX){
 	    				selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -7739,24 +7756,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		        		}
 	    			}
-	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-	    				if (oFLol != null && oFLol.isAdded()){
-	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
-	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-	        				oFLol.setIsList(isList);
-	        				oFLol.setPathNavigation(pathNavigationOffline);
-	        				//oFLol.setGridNavigation(false);
-	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
-
-	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-		        		}
-	    			}
+//	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+//	    				if (oFLol != null && oFLol.isAdded()){
+//	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+//	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        				fragTransaction.detach(currentFragment);
+//	        				fragTransaction.commitNowAllowingStateLoss();
+//
+//	        				oFLol.setIsList(isList);
+//	        				oFLol.setPathNavigation(pathNavigationOffline);
+//	        				//oFLol.setGridNavigation(false);
+//	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
+//
+//	        				fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        				fragTransaction.attach(currentFragment);
+//	        				fragTransaction.commitNowAllowingStateLoss();
+//
+//		        		}
+//	    			}
 	    			else if (drawerItem == DrawerItem.SEARCH){
 						selectDrawerItemLollipop(drawerItem);
 	    			}
