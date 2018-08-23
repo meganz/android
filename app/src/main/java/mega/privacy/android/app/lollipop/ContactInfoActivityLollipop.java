@@ -107,6 +107,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
 
+	LinearLayout chatOptionsLayout;
+	View dividerChatOptionsLayout;
 	RelativeLayout sendMessageLayout;
 	RelativeLayout audioCallLayout;
 	RelativeLayout videoCallLayout;
@@ -126,10 +128,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	Button sharedFoldersButton;
 	View dividerSharedFoldersLayout;
 
-	//RelativeLayout shareContactLayout;
-	//RelativeLayout shareContactContentLayout;
-	//TextView shareContactText;
-	//ImageView shareContactIcon;
+	RelativeLayout shareContactLayout;
+	View dividerShareContactLayout;
 
 	TextView emailContact;
 	TextView nameContact;
@@ -138,12 +138,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	TextView nameLength;
 	TextView emailLength;
 
-	//View dividerShareContactLayout;
-
 	RelativeLayout clearChatLayout;
 	View dividerClearChatLayout;
 	RelativeLayout removeContactChatLayout;
-
 
 	Toolbar toolbar;
 	ActionBar aB;
@@ -313,6 +310,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
 
+			//CHAT OPTIONS
+			chatOptionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_chat_options_layout);
+			dividerChatOptionsLayout = (View) findViewById(R.id.divider_chat_options_layout);
 			sendMessageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_send_message_layout);
 			sendMessageLayout.setOnClickListener(this);
 			audioCallLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_call_layout);
@@ -347,16 +347,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			//Share Contact Layout
 
-			//shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
-			//shareContactLayout.setOnClickListener(this);
+			shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
+			shareContactLayout.setOnClickListener(this);
 
-			//shareContactIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
-
-			//shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
-
-			//shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
-
-			//	dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
+			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
@@ -524,16 +518,27 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							dividerClearChatLayout.setVisibility(View.GONE);
 							//dividerShareContactLayout.setVisibility(View.GONE);
 						}
+
+						shareContactLayout.setVisibility(View.VISIBLE);
+						dividerShareContactLayout.setVisibility(View.VISIBLE);
+
+						chatOptionsLayout.setVisibility(View.VISIBLE);
+						dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 					}
 					else{
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-						//dividerShareContactLayout.setVisibility(View.GONE);
+						shareContactLayout.setVisibility(View.GONE);
+						dividerShareContactLayout.setVisibility(View.GONE);
+						chatOptionsLayout.setVisibility(View.GONE);
+						dividerChatOptionsLayout.setVisibility(View.GONE);
 					}
 				}
 				else{
 					sharedFoldersLayout.setVisibility(View.GONE);
 					dividerSharedFoldersLayout.setVisibility(View.GONE);
+					chatOptionsLayout.setVisibility(View.GONE);
+					dividerChatOptionsLayout.setVisibility(View.GONE);
 
 					if(Util.isChatEnabled()){
 						if(chat!=null){
@@ -543,18 +548,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 							clearChatLayout.setVisibility(View.VISIBLE);
 							dividerClearChatLayout.setVisibility(View.VISIBLE);
-							//dividerShareContactLayout.setVisibility(View.VISIBLE);
 						}
 						else{
 							clearChatLayout.setVisibility(View.GONE);
 							dividerClearChatLayout.setVisibility(View.GONE);
-							//dividerShareContactLayout.setVisibility(View.GONE);
 						}
+
+						shareContactLayout.setVisibility(View.VISIBLE);
+						dividerShareContactLayout.setVisibility(View.VISIBLE);
 					}
 					else{
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-						//dividerShareContactLayout.setVisibility(View.GONE);
+						shareContactLayout.setVisibility(View.GONE);
+						dividerShareContactLayout.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -572,7 +579,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				clearChatLayout.setVisibility(View.GONE);
 				dividerClearChatLayout.setVisibility(View.GONE);
 
-				//dividerShareContactLayout.setVisibility(View.GONE);
+				shareContactLayout.setVisibility(View.GONE);
+				dividerShareContactLayout.setVisibility(View.GONE);
+
+				chatOptionsLayout.setVisibility(View.VISIBLE);
+				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
 			((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -1132,11 +1143,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				startCall(true);
 				break;
 			}
-			/*case R.id.chat_contact_properties_share_contact_layout: {
+			case R.id.chat_contact_properties_share_contact_layout: {
 				log("Share contact option");
 				showSnackbar("Coming soon...");
 				break;
-			}*/
+			}
 			case R.id.chat_contact_properties_shared_folders_button:
 			case R.id.chat_contact_properties_shared_folders_layout:{
 				Intent i = new Intent(this, ContactFileListActivityLollipop.class);

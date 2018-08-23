@@ -245,57 +245,34 @@
             android:layout_height="1dp"
             android:background="@color/divider_upgrade_account" />
 
-
-
         <!-- SHARE CONTACT LAYOUT -->
 
-        <!--<RelativeLayout
+        <RelativeLayout
             android:id="@+id/chat_contact_properties_share_contact_layout"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
+            android:layout_height="56dp"
             android:layout_gravity="left|center_vertical">
 
-            <RelativeLayout
-                android:id="@+id/chat_contact_properties_share_contact_icon_layout"
+            <ImageView
+                android:id="@+id/chat_contact_properties_share_contact_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true">
-
-                <ImageView
-                    android:id="@+id/chat_contact_properties_email_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:layout_marginLeft="16dp"
-                    android:src="@drawable/ic_email_grey" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/chat_contact_properties_share_contact_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@+id/chat_contact_properties_share_contact_icon_layout"
+                android:layout_gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:orientation="vertical">
+                android:layout_marginLeft="16dp"
+                android:src="@drawable/ic_b_share_to_contact" />
 
-                <TextView
-                    android:id="@+id/chat_contact_properties_share_contact_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_properties_chat_share_contact"
-                    android:textSize="16dp"
-                    android:textColor="@color/name_my_account"/>
-
-                <TextView
-                    android:id="@+id/chat_contact_properties_share_contact"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/chat_contact_properties_share_contact_label"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14dp" />
-
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/chat_contact_properties_share_contact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="32dp"
+                android:layout_toRightOf="@id/chat_contact_properties_share_contact_icon"
+                android:text="@string/title_properties_chat_share_contact"
+                android:textSize="16dp"
+                android:textColor="@color/name_my_account"/>
 
         </RelativeLayout>
 
@@ -303,8 +280,7 @@
             android:id="@+id/divider_share_contact_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/divider_upgrade_account" />-->
+            android:background="@color/divider_upgrade_account" />
 
 
         <!-- CLEAR LAYOUT -->
