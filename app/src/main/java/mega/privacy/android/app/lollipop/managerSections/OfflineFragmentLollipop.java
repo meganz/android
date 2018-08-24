@@ -20,7 +20,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -471,6 +470,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
+            recyclerView.removeItemDecoration(floatingItemDecoration);
+            floatingItemDecoration = null;
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
@@ -537,6 +538,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
 			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
+			recyclerView.removeItemDecoration(floatingItemDecoration);
+			floatingItemDecoration = null;
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
@@ -668,7 +671,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					i--;
 				}
 			}
-			int type = ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 			addSectionTitle(mOffList);
 		}
 
@@ -967,7 +969,6 @@ public class OfflineFragmentLollipop extends Fragment{
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
         if(mOffList != null && mOffList.size() != 0) {
-			int type = ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 			addSectionTitle(mOffList);
 		}
     }
@@ -981,10 +982,8 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
-			dlog("long click position:" + position);
 			MegaOffline item = mOffList.get(position);
 			if(!(item.getHandle().equals("0"))){
-				dlog("toggle position:" + position);
 				adapter.toggleSelection(position);
 				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
 				if (selectedNodes.size() > 0){
@@ -995,8 +994,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 		}
 		else{
-   
-			dlog("short click position:" + position);
 			MegaOffline currentNode = mOffList.get(position);
 			
 			File currentFile=null;
@@ -1593,7 +1590,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			emptyTextView.setVisibility(View.GONE);
 //			contentText.setText(getInfoFolder(mOffList));
 		}
-		int type = ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 		addSectionTitle(mOffList);
 		setPositionClicked(-1);
 		notifyDataSetChanged();
@@ -1626,7 +1622,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				adapter.setNodes(mOffList);
 			}
 		}
-		int type = ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 		addSectionTitle(mOffList);
 //		setNodes(mOffList);
 		recyclerView.invalidate();
@@ -1731,7 +1726,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void setPathNavigation(String _pathNavigation){
 		log("setPathNavigation(): "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
-		int type = ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 		addSectionTitle(mOffList);
 		if (adapter != null){
 //			contentText.setText(getInfoFolder(mOffList));
@@ -1758,10 +1752,10 @@ public class OfflineFragmentLollipop extends Fragment{
 		Util.log("OfflineFragmentLollipop", log);
 	}
 	
-	private void dlog(Object o) {
-		String s = (o == null) ? "NULL" : o.toString();
-		Log.e("@#$","---> " + s);
-	}
+//	private void dlog(Object o) {
+//		String s = (o == null) ? "NULL" : o.toString();
+//		Log.e("@#$","---> " + s);
+//	}
 	
 	public String getPathNavigation() {
 		log("getPathNavigation");
