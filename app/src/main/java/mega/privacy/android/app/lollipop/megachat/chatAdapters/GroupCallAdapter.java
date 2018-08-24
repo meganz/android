@@ -194,22 +194,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
             holderGrid.rlGeneral.setOnClickListener(this);
             holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
+
             holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)holderGrid.avatarLayout.getLayoutParams();
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
             holderGrid.avatarLayout.setLayoutParams(layoutParams);
+
             holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
             holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
-
-//            holderGrid.surfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-//            holderGrid.surfaceView.getLayoutParams().height = maxScreenHeight/numPeersOnCall;
-//            holderGrid.surfaceView.getLayoutParams().width = maxScreenWidth;
-//
-//            holderGrid.surfaceView.setZOrderMediaOverlay(true);
-//            SurfaceHolder localSurfaceHolder = holderGrid.surfaceView.getHolder();
-//            localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-//            holderGrid.localRenderer = new MegaSurfaceRenderer(holderGrid.surfaceView);
-
 
             v.setTag(holderGrid);
             return holderGrid;
@@ -242,26 +234,32 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
         }
 
-        int numPeersOnCall = getItemCount();
+        if(peer.isAudioOn()){
+            log("Audio ON");
+        }else{
+            log("Audio OFF");
+        }
 
         if(peer.isVideoOn()) {
+            log("Video ON");
+
             holder.avatarLayout.setVisibility(GONE);
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
-            log("Video ON-> for " + peer.getName()+",  getChildCount: "+holder.surfaceViewLayout.getChildCount());
 
             if(holder.surfaceViewLayout.getChildCount() == 0){
                 log("Video ON-> Create New SurfaceView ");
                 holder.surfaceView = new SurfaceView(context);
                 holder.surfaceViewLayout.addView(holder.surfaceView);
                 holder.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-
                 holder.surfaceView.setZOrderMediaOverlay(true);
                 SurfaceHolder localSurfaceHolder = holder.surfaceView.getHolder();
                 localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
                 holder.localRenderer = new MegaSurfaceRenderer(holder.surfaceView);
+
             }
+
             if (peer.getListener() == null) {
-                log("Video ON-> Create New Listener ");
+                log("Video ON-> Create new Listener ");
                 GroupCallListener listenerPeer = new GroupCallListener(context, holder);
                 peer.setListener(listenerPeer);
 
@@ -275,30 +273,36 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }
 
         }else{
-            log("Video OFF-> for "+peer.getName()+", getChildCount: "+holder.surfaceViewLayout.getChildCount());
+            log("Video OFF");
+            log("surfaceViewLayout child: "+holder.surfaceViewLayout.getChildCount());
             if(holder.surfaceViewLayout.getChildCount() != 0){
-                log("Video OFF-> Remove all views of SurfaceView ");
+                log("Video OFF-> Remove SurfaceView ");
                 holder.surfaceViewLayout.removeAllViewsInLayout();
             }
-            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
-                if(peer.getListener()!=null){
-                    log("Video OFF-> removeMYChatVideoListener() ");
+
+            if(peer.getListener()!=null){
+                log("Video OFF-> Remove Listener");
+                if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                    log("Video OFF-> removeChatMyVideoListener()");
                     megaChatApi.removeChatVideoListener(chatId, -1, peer.getListener());
                     peer.setListener(null);
-                }
-                setProfileMyAvatar(holder);
-            }else{
-                if(peer.getListener()!=null){
-                    log("Video OFF-> removeChatVideoListener() ");
+                }else{
+                    log("Video OFF-> removeChatVideoListener()");
                     megaChatApi.removeChatVideoListener(chatId, peer.getHandle(), peer.getListener());
                     peer.setListener(null);
                 }
+            }
+
+            if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                log("Video OFF-> my Avatar");
+                setProfileMyAvatar(holder);
+            }else{
+                log("Video OFF-> contact Avatar");
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
 
             holder.avatarLayout.setVisibility(View.VISIBLE);
             holder.surfaceViewLayout.setVisibility(View.GONE);
-
         }
     }
 
@@ -528,5 +532,28 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     public void setListFragment(RecyclerView recyclerViewFragment) {
         this.recyclerViewFragment = recyclerViewFragment;
     }
+
+
+    public void changesInAudio(int position, ViewHolderGroupCall holder){
+        log("changesInAudio");
+        if(holder == null){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+        }
+        if(holder!=null){
+            InfoPeerGroupCall peer = getNodeAt(position);
+            if (peer == null){
+                return;
+            }
+            if(peer.isAudioOn()){
+                log("Audio ON");
+            }else{
+                log("Audio OFF");
+            }
+        }else{
+            log("holder is NULL");
+            notifyItemChanged(position);
+        }
+    }
+
 
 }

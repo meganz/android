@@ -60,7 +60,7 @@ public class MegaSurfaceRenderer implements Callback {
 
 
     public MegaSurfaceRenderer(SurfaceView view) {
-        Log.d("####","#### MegaSurfaceRenderer() ");
+        Log.d("MegaSurfaceRenderer","MegaSurfaceRenderer() ");
 
 //        this.surf = view;
         surfaceHolder = view.getHolder();
@@ -74,7 +74,7 @@ public class MegaSurfaceRenderer implements Callback {
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        Log.d("####","#### changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
+        Log.d("MegaSurfaceRenderer","changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
 
         dstRect.top = 0;
         dstRect.left = 0;
@@ -89,22 +89,43 @@ public class MegaSurfaceRenderer implements Callback {
         if (bitmap != null && dstRect.height() != 0) {
             float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
+//            Log.d("&&","&& srcaspectratio = bitmap.getWidth("+bitmap.getWidth()+") / bitmap.getHeight("+bitmap.getHeight()+") = "+srcaspectratio);
+//            Log.d("&&","&& dstaspectratio = dstRect.width()("+dstRect.width()+") / dstRect.height()("+dstRect.height()+") = "+dstaspectratio);
+
 
             if (srcaspectratio != 0 && dstaspectratio != 0) {
                 if (srcaspectratio > dstaspectratio) {
                     float newHeight = dstRect.width() / srcaspectratio;
+//                    Log.d("&&","&& newHeight = dstRect.width("+dstRect.width()+") / srcaspectratio("+srcaspectratio+") = "+newHeight);
+
                     float decrease = dstRect.height() - newHeight;
-                    dstRect.top += decrease / 2;
-                    dstRect.bottom -= decrease / 2;
+//                    Log.d("&&","&& decrease = dstRect.height()("+dstRect.height()+") - newHeight("+newHeight+") = "+decrease);
+
+                    float decreaseASide = decrease/2;
+//                    Log.d("&&","&& decreaseASide = "+decreaseASide);
+
+//                    Log.d("&&","&& ANTES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
+                    dstRect.top += decreaseASide;
+                    dstRect.bottom -= decreaseASide;
+//                    Log.d("&&","&& DESPUES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
+
                     dstRectf = new RectF(dstRect);
                 } else {
+
                     float newWidth = dstRect.height() * srcaspectratio;
+//                    Log.d("&&","&& newWidth = dstRect.height("+dstRect.height()+") * srcaspectratio("+srcaspectratio+") = "+newWidth);
+
                     float decrease = dstRect.width() - newWidth;
-//                    Log.d("####","#### B -> decrease("+decrease+")= dstRect.width("+dstRect.width()+") - newWidth("+newWidth+")");
-//                    Log.d("####","####  dstREct.left: "+dstRect.left+", dstRect.right: "+dstRect.right);
-                    dstRect.left -= decrease/2;
-                    dstRect.right -= decrease/2 + ((int)newWidth);;
-//                    Log.d("####","#### B -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
+//                    Log.d("&&","&& decrease = dstRect.width()("+dstRect.width()+") - newWidth("+newWidth+") = "+decrease);
+                    float decreaseASide = decrease/2;
+
+//                    Log.d("&&","&& decreaseASide = "+decreaseASide);
+
+//                    Log.d("&&","&& ANTES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
+                    dstRect.left += (-1)*decreaseASide;
+                    dstRect.right -= (newWidth - decreaseASide);
+
+//                    Log.d("&&","&& DESPUES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
 
                     dstRectf = new RectF(dstRect);
                 }
@@ -139,8 +160,6 @@ public class MegaSurfaceRenderer implements Callback {
 
 
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d("####","#### surfaceCreated(): ");
-
         Canvas canvas = surfaceHolder.lockCanvas();
         if(canvas != null) {
             Rect dst = surfaceHolder.getSurfaceFrame();
@@ -165,7 +184,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        Log.d("####","#### surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
+        Log.d("MegaSurfaceRenderer","surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
 
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
         changeDestRect(in_width, in_height);
@@ -183,7 +202,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d("####","#### surfaceDestroyed(): ");
+        Log.d("MegaSurfaceRenderer","surfaceDestroyed(): ");
 
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
@@ -191,7 +210,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public Bitmap CreateBitmap(int width, int height) {
-        Log.d("####","#### CreateBitmap(): width = "+width+", height = "+height);
+        Log.d("MegaSurfaceRenderer","CreateBitmap(): width = "+width+", height = "+height);
 
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
