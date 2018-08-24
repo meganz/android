@@ -108,7 +108,11 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 //			megaApi.localLogout();
 			urlConfirmationLink = url;
 
-			megaApi.querySignupLink(url, this);
+//			megaApi.querySignupLink(url, this);
+			AccountController aC = new AccountController(this);
+			MegaApplication.setUrlConfirmationLink(urlConfirmationLink);
+
+			aC.logout(this, megaApi);
 
 			return;
 		}
