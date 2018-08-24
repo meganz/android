@@ -70,5 +70,4 @@ public class InfoPeerGroupCall {
         this.surfaceview = surfaceview;
     }
 
-
 }
