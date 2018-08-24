@@ -6,16 +6,13 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -34,11 +31,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -47,13 +40,11 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaNode;
 
 
 public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener, View.OnLongClickListener {
@@ -254,10 +245,32 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			}
 		}
 		else{
-			log("adapter type is GRID");
-			if (selectedItems.size() <= 0){
-				((OfflineFragmentLollipop) fragment).hideMultipleSelect();
-			}
+            log("adapter type is GRID");
+            MegaOfflineLollipopAdapter.ViewHolderOfflineGrid view = (MegaOfflineLollipopAdapter.ViewHolderOfflineGrid) listFragment.findViewHolderForLayoutPosition(pos);
+			if(view != null) {
+                if (view.folderLayout.getVisibility() == View.VISIBLE) {
+                    Animation flipAnimation = AnimationUtils.loadAnimation(context,R.anim.multiselect_flip);
+                    flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {
+            
+                        }
+        
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            if (selectedItems.size() <= 0){
+                               fragment.hideMultipleSelect();
+                            }
+                        }
+        
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {
+            
+                        }
+                    });
+                    view.imageViewIcon.startAnimation(flipAnimation);
+                }
+            }
 		}
 	}
 
@@ -543,10 +556,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 	}
 	
-	private void dlog(Object o) {
-		String s = (o == null) ? "NULL" : o.toString();
-		Log.e("@#$",s);
-	}
+//	private void dlog(Object o) {
+//		String s = (o == null) ? "NULL" : o.toString();
+//		Log.e("@#$",s);
+//	}
 	
 	/**
 	 * In grid view.
