@@ -20,6 +20,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -135,7 +136,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         public RoundedImageView avatarImage;
         public TextView avatarInitialLetter;
         public RelativeLayout surfaceViewLayout;
+        public long userHandle;
         public SurfaceView surfaceView;
+        public ImageView microAvatar;
+        public ImageView microSurface;
         public MegaSurfaceRenderer localRenderer;
         public ViewHolderGroupCall(View itemView) {
             super(itemView);
@@ -194,12 +198,17 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
             holderGrid.rlGeneral.setOnClickListener(this);
             holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
+            holderGrid.surfaceViewLayout.removeAllViewsInLayout();
 
             holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)holderGrid.avatarLayout.getLayoutParams();
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
             holderGrid.avatarLayout.setLayoutParams(layoutParams);
 
+            holderGrid.microAvatar = (ImageView) v.findViewById(R.id.micro_avatar);
+
+            holderGrid.microSurface = new ImageView(context);
+            holderGrid.surfaceView = new SurfaceView(context);
             holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
             holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
 
@@ -234,35 +243,50 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
         }
 
-        if(peer.isAudioOn()){
-            log("Audio ON");
-        }else{
-            log("Audio OFF");
-        }
 
         if(peer.isVideoOn()) {
             log("Video ON");
+            holder.microAvatar.setVisibility(View.GONE);
 
             holder.avatarLayout.setVisibility(GONE);
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
 
+            log("Video ON-> surfaceViewLayout child: "+holder.surfaceViewLayout.getChildCount());
             if(holder.surfaceViewLayout.getChildCount() == 0){
-                log("Video ON-> Create New SurfaceView ");
-                holder.surfaceView = new SurfaceView(context);
-                holder.surfaceViewLayout.addView(holder.surfaceView);
+                log("Video ON- > SurfaceLayout == 0 -----> Create New SurfaceView");
+
+                log("Video ON-> Created child: "+holder.surfaceViewLayout.getChildCount());
                 holder.surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
                 holder.surfaceView.setZOrderMediaOverlay(true);
                 SurfaceHolder localSurfaceHolder = holder.surfaceView.getHolder();
                 localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
                 holder.localRenderer = new MegaSurfaceRenderer(holder.surfaceView);
+                holder.surfaceViewLayout.addView(holder.surfaceView);
 
+                holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+                RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                paramsMicroSurface.setMargins(0, Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(10, outMetrics), 0);
+
+
+                if(peer.isAudioOn()){
+                    holder.microSurface.setVisibility(View.GONE);
+                }else{
+                    holder.microSurface.setVisibility(View.VISIBLE);
+                }
+                holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+
+
+
+            }else{
+                log("Video ON- > SurfaceLayout != 0 -----> NADA ");
             }
 
             if (peer.getListener() == null) {
                 log("Video ON-> Create new Listener ");
                 GroupCallListener listenerPeer = new GroupCallListener(context, holder);
                 peer.setListener(listenerPeer);
-
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
                     log("Video ON-> addChatLocalVideoListener() ");
                     megaChatApi.addChatLocalVideoListener(chatId, peer.getListener());
@@ -272,14 +296,21 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 }
             }
 
+
+
         }else{
             log("Video OFF");
-            log("surfaceViewLayout child: "+holder.surfaceViewLayout.getChildCount());
-            if(holder.surfaceViewLayout.getChildCount() != 0){
-                log("Video OFF-> Remove SurfaceView ");
-                holder.surfaceViewLayout.removeAllViewsInLayout();
-            }
+            holder.microSurface.setVisibility(View.GONE);
 
+            log("Video OFF-> surfaceViewLayout child: "+holder.surfaceViewLayout.getChildCount());
+            if(holder.surfaceViewLayout.getChildCount() != 0){
+                log("Video OFF- > SurfaceLayout != 0 -----> Remove SurfaceView ");
+                holder.surfaceViewLayout.removeAllViewsInLayout();
+            }else{
+                log("Video OFF- > SurfaceLayout == 0 -----> NADA ");
+            }
+            holder.avatarLayout.setVisibility(View.VISIBLE);
+            holder.surfaceViewLayout.setVisibility(View.GONE);
             if(peer.getListener()!=null){
                 log("Video OFF-> Remove Listener");
                 if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
@@ -300,9 +331,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 log("Video OFF-> contact Avatar");
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
-
-            holder.avatarLayout.setVisibility(View.VISIBLE);
-            holder.surfaceViewLayout.setVisibility(View.GONE);
+            if(peer.isAudioOn()){
+                holder.microAvatar.setVisibility(View.GONE);
+            }else{
+                holder.microAvatar.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -546,8 +579,17 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }
             if(peer.isAudioOn()){
                 log("Audio ON");
+                holder.microAvatar.setVisibility(View.GONE);
+                holder.microSurface.setVisibility(View.GONE);
             }else{
                 log("Audio OFF");
+                if(!peer.isVideoOn()){
+                    holder.microAvatar.setVisibility(View.VISIBLE);
+                    holder.microSurface.setVisibility(View.GONE);
+                }else{
+                    holder.microSurface.setVisibility(View.VISIBLE);
+                    holder.microAvatar.setVisibility(View.GONE);
+                }
             }
         }else{
             log("holder is NULL");
