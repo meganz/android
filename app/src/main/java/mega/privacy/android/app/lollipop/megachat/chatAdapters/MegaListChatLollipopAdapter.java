@@ -16,6 +16,7 @@ import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
@@ -69,6 +70,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public static final int ITEM_VIEW_TYPE_NORMAL = 0;
 	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
+	public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
+	public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
@@ -482,19 +485,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, outMetrics));
 			}else{
 				log("Portrait");
-				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, outMetrics));
 			}
 
 			((ViewHolderNormalChatList)holder).textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, outMetrics));
 			}else{
 				log("Portrait");
-				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
+				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, outMetrics));
 			}
 			((ViewHolderNormalChatList)holder).textViewDate = (TextView) v.findViewById(R.id.recent_chat_list_date);
 			((ViewHolderNormalChatList)holder).imageButtonThreeDots = (ImageButton) v.findViewById(R.id.recent_chat_list_three_dots);
@@ -1211,6 +1214,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 		if(holder!=null){
 			MegaChatListItem chat = chats.get(position);
+			TextPaint textPaint = ((ViewHolderNormalChatList)holder).textViewContent.getPaint();
 
 			int messageType = chat.getLastMessageType();
 			log("MessageType: "+messageType);
@@ -2031,7 +2035,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						Spannable myMessage = new SpannableString(lastMessageString);
 						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
-						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
+						
+						lastMessageString = formatLastMessage(textPaint, indexedText.toString());
+						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
 				}
 				else{
@@ -2080,22 +2086,23 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						Spannable name = new SpannableString(fullNameAction+": ");
 						name.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+						
+						CharSequence indexedText;
+						Spannable myMessage;
 						if(chat.getUnreadCount()==0){
 							log("Message READ");
-
-							Spannable myMessage = new SpannableString(lastMessageString);
+							myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							CharSequence indexedText = TextUtils.concat(name, myMessage);
-							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 						}
 						else{
-							log("Message NOt read");
-							Spannable myMessage = new SpannableString(lastMessageString);
+							log("Message NOT read");
+							myMessage = new SpannableString(lastMessageString);
 							myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							CharSequence indexedText = TextUtils.concat(name, myMessage);
-							((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 						}
+						
+						indexedText = TextUtils.concat(name, myMessage);
+						lastMessageString = formatLastMessage(textPaint, indexedText.toString());
+						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
 					else{
 						if(chat.getUnreadCount()==0){
@@ -2103,10 +2110,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 						}
 						else{
-							log("Message NOt read");
+							log("Message NOT read");
 							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 						}
-
+						
+						lastMessageString = formatLastMessage(textPaint, lastMessageString);
 						((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
 					}
 
@@ -2119,6 +2127,25 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 	
+	//fix text view ellipsis does not work properly with emoji
+	private String formatLastMessage(TextPaint textPaint, String lastMessage){
+		
+		//get text view max width
+		int textViewMaxWidth;
+		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+			log("Landscape");
+			textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, outMetrics);
+		}else{
+			log("Portrait");
+			textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, outMetrics);
+		}
+		
+		//get formatted string
+		CharSequence cs = TextUtils.ellipsize(lastMessage, textPaint, textViewMaxWidth, TextUtils.TruncateAt.END);
+		
+		return cs.toString();
+	}
+	
 	public void setChats (ArrayList<MegaChatListItem> chats){
 		log("SETCONTACTS!!!!");
 		this.chats = chats;
@@ -2128,7 +2155,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 
 		positionClicked = -1;
-//		listFragment.invalidate();
 		notifyDataSetChanged();
 	}
 	
