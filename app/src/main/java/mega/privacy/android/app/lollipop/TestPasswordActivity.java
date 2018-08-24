@@ -29,6 +29,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -41,10 +42,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
  */
 
 public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
-
-    final String ACTION_RECOVERY_KEY_EXPORTED = "RECOVERY_KEY_EXPORTED";
-    final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
-    private static int REQUEST_DOWNLOAD_FOLDER = 1111;
 
     private EditText passwordEditText;
     private ImageView passwordToggle;
@@ -239,7 +236,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
+        if (requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK){
             log("REQUEST_DOWNLOAD_FOLDER");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (parentPath != null){
@@ -249,7 +246,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                 Intent newIntent = new Intent(this, ManagerActivityLollipop.class);
                 newIntent.putExtra("parentPath", parentPath);
                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                newIntent.setAction(ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
+                newIntent.setAction(Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT);
                 startActivity(newIntent);
             }
         }
@@ -289,7 +286,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
                 else {
                     Intent intent = new Intent(this, ManagerActivityLollipop.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.setAction(ACTION_RECOVERY_KEY_EXPORTED);
+                    intent.setAction(Constants.ACTION_RECOVERY_KEY_EXPORTED);
                     startActivity(intent);
                 }
                 break;
