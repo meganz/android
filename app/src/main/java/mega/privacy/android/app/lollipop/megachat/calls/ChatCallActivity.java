@@ -653,7 +653,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
                     log("1- Incoming call");
 
-
                     ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
                     ringerTimer = new Timer();
                     MyRingerTask myRingerTask = new MyRingerTask();
@@ -722,7 +721,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("CALL_STATUS_IN_PROGRESS");
                     updateScreenStatusInProgress();
-
                 }else{
 
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -744,6 +742,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         relativeVideo.requestLayout();
                         peersBeforeCall.clear();
                         peersOnCall.clear();
+
 
                         log("2- Outgoing call: Add : "+megaChatApi.getMyFullname()+" my peer ");
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
