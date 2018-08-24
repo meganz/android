@@ -62,6 +62,7 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_permissions_full_access"
                     android:background="@null"
+                    android:alpha="0.54"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="45dp"
                     android:layout_marginLeft="12dp"
@@ -84,7 +85,7 @@
                     android:layout_height="6dp"
                     android:layout_alignTop="@id/group_participants_chat_name_text"
                     android:layout_toRightOf="@id/group_participants_chat_name_text"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     android:layout_marginLeft="6dp"
                     android:background="@null"
                     android:src="@drawable/circle_status_contact_offline" />

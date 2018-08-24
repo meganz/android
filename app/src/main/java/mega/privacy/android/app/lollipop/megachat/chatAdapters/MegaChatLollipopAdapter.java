@@ -738,9 +738,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
             holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
-            holder.contentOwnMessageText.setTag(holder);
-            holder.contentOwnMessageText.setOnClickListener(this);
-            holder.contentOwnMessageText.setOnLongClickListener(this);
 
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
@@ -913,10 +910,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
             holder.contentContactMessageText.setLayoutParams(paramsContactMessage);
 
-            holder.contentContactMessageText.setTag(holder);
-            holder.contentContactMessageText.setOnClickListener(this);
-            holder.contentContactMessageText.setOnLongClickListener(this);
-
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(0);
@@ -1087,6 +1080,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("onBindViewHolderUploading: " + position);
 
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
 
         ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
         ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
@@ -1254,6 +1249,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("onBindViewHolderMessage: " + position);
 
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams paramsDefault = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(paramsDefault);
 
         ((ViewHolderMessageChat) holder).currentPosition = position;
         ((ViewHolderMessageChat) holder).triangleIcon.setVisibility(View.GONE);
@@ -1293,10 +1290,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).itemLayout.setTag(holder);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(this);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(this);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setTag(holder);
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnClickListener(this);
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnLongClickListener(this);
+
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setTag(holder);
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnClickListener(this);
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnLongClickListener(this);
+
         }
         else{
+            log("Not known message: disable click - position: "+position);
             ((ViewHolderMessageChat) holder).itemLayout.setOnClickListener(null);
             ((ViewHolderMessageChat) holder).itemLayout.setOnLongClickListener(null);
+
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnClickListener(null);
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setOnLongClickListener(null);
+
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnClickListener(null);
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setOnLongClickListener(null);
         }
 
         switch (messageType) {
@@ -1421,6 +1434,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //                ((ChatActivityLollipop)context).showJumpMessage();
                 ((ChatActivityLollipop) context).setNewVisibility(true);
 
+                log("Set positionNewMessagesLayout: "+position);
                 ((ChatActivityLollipop) context).positionNewMessagesLayout = position;
             } else {
                 ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
@@ -1442,11 +1456,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case MegaChatMessage.TYPE_CHAT_TITLE:
             case MegaChatMessage.TYPE_TRUNCATE:
             case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:
-            case MegaChatMessage.TYPE_CALL_ENDED:
-            case MegaChatMessage.TYPE_INVALID: {
+            case MegaChatMessage.TYPE_CALL_ENDED:{
                 return true;
             }
             case MegaChatMessage.TYPE_UNKNOWN:
+            case MegaChatMessage.TYPE_INVALID:
             default: {
                 return false;
             }
@@ -6338,6 +6352,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void hideMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         log("hideMessage");
         ((ViewHolderMessageChat) holder).itemLayout.setVisibility(View.GONE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(0, 0);
+        params.height = 0;
+        ((ViewHolderMessageChat) holder).itemLayout.setLayoutParams(params);
     }
 
     public void bindNoTypeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -6404,7 +6421,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.GONE);
-
 
             ((ViewHolderMessageChat) holder).contentOwnMessageLayout.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 

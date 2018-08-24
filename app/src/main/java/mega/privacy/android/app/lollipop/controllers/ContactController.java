@@ -60,7 +60,7 @@ public class ContactController {
     }
 
     public void pickFileToSend(List<MegaUser> users){
-        log("pickFileToSend");
+
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
         ArrayList<String> longArray = new ArrayList<String>();
@@ -68,7 +68,13 @@ public class ContactController {
             longArray.add(users.get(i).getEmail());
         }
         intent.putStringArrayListExtra("SELECTED_CONTACTS", longArray);
-        ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
+        log("pickFileToSend");
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
+        }
+        else if(context instanceof ContactInfoActivityLollipop){
+            ((ContactInfoActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FILE);
+        }
     }
 
     public void removeContact(MegaUser c){

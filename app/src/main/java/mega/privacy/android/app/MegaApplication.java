@@ -1,9 +1,5 @@
 package mega.privacy.android.app;
 
-//import com.google.android.gms.analytics.GoogleAnalytics;
-//import com.google.android.gms.analytics.Logger.LogLevel;
-//import com.google.android.gms.analytics.Tracker;
-
 import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -68,7 +64,7 @@ import nz.mega.sdk.MegaUser;
 public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.8_204";
+	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -351,17 +347,11 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
-		MegaApiAndroid.addLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
@@ -423,6 +413,13 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
 			}
 		}
+
+		//init logger only when pre-request are all ready
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, Util.getFileLoggerKarere()));
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		boolean useHttpsOnly = false;
 		if (dbH != null) {
@@ -650,6 +647,8 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 			requestListener = new BackgroundRequestListener();
 			log("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
+
+			megaApi.addGlobalListener(this);
 
 //			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //			if (dbH.getCredentials() != null){

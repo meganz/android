@@ -13,9 +13,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -61,6 +58,8 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
+import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -77,13 +76,13 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static android.provider.Settings.System.DEFAULT_RINGTONE_URI;
 import static mega.privacy.android.app.utils.Util.context;
 
 
@@ -97,7 +96,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public static int MAX_WIDTH_APPBAR_LAND=250;
 	public static int MAX_WIDTH_APPBAR_PORT=350;
 
-
 	RelativeLayout imageLayout;
 	android.app.AlertDialog permissionsDialog;
 	ProgressDialog statusDialog;
@@ -109,6 +107,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	View imageGradient;
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
+
+	LinearLayout chatOptionsLayout;
+	View dividerChatOptionsLayout;
+	RelativeLayout sendMessageLayout;
+	RelativeLayout audioCallLayout;
+	RelativeLayout videoCallLayout;
+
 	LinearLayout notificationsLayout;
 	SwitchCompat notificationsSwitch;
 	TextView notificationsTitle;
@@ -118,24 +123,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ChatItemPreferences chatPrefs = null;
 	boolean generalChatNotifications = true;
 
-	RelativeLayout messageSoundLayout;
-	TextView messageSoundText;
-	View dividerMessageSoundLayout;
-
-	RelativeLayout ringtoneLayout;
-	TextView ringtoneText;
-	View dividerRingtoneLayout;
-
 	RelativeLayout sharedFoldersLayout;
 	ImageView sharedFoldersIcon;
 	TextView sharedFoldersText;
 	Button sharedFoldersButton;
 	View dividerSharedFoldersLayout;
 
-	//RelativeLayout shareContactLayout;
-	//RelativeLayout shareContactContentLayout;
-	//TextView shareContactText;
-	//ImageView shareContactIcon;
+	RelativeLayout shareContactLayout;
+	View dividerShareContactLayout;
 
 	TextView emailContact;
 	TextView nameContact;
@@ -144,12 +139,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	TextView nameLength;
 	TextView emailLength;
 
-	//View dividerShareContactLayout;
-
 	RelativeLayout clearChatLayout;
 	View dividerClearChatLayout;
 	RelativeLayout removeContactChatLayout;
-
 
 	Toolbar toolbar;
 	ActionBar aB;
@@ -177,7 +169,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	MenuItem shareMenuItem;
 	MenuItem viewFoldersMenuItem;
-	MenuItem startConversationMenuItem;
+	MenuItem sendFileMenuItem;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -319,6 +311,16 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//OPTIONS LAYOUT
 			optionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_options);
 
+			//CHAT OPTIONS
+			chatOptionsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_chat_options_layout);
+			dividerChatOptionsLayout = (View) findViewById(R.id.divider_chat_options_layout);
+			sendMessageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_send_message_layout);
+			sendMessageLayout.setOnClickListener(this);
+			audioCallLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_call_layout);
+			audioCallLayout.setOnClickListener(this);
+			videoCallLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_chat_video_layout);
+			videoCallLayout.setOnClickListener(this);
+
 			//Notifications Layout
 
 			notificationsLayout = (LinearLayout) findViewById(R.id.chat_contact_properties_notifications_layout);
@@ -330,24 +332,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			notificationsSwitch.setOnClickListener(this);
 
 			dividerNotificationsLayout = (View) findViewById(R.id.divider_notifications_layout);
-
-			//Chat message sound Layout
-
-			messageSoundLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_messages_sound_layout);
-			messageSoundLayout.setOnClickListener(this);
-
-			messageSoundText = (TextView) findViewById(R.id.chat_contact_properties_messages_sound);
-
-			dividerMessageSoundLayout = (View) findViewById(R.id.divider_message_sound_layout);
-
-			//Call ringtone Layout
-
-			ringtoneLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_ringtone_layout);
-			ringtoneLayout.setOnClickListener(this);
-
-			ringtoneText = (TextView) findViewById(R.id.chat_contact_properties_ringtone);
-
-			dividerRingtoneLayout = (View) findViewById(R.id.divider_ringtone_layout);
 
 			//Shared folders layout
 			sharedFoldersLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_shared_folders_layout);
@@ -364,16 +348,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			//Share Contact Layout
 
-			//shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
-			//shareContactLayout.setOnClickListener(this);
+			shareContactLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_layout);
+			shareContactLayout.setOnClickListener(this);
 
-			//shareContactIcon = (ImageView) findViewById(R.id.chat_contact_properties_email_icon);
-
-			//shareContactContentLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_share_contact_content);
-
-			//shareContactText = (TextView) findViewById(R.id.chat_contact_properties_share_contact);
-
-			//	dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
+			dividerShareContactLayout = (View) findViewById(R.id.divider_share_contact_layout);
 
 			//Clear chat Layout
 			clearChatLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_clear_layout);
@@ -464,10 +442,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						if(chatHandle==-1){
 							notificationsLayout.setVisibility(View.GONE);
 							dividerNotificationsLayout.setVisibility(View.GONE);
-							ringtoneLayout.setVisibility(View.GONE);
-							dividerRingtoneLayout.setVisibility(View.GONE);
-							messageSoundLayout.setVisibility(View.GONE);
-							dividerMessageSoundLayout.setVisibility(View.GONE);
 						}
 						else{
 							chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -476,10 +450,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					else{
 						notificationsLayout.setVisibility(View.GONE);
 						dividerNotificationsLayout.setVisibility(View.GONE);
-						ringtoneLayout.setVisibility(View.GONE);
-						dividerRingtoneLayout.setVisibility(View.GONE);
-						messageSoundLayout.setVisibility(View.GONE);
-						dividerMessageSoundLayout.setVisibility(View.GONE);
 					}
 
 					if (megaChatApi == null){
@@ -549,16 +519,27 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							dividerClearChatLayout.setVisibility(View.GONE);
 							//dividerShareContactLayout.setVisibility(View.GONE);
 						}
+
+						shareContactLayout.setVisibility(View.VISIBLE);
+						dividerShareContactLayout.setVisibility(View.VISIBLE);
+
+						chatOptionsLayout.setVisibility(View.VISIBLE);
+						dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 					}
 					else{
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-						//dividerShareContactLayout.setVisibility(View.GONE);
+						shareContactLayout.setVisibility(View.GONE);
+						dividerShareContactLayout.setVisibility(View.GONE);
+						chatOptionsLayout.setVisibility(View.GONE);
+						dividerChatOptionsLayout.setVisibility(View.GONE);
 					}
 				}
 				else{
 					sharedFoldersLayout.setVisibility(View.GONE);
 					dividerSharedFoldersLayout.setVisibility(View.GONE);
+					chatOptionsLayout.setVisibility(View.GONE);
+					dividerChatOptionsLayout.setVisibility(View.GONE);
 
 					if(Util.isChatEnabled()){
 						if(chat!=null){
@@ -568,18 +549,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 							clearChatLayout.setVisibility(View.VISIBLE);
 							dividerClearChatLayout.setVisibility(View.VISIBLE);
-							//dividerShareContactLayout.setVisibility(View.VISIBLE);
 						}
 						else{
 							clearChatLayout.setVisibility(View.GONE);
 							dividerClearChatLayout.setVisibility(View.GONE);
-							//dividerShareContactLayout.setVisibility(View.GONE);
 						}
+
+						shareContactLayout.setVisibility(View.VISIBLE);
+						dividerShareContactLayout.setVisibility(View.VISIBLE);
 					}
 					else{
 						clearChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
-						//dividerShareContactLayout.setVisibility(View.GONE);
+						shareContactLayout.setVisibility(View.GONE);
+						dividerShareContactLayout.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -597,7 +580,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				clearChatLayout.setVisibility(View.GONE);
 				dividerClearChatLayout.setVisibility(View.GONE);
 
-				//dividerShareContactLayout.setVisibility(View.GONE);
+				shareContactLayout.setVisibility(View.GONE);
+				dividerShareContactLayout.setVisibility(View.GONE);
+
+				chatOptionsLayout.setVisibility(View.VISIBLE);
+				dividerChatOptionsLayout.setVisibility(View.VISIBLE);
 			}
 
 			((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -627,22 +614,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						boolean notificationsEnabled = false;
 						notificationsSwitch.setChecked(notificationsEnabled);
 
-						if (!notificationsEnabled) {
-							notificationsLayout.setVisibility(View.VISIBLE);
-							dividerNotificationsLayout.setVisibility(View.VISIBLE);
-							ringtoneLayout.setVisibility(View.GONE);
-							dividerRingtoneLayout.setVisibility(View.GONE);
-							messageSoundLayout.setVisibility(View.GONE);
-							dividerMessageSoundLayout.setVisibility(View.GONE);
-						}
-						else{
-							notificationsLayout.setVisibility(View.VISIBLE);
-							dividerNotificationsLayout.setVisibility(View.VISIBLE);
-							ringtoneLayout.setVisibility(View.VISIBLE);
-							dividerRingtoneLayout.setVisibility(View.VISIBLE);
-							messageSoundLayout.setVisibility(View.VISIBLE);
-							dividerMessageSoundLayout.setVisibility(View.VISIBLE);
-						}
+						notificationsLayout.setVisibility(View.VISIBLE);
+						dividerNotificationsLayout.setVisibility(View.VISIBLE);
 					}
 				}
 
@@ -650,10 +623,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				notificationsLayout.setVisibility(View.GONE);
 				dividerNotificationsLayout.setVisibility(View.GONE);
-				ringtoneLayout.setVisibility(View.GONE);
-				dividerRingtoneLayout.setVisibility(View.GONE);
-				messageSoundLayout.setVisibility(View.GONE);
-				dividerMessageSoundLayout.setVisibility(View.GONE);
 			}
 
 		} else {
@@ -672,154 +641,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
 			}
 			notificationsSwitch.setChecked(notificationsEnabled);
-
-			if(!notificationsEnabled){
-				notificationsLayout.setVisibility(View.VISIBLE);
-				dividerNotificationsLayout.setVisibility(View.VISIBLE);
-				ringtoneLayout.setVisibility(View.GONE);
-				dividerRingtoneLayout.setVisibility(View.GONE);
-				messageSoundLayout.setVisibility(View.GONE);
-				dividerMessageSoundLayout.setVisibility(View.GONE);
-			}
-			else{
-
-				String ringtoneString = chatPrefs.getRingtone();
-				if(ringtoneString.isEmpty()){
-					log("Empty ringtone");
-					Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-					Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
-					ringtoneText.setText(defaultRingtone.getTitle(this));
-				}
-				else if(ringtoneString.equals("-1")){
-					ringtoneText.setText(getString(R.string.settings_chat_silent_sound_not));
-				}
-				else{
-					Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(ringtoneString));
-					String title = ringtone.getTitle(this);
-					ringtoneText.setText(title);
-				}
-
-				String soundString = chatPrefs.getNotificationsSound();
-				if (soundString == null){
-					log("NULL sound");
-					Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-					Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-					messageSoundText.setText(defaultSound.getTitle(this));
-				}
-				else if(soundString.equals("-1")){
-					log("Notification sound -1");
-					messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-				}
-				else if(soundString.isEmpty()){
-					log("Empty sound");
-					Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-					Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-					messageSoundText.setText(defaultSound.getTitle(this));
-				}
-				else{
-					log("Sound stored in DB: "+soundString);
-					Uri uri = Uri.parse(soundString);
-					log("Uri: "+uri);
-
-					if(soundString.equals("true")){
-
-						Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-						Ringtone defaultSound2 = RingtoneManager.getRingtone(this, defaultSoundUri2);
-						messageSoundText.setText(defaultSound2.getTitle(this));
-						log("---Notification sound: "+defaultSound2.getTitle(this));
-					}
-					else{
-						Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
-						if(sound==null){
-							log("Sound is null");
-							messageSoundText.setText("None");
-						}
-						else{
-							String titleSound = sound.getTitle(this);
-							log("Notification sound: "+titleSound);
-							messageSoundText.setText(titleSound);
-						}
-					}
-				}
-
-				notificationsLayout.setVisibility(View.VISIBLE);
-				dividerNotificationsLayout.setVisibility(View.VISIBLE);
-				ringtoneLayout.setVisibility(View.VISIBLE);
-				dividerRingtoneLayout.setVisibility(View.VISIBLE);
-				messageSoundLayout.setVisibility(View.VISIBLE);
-				dividerMessageSoundLayout.setVisibility(View.VISIBLE);
-			}
 		}
 		else{
 			log("NO individual chat preferences");
 			notificationsSwitch.setChecked(true);
-
-			if(chatSettings==null){
-				log("Chat settings is NULL");
-				Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-				Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
-				ringtoneText.setText(defaultRingtone.getTitle(this));
-
-				Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-				Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-				messageSoundText.setText(defaultSound.getTitle(this));
-			}
-			else{
-				log("There is chat settings");
-
-				if (chatSettings.getNotificationsSound() == null){
-					log("Notification sound is NULL");
-					Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
-					Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-					messageSoundText.setText(defaultSound.getTitle(this));
-				}
-				else if(chatSettings.getNotificationsSound().equals("-1")){
-					log("Notification sound -1");
-					messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-
-				}
-				else{
-					if(chatSettings.getNotificationsSound().equals("")){
-						log("Notification sound is EMPTY");
-						Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
-						Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-						messageSoundText.setText(defaultSound.getTitle(this));
-					}
-					else{
-						String soundString = chatSettings.getNotificationsSound();
-						log("Sound stored in DB: "+soundString);
-						Uri uri = Uri.parse(soundString);
-						log("Uri: "+uri);
-
-						if(soundString.equals("true")){
-
-							Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-							Ringtone defaultSound2 = RingtoneManager.getRingtone(this, defaultSoundUri2);
-							messageSoundText.setText(defaultSound2.getTitle(this));
-							log("---Notification sound: "+defaultSound2.getTitle(this));
-						}
-						else{
-							Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
-							if(sound==null){
-								log("Sound is null");
-								messageSoundText.setText("None");
-							}
-							else{
-								String titleSound = sound.getTitle(this);
-								log("Notification sound: "+titleSound);
-								messageSoundText.setText(titleSound);
-							}
-						}
-
-					}
-				}
-
-				Ringtone defaultRingtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-				if(defaultRingtone!=null){
-					ringtoneText.setText(defaultRingtone.getTitle(this));
-				}
-			}
 		}
+
+		notificationsLayout.setVisibility(View.VISIBLE);
+		dividerNotificationsLayout.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -832,7 +661,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		//viewFoldersMenuItem = menu.findItem(R.id.cab_menu_view_shares);
-		startConversationMenuItem = menu.findItem(R.id.cab_menu_start_conversation);
+		sendFileMenuItem = menu.findItem(R.id.cab_menu_send_file);
 
 		if(Util.isOnline(this)){
 			ArrayList<MegaNode> shares = megaApi.getInShares(user);
@@ -850,14 +679,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if(Util.isChatEnabled()){
 				if(fromContacts){
-					startConversationMenuItem.setVisible(true);
+					sendFileMenuItem.setVisible(true);
 				}
 				else{
-					startConversationMenuItem.setVisible(false);
+					sendFileMenuItem.setVisible(false);
 				}
 			}
 			else{
-				startConversationMenuItem.setVisible(false);
+				sendFileMenuItem.setVisible(false);
 			}
 
 		}
@@ -865,7 +694,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			log("Hide all - no network connection");
 			shareMenuItem.setVisible(false);
 			//viewFoldersMenuItem.setVisible(false);
-			startConversationMenuItem.setVisible(false);
+			sendFileMenuItem.setVisible(false);
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -899,7 +728,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				this.startActivity(i);
 				break;
 			}*/
-			case R.id.cab_menu_start_conversation:{
+			case R.id.cab_menu_send_file:{
 
 				if(!Util.isOnline(this)){
 
@@ -907,35 +736,136 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					return true;
 				}
 
-				if(user!=null){
-					MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
-					if(chat==null){
-						log("No chat, create it!");
-						MegaChatPeerList peers = MegaChatPeerList.createInstance();
-						peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-						megaChatApi.createChat(false, peers, this);
-					}
-					else{
-						log("There is already a chat, open it!");
-						if(fromContacts){
-							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-							this.startActivity(intentOpenChat);
-						}
-						else{
-							Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-							intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-							intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-							intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							this.startActivity(intentOpenChat);
-						}
-					}
-				}
+				sendFileToChat();
 				break;
 			}
 		}
 		return true;
+	}
+
+	public void sendFileToChat(){
+		log("sendFileToChat");
+
+		if(user==null){
+			log("Selected contact NULL");
+			return;
+		}
+		List<MegaUser> userList = new ArrayList<MegaUser>();
+		userList.add(user);
+		ContactController cC = new ContactController(this);
+		cC.pickFileToSend(userList);
+	}
+
+	public void sendMessageToChat(){
+		log("sendMessageToChat");
+		if(user!=null){
+			MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+			if(chat==null){
+				log("No chat, create it!");
+				MegaChatPeerList peers = MegaChatPeerList.createInstance();
+				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+				megaChatApi.createChat(false, peers, this);
+			}
+			else{
+				log("There is already a chat, open it!");
+				if(fromContacts){
+					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+					intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					this.startActivity(intentOpenChat);
+				}
+				else{
+					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+					intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					this.startActivity(intentOpenChat);
+				}
+			}
+		}
+	}
+
+	public void startCall(boolean startVideo){
+
+		MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(user.getHandle());
+		if(chatRoomTo!=null){
+			if(startVideo){
+				log("Start video call");
+				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+			}
+			else{
+				log("Start audio call");
+				megaChatApi.startChatCall(chatRoomTo.getChatId(), startVideo, this);
+			}
+		}
+		else{
+			//Create first the chat
+			ArrayList<MegaChatRoom> chats = new ArrayList<>();
+			ArrayList<MegaUser> usersNoChat = new ArrayList<>();
+			usersNoChat.add(user);
+			CreateChatToPerformActionListener listener = null;
+
+			if(startVideo){
+				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_VIDEO_CALL);
+			}
+			else{
+				listener = new CreateChatToPerformActionListener(chats, usersNoChat, -1, this, CreateChatToPerformActionListener.START_AUDIO_CALL);
+			}
+
+			MegaChatPeerList peers = MegaChatPeerList.createInstance();
+			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+			megaChatApi.createChat(false, peers, listener);
+		}
+	}
+
+	public void openChat(long chatId, String text){
+		log("openChat: "+chatId);
+//		drawerItem=DrawerItem.CHAT;
+//		selectDrawerItemLollipop(drawerItem);
+
+		if(chatId!=-1){
+			MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+			if(chat!=null){
+				log("open chat with id: " + chatId);
+				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
+				intentToChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
+				intentToChat.putExtra("CHAT_ID", chatId);
+				if(text!=null){
+					intentToChat.putExtra("showSnackbar", text);
+				}
+				this.startActivity(intentToChat);
+			}
+			else{
+				log("Error, chat is NULL");
+			}
+		}
+		else{
+			log("Error, chat id is -1");
+		}
+	}
+
+	public void sendFileToChatsFromContacts(ArrayList<MegaChatRoom> chats, long fileHandle){
+		log("sendFileToChatsFromContacts");
+
+		MultipleAttachChatListener listener = null;
+
+		if(chats.size()==1){
+			listener = new MultipleAttachChatListener(this, chats.get(0).getChatId(), false, chats.size());
+		}
+		else{
+			listener = new MultipleAttachChatListener(this, -1, false, chats.size());
+		}
+
+		if(chats.size()==1){
+			//One chat, one file
+			megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
+		}
+		else if(chats.size()>1){
+			//Many chats, one file
+			for(int i=0;i<chats.size();i++){
+				megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
+			}
+		}
 	}
 
 	public void pickFolderToShare(String email){
@@ -1192,77 +1122,38 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					showConfirmationRemoveContact(user);
 				}
 				break;
-
-
 			}
-			/*case R.id.chat_contact_properties_share_contact_layout: {
+			case R.id.chat_contact_properties_chat_send_message_layout:{
+				log("Send message option");
+				if(!Util.isOnline(this)){
+
+					showSnackbar(getString(R.string.error_server_connection_problem));
+					return;
+				}
+
+				sendMessageToChat();
+				break;
+			}
+			case R.id.chat_contact_properties_chat_call_layout:{
+				log("Start audio call option");
+				startCall(false);
+				break;
+			}
+			case R.id.chat_contact_properties_chat_video_layout:{
+				log("Star video call option");
+				startCall(true);
+				break;
+			}
+			case R.id.chat_contact_properties_share_contact_layout: {
 				log("Share contact option");
-				showSnackbar("Coming soon...");
-				break;
-			}*/
-			case R.id.chat_contact_properties_ringtone_layout: {
-				log("Ringtone option");
-
-				Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
-				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.call_ringtone_title));
-
-				if(chatPrefs!=null){
-					String ringtoneString = chatPrefs.getRingtone();
-					if(ringtoneString.isEmpty()){
-						log("Empty ringtone");
-						Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultRingtoneUri);
-					}
-					else if(ringtoneString.equals("-1")){
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri)null);
-					}
-					else{
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(ringtoneString));
-					}
-				}
-				else{
-					Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-					intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultRingtoneUri);
+				if(user==null){
+					log("Selected contact NULL");
+					return;
 				}
 
-				this.startActivityForResult(intent, Constants.SELECT_RINGTONE);
+				ChatController cC = new ChatController(this);
 
-				break;
-			}
-			case R.id.chat_contact_properties_messages_sound_layout: {
-				log("Message sound option");
-
-				Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-				intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
-
-				if(chatPrefs!=null){
-					String soundString = chatPrefs.getNotificationsSound();
-					if (soundString == null){
-						log("NULL sound");
-						Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
-					}
-					else if(soundString.equals("-1")){
-						log("Notification sound -1");
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
-					}
-					else if(soundString.isEmpty()){
-						log("Empty sound");
-						Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
-					}
-					else{
-						intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(soundString));
-					}
-				}
-				else{
-					Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-					intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
-				}
-
-				this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
+				cC.selectChatsToAttachContact(user);
 				break;
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
@@ -1299,13 +1190,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 						}
 					}
 
-					if(!enabled){
-						ringtoneLayout.setVisibility(View.GONE);
-						dividerRingtoneLayout.setVisibility(View.GONE);
-						messageSoundLayout.setVisibility(View.GONE);
-						dividerMessageSoundLayout.setVisibility(View.GONE);
-					}
-					else{
+					if(enabled){
 						setUpIndividualChatNotifications();
 					}
 				}
@@ -1319,70 +1204,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		log("onActivityResult, resultCode: "+resultCode);
 
-		if (resultCode == RESULT_OK && requestCode == Constants.SELECT_RINGTONE)
-		{
-			log("Selected ringtone OK");
-
-			Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-			String chosenRingtone = "-1";
-			if(uri!=null){
-
-				Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-				String title = ringtone.getTitle(this);
-
-				if(title!=null){
-					log("Title ringtone: "+title);
-					ringtoneText.setText(title);
-				}
-
-				chosenRingtone = uri.toString();
-			}
-			else{
-				ringtoneText.setText(getString(R.string.settings_chat_silent_sound_not));
-			}
-
-			if(chatPrefs==null){
-				chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), chosenRingtone, "");
-				dbH.setChatItemPreferences(chatPrefs);
-			}
-			else{
-				chatPrefs.setRingtone(chosenRingtone);
-				dbH.setRingtoneChatItem(chosenRingtone, Long.toString(chatHandle));
-			}
-		}
-		else if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
-		{
-			log("Selected notification sound OK");
-
-			Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-			String chosenSound = "-1";
-			if(uri!=null){
-
-				Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-				String title = ringtone.getTitle(this);
-
-				if(title!=null){
-					log("Title ringtone: "+title);
-					messageSoundText.setText(title);
-				}
-
-				chosenSound = uri.toString();
-			}
-			else{
-				messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-			}
-
-			if(chatPrefs==null){
-
-				chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "", chosenSound);
-				dbH.setChatItemPreferences(chatPrefs);
-			}
-			else{
-				chatPrefs.setNotificationsSound(chosenSound);
-				dbH.setNotificationSoundChatItem(chosenSound, Long.toString(chatHandle));
-			}
-		}
-		else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
 			if (!Util.isOnline(this)) {
 				showSnackbar(getString(R.string.error_server_connection_problem));
@@ -1453,9 +1275,58 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
 			}
 		}
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
+			log("requestCode == REQUEST_CODE_SELECT_FILE");
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+
+//			ArrayList<String> selectedContacts = intent.getStringArrayListExtra("SELECTED_CONTACTS");
+			long fileHandle = intent.getLongExtra("SELECT", 0);
+
+			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
+			if(chatRoomToSend!=null){
+				MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatRoomToSend.getChatId(), false, 1);
+				megaChatApi.attachNode(chatRoomToSend.getChatId(), fileHandle, listener);
+			}
+			else{
+				//Create first the chat
+				ArrayList<MegaChatRoom> chats = new ArrayList<>();
+				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
+				usersNoChat.add(user);
+				CreateChatToPerformActionListener listener = new CreateChatToPerformActionListener(chats, usersNoChat, fileHandle, this, CreateChatToPerformActionListener.SEND_FILE);
+				MegaChatPeerList peers = MegaChatPeerList.createInstance();
+				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+				megaChatApi.createChat(false, peers, listener);
+			}
+		}
+		else if (requestCode == Constants.REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
+			log("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
+
+			long[] chatHandles = intent.getLongArrayExtra("SELECTED_CHATS");
+			log("Send to "+chatHandles.length+" chats");
+
+			int countChat = chatHandles.length;
+			log("Selected: "+countChat+" chats to send");
+
+			for(int i=0;i<chatHandles.length;i++){
+
+				MegaHandleList handleList = MegaHandleList.createInstance();
+				handleList.addMegaHandle(user.getHandle());
+				megaChatApi.attachContacts(chatHandles[i], handleList);
+			}
+
+			if(countChat==1){
+				openChat(chatHandles[0], null);
+			}
+			else{
+				String message = getResources().getQuantityString(R.plurals.plural_contact_sent_to_chats, 1);
+				showSnackbar(message);
+			}
+		}
 
 		super.onActivityResult(requestCode, resultCode, intent);
-
 	}
 
 	/*
@@ -1695,6 +1566,16 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			else{
 				log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
 				showSnackbar(getString(R.string.create_chat_error));
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_START_CHAT_CALL){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("TYPE_START_CHAT_CALL finished with success");
+				//getFlag - Returns true if it is a video-audio call or false for audio call
+			}
+			else{
+				log("EEEERRRRROR WHEN TYPE_START_CHAT_CALL " + e.getErrorString());
+				showSnackbar(getString(R.string.call_error));
 			}
 		}
 	}

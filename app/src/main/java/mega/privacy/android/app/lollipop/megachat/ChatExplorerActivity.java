@@ -112,7 +112,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         if(aB!=null){
-            aB.setTitle("Choose chat");
+            aB.setTitle(getString(R.string.choose_chat));
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
             aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -195,7 +195,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                         else{
                             Intent in = new Intent(this, AddContactActivityLollipop.class);
                             in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
-                            in.putExtra("chat", true);
                             startActivityForResult(in, Constants.REQUEST_CREATE_CHAT);
                         }
                     }
