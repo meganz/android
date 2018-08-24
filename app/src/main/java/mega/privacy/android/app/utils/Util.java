@@ -23,6 +23,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -103,7 +104,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -743,22 +744,22 @@ public class Util {
 //			}
 //		}
 	}
-	
+
 	public static boolean appendStringToFile(final String appendContents, final File file) {
-	      boolean result = false;
-	      try {
-            if (file != null && file.canWrite()) {
-               file.createNewFile(); // ok if returns false, overwrite
-               Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
-               out.write(appendContents);
-               out.close();   
-               result = true;
-            }
-	      } catch (IOException e) {
-	      //   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
-	      }
-	      return result;
-	   }
+		boolean result = false;
+		try {
+			if (file != null && file.canWrite()) {
+				file.createNewFile(); // ok if returns false, overwrite
+				Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
+				out.write(appendContents);
+				out.close();
+				result = true;
+			}
+		} catch (IOException e) {
+			//   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
+		}
+		return result;
+	}
 	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
@@ -1660,7 +1661,6 @@ public class Util {
 		log("isVideoFile: "+path);
 		try{
 			String mimeType = URLConnection.guessContentTypeFromName(path);
-		    log("The mimeType is: "+mimeType);
 		    return mimeType != null && mimeType.indexOf("video") == 0;
 		}
 		catch(Exception e){
@@ -1805,7 +1805,7 @@ public class Util {
 
 	public static void resetAndroidLogger(){
 
-		MegaApiAndroid.addLoggerObject(new AndroidLogger());
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		boolean fileLogger = false;
@@ -1865,6 +1865,15 @@ public class Util {
 		bitmap.recycle();
 
 		return output;
+	}
+
+	public static Drawable mutateIcon (Context context, int idDrawable, int idColor) {
+
+		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+		icon = icon.mutate();
+		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
+
+		return icon;
 	}
 
 	private static void log(String message) {
