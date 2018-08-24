@@ -48,7 +48,7 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:fontFamily="roboto"
-            android:background="@drawable/background_button"
+            android:background="@drawable/background_accent_button"
             android:layout_gravity="center"
             android:text="@string/general_enable"
             android:layout_marginTop="32dp"/>
