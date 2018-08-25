@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
@@ -40,12 +41,23 @@ public class CreateGroupChatWithTitle implements MegaChatRequestListenerInterfac
                 api.setChatTitle(request.getChatHandle(), title, this);
             }
             else{
-                ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                if(context instanceof ManagerActivityLollipop){
+                    ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                }
+                else if(context instanceof FileExplorerActivityLollipop){
+                    ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+                }
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
             log("Change title");
-            ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+            if(context instanceof ManagerActivityLollipop){
+                ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+            }
+            else if(context instanceof FileExplorerActivityLollipop){
+                ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+            }
+
         }
     }
 
