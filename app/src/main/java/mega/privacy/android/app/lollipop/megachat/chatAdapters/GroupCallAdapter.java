@@ -270,18 +270,28 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
             //Update micro icon
             holder.microSurface.setImageResource(R.drawable.ic_mic_off);
-            RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            paramsMicroSurface.setMargins(0, Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(10, outMetrics), 0);
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
                 holder.microSurface.setVisibility(View.VISIBLE);
             }
 
-            holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+            holder.surfaceViewLayout.addView(holder.microSurface);
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
+
+//            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+//            RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+//            paramsMicroSurface.setMargins(0, Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(10, outMetrics), 0);
+//            if(peer.isAudioOn()){
+//                holder.microSurface.setVisibility(View.GONE);
+//            }else{
+//                holder.microSurface.setVisibility(View.VISIBLE);
+//            }
+//
+//            holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+//            holder.surfaceViewLayout.setVisibility(View.VISIBLE);
 
 
             //Create listener

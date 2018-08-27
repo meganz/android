@@ -51,12 +51,15 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
                     this.bitmap = holder.localRenderer.CreateBitmap(width, height);
-//                    holder.widthX = width;
-//                    holder.heightX = height;
-//                    log("#### width("+width+"), height("+height+")");
-//                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
-//                    lp.setMargins(50, 100, 0, 0);
-//                    holder.microSurface.setLayoutParams(lp);
+
+                    int marginTop = 50 + ((int)holder.localRenderer.getTopR());
+                    int marginRight = 50 + (viewWidth - (int)holder.localRenderer.getRightR());
+                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
+                    lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    lp.setMargins(0, marginTop, marginRight, 0);
+                    holder.microSurface.setLayoutParams(lp);
+
                     Sholder.setFixedSize(holderWidth, holderHeight);
                 }
                 else{

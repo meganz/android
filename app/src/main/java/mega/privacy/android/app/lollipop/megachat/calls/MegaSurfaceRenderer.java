@@ -56,6 +56,9 @@ public class MegaSurfaceRenderer implements Callback {
     PorterDuffXfermode modesrcin;
     int surfaceWidth = 0;
     int surfaceHeight = 0;
+
+    float rightR = 0;
+    float topR = 0;
 //    SurfaceView surf;
 
 
@@ -86,6 +89,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     private void adjustAspectRatio() {
+
         if (bitmap != null && dstRect.height() != 0) {
             float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
@@ -96,12 +100,16 @@ public class MegaSurfaceRenderer implements Callback {
                     float decrease = dstRect.height() - newHeight;
                     dstRect.top += decrease / 2;
                     dstRect.bottom -= decrease / 2;
+                    rightR = dstRect.right;
+                    topR = dstRect.top;
                     dstRectf = new RectF(dstRect);
                 } else {
                     float newWidth = dstRect.height() * srcaspectratio;
                     float decrease = dstRect.width() - newWidth;
                     dstRect.left += decrease / 2;
                     dstRect.right -= decrease / 2;
+                    rightR = dstRect.right;
+                    topR = dstRect.top;
                     dstRectf = new RectF(dstRect);
                 }
             }
@@ -111,6 +119,8 @@ public class MegaSurfaceRenderer implements Callback {
 
 
     public void surfaceCreated(SurfaceHolder holder) {
+        Log.d("MegaSurfaceRenderer","surfaceCreated()");
+
         Canvas canvas = surfaceHolder.lockCanvas();
         if(canvas != null) {
             Rect dst = surfaceHolder.getSurfaceFrame();
@@ -219,6 +229,7 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public void DrawBitmap(boolean flag) {
+
         if(bitmap == null)
             return;
 
@@ -265,7 +276,13 @@ public class MegaSurfaceRenderer implements Callback {
         return output;
     }
 
-    public Bitmap getBitmap(){
-        return bitmap;
+    public float getRightR() {
+        return rightR;
     }
+
+    public float getTopR() {
+        return topR;
+    }
+
+
 }
