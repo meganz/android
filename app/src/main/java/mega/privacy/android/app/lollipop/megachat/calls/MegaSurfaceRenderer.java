@@ -313,4 +313,8 @@ public class MegaSurfaceRenderer implements Callback {
 
         return output;
     }
+
+    public Bitmap getBitmap(){
+        return bitmap;
+    }
 }

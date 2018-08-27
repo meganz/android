@@ -721,7 +721,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("CALL_STATUS_IN_PROGRESS");
                     updateScreenStatusInProgress();
+
                 }else{
+
 
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {

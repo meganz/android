@@ -15,7 +15,8 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
     Context context;
     GroupCallAdapter.ViewHolderGroupCall holder;
-    int width,height;
+    int width;
+    int height;
     Bitmap bitmap;
 
     public GroupCallListener(Context context, GroupCallAdapter.ViewHolderGroupCall holder) {
@@ -48,6 +49,8 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
                     this.bitmap = holder.localRenderer.CreateBitmap(width, height);
+                    holder.widthX = width;
+                    holder.heightX = height;
                     Sholder.setFixedSize(holderWidth, holderHeight);
                 }
                 else{
@@ -65,6 +68,7 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             holder.localRenderer.DrawBitmap(false);
         }
     }
+
     private static void log(String log) {
         Util.log("GroupCallListener", log);
     }
