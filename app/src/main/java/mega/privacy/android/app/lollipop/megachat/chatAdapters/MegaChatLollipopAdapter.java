@@ -786,7 +786,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             int radius = Util.scaleWidthPx(15, outMetrics);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
-            holder.contentOwnMessageThumbLand.setBorderWidth(0);
+            holder.contentOwnMessageThumbLand.setBorderWidth(1);
+            holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentOwnMessageThumbLand.setOval(false);
 
             holder.gradientOwnMessageThumbLand = (RelativeLayout) v.findViewById(R.id.gradient_own_message_thumb_landscape);
@@ -799,7 +800,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
             holder.contentOwnMessageThumbPort.setCornerRadius(radius);
-            holder.contentOwnMessageThumbPort.setBorderWidth(0);
+            holder.contentOwnMessageThumbPort.setBorderWidth(1);
+            holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentOwnMessageThumbPort.setOval(false);
 
             holder.ownTriangleIconFile = (RelativeLayout) v.findViewById(R.id.own_triangle_icon_file);
@@ -912,7 +914,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
-            holder.contentContactMessageThumbLand.setBorderWidth(0);
+            holder.contentContactMessageThumbLand.setBorderWidth(1);
+            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentContactMessageThumbLand.setOval(false);
             holder.forwardContactPreviewLandscape = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_landscape);
             holder.forwardContactPreviewLandscape.setTag(holder);
@@ -957,7 +960,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
-            holder.contentContactMessageThumbPort.setBorderWidth(0);
+            holder.contentContactMessageThumbPort.setBorderWidth(1);
+            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentContactMessageThumbPort.setOval(false);
             holder.forwardContactPreviewPortrait = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_portrait);
             holder.forwardContactPreviewPortrait.setTag(holder);
