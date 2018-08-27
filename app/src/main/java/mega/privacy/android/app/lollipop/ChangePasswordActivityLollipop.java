@@ -2,36 +2,46 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -43,7 +53,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 
 @SuppressLint("NewApi")
-public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface{
+public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
 	
 	ChangePasswordActivityLollipop changePasswordActivity = this;
 
@@ -86,6 +96,26 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private TextView passwdType;
 	private TextView passwdAdvice;
 	private boolean passwdValid;
+
+	AlertDialog verify2FADialog;
+	boolean verify2FADialogIsShown = false;
+	InputMethodManager imm;
+	private EditTextPIN firstPin;
+	private EditTextPIN secondPin;
+	private EditTextPIN thirdPin;
+	private EditTextPIN fourthPin;
+	private EditTextPIN fifthPin;
+	private EditTextPIN sixthPin;
+	private StringBuilder sb = new StringBuilder();
+	private String pin = null;
+	private TextView pinError;
+	private ProgressBar verify2faProgressBar;
+
+	private boolean isFirstTime = true;
+	private boolean isErrorShown = false;
+	private boolean is2FAEnabled = false;
+	private boolean pinLongClick = false;
+
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -221,6 +251,18 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		progress.setCancelable(false);
 		progress.setCanceledOnTouchOutside(false);
 
+		tB  =(Toolbar) findViewById(R.id.toolbar);
+		hideAB();
+
+		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+		if (savedInstanceState != null) {
+			verify2FADialogIsShown =  savedInstanceState.getBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
+			if (verify2FADialogIsShown) {
+				showVerifyPin2FA();
+			}
+		}
+
 		Intent intentReceived = getIntent();
 		if (intentReceived != null) {
 			log("There is an intent!");
@@ -259,12 +301,502 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		outState.putBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
+	}
+
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		switch (v.getId()) {
+			case R.id.pin_first_verify:{
+				if (hasFocus) {
+					firstPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_second_verify:{
+				if (hasFocus) {
+					secondPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_third_verify:{
+				if (hasFocus) {
+					thirdPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fouth_verify:{
+				if (hasFocus) {
+					fourthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fifth_verify:{
+				if (hasFocus) {
+					fifthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_sixth_verify:{
+				if (hasFocus) {
+					sixthPin.setText("");
+				}
+				break;
+			}
+		}
+	}
+
+	public void showVerifyPin2FA(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_verify_2fa, null);
+		builder.setView(v);
+
+		TextView titleDialog = (TextView) v.findViewById(R.id.title_dialog_verify);
+		titleDialog.setText(getString(R.string.change_password_verification));
+
+		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
+		pinError.setVisibility(View.GONE);
+
+		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
+
+		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+		firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_verify);
+		firstPin.setOnLongClickListener(this);
+		firstPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
+		firstPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(firstPin.length() != 0){
+					secondPin.requestFocus();
+					secondPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick){
+						secondPin.setText("");
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_verify);
+		secondPin.setOnLongClickListener(this);
+		secondPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
+		secondPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (secondPin.length() != 0){
+					thirdPin.requestFocus();
+					thirdPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_verify);
+		thirdPin.setOnLongClickListener(this);
+		thirdPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
+		thirdPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (thirdPin.length()!= 0){
+					fourthPin.requestFocus();
+					fourthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_verify);
+		fourthPin.setOnLongClickListener(this);
+		fourthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
+		fourthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fourthPin.length()!=0){
+					fifthPin.requestFocus();
+					fifthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_verify);
+		fifthPin.setOnLongClickListener(this);
+		fifthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
+		fifthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fifthPin.length()!=0){
+					sixthPin.requestFocus();
+					sixthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_verify);
+		sixthPin.setOnLongClickListener(this);
+		sixthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
+		sixthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (sixthPin.length()!=0){
+					sixthPin.setCursorVisible(true);
+					hideKeyboard();
+
+					if (pinLongClick) {
+						pasteClipboard();
+					}
+					else {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		firstPin.setLayoutParams(paramsb1);
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		firstPin.setLayoutParams(textParams);
+
+		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		secondPin.setLayoutParams(paramsb2);
+		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		secondPin.setLayoutParams(textParams);
+		secondPin.setEt(firstPin);
+
+		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		thirdPin.setLayoutParams(paramsb3);
+		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+		thirdPin.setLayoutParams(textParams);
+		thirdPin.setEt(secondPin);
+
+		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fourthPin.setLayoutParams(paramsb4);
+		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fourthPin.setLayoutParams(textParams);
+		fourthPin.setEt(thirdPin);
+
+		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fifthPin.setLayoutParams(paramsb5);
+		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fifthPin.setLayoutParams(textParams);
+		fifthPin.setEt(fourthPin);
+
+		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		sixthPin.setLayoutParams(paramsb6);
+		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
+		textParams.setMargins(0, 0, 0, 0);
+		sixthPin.setLayoutParams(textParams);
+		sixthPin.setEt(fifthPin);
+
+		verify2FADialog = builder.create();
+		verify2FADialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				verify2FADialogIsShown = false;
+			}
+		});
+		verify2FADialog.show();
+		verify2FADialogIsShown = true;
+		imm.showSoftInput(this.getCurrentFocus(), InputMethodManager.SHOW_IMPLICIT);
+	}
+
+	void verifyQuitError(){
+		isErrorShown = false;
+		pinError.setVisibility(View.GONE);
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+	}
+
+	void verifyShowError(){
+		isFirstTime = false;
+		isErrorShown = true;
+		pinError.setVisibility(View.VISIBLE);
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+	}
+
+	void permitVerify(){
+		log("permitVerify");
+		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+			hideKeyboard();
+			if (sb.length()>0) {
+				sb.delete(0, sb.length());
+			}
+			sb.append(firstPin.getText());
+			sb.append(secondPin.getText());
+			sb.append(thirdPin.getText());
+			sb.append(fourthPin.getText());
+			sb.append(fifthPin.getText());
+			sb.append(sixthPin.getText());
+			pin = sb.toString();
+			log("PIN: "+pin);
+			if (!isErrorShown && pin != null) {
+				verify2faProgressBar.setVisibility(View.VISIBLE);
+				changePassword(newPassword1View.getText().toString());
+			}
+		}
+	}
+
+	void pasteClipboard() {
+		log("pasteClipboard");
+		pinLongClick = false;
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		ClipData clipData = clipboard.getPrimaryClip();
+		if (clipData != null) {
+			String code = clipData.getItemAt(0).getText().toString();
+			log("code: "+code);
+			if (code != null && code.length() == 6) {
+				boolean areDigits = true;
+				for (int i=0; i<6; i++) {
+					if (!Character.isDigit(code.charAt(i))) {
+						areDigits = false;
+						break;
+					}
+				}
+				if (areDigits) {
+					firstPin.setText(""+code.charAt(0));
+					secondPin.setText(""+code.charAt(1));
+					thirdPin.setText(""+code.charAt(2));
+					fourthPin.setText(""+code.charAt(3));
+					fifthPin.setText(""+code.charAt(4));
+					sixthPin.setText(""+code.charAt(5));
+				}
+				else {
+					firstPin.setText("");
+					secondPin.setText("");
+					thirdPin.setText("");
+					fourthPin.setText("");
+					fifthPin.setText("");
+					sixthPin.setText("");
+				}
+			}
+		}
+	}
+
+	void hideKeyboard(){
+
+		View v = getCurrentFocus();
+		if (v != null){
+			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+		}
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	    switch (item.getItemId()) {
 	    // Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
-		    	finish();
+					finish();
 		    	return true;
 		    }
 		}	    
@@ -491,9 +1023,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			return;
 		}
 
-		InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
-		inputMethodManager.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
 
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
@@ -530,11 +1061,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		if (!validateForm(true)) {
 			return;
 		}
-		
-		InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        inputMethodManager.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
-        inputMethodManager.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(newPassword1View.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(newPassword2View.getWindowToken(), 0);
 		
 
 		String newPassword1 = newPassword1View.getText().toString();
@@ -546,8 +1075,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 //			setError(newPassword2View, getString(R.string.my_account_change_password_dont_match));
 //			return;
 //		}
-
-		changePassword(newPassword1);
+		
+		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+//		changePassword(newPassword1);
 	}
 	
 //	private boolean checkPassword (String oldPassword, String newPassword1, String newPassword2){
@@ -647,10 +1177,15 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	
 	private void changePassword (String newPassword){
 		log("changePassword");
-		progress.setMessage(getString(R.string.my_account_changing_password));
-		progress.show();
 
-		megaApi.changePassword(null, newPassword, this);
+		if (is2FAEnabled){
+			megaApi.multiFactorAuthChangePassword(null, newPassword, pin, this);
+		}
+		else {
+			megaApi.changePassword(null, newPassword, this);
+			progress.setMessage(getString(R.string.my_account_changing_password));
+			progress.show();
+		}
 	}
 	
 	@Override
@@ -666,24 +1201,40 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			log("TYPE_CHANGE_PW");
 			if (e.getErrorCode() != MegaError.API_OK){
 				log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
-				
-				try{ 
-					progress.dismiss();
-				} catch(Exception ex) {};
 
-				//Intent to MyAccount
-				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
-				if(e.getErrorCode()!=MegaError.API_OK){
-					log("Error, request: "+e.getErrorString());
-
-					showSnackbar(getString(R.string.email_verification_text_error));
+				if (!is2FAEnabled) {
+					try {
+						progress.dismiss();
+					} catch (Exception ex) {}
 				}
-				else{
-					resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
-					log("General Error");
-					resetPassIntent.putExtra("RESULT", -1);
-					startActivity(resetPassIntent);
-					finish();
+
+				if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
+					if (verify2faProgressBar != null) {
+						verify2faProgressBar.setVisibility(View.GONE);
+					}
+					verifyShowError();
+				}
+				else {
+					//Intent to MyAccount
+					Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
+					if (e.getErrorCode() != MegaError.API_OK) {
+						log("Error, request: " + e.getErrorString());
+						if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED) {
+							if (is2FAEnabled) {
+								verifyShowError();
+							}
+						}
+						else {
+							showSnackbar(getString(R.string.email_verification_text_error));
+						}
+					}
+					else {
+						resetPassIntent.setAction(Constants.ACTION_PASS_CHANGED);
+						log("General Error");
+						resetPassIntent.putExtra("RESULT", -1);
+						startActivity(resetPassIntent);
+						finish();
+					}
 				}
 			}
 			else{
@@ -691,7 +1242,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};
-				
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 				//Intent to MyAccount
 				Intent resetPassIntent = new Intent(this, ManagerActivityLollipop.class);
@@ -778,6 +1328,18 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					finish();
 				}
 
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK){
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (request.getFlag()){
+					is2FAEnabled = true;
+					showVerifyPin2FA();
+				}
+				else {
+					is2FAEnabled = false;
+					changePassword(newPassword1View.getText().toString());
+				}
 			}
 		}
 	}
@@ -879,5 +1441,34 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+
+	void hideAB(){
+		if (aB != null){
+			aB.hide();
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		}
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()){
+			case R.id.pin_first_verify:
+			case R.id.pin_second_verify:
+			case R.id.pin_third_verify:
+			case R.id.pin_fouth_verify:
+			case R.id.pin_fifth_verify:
+			case R.id.pin_sixth_verify: {
+				pinLongClick = true;
+				v.requestFocus();
+			}
+		}
+		return false;
 	}
 }

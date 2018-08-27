@@ -52,7 +52,6 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.LoginActivityLollipop"
-            android:theme="@style/no_title_activity"
             android:label="@string/login_text"
             android:screenOrientation="locked"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -384,6 +383,12 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
             android:label="@string/app_name">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar.General">
         </activity>
 
         <activity

@@ -8,6 +8,8 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -117,12 +119,12 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
-import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
@@ -225,7 +227,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
 
 	public int accountFragment;
 
@@ -318,6 +320,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
+	boolean newAccount = false;
 
 	boolean showStorageAlmostFullDialog = true;
 
@@ -544,6 +547,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private Button dismissButton;
 	private boolean rememberPasswordLogout = false;
 
+	AlertDialog enable2FADialog;
+	boolean isEnable2FADialogShown = false;
+	Button enable2FAButton;
+	Button skip2FAButton;
+	AlertDialog verify2FADialog;
+	boolean verify2FADialogIsShown = false;
+	int verifyPin2FADialogType;
+	private boolean is2FAEnabled = false;
+	InputMethodManager imm;
+	private EditTextPIN firstPin;
+	private EditTextPIN secondPin;
+	private EditTextPIN thirdPin;
+	private EditTextPIN fourthPin;
+	private EditTextPIN fifthPin;
+	private EditTextPIN sixthPin;
+	private StringBuilder sb = new StringBuilder();
+	private String pin = null;
+	private String newMail = null;
+	private TextView pinError;
+	private ProgressBar verify2faProgressBar;
+
+	private boolean isFirstTime = true;
+	private boolean isErrorShown = false;
+	private boolean pinLongClick = false;
+
 	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -619,6 +647,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 				else if(actionType == Constants.UPDATE_PAYMENT_METHODS){
 					log("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver receiverUpdate2FA = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				boolean enabled = intent.getBooleanExtra("enabled", false);
+				is2FAEnabled = enabled;
+				if (sttFLol != null && sttFLol.isAdded()) {
+					sttFLol.update2FAPreference(enabled);
 				}
 			}
 		}
@@ -1499,6 +1540,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 		outState.putInt("orientationSaved", orientationSaved);
+		outState.putBoolean("verify2FADialogIsShown", verify2FADialogIsShown);
+		outState.putInt("verifyPin2FADialogType", verifyPin2FADialogType);
+		outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown);
 	}
 
 	@Override
@@ -1556,7 +1600,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			passwordReminderFromMyAccount = savedInstanceState.getBoolean("passwordReminderFromaMyAccount", false);
 			turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false);
 			orientationSaved = savedInstanceState.getInt("orientationSaved");
-
+			verify2FADialogIsShown = savedInstanceState.getBoolean("verify2FADialogIsShown", false);
+			verifyPin2FADialogType = savedInstanceState.getInt("verifyPin2FADialogType");
+			isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false);
 		}
 		else{
 			log("Bundle is NULL");
@@ -1576,6 +1622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate2FA, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
 		LocalBroadcastManager.getInstance(this).registerReceiver(inviteContactsReceiver, new IntentFilter(AddContactActivityLollipop.BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT));
 
 		nC = new NodeController(this);
@@ -1649,14 +1696,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 
 	    if (dbH.getCredentials() == null){
-	    	if (OldPreferences.getOldCredentials(this) != null){
-	    		Intent loginWithOldCredentials = new Intent(this, LoginActivityLollipop.class);
-				loginWithOldCredentials.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-	    		startActivity(loginWithOldCredentials);
-	    		finish();
-	    		return;
-		    }
-
 	    	Intent newIntent = getIntent();
 
 	    	if (newIntent != null){
@@ -2548,6 +2587,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	Intent intent = getIntent();
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
+					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					getIntent().putExtra("newAccount", false);
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -2610,6 +2651,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				Intent intentRec = getIntent();
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
+					newAccount = getIntent().getBooleanExtra("newAccount", false);
+					getIntent().putExtra("newAccount", false);
 					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
@@ -2697,8 +2740,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		megaApi.shouldShowPasswordReminderDialog(false, this);
 //		showRememberPasswordDialog(false);
-		log("END onCreate");
 //		showTransferOverquotaDialog();
+		if (verify2FADialogIsShown){
+			showVerifyPin2FA(verifyPin2FADialogType);
+		}
+		log("END onCreate");
 	}
 
 	public void showRememberPasswordDialog(boolean logout){
@@ -3137,13 +3183,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					String parentPath = intent.getStringExtra("parentPath");
 					if (parentPath != null){
 						log("path to download: "+parentPath);
+						boolean fromOffline = getIntent().getBooleanExtra("fromOffline", false);
 						AccountController ac = new AccountController(this);
-						ac.exportMK(parentPath, false);
+						ac.exportMK(parentPath, fromOffline);
 					}
 				}
 				else  if (getIntent().getAction().equals(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD)){
 					AccountController ac = new AccountController(this);
-					ac.copyMK(true);
+					if (getIntent().getBooleanExtra("logout", false)) {
+						ac.copyMK(true);
+					}
+					else {
+						ac.copyMK(false);
+					}
 				}
 
     			intent.setAction(null);
@@ -3486,6 +3538,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showDialogChangeUserAttribute(){
 		log("showDialogChangeUserAttribute");
+
+		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 
 		ScrollView scrollView = new ScrollView(this);
 
@@ -3918,6 +3972,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(inviteContactsReceiver);
 
     	super.onDestroy();
@@ -5474,6 +5529,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				break;
 			}
     	}
+
+    	if (newAccount || isEnable2FADialogShown) {
+    		showEnable2FADialog();
+		}
+	}
+
+	void showEnable2FADialog () {
+		log ("showEnable2FADialog newaccount: "+newAccount);
+		newAccount = false;
+		if (getIntent() != null) {
+			getIntent().putExtra("newAccount", false);
+		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
+		builder.setView(v);
+
+		enable2FAButton = (Button) v.findViewById(R.id.enable_2fa_button);
+		enable2FAButton.setOnClickListener(this);
+		skip2FAButton = (Button) v.findViewById(R.id.skip_enable_2fa_button);
+		skip2FAButton.setOnClickListener(this);
+
+		enable2FADialog = builder.create();
+		enable2FADialog.setCanceledOnTouchOutside(false);
+		try {
+			enable2FADialog.show();
+		}catch (Exception e){};
+		isEnable2FADialogShown = true;
 	}
 
 	public void moveToSettingsSection(){
@@ -7804,43 +7887,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        }
 	        case R.id.action_menu_refresh:{
 	        	switch(drawerItem){
-		        	case CLOUD_DRIVE:{
-		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			    		intent.setAction(Constants.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-		        		break;
-		        	}
-		        	case CONTACTS:{
-		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-			    		intent.setAction(Constants.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-			    		startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-			    		break;
-		        	}
-		        	case SHARED_ITEMS:{
-
-		        		int index = viewPagerShares.getCurrentItem();
-		    			if(index==1){
-		    				//OUTGOING
-							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-							intent.setAction(Constants.ACTION_REFRESH);
-							intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
-							startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-		    			}
-		    			else{
-		    				//InCOMING
-
-							Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-							intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-							intent.setAction(Constants.ACTION_REFRESH);
-							intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
-							startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
-		    			}
-		        	}
 		        	case ACCOUNT:{
 						//Refresh all the info of My Account
 		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
@@ -9934,6 +9980,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void askConfirmationDeleteAccount(){
 		log("askConfirmationDeleteAccount");
+		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
 
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			@Override
@@ -9958,6 +10005,529 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		builder.setPositiveButton(R.string.delete_account, dialogClickListener);
 		builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
 		builder.show();
+	}
+
+	void verify2FA(int type) {
+		if (type == Constants.CANCEL_ACCOUNT_2FA) {
+			megaApi.multiFactorAuthCancelAccount(pin, this);
+		}
+		else if (type == Constants.CHANGE_MAIL_2FA){
+			megaApi.multiFactorAuthChangeEmail(newMail, pin, this);
+		}
+		else if (type ==  Constants.DISABLE_2FA) {
+			megaApi.multiFactorAuthDisable(pin, this);
+		}
+	}
+
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		switch (v.getId()) {
+			case R.id.pin_first_verify:{
+				if (hasFocus) {
+					firstPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_second_verify:{
+				if (hasFocus) {
+					secondPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_third_verify:{
+				if (hasFocus) {
+					thirdPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fouth_verify:{
+				if (hasFocus) {
+					fourthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fifth_verify:{
+				if (hasFocus) {
+					fifthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_sixth_verify:{
+				if (hasFocus) {
+					sixthPin.setText("");
+				}
+				break;
+			}
+		}
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()){
+			case R.id.pin_first_verify:
+			case R.id.pin_second_verify:
+			case R.id.pin_third_verify:
+			case R.id.pin_fouth_verify:
+			case R.id.pin_fifth_verify:
+			case R.id.pin_sixth_verify: {
+				pinLongClick = true;
+				v.requestFocus();
+			}
+		}
+		return false;
+	}
+
+	void pasteClipboard() {
+		log("pasteClipboard");
+		pinLongClick = false;
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		ClipData clipData = clipboard.getPrimaryClip();
+		if (clipData != null) {
+			String code = clipData.getItemAt(0).getText().toString();
+			log("code: "+code);
+			if (code != null && code.length() == 6) {
+				boolean areDigits = true;
+				for (int i=0; i<6; i++) {
+					if (!Character.isDigit(code.charAt(i))) {
+						areDigits = false;
+						break;
+					}
+				}
+				if (areDigits) {
+					firstPin.setText(""+code.charAt(0));
+					secondPin.setText(""+code.charAt(1));
+					thirdPin.setText(""+code.charAt(2));
+					fourthPin.setText(""+code.charAt(3));
+					fifthPin.setText(""+code.charAt(4));
+					sixthPin.setText(""+code.charAt(5));
+				}
+				else {
+					firstPin.setText("");
+					secondPin.setText("");
+					thirdPin.setText("");
+					fourthPin.setText("");
+					fifthPin.setText("");
+					sixthPin.setText("");
+				}
+			}
+		}
+	}
+
+	public void showVerifyPin2FA(final int type){
+		verifyPin2FADialogType = type;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_verify_2fa, null);
+		builder.setView(v);
+
+		TextView titleDialog = (TextView) v.findViewById(R.id.title_dialog_verify);
+		if (type == Constants.CANCEL_ACCOUNT_2FA){
+			titleDialog.setText(getString(R.string.cancel_account_verification));
+		}
+		else if (type == Constants.CHANGE_MAIL_2FA){
+			titleDialog.setText(getString(R.string.change_mail_verification));
+		}
+		else if (type == Constants.DISABLE_2FA) {
+			titleDialog.setText(getString(R.string.disable_2fa_verification));
+		}
+
+		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
+
+		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
+		pinError.setVisibility(View.GONE);
+
+		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+		firstPin = (EditTextPIN) v.findViewById(R.id.pin_first_verify);
+		firstPin.setOnLongClickListener(this);
+		firstPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
+		firstPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(firstPin.length() != 0){
+					secondPin.requestFocus();
+					secondPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick){
+						secondPin.setText("");
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify(type);
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		secondPin = (EditTextPIN) v.findViewById(R.id.pin_second_verify);
+		secondPin.setOnLongClickListener(this);
+		secondPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
+		secondPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (secondPin.length() != 0){
+					thirdPin.requestFocus();
+					thirdPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify(type);
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		thirdPin = (EditTextPIN) v.findViewById(R.id.pin_third_verify);
+		thirdPin.setOnLongClickListener(this);
+		thirdPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
+		thirdPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (thirdPin.length()!= 0){
+					fourthPin.requestFocus();
+					fourthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify(type);
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_verify);
+		fourthPin.setOnLongClickListener(this);
+		fourthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
+		fourthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fourthPin.length()!=0){
+					fifthPin.requestFocus();
+					fifthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify(type);
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fifthPin = (EditTextPIN) v.findViewById(R.id.pin_fifth_verify);
+		fifthPin.setOnLongClickListener(this);
+		fifthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
+		fifthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fifthPin.length()!=0){
+					sixthPin.requestFocus();
+					sixthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify(type);
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		sixthPin = (EditTextPIN) v.findViewById(R.id.pin_sixth_verify);
+		sixthPin.setOnLongClickListener(this);
+		sixthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
+		sixthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (sixthPin.length()!=0){
+					sixthPin.setCursorVisible(true);
+					hideKeyboard();
+
+					if (pinLongClick) {
+						pasteClipboard();
+					}
+					else {
+						permitVerify(type);
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		firstPin.setLayoutParams(paramsb1);
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		firstPin.setLayoutParams(textParams);
+
+		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		secondPin.setLayoutParams(paramsb2);
+		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		secondPin.setLayoutParams(textParams);
+		secondPin.setEt(firstPin);
+
+		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		thirdPin.setLayoutParams(paramsb3);
+		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+		thirdPin.setLayoutParams(textParams);
+		thirdPin.setEt(secondPin);
+
+		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fourthPin.setLayoutParams(paramsb4);
+		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fourthPin.setLayoutParams(textParams);
+		fourthPin.setEt(thirdPin);
+
+		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fifthPin.setLayoutParams(paramsb5);
+		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fifthPin.setLayoutParams(textParams);
+		fifthPin.setEt(fourthPin);
+
+		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		sixthPin.setLayoutParams(paramsb6);
+		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
+		textParams.setMargins(0, 0, 0, 0);
+		sixthPin.setLayoutParams(textParams);
+		sixthPin.setEt(fifthPin);
+
+		verify2FADialog = builder.create();
+		verify2FADialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				verify2FADialogIsShown = false;
+			}
+		});
+		verify2FADialog.show();
+		verify2FADialogIsShown = true;
+	}
+
+	void hideKeyboard(){
+
+		View v = getCurrentFocus();
+		if (v != null){
+			if (imm == null) {
+				imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+			}
+			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+		}
+	}
+
+	void verifyQuitError(){
+		isErrorShown = false;
+		pinError.setVisibility(View.GONE);
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+	}
+
+	void verifyShowError(){
+		log("Pin not correct verifyShowError");
+		isFirstTime = false;
+		isErrorShown = true;
+		pinError.setVisibility(View.VISIBLE);
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+	}
+
+	void permitVerify(int type){
+		log("permitVerify");
+		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+			hideKeyboard();
+			if (sb.length()>0) {
+				sb.delete(0, sb.length());
+			}
+			sb.append(firstPin.getText());
+			sb.append(secondPin.getText());
+			sb.append(thirdPin.getText());
+			sb.append(fourthPin.getText());
+			sb.append(fifthPin.getText());
+			sb.append(sixthPin.getText());
+			pin = sb.toString();
+			log("PIN: "+pin);
+			if (!isErrorShown && pin != null) {
+				verify2faProgressBar.setVisibility(View.VISIBLE);
+				verify2FA(type);
+			}
+		}
 	}
 
 	public void showImportLinkDialog(){
@@ -11956,6 +12526,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				if (rememberPasswordLogout){
 					AccountController ac = new AccountController(this);
 					ac.logout(this, megaApi);
+				}
+				break;
+			}
+			case R.id.enable_2fa_button: {
+				if (enable2FADialog != null) {
+					enable2FADialog.dismiss();
+				}
+				isEnable2FADialogShown = false;
+				Intent intent = new Intent(this, TwoFactorAuthenticationActivity.class);
+				intent.putExtra("newAccount", true);
+				startActivity(intent);
+				break;
+			}
+			case R.id.skip_enable_2fa_button: {
+				isEnable2FADialogShown = false;
+				if (enable2FADialog != null) {
+					enable2FADialog.dismiss();
 				}
 				break;
 			}
@@ -14493,17 +15080,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
 			log("TYPE_GET_CHANGE_EMAIL_LINK: "+request.getEmail());
+			if (verify2faProgressBar != null) {
+				verify2faProgressBar.setVisibility(View.GONE);
+			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("The change link has been sent");
+				hideKeyboard();
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
 				Util.showAlert(this, getString(R.string.email_verification_text_change_mail), getString(R.string.email_verification_title));
 			}
 			else if(e.getErrorCode() == MegaError.API_EEXIST){
 				log("The new mail already exists");
-				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.general_error_word));
+				hideKeyboard();
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
+				Util.showAlert(this, getString(R.string.mail_already_used), getString(R.string.email_verification_title));
+			}
+			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
+				if (is2FAEnabled()){
+					verifyShowError();
+				}
 			}
 			else{
 				log("Error when asking for change mail link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
+				hideKeyboard();
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
 		}
@@ -14561,15 +15168,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		}
 		else if(request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK){
             log("TYPE_GET_CANCEL_LINK");
-
+			if (verify2faProgressBar != null) {
+				verify2faProgressBar.setVisibility(View.GONE);
+			}
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("cancelation link received!");
 				log(e.getErrorString() + "___" + e.getErrorCode());
+				hideKeyboard();
+				if (verify2FADialog != null && verify2FADialog.isShowing()) {
+					verify2FADialog.dismiss();
+				}
 				Util.showAlert(this, getString(R.string.email_verification_text), getString(R.string.email_verification_title));
+			}
+			else if (e.getErrorCode() == MegaError.API_EFAILED || e.getErrorCode() == MegaError.API_EEXPIRED){
+				if (is2FAEnabled()){
+					verifyShowError();
+				}
 			}
 			else{
 				log("Error when asking for the cancelation link");
 				log(e.getErrorString() + "___" + e.getErrorCode());
+				hideKeyboard();
+				if (verify2FADialog != null && verify2FADialog.isShowing()){
+					verify2FADialog.dismiss();
+				}
 				Util.showAlert(this, getString(R.string.email_verification_text_error), getString(R.string.general_error_word));
 			}
         }
@@ -15110,6 +15732,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				showSnackbar(getString(R.string.context_link_action_error));
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				if (request.getFlag()) {
+					is2FAEnabled = true;
+				} else {
+					is2FAEnabled = false;
+				}
+				if (sttFLol != null && sttFLol.isAdded()) {
+					sttFLol.update2FAPreference(is2FAEnabled);
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET){
+			log("TYPE_MULTI_FACTOR_AUTH_SET: "+e.getErrorCode());
+			if (verify2faProgressBar != null) {
+				verify2faProgressBar.setVisibility(View.GONE);
+			}
+			if (!request.getFlag() && e.getErrorCode() == MegaError.API_OK){
+				log("Pin correct: Two-Factor Authentication disabled");
+				is2FAEnabled = false;
+				if (sttFLol != null && sttFLol.isAdded()) {
+					sttFLol.update2FAPreference(false);
+					showSnackbar(getString(R.string.label_2fa_disabled));
+				}
+				hideKeyboard();
+				if (verify2FADialog != null) {
+					verify2FADialog.dismiss();
+				}
+			}
+			else if (e.getErrorCode() == MegaError.API_EFAILED){
+				log("Pin not correct");
+				verifyShowError();
+			}
+			else {
+				hideKeyboard();
+				if (verify2FADialog != null) {
+					verify2FADialog.dismiss();
+				}
+				showSnackbar(getString(R.string.error_disable_2fa));
+				log("An error ocurred trying to disable Two-Factor Authentication");
+			}
+
+			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
+		}
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
 			if (e.getErrorCode() == MegaError.API_OK) {
 				MegaFolderInfo info = request.getMegaFolderInfo();
@@ -15167,7 +15833,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					// -1 if the change is the result of an implicit request made by the SDK internally
 
 					if(user.isOwnChange()>0){
-						log("isOwnChange!!!: "+user.isOwnChange());
+						log("isOwnChange!!!: "+user.getEmail());
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)){
 							log("Change on CHANGE_TYPE_RICH_PREVIEWS");
 							if(Util.isChatEnabled()){
@@ -15177,17 +15843,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						}
 					}
 					else{
-						log("NOT OWN change: "+user.isOwnChange());
+						log("NOT OWN change: "+user.getEmail());
 
-						if(user.getHandle()==megaApi.getMyUser().getHandle()){
-							log("Change on my account from another client");
-							if(user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)){
-								log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
-								megaApi.getFileVersionsOption(this);
-							}
-							else if(user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)){
-								log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
-								megaApi.getContactLinksOption(this);
+						log("Changes: "+user.getChanges());
+
+						if(megaApi.getMyUser()!=null) {
+							if (user.getHandle() == megaApi.getMyUser().getHandle()) {
+								log("Change on my account from another client");
+								if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
+									log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
+									megaApi.getFileVersionsOption(this);
+								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
+									log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
+									megaApi.getContactLinksOption(this);
+								}
 							}
 						}
 
@@ -16998,6 +17667,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("refreshMenu");
 		supportInvalidateOptionsMenu();
 	}
+
+	public boolean is2FAEnabled (){
+		return is2FAEnabled;
+	}
+
+	public void setNewMail (String newMail) {
+		this.newMail = newMail;
+	}
+
 
 	public boolean isCameraUploads(MegaNode n){
 		log("isCameraUploads()");
