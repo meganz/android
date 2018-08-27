@@ -7722,20 +7722,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						sharesPageAdapter.notifyDataSetChanged();
 					}
 					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
-					if (oFLol != null) {
-						oFLol.getRecyclerView().removeItemDecoration(oFLol.floatingItemDecoration);
-						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
-						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-						fragTransaction.detach(currentFragment);
-//						fragTransaction.commitNowAllowingStateLoss();
-						oFLol.setPathNavigation(pathNavigationOffline);
-						//Add section header.
-						oFLol.floatingItemDecoration = null;
-//						fragTransaction = getSupportFragmentManager().beginTransaction();
-						fragTransaction.attach(currentFragment);
-						fragTransaction.commitNowAllowingStateLoss();
-					}
-					
+                    if (oFLol != null && oFLol.isAdded()){
+                        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+                        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+                        fragTransaction.detach(currentFragment);
+                        fragTransaction.commitNowAllowingStateLoss();
+                        oFLol.floatingItemDecoration = null;
+                        oFLol.setIsList(isList);
+                        oFLol.setPathNavigation(pathNavigationOffline);
+                        //oFLol.setGridNavigation(false);
+                        //oFLol.setParentHandle(parentHandleSharedWithMe);
+    
+                        fragTransaction = getSupportFragmentManager().beginTransaction();
+                        fragTransaction.attach(currentFragment);
+                        fragTransaction.commitNowAllowingStateLoss();
+                    }
+                    
 	    			if(drawerItem == DrawerItem.INBOX){
 	    				selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -11743,14 +11745,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		this.orderCloud = _orderCloud;
 		this.setOrderCloud(orderCloud);
-		MegaNode inboxNode = megaApi.getInboxNode();
-		if(inboxNode!=null){
-			ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, orderCloud);
-			if (iFLol != null && iFLol.isAdded()){
-				iFLol.setNodes(nodes);
-				iFLol.getRecyclerView().invalidate();
-			}
-		}
+		//Fix the issuse which leads to get back to the root of Inbox when sort.
+        if (iFLol != null && iFLol.isAdded()){
+            iFLol.refresh();
+        }
+//		MegaNode inboxNode = megaApi.getInboxNode();
+//		if(inboxNode!=null){
+//			ArrayList<MegaNode> nodes = megaApi.getChildren(inboxNode, orderCloud);
+//			if (iFLol != null && iFLol.isAdded()){
+//				iFLol.setNodes(nodes);
+//				iFLol.getRecyclerView().invalidate();
+//			}
+//		}
 	}
 
 	public void selectSortUploads(int orderCamera){
