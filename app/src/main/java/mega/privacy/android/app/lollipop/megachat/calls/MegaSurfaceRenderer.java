@@ -89,73 +89,24 @@ public class MegaSurfaceRenderer implements Callback {
         if (bitmap != null && dstRect.height() != 0) {
             float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             float dstaspectratio = (float) dstRect.width() / dstRect.height();
-//            Log.d("&&","&& srcaspectratio = bitmap.getWidth("+bitmap.getWidth()+") / bitmap.getHeight("+bitmap.getHeight()+") = "+srcaspectratio);
-//            Log.d("&&","&& dstaspectratio = dstRect.width()("+dstRect.width()+") / dstRect.height()("+dstRect.height()+") = "+dstaspectratio);
-
 
             if (srcaspectratio != 0 && dstaspectratio != 0) {
                 if (srcaspectratio > dstaspectratio) {
                     float newHeight = dstRect.width() / srcaspectratio;
-//                    Log.d("&&","&& newHeight = dstRect.width("+dstRect.width()+") / srcaspectratio("+srcaspectratio+") = "+newHeight);
-
                     float decrease = dstRect.height() - newHeight;
-//                    Log.d("&&","&& decrease = dstRect.height()("+dstRect.height()+") - newHeight("+newHeight+") = "+decrease);
-
-                    float decreaseASide = decrease/2;
-//                    Log.d("&&","&& decreaseASide = "+decreaseASide);
-
-//                    Log.d("&&","&& ANTES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
-                    dstRect.top += decreaseASide;
-                    dstRect.bottom -= decreaseASide;
-//                    Log.d("&&","&& DESPUES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
-
+                    dstRect.top += decrease / 2;
+                    dstRect.bottom -= decrease / 2;
                     dstRectf = new RectF(dstRect);
                 } else {
-
                     float newWidth = dstRect.height() * srcaspectratio;
-//                    Log.d("&&","&& newWidth = dstRect.height("+dstRect.height()+") * srcaspectratio("+srcaspectratio+") = "+newWidth);
-
                     float decrease = dstRect.width() - newWidth;
-//                    Log.d("&&","&& decrease = dstRect.width()("+dstRect.width()+") - newWidth("+newWidth+") = "+decrease);
-                    float decreaseASide = decrease/2;
-
-//                    Log.d("&&","&& decreaseASide = "+decreaseASide);
-
-//                    Log.d("&&","&& ANTES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
-                    dstRect.left += (-1)*decreaseASide;
-                    dstRect.right -= (newWidth - decreaseASide);
-
-//                    Log.d("&&","&& DESPUES -> left("+dstRect.left+" ---> "+dstRect.right+")right, top("+dstRect.top+" ---> "+dstRect.bottom+")bottom");
-
+                    dstRect.left += decrease / 2;
+                    dstRect.right -= decrease / 2;
                     dstRectf = new RectF(dstRect);
                 }
             }
         }
     }
-
-
-//    private void adjustAspectRatio() {
-//        if (bitmap != null && dstRect.height() != 0) {
-//            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
-//            float dstaspectratio = (float) dstRect.width() / dstRect.height();
-//
-//            if (srcaspectratio != 0 && dstaspectratio != 0) {
-//                if (srcaspectratio > dstaspectratio) {
-//                    float newHeight = dstRect.width() / srcaspectratio;
-//                    float decrease = dstRect.height() - newHeight;
-//                    dstRect.top += decrease / 2;
-//                    dstRect.bottom -= decrease / 2;
-//                    dstRectf = new RectF(dstRect);
-//                } else {
-//                    float newWidth = dstRect.height() * srcaspectratio;
-//                    float decrease = dstRect.width() - newWidth;
-//                    dstRect.left += decrease / 2;
-//                    dstRect.right -= decrease / 2;
-//                    dstRectf = new RectF(dstRect);
-//                }
-//            }
-//        }
-//    }
 
 
 
@@ -278,8 +229,8 @@ public class MegaSurfaceRenderer implements Callback {
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
             canvas.scale(-1, 1);
-            canvas.translate(-dstRect.width(), 0);
-
+//            canvas.translate(-dstRect.width(), 0);
+            canvas.translate(-canvas.getWidth(), 0);
             if (flag) {
                 paint.reset();
                 paint.setXfermode(modesrcover);

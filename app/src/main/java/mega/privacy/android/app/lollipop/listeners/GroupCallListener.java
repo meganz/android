@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.widget.RelativeLayout;
+
 import java.nio.ByteBuffer;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -49,8 +51,12 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
                     this.bitmap = holder.localRenderer.CreateBitmap(width, height);
-                    holder.widthX = width;
-                    holder.heightX = height;
+//                    holder.widthX = width;
+//                    holder.heightX = height;
+//                    log("#### width("+width+"), height("+height+")");
+//                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
+//                    lp.setMargins(50, 100, 0, 0);
+//                    holder.microSurface.setLayoutParams(lp);
                     Sholder.setFixedSize(holderWidth, holderHeight);
                 }
                 else{
