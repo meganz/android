@@ -648,6 +648,8 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 			log("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
 
+			megaApi.addGlobalListener(this);
+
 //			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //			if (dbH.getCredentials() != null){
 //				megaChatApi = new MegaChatApiAndroid(megaApi, true);
