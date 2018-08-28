@@ -297,8 +297,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("updateScreenStatusInProgress");
 
         if(chat.isGroup()){
-            relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
-            relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+            relativeVideo.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+            relativeVideo.getLayoutParams().width = RelativeLayout.LayoutParams.WRAP_CONTENT;
         }
         else{
             relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -317,12 +317,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         startClock();
     }
 
-    public void updateNumberOfPeers(){
-        if(chat.isGroup()){
-            int totalParticipants = callChat.getNumParticipants();
-            //redesign of screens:
-        }
-    }
 
     public void updateSubTitle(){
         log("updateSubTitle");
@@ -722,7 +716,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateScreenStatusInProgress();
 
                 }else{
-
 
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
@@ -1248,13 +1241,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 int callStatus = callChat.getStatus();
                 switch (callStatus){
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
-                        log("4 CALL_STATUS_IN_PROGRESS");
+                        log("CALL_STATUS_IN_PROGRESS");
 
                         if(chat.isGroup()){
                             if(call.isIncoming()){
                                 log("incoming call");
                                 peersBeforeCall.clear();
-                                log("4 IN_PROGRESS - Add : "+megaChatApi.getMyFullname()+" my peer ");
+                                log("IN_PROGRESS-Incoming - Add : "+megaChatApi.getMyFullname()+" my peer ");
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                                 peersOnCall.add(myPeer);
 
@@ -1267,6 +1260,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 recyclerView.setAdapter(null);
                                 adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
                                 recyclerView.setAdapter(adapter);
+                            }else{
+
+                                peersBeforeCall.clear();
+                                boolean  iAm = false;
+                                for(int i=0;i<peersOnCall.size();i++){
+                                    if(peersOnCall.get(i).getHandle() == megaChatApi.getMyUserHandle()){
+                                        iAm = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!iAm){
+                                    log("IN_PROGRESS-joining - Add : "+megaChatApi.getMyFullname()+" my peer ");
+                                    InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
+                                    peersOnCall.add(myPeer);
+
+                                    if(peersOnCall.size() <= 3){
+                                        recyclerView.setColumnWidth((int) widthScreenPX);
+                                    }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
+                                        recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                    }
+
+                                    recyclerView.setAdapter(null);
+                                    adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
+                                    recyclerView.setAdapter(adapter);
+                                }
                             }
                         }
 
@@ -1308,7 +1327,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     case MegaChatCall.CALL_STATUS_DESTROYED:{
                         log("CALL_STATUS_DESTROYED:TERM code of the call: "+call.getTermCode());
-                        //The group call has finished so I can not join again
+                        //The group call has finished but I can not join again
 
                         stopAudioSignals();
                         rtcAudioManager.stop();
