@@ -59,7 +59,6 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
                     int marginRight = 50 + (viewWidth - (int)holder.localRenderer.getRightR());
 
                     holder.surfaceViewLayout.removeViewInLayout(holder.microSurface);
-                    holder.microSurface.setImageResource(R.drawable.ic_mic_off);
                     RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                     paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                     paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);

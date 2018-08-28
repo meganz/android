@@ -270,7 +270,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.surfaceViewLayout.addView(holder.surfaceView);
 
             //Update micro icon
-//            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
@@ -292,7 +292,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 //            }
 //
 //            holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
-//            holder.surfaceViewLayout.setVisibility(View.VISIBLE);
 
 
             //Create listener
