@@ -87,7 +87,6 @@
         android:layout_toRightOf="@id/recent_chat_list_relative_layout_avatar"
         android:layout_marginLeft="16dp"
         android:textSize="14sp"
-        android:ellipsize="end"
         android:singleLine="true"
         android:maxLines="1"
         android:textColor="@color/accentColor" />
