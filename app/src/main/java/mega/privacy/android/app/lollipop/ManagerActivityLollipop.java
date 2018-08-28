@@ -1368,6 +1368,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
 	        	break;
 	        }
+			case Constants.REQUEST_READ_WRITE_STORAGE:{
+				log("REQUEST_READ_WRITE_STORAGE");
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+					onGetReadWritePermission();
+				}
+			}
 	        case Constants.REQUEST_WRITE_STORAGE:{
 				log("REQUEST_WRITE_STORAGE PERMISSIONS");
 	        	if (firstTimeCam){
@@ -12087,11 +12093,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 			if (!hasStoragePermission) {
 				ActivityCompat.requestPermissions((ManagerActivityLollipop)this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						Constants.REQUEST_WRITE_STORAGE);
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+						Constants.REQUEST_READ_WRITE_STORAGE);
+			}else{
+				onGetReadWritePermission();
 			}
+		}else{
+			onGetReadWritePermission();
 		}
+	}
 
+	private void onGetReadWritePermission(){
 		UploadBottomSheetDialogFragment bottomSheetDialogFragment = new UploadBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
