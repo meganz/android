@@ -653,22 +653,20 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
                     log("Incoming call");
 
-                    //*********** DESCOMENTAR ************
+                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+                    ringerTimer = new Timer();
+                    MyRingerTask myRingerTask = new MyRingerTask();
+                    ringerTimer.schedule(myRingerTask, 0, 500);
 
-//                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-//                    ringerTimer = new Timer();
-//                    MyRingerTask myRingerTask = new MyRingerTask();
-//                    ringerTimer.schedule(myRingerTask, 0, 500);
-//
-//                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                    long[] pattern = {0, 1000, 500, 500, 1000};
-//                    if (vibrator != null){
-//                        if (vibrator.hasVibrator()){
-//                            //FOR API>=26
-//                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
-//                            vibrator.vibrate(pattern, 0);
-//                        }
-//                    }
+                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    long[] pattern = {0, 1000, 500, 500, 1000};
+                    if (vibrator != null){
+                        if (vibrator.hasVibrator()){
+                            //FOR API>=26
+                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
+                            vibrator.vibrate(pattern, 0);
+                        }
+                    }
 
                     if(chat.isGroup()){
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -724,18 +722,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateScreenStatusInProgress();
 
                 }else{
-                    //*********** DESCOMENTAR ************
 
 
-//                    int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-//                    if (volume == 0) {
-//                        toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
-//                        toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE, 60000);
-//                    }else {
-//                        thePlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
-//                        thePlayer.setLooping(true);
-//                        thePlayer.start();
-//                    }
+                    int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    if (volume == 0) {
+                        toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
+                        toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE, 60000);
+                    }else {
+                        thePlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
+                        thePlayer.setLooping(true);
+                        thePlayer.start();
+                    }
 
                     if(chat.isGroup()){
                         log("Outgoing call");
@@ -1290,9 +1287,22 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                         log("Terminating call of chat: "+chatId);
                         if(chat.isGroup()){
-                            long userHandle = call.getPeerSessionStatusChange();
-                            log(userHandle+": finished the participation on the call");
+                            stopAudioSignals();
+                            rtcAudioManager.stop();
+                            MegaApplication.activityPaused();
+
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                super.finishAndRemoveTask();
+                            }
+                            else {
+                                super.finish();
+                            }
                         }
+
+                        break;
+                    }
+                    case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:{
+                        log("CALL_STATUS_USER_NO_PRESENT");
 
                         break;
                     }

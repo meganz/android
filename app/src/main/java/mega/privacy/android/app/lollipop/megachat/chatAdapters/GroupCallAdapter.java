@@ -135,11 +135,12 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         RelativeLayout avatarLayout;
         RoundedImageView avatarImage;
         TextView avatarInitialLetter;
-        RelativeLayout surfaceViewLayout;
+        public RelativeLayout surfaceViewLayout;
         ImageView microAvatar;
         public ImageView microSurface;
         public SurfaceView surfaceView;
         public MegaSurfaceRenderer localRenderer;
+
         SurfaceHolder localSurfaceHolder;
 
         public ViewHolderGroupCall(View itemView) {
@@ -269,14 +270,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.surfaceViewLayout.addView(holder.surfaceView);
 
             //Update micro icon
-            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+//            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
                 holder.microSurface.setVisibility(View.VISIBLE);
             }
 
-            holder.surfaceViewLayout.addView(holder.microSurface);
+//            holder.surfaceViewLayout.addView(holder.microSurface);
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
 
 //            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
@@ -309,10 +310,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }else{
             log("Video OFF");
             holder.microSurface.setVisibility(View.GONE);
-            holder.surfaceViewLayout.setVisibility(View.VISIBLE);
-            holder.surfaceViewLayout.setVisibility(View.GONE);
+
             //Remove Surface View
             holder.surfaceViewLayout.removeAllViewsInLayout();
+            holder.surfaceViewLayout.setVisibility(View.GONE);
 
             //Create the avatar
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {

@@ -277,11 +277,14 @@ public class MegaSurfaceRenderer implements Callback {
     }
 
     public float getRightR() {
-        return rightR;
+        return dstRectf.right;
+    }
+    public float getLeftR() {
+        return dstRectf.left;
     }
 
     public float getTopR() {
-        return topR;
+        return dstRectf.top;
     }
 
 
