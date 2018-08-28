@@ -2094,4 +2094,11 @@
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Send to&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 
+    <plurals name="plural_select_file" context="Section title to select a file to perform an action">
+        <item context="one file" quantity="one">Choose file</item>
+        <item context="more files" quantity="other">Choose files</item>
+    </plurals>
+
+    <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
+
 </resources>
