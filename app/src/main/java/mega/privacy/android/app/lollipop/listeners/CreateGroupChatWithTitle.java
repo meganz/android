@@ -5,6 +5,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -47,6 +48,9 @@ public class CreateGroupChatWithTitle implements MegaChatRequestListenerInterfac
                 else if(context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
                 }
+                else if(context instanceof ChatExplorerActivity){
+                    ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+                }
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
@@ -57,7 +61,9 @@ public class CreateGroupChatWithTitle implements MegaChatRequestListenerInterfac
             else if(context instanceof FileExplorerActivityLollipop){
                 ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
             }
-
+            else if(context instanceof ChatExplorerActivity){
+                ((ChatExplorerActivity) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+            }
         }
     }
 
