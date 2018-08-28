@@ -7,6 +7,8 @@ import android.view.SurfaceHolder;
 import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
+
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.GroupCallAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
@@ -47,6 +49,7 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
                     int holderWidth = viewWidth < width ? viewWidth : width;
                     int holderHeight = holderWidth * viewHeight / viewWidth;
                     if (holderHeight > viewHeight) {
+
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
@@ -54,15 +57,17 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
                     int marginTop = 50 + ((int)holder.localRenderer.getTopR());
                     int marginRight = 50 + (viewWidth - (int)holder.localRenderer.getRightR());
-                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(holder.microSurface.getLayoutParams());
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                    lp.setMargins(0, marginTop, marginRight, 0);
-                    holder.microSurface.setLayoutParams(lp);
+
+                    holder.surfaceViewLayout.removeViewInLayout(holder.microSurface);
+                    holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+                    RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                    paramsMicroSurface.setMargins(0, marginTop, marginRight, 0);
+                    holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
 
                     Sholder.setFixedSize(holderWidth, holderHeight);
-                }
-                else{
+                }else{
                     this.width = -1;
                     this.height = -1;
                 }
