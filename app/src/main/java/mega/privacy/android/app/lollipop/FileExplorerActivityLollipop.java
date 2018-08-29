@@ -1546,21 +1546,26 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if(extras!=null){
 						if (!extras.containsKey(Intent.EXTRA_STREAM)) {
 							StringBuilder body = new StringBuilder();
-							String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-							if (sharedText2 != null) {
-								body.append(getString(R.string.new_file_subject_when_uploading)+": ");
-								body.append(sharedText2);
-							}
+							String header = "[InternetShortcut]\n";
+							body.append(header);
+
 							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 							if (sharedText != null) {
-								body.append("\n");
-								body.append(getString(R.string.new_file_content_when_uploading)+": ");
+								body.append("URL=");
+//								body.append(getString(R.string.new_file_content_when_uploading)+": ");
 								body.append(sharedText);
 							}
+
+							String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+							if (sharedText2 != null) {
+								body.append("\nsubject=");
+								body.append(sharedText2);
+							}
+
 							String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
 							if (sharedText3 != null) {
-								body.append("\n");
-								body.append(getString(R.string.new_file_email_when_uploading)+": ");
+								body.append("\nemail=");
+//								body.append(getString(R.string.new_file_email_when_uploading)+": ");
 								body.append(sharedText3);
 							}
 
@@ -1687,7 +1692,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
     private void createFile(String name, String data, MegaNode parentNode){
 
-		File file = Util.createTemporalTextFile(name, data);
+		File file = Util.createTemporalURLFile(name, data);
 		if(file!=null){
 			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
 
