@@ -1,3 +1,4 @@
+package mega.privacy.android.app.lollipop.megachat.calls;
 /*
  *  Copyright (c) 2012 The WebRTC project authors. All Rights Reserved.
  *
@@ -8,7 +9,25 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package mega.privacy.android.app.lollipop.megachat.calls;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+import org.webrtc.Logging;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 // The following four imports are needed saveBitmapToJPEG which
 // is for debug only
@@ -38,7 +57,7 @@ import org.webrtc.Logging;
 
 import mega.privacy.android.app.R;
 
-public class MegaSurfaceRenderer implements Callback {
+public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
 
     private final static String TAG = "WEBRTC";
 
@@ -58,7 +77,7 @@ public class MegaSurfaceRenderer implements Callback {
     int surfaceHeight = 0;
 
 
-    public MegaSurfaceRenderer(SurfaceView view) {
+    public MegaSurfaceRendererGroup(SurfaceView view) {
         Log.d("MegaSurfaceRenderer","MegaSurfaceRenderer() ");
 
 //        this.surf = view;
@@ -73,7 +92,7 @@ public class MegaSurfaceRenderer implements Callback {
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        Log.d("MegaSurfaceRenderer","changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
+        Log.d("SurfaceRendererGroup","changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -101,14 +120,17 @@ public class MegaSurfaceRenderer implements Callback {
                 if (srcaspectratio > dstaspectratio) {
                     float newHeight = dstRect.width() / srcaspectratio;
                     float decrease = dstRect.height() - newHeight;
-                    dstRect.top += decrease / 2;
-                    dstRect.bottom -= decrease / 2;
+//                    dstRect.top += decrease / 2;
+//                    dstRect.bottom -= decrease / 2;
+//                    surfaceHolder.setFixedSize(surfaceWidth,surfaceHeight);
                     dstRectf = new RectF(dstRect);
                 } else {
                     float newWidth = dstRect.height() * srcaspectratio;
                     float decrease = dstRect.width() - newWidth;
-                    dstRect.left += decrease / 2;
-                    dstRect.right -= decrease / 2;
+//                    dstRect.left += decrease / 2;
+//                    dstRect.right -= decrease / 2;
+//                    surfaceHolder.setFixedSize(surfaceWidth,surfaceHeight);
+
                     dstRectf = new RectF(dstRect);
                 }
             }
@@ -176,7 +198,7 @@ public class MegaSurfaceRenderer implements Callback {
         if (bitmap == null) {
             try {
                 android.os.Process.setThreadPriority(
-                    android.os.Process.THREAD_PRIORITY_DISPLAY);
+                        android.os.Process.THREAD_PRIORITY_DISPLAY);
             }
             catch (Exception e) {
             }
@@ -187,7 +209,7 @@ public class MegaSurfaceRenderer implements Callback {
         srcRect.bottom = height;
         srcRect.right = width;
 
-        adjustAspectRatio();
+//        adjustAspectRatio();
 
         return bitmap;
     }
@@ -208,7 +230,7 @@ public class MegaSurfaceRenderer implements Callback {
 
         try{
             FileOutputStream output = new FileOutputStream(String.format(
-                "/sdcard/render_%d.jpg", System.currentTimeMillis()));
+                    "/sdcard/render_%d.jpg", System.currentTimeMillis()));
             output.write(byteOutStream.toByteArray());
             output.flush();
             output.close();
@@ -274,5 +296,6 @@ public class MegaSurfaceRenderer implements Callback {
 
         return output;
     }
+
 
 }
