@@ -646,6 +646,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
+
                     ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
                     ringerTimer = new Timer();
                     MyRingerTask myRingerTask = new MyRingerTask();
@@ -662,7 +663,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                     if(chat.isGroup()){
-                        log("Incoming call - group");
+                        log("Incoming group call");
 
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
@@ -700,7 +701,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
 
                     }else{
-                        log("Incoming call - individual ");
+                        log("Incoming individual call");
 
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.MATCH_PARENT;
@@ -731,7 +732,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                     if(chat.isGroup()){
-                        log("Outgoing call - group");
+                        log("Outgoing group call");
 
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -760,7 +761,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             recyclerView.setVisibility(View.VISIBLE);
                         }
                     }else{
-                        log("Outgoing call - individual");
+                        log("Outgoing individual call");
 
                         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
                         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -1290,6 +1291,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID);
                                     recyclerView.setAdapter(adapter);
                                 }
+                                updateLocalVideoStatus();
+
                             }
                         }else{
                             flagMyAvatar = true;

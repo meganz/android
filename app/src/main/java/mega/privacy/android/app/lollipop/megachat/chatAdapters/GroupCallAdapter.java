@@ -41,7 +41,7 @@ import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
 import mega.privacy.android.app.lollipop.megachat.calls.LocalCameraCallFullScreenFragment;
-import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRenderer;
+import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
 import mega.privacy.android.app.lollipop.megachat.calls.RemoteCameraCallFullScreenFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -139,7 +139,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         ImageView microAvatar;
         public ImageView microSurface;
         public SurfaceView surfaceView;
-        public MegaSurfaceRenderer localRenderer;
+        public MegaSurfaceRendererGroup localRenderer;
 
         SurfaceHolder localSurfaceHolder;
 
@@ -173,55 +173,53 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         maxScreenHeight = parent.getMeasuredHeight();
         maxScreenWidth = parent.getMeasuredWidth();
 
-        if (viewType == GroupCallAdapter.ITEM_VIEW_TYPE_GRID){
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
+        int numPeersOnCall = getItemCount();
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
-            int numPeersOnCall = getItemCount();
+        CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) v.getLayoutParams();
 
-            CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) v.getLayoutParams();
-            if(numPeersOnCall <= 3){
+        if(numPeersOnCall <= 3){
+            lp.height = maxScreenHeight / numPeersOnCall;
+            lp.width = maxScreenWidth;
 
-                lp.height = maxScreenHeight / numPeersOnCall;
-                lp.width = maxScreenWidth;
+        }else if(numPeersOnCall == 4){
+            lp.height = maxScreenHeight / 2;
+            lp.width = maxScreenWidth/2;
 
-            }else if(numPeersOnCall == 4){
-                lp.height = maxScreenHeight / 2;
-                lp.width = maxScreenWidth/2;
+        }else if(numPeersOnCall == 5){
+            lp.height = maxScreenHeight / 3;
+            lp.width = maxScreenWidth/2;
+            log("****** For 5 peers: maxWidth: "+(maxScreenWidth/2)+", maxHeight: "+(maxScreenHeight/3));
 
-            }else if((numPeersOnCall > 4)&&(numPeersOnCall<7)){
-                lp.height = maxScreenHeight / 3;
-                lp.width = maxScreenWidth/2;
-
-            }
-
-            v.setLayoutParams(lp);
-
-            holderGrid = new ViewHolderGroupCallGrid(v);
-            holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
-            holderGrid.rlGeneral.setOnClickListener(this);
-            holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
-            holderGrid.surfaceViewLayout.removeAllViewsInLayout();
-
-            holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)holderGrid.avatarLayout.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-            holderGrid.avatarLayout.setLayoutParams(layoutParams);
-
-            holderGrid.microAvatar = (ImageView) v.findViewById(R.id.micro_avatar);
-
-            holderGrid.microSurface = new ImageView(context);
-            holderGrid.microSurface.setVisibility(View.GONE);
-
-            holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
-            holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
-
-            v.setTag(holderGrid);
-            return holderGrid;
-
-        }else{
-            return null;
-
+        }else if((numPeersOnCall > 5)&&(numPeersOnCall<7)){
+            lp.height = maxScreenHeight / 3;
+            lp.width = maxScreenWidth/2;
         }
+
+        v.setLayoutParams(lp);
+
+        holderGrid = new ViewHolderGroupCallGrid(v);
+        holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
+        holderGrid.rlGeneral.setOnClickListener(this);
+        holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
+        holderGrid.surfaceViewLayout.removeAllViewsInLayout();
+
+        holderGrid.avatarLayout = (RelativeLayout) v.findViewById(R.id.avatar_rl);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)holderGrid.avatarLayout.getLayoutParams();
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        holderGrid.avatarLayout.setLayoutParams(layoutParams);
+
+        holderGrid.microAvatar = (ImageView) v.findViewById(R.id.micro_avatar);
+
+        holderGrid.microSurface = new ImageView(context);
+        holderGrid.microSurface.setVisibility(View.GONE);
+
+        holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
+        holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
+
+        v.setTag(holderGrid);
+        return holderGrid;
+
     }
 
     @Override
@@ -246,6 +244,17 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
         }
 
+            int numPeers = getItemCount();
+        if((numPeers == 5) && (peer.getHandle().equals(megaChatApi.getMyUserHandle()))){
+            log("*******onBindViewHolderGrid() 5 peers and This is me-> maxWidth: "+maxScreenWidth+", maxHeight: "+(maxScreenHeight/3));
+
+            ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+            layoutParams.width = maxScreenWidth;
+            layoutParams.height = (maxScreenHeight/3);
+            holder.rlGeneral.setLayoutParams(layoutParams);
+
+        }
+
         if(peer.isVideoOn()) {
             log("Video ON");
             holder.microAvatar.setVisibility(View.GONE);
@@ -266,33 +275,24 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.surfaceView.setZOrderMediaOverlay(true);
             holder.localSurfaceHolder = holder.surfaceView.getHolder();
             holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-            holder.localRenderer = new MegaSurfaceRenderer(holder.surfaceView);
+            holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView);
             holder.surfaceViewLayout.addView(holder.surfaceView);
 
             //Update micro icon
             holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+            RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            paramsMicroSurface.setMargins(0, 50, 50, 0);
+            holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
             }else{
                 holder.microSurface.setVisibility(View.VISIBLE);
             }
 
-//            holder.surfaceViewLayout.addView(holder.microSurface);
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
-
-//            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
-//            RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-//            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//            paramsMicroSurface.setMargins(0, Util.scaleWidthPx(10, outMetrics), Util.scaleWidthPx(10, outMetrics), 0);
-//            if(peer.isAudioOn()){
-//                holder.microSurface.setVisibility(View.GONE);
-//            }else{
-//                holder.microSurface.setVisibility(View.VISIBLE);
-//            }
-//
-//            holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
-
 
             //Create listener
             GroupCallListener listenerPeer = new GroupCallListener(context, holder);
@@ -316,8 +316,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
             //Create the avatar
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                holder.rlGeneral.setBackgroundColor(Color.YELLOW);
                 setProfileMyAvatar(holder);
             }else{
+                holder.rlGeneral.setBackgroundColor(Color.BLUE);
+
                 setProfileContactAvatar(peer.getHandle(), peer.getName(), holder);
             }
             //Update micro icon
