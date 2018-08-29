@@ -190,6 +190,38 @@ public class Util {
 		}
 	}
 
+	public static File createTemporalURLFile(String name, String data){
+
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/";
+		File tempDownDirectory = new File(path);
+		if(!tempDownDirectory.exists()){
+			tempDownDirectory.mkdirs();
+		}
+
+		String fileName = name+".url";
+		final File file = new File(path, fileName);
+
+		try
+		{
+			file.createNewFile();
+			FileOutputStream fOut = new FileOutputStream(file);
+			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+			myOutWriter.append(data);
+
+			myOutWriter.close();
+
+			fOut.flush();
+			fOut.close();
+
+			return file;
+		}
+		catch (IOException e)
+		{
+			log("File write failed: " + e.toString());
+			return null;
+		}
+	}
+
 	/*
 	 * Build error dialog
 	 * @param message Message to display
