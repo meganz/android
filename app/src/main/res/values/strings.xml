@@ -1600,6 +1600,9 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">New file</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">File Name</string>
 
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Link name</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog.">link.url</string>
+
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">SUBJECT</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">CONTENT</string>
     <string name="new_file_email_when_uploading" context="Title of the field email when a new contact is created to upload">EMAIL</string>
