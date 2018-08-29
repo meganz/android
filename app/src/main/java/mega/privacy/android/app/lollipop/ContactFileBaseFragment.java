@@ -22,7 +22,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
-public abstract class ContactFileBaseFragment extends Fragment{
+public class ContactFileBaseFragment extends Fragment{
     
     public static int REQUEST_CODE_GET = 1000;
     public static int REQUEST_CODE_GET_LOCAL = 1003;

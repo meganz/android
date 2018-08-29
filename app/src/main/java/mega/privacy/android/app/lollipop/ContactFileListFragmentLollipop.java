@@ -374,8 +374,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
 				} else {
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//					emptyTextView.setText(R.string.file_browser_empty_folder);
 
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);

@@ -18,6 +18,5 @@
 	        android:layout_alignParentRight="true"
 	        android:layout_below="@+id/contact_shared_folder_list_view"
 	        android:background="@android:color/transparent"
-	        android:text="4 More"
 	        android:textColor="@color/accentColor"/>
 </RelativeLayout>
