@@ -245,44 +245,115 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
 
         int numPeersOnCall = getItemCount();
-
         if(numPeersOnCall == 2){
-            holderGrid.rlGeneral.setPadding(Util.scaleWidthPx(20, outMetrics),0,Util.scaleWidthPx(20, outMetrics),0);
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
+            layoutParams.width = Util.scaleWidthPx(320, outMetrics);
+            layoutParams.height = Util.scaleWidthPx(320, outMetrics);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+            holder.surfaceViewLayout.setLayoutParams(layoutParams);
 
         }else if(numPeersOnCall == 3){
-            holderGrid.rlGeneral.setPadding(Util.scaleWidthPx(74, outMetrics),0,Util.scaleWidthPx(74, outMetrics),0);
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
+            layoutParams.width = Util.scaleWidthPx(212, outMetrics);
+            layoutParams.height = Util.scaleWidthPx(212, outMetrics);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+            holder.surfaceViewLayout.setLayoutParams(layoutParams);
 
         }else if(numPeersOnCall == 4){
+
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
+            layoutParams.width = Util.scaleWidthPx(180, outMetrics);
+            layoutParams.height = Util.scaleWidthPx(180, outMetrics);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+
             if((position < 2)){
-                holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(136, outMetrics),0,0);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
             }else{
-                holderGrid.rlGeneral.setPadding(0,0,0,Util.scaleWidthPx(144, outMetrics));
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
             }
+            holder.surfaceViewLayout.setLayoutParams(layoutParams);
+
 
         }else if(numPeersOnCall == 5){
+
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
+            layoutParams.width = Util.scaleWidthPx(180, outMetrics);
+            layoutParams.height = Util.scaleWidthPx(180, outMetrics);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+
+            if((position < 2)){
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+
+            }else if(position > 3){
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+            }
+
+            holder.surfaceViewLayout.setLayoutParams(layoutParams);
+
             if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
-                ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-                layoutParams.width = maxScreenWidth;
-                layoutParams.height = (maxScreenHeight/3);
-                holder.rlGeneral.setLayoutParams(layoutParams);
-                holder.rlGeneral.setPadding(Util.scaleWidthPx(90, outMetrics),0,Util.scaleWidthPx(90, outMetrics),Util.scaleWidthPx(50, outMetrics));
-            }else{
-                if((position < 2)){
-                    holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(50, outMetrics),0,0);
-                }else{
-                    holderGrid.rlGeneral.setPadding(0,0,0,0);
-                }
+                ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+                layoutParamsPeer.width = maxScreenWidth;
+                layoutParamsPeer.height = (maxScreenHeight/3);
+                holder.rlGeneral.setLayoutParams(layoutParamsPeer);
             }
 
         }else if(numPeersOnCall == 6){
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
+            layoutParams.width = Util.scaleWidthPx(180, outMetrics);
+            layoutParams.height = Util.scaleWidthPx(180, outMetrics);
+            layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+
             if((position < 2)){
-                holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(50, outMetrics),0,0);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 
             }else if(position > 3){
-                holderGrid.rlGeneral.setPadding(0,0,0,Util.scaleWidthPx(50, outMetrics));
-
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
             }
+            holder.surfaceViewLayout.setLayoutParams(layoutParams);
+
         }
+
+
+//        if(numPeersOnCall == 2){
+//            holderGrid.rlGeneral.setPadding(Util.scaleWidthPx(20, outMetrics),0,Util.scaleWidthPx(20, outMetrics),0);
+//
+//        }else if(numPeersOnCall == 3){
+//            holderGrid.rlGeneral.setPadding(Util.scaleWidthPx(74, outMetrics),0,Util.scaleWidthPx(74, outMetrics),0);
+//
+//        }else if(numPeersOnCall == 4){
+//            if((position < 2)){
+//                holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(136, outMetrics),0,0);
+//            }else{
+//                holderGrid.rlGeneral.setPadding(0,0,0,Util.scaleWidthPx(144, outMetrics));
+//            }
+//
+//        }else if(numPeersOnCall == 5){
+//            if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
+//                ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+//                layoutParams.width = maxScreenWidth;
+//                layoutParams.height = (maxScreenHeight/3);
+//                holder.rlGeneral.setLayoutParams(layoutParams);
+//                holder.rlGeneral.setPadding(Util.scaleWidthPx(90, outMetrics),0,Util.scaleWidthPx(90, outMetrics),Util.scaleWidthPx(50, outMetrics));
+//            }else{
+//                if((position < 2)){
+//                    holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(50, outMetrics),0,0);
+//                }else{
+//                    holderGrid.rlGeneral.setPadding(0,0,0,0);
+//                }
+//            }
+//
+//        }else if(numPeersOnCall == 6){
+//            if((position < 2)){
+//                holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(50, outMetrics),0,0);
+//
+//            }else if(position > 3){
+//                holderGrid.rlGeneral.setPadding(0,0,0,Util.scaleWidthPx(50, outMetrics));
+//
+//            }
+//        }
 
         if(peer.isVideoOn()) {
             log("Video ON");

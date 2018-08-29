@@ -721,6 +721,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 }else{
 
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
