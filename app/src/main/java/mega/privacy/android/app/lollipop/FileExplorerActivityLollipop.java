@@ -2607,7 +2607,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_file_name));
+		input.setHint(getString(R.string.context_new_link_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 
@@ -2640,7 +2640,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		});
 
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -2651,8 +2651,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.dialog_title_new_file));
-		builder.setPositiveButton(getString(R.string.general_create),
+		builder.setTitle(getString(R.string.dialog_title_new_link));
+		builder.setPositiveButton(getString(R.string.cam_sync_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();
