@@ -40,6 +40,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -170,6 +171,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	MenuItem shareMenuItem;
 	MenuItem viewFoldersMenuItem;
 	MenuItem sendFileMenuItem;
+	boolean isShareFolderExpanded;
+    ContactSharedFolderFragment sharedFoldersFragment;
+	FrameLayout sharedFoldersFragmentContainer;
+    ContactFileListFragmentLollipop testFragment;
 
 	private void setAppBarOffset(int offsetPx){
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
@@ -1158,9 +1163,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
 			case R.id.chat_contact_properties_shared_folders_layout:{
-				Intent i = new Intent(this, ContactFileListActivityLollipop.class);
-				i.putExtra("name", user.getEmail());
-				this.startActivity(i);
+				//yuan2
+//				Intent i = new Intent(this, ContactFileListActivityLollipop.class);
+//				i.putExtra("name", user.getEmail());
+//				this.startActivity(i);
+				sharedFolderClicked();
 				break;
 			}
 			case R.id.chat_contact_properties_switch:{
@@ -1591,5 +1598,22 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		TextView snackbarTextView = (TextView)snackbar.getView().findViewById(android.support.design.R.id.snackbar_text);
 		snackbarTextView.setMaxLines(5);
 		snackbar.show();
+	}
+	
+	private void sharedFolderClicked(){
+	    //yuan3
+        RelativeLayout sharedFolderLayout = (RelativeLayout)findViewById(R.id.shared_folder_list_container);
+		if(isShareFolderExpanded){
+			sharedFolderLayout.setVisibility(View.GONE);
+		}
+		else{
+			sharedFolderLayout.setVisibility(View.VISIBLE);
+            if (sharedFoldersFragment == null){
+                sharedFoldersFragment = new ContactSharedFolderFragment();
+                sharedFoldersFragment.setUserEmail(user.getEmail());
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_shared_folders, sharedFoldersFragment, "cflF").commitNow();
+            }
+		}
+		isShareFolderExpanded = !isShareFolderExpanded;
 	}
 }

@@ -180,7 +180,18 @@
                 android:background="@android:color/transparent"
                 android:textColor="@color/accentColor"/>
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/shared_folder_list_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:visibility="gone">
 
+	        <FrameLayout
+		        android:id="@+id/fragment_container_shared_folders"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"/>
+        </RelativeLayout>
         <View
             android:id="@+id/divider_shared_folder_layout"
             android:layout_width="fill_parent"

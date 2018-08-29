@@ -480,6 +480,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				((ManagerActivityLollipop) context).setParentHandleInbox(parentHandle);
 				break;
 			}
+			case Constants.CONTACT_SHARED_FOLDER_ADAPTER:
 			default: {
 	//			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
 				break;
