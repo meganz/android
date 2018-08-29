@@ -178,7 +178,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) v.getLayoutParams();
 
-        if(numPeersOnCall <= 3){
+        if(numPeersOnCall < 4) {
             lp.height = maxScreenHeight / numPeersOnCall;
             lp.width = maxScreenWidth;
 
@@ -189,7 +189,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }else if(numPeersOnCall == 5){
             lp.height = maxScreenHeight / 3;
             lp.width = maxScreenWidth/2;
-            log("****** For 5 peers: maxWidth: "+(maxScreenWidth/2)+", maxHeight: "+(maxScreenHeight/3));
 
         }else if((numPeersOnCall > 5)&&(numPeersOnCall<7)){
             lp.height = maxScreenHeight / 3;
@@ -201,6 +200,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holderGrid = new ViewHolderGroupCallGrid(v);
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
         holderGrid.rlGeneral.setOnClickListener(this);
+
         holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
         holderGrid.surfaceViewLayout.removeAllViewsInLayout();
 
@@ -244,15 +244,44 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
         }
 
-            int numPeers = getItemCount();
-        if((numPeers == 5) && (peer.getHandle().equals(megaChatApi.getMyUserHandle()))){
-            log("*******onBindViewHolderGrid() 5 peers and This is me-> maxWidth: "+maxScreenWidth+", maxHeight: "+(maxScreenHeight/3));
+        int numPeersOnCall = getItemCount();
 
-            ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-            layoutParams.width = maxScreenWidth;
-            layoutParams.height = (maxScreenHeight/3);
-            holder.rlGeneral.setLayoutParams(layoutParams);
+        if(numPeersOnCall == 2){
+            holderGrid.rlGeneral.setPadding(Util.scaleWidthPx(20, outMetrics),0,Util.scaleWidthPx(20, outMetrics),0);
 
+        }else if(numPeersOnCall == 3){
+            holderGrid.rlGeneral.setPadding(Util.scaleWidthPx(74, outMetrics),0,Util.scaleWidthPx(74, outMetrics),0);
+
+        }else if(numPeersOnCall == 4){
+            if((position < 2)){
+                holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(136, outMetrics),0,0);
+            }else{
+                holderGrid.rlGeneral.setPadding(0,0,0,Util.scaleWidthPx(144, outMetrics));
+            }
+
+        }else if(numPeersOnCall == 5){
+            if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
+                ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+                layoutParams.width = maxScreenWidth;
+                layoutParams.height = (maxScreenHeight/3);
+                holder.rlGeneral.setLayoutParams(layoutParams);
+                holder.rlGeneral.setPadding(Util.scaleWidthPx(90, outMetrics),0,Util.scaleWidthPx(90, outMetrics),Util.scaleWidthPx(50, outMetrics));
+            }else{
+                if((position < 2)){
+                    holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(50, outMetrics),0,0);
+                }else{
+                    holderGrid.rlGeneral.setPadding(0,0,0,0);
+                }
+            }
+
+        }else if(numPeersOnCall == 6){
+            if((position < 2)){
+                holderGrid.rlGeneral.setPadding(0,Util.scaleWidthPx(50, outMetrics),0,0);
+
+            }else if(position > 3){
+                holderGrid.rlGeneral.setPadding(0,0,0,Util.scaleWidthPx(50, outMetrics));
+
+            }
         }
 
         if(peer.isVideoOn()) {

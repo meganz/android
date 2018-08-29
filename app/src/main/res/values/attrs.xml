@@ -98,4 +98,5 @@
         <attr name="fastscroll__handleColor" format="color" />
         <attr name="fastscroll__bubbleTextAppearance" format="reference" />
     </declare-styleable>
+
 </resources>

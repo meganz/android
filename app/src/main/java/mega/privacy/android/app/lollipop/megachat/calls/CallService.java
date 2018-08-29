@@ -162,9 +162,6 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
             avatar = new File(context.getCacheDir().getAbsolutePath(), email + ".jpg");
         }
 
-//        return createDefaultAvatar(userHandle, fullName);
-
-
         if (avatar.exists()) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
