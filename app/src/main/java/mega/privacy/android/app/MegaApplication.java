@@ -1124,7 +1124,7 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 
 	@Override
 	public void onChatCallUpdate(MegaChatApiJava api, MegaChatCall call) {
-		log("onChatCallUpdate");
+		log("onChatCallUpdate: "+call.getStatus());
 
 		if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) {
 			log("Call destroyed: "+call.getTermCode());
@@ -1207,6 +1207,8 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		log("launchCallActivity: "+call.getStatus());
 		MegaApplication.setShowPinScreen(false);
 
+		MegaApplication.setOpenCallChatId(call.getChatid());
+
 		Intent i = new Intent(this, ChatCallActivity.class);
 		i.putExtra("chatHandle", call.getChatid());
 		i.putExtra("callId", call.getId());
@@ -1216,7 +1218,6 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		log("Launch call: "+chatRoom.getTitle());
-
 	}
 
 	public void clearIncomingCallNotification(long chatCallId) {
