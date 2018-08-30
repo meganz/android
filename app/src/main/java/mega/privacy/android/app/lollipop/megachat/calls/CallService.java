@@ -185,17 +185,13 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
                 bitmap = getCircleBitmap(bitmap);
                 if (bitmap != null) {
                     return bitmap;
-
-                }
-                else{
+                }else{
                     return createDefaultAvatar(userHandle, fullName);
                 }
-            }
-            else{
+            }else{
                 return createDefaultAvatar(userHandle, fullName);
             }
-        }
-        else{
+        }else{
             return createDefaultAvatar(userHandle, fullName);
         }
     }

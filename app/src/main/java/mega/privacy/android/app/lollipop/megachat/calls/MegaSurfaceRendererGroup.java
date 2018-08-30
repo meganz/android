@@ -105,39 +105,15 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     private void adjustAspectRatio() {
-
         if (bitmap != null && dstRect.height() != 0) {
+            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
             dstRect.top = 0;
             dstRect.left = 0;
             dstRect.right = surfaceWidth;
-            dstRect.bottom = surfaceHeight;
-
+            dstRect.bottom = (int)(surfaceWidth/srcaspectratio);
             dstRectf = new RectF(dstRect);
-            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
-            float dstaspectratio = (float) dstRect.width() / dstRect.height();
-
-            if (srcaspectratio != 0 && dstaspectratio != 0) {
-                if (srcaspectratio > dstaspectratio) {
-                    float newHeight = dstRect.width() / srcaspectratio;
-                    float decrease = dstRect.height() - newHeight;
-//                    dstRect.top += decrease / 2;
-//                    dstRect.bottom -= decrease / 2;
-//                    surfaceHolder.setFixedSize(surfaceWidth,surfaceHeight);
-                    dstRectf = new RectF(dstRect);
-                } else {
-                    float newWidth = dstRect.height() * srcaspectratio;
-                    float decrease = dstRect.width() - newWidth;
-//                    dstRect.left += decrease / 2;
-//                    dstRect.right -= decrease / 2;
-//                    surfaceHolder.setFixedSize(surfaceWidth,surfaceHeight);
-
-                    dstRectf = new RectF(dstRect);
-                }
-            }
         }
     }
-
-
 
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d("MegaSurfaceRenderer","surfaceCreated()");
@@ -208,45 +184,9 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         srcRect.top = 0;
         srcRect.bottom = height;
         srcRect.right = width;
-
-//        adjustAspectRatio();
+        adjustAspectRatio();
 
         return bitmap;
-    }
-
-    public ByteBuffer CreateByteBuffer(int width, int height) {
-        Logging.d(TAG, "CreateByteBuffer " + width + ":" + height);
-        if (bitmap == null) {
-            bitmap = CreateBitmap(width, height);
-            byteBuffer = ByteBuffer.allocateDirect(width * height * 2);
-        }
-        return byteBuffer;
-    }
-
-    // It saves bitmap data to a JPEG picture, this function is for debug only.
-    private void saveBitmapToJPEG(int width, int height) {
-        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteOutStream);
-
-        try{
-            FileOutputStream output = new FileOutputStream(String.format(
-                    "/sdcard/render_%d.jpg", System.currentTimeMillis()));
-            output.write(byteOutStream.toByteArray());
-            output.flush();
-            output.close();
-        }
-        catch (FileNotFoundException e) {
-        }
-        catch (IOException e) {
-        }
-    }
-
-    public void DrawByteBuffer() {
-        if(byteBuffer == null)
-            return;
-        byteBuffer.rewind();
-        bitmap.copyPixelsFromBuffer(byteBuffer);
-        DrawBitmap(false);
     }
 
     public void DrawBitmap(boolean flag) {
@@ -261,7 +201,6 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         Canvas canvas = surfaceHolder.lockCanvas();
         if (canvas != null) {
             canvas.scale(-1, 1);
-//            canvas.translate(-dstRect.width(), 0);
             canvas.translate(-canvas.getWidth(), 0);
             if (flag) {
                 paint.reset();
@@ -276,26 +215,5 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
-
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-        final float roundPx = pixels;
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.BLUE);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-
-        return output;
-    }
-
 
 }
