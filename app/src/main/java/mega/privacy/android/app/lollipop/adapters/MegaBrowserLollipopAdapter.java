@@ -174,6 +174,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							else if(type==Constants.CONTACT_FILE_ADAPTER){
 								((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
 							}
+                            else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+                                ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
+                            }
 							else if(type==Constants.FOLDER_LINK_ADAPTER){
 								((FolderLinkActivityLollipop) context).hideMultipleSelect();
 							}
@@ -218,6 +221,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
 				}
+                else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+                    ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
+                }
 				else if(type==Constants.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).hideMultipleSelect();
 				}
@@ -276,6 +282,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 							else if(type==Constants.CONTACT_FILE_ADAPTER){
 								((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
 							}
+							else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+                                ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
+                            }
 							else if(type==Constants.FOLDER_LINK_ADAPTER){
 								((FolderLinkActivityLollipop) context).hideMultipleSelect();
 							}
@@ -315,6 +324,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					else if(type==Constants.CONTACT_FILE_ADAPTER){
 						((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
 					}
+					else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+						((ContactSharedFolderFragment) fragment).hideMultipleSelect();
+					}
 					else if(type==Constants.FOLDER_LINK_ADAPTER){
 						((FolderLinkActivityLollipop) context).hideMultipleSelect();
 					}
@@ -346,6 +358,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).hideMultipleSelect();
 				}
+                else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+                    ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
+                }
 				else if(type==Constants.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).hideMultipleSelect();
 				}
@@ -1512,6 +1527,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					else if(type==Constants.CONTACT_FILE_ADAPTER){
 						((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, null, null);
 					}
+                    else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+                        ((ContactSharedFolderFragment) fragment).itemClick(currentPosition, null, null);
+                    }
 					else if(type==Constants.FOLDER_LINK_ADAPTER){
 						((FolderLinkActivityLollipop) context).itemClick(currentPosition, null, null);
 					}
@@ -1613,6 +1631,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		else if(type==Constants.INCOMING_SHARES_ADAPTER){
 			((IncomingSharesFragmentLollipop) fragment).activateActionMode();
 			((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition, null, null);
+		}
+		else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+			((ContactSharedFolderFragment) fragment).activateActionMode();
+			((ContactSharedFolderFragment) fragment).itemClick(currentPosition, null, null);
 		}
 		else if(type==Constants.OUTGOING_SHARES_ADAPTER){
 			((OutgoingSharesFragmentLollipop) fragment).activateActionMode();

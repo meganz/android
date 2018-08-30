@@ -155,7 +155,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					break;
 				}
 			}
-			return false;
+			//After click item, should quit action mode.
+            actionMode.finish();
+            return true;
 		}
 
 		@Override
