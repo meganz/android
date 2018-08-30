@@ -308,11 +308,63 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
             if((peersOnCall != null)&&(peersOnCall.size() != 0)){
-                log("updateScreenStatusInProgress() peersOnCall has items");
+                for(int i = 0; i < callChat.getParticipants().size(); i++){
+                    long userHandle = callChat.getParticipants().get(i);
+                    if((peersOnCall != null)&&(peersOnCall.size() != 0)) {
+                        boolean peerContain = false;
+                        for (InfoPeerGroupCall peer : peersOnCall) {
+                            if (peer.getHandle().equals(userHandle)) {
+                                peerContain = true;
+                                break;
+                            }
+                        }
+                        if (!peerContain) {
+                            if(userHandle == megaChatApi.getMyUserHandle()){
+                                log("updateScreenStatusInProgress(): peersOnCall.add("+megaChatApi.getMyFullname()+")");
+                                InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
+                                peersOnCall.add(myPeer);
 
+                                if(peersOnCall.size() <= 3){
+                                    recyclerView.setColumnWidth((int) widthScreenPX);
+                                }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
+                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                }
+                                recyclerView.setAdapter(null);
+                                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
+                                recyclerView.setAdapter(adapter);
+                                if (adapter.getItemCount() == 0){
+                                    recyclerView.setVisibility(View.GONE);
+                                }else{
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                }
+                            }else{
+                                MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
+                                if(userSession!=null){
+                                    if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
+                                        log("updateScreenStatusInProgress(): peersOnCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
+                                        InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), null, null);
+                                        peersOnCall.add(0, userPeer);
 
+                                        if(peersOnCall.size() <= 3){
+                                            recyclerView.setColumnWidth((int) widthScreenPX);
+                                        }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
+                                            recyclerView.setColumnWidth((int) widthScreenPX/2);
+                                        }
+                                        recyclerView.setAdapter(null);
+                                        adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
+                                        recyclerView.setAdapter(adapter);
+                                        if (adapter.getItemCount() == 0){
+                                            recyclerView.setVisibility(View.GONE);
+                                        }else{
+                                            recyclerView.setVisibility(View.VISIBLE);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }else{
-                log("updateScreenStatusInProgress() peersOnCall is empty");
                 for(int i = 0; i < callChat.getParticipants().size(); i++){
                     long userHandle = callChat.getParticipants().get(i);
                     if(userHandle == megaChatApi.getMyUserHandle()){
@@ -1310,7 +1362,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             this.callChat = call;
 
             if(callChat.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)){
-                log("++++ CHANGE_TYPE_STATUS");
+                log("CHANGE_TYPE_STATUS");
 
                 int callStatus = callChat.getStatus();
                 switch (callStatus){
