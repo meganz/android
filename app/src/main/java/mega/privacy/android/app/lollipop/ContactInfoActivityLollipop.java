@@ -46,7 +46,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -75,6 +75,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
+import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -108,6 +109,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	ContactController cC;
     static ContactFileListActivityLollipop contactPropertiesMainActivity;
+    private android.support.v7.app.AlertDialog downloadConfirmationDialog;
     private android.support.v7.app.AlertDialog renameDialog;
     
 	public static int MAX_WIDTH_FILENAME_LAND=450;
@@ -528,11 +530,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					dividerSharedFoldersLayout.setVisibility(View.VISIBLE);
 
 					ArrayList<MegaNode> nodes = megaApi.getInShares(user);
-					sharedFoldersButton.setText(getDescription(nodes));
-					if(nodes.size() == 0){
-					    sharedFoldersButton.setClickable(false);
-                        sharedFoldersLayout.setClickable(false);
-                    }
+                    setFoldersButtonText(nodes);
 					emailContact.setText(user.getEmail());
 					emailLength.setText(user.getEmail());
 
@@ -2215,6 +2213,115 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         this.parentHandle = parentHandle;
     }
     
+    private void setFoldersButtonText(ArrayList<MegaNode> nodes){
+        sharedFoldersButton.setText(getDescription(nodes));
+        if(nodes.size() == 0){
+            sharedFoldersButton.setClickable(false);
+            sharedFoldersLayout.setClickable(false);
+        }
+    }
+    
+    public void showSnackbarNotSpace(){
+        log("showSnackbarNotSpace");
+        Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
+        mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
+        mySnackbar.show();
+    }
+    
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+        log("askSizeConfirmationBeforeDownload");
+        
+        final String parentPathC = parentPath;
+        final String urlC = url;
+        final long [] hashesC = hashes;
+        final long sizeC=size;
+        
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        
+        final CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        
+        confirmationLayout.addView(dontShowAgain, params);
+        
+        builder.setView(confirmationLayout);
+        
+        builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
+        builder.setPositiveButton(getString(R.string.general_download),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if(dontShowAgain.isChecked()){
+                            dbH.setAttrAskSizeDownload("false");
+                        }
+                        if(nC==null){
+                            nC = new NodeController(contactPropertiesMainActivity);
+                        }
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if(dontShowAgain.isChecked()){
+                    dbH.setAttrAskSizeDownload("false");
+                }
+            }
+        });
+        
+        downloadConfirmationDialog = builder.create();
+        downloadConfirmationDialog.show();
+    }
+    
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+        log("askConfirmationNoAppInstaledBeforeDownload");
+        
+        final String parentPathC = parentPath;
+        final String urlC = url;
+        final long [] hashesC = hashes;
+        final long sizeC=size;
+        
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(10, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        
+        final CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        
+        confirmationLayout.addView(dontShowAgain, params);
+        
+        builder.setView(confirmationLayout);
+        
+        builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
+        builder.setPositiveButton(getString(R.string.general_download),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        if(dontShowAgain.isChecked()){
+                            dbH.setAttrAskNoAppDownload("false");
+                        }
+                        if(nC==null){
+                            nC = new NodeController(contactPropertiesMainActivity);
+                        }
+                        nC.download(parentPathC, urlC, sizeC, hashesC);
+                    }
+                });
+        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if(dontShowAgain.isChecked()){
+                    dbH.setAttrAskNoAppDownload("false");
+                }
+            }
+        });
+        downloadConfirmationDialog = builder.create();
+        downloadConfirmationDialog.show();
+    }
+    
+    
     @Override
     public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
     
@@ -2225,6 +2332,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if (sharedFoldersFragment != null){
             if (sharedFoldersFragment.isVisible()){
                 sharedFoldersFragment.setNodes(parentHandle);
+                ArrayList<MegaNode> nodes = megaApi.getInShares(user);
+                setFoldersButtonText(nodes);
             }
         }
     }
