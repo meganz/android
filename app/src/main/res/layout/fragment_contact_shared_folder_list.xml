@@ -9,6 +9,7 @@
 		android:id="@+id/contact_shared_folder_list_view"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:paddingBottom="2dp"
 		android:choiceMode="multipleChoice"/>
 
 	<Button android:id="@+id/more_button"
