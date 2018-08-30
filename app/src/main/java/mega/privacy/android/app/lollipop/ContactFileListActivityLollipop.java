@@ -528,7 +528,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
 			userEmail = extras.getString("name");
-
+            int currNodePosition = extras.getInt("node_position", -1);
+			
 			setContentView(R.layout.activity_main_contact_properties);
 
 			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
@@ -570,6 +571,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				cflF = new ContactFileListFragmentLollipop();
 			}
 			cflF.setUserEmail(userEmail);
+			cflF.setCurrNodePosition(currNodePosition);
 
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();

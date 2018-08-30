@@ -1,23 +1,42 @@
 package mega.privacy.android.app.lollipop;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaNode;
 
 
@@ -45,7 +64,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             //set button text
             moreButton = (Button)v.findViewById(R.id.more_button);
             setupMoreButtonText(fullList.size());
-    
+            
             moreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -58,7 +77,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             //set up list view
             listView = (RecyclerView)v.findViewById(R.id.contact_shared_folder_list_view);
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(context);
-            listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+            listView.addItemDecoration(new SimpleDividerItemDecoration(context,outMetrics));
             listView.setLayoutManager(mLayoutManager);
             listView.setItemAnimator(new DefaultItemAnimator());
             
@@ -77,11 +96,11 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         return v;
     }
     
-    private ArrayList<MegaNode> getNodeListToBeDisplayed(ArrayList<MegaNode> fullList){
-    
+    private ArrayList<MegaNode> getNodeListToBeDisplayed(ArrayList<MegaNode> fullList) {
+        
         ArrayList newList = new ArrayList<>();
         if (fullList.size() > MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED) {
-            for (int i = 0; i < MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED; i++) {
+            for (int i = 0;i < MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED;i++) {
                 newList.add(fullList.get(i));
             }
         } else {
@@ -91,26 +110,26 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         return newList;
     }
     
-    public void showOptionsPanel(MegaNode sNode){
+    public void showOptionsPanel(MegaNode sNode) {
         log("showOptionsPanel");
         ((ContactInfoActivityLollipop)context).showOptionsPanel(sNode);
     }
     
     public void clearSelections() {
-        if(adapter != null && adapter.isMultipleSelect()){
+        if (adapter != null && adapter.isMultipleSelect()) {
             adapter.clearSelections();
         }
     }
     
-    public void setupMoreButtonText(int fullListLength){
-    
+    public void setupMoreButtonText(int fullListLength) {
+        
         int foldersInvisible = fullListLength - contactNodes.size();
         
         //hide button if no invisible folders
-        if(foldersInvisible == 0){
+        if (foldersInvisible == 0) {
             moreButton.setVisibility(View.GONE);
             return;
-        }else {
+        } else {
             moreButton.setVisibility(View.VISIBLE);
         }
         
@@ -128,8 +147,8 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
 //        }
     }
     
-    public void setNodes(long parentHandle){
-        if (megaApi.getNodeByHandle(parentHandle) == null){
+    public void setNodes(long parentHandle) {
+        if (megaApi.getNodeByHandle(parentHandle) == null) {
             parentHandle = -1;
             this.parentHandle = -1;
             ((ContactInfoActivityLollipop)context).setParentHandle(parentHandle);
@@ -141,17 +160,36 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         }
     }
     
-    public void setNodes(ArrayList<MegaNode> nodes){
+    public void setNodes(ArrayList<MegaNode> nodes) {
         this.contactNodes = nodes;
-        if (adapter != null){
+        if (adapter != null) {
             adapter.setNodes(contactNodes);
             //todo handle when no node available - collapse section and update button?
         }
     }
     
-    public void setNodes(){
+    public void setNodes() {
         contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
         adapter.setNodes(contactNodes);
         listView.invalidate();
+    }
+    
+    public void itemClick(int position,int[] screenPosition,ImageView imageView) {
+        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
+        
+        if (adapter.isMultipleSelect()) {
+            log("multiselect ON");
+            adapter.toggleSelection(position);
+            
+            List<MegaNode> selectedNodes = adapter.getSelectedNodes();
+            if (selectedNodes.size() > 0) {
+//                updateActionModeTitle();
+            }
+        } else {
+            Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
+            i.putExtra("name",userEmail);
+            i.putExtra("node_position",position);
+            getContext().startActivity(i);
+        }
     }
 }

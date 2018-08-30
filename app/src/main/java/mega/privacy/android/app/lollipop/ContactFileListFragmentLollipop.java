@@ -65,6 +65,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	MegaBrowserLollipopAdapter adapter;
 	FloatingActionButton fab;
 	Stack<Long> parentHandleStack = new Stack<Long>();
+    int currNodePosition = -1;
+    
+    public void setCurrNodePosition(int currNodePosition) {
+        this.currNodePosition = currNodePosition;
+    }
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -277,6 +282,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			contactNodes = megaApi.getInShares(contact);
+
 			
 			listView = (RecyclerView) v.findViewById(R.id.contact_file_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
@@ -336,7 +342,9 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 			listView.setAdapter(adapter);
 		}
-
+        if(currNodePosition != -1 ) {
+            itemClick(currNodePosition,null,null);
+        }
 		return v;
 	}
 	
@@ -662,7 +670,10 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 		parentHandle = adapter.getParentHandle();
 		((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-
+		//If from ContactInfoActivityLollipop embeded list, retrun to ContactInfoActivityLollipop directly.
+        if(currNodePosition != -1 && parentHandleStack.size() == 1) {
+            return 0;
+        }
 		if (parentHandleStack.isEmpty()) {
 			log("return 0");
 			fab.setVisibility(View.GONE);
