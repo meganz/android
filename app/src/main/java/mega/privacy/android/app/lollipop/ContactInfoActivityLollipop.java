@@ -2347,10 +2347,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if (sharedFoldersFragment != null){
             if (sharedFoldersFragment.isVisible()){
                 sharedFoldersFragment.setNodes(parentHandle);
-                ArrayList<MegaNode> nodes = megaApi.getInShares(user);
-                setFoldersButtonText(nodes);
             }
         }
+        ArrayList<MegaNode> nodes = megaApi.getInShares(user);
+        setFoldersButtonText(nodes);
     }
     
     @Override
