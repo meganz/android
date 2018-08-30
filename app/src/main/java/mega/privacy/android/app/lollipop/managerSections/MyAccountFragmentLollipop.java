@@ -38,6 +38,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -79,6 +80,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout achievementsSeparator;
 
 	LinearLayout parentLinearLayout;
+
+	ArrayList<MegaUser> lastContacted;
 	
 	DisplayMetrics outMetrics;
 	float density;
@@ -248,6 +251,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}		
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+
+		lastContacted = MegaApiUtils.getLastContactedUsers(context);
+		//Draw contact's connection component if lastContacted.size > 0
 
 		setAccountDetails();
 
