@@ -1573,6 +1573,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==Constants.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition, dimens, imageView);
+				}else if(type==Constants.CONTACT_SHARED_FOLDER_ADAPTER){
+					((ContactSharedFolderFragment) fragment).itemClick(currentPosition, dimens, imageView);
 				}
 				else if(type==Constants.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).itemClick(currentPosition, dimens, imageView);
