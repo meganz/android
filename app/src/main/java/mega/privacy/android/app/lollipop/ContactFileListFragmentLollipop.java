@@ -155,9 +155,12 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					break;
 				}
 			}
-			//After click item, should quit action mode.
-            actionMode.finish();
-            return true;
+//			//After click item, should quit action mode except select all.
+//            if(item.getItemId() != R.id.cab_menu_select_all) {
+//                actionMode.finish();
+//                return true;
+//            }
+            return false;
 		}
 
 		@Override
