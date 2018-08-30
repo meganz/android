@@ -310,8 +310,11 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
                     break;
                 }
             }
-            actionMode.finish();
-            return true;
+//            if(item.getItemId() != R.id.cab_menu_select_all) {
+//                actionMode.finish();
+//                return true;
+//            }
+            return false;
         }
         
         @Override
