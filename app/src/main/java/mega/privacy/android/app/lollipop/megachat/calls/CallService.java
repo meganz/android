@@ -133,14 +133,26 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
         if(chat!=null){
             title = chat.getTitle();
-            userHandle = chat.getPeerHandle(0);
-            email = chat.getPeerEmail(0);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
-                if(largeIcon!=null){
-                    mBuilderCompat.setLargeIcon(largeIcon);
+
+            if(chat.isGroup()){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    Bitmap largeIcon = createDefaultAvatar(-1, title);
+                    if(largeIcon!=null){
+                        mBuilderCompat.setLargeIcon(largeIcon);
+                    }
                 }
             }
+            else{
+                userHandle = chat.getPeerHandle(0);
+                email = chat.getPeerEmail(0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                    if(largeIcon!=null){
+                        mBuilderCompat.setLargeIcon(largeIcon);
+                    }
+                }
+            }
+
             mBuilderCompat.setContentTitle(title);
             mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
         }
@@ -218,13 +230,18 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
         Paint paintText = new Paint();
         Paint paintCircle = new Paint();
 
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
-        if (color != null) {
-            log("The color to set the avatar is " + color);
-            paintCircle.setColor(Color.parseColor(color));
-        } else {
-            log("Default color to the avatar");
-            paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+        if(userHandle!=-1){
+            String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
+            if (color != null) {
+                log("The color to set the avatar is " + color);
+                paintCircle.setColor(Color.parseColor(color));
+            } else {
+                log("Default color to the avatar");
+                paintCircle.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+            }
+        }
+        else{
+            paintCircle.setColor(ContextCompat.getColor(context,R.color.divider_upgrade_account));
         }
 
         paintText.setColor(Color.WHITE);
