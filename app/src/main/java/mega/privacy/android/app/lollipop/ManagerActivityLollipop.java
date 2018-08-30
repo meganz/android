@@ -3103,34 +3103,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
-					Intent tempIntent = null;
-					String title = null;
-					String text = null;
-					if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						tempIntent = new Intent(this, CameraSyncService.class);
-						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-						title = getString(R.string.cam_sync_syncing);
-						text = getString(R.string.cam_sync_cancel_sync);
-					}
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						Intent tempIntent = null;
+						String title = null;
+						String text = null;
+						if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+							tempIntent = new Intent(this, CameraSyncService.class);
+							tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+							title = getString(R.string.cam_sync_syncing);
+							text = getString(R.string.cam_sync_cancel_sync);
+						}
 
-					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+						final Intent cancelIntent = tempIntent;
+						AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //					builder.setTitle(title);
-		            builder.setMessage(text);
+						builder.setMessage(text);
 
-					builder.setPositiveButton(getString(R.string.cam_sync_stop),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									startService(cancelIntent);
-								}
-							});
-					builder.setNegativeButton(getString(R.string.general_cancel), null);
-					final AlertDialog dialog = builder.create();
-					try {
-						dialog.show();
-					}
-					catch(Exception ex)	{
-						startService(cancelIntent);
+						builder.setPositiveButton(getString(R.string.cam_sync_stop),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										startService(cancelIntent);
+									}
+								});
+						builder.setNegativeButton(getString(R.string.general_cancel), null);
+						final AlertDialog dialog = builder.create();
+						try {
+							dialog.show();
+						} catch (Exception ex) {
+							startService(cancelIntent);
+						}
 					}
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){

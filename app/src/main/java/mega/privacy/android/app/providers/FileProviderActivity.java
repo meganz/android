@@ -1163,10 +1163,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-					Intent stopIntent = null;
-					stopIntent = new Intent(this, CameraSyncService.class);
-					stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-					startService(stopIntent);
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						Intent stopIntent = null;
+						stopIntent = new Intent(this, CameraSyncService.class);
+						stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+						startService(stopIntent);
+					}
 				}
 			}
 			else{
