@@ -38,7 +38,7 @@ public class ContactFileBaseFragment extends Fragment{
     protected long parentHandle = -1;
     protected Stack<Integer> lastPositionStack;
     protected ArrayList<MegaNode> contactNodes;
-    protected  int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+    protected int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     protected DatabaseHandler dbH = null;
     protected MegaPreferences prefs = null;
     protected String downloadLocationDefaultPath = Util.downloadDIR;

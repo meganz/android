@@ -27,7 +27,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     Button moreButton;
     MegaBrowserLollipopAdapter adapter;
     Stack<Long> parentHandleStack = new Stack<Long>();
-    final int MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 1;
+    final int MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5;
     
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -39,34 +39,21 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             contact = megaApi.getContact(userEmail);
             
             //only show up to 5 folders in this page
-            ArrayList<MegaNode> sharedFolders = megaApi.getInShares(contact);
-            if (sharedFolders.size() > MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED) {
-                contactNodes = new ArrayList<>();
-                for (int i = 0;i < MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED;i++) {
-                    contactNodes.add(sharedFolders.get(i));
-                }
-            } else {
-                contactNodes = megaApi.getInShares(contact);
-            }
+            ArrayList<MegaNode> fullList = megaApi.getInShares(contact);
+            contactNodes = getNodeListToBeDisplayed(fullList);
             
             //set button text
             moreButton = (Button)v.findViewById(R.id.more_button);
-            int foldersInvisible = sharedFolders.size() - contactNodes.size();
-            moreButton.setText(getButtonLabel(foldersInvisible));
-            
-            //button is not clickable if no invisible folder
-            if (foldersInvisible > 0) {
-                moreButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(getContext(),ContactInfoActivityLollipop.class);
-                        i.putExtra("name",userEmail);
-                        getContext().startActivity(i);
-                    }
-                });
-            } else {
-                moreButton.setClickable(false);
-            }
+            setupMoreButtonText(fullList.size());
+    
+            moreButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
+                    i.putExtra("name",userEmail);
+                    getContext().startActivity(i);
+                }
+            });
             
             //set up list view
             listView = (RecyclerView)v.findViewById(R.id.contact_shared_folder_list_view);
@@ -90,9 +77,18 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         return v;
     }
     
-    //get button label in the format of x FOLDERS
-    private String getButtonLabel(int foldersInvisible) {
-        return foldersInvisible + " " + getResources().getString(R.string.contact_info_button_more).toUpperCase(Locale.getDefault());
+    private ArrayList<MegaNode> getNodeListToBeDisplayed(ArrayList<MegaNode> fullList){
+    
+        ArrayList newList = new ArrayList<>();
+        if (fullList.size() > MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED) {
+            for (int i = 0; i < MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED; i++) {
+                newList.add(fullList.get(i));
+            }
+        } else {
+            newList = fullList;
+        }
+        
+        return newList;
     }
     
     public void showOptionsPanel(MegaNode sNode){
@@ -106,13 +102,21 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
         }
     }
     
-    public void updateButtonText(){
-        contactNodes = megaApi.getInShares(contact);
-        if(contactNodes.size() == 0){
+    public void setupMoreButtonText(int fullListLength){
+    
+        int foldersInvisible = fullListLength - contactNodes.size();
         
-        }else{
-        
+        //hide button if no invisible folders
+        if(foldersInvisible == 0){
+            moreButton.setVisibility(View.GONE);
+            return;
+        }else {
+            moreButton.setVisibility(View.VISIBLE);
         }
+        
+        String label = foldersInvisible + " " + getResources().getString(R.string.contact_info_button_more).toUpperCase(Locale.getDefault());
+        moreButton.setText(label);
+        
     }
     
     public void hideMultipleSelect() {
@@ -131,13 +135,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             ((ContactInfoActivityLollipop)context).setParentHandle(parentHandle);
             adapter.setParentHandle(parentHandle);
             
-            setNodes(megaApi.getInShares(contact));
-        }
-        else{
-            this.parentHandle = parentHandle;
-            ((ContactInfoActivityLollipop)context).setParentHandle(parentHandle);
-            adapter.setParentHandle(parentHandle);
-            setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren));
+            ArrayList<MegaNode> fullList = megaApi.getInShares(contact);
+            setNodes(getNodeListToBeDisplayed(fullList));
+            setupMoreButtonText(fullList.size());
         }
     }
     
