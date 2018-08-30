@@ -2,13 +2,18 @@ package mega.privacy.android.app;
 
 import android.app.Application;
 import android.app.NotificationManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -29,6 +34,7 @@ import java.util.TimeZone;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -353,6 +359,29 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
+
+			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
+			//			jobInfoBuilder.setMinimumLatency(15000);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				jobInfoBuilder.setPeriodic(schedulerInterval);
+			}
+
+			if (mJobScheduler != null) {
+				int result = mJobScheduler.schedule(jobInfoBuilder.build());
+				if (result == JobScheduler.RESULT_SUCCESS) {
+					log("CameraUploadsService: Job scheduled SUCCESS");
+				} else {
+					log("CameraUploadsService: Job scheduled FAILED");
+				}
+			}
+		}
+
+
+
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		if (dbH != null) {
@@ -371,6 +400,9 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				fileLoggerSDK = false;
 			}
 		}
+
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		if (Util.DEBUG){
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
@@ -402,6 +434,9 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 			}
 		}
 
+		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+
 		if (Util.DEBUG){
 			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		}
@@ -413,13 +448,6 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
 			}
 		}
-
-		//init logger only when pre-request are all ready
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, Util.getFileLoggerKarere()));
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		boolean useHttpsOnly = false;
 		if (dbH != null) {

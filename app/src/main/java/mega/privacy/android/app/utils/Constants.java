@@ -236,6 +236,9 @@ public class Constants {
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
+	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
+	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
+
 	public static String CHAT_FOLDER = "My chat files";
 
 	public static int RICH_WARNING_TRUE = 1;
