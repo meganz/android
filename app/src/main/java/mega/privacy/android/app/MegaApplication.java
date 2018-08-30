@@ -1149,6 +1149,7 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 						MegaChatCall callToLaunch = megaChatApi.getChatCall(chatId);
 						if (callToLaunch != null) {
 							if (callToLaunch.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+								log("Launch call with status: "+callToLaunch.getStatus());
 								launchCallActivity(callToLaunch);
 							} else {
 								log("Launch not in correct status");
@@ -1206,7 +1207,6 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	public void launchCallActivity(MegaChatCall call){
 		log("launchCallActivity: "+call.getStatus());
 		MegaApplication.setShowPinScreen(false);
-
 		MegaApplication.setOpenCallChatId(call.getChatid());
 
 		Intent i = new Intent(this, ChatCallActivity.class);
