@@ -5,17 +5,23 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -37,7 +43,9 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 
 
 public class ContactSharedFolderFragment extends ContactFileBaseFragment {
@@ -47,6 +55,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     MegaBrowserLollipopAdapter adapter;
     Stack<Long> parentHandleStack = new Stack<Long>();
     final int MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5;
+    private ActionMode actionMode;
     
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
@@ -141,10 +150,9 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         adapter.setMultipleSelect(false);
-        //todo update action buttons
-//        if (actionMode != null) {
-//            actionMode.finish();
-//        }
+        if (actionMode != null) {
+            actionMode.finish();
+        }
     }
     
     public void setNodes(long parentHandle) {
@@ -183,7 +191,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             
             List<MegaNode> selectedNodes = adapter.getSelectedNodes();
             if (selectedNodes.size() > 0) {
-//                updateActionModeTitle();
+                updateActionModeTitle();
             }
         } else {
             Intent i = new Intent(getContext(),ContactFileListActivityLollipop.class);
@@ -192,4 +200,231 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             getContext().startActivity(i);
         }
     }
+    
+    public void selectAll(){
+        if (adapter != null){
+            if(adapter.isMultipleSelect()){
+                adapter.selectAll();
+            }
+            else{
+                adapter.setMultipleSelect(true);
+                adapter.selectAll();
+                
+                actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+            }
+            
+            updateActionModeTitle();
+        }
+    }
+    
+    private void updateActionModeTitle() {
+        if (actionMode == null) {
+            return;
+        }
+        List<MegaNode> documents = adapter.getSelectedNodes();
+        int files = 0;
+        int folders = 0;
+        for (MegaNode document : documents) {
+            if (document.isFile()) {
+                files++;
+            } else if (document.isFolder()) {
+                folders++;
+            }
+        }
+        Resources res = getResources();
+        String title;
+        int sum=files+folders;
+        
+        if (files == 0 && folders == 0) {
+            title = Integer.toString(sum);
+        } else if (files == 0) {
+            title = Integer.toString(folders);
+        } else if (folders == 0) {
+            title = Integer.toString(files);
+        } else {
+            title = Integer.toString(sum);
+        }
+        actionMode.setTitle(title);
+        try {
+            actionMode.invalidate();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            log("oninvalidate error");
+        }
+        // actionMode.
+    }
+    
+    private class ActionBarCallBack implements ActionMode.Callback {
+        
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            List<MegaNode> documents = adapter.getSelectedNodes();
+            
+            switch (item.getItemId()) {
+                case R.id.cab_menu_download: {
+                    ArrayList<Long> handleList = new ArrayList<Long>();
+                    for (int i = 0; i < documents.size(); i++) {
+                        handleList.add(documents.get(i).getHandle());
+                    }
+                    
+                    ((ContactInfoActivityLollipop)context).onFileClick(handleList);
+                    break;
+                }
+                case R.id.cab_menu_copy: {
+                    ArrayList<Long> handleList = new ArrayList<Long>();
+                    for (int i = 0; i < documents.size(); i++) {
+                        handleList.add(documents.get(i).getHandle());
+                    }
+                    
+                    ((ContactInfoActivityLollipop)context).showCopyLollipop(handleList);
+                    break;
+                }
+                case R.id.cab_menu_select_all:{
+                    selectAll();
+                    break;
+                }
+                case R.id.cab_menu_unselect_all:{
+                    clearSelections();
+                    break;
+                }
+                case R.id.cab_menu_leave_multiple_share: {
+                    ArrayList<Long> handleList = new ArrayList<Long>();
+                    for (int i=0;i<documents.size();i++){
+                        handleList.add(documents.get(i).getHandle());
+                    }
+                    
+                    ((ContactInfoActivityLollipop) context).showConfirmationLeaveIncomingShare(handleList);
+                    break;
+                }
+                case R.id.cab_menu_trash: {
+                    ArrayList<Long> handleList = new ArrayList<Long>();
+                    for (int i=0;i<documents.size();i++){
+                        handleList.add(documents.get(i).getHandle());
+                    }
+                    ((ContactInfoActivityLollipop)(context)).askConfirmationMoveToRubbish(handleList);
+                    break;
+                }
+                case R.id.cab_menu_rename: {
+                    MegaNode aux = documents.get(0);
+                    ((ContactInfoActivityLollipop) context).showRenameDialog(aux, aux.getName());
+                    break;
+                }
+            }
+            actionMode.finish();
+            return true;
+        }
+        
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.file_browser_action, menu);
+            return true;
+        }
+        
+        @Override
+        public void onDestroyActionMode(ActionMode arg0) {
+            log("onDestroyActionMode");
+            clearSelections();
+            adapter.setMultipleSelect(false);
+        }
+        
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            List<MegaNode> selected = adapter.getSelectedNodes();
+            boolean showRename = false;
+            boolean showMove = false;
+            boolean showTrash = false;
+            
+            // Rename
+            if(selected.size() == 1){
+                if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
+                    showRename = true;
+                }
+            }
+            
+            if (selected.size() > 0) {
+                if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
+                    showMove = true;
+                }
+            }
+            
+            if (selected.size() != 0) {
+                showMove = false;
+                // Rename
+                if(selected.size() == 1) {
+                    
+                    if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+                        showMove = true;
+                        showRename = true;
+                    }
+                    else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
+                        showMove = false;
+                        showRename = false;
+                    }
+                }
+                else{
+                    showRename = false;
+                    showMove = false;
+                }
+                
+                for(int i=0; i<selected.size();i++)	{
+                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+                        showMove = false;
+                        break;
+                    }
+                }
+                
+                if(!((ContactInfoActivityLollipop)context).isEmptyParentHandleStack()){
+                    showTrash = true;
+                }
+                for(int i=0; i<selected.size(); i++){
+                    if((megaApi.checkAccess(selected.get(i), MegaShare.ACCESS_FULL).getErrorCode() != MegaError.API_OK)){
+                        showTrash = false;
+                        break;
+                    }
+                }
+                
+                if(selected.size()==adapter.getItemCount()){
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                    menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
+                }
+                else{
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                    menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);
+                }
+            }
+            else{
+                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+            }
+            
+            menu.findItem(R.id.cab_menu_download).setVisible(true);
+            menu.findItem(R.id.cab_menu_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            
+            menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
+            menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            
+            menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+            menu.findItem(R.id.cab_menu_copy).setVisible(true);
+            
+            menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+            menu.findItem(R.id.cab_menu_share_link).setVisible(false);
+            menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+            
+            return false;
+        }
+    }
+    
+    public void activateActionMode(){
+        log("activateActionMode");
+        if (!adapter.isMultipleSelect()){
+            adapter.setMultipleSelect(true);
+            actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+        }
+    }
+    
+    public boolean isEmptyParentHandleStack() {
+        return parentHandleStack.isEmpty();
+    }
 }
+
