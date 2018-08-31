@@ -533,7 +533,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			}else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 			}
 
 			((ManagerActivityLollipop)context).setToolbarTitle();
@@ -654,7 +654,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleOutgoing);
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 			}
 
@@ -828,7 +828,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
             contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
-			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
             adapter.setNodes(nodes);
 			visibilityFastScroller();
 
@@ -933,7 +933,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 			MegaNode n = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleOutgoing);
 			contentText.setText(MegaApiUtils.getInfoFolder(n, context));
 
-			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderOthers);
+			nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
 			adapter.setNodes(nodes);
 			visibilityFastScroller();
 
@@ -1080,7 +1080,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				MegaNode infoNode = megaApi.getNodeByHandle(n.getHandle());
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				visibilityFastScroller();
@@ -1513,7 +1513,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 
 		adapter.setNodes(nodes);
 	}
-
 	
 	public void sortByNameAscending(){
 		log("sortByNameAscending");
@@ -1686,7 +1685,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setToolbarTitle();
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				visibilityFastScroller();
 
