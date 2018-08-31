@@ -15,14 +15,14 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class LastContactAvatarListener implements MegaRequestListenerInterface {
     
+    private static final int PIXELS = 3;
+    private static final String SUFFIX = ".jpg";
+    
     private Context context;
     
     private String contactEmail;
     
     private ImageView avatarImage;
-    
-    private static final int PIXELS = 3;
-    private static final String SUFFIX = ".jpg";
     
     public LastContactAvatarListener(Context context,String contactEmail,ImageView avatarImage) {
         this.context = context;
