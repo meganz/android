@@ -87,6 +87,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1906,6 +1908,44 @@ public class Util {
 		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
 
 		return icon;
+	}
+
+	//Notice user that any transfer prior to login will be destroyed
+	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
+		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+			if(context instanceof ManagerActivityLollipop){
+				log("Show dialog to cancel transfers before logging OUT");
+				builder.setMessage(R.string.logout_warning_abort_transfers);
+				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						callback.onAbortConfirm();
+					}
+				});
+			}
+			else{
+				log("Show dialog to cancel transfers before logging IN");
+				builder.setMessage(R.string.login_warning_abort_transfers);
+				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						callback.onAbortConfirm();
+					}
+				});
+			}
+
+			builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					callback.onAbortCancel();
+				}
+			});
+			builder.show();
+		}else{
+			callback.onAbortConfirm();
+		}
 	}
 
 	private static void log(String message) {
