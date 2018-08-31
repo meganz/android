@@ -2104,6 +2104,7 @@
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
 
-    <string name="warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be aborted, do you want to continue?</string>
+    <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to login?</string>
+    <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to logout?</string>
 
 </resources>
