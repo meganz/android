@@ -7,14 +7,21 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaUser;
 
 
 public class MegaApiUtils {
@@ -247,6 +254,101 @@ public class MegaApiUtils {
 
         log("createStringTree: "+s);
         return s;
+    }
+
+    public static ArrayList<MegaUser> getLastContactedUsers(Context context) {
+
+        MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+
+        ArrayList<MegaUser> lastContacted = new ArrayList<MegaUser>();
+
+        if(Util.isChatEnabled()){
+            MegaChatApiAndroid megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+
+            ArrayList<MegaChatListItem> chats = megaChatApi.getActiveChatListItems();
+
+            //Order by last interaction
+            Collections.sort(chats, new Comparator<MegaChatListItem>(){
+
+                public int compare(MegaChatListItem c1, MegaChatListItem c2) {
+                    long timestamp1 = c1.getLastTimestamp();
+                    long timestamp2 = c2.getLastTimestamp();
+
+                    long result = timestamp2 - timestamp1;
+                    return (int)result;
+                }
+            });
+
+            for(int i=0; i<chats.size(); i++){
+                MegaChatListItem chatItem = chats.get(i);
+                if(!chatItem.isGroup()){
+                    long peer = chatItem.getPeerHandle();
+                    MegaUser user = megaApi.getContact(MegaApiJava.userHandleToBase64(peer));
+                    if(user!=null){
+                        lastContacted.add(user);
+                    }
+                }
+
+                if(lastContacted.size() >= 6){
+                    return lastContacted;
+                }
+            }
+        }
+
+        //Still not 6 to fill the array
+        ArrayList<MegaUser> users = megaApi.getContacts();
+
+        ArrayList<MegaUser> usersNoAvatar = new ArrayList<>();
+
+        for(int i=0; i<users.size(); i++){
+            if (users.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+                boolean included = false;
+                for(int j=0; j<lastContacted.size(); j++) {
+                    if (lastContacted.get(j).getHandle() == users.get(i).getHandle()) {
+                        //Already included on the list
+                        included = true;
+                        break;
+                    }
+                }
+
+                if(!included){
+                    File avatar = null;
+                    if (context.getExternalCacheDir() != null){
+                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), users.get(i).getEmail() + ".jpg");
+                    }
+                    else{
+                        avatar = new File(context.getCacheDir().getAbsolutePath(), users.get(i).getEmail() + ".jpg");
+                    }
+
+                    if (avatar.exists()) {
+                        if (avatar.length() > 0) {
+                            lastContacted.add(users.get(i));
+                        }
+                        else{
+                            usersNoAvatar.add(users.get(i));
+                        }
+                    }
+                    else{
+                        usersNoAvatar.add(users.get(i));
+                    }
+
+                    if(lastContacted.size() >= 6){
+                        return lastContacted;
+                    }
+                }
+            }
+        }
+
+        //Add contacts without avatar
+        for(int i=0; i<usersNoAvatar.size(); i++){
+            lastContacted.add(usersNoAvatar.get(i));
+
+            if(lastContacted.size() >= 6){
+                return lastContacted;
+            }
+        }
+
+        return lastContacted;
     }
 
     private static void log(String message) {

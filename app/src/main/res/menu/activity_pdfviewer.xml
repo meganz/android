@@ -30,7 +30,7 @@
         android:id="@+id/pdf_viewer_chat"
         android:orderInCategory="110"
         android:title="@string/general_share"
-        android:icon="@drawable/ic_chat_white"
+        android:icon="@drawable/ic_w_send_to_contact"
         MEGA:showAsAction="always"
         android:visible="true"/>
 

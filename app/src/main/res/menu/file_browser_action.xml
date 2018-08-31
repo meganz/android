@@ -93,7 +93,7 @@
 
     <item
         android:id="@+id/cab_menu_send_to_chat"
-        android:icon="@drawable/ic_chat_w"
+        android:icon="@drawable/ic_w_send_to_contact"
         android:orderInCategory="128"
         android:title="@string/context_send_file_to_chat"
         android:visible="false"

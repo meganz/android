@@ -69,6 +69,10 @@ public class Constants {
 
 	final public static int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES+1;
 
+	final public static int CANCEL_ACCOUNT_2FA = 4000;
+	final public static int CHANGE_MAIL_2FA = 4001;
+	final public static int DISABLE_2FA = 4002;
+
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
 	final public static int OVERQUOTA_ALERT = 5003;
@@ -111,6 +115,7 @@ public class Constants {
 	public static final int REQUEST_DOWNLOAD_FOLDER = 7;
 
 	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
+	public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -174,6 +179,7 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
+	public static String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -240,6 +246,7 @@ public class Constants {
 	public static int TAKE_PROFILE_PICTURE = 1;
 
 	final public static String MAIL_ANDROID = "androidfeedback@mega.nz";
+	final public static String MAIL_SUPPORT = "support@mega.nz";
 
 	public static int MIN_ITEMS_SCROLLBAR = 30;
 	public static int MIN_ITEMS_SCROLLBAR_GRID = 200;
