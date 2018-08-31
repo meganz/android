@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -91,7 +92,12 @@ public class AccountController implements View.OnClickListener{
 
     public void deleteAccount(){
         log("deleteAccount");
-        megaApi.cancelAccount((ManagerActivityLollipop)context);
+        if (((ManagerActivityLollipop) context).is2FAEnabled()){
+            ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CANCEL_ACCOUNT_2FA);
+        }
+        else {
+            megaApi.cancelAccount((ManagerActivityLollipop) context);
+        }
     }
 
     public void confirmDeleteAccount(String link, String pass){
@@ -317,6 +323,9 @@ public class AccountController implements View.OnClickListener{
                 ((ManagerActivityLollipop) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
             }
         }
+        else if (context instanceof TwoFactorAuthenticationActivity){
+            ((TwoFactorAuthenticationActivity) context).startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER);
+        }
     }
 
     public void copyRkToClipboard () {
@@ -328,8 +337,17 @@ public class AccountController implements View.OnClickListener{
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            intent.putExtra("logout", true);
             context.startActivity(intent);
             ((TestPasswordActivity) context).finish();
+        }
+        else if (context instanceof TwoFactorAuthenticationActivity) {
+            Intent intent = new Intent(context, ManagerActivityLollipop.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setAction(Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD);
+            intent.putExtra("logout", false);
+            context.startActivity(intent);
+            ((TwoFactorAuthenticationActivity) context).finish();
         }
     }
 
@@ -566,7 +584,13 @@ public class AccountController implements View.OnClickListener{
         }
         if(!oldMail.equals(newMail)){
             log("Changes in mail, new mail: "+newMail);
-            megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
+            if (((ManagerActivityLollipop) context).is2FAEnabled()){
+                ((ManagerActivityLollipop) context).setNewMail(newMail);
+                ((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.CHANGE_MAIL_2FA);
+            }
+            else {
+                megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
+            }
         }
         log("The number of attributes to change is: "+count);
         return count;

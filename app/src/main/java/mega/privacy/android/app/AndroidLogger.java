@@ -1,150 +1,71 @@
 package mega.privacy.android.app;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import android.util.Log;
 
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaLoggerInterface;
-import android.os.Environment;
-import android.util.Log;
 
 
-public class AndroidLogger implements MegaLoggerInterface {
+public class AndroidLogger extends MegaLogger implements MegaLoggerInterface{
 
-	public void log(String time, int loglevel, String source, String message) {
+    public static final String LOG_FILE_NAME = "logSDK.txt";
+    private final String TAG =  "AndroidLogger";
 
-		try {
-			if (Util.DEBUG) {
-				try {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					String currentDateandTime = sdf.format(new Date());
+    public AndroidLogger(String fileName, boolean fileLogger) {
+        super(fileName, fileLogger);
+    }
 
-					message = "(" + currentDateandTime + ") - " + message;
-				} catch (Exception e) {
-				}
+    @Override
+    public void log(String time, int logLevel, String source, String message) {
+        //display to console
+        if (Util.DEBUG) {
+			Log.d(TAG,createSourceMessage(message) + ": " + createMessage(message));
+        }
 
-				String sourceMessage = "";
-				if (source != null) {
-					String[] s = source.split("jni/mega");
-					if (s != null) {
-						if (s.length > 1) {
-							sourceMessage = s[1] + "";
-						} else {
-							sourceMessage = source + "";
-						}
-					}
-				}
+        //save to log file
+        if (isReadyToWriteToFile(Util.getFileLoggerSDK())) {
+            fileLogQueue.add(createSourceMessage(message) + ": " + createMessage(message) + "\n");
+        }
+    }
 
-				Log.d("AndroidLogger", sourceMessage + ": " + message);
-				//			addRecordToLog("AndroidLogger: " + source + ": " + message);
-			}
-
-			File logFile = null;
-			boolean fileLogger = Util.getFileLoggerSDK();
-			if (fileLogger) {
-				//Send the log to a file
-
-				try {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					String currentDateandTime = sdf.format(new Date());
-
-					message = "(" + currentDateandTime + ") - " + message;
-				} catch (Exception e) {
-				}
-
-				String sourceMessage = "";
-				if (source != null) {
-					String[] s = source.split("jni/mega");
-					if (s != null) {
-						if (s.length > 1) {
-							sourceMessage = s[1] + "";
-						} else {
-							sourceMessage = source + "";
-						}
-					}
-				}
-
-				String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/";
-				//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
-				File dirFile = new File(dir);
-				if (!dirFile.exists()) {
-					dirFile.mkdirs();
-					logFile = new File(dirFile, "logSDK.txt");
-					if (!logFile.exists()) {
-						try {
-							logFile.createNewFile();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				} else {
-					logFile = new File(dirFile, "logSDK.txt");
-					if (!logFile.exists()) {
-						try {
-							logFile.createNewFile();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-
-				if (logFile != null && logFile.exists()) {
-					//				String sourceMessage = "";
-					//				if (source != null) {
-					//					String[] s = source.split("jni/mega");
-					//					if (s != null) {
-					//						if (s.length > 1) {
-					//							sourceMessage = s[1] + "";
-					//						} else {
-					//							sourceMessage = source + "";
-					//						}
-					//					}
-					//				}
-
-					Util.appendStringToFile(sourceMessage + ": " + message + "\n", logFile);
-				}
-			}
-		}
-		catch (Exception exc) {
-			Log.d("AndroidLogger", source + ": " + message);
-		}
-
-	}
-	 
-	public static void addRecordToLog(String message) {
-		 
-		File logDir;
-		if (Environment.getExternalStorageDirectory() != null){
-			logDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.logDIR + "/");
-			logDir.mkdirs();
-			
-			File logFile = new File (logDir, "log.txt");
-			if (!logFile.exists()){
-				try  {
-                    logFile.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
+    //create SDK specific log prefix
+    private String createSourceMessage(String source) {
+        String sourceMessage = "";
+        if (source != null) {
+            String[] s = source.split("jni/mega");
+            if (s != null) {
+                if (s.length > 1) {
+                    sourceMessage = s[1] + "";
+                } else {
+                    sourceMessage = source + "";
                 }
-			}
-			
-			try { 
-				BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true)); 
-				buf.write(message + "\r\n");
-				buf.newLine();
-                buf.flush();
-                buf.close();
-			}
-			catch (IOException e) {
-                e.printStackTrace();
             }
-			
-		}
-	}
+        }
+
+        return sourceMessage;
+    }
+
+    //save logs to file in new thread
+    @Override
+    protected void logToFile(){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    String log = fileLogQueue.pollFirst();
+                    if (log != null) {
+                        writeToFile(log);
+                    } else {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+        thread.start();
+    }
 }

@@ -776,6 +776,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						log("NOT video, image or pdf!");
 						attachNodes(transfer);
 					}
+
+//					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				}
 				else{
 					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());

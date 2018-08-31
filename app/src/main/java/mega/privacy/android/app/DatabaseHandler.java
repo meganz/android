@@ -676,6 +676,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
+
+	public String getMyEmail() {
+		String selectQuery = "SELECT "+KEY_EMAIL+" FROM " + TABLE_CREDENTIALS;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		String email = null;
+		if (cursor!= null && cursor.moveToFirst()){
+			email = decrypt(cursor.getString(0));
+		}
+
+		cursor.close();
+		return email;
+	}
 	
 	public static String decrypt(String encodedString) {
 		if (encodedString == null) {
@@ -816,6 +829,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return idMessages;
 	}
 
+	public PendingMessage findPendingMessagesById(long messageId){
+		log("findPendingMessagesById");
+//		String id = messageId+"";
+		PendingMessage pendMsg = null;
+		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG + " WHERE " +KEY_ID + " ='"+ messageId+"'";
+		log("QUERY: "+selectQuery);
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()) {
+//				long id = Integer.parseInt(cursor.getString(0));
+				long chatId = Long. parseLong(decrypt(cursor.getString(1)));
+				long timestamp = Long. parseLong(decrypt(cursor.getString(2)));
+				String idKarereString = decrypt(cursor.getString(3));
+				long idTempKarere = -1;
+				if(idKarereString!=null && (!idKarereString.isEmpty())){
+					idTempKarere = Long. parseLong(idKarereString);
+				}
+				int state = cursor.getInt(4);
+
+				pendMsg = new PendingMessage(messageId, chatId, timestamp, idTempKarere, state);
+			}
+		}
+
+		cursor.close();
+
+		ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(messageId);
+		pendMsg.setNodeAttachment(nodes.get(0));
+
+		return pendMsg;
+	}
+
 	public ArrayList<AndroidMegaChatMessage> findAndroidMessagesBySent(int sent, long idChat){
 		log("findPendingMessageBySent");
 		ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
@@ -856,10 +902,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			PendingMessage pendMsg = pendMsgs.get(i);
 			long id = pendMsg.getId();
 			ArrayList<PendingNodeAttachment> nodes = findPendingNodesByMsgId(id);
-			pendMsg.setNodeAttachment(nodes.get(0));
+			if(nodes!=null && (!nodes.isEmpty())){
+				pendMsg.setNodeAttachment(nodes.get(0));
 
-			AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
-			messages.add(androidMsg);
+				AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(pendMsg, true);
+				messages.add(androidMsg);
+			}
+			else{
+				log("Error. Not nodes found any chat");
+			}
 		}
 
 		log("Found: "+ messages.size());
@@ -1276,8 +1327,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHAT_HANDLE, encrypt(chatPrefs.getChatHandle()));
 		values.put(KEY_CHAT_ITEM_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsEnabled()));
-		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(chatPrefs.getRingtone()));
-		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(chatPrefs.getNotificationsSound()));
+		values.put(KEY_CHAT_ITEM_RINGTONE, "");
+		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, "");
 		values.put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(chatPrefs.getWrittenText()));
 
 		db.insert(TABLE_CHAT_ITEMS, null, values);
@@ -1291,21 +1342,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
 	}
 
-	public int setRingtoneChatItem(String ringtone, String handle){
-		log("setRingtoneChatItem: "+ringtone+" "+handle);
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(ringtone));
-		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-	}
-
-	public int setNotificationSoundChatItem(String sound, String handle){
-		log("setNotificationSoundChatItem: "+sound+" "+handle);
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(sound));
-		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
-	}
+//	public int setRingtoneChatItem(String ringtone, String handle){
+//		log("setRingtoneChatItem: "+ringtone+" "+handle);
+//
+//		ContentValues values = new ContentValues();
+//		values.put(KEY_CHAT_ITEM_RINGTONE, encrypt(ringtone));
+//		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+//	}
+//
+//	public int setNotificationSoundChatItem(String sound, String handle){
+//		log("setNotificationSoundChatItem: "+sound+" "+handle);
+//
+//		ContentValues values = new ContentValues();
+//		values.put(KEY_CHAT_ITEM_SOUND_NOTIFICATIONS, encrypt(sound));
+//		return db.update(TABLE_CHAT_ITEMS, values, KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'", null);
+//	}
 
 	public int setNotificationEnabledChatItem(String enabled, String handle){
 		log("setNotificationEnabledChatItem: "+enabled+" "+handle);
@@ -1334,7 +1385,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String notificationsSound = decrypt(cursor.getString(4));
 				String writtenText = decrypt(cursor.getString(5));
 
-				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, ringtone, notificationsSound, writtenText);
+				prefs = new ChatItemPreferences(chatHandle, notificationsEnabled, writtenText);
 				cursor.close();
 				return prefs;
 			}
