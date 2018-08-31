@@ -14,6 +14,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -31,10 +35,13 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.utils.DBUtil;
@@ -74,7 +81,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	LinearLayout typeLayout;
 	LinearLayout lastSessionLayout;
-	LinearLayout connectionsLayout;
+    RelativeLayout connectionsLayout;
+    private CustomizedGridRecyclerView lastContactsGridView;
 
 	LinearLayout achievementsLayout;
 	LinearLayout achievementsSeparator;
@@ -201,8 +209,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
-
+		connectionsLayout = (RelativeLayout) v.findViewById(R.id.my_account_connections_layout);
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
@@ -254,6 +261,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		lastContacted = MegaApiUtils.getLastContactedUsers(context);
 		//Draw contact's connection component if lastContacted.size > 0
+        lastContactsGridView = (CustomizedGridRecyclerView)v.findViewById(R.id.last_contacts_gridview);
+        
+        lastContactsGridView.setColumnCount(LastContactsAdapter.MAX_COLUMN);
+        lastContactsGridView.setClipToPadding(false);
+        lastContactsGridView.setHasFixedSize(false);
+        
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
 
 		setAccountDetails();
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:rounded="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/contact_list_relative_layout_avatar"
+	android:layout_width="26dp"
+	android:layout_height="26dp">
+	<mega.privacy.android.app.components.RoundedImageView
+		android:id="@+id/item_last_contacts_avatar"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_centerInParent="true"
+		android:layout_margin="3dp"
+		android:scaleType="fitCenter"
+		rounded:corner_radius="13dp"/>
+	<TextView
+		android:id="@+id/contact_list_initial_letter"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_centerInParent="true"
+		android:gravity="center_horizontal|center_vertical"
+		android:paddingBottom="3dp"
+		android:text="A"/>
+</RelativeLayout>
