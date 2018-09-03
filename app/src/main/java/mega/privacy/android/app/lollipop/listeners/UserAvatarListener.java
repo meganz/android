@@ -4,10 +4,12 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.View;
 
 import java.io.File;
 
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -36,7 +38,7 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
+        Log.e("@#@",getClass().getSimpleName());
         if (e.getErrorCode() == MegaError.API_OK){
 
             if(context instanceof ChatCallActivity){
@@ -69,6 +71,8 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 }
                                 else if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsList){
                                     ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
+                                }else if(holder instanceof LastContactsAdapter.ViewHolder){
+                                    ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
                                 }
                                 holder.contactInitialLetter.setVisibility(View.GONE);
                             }
