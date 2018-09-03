@@ -39,8 +39,10 @@ import android.provider.MediaStore.Video;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -1924,6 +1926,17 @@ public class Util {
 		metrics.scaledDensity = configuration.fontScale * metrics.density;
 		activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
 	}
+    
+    //reduce font size for scale mode to prevent title and subtitle overlap
+    public static SpannableString adjustForLargeFont(String original) {
+        float scale = context.getResources().getConfiguration().fontScale;
+        if(scale > 1){
+            scale = (float)0.9;
+        }
+        SpannableString spannableString = new SpannableString(original);
+        spannableString.setSpan(new RelativeSizeSpan(scale),0, original.length(),0);
+        return spannableString;
+    }
 
 	public static Drawable mutateIcon (Context context, int idDrawable, int idColor) {
 
