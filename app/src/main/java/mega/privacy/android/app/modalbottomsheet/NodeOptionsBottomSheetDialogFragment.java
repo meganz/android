@@ -49,6 +49,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_FILE_INFO;
+
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     private Context context;
@@ -822,7 +824,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
                 i.putExtra("name", node.getName());
 
-                context.startActivity(i);
+                ((ManagerActivityLollipop)context).startActivityForResult(i, REQUEST_CODE_FILE_INFO);
                 dismissAllowingStateLoss();
                 break;
             }
