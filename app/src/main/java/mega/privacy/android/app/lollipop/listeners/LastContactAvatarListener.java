@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -32,6 +33,7 @@ public class LastContactAvatarListener implements MegaRequestListenerInterface {
     
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+        Log.e("@#@",getClass().getSimpleName());
         if (e.getErrorCode() == MegaError.API_OK) {
             if (contactEmail.compareTo(request.getEmail()) == 0) {
                 File avatar;
