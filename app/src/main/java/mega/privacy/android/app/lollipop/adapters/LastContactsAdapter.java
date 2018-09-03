@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,16 +55,11 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     
     private List<MegaUser> lastContacts;
     
-    private int contactsCount;
-    
-    private DisplayMetrics outMetrics;
-    
     private DatabaseHandler dbH;
     
     public LastContactsAdapter(final Activity context,List<MegaUser> data) {
         this.context = context;
         this.lastContacts = subLastContacts(data);
-        this.contactsCount = this.lastContacts.size();
         this.lastContacts = reOrder(this.lastContacts);
         
         if (megaApi == null) {
@@ -73,49 +68,10 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         dbH = DatabaseHandler.getDbHandler(context);
     }
     
-    /**
-     * Calculate the new position of each element.
-     * To adjust the top to bottom, right to left layout.
-     * <p>
-     * In this case, with max 6 elements:
-     * 0 1 2 >>> 4 2 0
-     * 3 4 5     5 3 1
-     *
-     * @param lastContacts Original last contacts list.
-     * @return New last contacts list with new element's position.
-     */
-    private List<MegaUser> reOrder(List<MegaUser> lastContacts) {
-        List<MegaUser> list = new LinkedList<>();
-        for (int i = 0;i < MAX_CONTACTS;i++) {
-            list.add(i,null);
-        }
-        switch (contactsCount) {
-            case MAX_CONTACTS:
-                list.remove(3);
-                list.add(3,lastContacts.get(5));
-            case MAX_CONTACTS - 1:
-                list.remove(0);
-                list.add(0,lastContacts.get(4));
-            case MAX_CONTACTS - 2:
-                list.remove(4);
-                list.add(4,lastContacts.get(3));
-            case MAX_CONTACTS - 3:
-                list.remove(1);
-                list.add(1,lastContacts.get(2));
-            case MAX_CONTACTS - 4:
-                list.remove(5);
-                list.add(5,lastContacts.get(1));
-            case MAX_CONTACTS - 5:
-                list.remove(2);
-                list.add(2,lastContacts.get(0));
-        }
-        return list;
-    }
-    
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent,int viewType) {
         Display display = context.getWindowManager().getDefaultDisplay();
-        outMetrics = new DisplayMetrics();
+        DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         
         View main = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_last_contacts,parent,false);
@@ -274,6 +230,40 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         return lastContacts;
     }
     
+    /**
+     * Calculate the new position of each element.
+     * To adjust the top to bottom, right to left layout.
+     * <p>
+     * In this case, with max 6 elements:
+     * 0 1 2 >>> 4 2 0
+     * 3 4 5     5 3 1
+     *
+     * @param lastContacts Original last contacts list.
+     * @return New last contacts list with new element's position.
+     */
+    private List<MegaUser> reOrder(List<MegaUser> lastContacts) {
+        int col = MAX_COLUMN;
+        int row = getRowCount(MAX_CONTACTS,MAX_COLUMN);
+        MegaUser[][] matrix = new MegaUser[row][col];
+        for (int i = 0, y = row * col - 1;i < lastContacts.size();i++,y--) {
+            int r = i % (col - (col - row));
+            int c = y / row;
+            matrix[r][c] = lastContacts.get(i);
+        }
+        List<MegaUser> list = new ArrayList<>(lastContacts.size());
+        for (int i = 0;i < row;i++) {
+            list.addAll(Arrays.asList(matrix[i]));
+        }
+        return list;
+    }
+    
+    private int getRowCount(int total,int colCount) {
+        if (total % colCount == 0) {
+            return total / colCount;
+        }
+        return (total / colCount) + 1;
+    }
+    
     public static class ViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
         
         public ImageView avatarImage;
@@ -281,6 +271,5 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         public ViewHolder(View itemView) {
             super(itemView);
         }
-        
     }
 }
