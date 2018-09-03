@@ -14,10 +14,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -37,7 +33,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -277,6 +272,21 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		return v;
 	}
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Refresh
+        updateView();
+    }
+    
+    /**
+     * Update last contacts list and refresh last contacts' avatar.
+     */
+    public void updateView() {
+        lastContacted = MegaApiUtils.getLastContactedUsers(context);
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+    }
 
 	public void setMkButtonText(){
 		log("setMkButtonText");

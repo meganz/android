@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.listeners;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,59 +18,54 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 public class UserAvatarListener implements MegaRequestListenerInterface {
-
+    
     Context context;
     MegaContactsLollipopAdapter.ViewHolderContacts holder;
-
-    public UserAvatarListener(Context context, MegaContactsLollipopAdapter.ViewHolderContacts holder) {
+    
+    public UserAvatarListener(Context context,MegaContactsLollipopAdapter.ViewHolderContacts holder) {
         this.context = context;
         this.holder = holder;
     }
-
+    
     public UserAvatarListener(Context context) {
         this.context = context;
     }
-
+    
     @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+    public void onRequestStart(MegaApiJava api,MegaRequest request) {
     }
-
+    
     @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        Log.e("@#@",getClass().getSimpleName());
-        if (e.getErrorCode() == MegaError.API_OK){
-
-            if(context instanceof ChatCallActivity){
+    public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
+        if (e.getErrorCode() == MegaError.API_OK) {
+            
+            if (context instanceof ChatCallActivity) {
                 ((ChatCallActivity)context).setProfileContactAvatar();
-            }
-            else{
-                if (holder.contactMail.compareTo(request.getEmail()) == 0){
+            } else {
+                if (holder.contactMail.compareTo(request.getEmail()) == 0) {
                     File avatar = null;
-                    if (context.getExternalCacheDir() != null){
-                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-                    }
-                    else{
-                        avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+                    if (context.getExternalCacheDir() != null) {
+                        avatar = new File(context.getExternalCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
+                    } else {
+                        avatar = new File(context.getCacheDir().getAbsolutePath(),holder.contactMail + ".jpg");
                     }
                     Bitmap bitmap = null;
-                    if (avatar.exists()){
-                        if (avatar.length() > 0){
+                    if (avatar.exists()) {
+                        if (avatar.length() > 0) {
                             BitmapFactory.Options bOpts = new BitmapFactory.Options();
                             bOpts.inPurgeable = true;
                             bOpts.inInputShareable = true;
-                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                            bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
                             if (bitmap == null) {
                                 avatar.delete();
-                            }
-                            else{
+                            } else {
 //								holder.imageView.setImageBitmap(bitmap);
-                                if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsGrid){
-                                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+                                if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsGrid) {
+                                    bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,bitmap,3);
                                     ((MegaContactsLollipopAdapter.ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
-                                }
-                                else if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsList){
+                                } else if (holder instanceof MegaContactsLollipopAdapter.ViewHolderContactsList) {
                                     ((MegaContactsLollipopAdapter.ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
-                                }else if(holder instanceof LastContactsAdapter.ViewHolder){
+                                } else if (holder instanceof LastContactsAdapter.ViewHolder) {
                                     ((LastContactsAdapter.ViewHolder)holder).avatarImage.setImageBitmap(bitmap);
                                 }
                                 holder.contactInitialLetter.setVisibility(View.GONE);
@@ -82,14 +76,14 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
             }
         }
     }
-
+    
     @Override
-    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
+    public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
     }
-
+    
     @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+    public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
     }
-
+    
 }
 

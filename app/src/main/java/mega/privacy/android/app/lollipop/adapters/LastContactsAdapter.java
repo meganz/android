@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,18 +33,21 @@ import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapter.ViewHolder> {
     
+    /**
+     * The last contacts grid has maxium 3 columns.
+     */
     public static final int MAX_COLUMN = 3;
+    
+    /**
+     * The last contacts grid displays 6 last contacts at most.
+     */
     private static final int MAX_CONTACTS = 6;
-    private static final int RX = 10;
-    private static final int RY = 10;
     
     private Activity context;
     
@@ -57,7 +61,6 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     
     private DatabaseHandler dbH;
     
-    
     public LastContactsAdapter(final Activity context,List<MegaUser> data) {
         this.context = context;
         this.lastContacts = subLastContacts(data);
@@ -70,8 +73,19 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         dbH = DatabaseHandler.getDbHandler(context);
     }
     
+    /**
+     * Calculate the new position of each element.
+     * To adjust the top to bottom, right to left layout.
+     * <p>
+     * In this case, with max 6 elements:
+     * 0 1 2 >>> 4 2 0
+     * 3 4 5     5 3 1
+     *
+     * @param lastContacts Original last contacts list.
+     * @return New last contacts list with new element's position.
+     */
     private List<MegaUser> reOrder(List<MegaUser> lastContacts) {
-        List<MegaUser> list = new ArrayList<>(MAX_CONTACTS);
+        List<MegaUser> list = new LinkedList<>();
         for (int i = 0;i < MAX_CONTACTS;i++) {
             list.add(i,null);
         }
@@ -148,6 +162,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder,int position) {
         MegaUser contact = lastContacts.get(position);
+        //Placeholder.
         if (contact == null) {
             return;
         }
@@ -163,7 +178,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         } else {
             avatar = new File(context.getCacheDir().getAbsolutePath(),email + ".jpg");
         }
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         if (avatar.exists()) {
             if (avatar.length() > 0) {
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
@@ -253,19 +268,13 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     }
     
     private List<MegaUser> subLastContacts(List<MegaUser> lastContacts) {
-//        lastContacts.addAll(lastContacts);
-//        lastContacts.addAll(lastContacts);
-//        lastContacts.addAll(lastContacts);
         if (lastContacts.size() > MAX_CONTACTS) {
             return lastContacts.subList(0,MAX_CONTACTS);
         }
-//        lastContacts = lastContacts.subList(0,6);
         return lastContacts;
     }
     
     public static class ViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
-
-//        private TextView contactInitialLetter;
         
         public ImageView avatarImage;
         
