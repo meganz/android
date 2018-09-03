@@ -85,33 +85,40 @@
 
 					<RelativeLayout
 						android:layout_width="fill_parent"
-						android:layout_height="wrap_content">
+						android:layout_height="match_parent">
 
 						<RelativeLayout
 							android:id="@+id/my_account_relative_layout_avatar"
-							android:layout_width="60dp"
-							android:layout_height="60dp"
+							android:layout_width="72dp"
+							android:layout_height="72dp"
 							android:layout_gravity="right"
 							android:layout_alignParentRight="true"
 							android:orientation="horizontal">
 
-							<mega.privacy.android.app.components.RoundedImageView
-								android:id="@+id/my_account_thumbnail"
-								android:layout_width="fill_parent"
-								android:layout_height="fill_parent"
-								android:scaleType="fitCenter"
-								android:layout_centerInParent="true"
-								rounded:border_color="@color/border_file_properties"
-								rounded:border_width="0dp"
-								rounded:corner_radius="30dp" />
+							<RelativeLayout
+								android:layout_width="40dp"
+								android:layout_height="40dp"
+								android:layout_centerInParent="true">
 
-							<TextView
-								android:id="@+id/my_account_initial_letter"
-								android:layout_width="fill_parent"
-								android:layout_height="fill_parent"
-								android:layout_centerInParent="true"
-								android:gravity="center_horizontal|center_vertical"
-								android:paddingBottom="3dp" />
+								<mega.privacy.android.app.components.RoundedImageView
+									android:id="@+id/my_account_thumbnail"
+									android:layout_width="fill_parent"
+									android:layout_height="fill_parent"
+									android:scaleType="fitCenter"
+									android:layout_centerInParent="true"
+									rounded:border_color="@color/border_file_properties"
+									rounded:border_width="0dp"
+									rounded:corner_radius="30dp" />
+
+								<TextView
+									android:id="@+id/my_account_initial_letter"
+									android:layout_width="fill_parent"
+									android:layout_height="fill_parent"
+									android:layout_centerInParent="true"
+									android:gravity="center_horizontal|center_vertical"
+									android:paddingBottom="3dp" />
+
+							</RelativeLayout>
 						</RelativeLayout>
 
 					</RelativeLayout>
