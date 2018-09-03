@@ -223,6 +223,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+
 public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight{
 
@@ -13007,6 +13009,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				ac.exportMK(path, true);
 			}
 		}
+		else if(requestCode == Constants.REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK){
+		    if(fbFLol != null){
+                long handle = intent.getLongExtra(NODE_HANDLE, -1);
+                fbFLol.refresh(handle);
+            }
+        }
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
@@ -15729,6 +15737,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					if (fbFLol != null){
 						if(fbFLol.isAdded()){
 							fbFLol.setOverviewLayout();
+                            fbFLol.refresh(transfer.getNodeHandle());
 						}
 					}
 				}

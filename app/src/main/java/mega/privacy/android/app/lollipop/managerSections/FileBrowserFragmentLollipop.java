@@ -1640,4 +1640,24 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 		}
 	}
+    
+    //refresh list when item updated
+    public void refresh(long handle) {
+        if (handle == -1) {
+            return;
+        }
+        updateNode(handle);
+        adapter.notifyDataSetChanged();
+    }
+    
+    private void updateNode(long handle) {
+        for (int i = 0;i < nodes.size();i++) {
+            MegaNode node = nodes.get(i);
+            if (node.getHandle() == handle) {
+                MegaNode updated = megaApi.getNodeByHandle(handle);
+                nodes.set(i,updated);
+                break;
+            }
+        }
+    }
 }

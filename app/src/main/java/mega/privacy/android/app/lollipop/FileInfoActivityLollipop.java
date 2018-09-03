@@ -108,6 +108,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	public static int MAX_WIDTH_FILENAME_PORT=200;
 	public static int MAX_WIDTH_FILENAME_PORT_2=200;
+	
+	public static String NODE_HANDLE = "NODE_HANDLE";
 
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;
@@ -278,6 +280,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
  	private File file;
  	private long fragmentHandle  = -1;
  	private String pathNavigation;
+ 	boolean isRemoveOffline;
+ 	long handle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -1553,20 +1557,24 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				break;
 			}
 			case R.id.file_properties_switch:{
-				boolean isChecked = offlineSwitch.isChecked();
+				boolean isChecked = offlineSwitch.isChecked();//yuan
 
 				if(owner){
 					log("Owner: me");
 					if (!isChecked){
 						log("isChecked");
+                        isRemoveOffline = true;
+                        handle = node.getHandle();
 						availableOfflineBoolean = false;
 						offlineSwitch.setChecked(false);
-						mOffDelete = dbH.findByHandle(node.getHandle());
+						mOffDelete = dbH.findByHandle(handle);
 						removeOffline(mOffDelete);
 						supportInvalidateOptionsMenu();
 					}
 					else{
-						log("NOT Checked");
+                        log("NOT Checked");
+                        isRemoveOffline = false;
+                        handle = -1;
 						availableOfflineBoolean = true;
 						offlineSwitch.setChecked(true);
 
@@ -2995,7 +3003,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onBackPressed() {
-
+        if(isRemoveOffline){
+            Intent intent = new Intent();
+            intent.putExtra(NODE_HANDLE, handle);
+            setResult(RESULT_OK, intent);
+        }
 		super.onBackPressed();
 	}
 
