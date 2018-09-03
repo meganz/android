@@ -16041,6 +16041,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				sttFLol.setVersionsInfo();
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
+			String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+			if (maFLol != null && maFLol.isAdded()) {
+				maFLol.initCreateQR(request, e);
+			}
+		}
 	}
 
 	public void updateAccountStorageInfo(){
