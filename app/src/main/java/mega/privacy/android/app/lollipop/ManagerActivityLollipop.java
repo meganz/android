@@ -5536,8 +5536,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
     	}
 
-    	if (newAccount || isEnable2FADialogShown) {
-    		showEnable2FADialog();
+		if (megaApi.multiFactorAuthAvailable()) {
+			if (newAccount || isEnable2FADialogShown) {
+				showEnable2FADialog();
+			}
 		}
 	}
 
@@ -15362,7 +15364,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(e.getErrorCode() == MegaError.API_ENOENT){
 				log("Email not changed -- API_ENOENT");
-				Util.showAlert(this, "Email not changed!", getString(R.string.general_error_word));
+				Util.showAlert(this, "Email not changed!" + getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
 			}
 			else{
 				log("Error when asking for change mail link");
