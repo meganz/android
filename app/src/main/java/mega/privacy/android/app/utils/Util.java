@@ -23,6 +23,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -86,6 +87,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -166,6 +169,38 @@ public class Util {
 		}
 
 		String fileName = name+".txt";
+		final File file = new File(path, fileName);
+
+		try
+		{
+			file.createNewFile();
+			FileOutputStream fOut = new FileOutputStream(file);
+			OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+			myOutWriter.append(data);
+
+			myOutWriter.close();
+
+			fOut.flush();
+			fOut.close();
+
+			return file;
+		}
+		catch (IOException e)
+		{
+			log("File write failed: " + e.toString());
+			return null;
+		}
+	}
+
+	public static File createTemporalURLFile(String name, String data){
+
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR + "/";
+		File tempDownDirectory = new File(path);
+		if(!tempDownDirectory.exists()){
+			tempDownDirectory.mkdirs();
+		}
+
+		String fileName = name+".url";
 		final File file = new File(path, fileName);
 
 		try
@@ -743,22 +778,22 @@ public class Util {
 //			}
 //		}
 	}
-	
+
 	public static boolean appendStringToFile(final String appendContents, final File file) {
-	      boolean result = false;
-	      try {
-            if (file != null && file.canWrite()) {
-               file.createNewFile(); // ok if returns false, overwrite
-               Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
-               out.write(appendContents);
-               out.close();   
-               result = true;
-            }
-	      } catch (IOException e) {
-	      //   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
-	      }
-	      return result;
-	   }
+		boolean result = false;
+		try {
+			if (file != null && file.canWrite()) {
+				file.createNewFile(); // ok if returns false, overwrite
+				Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
+				out.write(appendContents);
+				out.close();
+				result = true;
+			}
+		} catch (IOException e) {
+			//   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
+		}
+		return result;
+	}
 	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {
@@ -1804,7 +1839,7 @@ public class Util {
 
 	public static void resetAndroidLogger(){
 
-		MegaApiAndroid.addLoggerObject(new AndroidLogger());
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		boolean fileLogger = false;
@@ -1864,6 +1899,53 @@ public class Util {
 		bitmap.recycle();
 
 		return output;
+	}
+
+	public static Drawable mutateIcon (Context context, int idDrawable, int idColor) {
+
+		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+		icon = icon.mutate();
+		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
+
+		return icon;
+	}
+
+	//Notice user that any transfer prior to login will be destroyed
+	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
+		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+			if(context instanceof ManagerActivityLollipop){
+				log("Show dialog to cancel transfers before logging OUT");
+				builder.setMessage(R.string.logout_warning_abort_transfers);
+				builder.setPositiveButton(R.string.action_logout, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						callback.onAbortConfirm();
+					}
+				});
+			}
+			else{
+				log("Show dialog to cancel transfers before logging IN");
+				builder.setMessage(R.string.login_warning_abort_transfers);
+				builder.setPositiveButton(R.string.login_text, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						callback.onAbortConfirm();
+					}
+				});
+			}
+
+			builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					callback.onAbortCancel();
+				}
+			});
+			builder.show();
+		}else{
+			callback.onAbortConfirm();
+		}
 	}
 
 	private static void log(String message) {
