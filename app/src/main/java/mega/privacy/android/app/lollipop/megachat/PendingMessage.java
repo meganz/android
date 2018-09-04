@@ -11,6 +11,7 @@ public class PendingMessage {
     long id;
     long uploadTimestamp;
     int state;
+    long tempIdKarere;
     String videoDownSampled;
     PendingNodeAttachment nodeAttachment;
 
@@ -28,6 +29,14 @@ public class PendingMessage {
         this.nodeAttachment = nodeAttachment;
         this.id = id;
         this.uploadTimestamp = uploadTimestamp;
+        this.state = state;
+    }
+
+    public PendingMessage(long id, long chatId, long uploadTimestamp, long idKarere, int state) {
+        this.chatId = chatId;
+        this.id = id;
+        this.uploadTimestamp = uploadTimestamp;
+        this.tempIdKarere = idKarere;
         this.state = state;
     }
 

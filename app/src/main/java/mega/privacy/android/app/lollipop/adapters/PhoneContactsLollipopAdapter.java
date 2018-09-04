@@ -34,6 +34,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.PhoneContactInfo;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -43,12 +44,16 @@ import nz.mega.sdk.MegaApiAndroid;
 /*
  * Adapter for FilestorageActivity list
  */
-public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> implements OnClickListener {
+public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneContactsLollipopAdapter.ViewHolderPhoneContactsLollipop> implements OnClickListener, SectionTitleProvider {
 
-	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	DatabaseHandler dbH = null;
 	public static int MAX_WIDTH_CONTACT_NAME_LAND=450;
 	public static int MAX_WIDTH_CONTACT_NAME_PORT=200;
+
+	@Override
+	public String getSectionTitle(int position) {
+		return phoneContacts.get(position).getName().substring(0, 1).toUpperCase();
+	}
 
 	private class ContactPicture extends AsyncTask<Void, Void, Long> {
 
@@ -143,16 +148,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 
 	}
 
-	public PhoneContactInfo getDocumentAt(int position)
-	{
-		if(position < phoneContacts.size())
-		{
-			return phoneContacts.get(position);
-		}
-
-		return null;
-	}
-
 	@Override
 	public int getItemCount() {
 
@@ -240,7 +235,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
 		holder.contactImageLayout = (RelativeLayout) rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
 		holder.initialLetter = (TextView) rowView.findViewById(R.id.contact_explorer_initial_letter);
-		
+
 		return holder;
 		
 	}
@@ -309,7 +304,7 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	    display.getMetrics(outMetrics);
 	    float density  = mContext.getResources().getDisplayMetrics().density;
 	    
-	    int avatarTextSize = getAvatarTextSize(density);
+	    int avatarTextSize = Util.getAvatarTextSize(density);
 	    log("DENSITY: " + density + ":::: " + avatarTextSize);
 	    if (isMegaContact){
 		    if (holder.contactMail != null){
@@ -335,31 +330,6 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 	    		}
 	    	}
 	    }
-	}
-	
-	private int getAvatarTextSize (float density){
-		float textSize = 0.0f;
-		
-		if (density > 3.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-		}
-		else if (density > 2.0){
-			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-		}
-		else if (density > 1.5){
-			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-		}
-		else if (density > 1.0){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-		}
-		else if (density > 0.75){
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-		}
-		else{
-			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-		}
-		
-		return (int)textSize;
 	}
 	
 	@Override

@@ -24,12 +24,14 @@ import android.text.format.Formatter;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -806,8 +808,97 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 						}
 
-					} else {
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
+						log("Is URL file");
+						InputStream instream = null;
 
+						try {
+							// open the file for reading
+							instream = new FileInputStream(currentFile.getAbsolutePath());
+
+							// if file the available for reading
+							if (instream != null) {
+								// prepare the file for reading
+								InputStreamReader inputreader = new InputStreamReader(instream);
+								BufferedReader buffreader = new BufferedReader(inputreader);
+
+								String line1 = buffreader.readLine();
+								if(line1!=null){
+									String line2= buffreader.readLine();
+
+									String url = line2.replace("URL=","");
+
+									log("Is URL - launch browser intent");
+									Intent i = new Intent(Intent.ACTION_VIEW);
+									i.setData(Uri.parse(url));
+									startActivity(i);
+								}
+								else{
+									log("Not expected format: Exception on processing url file");
+									intent = new Intent(Intent.ACTION_VIEW);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+										intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), "text/plain");
+									} else {
+										intent.setDataAndType(Uri.fromFile(currentFile), "text/plain");
+									}
+									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+									if (MegaApiUtils.isIntentAvailable(this, intent)){
+										startActivity(intent);
+									}
+									else{
+										log("No app to url file as text: show notification");
+										mBuilderCompat
+												.setSmallIcon(R.drawable.ic_stat_notify)
+												.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+												.setAutoCancel(true).setTicker(notificationTitle)
+												.setContentTitle(notificationTitle).setContentText(size)
+												.setOngoing(false);
+
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+											mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+										}
+
+										mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+									}
+								}
+							}
+						} catch (Exception ex) {
+
+							intent = new Intent(Intent.ACTION_VIEW);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), "text/plain");
+							} else {
+								intent.setDataAndType(Uri.fromFile(currentFile), "text/plain");
+							}
+							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+							if (MegaApiUtils.isIntentAvailable(this, intent)){
+								startActivity(intent);
+							}
+							else{
+								log("Exception on processing url file: show notification");
+								mBuilderCompat
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+									mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+								}
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							}
+
+						} finally {
+							// close the file.
+							instream.close();
+						}
+
+					}else {
 						log("Download is OTHER FILE");
 						intent = new Intent(Intent.ACTION_VIEW);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -893,6 +984,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		}
 	}
+
 
 	/*
 	 * Update notification download progress

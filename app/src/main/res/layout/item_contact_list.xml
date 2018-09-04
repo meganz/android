@@ -44,7 +44,24 @@
             android:src="@drawable/ic_dots_vertical_grey"
             android:background="@null"
             android:layout_marginRight="10dp"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/contact_list_decline"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_decline"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:alpha="0.5"
+            android:layout_centerVertical="true"/>
 
     </RelativeLayout>
 

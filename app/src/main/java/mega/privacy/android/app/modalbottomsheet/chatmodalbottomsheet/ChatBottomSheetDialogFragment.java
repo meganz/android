@@ -450,10 +450,10 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 if(chatPrefs==null) {
 
                     if(notificationsEnabled){
-                        chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(true), "", "");
+                        chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(true), "");
                     }
                     else{
-                        chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(false), "", "");
+                        chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(false), "");
                     }
 
                     dbH.setChatItemPreferences(chatPrefs);
