@@ -13,7 +13,7 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     -->
 
-    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">&#160;of&#160;</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> of </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Cancel</string>
