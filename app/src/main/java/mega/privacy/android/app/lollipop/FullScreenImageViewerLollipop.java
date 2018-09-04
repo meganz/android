@@ -395,17 +395,49 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				moveToTrashIcon.setVisible(false);
 				removeIcon.setVisible(true);
 			}
-		}else {
+		}
+		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+			propertiesIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			chatIcon.setVisible(true);
+			copyIcon.setVisible(true);
+			removeIcon.setVisible(false);
+			getlinkIcon.setVisible(false);
+			removelinkIcon.setVisible(false);
+			downloadIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			shareIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			MegaNode node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			int accessLevel = megaApi.getAccess(node);
+
+			switch (accessLevel) {
+				case MegaShare.ACCESS_FULL: {
+					log("access FULL");
+					renameIcon.setVisible(true);
+					moveIcon.setVisible(true);
+					moveToTrashIcon.setVisible(true);
+					break;
+				}
+				case MegaShare.ACCESS_READ:
+					log("access read");
+				case MegaShare.ACCESS_READWRITE: {
+					log("readwrite");
+					renameIcon.setVisible(false);
+					moveIcon.setVisible(false);
+					moveToTrashIcon.setVisible(false);
+					break;
+				}
+			}
+		}
+		else {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(adapterType==Constants.CONTACT_FILE_ADAPTER){
 				shareIcon.setVisible(false);
 				menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			}else{
-				if(fromShared){
-					shareIcon.setVisible(false);
-					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				}
 				if(isFolderLink){
 					shareIcon.setVisible(false);
 					menu.findItem(R.id.full_image_viewer_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -424,8 +456,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				removelinkIcon.setVisible(true);
 				menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-			}else{
-
+			}
+			else{
 				if(adapterType==Constants.CONTACT_FILE_ADAPTER){
 
 					getlinkIcon.setVisible(false);
@@ -434,127 +466,94 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					menu.findItem(R.id.full_image_viewer_remove_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 				}else{
-
-					if(fromShared){
-						removelinkIcon.setVisible(false);
+					if(isFolderLink){
 						getlinkIcon.setVisible(false);
+						removelinkIcon.setVisible(false);
 
-					} else{
-						if(isFolderLink){
-							getlinkIcon.setVisible(false);
-							removelinkIcon.setVisible(false);
-
-						}else{
-							getlinkIcon.setVisible(true);
-							menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-							removelinkIcon.setVisible(false);
-						}
-
+					}else{
+						getlinkIcon.setVisible(true);
+						menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+						removelinkIcon.setVisible(false);
 					}
 				}
 			}
 
-			if(fromShared){
+			if(isFolderLink){
+				propertiesIcon.setVisible(false);
+				menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+				moveToTrashIcon.setVisible(false);
 				removeIcon.setVisible(false);
+				renameIcon.setVisible(false);
+				moveIcon.setVisible(false);
+				copyIcon.setVisible(false);
 				chatIcon.setVisible(false);
 
-				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-				int accessLevel = megaApi.getAccess(node);
+			}
+			else{
 
-				switch(accessLevel){
+				propertiesIcon.setVisible(true);
+				menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-					case MegaShare.ACCESS_OWNER:
-					case MegaShare.ACCESS_FULL:{
-						renameIcon.setVisible(true);
-						moveIcon.setVisible(true);
-						moveToTrashIcon.setVisible(true);
-						break;
-					}
-					case MegaShare.ACCESS_READWRITE:
-					case MegaShare.ACCESS_READ:{
-						renameIcon.setVisible(false);
-						moveIcon.setVisible(false);
-						moveToTrashIcon.setVisible(false);
-						break;
-					}
-				}
-			}else{
-				if(isFolderLink){
-					propertiesIcon.setVisible(false);
-					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
-					moveToTrashIcon.setVisible(false);
+				if(adapterType==Constants.CONTACT_FILE_ADAPTER){
 					removeIcon.setVisible(false);
-					renameIcon.setVisible(false);
-					moveIcon.setVisible(false);
-					copyIcon.setVisible(false);
-					chatIcon.setVisible(false);
+					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+					int accessLevel = megaApi.getAccess(node);
+					switch(accessLevel){
+
+						case MegaShare.ACCESS_OWNER:
+						case MegaShare.ACCESS_FULL:{
+							renameIcon.setVisible(true);
+							moveIcon.setVisible(true);
+							moveToTrashIcon.setVisible(true);
+							if(Util.isChatEnabled()){
+								chatIcon.setVisible(true);
+							}
+							else{
+								chatIcon.setVisible(false);
+							}
+							break;
+						}
+						case MegaShare.ACCESS_READWRITE:
+						case MegaShare.ACCESS_READ:{
+							renameIcon.setVisible(false);
+							moveIcon.setVisible(false);
+							moveToTrashIcon.setVisible(false);
+							chatIcon.setVisible(false);
+							break;
+						}
+					}
 
 				}else{
+					if(Util.isChatEnabled()){
+						chatIcon.setVisible(true);
+					}
+					else{
+						chatIcon.setVisible(false);
+					}
+					renameIcon.setVisible(true);
+					moveIcon.setVisible(true);
 
-					propertiesIcon.setVisible(true);
-					menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
-					if(adapterType==Constants.CONTACT_FILE_ADAPTER){
+					final long handle = node.getHandle();
+					MegaNode parent = megaApi.getNodeByHandle(handle);
+
+					while (megaApi.getParentNode(parent) != null){
+						parent = megaApi.getParentNode(parent);
+					}
+
+					if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+
+						moveToTrashIcon.setVisible(true);
 						removeIcon.setVisible(false);
-						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-						int accessLevel = megaApi.getAccess(node);
-						switch(accessLevel){
-
-							case MegaShare.ACCESS_OWNER:
-							case MegaShare.ACCESS_FULL:{
-								renameIcon.setVisible(true);
-								moveIcon.setVisible(true);
-								moveToTrashIcon.setVisible(true);
-								if(Util.isChatEnabled()){
-									chatIcon.setVisible(true);
-								}
-								else{
-									chatIcon.setVisible(false);
-								}
-								break;
-							}
-							case MegaShare.ACCESS_READWRITE:
-							case MegaShare.ACCESS_READ:{
-								renameIcon.setVisible(false);
-								moveIcon.setVisible(false);
-								moveToTrashIcon.setVisible(false);
-								chatIcon.setVisible(false);
-								break;
-							}
-						}
 
 					}else{
-						if(Util.isChatEnabled()){
-							chatIcon.setVisible(true);
-						}
-						else{
-							chatIcon.setVisible(false);
-						}
-						renameIcon.setVisible(true);
-						moveIcon.setVisible(true);
 
-						node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-
-						final long handle = node.getHandle();
-						MegaNode parent = megaApi.getNodeByHandle(handle);
-
-						while (megaApi.getParentNode(parent) != null){
-							parent = megaApi.getParentNode(parent);
-						}
-
-						if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-
-							moveToTrashIcon.setVisible(true);
-							removeIcon.setVisible(false);
-
-						}else{
-
-							moveToTrashIcon.setVisible(false);
-							removeIcon.setVisible(true);
-							getlinkIcon.setVisible(false);
-							removelinkIcon.setVisible(false);
-						}
+						moveToTrashIcon.setVisible(false);
+						removeIcon.setVisible(true);
+						getlinkIcon.setVisible(false);
+						removelinkIcon.setVisible(false);
 					}
 				}
 			}
@@ -720,6 +719,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					i.putExtra("handle", node.getHandle());
 					i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 					i.putExtra("name", node.getName());
+					if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+						i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+						i.putExtra("firstLevel", false);
+					}
 					startActivity(i);
 					break;
 				}

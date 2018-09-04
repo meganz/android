@@ -1055,7 +1055,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     updateContainers();
                     enableNextButton();
                     int newIndex = player.getCurrentWindowIndex();
-                    if (currentWindowIndex != newIndex) {
+                    if (currentWindowIndex != newIndex && playListCreated) {
                         updateFileProperties();
                     }
                 }
@@ -1083,7 +1083,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     }
                     else if (playbackState == Player.STATE_ENDED) {
                         if (creatingPlaylist){
-                            initPlaylist(currentWindowIndex+1, 0);
+                           setPlaylist(currentWindowIndex + 1);
                         }
                         else if (!loop && !onPlaylist && !creatingPlaylist) {
                             showActionStatusBar();
@@ -1138,7 +1138,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     int oldWindowIndex = currentWindowIndex;
                     currentWindowIndex = player.getCurrentWindowIndex();
 
-                    if (currentWindowIndex != oldWindowIndex) {
+                    if (currentWindowIndex != oldWindowIndex && playListCreated) {
                         updateFileProperties();
                     }
                 }
@@ -1164,6 +1164,28 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             log("Error creating player");
+        }
+    }
+
+    void setPlaylist (int index) {
+        boolean next = false;
+        if (isOffline) {
+            if (index < mediaOffList.size()) {
+                next = true;
+            }
+        }
+        else if (isZip) {
+            if (index < zipMediaFiles.size()) {
+                next = true;
+            }
+        }
+        else {
+            if (index < mediaHandles.size()) {
+                next = true;
+            }
+        }
+        if (next) {
+            initPlaylist(index, 0);
         }
     }
 
@@ -1716,6 +1738,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putLong("handle", handle);
         outState.putString("fileName", fileName);
         outState.putString("uri", uri.toString());
+        if (getIntent() != null) {
+            getIntent().setData(uri);
+        }
         outState.putBoolean("renamed", renamed);
         outState.putBoolean("loop", loop);
         outState.putBoolean("onPlaylist", onPlaylist);
@@ -2101,6 +2126,49 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
+            else if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+                propertiesMenuItem.setVisible(true);
+                chatMenuItem.setVisible(true);
+                copyMenuItem.setVisible(true);
+                removeMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+
+                if (isUrl){
+                    downloadMenuItem.setVisible(true);
+                    shareMenuItem.setVisible(false);
+                }
+                else {
+                    downloadMenuItem.setVisible(false);
+                    shareMenuItem.setVisible(true);
+                }
+
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                int accessLevel = megaApi.getAccess(node);
+                
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_FULL: {
+                        log("access FULL");
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+
+                        break;
+                    }
+                    case MegaShare.ACCESS_READ:
+                        log("access read");
+                    case MegaShare.ACCESS_READWRITE: {
+                        log("readwrite");
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                }
+            }
             else {
                 log("onCreateOptionsMenu else");
                 boolean shareVisible = true;
@@ -2130,10 +2198,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         shareVisible = false;
                     }
                     else{
-                        if(fromShared){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
                         if(isFolderLink){
                             shareMenuItem.setVisible(false);
                             shareVisible = false;
@@ -2151,120 +2215,88 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             removelinkMenuItem.setVisible(false);
                         }
                         else{
-                            if(fromShared){
-                                removelinkMenuItem.setVisible(false);
+                            if(isFolderLink){
                                 getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
+
                             }
                             else{
-                                if(isFolderLink){
-                                    getlinkMenuItem.setVisible(false);
-                                    removelinkMenuItem.setVisible(false);
-
-                                }
-                                else{
-                                    getlinkMenuItem.setVisible(true);
-                                    removelinkMenuItem.setVisible(false);
-                                }
+                                getlinkMenuItem.setVisible(true);
+                                removelinkMenuItem.setVisible(false);
                             }
                         }
                     }
-                    if(fromShared){
+                    if(isFolderLink){
+                        propertiesMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
                         removeMenuItem.setVisible(false);
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        copyMenuItem.setVisible(false);
                         chatMenuItem.setVisible(false);
-
-                        node = megaApi.getNodeByHandle(handle);
-                        int accessLevel = megaApi.getAccess(node);
-
-                        switch(accessLevel){
-                            case MegaShare.ACCESS_OWNER:
-                            case MegaShare.ACCESS_FULL:{
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
-                                moveToTrashMenuItem.setVisible(true);
-                                break;
-                            }
-                            case MegaShare.ACCESS_READWRITE:
-                            case MegaShare.ACCESS_READ:{
-                                renameMenuItem.setVisible(false);
-                                moveMenuItem.setVisible(false);
-                                moveToTrashMenuItem.setVisible(false);
-                                break;
-                            }
-                        }
                     }
                     else{
-                        if(isFolderLink){
-                            propertiesMenuItem.setVisible(false);
-                            moveToTrashMenuItem.setVisible(false);
+                        propertiesMenuItem.setVisible(true);
+
+                        if(adapterType==Constants.CONTACT_FILE_ADAPTER){
                             removeMenuItem.setVisible(false);
-                            renameMenuItem.setVisible(false);
-                            moveMenuItem.setVisible(false);
-                            copyMenuItem.setVisible(false);
-                            chatMenuItem.setVisible(false);
-                        }
-                        else{
-                            propertiesMenuItem.setVisible(true);
+                            node = megaApi.getNodeByHandle(handle);
+                            int accessLevel = megaApi.getAccess(node);
+                            switch(accessLevel){
 
-                            if(adapterType==Constants.CONTACT_FILE_ADAPTER){
-                                removeMenuItem.setVisible(false);
-                                node = megaApi.getNodeByHandle(handle);
-                                int accessLevel = megaApi.getAccess(node);
-                                switch(accessLevel){
-
-                                    case MegaShare.ACCESS_OWNER:
-                                    case MegaShare.ACCESS_FULL:{
-                                        renameMenuItem.setVisible(true);
-                                        moveMenuItem.setVisible(true);
-                                        moveToTrashMenuItem.setVisible(true);
-                                        if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-                                            chatMenuItem.setVisible(true);
-                                        }
-                                        else{
-                                            chatMenuItem.setVisible(false);
-                                        }
-                                        break;
+                                case MegaShare.ACCESS_OWNER:
+                                case MegaShare.ACCESS_FULL:{
+                                    renameMenuItem.setVisible(true);
+                                    moveMenuItem.setVisible(true);
+                                    moveToTrashMenuItem.setVisible(true);
+                                    if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                        chatMenuItem.setVisible(true);
                                     }
-                                    case MegaShare.ACCESS_READWRITE:
-                                    case MegaShare.ACCESS_READ:{
-                                        renameMenuItem.setVisible(false);
-                                        moveMenuItem.setVisible(false);
-                                        moveToTrashMenuItem.setVisible(false);
+                                    else{
                                         chatMenuItem.setVisible(false);
-                                        break;
                                     }
+                                    break;
+                                }
+                                case MegaShare.ACCESS_READWRITE:
+                                case MegaShare.ACCESS_READ:{
+                                    renameMenuItem.setVisible(false);
+                                    moveMenuItem.setVisible(false);
+                                    moveToTrashMenuItem.setVisible(false);
+                                    chatMenuItem.setVisible(false);
+                                    break;
                                 }
                             }
+                        }
+                        else{
+                            if(mega.privacy.android.app.utils.Util.isChatEnabled()){
+                                chatMenuItem.setVisible(true);
+                            }
                             else{
-                                if(mega.privacy.android.app.utils.Util.isChatEnabled()){
-                                    chatMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatMenuItem.setVisible(false);
-                                }
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
+                                chatMenuItem.setVisible(false);
+                            }
+                            renameMenuItem.setVisible(true);
+                            moveMenuItem.setVisible(true);
 
 //                                node = megaApi.getNodeByHandle(handle);
 //
 //                                final long handle = node.getHandle();
-                                MegaNode parent = megaApi.getNodeByHandle(handle);
+                            MegaNode parent = megaApi.getNodeByHandle(handle);
 
-                                while (megaApi.getParentNode(parent) != null){
-                                    parent = megaApi.getParentNode(parent);
-                                }
+                            while (megaApi.getParentNode(parent) != null){
+                                parent = megaApi.getParentNode(parent);
+                            }
 
-                                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
 
-                                    moveToTrashMenuItem.setVisible(true);
-                                    removeMenuItem.setVisible(false);
+                                moveToTrashMenuItem.setVisible(true);
+                                removeMenuItem.setVisible(false);
 
-                                }
-                                else{
-                                    moveToTrashMenuItem.setVisible(false);
-                                    removeMenuItem.setVisible(true);
-                                    getlinkMenuItem.setVisible(false);
-                                    removelinkMenuItem.setVisible(false);
-                                }
+                            }
+                            else{
+                                moveToTrashMenuItem.setVisible(false);
+                                removeMenuItem.setVisible(true);
+                                getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
                             }
                         }
                     }
@@ -2994,6 +3026,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
             i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
+            if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                i.putExtra("firstLevel", false);
+            }
             i.putExtra("name", node.getName());
         }
         startActivity(i);
@@ -4272,7 +4308,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             case MotionEvent.ACTION_UP: {
                 if (creatingPlaylist && player != null){
                     currentWindowIndex++;
-                    initPlaylist(currentWindowIndex, 0);
+                    setPlaylist(currentWindowIndex);
                 }
                 break;
             }
@@ -4302,7 +4338,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             playWhenReady = player.getPlayWhenReady();
             if (creatingPlaylist){
                 currentTime = player.getCurrentPosition();
-                initPlaylist(currentWindowIndex, currentTime);
+                setPlaylist(currentWindowIndex);
             }
         }
         onPlaylist = true;
@@ -4478,7 +4514,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     instantiatePlaylist();
                 }
                 if (playbackStateSaved == Player.STATE_ENDED){
-                    initPlaylist(currentWindowIndex+1, 0);
+                    setPlaylist(currentWindowIndex + 1);
                 }
             }
         }
