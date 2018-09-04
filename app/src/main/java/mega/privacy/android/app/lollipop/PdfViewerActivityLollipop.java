@@ -1599,6 +1599,49 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
+            else if (type == Constants.INCOMING_SHARES_ADAPTER) {
+                propertiesMenuItem.setVisible(true);
+                chatMenuItem.setVisible(true);
+                copyMenuItem.setVisible(true);
+                removeMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+
+                if (isUrl){
+                    downloadMenuItem.setVisible(true);
+                    shareMenuItem.setVisible(false);
+                }
+                else {
+                    downloadMenuItem.setVisible(false);
+                    shareMenuItem.setVisible(true);
+                }
+
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                int accessLevel = megaApi.getAccess(node);
+
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_FULL: {
+                        log("access FULL");
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+
+                        break;
+                    }
+                    case MegaShare.ACCESS_READ:
+                        log("access read");
+                    case MegaShare.ACCESS_READWRITE: {
+                        log("readwrite");
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                }
+            }
             else {
                 shareMenuItem.setVisible(true);
                 boolean shareVisible = true;
@@ -1626,10 +1669,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         shareVisible = false;
                     }
                     else{
-                        if(fromShared){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
                         if(isFolderLink){
                             shareMenuItem.setVisible(false);
                             shareVisible = false;
@@ -1647,122 +1686,91 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             removelinkMenuItem.setVisible(false);
                         }
                         else{
-                            if(fromShared){
-                                removelinkMenuItem.setVisible(false);
+                            if(isFolderLink){
                                 getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
+
                             }
                             else{
-                                if(isFolderLink){
-                                    getlinkMenuItem.setVisible(false);
-                                    removelinkMenuItem.setVisible(false);
-
-                                }
-                                else{
-                                    getlinkMenuItem.setVisible(true);
-                                    removelinkMenuItem.setVisible(false);
-                                }
+                                getlinkMenuItem.setVisible(true);
+                                removelinkMenuItem.setVisible(false);
                             }
                         }
                     }
 
-                    if(fromShared){
+                    if(isFolderLink){
+                        propertiesMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
                         removeMenuItem.setVisible(false);
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        copyMenuItem.setVisible(false);
                         chatMenuItem.setVisible(false);
-
-                        node = megaApi.getNodeByHandle(handle);
-                        int accessLevel = megaApi.getAccess(node);
-
-                        switch(accessLevel){
-                            case MegaShare.ACCESS_OWNER:
-                            case MegaShare.ACCESS_FULL:{
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
-                                moveToTrashMenuItem.setVisible(true);
-                                break;
-                            }
-                            case MegaShare.ACCESS_READWRITE:
-                            case MegaShare.ACCESS_READ:{
-                                renameMenuItem.setVisible(false);
-                                moveMenuItem.setVisible(false);
-                                moveToTrashMenuItem.setVisible(false);
-                                break;
-                            }
-                        }
                     }
                     else{
-                        if(isFolderLink){
-                            propertiesMenuItem.setVisible(false);
-                            moveToTrashMenuItem.setVisible(false);
-                            removeMenuItem.setVisible(false);
-                            renameMenuItem.setVisible(false);
-                            moveMenuItem.setVisible(false);
-                            copyMenuItem.setVisible(false);
-                            chatMenuItem.setVisible(false);
-                        }
-                        else{
-                            propertiesMenuItem.setVisible(true);
+                        propertiesMenuItem.setVisible(true);
 
-                            if(type==Constants.CONTACT_FILE_ADAPTER){
-                                removeMenuItem.setVisible(false);
-                                node = megaApi.getNodeByHandle(handle);
-                                int accessLevel = megaApi.getAccess(node);
-                                switch(accessLevel){
-                                    case MegaShare.ACCESS_OWNER:
-                                    case MegaShare.ACCESS_FULL:{
-                                        renameMenuItem.setVisible(true);
-                                        moveMenuItem.setVisible(true);
-                                        moveToTrashMenuItem.setVisible(true);
-                                        if(Util.isChatEnabled()){
-                                            chatMenuItem.setVisible(true);
-                                        }
-                                        else{
-                                            chatMenuItem.setVisible(false);
-                                        }
-                                        break;
+                        if(type==Constants.CONTACT_FILE_ADAPTER){
+                            removeMenuItem.setVisible(false);
+                            node = megaApi.getNodeByHandle(handle);
+                            int accessLevel = megaApi.getAccess(node);
+                            switch(accessLevel){
+                                case MegaShare.ACCESS_OWNER:
+                                case MegaShare.ACCESS_FULL:{
+                                    renameMenuItem.setVisible(true);
+                                    moveMenuItem.setVisible(true);
+                                    moveToTrashMenuItem.setVisible(true);
+                                    if(Util.isChatEnabled()){
+                                        chatMenuItem.setVisible(true);
                                     }
-                                    case MegaShare.ACCESS_READWRITE:
-                                    case MegaShare.ACCESS_READ:{
-                                        renameMenuItem.setVisible(false);
-                                        moveMenuItem.setVisible(false);
-                                        moveToTrashMenuItem.setVisible(false);
+                                    else{
                                         chatMenuItem.setVisible(false);
-                                        break;
                                     }
+                                    break;
+                                }
+                                case MegaShare.ACCESS_READWRITE:
+                                case MegaShare.ACCESS_READ:{
+                                    renameMenuItem.setVisible(false);
+                                    moveMenuItem.setVisible(false);
+                                    moveToTrashMenuItem.setVisible(false);
+                                    chatMenuItem.setVisible(false);
+                                    break;
                                 }
                             }
+                        }
+                        else{
+                            if(Util.isChatEnabled()){
+                                chatMenuItem.setVisible(true);
+                            }
                             else{
-                                if(Util.isChatEnabled()){
-                                    chatMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatMenuItem.setVisible(false);
-                                }
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
+                                chatMenuItem.setVisible(false);
+                            }
+                            renameMenuItem.setVisible(true);
+                            moveMenuItem.setVisible(true);
 
-                                node = megaApi.getNodeByHandle(handle);
+                            node = megaApi.getNodeByHandle(handle);
 
-                                final long handle = node.getHandle();
-                                MegaNode parent = megaApi.getNodeByHandle(handle);
+                            final long handle = node.getHandle();
+                            MegaNode parent = megaApi.getNodeByHandle(handle);
 
-                                while (megaApi.getParentNode(parent) != null){
-                                    parent = megaApi.getParentNode(parent);
-                                }
+                            while (megaApi.getParentNode(parent) != null){
+                                parent = megaApi.getParentNode(parent);
+                            }
 
-                                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-                                    moveToTrashMenuItem.setVisible(true);
-                                    removeMenuItem.setVisible(false);
+                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                                moveToTrashMenuItem.setVisible(true);
+                                removeMenuItem.setVisible(false);
 
-                                }
-                                else{
-                                    moveToTrashMenuItem.setVisible(false);
-                                    removeMenuItem.setVisible(true);
-                                    getlinkMenuItem.setVisible(false);
-                                    removelinkMenuItem.setVisible(false);
-                                }
+                            }
+                            else{
+                                moveToTrashMenuItem.setVisible(false);
+                                removeMenuItem.setVisible(true);
+                                getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
                             }
                         }
                     }
+
                     if (isUrl){
                         downloadMenuItem.setVisible(true);
                         shareMenuItem.setVisible(false);
@@ -2296,6 +2304,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             i.putExtra("handle", node.getHandle());
             i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
+            if (type == Constants.INCOMING_SHARES_ADAPTER) {
+                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                i.putExtra("firstLevel", false);
+            }
         }
         startActivity(i);
         renamed = false;
