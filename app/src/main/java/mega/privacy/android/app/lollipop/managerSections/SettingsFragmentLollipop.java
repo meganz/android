@@ -1311,6 +1311,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 			cameraUploadWhat.setSummary(fileUpload);
+			dbH.setCamSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 				Intent photosVideosIntent = null;
