@@ -213,11 +213,11 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 startUploads();
             } catch (Exception e) {}
 
-            stopForeground(true);
-            if (mNotificationManager != null){
-                mNotificationManager.cancel(notificationId);
-            }
-            jobFinished(globalParams, true);
+//            stopForeground(true);
+//            if (mNotificationManager != null){
+//                mNotificationManager.cancel(notificationId);
+//            }
+//            jobFinished(globalParams, true);
         }
     }
 
@@ -1238,7 +1238,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                     }
                                 }
                             }
-                        }, 60000);
+                        }, 30000);
 
                         return LOGIN_IN;
                     }
@@ -1906,6 +1906,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             else{
                 log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+                cancel();
             }
         }
     }
