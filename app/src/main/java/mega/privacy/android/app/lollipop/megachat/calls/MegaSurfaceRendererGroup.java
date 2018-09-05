@@ -101,19 +101,19 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         dstRect.bottom = dstHeight;
         dstRectf = new RectF(dstRect);
 
-        adjustAspectRatio();
+//        adjustAspectRatio();
     }
 
-    private void adjustAspectRatio() {
-        if (bitmap != null && dstRect.height() != 0) {
-            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
-            dstRect.top = 0;
-            dstRect.left = 0;
-            dstRect.right = surfaceWidth;
-            dstRect.bottom = (int)(surfaceWidth/srcaspectratio);
-            dstRectf = new RectF(dstRect);
-        }
-    }
+//    private void adjustAspectRatio() {
+//        if (bitmap != null && dstRect.height() != 0) {
+//            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
+//            dstRect.top = 0;
+//            dstRect.left = 0;
+//            dstRect.right = surfaceWidth;
+//            dstRect.bottom = (int)(surfaceWidth/srcaspectratio);
+//            dstRectf = new RectF(dstRect);
+//        }
+//    }
 
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d("MegaSurfaceRenderer","surfaceCreated()");
@@ -179,12 +179,50 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             catch (Exception e) {
             }
         }
-        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        srcRect.left = 0;
-        srcRect.top = 0;
-        srcRect.bottom = height;
-        srcRect.right = width;
-        adjustAspectRatio();
+
+        if(height == width){
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            srcRect.top = 0;
+            srcRect.bottom = height;
+            srcRect.left = 0;
+            srcRect.right = width;
+
+        }else if(height > width){
+            int newHeight = width;
+            bitmap = Bitmap.createBitmap(width, newHeight, Bitmap.Config.ARGB_8888);
+            srcRect.top = 0;
+            srcRect.bottom = newHeight;
+            srcRect.left = 0;
+            srcRect.right = width;
+//            float decrease = height - newHeight;
+//            int decreaseHalf = (int) (decrease/2);
+//
+//            srcRect.top = decreaseHalf;
+//            srcRect.bottom = (height - decreaseHalf);
+//            srcRect.left = 0;
+//            srcRect.right = width;
+        }else{
+            int newWidth = height;
+            bitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888);
+            srcRect.left = 0;
+            srcRect.right = newWidth;
+            srcRect.top = 0;
+            srcRect.bottom = height;
+//            float decrease = width - newWidth;
+//            int decreaseHalf = (int) (decrease/2);
+//
+//            srcRect.left = decreaseHalf;
+//            srcRect.right = (width - decreaseHalf);
+//            srcRect.top = 0;
+//            srcRect.bottom = height;
+        }
+
+//        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//        srcRect.left = 0;
+//        srcRect.top = 0;
+//        srcRect.bottom = height;
+//        srcRect.right = width;
+//        adjustAspectRatio();
 
         return bitmap;
     }
