@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -115,7 +116,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
         }
-
     }
 
     @Override
@@ -640,16 +640,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     @Override
     public int getItemCount() {
         if (peers != null){
-            log("getItemCount() -> "+peers.size());
             return peers.size();
         }else{
-            log("getItemCount() -> 0");
             return 0;
         }
     }
 
     public Object getItem(int position) {
-        log("getItem()");
+        log("getItem() position "+position);
 
         if (peers != null){
             return peers.get(position);
@@ -659,7 +657,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
     public InfoPeerGroupCall getNodeAt(int position) {
-        log("getNodeAt() position-> "+position);
+        log("getNodeAt() position "+position);
 
         try {
             if (peers != null) {
