@@ -199,8 +199,8 @@ public class NodeController {
         selectChatsToSendNodes(longArray);
     }
 
-    public void checkIfNodeIsMineAndSelctChatsToSendNode (MegaNode node) {
-        log("checkIfNodeIsMineAndSelctChatsToSendNode");
+    public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
+        log("checkIfNodeIsMineAndSelectChatsToSendNode");
         if (node != null) {
             if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
                 selectChatsToSendNode(node);
