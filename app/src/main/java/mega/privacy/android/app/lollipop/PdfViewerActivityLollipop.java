@@ -232,6 +232,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     boolean notChangePage = false;
     MegaNode currentDocument;
 
+    boolean sendToChat = false;
+
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -1601,7 +1603,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
             else if (type == Constants.INCOMING_SHARES_ADAPTER) {
                 propertiesMenuItem.setVisible(true);
-                chatMenuItem.setVisible(true);
+                if(Util.isChatEnabled()){
+                    chatMenuItem.setVisible(true);
+                }
+                else{
+                    chatMenuItem.setVisible(false);
+                }
                 copyMenuItem.setVisible(true);
                 removeMenuItem.setVisible(false);
                 importMenuItem.setVisible(false);
@@ -1818,8 +1825,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-
-                nC.selectChatsToSendNodes(longArray);
+                if (type == Constants.INCOMING_SHARES_ADAPTER) {
+                    MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                    if (attachNode != null) {
+                        nC.checkIfNodeIsMineAndSelctChatsToSendNode(attachNode);
+                    }
+                }
+                else {
+                    nC.selectChatsToSendNodes(longArray);
+                }
                 break;
             }
             case R.id.pdf_viewer_properties: {
@@ -2307,6 +2321,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (type == Constants.INCOMING_SHARES_ADAPTER) {
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);
+            }
+            else if(type == Constants.INBOX_ADAPTER){
+                i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
             }
         }
         startActivity(i);
@@ -2888,7 +2905,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+                        && type == Constants.INCOMING_SHARES_ADAPTER) {
+                    log("Incoming node copied to Send to chat");
+                    MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
+                    if (attachNode != null) {
+                        nC.selectChatsToSendNode(attachNode);
+                    }
+                }
+                else {
+                    Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+                }
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
                 log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2907,6 +2934,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             else{
                 Snackbar.make(pdfviewerContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
             }
+            sendToChat = false;
             log("copy nodes request finished");
         }
     }
@@ -3330,5 +3358,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
+    }
+
+    public void setSendToChat (boolean sendToChat) {
+        this.sendToChat = sendToChat;
     }
 }
