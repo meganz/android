@@ -420,30 +420,6 @@
                     android:layout_centerHorizontal="true"/>
 
             </RelativeLayout>
-            <!--<android.support.design.widget.CoordinatorLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_alignParentRight="true">-->
-            <!--<android.support.design.widget.FloatingActionButton-->
-            <!--android:id="@+id/fab_chat"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--app:fabSize="mini"-->
-            <!--android:layout_gravity="bottom|end"-->
-            <!--app:elevation="6dp"-->
-            <!--app:borderWidth="0dp"-->
-            <!--android:scaleType="center"-->
-            <!--app:backgroundTint="@color/accentColor"-->
-            <!--app:pressedTranslationZ="12dp"-->
-            <!--android:layout_marginLeft="16dp"-->
-            <!--android:layout_marginRight="16dp"-->
-            <!--android:layout_marginBottom="12dp"-->
-            <!--android:src="@drawable/ic_add_white"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_alignParentBottom="true"/>-->
-            <!--</android.support.design.widget.CoordinatorLayout>-->
-
         </RelativeLayout>
 
     </RelativeLayout>

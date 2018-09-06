@@ -20,7 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-
                 <!-- Layout for group call -->
                 <RelativeLayout
                     android:id="@+id/big_elements_group_call"

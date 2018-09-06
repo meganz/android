@@ -1741,6 +1741,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public boolean checkPermissionsCall(){
+        log("checkPermissionsCall() ");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -2260,16 +2261,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                break;
 //			}
             case R.id.call_in_progress_layout:{
-                MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
-                if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
-                    megaChatApi.startChatCall(idChat, false, null);
-                }
-                else{
-                    Intent intent = new Intent(this, ChatCallActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if(checkPermissionsCall()){
+                    MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                    if(callInProgress.getStatus()==MegaChatCall.CALL_STATUS_USER_NO_PRESENT){
+                        megaChatApi.startChatCall(idChat, false, null);
+                    }else{
+                        Intent intent = new Intent(this, ChatCallActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));
-                    intent.putExtra("chatHandle", idChat);
-                    startActivity(intent);
+                        intent.putExtra("chatHandle", idChat);
+                        startActivity(intent);
+                    }
                 }
                 break;
             }
