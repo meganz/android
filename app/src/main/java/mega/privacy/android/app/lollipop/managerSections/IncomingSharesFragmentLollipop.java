@@ -248,7 +248,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					log("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
-					nC.checkIfNodeIsMineAndSelctChatsToSendNode(nodesSelected.get(0));
+					nC.checkIfNodeIsMineAndSelectChatsToSendNode(nodesSelected.get(0));
 					clearSelections();
 					hideMultipleSelect();
 					break;

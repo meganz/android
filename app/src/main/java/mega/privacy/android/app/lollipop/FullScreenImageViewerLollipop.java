@@ -623,7 +623,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
 					MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
 					if (attachNode != null) {
-						nC.checkIfNodeIsMineAndSelctChatsToSendNode(attachNode);
+						nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
 					}
 				}
 				else {
