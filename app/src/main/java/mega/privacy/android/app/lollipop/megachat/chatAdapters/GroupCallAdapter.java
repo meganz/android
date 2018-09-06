@@ -130,7 +130,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }
     }
 
-    /*private view holder class*/
     public class ViewHolderGroupCall extends RecyclerView.ViewHolder{
 
         RelativeLayout rlGeneral;
