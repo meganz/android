@@ -83,8 +83,9 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     }
 
     @Override
-    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer)
-    {
+    public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer){
+        log("onChatVideoData");
+
         if((width == 0) || (height == 0)){
             return;
         }
@@ -127,15 +128,20 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
 
     @Override
     public void onAttach(Context context) {
+        log("onAttach");
+
         super.onAttach(context);
         this.context = context;
     }
 
     @Override
     public void onDestroy(){
+        log("onDestroy");
+
         megaChatApi.removeChatVideoListener(chatId, userHandle, this);
         super.onDestroy();
     }
+
     @Override
     public void onResume() {
         log("onResume");
@@ -145,6 +151,7 @@ public class RemoteCameraCallFullScreenFragment extends Fragment implements Mega
     }
 
     public void setVideoFrame(boolean visible){
+        log("setVideoFrame");
         if(visible){
             remoteFullScreenSurfaceView.setVisibility(View.VISIBLE);
         }

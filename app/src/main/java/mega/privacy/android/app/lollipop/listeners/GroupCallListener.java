@@ -19,11 +19,13 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
     Context context;
     GroupCallAdapter.ViewHolderGroupCall holder;
+
     int width;
     int height;
     Bitmap bitmap;
 
     public GroupCallListener(Context context, GroupCallAdapter.ViewHolderGroupCall holder) {
+        log("GroupCallListener");
         this.context = context;
         this.holder = holder;
         this.width = 0;
@@ -70,6 +72,15 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
             // The renderer has been modified a bit and an update of WebRTC could break our app
             holder.localRenderer.DrawBitmap(false);
         }
+    }
+
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     private static void log(String log) {

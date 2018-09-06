@@ -317,20 +317,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                                 peersOnCall.add(myPeer);
                                 changes = true;
-
-//                                if(peersOnCall.size() <= 3){
-//                                    recyclerView.setColumnWidth((int) widthScreenPX);
-//                                }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                                }
-//                                recyclerView.setAdapter(null);
-//                                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                                recyclerView.setAdapter(adapter);
-//                                if (adapter.getItemCount() == 0){
-//                                    recyclerView.setVisibility(View.GONE);
-//                                }else{
-//                                    recyclerView.setVisibility(View.VISIBLE);
-//                                }
                             }else{
                                 MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                                 if(userSession!=null){
@@ -339,19 +325,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                         InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), null, null);
                                         peersOnCall.add(0, userPeer);
                                         changes = true;
-//                                        if(peersOnCall.size() <= 3){
-//                                            recyclerView.setColumnWidth((int) widthScreenPX);
-//                                        }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                                            recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                                        }
-//                                        recyclerView.setAdapter(null);
-//                                        adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                                        recyclerView.setAdapter(adapter);
-//                                        if (adapter.getItemCount() == 0){
-//                                            recyclerView.setVisibility(View.GONE);
-//                                        }else{
-//                                            recyclerView.setVisibility(View.VISIBLE);
-//                                        }
                                     }
                                 }
                             }
@@ -360,7 +333,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 if(changes){
-                    createNewAdapter(peersOnCall.size());
+                    createNewAdapter();
                 }
 
             }else{
@@ -372,19 +345,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                         peersOnCall.add(myPeer);
                         changes = true;
-//                        if(peersOnCall.size() <= 3){
-//                            recyclerView.setColumnWidth((int) widthScreenPX);
-//                        }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                            recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                        }
-//                        recyclerView.setAdapter(null);
-//                        adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                        recyclerView.setAdapter(adapter);
-//                        if (adapter.getItemCount() == 0){
-//                            recyclerView.setVisibility(View.GONE);
-//                        }else{
-//                            recyclerView.setVisibility(View.VISIBLE);
-//                        }
                     }else{
                         MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                         if(userSession!=null){
@@ -393,19 +353,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), null, null);
                                 peersOnCall.add(0, userPeer);
                                 changes = true;
-//                                if(peersOnCall.size() <= 3){
-//                                    recyclerView.setColumnWidth((int) widthScreenPX);
-//                                }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                                }
-//                                recyclerView.setAdapter(null);
-//                                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                                recyclerView.setAdapter(adapter);
-//                                if (adapter.getItemCount() == 0){
-//                                    recyclerView.setVisibility(View.GONE);
-//                                }else{
-//                                    recyclerView.setVisibility(View.VISIBLE);
-//                                }
                             }else{
                                 log("updateScreenStatusInProgress()-userSession.getStatus():  "+userSession.getStatus());
                             }
@@ -414,7 +361,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
                 if(changes){
-                    createNewAdapter(peersOnCall.size());
+                    createNewAdapter();
                 }
             }
 
@@ -869,20 +816,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         log("onCreate()-OutgoingCall: peersOnCall.add("+megaChatApi.getMyFullname()+")");
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                         peersOnCall.add(myPeer);
-                        createNewAdapter(peersOnCall.size());
-//                        if(peersOnCall.size() <= 3){
-//                            recyclerView.setColumnWidth((int) widthScreenPX);
-//                        }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                            recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                        }
-//                        recyclerView.setAdapter(null);
-//                        adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                        recyclerView.setAdapter(adapter);
-//                        if (adapter.getItemCount() == 0){
-//                            recyclerView.setVisibility(View.GONE);
-//                        }else{
-//                            recyclerView.setVisibility(View.VISIBLE);
-//                        }
+                        createNewAdapter();
                     }else{
                         log("Outgoing individual call");
 
@@ -1191,9 +1125,18 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     protected void onResume() {
         log("onResume");
+        if(peersOnCall!=null){
+            if(peersOnCall.size()!=0){
+                for(InfoPeerGroupCall peer :peersOnCall){
+                    if(peer.getListener()!=null){
+                        peer.getListener().setHeight(0);
+                        peer.getListener().setWidth(0);
+                    }
 
-//        this.width=0;
-//        this.height=0;
+                }
+            }
+        }
+
         super.onResume();
 //        adapter.notifyDataSetChanged();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -1204,6 +1147,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if((callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)||(callChat.getStatus()==MegaChatCall.CALL_STATUS_REQUEST_SENT)){
             ((MegaApplication) getApplication()).sendSignalPresenceActivity();
         }
+
+
     }
 
     @Override
@@ -1388,42 +1333,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     log("CALL_STATUS_IN_PROGRESS- peersOnCall.add("+megaChatApi.getMyFullname()+")");
                                     InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                                     peersOnCall.add(myPeer);
-                                    createNewAdapter(peersOnCall.size());
-//                                    if(peersOnCall.size() <= 3){
-//                                        recyclerView.setColumnWidth((int) widthScreenPX);
-//                                    }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                                        recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                                    }
-//
-//                                    recyclerView.setAdapter(null);
-//                                    adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                                    recyclerView.setAdapter(adapter);
-//                                    if (adapter.getItemCount() == 0){
-//                                        recyclerView.setVisibility(View.GONE);
-//                                    }else{
-//                                        recyclerView.setVisibility(View.VISIBLE);
-//                                    }
+                                    createNewAdapter();
                                 }
                             }else{
                                 log("CALL_STATUS_IN_PROGRESS- peersOnCall.add("+megaChatApi.getMyFullname()+")");
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                                 peersOnCall.add(myPeer);
-                                createNewAdapter(peersOnCall.size());
-
-//                                if(peersOnCall.size() <= 3){
-//                                    recyclerView.setColumnWidth((int) widthScreenPX);
-//                                }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                                    recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                                }
-//
-//                                recyclerView.setAdapter(null);
-//                                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                                recyclerView.setAdapter(adapter);
-//                                if (adapter.getItemCount() == 0){
-//                                    recyclerView.setVisibility(View.GONE);
-//                                }else{
-//                                    recyclerView.setVisibility(View.VISIBLE);
-//                                }
+                                createNewAdapter();
                             }
                             updateLocalVideoStatus();
                             updateLocalAudioStatus();
@@ -1529,20 +1445,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     log("CHANGE_TYPE_SESSION_STATUS: peersOnCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
                                     InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), null, null);
                                     peersOnCall.add(0, userPeer);
-                                    createNewAdapter(peersOnCall.size());
-//                                    if(peersOnCall.size() <= 3){
-//                                        recyclerView.setColumnWidth((int) widthScreenPX);
-//                                    }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-//                                        recyclerView.setColumnWidth((int) widthScreenPX/2);
-//                                    }
-//                                    recyclerView.setAdapter(null);
-//                                    adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//                                    recyclerView.setAdapter(adapter);
-//                                    if (adapter.getItemCount() == 0){
-//                                        recyclerView.setVisibility(View.GONE);
-//                                    }else{
-//                                        recyclerView.setVisibility(View.VISIBLE);
-//                                    }
+                                    createNewAdapter();
                                 }
                             }
 
@@ -1563,7 +1466,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
 
                             if(changes){
-                                createNewAdapter(peersOnCall.size());
+                                createNewAdapter();
                             }
 
 //                            if(peersOnCall.size() <= 3){
@@ -2524,9 +2427,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
 
-    public void createNewAdapter(int numOfPeers){
+    public void createNewAdapter(){
         log("createNewAdapter");
-
         if(peersOnCall.size() <= 3){
             recyclerView.setColumnWidth((int) widthScreenPX);
         }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
@@ -2540,49 +2442,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }else{
             recyclerView.setVisibility(View.VISIBLE);
         }
-
-//        if(numOfPeers == 1 ){
-//            recyclerView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-//        }else if(numOfPeers == 2){
-//            ViewGroup.LayoutParams params=recyclerView.getLayoutParams();
-//            params.width = (Util.scaleWidthPx(320, outMetrics));
-//            params.height= (Util.scaleWidthPx(320, outMetrics))*2;
-//            recyclerView.setLayoutParams(params);
-//            recyclerView.setColumnWidth(Util.scaleWidthPx(320, outMetrics));
-//            log("#### 5Recycler: peers("+numOfPeers+") ---> (w 180*2, h 180*2)");
-//
-////            ViewGroup.LayoutParams params=recyclerView.getLayoutParams();
-////            params.width = (int) widthScreenPX;
-////            params.height= (int) heightScreenPX;
-////            recyclerView.setLayoutParams(params);
-////            recyclerView.setColumnWidth((int) widthScreenPX);
-////            log("#### 4Recycler: peers("+numOfPeers+") ---> (w "+widthScreenPX+", h "+heightScreenPX+")");
-//
-//        }else if(numOfPeers == 4){
-//            ViewGroup.LayoutParams params=recyclerView.getLayoutParams();
-//            params.width = (Util.scaleWidthPx(180, outMetrics))*2;
-//            params.height= (Util.scaleWidthPx(180, outMetrics))*2;
-//            recyclerView.setLayoutParams(params);
-//            recyclerView.setColumnWidth(Util.scaleWidthPx(180, outMetrics));
-//            log("#### 5Recycler: peers("+numOfPeers+") ---> (w 180*2, h 180*2)");
-//
-//        }else if(numOfPeers > 4){
-//            ViewGroup.LayoutParams params=recyclerView.getLayoutParams();
-//            params.width = (Util.scaleWidthPx(180, outMetrics))*2;
-//            params.height= (Util.scaleWidthPx(180, outMetrics))*3;
-//            recyclerView.setLayoutParams(params);
-//            recyclerView.setColumnWidth(Util.scaleWidthPx(180, outMetrics));
-//            log("#### 6Recycler: peers("+numOfPeers+") ---> (w 180*2, h 180*3)");
-//        }
-//
-//        recyclerView.setAdapter(null);
-//        adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, GroupCallAdapter.ITEM_VIEW_TYPE_GRID, true);
-//        recyclerView.setAdapter(adapter);
-//        if (adapter.getItemCount() == 0){
-//            recyclerView.setVisibility(View.GONE);
-//        }else{
-//            recyclerView.setVisibility(View.VISIBLE);
-//        }
     }
 
 }
