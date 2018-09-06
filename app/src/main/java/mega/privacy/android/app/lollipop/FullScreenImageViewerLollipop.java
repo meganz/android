@@ -230,6 +230,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	ArrayList<File> zipFiles = new ArrayList<>();
 
+	boolean sendToChat = false;
+
 	@Override
 	public void onDestroy(){
 
@@ -399,7 +401,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
 			propertiesIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			chatIcon.setVisible(true);
+			if(Util.isChatEnabled()){
+				chatIcon.setVisible(true);
+			}
+			else{
+				chatIcon.setVisible(false);
+			}
 			copyIcon.setVisible(true);
 			removeIcon.setVisible(false);
 			getlinkIcon.setVisible(false);
@@ -613,8 +620,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				if(nC ==null){
 					nC = new NodeController(this, isFolderLink);
 				}
-
-				nC.selectChatsToSendNodes(longArray);
+				if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+					MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+					if (attachNode != null) {
+						nC.checkIfNodeIsMineAndSelctChatsToSendNode(attachNode);
+					}
+				}
+				else {
+					nC.selectChatsToSendNodes(longArray);
+				}
 				break;
 			}
 
@@ -722,6 +736,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
 						i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
 						i.putExtra("firstLevel", false);
+					}
+					else if(adapterType == Constants.INBOX_ADAPTER){
+						i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
 					}
 					startActivity(i);
 					break;
@@ -2479,7 +2496,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+						&& adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+					log("Incoming node copied to Send to chat");
+					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
+					if (attachNode != null) {
+						nC.selectChatsToSendNode(attachNode);
+					}
+				}
+				else {
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+				}
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2499,6 +2526,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else{
 				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 			}
+			sendToChat = false;
 			log("copy nodes request finished");
 		}
 	}
@@ -3409,5 +3437,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 //		}
 	}
 
+	public void setSendToChat (boolean sendToChat) {
+		this.sendToChat = sendToChat;
+	}
 
 }

@@ -1200,7 +1200,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 						imageDrag = imageView;
 					}
-					if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
+					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
 						log("Is URL file");
 						InputStream instream = null;
 						try {
