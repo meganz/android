@@ -2052,7 +2052,8 @@
 
     <string name="settings_file_management_category" context="Title of the section File management on Settings section">File management</string>
 
-    <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">Delete all file versions</string>
+    <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">Delete all my older versions of files</string>
+    <string name="settings_file_management_subtitle_delete_versions" context="subtitle of the option in Settings to delete all the versions of the account">All current files will remain. Only historic versions of your files will be deleted.</string>
 
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
 
