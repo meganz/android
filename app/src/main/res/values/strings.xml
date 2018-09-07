@@ -726,7 +726,7 @@
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your MEGA\'s local files will be deleted and you will be logged out after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
     <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Wrong PIN code, please try again. You have %2d attempts left</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Codes don\'t match</string>
