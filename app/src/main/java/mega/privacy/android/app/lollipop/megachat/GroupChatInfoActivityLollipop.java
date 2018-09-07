@@ -293,11 +293,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if(chat.isArchived()){
                 archiveChatTitle.setText(getString(R.string.general_unarchive));
-                archiveChatIcon.setImageDrawable(getDrawable(R.drawable.ic_b_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_unarchive));
             }
             else{
                 archiveChatTitle.setText(getString(R.string.general_archive));
-                archiveChatIcon.setImageDrawable(getDrawable(R.drawable.ic_b_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,(R.drawable.ic_b_archive)));
             }
 
             //Leave chat Layout
@@ -643,25 +643,49 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
 
         final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
-        administratorCheck.setText(getString(R.string.administrator_permission_label_participants_panel));
-        administratorCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
-        administratorMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        administratorMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+
+        final TextView administratorTitle = (TextView) dialoglayout.findViewById(R.id.administrator_title);
+        administratorTitle.setText(getString(R.string.administrator_permission_label_participants_panel));
+        administratorTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
+        final TextView administratorSubtitle = (TextView) dialoglayout.findViewById(R.id.administrator_subtitle);
+        administratorSubtitle.setText(getString(R.string.file_properties_shared_folder_full_access));
+        administratorSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
+        final LinearLayout administratorTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.administrator_text_layout);
+        ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
+        administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
         final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
-        memberCheck.setText(getString(R.string.standard_permission_label_participants_panel));
-        memberCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
-        memberMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        memberMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+
+        final TextView memberTitle = (TextView) dialoglayout.findViewById(R.id.member_title);
+        memberTitle.setText(getString(R.string.standard_permission_label_participants_panel));
+        memberTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
+        final TextView memberSubtitle = (TextView) dialoglayout.findViewById(R.id.member_subtitle);
+        memberSubtitle.setText(getString(R.string.file_properties_shared_folder_read_write));
+        memberSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
+        final LinearLayout memberTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.member_text_layout);
+        ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
+        memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
         final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
-        observerCheck.setText(getString(R.string.observer_permission_label_participants_panel));
-        observerCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
-        observerMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        observerMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+
+        final TextView observerTitle = (TextView) dialoglayout.findViewById(R.id.observer_title);
+        observerTitle.setText(getString(R.string.observer_permission_label_participants_panel));
+        observerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
+        final TextView observerSubtitle = (TextView) dialoglayout.findViewById(R.id.observer_subtitle);
+        observerSubtitle.setText(getString(R.string.subtitle_read_only_permissions));
+        observerSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
+        final LinearLayout observerTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.observer_text_layout);
+        ViewGroup.MarginLayoutParams observerSubtitleMLP = (ViewGroup.MarginLayoutParams) observerTextLayout.getLayoutParams();
+        observerSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setView(dialoglayout);
@@ -1174,11 +1198,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if(chat.isArchived()){
                 archiveChatTitle.setText(getString(R.string.general_unarchive));
-                archiveChatIcon.setImageDrawable(getDrawable(R.drawable.ic_b_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_unarchive));
             }
             else{
                 archiveChatTitle.setText(getString(R.string.general_archive));
-                archiveChatIcon.setImageDrawable(getDrawable(R.drawable.ic_b_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_archive));
             }
         }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
