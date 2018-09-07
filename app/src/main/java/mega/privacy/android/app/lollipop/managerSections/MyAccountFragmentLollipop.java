@@ -35,9 +35,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +108,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
+	private Bitmap qrAvatarSave;
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		log("onCreate");
@@ -144,10 +145,30 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		log("My user handle string: "+megaApi.getMyUserHandle());
-		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
 
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
 		avatarLayout.setOnClickListener(this);
+
+		if (savedInstanceState != null) {
+			byte[] avatarByteArray = savedInstanceState.getByteArray("qrAvatar");
+			if (avatarByteArray != null) {
+				log("savedInstanceState avatarByteArray != null");
+				qrAvatarSave = BitmapFactory.decodeByteArray(avatarByteArray, 0, avatarByteArray.length);
+				if (qrAvatarSave != null) {
+					log("savedInstanceState qrAvatarSave != null");
+					avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
+				}
+				else {
+					megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+				}
+			}
+			else {
+				megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+			}
+		}
+		else {
+			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+		}
 
 		nameView = (TextView) v.findViewById(R.id.my_account_name);
 		nameView.setOnClickListener(this);
@@ -770,7 +791,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		int w = bitMatrix.getWidth();
 		int h = bitMatrix.getHeight();
 		int[] pixels = new int[w * h];
-		int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
+		int color = ContextCompat.getColor(context, R.color.grey_achievements_invite_friends_sub);
 		float resize = 12.2f;
 
 		Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
@@ -837,34 +858,30 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			String contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
 			Bitmap qrCodeBitmap = queryQR(contactLink);
-			File qrCodeFile = null;
-			if (context.getExternalCacheDir() != null){
-				qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "AvatarQRcode.jpg");
-			}
-			else{
-				qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "AvatarQRcode.jpg");
-			}
-			if (qrCodeFile!= null && qrCodeFile.exists()){
-				qrCodeFile.delete();
-				if (context.getExternalCacheDir() != null){
-					qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "AvatarQRcode.jpg");
-				}
-				else{
-					qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "AvatarQRcode.jpg");
-				}
-			}
-			if (qrCodeFile != null && !qrCodeFile.exists()) {
-				try {
-					FileOutputStream out = new FileOutputStream(qrCodeFile);
-					qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				}
-			}
+			qrAvatarSave = qrCodeBitmap;
 			avatarLayout.setBackground(new BitmapDrawable(qrCodeBitmap));
 		}
 		else {
-			log("");
+			log("Error request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE: " + e.getErrorString());
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		if (qrAvatarSave != null){
+			log("onSaveInstanceState qrAvatarSave != null");
+			ByteArrayOutputStream qrAvatarOutputStream = new ByteArrayOutputStream();
+			qrAvatarSave.compress(Bitmap.CompressFormat.PNG, 100, qrAvatarOutputStream);
+			byte[] qrAvatarByteArray = qrAvatarOutputStream.toByteArray();
+			outState.putByteArray("qrAvatar", qrAvatarByteArray);
 		}
 	}
 
