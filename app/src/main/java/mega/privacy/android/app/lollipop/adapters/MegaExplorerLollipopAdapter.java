@@ -23,9 +23,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
@@ -48,6 +50,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	Context context;
 	MegaApiAndroid megaApi;
+	MegaPreferences prefs;
+
 
 	int positionClicked;
 	ArrayList<Integer> imageIds;
@@ -196,7 +200,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		holder.textViewFileName.setText(node.getName());
 			
 		if (node.isFolder()){
-
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
 			params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
 			params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
@@ -276,20 +279,19 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 				holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 
-			}
-			else{
+			}else{
 				holder.permissionsIcon.setVisibility(View.GONE);
-//				holder.imageView.setImageResource(R.drawable.ic_folder_list);
-				if(((CloudDriveExplorerFragmentLollipop) fragment).isCameraUploads(node)){
+				boolean isCU = isCameraUploads(node);
+				if(isCU){
 					holder.imageView.setImageResource(R.drawable.ic_folder_image_list);
 				}else{
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				}
-
 				holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node, context));
 			}
 		}
 		else{
+
 			holder.permissionsIcon.setVisibility(View.GONE);
 			
 			long nodeSize = node.getSize();
@@ -677,5 +679,80 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		Util.log("MegaExplorerLollipopAdapter", log);
 	}
 
+
+	public boolean isCameraUploads(MegaNode n){
+		log("isCameraUploads()");
+		String cameraSyncHandle = null;
+
+		//Check if the item is the Camera Uploads folder
+		if(dbH.getPreferences()!=null){
+			prefs = dbH.getPreferences();
+			if(prefs.getCamSyncHandle()!=null){
+				cameraSyncHandle = prefs.getCamSyncHandle();
+			}else{
+				cameraSyncHandle = null;
+			}
+		}else{
+			prefs=null;
+		}
+
+		if(cameraSyncHandle!=null){
+			if(!(cameraSyncHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+					return true;
+				}
+
+			}else{
+				if(n.getName().equals("Camera Uploads")){
+					if (prefs != null){
+						prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+					}
+					dbH.setCamSyncHandle(n.getHandle());
+					log("FOUND Camera Uploads!!----> "+n.getHandle());
+					return true;
+				}
+			}
+
+		}else{
+			if(n.getName().equals("Camera Uploads")){
+				if (prefs != null){
+					prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+				}
+				dbH.setCamSyncHandle(n.getHandle());
+				log("FOUND Camera Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+
+		//Check if the item is the Media Uploads folder
+		String secondaryMediaHandle = null;
+
+		if(prefs!=null){
+			if(prefs.getMegaHandleSecondaryFolder()!=null){
+				secondaryMediaHandle =prefs.getMegaHandleSecondaryFolder();
+			}else{
+				secondaryMediaHandle = null;
+			}
+		}
+
+		if(secondaryMediaHandle!=null){
+			if(!(secondaryMediaHandle.equals(""))){
+				if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+					log("Click on Media Uploads");
+					return true;
+				}
+			}
+		}else{
+			if(n.getName().equals(CameraSyncService.SECONDARY_UPLOADS)){
+				if (prefs != null){
+					prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+				}
+				dbH.setSecondaryFolderHandle(n.getHandle());
+				log("FOUND Media Uploads!!: "+n.getHandle());
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
