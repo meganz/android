@@ -572,13 +572,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
 
-	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			addContactFromPhone();
-		}
-	};
-
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1629,7 +1622,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate2FA, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-		LocalBroadcastManager.getInstance(this).registerReceiver(inviteContactsReceiver, new IntentFilter(AddContactActivityLollipop.BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -3979,7 +3971,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(inviteContactsReceiver);
 
     	super.onDestroy();
 	}
