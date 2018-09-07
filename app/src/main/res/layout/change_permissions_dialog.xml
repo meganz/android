@@ -13,13 +13,14 @@
 	    android:orientation="vertical">
 
 		<LinearLayout
-			android:layout_width="wrap_content"
+			android:id="@+id/change_permissions_dialog_administrator_layout"
+			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:orientation="horizontal">
 
 			<CheckedTextView
 				android:id="@+id/change_permissions_dialog_administrator"
-				android:layout_width="match_parent"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 				android:ellipsize="marquee"
@@ -53,13 +54,14 @@
 		</LinearLayout>
 
 		<LinearLayout
-			android:layout_width="wrap_content"
+			android:id="@+id/change_permissions_dialog_member_layout"
+			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:orientation="horizontal">
 
 			<CheckedTextView
 				android:id="@+id/change_permissions_dialog_member"
-				android:layout_width="match_parent"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 				android:ellipsize="marquee"
@@ -93,13 +95,14 @@
 		</LinearLayout>
 
 		<LinearLayout
-			android:layout_width="wrap_content"
+			android:id="@+id/change_permissions_dialog_observer_layout"
+			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:orientation="horizontal">
 
 			<CheckedTextView
 				android:id="@+id/change_permissions_dialog_observer"
-				android:layout_width="match_parent"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
 				android:ellipsize="marquee"
