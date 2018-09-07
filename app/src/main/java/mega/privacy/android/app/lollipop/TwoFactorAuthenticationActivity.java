@@ -577,15 +577,15 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             scrollContainerVerify.setVisibility(View.GONE);
             scrollContainer2FAEnabled.setVisibility(View.VISIBLE);
             if (rkSaved) {
-                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                log("Exists MK in: "+path);
-                File file= new File(path);
-                if(file.exists()){
-                    exportRKButton.setVisibility(View.GONE);
-                }
-                else{
-                    exportRKButton.setVisibility(View.VISIBLE);
-                }
+//                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+//                log("Exists MK in: "+path);
+//                File file= new File(path);
+//                if(file.exists()){
+//                    exportRKButton.setVisibility(View.GONE);
+//                }
+//                else{
+//                    exportRKButton.setVisibility(View.VISIBLE);
+//                }
                 dismissRKButton.setVisibility(View.VISIBLE);
             }
             else {
@@ -923,12 +923,13 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 }
                 break;
             }
-            case R.id.container_rk_2fa: {
-                update2FASetting();
-                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
-                recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
-                break;
-            }
+            case R.id.container_rk_2fa:
+//                {
+//                update2FASetting();
+//                RecoveryKeyBottomSheetDialogFragment recoveryKeyBottomSheetDialogFragment = new RecoveryKeyBottomSheetDialogFragment();
+//                recoveryKeyBottomSheetDialogFragment.show(getSupportFragmentManager(), recoveryKeyBottomSheetDialogFragment.getTag());
+//                break;
+//            }
             case R.id.button_export_rk:{
                 update2FASetting();
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
@@ -1045,15 +1046,15 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
                 if (e.getErrorCode() == MegaError.API_OK && request.getAccess() == 1) {
                     rkSaved = true;
-                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
-                    log("Exists MK in: "+path);
-                    File file= new File(path);
-                    if(file.exists()){
-                        exportRKButton.setVisibility(View.GONE);
-                    }
-                    else{
-                        exportRKButton.setVisibility(View.VISIBLE);
-                    }
+//                    String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+//                    log("Exists MK in: "+path);
+//                    File file= new File(path);
+//                    if(file.exists()){
+//                        exportRKButton.setVisibility(View.GONE);
+//                    }
+//                    else{
+//                        exportRKButton.setVisibility(View.VISIBLE);
+//                    }
                     dismissRKButton.setVisibility(View.VISIBLE);
                 }
                 else {
