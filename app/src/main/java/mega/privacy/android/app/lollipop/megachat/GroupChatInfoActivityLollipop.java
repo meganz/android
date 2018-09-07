@@ -649,10 +649,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         final TextView administratorTitle = (TextView) dialoglayout.findViewById(R.id.administrator_title);
         administratorTitle.setText(getString(R.string.administrator_permission_label_participants_panel));
-        administratorTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        administratorTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
         final TextView administratorSubtitle = (TextView) dialoglayout.findViewById(R.id.administrator_subtitle);
         administratorSubtitle.setText(getString(R.string.file_properties_shared_folder_full_access));
-        administratorSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+        administratorSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout administratorTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.administrator_text_layout);
         ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
         administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
@@ -664,10 +664,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         final TextView memberTitle = (TextView) dialoglayout.findViewById(R.id.member_title);
         memberTitle.setText(getString(R.string.standard_permission_label_participants_panel));
-        memberTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        memberTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
         final TextView memberSubtitle = (TextView) dialoglayout.findViewById(R.id.member_subtitle);
         memberSubtitle.setText(getString(R.string.file_properties_shared_folder_read_write));
-        memberSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+        memberSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout memberTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.member_text_layout);
         ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
         memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
@@ -679,10 +679,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         final TextView observerTitle = (TextView) dialoglayout.findViewById(R.id.observer_title);
         observerTitle.setText(getString(R.string.observer_permission_label_participants_panel));
-        observerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        observerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
         final TextView observerSubtitle = (TextView) dialoglayout.findViewById(R.id.observer_subtitle);
         observerSubtitle.setText(getString(R.string.subtitle_read_only_permissions));
-        observerSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+        observerSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout observerTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.observer_text_layout);
         ViewGroup.MarginLayoutParams observerSubtitleMLP = (ViewGroup.MarginLayoutParams) observerTextLayout.getLayoutParams();
         observerSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
