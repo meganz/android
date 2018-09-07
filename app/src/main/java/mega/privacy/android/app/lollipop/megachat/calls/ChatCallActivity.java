@@ -710,7 +710,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
-
                     ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
                     ringerTimer = new Timer();
                     MyRingerTask myRingerTask = new MyRingerTask();
@@ -778,8 +777,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateScreenStatusInProgress();
 
                 }else{
-
-
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -2400,6 +2397,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("createNewAdapter");
 
         if(flag){
+            if(peersOnCall.size() <= 4){
+                ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                recyclerView.setLayoutParams(params);
+
+            }else{
+                ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                params.height = Util.scaleWidthPx(540, outMetrics);
+                recyclerView.setLayoutParams(params);
+
+            }
             if(peersOnCall.size() <= 3){
                 recyclerView.setColumnWidth((int) widthScreenPX);
             }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
