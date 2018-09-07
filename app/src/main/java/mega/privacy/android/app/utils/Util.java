@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -38,8 +39,10 @@ import android.provider.MediaStore.Video;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -1900,6 +1903,40 @@ public class Util {
 
 		return output;
 	}
+
+	//restrict the scale factor to below 1.1 to allow user to have some level of freedom and also prevent ui issues
+	public static void setAppFontSize(Activity activity) {
+		float scale = activity.getResources().getConfiguration().fontScale;
+		log("system font size scale is " + scale);
+
+		float newScale;
+
+		if (scale <= 1.1) {
+			newScale = scale;
+		} else {
+			newScale = (float) 1.1;
+		}
+
+		log("new font size new scale is " + newScale);
+		Configuration configuration = activity.getResources().getConfiguration();
+		configuration.fontScale = newScale;
+
+		DisplayMetrics metrics = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		metrics.scaledDensity = configuration.fontScale * metrics.density;
+		activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
+	}
+    
+    //reduce font size for scale mode to prevent title and subtitle overlap
+    public static SpannableString adjustForLargeFont(String original) {
+        float scale = context.getResources().getConfiguration().fontScale;
+        if(scale > 1){
+            scale = (float)0.9;
+        }
+        SpannableString spannableString = new SpannableString(original);
+        spannableString.setSpan(new RelativeSizeSpan(scale),0, original.length(),0);
+        return spannableString;
+    }
 
 	public static Drawable mutateIcon (Context context, int idDrawable, int idColor) {
 

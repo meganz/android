@@ -8,8 +8,6 @@
 	    android:id="@+id/change_permissions_dialog_layout"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-		android:paddingTop="15dp"
-		android:paddingBottom="20dp"
 	    android:orientation="vertical">
 
 		<LinearLayout

@@ -40,7 +40,7 @@ public class PinActivityLollipop extends AppCompatActivity{
 		log("onResume");
 
 		super.onResume();
-
+        Util.setAppFontSize(this);
 		MegaApplication.activityResumed();
 
 		if (megaApi == null){
