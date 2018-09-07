@@ -642,6 +642,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
 
+        final LinearLayout administratorLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator_layout);
         final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
         administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
@@ -657,6 +658,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
         administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
+        final LinearLayout memberLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_member_layout);
         final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
         memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
@@ -672,6 +674,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
         memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
+        final LinearLayout observerLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_observer_layout);
         final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
         observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
@@ -714,38 +717,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         final AlertDialog dialog = permissionsDialog;
-        administratorCheck.setOnClickListener(new View.OnClickListener() {
 
+        View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_MODERATOR);
+                switch (v.getId()) {
+                    case R.id.change_permissions_dialog_administrator_layout: {
+                        changePermissions(MegaChatRoom.PRIV_MODERATOR);
+                        break;
+                    }
+                    case R.id.change_permissions_dialog_member_layout: {
+                        changePermissions(MegaChatRoom.PRIV_STANDARD);
+                        break;
+                    }
+                    case R.id.change_permissions_dialog_observer_layout: {
+                        changePermissions(MegaChatRoom.PRIV_RO);
+                        break;
+                    }
+                }
                 if (dialog != null){
                     dialog.dismiss();
                 }
             }
-        });
-
-        memberCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_STANDARD);
-                if (dialog != null){
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        observerCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_RO);
-                if (dialog != null){
-                    dialog.dismiss();
-                }
-            }
-        });
+        };
+        administratorLayout.setOnClickListener(clickListener);
+        memberLayout.setOnClickListener(clickListener);
+        observerLayout.setOnClickListener(clickListener);
 
         log("Change permissions");
     }
