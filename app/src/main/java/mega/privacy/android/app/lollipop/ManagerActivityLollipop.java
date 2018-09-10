@@ -2586,7 +2586,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-					getIntent().putExtra("newAccount", false);
+					
+                    //reset flag to fix incorrect view loaded when orientation changes
+                    getIntent().removeExtra("newAccount");
+                    getIntent().removeExtra("upgradeAccount");
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -2650,7 +2653,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-					getIntent().putExtra("newAccount", false);
+					
+					//reset flag to fix incorrect view loaded when orientation changes
+                    getIntent().removeExtra("newAccount");
+                    getIntent().removeExtra("upgradeAccount");
 					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
@@ -4044,6 +4050,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 			fillDBContactsTask.execute();
 			firstTime = false;
+            dbH.setFirstTime(false);
 		}
 	}
 
