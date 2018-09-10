@@ -143,6 +143,16 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
+    public static final String OWN_PREVIEW_LANDSCAPE = "OWN_PREVIEW_LANDSCAPE";
+    public static final String OWN_PREVIEW_PORTRAIT = "OWN_PREVIEW_PORTRAIT";
+    public static final String OWN_THUMBNAIL = "OWN_THUMBNAIL";
+    public static final String CONTACT_PREVIEW_LANDSCAPE = "CONTACT_PREVIEW_LANDSCAPE";
+    public static final String CONTACT_PREVIEW_PORTRAIT = "CONTACT_PREVIEW_PORTRAIT";
+    public static final String CONTACT_THUMBNAIL = "CONTACT_THUMBNAIL";
+
+    public static ImageView imageDrag;
+    public static String type_imageDrag;
+
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
@@ -3372,7 +3382,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void itemClick(int positionInAdapter) {
+    public void itemClick(int positionInAdapter, int [] screenPosition) {
         log("itemClick");
         int position = positionInAdapter-1;
         if(megaChatApi.isSignalActivityRequired()){
@@ -3432,7 +3442,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     if (MimeTypeList.typeForName(node.getName()).isImage()){
                                         if(node.hasPreview()){
                                             log("Show full screen viewer");
-                                            showFullScreenViewer(m.getMessage().getMsgId());
+                                            showFullScreenViewer(m.getMessage().getMsgId(), screenPosition);
                                         }
                                         else{
                                             log("Image without preview - show node attachment panel for one node");
@@ -3461,6 +3471,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
                                             internalIntent=true;
                                         }
+                                        mediaIntent.putExtra("screenPosition", screenPosition);
                                         mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
                                         mediaIntent.putExtra("isPlayList", false);
                                         mediaIntent.putExtra("msgId", m.getMessage().getMsgId());
@@ -3771,7 +3782,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showFullScreenViewer(long msgId){
+    public void showFullScreenViewer(long msgId, int[] screenPosition){
         log("showFullScreenViewer");
         int position = 0;
         boolean positionFound = false;
@@ -3803,6 +3814,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
         intent.putExtra("position", position);
         intent.putExtra("chatId", idChat);
+        intent.putExtra("screenPosition", screenPosition);
         long[] array = new long[ids.size()];
         for(int i = 0; i < ids.size(); i++) {
             array[i] = ids.get(i);

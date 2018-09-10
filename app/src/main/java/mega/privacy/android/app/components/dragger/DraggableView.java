@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Util;
 
 public class DraggableView extends FrameLayout{
@@ -241,6 +242,12 @@ public class DraggableView extends FrameLayout{
         final int action = MotionEventCompat.getActionMasked(event);
 
         if (getContext() instanceof FullScreenImageViewerLollipop){
+            if (event.getPointerCount() > 1 || normalizedScale != 1){
+                setDraggable(false);
+                return false;
+            }
+        }
+        else if (getContext() instanceof ChatFullScreenImageViewer) {
             if (event.getPointerCount() > 1 || normalizedScale != 1){
                 setDraggable(false);
                 return false;
@@ -488,6 +495,11 @@ public class DraggableView extends FrameLayout{
             public boolean onDoubleTap(MotionEvent e) {
                 if (getContext() instanceof FullScreenImageViewerLollipop){
                     if (normalizedScale != 1){
+                        setDraggable(false);
+                    }
+                }
+                else if (getContext() instanceof ChatFullScreenImageViewer) {
+                    if (normalizedScale != 1) {
                         setDraggable(false);
                     }
                 }

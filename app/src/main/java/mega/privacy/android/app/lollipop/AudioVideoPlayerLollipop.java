@@ -408,7 +408,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             pathNavigation = null;
             if (adapterType == Constants.FROM_CHAT){
                 fromChat = true;
-                draggableView.setDraggable(false);
+//                draggableView.setDraggable(false);
                 chatC = new ChatController(this);
                 msgId = intent.getLongExtra("msgId", -1);
                 chatId = intent.getLongExtra("chatId", -1);
