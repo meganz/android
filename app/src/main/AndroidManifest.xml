@@ -148,7 +148,8 @@
             android:name="mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow" >
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:theme="@style/Theme.Swipe.Back">
         </activity>
 
         <activity

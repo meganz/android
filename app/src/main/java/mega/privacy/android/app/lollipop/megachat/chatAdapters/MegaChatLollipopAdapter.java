@@ -61,6 +61,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.WrapEmojiconTextView;
+import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -7877,6 +7878,67 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         return timeString;
     }
 
+    public void checkItem (View v, ViewHolderMessageChat holder, int[] screenPosition, int[] dimens) {
+
+        ImageView imageView = null;
+
+        int position = holder.getCurrentPosition();
+        if(position<=messages.size()){
+            AndroidMegaChatMessage message = messages.get(position - 1);
+            if (message.getMessage() != null) {
+                if (message.getMessage().getMegaNodeList() != null) {
+                    if (message.getMessage().getMegaNodeList().get(0) != null) {
+                        if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
+                            if (holder.contentOwnMessageThumbPort.getVisibility() == View.VISIBLE) {
+                                log("contentOwnMessageThumbPort");
+                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_PREVIEW_PORTRAIT;
+                                imageView = (ImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
+                            }
+                            else if (holder.contentOwnMessageThumbLand.getVisibility() == View.VISIBLE) {
+                                log("contentOwnMessageThumbLand");
+                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_PREVIEW_LANDSCAPE;
+                                imageView = (ImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
+                            }
+                            else if (holder.contentOwnMessageFileThumb.getVisibility() == View.VISIBLE) {
+                                log("contentOwnMessageFileThumb");
+                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_THUMBNAIL;
+                                imageView = (ImageView) v.findViewById(R.id.content_own_message_file_thumb);
+                            }
+                        }
+                        else {
+                            if (holder.contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
+                                log("contentContactMessageThumbPort");
+                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_PREVIEW_PORTRAIT;
+                                imageView = (ImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
+                            }
+                            else if (holder.contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
+                                log("contentContactMessageThumbLand");
+                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_PREVIEW_LANDSCAPE;
+                                imageView = (ImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
+                            }
+                            else if (holder.contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
+                                log("contentContactMessageFileThumb");
+                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_THUMBNAIL;
+                                imageView = (ImageView) v.findViewById(R.id.content_contact_message_file_thumb);
+                            }
+                        }
+                    }
+                }
+            }
+        }else{
+            log("messages removed");
+        }
+
+        ((ChatActivityLollipop) context).imageDrag = imageView;
+        if (imageView != null) {
+            imageView.getLocationOnScreen(screenPosition);
+            dimens[0] = screenPosition[0] + (imageView.getWidth() / 2);
+            dimens[1] = screenPosition[1] + (imageView.getHeight() / 2);
+            dimens[2] = imageView.getWidth();
+            dimens[3] = imageView.getHeight();
+        }
+    }
+
     @Override
     public void onClick(View v) {
         log("onClick");
@@ -7916,7 +7978,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case R.id.url_own_message_text:
             case R.id.url_contact_message_text:
             case R.id.message_chat_item_layout:{
-                ((ChatActivityLollipop) context).itemClick(currentPosition);
+                int[] screenPosition = new int[2];
+                int [] dimens = new int[4];
+                checkItem(v, holder, screenPosition, dimens);
+
+                ((ChatActivityLollipop) context).itemClick(currentPosition, dimens);
                 break;
             }
 
@@ -7983,7 +8049,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             }else if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
 //                                setMultipleSelect(true);
                                 ((ChatActivityLollipop) context).activateActionMode();
-                                ((ChatActivityLollipop) context).itemClick(currentPosition);
+                                ((ChatActivityLollipop) context).itemClick(currentPosition, null);
 
 //
 //                                if(currentPosition<1){
@@ -7999,7 +8065,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
  //                           setMultipleSelect(true);
                             ((ChatActivityLollipop) context).activateActionMode();
-                            ((ChatActivityLollipop) context).itemClick(currentPosition);
+                            ((ChatActivityLollipop) context).itemClick(currentPosition, null);
 
 //
 //                            if(currentPosition<1){
