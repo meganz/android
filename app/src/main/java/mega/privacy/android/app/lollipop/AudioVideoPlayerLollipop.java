@@ -1136,11 +1136,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     updateContainers();
                     enableNextButton();
 
-                    int oldWindowIndex = currentWindowIndex;
-                    currentWindowIndex = player.getCurrentWindowIndex();
+                    if (!creatingPlaylist) {
+                        int oldWindowIndex = currentWindowIndex;
+                        currentWindowIndex = player.getCurrentWindowIndex();
 
-                    if (currentWindowIndex != oldWindowIndex && playListCreated) {
-                        updateFileProperties();
+                        if (currentWindowIndex != oldWindowIndex && playListCreated) {
+                            updateFileProperties();
+                        }
                     }
                 }
 
@@ -1241,7 +1243,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void enableNextButton() {
-        if (creatingPlaylist && playListCreated){
+        if (playListCreated){
             if (isOffline) {
                 if (currentWindowIndex == mediaOffList.size() -1)
                     return;
