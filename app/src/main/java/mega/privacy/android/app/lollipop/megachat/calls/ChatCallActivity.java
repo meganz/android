@@ -263,7 +263,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
 
-
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
@@ -673,6 +672,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {}
 
     public void createDefaultAvatar(long userHandle,  String fullName) {
+        log("createDefaultAvatar");
+
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -790,6 +791,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void createMyDefaultAvatar() {
+        log("createMyDefaultAvatar()");
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
@@ -921,12 +923,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onPause(){
+        log("onPause()");
+
         mSensorManager.unregisterListener(this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        log("onResume()");
+
         this.width=0;
         this.height=0;
         super.onResume();
@@ -942,6 +948,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onDestroy(){
+        log("onDestroy()");
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
@@ -989,16 +996,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        log("Type: "+request.getType());
+        log("onRequestStart()");
     }
 
     @Override
     public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+        log("onRequestUpdate()");
 
     }
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish()");
+
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             MegaApplication.activityPaused();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1311,6 +1321,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         if (this.width != width || this.height != height) {
+            log("onChatVideoData");
             this.width = width;
             this.height = height;
 
