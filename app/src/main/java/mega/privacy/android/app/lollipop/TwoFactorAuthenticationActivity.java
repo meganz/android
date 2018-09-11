@@ -13,7 +13,6 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,18 +39,20 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -71,7 +72,7 @@ import static android.graphics.Color.WHITE;
 public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener, View.OnFocusChangeListener{
 
     final int LENGTH_SEED = 13;
-    final int WIDTH = 700;
+    final int WIDTH = 500;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -751,9 +752,11 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             setSeed();
         }
         if (url != null) {
+            Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
             BitMatrix bitMatrix = null;
             try {
-                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, null);
+                bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, hints);
             } catch (WriterException e) {
                 e.printStackTrace();
                 return;
@@ -761,7 +764,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             int w = bitMatrix.getWidth();
             int h = bitMatrix.getHeight();
             int[] pixels = new int[w * h];
-            float resize = 15;
+            float resize = 8f;
 
             qr = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(qr);
@@ -776,42 +779,42 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 for (int x = 0; x < w; x++) {
                     pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
                     if (pixels[offset + x] == BLACK){
-                        c.drawCircle(x*resize, y*resize, 5, paint);
+                        c.drawCircle(x*resize, y*resize, 3.5f, paint);
                     }
                 }
             }
             paint.setColor(WHITE);
             c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
-            c.drawRect(36.5f*resize, 3*resize, 45*resize, 11.5f*resize, paint);
-            c.drawRect(3*resize, 36.5f*resize, 11.5f*resize, 45*resize, paint);
+            c.drawRect(53.5f*resize, 3*resize, 62*resize, 11.5f*resize, paint);
+            c.drawRect(3*resize, 53.5f*resize, 11.5f*resize, 62*resize, paint);
 
             paint.setColor(BLACK);
 
             if (Build.VERSION.SDK_INT >= 21) {
-                c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 30, 30, paint);
-                c.drawRoundRect(37.25f * resize, 3.75f * resize, 44.25f * resize, 10.75f * resize, 30, 30, paint);
-                c.drawRoundRect(3.75f * resize, 37.25f * resize, 10.75f * resize, 44.25f * resize, 30, 30, paint);
+                c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 15, 15, paint);
+                c.drawRoundRect(53.25f * resize, 3.75f * resize, 60.25f * resize, 10.75f * resize, 15, 15, paint);
+                c.drawRoundRect(3.75f * resize, 53.25f * resize, 10.75f * resize, 60.25f * resize, 15, 15, paint);
 
                 paint.setColor(WHITE);
-                c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
-                c.drawRoundRect(38.25f * resize, 4.75f * resize, 43.25f * resize, 9.75f * resize, 25, 25, paint);
-                c.drawRoundRect(4.75f * resize, 38.25f * resize, 9.75f * resize, 43.25f * resize, 25, 25, paint);
+                c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 12.5f, 12.5f, paint);
+                c.drawRoundRect(54.25f * resize, 4.75f * resize, 59.25f * resize, 9.75f * resize, 12.5f, 12.5f, paint);
+                c.drawRoundRect(4.75f * resize, 54.25f * resize, 9.75f * resize, 59.25f * resize, 12.5f, 12.5f, paint);
             }
             else {
-                c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 30, 30, paint);
-                c.drawRoundRect(new RectF(37.25f * resize, 3.75f * resize, 44.25f * resize, 10.75f * resize), 30, 30, paint);
-                c.drawRoundRect(new RectF(3.75f * resize, 37.25f * resize, 10.75f * resize, 44.25f * resize), 30, 30, paint);
+                c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 15, 15, paint);
+                c.drawRoundRect(new RectF(53.25f * resize, 3.75f * resize, 60.25f * resize, 10.75f * resize), 15, 15, paint);
+                c.drawRoundRect(new RectF(3.75f * resize, 53.25f * resize, 10.75f * resize, 60.25f * resize), 15, 15, paint);
 
                 paint.setColor(WHITE);
-                c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
-                c.drawRoundRect(new RectF(38.25f * resize, 4.75f * resize, 43.25f * resize, 9.75f * resize), 25, 25, paint);
-                c.drawRoundRect(new RectF(4.75f * resize, 38.25f * resize, 9.75f * resize, 43.25f * resize), 25, 25, paint);
+                c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 12.5f, 12.5f, paint);
+                c.drawRoundRect(new RectF(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize), 12.5f, 12.5f, paint);
+                c.drawRoundRect(new RectF(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize), 12.5f, 12.5f, paint);
             }
 
             paint.setColor(BLACK);
-            c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
-            c.drawCircle(40.75f*resize, 7.25f*resize, 17.5f, paint);
-            c.drawCircle(7.25f*resize, 40.75f*resize, 17.5f, paint);
+            c.drawCircle(7.25f*resize, 7.25f*resize, 9f, paint);
+            c.drawCircle(56.75f*resize, 7.25f*resize, 9f, paint);
+            c.drawCircle(7.25f*resize, 56.75f*resize, 9f, paint);
 
             if (qr != null){
                 qrImage.setImageBitmap(qr);
