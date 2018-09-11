@@ -158,27 +158,7 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
         maxScreenHeight = parent.getMeasuredHeight();
         maxScreenWidth = parent.getMeasuredWidth();
 
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_camera_group_call, parent, false);
-        int numPeersOnCall = getItemCount();
-
-        CustomizedGridRecyclerView.LayoutParams lp = (CustomizedGridRecyclerView.LayoutParams) v.getLayoutParams();
-
-
-        if(numPeersOnCall < 4) {
-            lp.height = maxScreenHeight / numPeersOnCall;
-            lp.width = maxScreenWidth;
-
-        }else if(numPeersOnCall == 4){
-            lp.height = maxScreenHeight / 2;
-            lp.width = maxScreenWidth/2;
-
-        }else if(numPeersOnCall > 4){
-            lp.height = Util.scaleWidthPx(180, outMetrics);
-            lp.width = maxScreenWidth/2;
-
-        }
-
-        v.setLayoutParams(lp);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_big_camera_group_call, parent, false);
 
         holderGrid = new BigGroupCallAdapter.ViewHolderGroupCallGrid(v);
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
@@ -232,76 +212,7 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
         int numPeersOnCall = getItemCount();
         if(peer.isVideoOn()) {
             log("Video ON");
-            if(numPeersOnCall == 1){
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = maxScreenWidth;
-                layoutParamsSurface.height = maxScreenWidth;
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
-
-            }else if(numPeersOnCall == 2){
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(320, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(320, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
-
-            }else if(numPeersOnCall == 3){
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(212, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(212, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
-
-            }else if(numPeersOnCall == 4){
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-
-                if((position < 2)){
-                    layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                }else{
-                    layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-                }
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
-
-            }else if(numPeersOnCall == 5){
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
-
-                if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
-                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-                    layoutParamsPeer.width = maxScreenWidth;
-                    layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
-                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-                }
-
-
-            }else if(numPeersOnCall == 6){
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-
-//                if((position < 2)){
-//                    layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 //
-//                }else if(position > 3){
-//                    layoutParamsSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-//                }
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
-
-            }
 
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
@@ -328,7 +239,7 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
             RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            paramsMicroSurface.setMargins(0, 50, 50, 0);
+            paramsMicroSurface.setMargins(0, 4, 4, 0);
             holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
 
             if(peer.isAudioOn()){
@@ -357,87 +268,6 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
 
         }else{
             log("Video OFF");
-            if(numPeersOnCall == 1){
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = maxScreenWidth;
-                layoutParamsAvatar.height = maxScreenWidth;
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
-
-            }else if(numPeersOnCall == 2){
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = Util.scaleWidthPx(320, outMetrics);
-                layoutParamsAvatar.height = Util.scaleWidthPx(320, outMetrics);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
-
-            }else if(numPeersOnCall == 3){
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = Util.scaleWidthPx(212, outMetrics);
-                layoutParamsAvatar.height = Util.scaleWidthPx(212, outMetrics);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
-
-            }else if(numPeersOnCall == 4){
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-
-                if((position < 2)){
-                    layoutParamsAvatar.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                }else{
-                    layoutParamsAvatar.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-                }
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
-
-            }else if(numPeersOnCall == 5){
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-
-//                if((position < 2)){
-//                    layoutParamsAvatar.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//                }else if(position > 3){
-//                    layoutParamsAvatar.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-//                }
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
-                if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
-                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-                    layoutParamsPeer.width = maxScreenWidth;
-                    layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
-                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-                }
-
-//                if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
-//                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
-//                    layoutParamsPeer.width = maxScreenWidth;
-//                    layoutParamsPeer.height = (maxScreenHeight/3);
-//                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
-//                }
-
-            }else if(numPeersOnCall == 6){
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-
-//                if((position < 2)){
-//                    layoutParamsAvatar.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//                }else if(position > 3){
-//                    layoutParamsAvatar.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-//                }
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
-            }
 
             holder.microSurface.setVisibility(View.GONE);
 
