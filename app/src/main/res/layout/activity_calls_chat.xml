@@ -35,6 +35,12 @@
                         android:layout_centerHorizontal="true"
                         android:nestedScrollingEnabled="false"/>
 
+                    <RecyclerView
+                        android:id="@+id/big_recycler_view_cameras"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"/>
+
                 </RelativeLayout>
 
             <!-- Background -->
