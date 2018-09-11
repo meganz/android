@@ -35,11 +35,14 @@
                         android:layout_centerHorizontal="true"
                         android:nestedScrollingEnabled="false"/>
 
-                    <RecyclerView
-                        android:id="@+id/big_recycler_view_cameras"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"/>
+                     <android.support.v7.widget.RecyclerView
+                         android:id="@+id/big_recycler_view_cameras"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_alignParentBottom="true"
+                         android:layout_alignParentLeft="true"
+                         android:layout_marginBottom="94dp"
+                         android:orientation="horizontal"/>
 
                 </RelativeLayout>
 

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/general"
+    android:layout_width="90dp"
+    android:layout_height="90dp"
+    android:background="@color/black">
+
+    <!--Surface view-->
+    <RelativeLayout
+        android:id="@+id/rl_surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:visibility="gone">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_avatar_micro"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:visibility="gone">
+
+        <!--Big Avatar-->
+        <RelativeLayout
+            android:id="@+id/avatar_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:background="@android:color/transparent">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/avatar_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                rounded:border_color="#4DFFFFFF"
+                rounded:border_width="3dp"
+                rounded:corner_radius="60dp" />
+
+            <TextView
+                android:id="@+id/avatar_initial_letter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:background="@android:color/transparent"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
+        <!--Micro-->
+        <ImageView
+            android:id="@+id/micro_avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/avatar_rl"
+            android:layout_alignTop="@+id/avatar_rl"
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            android:src="@drawable/ic_mic_off"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
