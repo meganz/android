@@ -170,6 +170,17 @@ public class ContactsBottomSheetDialogFragment extends BottomSheetDialogFragment
         optionSendContact.setOnClickListener(this);
         optionShareFolder.setOnClickListener(this);
 
+        if (Util.isChatEnabled()) {
+            optionSendFile.setVisibility(View.VISIBLE);
+            optionStartConversation.setVisibility(View.VISIBLE);
+            optionSendContact.setVisibility(View.VISIBLE);
+        }
+        else {
+            optionSendFile.setVisibility(View.GONE);
+            optionStartConversation.setVisibility(View.GONE);
+            optionSendContact.setVisibility(View.GONE);
+        }
+
         if(contact!=null){
             fullName = contact.getFullName();
             titleNameContactPanel.setText(fullName);

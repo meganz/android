@@ -399,7 +399,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}
 
 				if(allFiles){
-					showSendToChat = true;
+					if (Util.isChatEnabled()) {
+						showSendToChat = true;
+					}
+					else {
+						showSendToChat = false;
+					}
 				}else{
 					showSendToChat = false;
 				}

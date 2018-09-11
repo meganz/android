@@ -572,6 +572,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
 
+	boolean sendToChat = false;
+
+	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			addContactFromPhone();
+		}
+	};
+
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -4708,6 +4717,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		setToolbarTitle();
 
+		if(Util.isChatEnabled()) {
+			MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+			if (parentNode == null) {
+				log("Create folder: " + Constants.CHAT_FOLDER);
+				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+			}
+		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -15794,35 +15810,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Show snackbar!!!!!!!!!!!!!!!!!!!");
-				showSnackbar(getString(R.string.context_correctly_copied));
-
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-
-					int index = viewPagerCDrive.getCurrentItem();
-					log("----------------------------------------INDEX: "+index);
-					if(index==1){
-						//Rubbish bin
-						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-						}
-					}
-					else{
-						//Cloud Drive
-						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-						if (fbFLol != null && fbFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-							fbFLol.setNodes(nodes);
-							fbFLol.getRecyclerView().invalidate();
-						}
+				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+						&& drawerItem == DrawerItem.SHARED_ITEMS && getTabItemShares() == 0) {
+					log("Incoming node copied to Send to chat");
+					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
+					if (attachNode != null) {
+						nC.selectChatsToSendNode(attachNode);
 					}
 				}
-				else if (drawerItem == DrawerItem.INBOX){
-					if (iFLol != null && iFLol.isAdded()){
-						iFLol.getRecyclerView().invalidate();
+				else {
+					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+					showSnackbar(getString(R.string.context_correctly_copied));
+
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+
+						int index = viewPagerCDrive.getCurrentItem();
+						log("----------------------------------------INDEX: "+index);
+						if(index==1){
+							//Rubbish bin
+							rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+							if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+								rubbishBinFLol.setNodes(nodes);
+								rubbishBinFLol.getRecyclerView().invalidate();
+							}
+						}
+						else{
+							//Cloud Drive
+							fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+							if (fbFLol != null && fbFLol.isAdded()){
+								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+								fbFLol.setNodes(nodes);
+								fbFLol.getRecyclerView().invalidate();
+							}
+						}
+					}
+					else if (drawerItem == DrawerItem.INBOX){
+						if (iFLol != null && iFLol.isAdded()){
+							iFLol.getRecyclerView().invalidate();
+						}
 					}
 				}
 			}
@@ -15840,6 +15866,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					showSnackbar(getString(R.string.context_no_copied));
 				}
 			}
+			sendToChat = false;
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try {
@@ -17905,6 +17932,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.newMail = newMail;
 	}
 
+	public void setSendToChat (boolean sendToChat) {
+			this.sendToChat = sendToChat;
+	}
 
 	public boolean isCameraUploads(MegaNode n){
 		log("isCameraUploads()");
