@@ -1631,7 +1631,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate2FA, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-		LocalBroadcastManager.getInstance(this).registerReceiver(inviteContactsReceiver, new IntentFilter(AddContactActivityLollipop.BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -3981,7 +3980,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(inviteContactsReceiver);
 
     	super.onDestroy();
 	}
@@ -5545,8 +5543,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
     	}
 
-    	if (newAccount || isEnable2FADialogShown) {
-    		showEnable2FADialog();
+		if (megaApi.multiFactorAuthAvailable()) {
+			if (newAccount || isEnable2FADialogShown) {
+				showEnable2FADialog();
+			}
 		}
 	}
 
@@ -15371,7 +15371,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(e.getErrorCode() == MegaError.API_ENOENT){
 				log("Email not changed -- API_ENOENT");
-				Util.showAlert(this, "Email not changed!", getString(R.string.general_error_word));
+				Util.showAlert(this, "Email not changed!" + getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
 			}
 			else{
 				log("Error when asking for change mail link");
