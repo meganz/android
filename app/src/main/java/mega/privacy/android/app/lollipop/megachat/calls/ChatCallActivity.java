@@ -631,6 +631,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     setProfileMyAvatar();
                     flagContactAvatar = true;
                     setProfileContactAvatar();
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -1362,7 +1363,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         switch (v.getId()) {
             case R.id.video_fab:{
-
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
                     answerCallFAB.clearAnimation();
@@ -1653,7 +1653,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         int callStatus = callChat.getStatus();
 
         if (callChat.hasLocalVideo()) {
-
             log("Video local connected");
             if (myAvatarLayout.getVisibility() == View.VISIBLE) {
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
@@ -1661,6 +1660,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
                     if(localCameraFragmentFS == null){
+                        log("Create local camera fragment full screen");
                         localCameraFragmentFS = new LocalCameraCallFullScreenFragment();
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
@@ -1671,11 +1671,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
 
                 }else{
-                    localCameraFragment = new LocalCameraCallFragment();
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                    ft.commitNowAllowingStateLoss();
-
+                    if(localCameraFragment == null){
+                        log("Create local camera fragment");
+                        localCameraFragment = new LocalCameraCallFragment();
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+                        ft.commitNowAllowingStateLoss();
+                    }
                     myAvatarLayout.setVisibility(GONE);
                     parent.setVisibility(View.VISIBLE);
                     fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
@@ -1691,11 +1693,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parentFS.setVisibility(View.GONE);
                 fragmentContainerLocalCameraFS.setVisibility(View.GONE);
                 if (localCameraFragmentFS != null) {
+                    log("Remove local camera fragment full screen");
                     localCameraFragmentFS.setVideoFrame(false);
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(localCameraFragmentFS);
                     localCameraFragmentFS = null;
-
                 }
                 contactAvatarLayout.setVisibility(View.VISIBLE);
 
@@ -1703,6 +1705,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parent.setVisibility(View.GONE);
                 fragmentContainerLocalCamera.setVisibility(View.GONE);
                 if (localCameraFragment != null) {
+                    log("Create local camera fragment");
                     localCameraFragment.setVideoFrame(false);
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.remove(localCameraFragment);
