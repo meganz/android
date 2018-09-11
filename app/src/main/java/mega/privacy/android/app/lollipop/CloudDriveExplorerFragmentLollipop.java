@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
