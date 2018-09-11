@@ -1558,7 +1558,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		log("onStart");
 		super.onStart();
 		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
+//		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 	}
 
@@ -1675,6 +1675,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (megaApi != null){
 			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
+		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
 		}
 
 		transfersInProgress = new ArrayList<Integer>();
@@ -7111,6 +7115,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaApi.retryPendingConnections();
 		}
 
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
+		}
+
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		int id = item.getItemId();
@@ -9151,6 +9159,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
 		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
+		}
+
 		try {
 			statusDialog.dismiss();
 		}
@@ -17635,6 +17648,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if(megaApi!=null){
 			megaApi.retryPendingConnections();
 		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
+		}
+
 		showOnlineMode();
 	}
 
