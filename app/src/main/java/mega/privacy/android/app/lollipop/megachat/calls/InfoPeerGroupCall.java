@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 import android.view.SurfaceView;
 
+import mega.privacy.android.app.lollipop.listeners.BigGroupCallListener;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 
 public class InfoPeerGroupCall {
@@ -10,16 +11,20 @@ public class InfoPeerGroupCall {
     String name;
     boolean videoOn;
     boolean audioOn;
-    GroupCallListener listener;
+    GroupCallListener listener = null;
+    BigGroupCallListener listenerB = null;
+
     SurfaceView surfaceview;
 
-    public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, GroupCallListener listener, SurfaceView surfaceview) {
+    public InfoPeerGroupCall(Long handle, String name, boolean videoOn, boolean audioOn, GroupCallListener listener, BigGroupCallListener listenerB, SurfaceView surfaceview) {
         this.handle = handle;
         this.name = name;
         this.videoOn = videoOn;
         this.audioOn = audioOn;
         this.listener = listener;
         this.surfaceview = surfaceview;
+        this.listenerB = listenerB;
+
     }
 
     public Long getHandle() {
@@ -61,6 +66,15 @@ public class InfoPeerGroupCall {
     public void setListener(GroupCallListener listener) {
         this.listener = listener;
     }
+
+    public BigGroupCallListener getListenerB() {
+        return listenerB;
+    }
+
+    public void setListenerB(BigGroupCallListener listenerB) {
+        this.listenerB = listenerB;
+    }
+
 
     public SurfaceView getSurfaceview() {
         return surfaceview;
