@@ -2302,7 +2302,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     case DialogInterface.BUTTON_POSITIVE:
                         log("Open camera and lost the camera in the call");
                         //Remove the local video from the video call:
-                        openCameraApp();
+                        MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                        if(callInProgress != null) {
+                            if (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                                megaChatApi.answerChatCall(idChat, true, null);
+                            } else {
+                                if (callInProgress.hasLocalVideo()) {
+                                    megaChatApi.disableVideo(idChat, null);
+                                } else {
+                                    megaChatApi.enableVideo(idChat, null);
+                                }
+                            }
+
+                            if ((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)) {
+                                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                            }
+                            openCameraApp();
+                        }
+
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -2315,7 +2332,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         String message= getResources().getString(R.string.confirmation_open_camera_on_chat);
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
-        builder.setMessage(message).setPositiveButton(R.string.contact_accept, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationClearChat(final MegaChatRoom c){
