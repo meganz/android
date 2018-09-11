@@ -593,7 +593,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     public void onResume() {
         log("onResume");
         super.onResume();
-
+        Util.setAppFontSize(this);
         Intent intent = getIntent();
 
         if (intent != null) {
