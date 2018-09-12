@@ -61,7 +61,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.WrapEmojiconTextView;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -7892,12 +7891,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             if (holder.contentOwnMessageThumbPort.getVisibility() == View.VISIBLE) {
                                 log("contentOwnMessageThumbPort");
                                 ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_PREVIEW_PORTRAIT;
-                                imageView = (ImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
+                                imageView = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
                             }
                             else if (holder.contentOwnMessageThumbLand.getVisibility() == View.VISIBLE) {
                                 log("contentOwnMessageThumbLand");
                                 ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_PREVIEW_LANDSCAPE;
-                                imageView = (ImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
+                                imageView = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
                             }
                             else if (holder.contentOwnMessageFileThumb.getVisibility() == View.VISIBLE) {
                                 log("contentOwnMessageFileThumb");
@@ -7909,12 +7908,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             if (holder.contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
                                 log("contentContactMessageThumbPort");
                                 ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_PREVIEW_PORTRAIT;
-                                imageView = (ImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
+                                imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
                             }
                             else if (holder.contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
                                 log("contentContactMessageThumbLand");
                                 ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_PREVIEW_LANDSCAPE;
-                                imageView = (ImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
+                                imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
                             }
                             else if (holder.contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
                                 log("contentContactMessageFileThumb");
@@ -7929,7 +7928,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("messages removed");
         }
 
-        ((ChatActivityLollipop) context).imageDrag = imageView;
+//        ((ChatActivityLollipop) context).imageDrag = imageView;
         if (imageView != null) {
             imageView.getLocationOnScreen(screenPosition);
             dimens[0] = screenPosition[0] + (imageView.getWidth() / 2);
@@ -7981,7 +7980,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 int[] screenPosition = new int[2];
                 int [] dimens = new int[4];
                 checkItem(v, holder, screenPosition, dimens);
-
+//                ((ChatActivityLollipop) context).itemClick(currentPosition, dimens, v);
                 ((ChatActivityLollipop) context).itemClick(currentPosition, dimens);
                 break;
             }
@@ -8081,10 +8080,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
-
-
-
-
 
         return true;
     }
