@@ -794,6 +794,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 }else{
 
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -1132,13 +1133,26 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onResume");
         if(peersOnCall!=null){
             if(peersOnCall.size()!=0){
-                for(InfoPeerGroupCall peer :peersOnCall){
-                    if(peer.getListener()!=null){
-                        peer.getListener().setHeight(0);
-                        peer.getListener().setWidth(0);
+                if(peersOnCall.size()<7){
+                    for(InfoPeerGroupCall peer :peersOnCall){
+                        if(peer.getListenerB()!=null){
+                            if(peer.getListenerB().getHeight() != 0){
+                                peer.getListenerB().setHeight(0);
+                            }
+                            if(peer.getListenerB().getWidth() != 0){
+                                peer.getListenerB().setWidth(0);
+                            }
+                        }
                     }
-
+                }else{
+                    for(InfoPeerGroupCall peer :peersOnCall){
+                        if(peer.getListener()!=null){
+                            peer.getListener().setHeight(0);
+                            peer.getListener().setWidth(0);
+                        }
+                    }
                 }
+
             }
         }
 
@@ -1152,8 +1166,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if((callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)||(callChat.getStatus()==MegaChatCall.CALL_STATUS_REQUEST_SENT)){
             ((MegaApplication) getApplication()).sendSignalPresenceActivity();
         }
-
-
     }
 
     @Override

@@ -36,6 +36,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,6 +58,8 @@ import android.view.SurfaceHolder.Callback;
 import org.webrtc.Logging;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.megachat.chatAdapters.BigGroupCallAdapter;
+import mega.privacy.android.app.utils.Util;
 
 public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
 
@@ -75,24 +79,28 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     PorterDuffXfermode modesrcin;
     int surfaceWidth = 0;
     int surfaceHeight = 0;
+    Long handleUser;
+
+    protected List<MegaSurfaceRendererGroupListener> listeners;
 
 
-    public MegaSurfaceRendererGroup(SurfaceView view) {
-        Log.d("MegaSurfaceRenderer","MegaSurfaceRenderer() ");
+    public MegaSurfaceRendererGroup(SurfaceView view, Long handle) {
 
-//        this.surf = view;
         surfaceHolder = view.getHolder();
         if(surfaceHolder == null)
             return;
+
         surfaceHolder.addCallback(this);
         paint = new Paint();
         modesrcover = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
         modesrcin = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        this.handleUser = handle;
+        listeners = new ArrayList<MegaSurfaceRendererGroupListener>();
     }
 
     // surfaceChanged and surfaceCreated share this function
     private void changeDestRect(int dstWidth, int dstHeight) {
-        Log.d("SurfaceRendererGroup","changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
+        log("changeDestRect(): dstWidth = "+dstWidth+", dstHeight = "+dstHeight);
         surfaceWidth = dstWidth;
         surfaceHeight = dstHeight;
         dstRect.top = 0;
@@ -100,28 +108,16 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         dstRect.right = dstWidth;
         dstRect.bottom = dstHeight;
         dstRectf = new RectF(dstRect);
-
-//        adjustAspectRatio();
     }
 
-//    private void adjustAspectRatio() {
-//        if (bitmap != null && dstRect.height() != 0) {
-//            float srcaspectratio = (float) bitmap.getWidth() / bitmap.getHeight();
-//            dstRect.top = 0;
-//            dstRect.left = 0;
-//            dstRect.right = surfaceWidth;
-//            dstRect.bottom = (int)(surfaceWidth/srcaspectratio);
-//            dstRectf = new RectF(dstRect);
-//        }
-//    }
-
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d("MegaSurfaceRenderer","surfaceCreated()");
+        log("surfaceCreated()");
 
-        Canvas canvas = surfaceHolder.lockCanvas();
+        Canvas canvas = holder.lockCanvas();
         if(canvas != null) {
-            Rect dst = surfaceHolder.getSurfaceFrame();
+            Rect dst = holder.getSurfaceFrame();
             if(dst != null) {
+                notifyStateToAll();
                 changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
                 Logging.d(TAG, "ViESurfaceRender::surfaceCreated" +
                         " dst.left:" + dst.left +
@@ -137,12 +133,12 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
                         " dstRect.right:" + dstRect.right +
                         " dstRect.bottom:" + dstRect.bottom);
             }
-            surfaceHolder.unlockCanvasAndPost(canvas);
+            holder.unlockCanvasAndPost(canvas);
         }
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int in_width, int in_height) {
-        Log.d("MegaSurfaceRenderer","surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
+        log("surfaceChanged(): in_width = "+in_width+", in_height = "+in_height);
 
         Logging.d(TAG, "ViESurfaceRender::surfaceChanged");
         changeDestRect(in_width, in_height);
@@ -160,21 +156,21 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d("MegaSurfaceRenderer","surfaceDestroyed(): ");
-
+        log("surfaceDestroyed(): ");
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
         byteBuffer = null;
+        surfaceWidth = 0;
+        surfaceHeight = 0;
     }
 
     public Bitmap CreateBitmap(int width, int height) {
-        Log.d("MegaSurfaceRenderer","CreateBitmap(): width = "+width+", height = "+height);
+        log("CreateBitmap(): width = "+width+", height = "+height);
 
         Logging.d(TAG, "CreateByteBitmap " + width + ":" + height);
         if (bitmap == null) {
             try {
-                android.os.Process.setThreadPriority(
-                        android.os.Process.THREAD_PRIORITY_DISPLAY);
+                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
             }
             catch (Exception e) {
             }
@@ -194,13 +190,6 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             srcRect.bottom = newHeight;
             srcRect.left = 0;
             srcRect.right = width;
-//            float decrease = height - newHeight;
-//            int decreaseHalf = (int) (decrease/2);
-//
-//            srcRect.top = decreaseHalf;
-//            srcRect.bottom = (height - decreaseHalf);
-//            srcRect.left = 0;
-//            srcRect.right = width;
         }else{
             int newWidth = height;
             bitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888);
@@ -208,30 +197,14 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             srcRect.right = newWidth;
             srcRect.top = 0;
             srcRect.bottom = height;
-//            float decrease = width - newWidth;
-//            int decreaseHalf = (int) (decrease/2);
-//
-//            srcRect.left = decreaseHalf;
-//            srcRect.right = (width - decreaseHalf);
-//            srcRect.top = 0;
-//            srcRect.bottom = height;
         }
-
-//        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//        srcRect.left = 0;
-//        srcRect.top = 0;
-//        srcRect.bottom = height;
-//        srcRect.right = width;
-//        adjustAspectRatio();
-
         return bitmap;
     }
 
     public void DrawBitmap(boolean flag) {
-
-        if(bitmap == null)
+        if(bitmap == null){
             return;
-
+        }
         if (surfaceHolder == null){
             return;
         }
@@ -249,9 +222,30 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
             } else {
                 canvas.drawBitmap(bitmap, srcRect, dstRect, null);
             }
-
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
+    private static void log(String log) {
+        Util.log("MegaSurfaceRendererGroup", log);
+    }
 
+    private void notifyStateToAll() {
+        for(MegaSurfaceRendererGroupListener listener : listeners)
+            notifyState(listener);
+    }
+
+    public void addListener(MegaSurfaceRendererGroupListener l) {
+        listeners.add(l);
+        notifyState(l);
+    }
+
+    private void notifyState(MegaSurfaceRendererGroupListener listener) {
+        if(listener == null)
+            return;
+        listener.resetSize(handleUser);
+    }
+
+    public interface MegaSurfaceRendererGroupListener {
+        public void resetSize(Long handle);
+    }
 }

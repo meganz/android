@@ -43,7 +43,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import static android.view.View.GONE;
 
 
-public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapter.ViewHolderGroupCall> implements View.OnClickListener {
+public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapter.ViewHolderGroupCall> implements View.OnClickListener, MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
     public static final int ITEM_VIEW_TYPE_GRID = 1;
 
@@ -110,6 +110,24 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
             case R.id.general:{
                 ((ChatCallActivity) context).remoteCameraClick();
                 break;
+            }
+        }
+    }
+
+    @Override
+    public void resetSize(Long userHandle) {
+        if(getItemCount()!=0){
+            for(InfoPeerGroupCall peer:peers){
+                if(peer.getHandle() == userHandle){
+                    if(peer.getListenerB()!=null){
+                        if(peer.getListenerB().getWidth()!=0){
+                            peer.getListenerB().setWidth(0);
+                        }
+                        if(peer.getListenerB().getHeight()!=0){
+                            peer.getListenerB().setHeight(0);
+                        }
+                    }
+                }
             }
         }
     }
@@ -209,10 +227,8 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
             return;
         }
 
-        int numPeersOnCall = getItemCount();
         if(peer.isVideoOn()) {
             log("Video ON");
-//
 
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
@@ -231,8 +247,9 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
             holder.surfaceView.setZOrderMediaOverlay(true);
             holder.localSurfaceHolder = holder.surfaceView.getHolder();
             holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-            holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView);
+            holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
             holder.surfaceViewLayout.addView(holder.surfaceView);
+            holder.localRenderer.addListener(this);
 
             //Update micro icon
             holder.microSurface.setImageResource(R.drawable.ic_mic_off);
@@ -521,9 +538,6 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
     public void setAdapterType(int adapterType){
         this.adapterType = adapterType;
     }
-    private static void log(String log) {
-        Util.log("BigGroupCallAdapter", log);
-    }
 
     public RecyclerView getListFragment() {
         return recyclerViewFragment;
@@ -562,6 +576,9 @@ public class BigGroupCallAdapter extends RecyclerView.Adapter<BigGroupCallAdapte
             log("holder is NULL");
             notifyItemChanged(position);
         }
+    }
+    private static void log(String log) {
+        Util.log("BigGroupCallAdapter", log);
     }
 
 }
