@@ -185,7 +185,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -226,7 +225,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
 
 	public int accountFragment;
@@ -255,7 +254,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean mkLayoutVisible = false;
 
-	private NetworkStateReceiver networkStateReceiver;
 	MegaNode rootNode = null;
 
 	NodeController nC;
@@ -574,13 +572,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean sendToChat = false;
 
-	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			addContactFromPhone();
-		}
-	};
-
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -662,6 +653,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				is2FAEnabled = enabled;
 				if (sttFLol != null && sttFLol.isAdded()) {
 					sttFLol.update2FAPreference(enabled);
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			log("Network broadcast received!");
+			int actionType;
+
+			if (intent != null){
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if(actionType == Constants.GO_OFFLINE){
+					showOfflineMode();
+				}
+				else if(actionType == Constants.GO_ONLINE){
+					log("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS");
+					showOnlineMode();
 				}
 			}
 		}
@@ -1557,9 +1568,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onStart(){
 		log("onStart");
 		super.onStart();
-		networkStateReceiver = new NetworkStateReceiver();
-//		networkStateReceiver.addListener(this);
-		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 	}
 
 	@SuppressLint("NewApi") @Override
@@ -1631,6 +1639,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate2FA, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
+		LocalBroadcastManager.getInstance(this).registerReceiver(networkReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -3975,15 +3984,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaChatApi.removeChatCallListener(this);
 		}
 
-		if(networkStateReceiver!=null){
-			this.unregisterReceiver(networkStateReceiver);
-		}
-
 		showStorageAlmostFullDialog = true;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 
     	super.onDestroy();
 	}
@@ -17640,26 +17646,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			showSnackbar(getString(R.string.context_no_copied));
 		}
 		catch (Exception ex) {}
-	}
-
-	@Override
-	public void networkAvailable() {
-		log("networkAvailable");
-		if(megaApi!=null){
-			megaApi.retryPendingConnections();
-		}
-
-		if (megaChatApi != null){
-			megaChatApi.retryPendingConnections(false, null);
-		}
-
-		showOnlineMode();
-	}
-
-	@Override
-	public void networkUnavailable() {
-		log("networkUnavailable: network NOT available");
-		showOfflineMode();
 	}
 
 	public void uploadTakePicture(String imagePath){
