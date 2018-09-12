@@ -372,7 +372,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.surfaceView.setZOrderMediaOverlay(true);
             holder.localSurfaceHolder = holder.surfaceView.getHolder();
             holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-            holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView);
+            holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
             holder.surfaceViewLayout.addView(holder.surfaceView);
 
             //Update micro icon

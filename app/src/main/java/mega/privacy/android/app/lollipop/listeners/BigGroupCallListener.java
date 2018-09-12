@@ -21,7 +21,6 @@ public class BigGroupCallListener implements MegaChatVideoListenerInterface {
     Bitmap bitmap;
 
     public BigGroupCallListener(Context context, BigGroupCallAdapter.ViewHolderGroupCall holder) {
-        log("BigGroupCallListener");
         this.context = context;
         this.holder = holder;
         this.width = 0;
@@ -38,7 +37,6 @@ public class BigGroupCallListener implements MegaChatVideoListenerInterface {
             this.width = width;
             this.height = height;
 
-
             SurfaceHolder Sholder = holder.surfaceView.getHolder();
             if (Sholder != null) {
                 int viewWidth = holder.surfaceView.getWidth();
@@ -48,12 +46,12 @@ public class BigGroupCallListener implements MegaChatVideoListenerInterface {
                     int holderWidth = viewWidth < width ? viewWidth : width;
                     int holderHeight = holderWidth * viewHeight / viewWidth;
                     if (holderHeight > viewHeight) {
-
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
                     this.bitmap = holder.localRenderer.CreateBitmap(width, height);
                     Sholder.setFixedSize(holderWidth, holderHeight);
+
                 }else{
                     this.width = -1;
                     this.height = -1;
@@ -63,7 +61,6 @@ public class BigGroupCallListener implements MegaChatVideoListenerInterface {
 
         if (bitmap != null) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
-
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
             holder.localRenderer.DrawBitmap(false);
@@ -79,8 +76,16 @@ public class BigGroupCallListener implements MegaChatVideoListenerInterface {
         this.height = height;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     private static void log(String log) {
-        Util.log("GroupCallListener", log);
+        Util.log("BigGroupCallListener", log);
     }
 
 }
