@@ -86,6 +86,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 public void run() {
                     log("Now I start the service");
                     c.startService(new Intent(c, CameraSyncService.class));
+                    handler.removeCallbacksAndMessages(null);
                 }
             }, 2 * 1000);
         } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
