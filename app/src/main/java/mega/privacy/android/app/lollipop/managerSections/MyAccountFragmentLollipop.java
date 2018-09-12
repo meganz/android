@@ -46,10 +46,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -109,6 +111,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	MegaChatApiAndroid megaChatApi;
 
 	private Bitmap qrAvatarSave;
+
+	int numOfClicksLastSession = 0;
+	boolean stagingApiUrl = false;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -242,6 +247,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton.setVisibility(View.VISIBLE);
 
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
+		lastSessionLayout.setOnClickListener(this);
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
 		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
@@ -561,6 +567,29 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					Intent intent = new Intent(context, AchievementsActivity.class);
 //				intent.putExtra("orderGetChildren", orderGetChildren);
 					startActivity(intent);
+				}
+				break;
+			}
+			case R.id.my_account_last_session_layout:{
+				numOfClicksLastSession++;
+				if (numOfClicksLastSession == 5){
+					numOfClicksLastSession = 0;
+					if (!stagingApiUrl) {
+						stagingApiUrl = true;
+						megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+						Intent intent = new Intent(context, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setAction(Constants.ACTION_REFRESH);
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					}
+					else{
+						stagingApiUrl = false;
+						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+						Intent intent = new Intent(context, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setAction(Constants.ACTION_REFRESH);
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					}
 				}
 				break;
 			}

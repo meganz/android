@@ -193,22 +193,46 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		holder.gifImgDisplay = (ImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
 		holder.gifImgDisplay.setOnClickListener(this);
 
-		if (isGIF(mOffList.get(position).getName())){
+		boolean isGIF;
+		if (zipImage) {
+			isGIF = isGIF(paths.get(position));
+		}
+		else {
+			isGIF = isGIF(mOffList.get(position).getName());
+		}
+
+		if (isGIF){
+			log("isGIF");
 			holder.isGIF = true;
 			holder.imgDisplay.setVisibility(View.GONE);
 			holder.gifImgDisplay.setVisibility(View.VISIBLE);
-			holder.currentPath = mOffList.get(position).getPath();
+			if (zipImage) {
+				holder.currentPath = paths.get(position);
+			}
+			else {
+				holder.currentPath = mOffList.get(position).getPath();
+			}
 			holder.progressBar.setVisibility(View.VISIBLE);
 
 			Bitmap thumb = null;
 			Bitmap preview = null;
-			try {
-				holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
+			if (!zipImage) {
+				try {
+					holder.currentHandle = Long.parseLong(mOffList.get(position).getHandle());
 
-				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
-				preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+					thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentHandle);
+					preview = PreviewUtils.getPreviewFromCache(holder.currentHandle);
+				} catch (Exception e) {
+				}
 			}
-			catch (Exception e){}
+
+			File file;
+			if (zipImage) {
+				file = currentFile;
+			}
+			else {
+				file = getOfflineFile(position);
+			}
 
 			Drawable drawable = null;
 			if (preview != null){
@@ -218,9 +242,9 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 				drawable = new BitmapDrawable(context.getResources(), thumb);
 			}
 			if (drawable == null) {
-				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(currentFile.getName()).getIconResourceId());
+				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(file.getName()).getIconResourceId());
 			}
-			File file = getOfflineFile(position);
+
 			if (file != null){
 				final ProgressBar pb = holder.progressBar;
 

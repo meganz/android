@@ -199,6 +199,49 @@ public class NodeController {
         selectChatsToSendNodes(longArray);
     }
 
+    public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
+        log("checkIfNodeIsMineAndSelectChatsToSendNode");
+        if (node != null) {
+            if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
+                selectChatsToSendNode(node);
+            }
+            else {
+                String nodeFP = megaApi.getFingerprint(node);
+                ArrayList<MegaNode> nodes = megaApi.getNodesByFingerprint(nodeFP);
+                MegaNode nodeOwner = null;
+                if (nodes != null) {
+                    for (int i=0; i<nodes.size(); i++) {
+                        if (megaApi.getAccess(nodes.get(i)) == MegaShare.ACCESS_OWNER){
+                            nodeOwner = nodes.get(i);
+                            break;
+                        }
+                    }
+                }
+                if (nodeOwner != null) {
+                    selectChatsToSendNode(nodeOwner);
+                }
+                else {
+                    MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+                    if (parentNode != null) {
+                        if (context instanceof ManagerActivityLollipop) {
+                            ((ManagerActivityLollipop) context).setSendToChat(true);
+                            megaApi.copyNode(node, parentNode, (ManagerActivityLollipop) context);
+                        } else if (context instanceof AudioVideoPlayerLollipop) {
+                            ((AudioVideoPlayerLollipop) context).setSendToChat(true);
+                            megaApi.copyNode(node, parentNode, (AudioVideoPlayerLollipop) context);
+                        } else if (context instanceof PdfViewerActivityLollipop) {
+                            ((PdfViewerActivityLollipop) context).setSendToChat(true);
+                            megaApi.copyNode(node, parentNode, (PdfViewerActivityLollipop) context);
+                        } else if (context instanceof FullScreenImageViewerLollipop) {
+                            ((FullScreenImageViewerLollipop) context).setSendToChat(true);
+                            megaApi.copyNode(node, parentNode, (FullScreenImageViewerLollipop) context);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void selectChatsToSendNode(MegaNode node){
         log("selectChatsToSendNode");
 

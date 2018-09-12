@@ -262,23 +262,18 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
-//        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
-//
-//        int id = item.getItemId();
-//        switch (id) {
-//            case android.R.id.home: {
-//                log("Hang call");
-//                megaChatApi.hangChatCall(chatId, null);
-//                MegaApplication.activityPaused();
-//                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                    super.finishAndRemoveTask();
-//                }
-//                else {
-//                    super.finish();
-//                }
-//                break;
-//            }
-//        }
+
+
+        ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home: {
+                log("Hang call");
+                onBackPressed();
+                break;
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -406,6 +401,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaApi.retryPendingConnections();
         }
 
+        if (megaChatApi != null){
+            megaChatApi.retryPendingConnections(false, null);
+        }
+
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
         }
@@ -463,11 +462,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        log("aB.setHomeAsUpIndicator_1");
         aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-        aB.setHomeButtonEnabled(false);
-        aB.setDisplayHomeAsUpEnabled(false);
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
         aB.setTitle(" ");
+
         myChrono = new Chronometer(context);
 
         linearFAB = (LinearLayout) findViewById(R.id.linear_buttons);
@@ -1896,7 +1895,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //        @Override
 //        public void run() {
 //            milliseconds = milliseconds +1000;
-//            log("***********milliseconds: "+milliseconds);
 //            SimpleDateFormat formatter = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
 //            final String strDate = formatter.format(new Date(milliseconds));
 //
