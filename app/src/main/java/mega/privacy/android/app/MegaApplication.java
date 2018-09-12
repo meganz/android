@@ -20,12 +20,8 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
@@ -37,6 +33,7 @@ import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -283,13 +280,10 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 							log("getMegaAccountSESSION not Null");
 							dbH.setExtendedAccountDetailsTimestamp();
 							long mostRecentSession = megaAccountSession.getMostRecentUsage();
-							log("The last session: "+mostRecentSession);
-							java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-							Date date = new Date(mostRecentSession * 1000);
-							Calendar cal = Calendar.getInstance();
-							TimeZone tz = cal.getTimeZone();
-							df.setTimeZone(tz);
-							myAccountInfo.setLastSessionFormattedDate(df.format(date));
+
+							String date = TimeChatUtils.formatDateAndTime(mostRecentSession, TimeChatUtils.DATE_LONG_FORMAT);
+
+							myAccountInfo.setLastSessionFormattedDate(date);
 							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
 						}
 
