@@ -71,10 +71,10 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             }
             else{
 
+                log("retryPendingConnections");
                 megaApi.retryPendingConnections();
 
                 if (megaChatApi != null){
-                    log("retryPendingConnections");
                     megaChatApi.retryPendingConnections(false, null);
                 }
             }
@@ -84,7 +84,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
                 @Override
                 public void run() {
-                    log("Now I start the service");
+                    log("Start CameraSyncService");
                     c.startService(new Intent(c, CameraSyncService.class));
                     handler.removeCallbacksAndMessages(null);
                 }
