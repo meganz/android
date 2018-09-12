@@ -671,7 +671,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					showOfflineMode();
 				}
 				else if(actionType == Constants.GO_ONLINE){
-					log("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS");
 					showOnlineMode();
 				}
 			}
@@ -4412,38 +4411,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void showOnlineMode(){
 		log("showOnlineMode");
-		if(rootNode!=null){
-			Menu nVMenu = nV.getMenu();
-			if(nVMenu!=null){
-				resetNavigationViewMenu(nVMenu);
-			}
-			clickDrawerItemLollipop(drawerItem);
 
-			if(sttFLol!=null){
-				if(sttFLol.isAdded()){
-					sttFLol.setOnlineOptions(true);
+		if(usedSpaceLayout!=null){
+
+			if(rootNode!=null){
+				Menu nVMenu = nV.getMenu();
+				if(nVMenu!=null){
+					resetNavigationViewMenu(nVMenu);
+				}
+				clickDrawerItemLollipop(drawerItem);
+
+				if(sttFLol!=null){
+					if(sttFLol.isAdded()){
+						sttFLol.setOnlineOptions(true);
+					}
+				}
+
+				supportInvalidateOptionsMenu();
+			}
+			else{
+				log("showOnlineMode - Root is NULL");
+				if(getApplicationContext()!=null){
+					showConfirmationConnect();
 				}
 			}
 
-			supportInvalidateOptionsMenu();
-		}
-		else{
-			log("showOnlineMode - Root is NULL");
-			if(getApplicationContext()!=null){
-				showConfirmationConnect();
-			}
-		}
-
-		if (rChatFL != null){
-			if(rChatFL.isAdded()){
-				log("ONLINE: Update screen RecentChats");
-				if(!Util.isChatEnabled()){
-					rChatFL.showDisableChatScreen();
+			if (rChatFL != null){
+				if(rChatFL.isAdded()){
+					log("ONLINE: Update screen RecentChats");
+					if(!Util.isChatEnabled()){
+						rChatFL.showDisableChatScreen();
+					}
 				}
 			}
-		}
 
-		usedSpaceLayout.setVisibility(View.VISIBLE);
+			usedSpaceLayout.setVisibility(View.VISIBLE);
+		}
 	}
 
 	public void showConfirmationConnect(){
