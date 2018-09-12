@@ -185,7 +185,6 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.TransfersBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -226,7 +225,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-public class ManagerActivityLollipop extends PinActivityLollipop implements NetworkStateReceiver.NetworkStateReceiverListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
 
 	public int accountFragment;
@@ -255,7 +254,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	boolean mkLayoutVisible = false;
 
-	private NetworkStateReceiver networkStateReceiver;
 	MegaNode rootNode = null;
 
 	NodeController nC;
@@ -572,12 +570,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
 
-	private BroadcastReceiver inviteContactsReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			addContactFromPhone();
-		}
-	};
+	boolean sendToChat = false;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -660,6 +653,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 				is2FAEnabled = enabled;
 				if (sttFLol != null && sttFLol.isAdded()) {
 					sttFLol.update2FAPreference(enabled);
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			log("Network broadcast received!");
+			int actionType;
+
+			if (intent != null){
+				actionType = intent.getIntExtra("actionType", -1);
+
+				if(actionType == Constants.GO_OFFLINE){
+					showOfflineMode();
+				}
+				else if(actionType == Constants.GO_ONLINE){
+					showOnlineMode();
 				}
 			}
 		}
@@ -1555,9 +1567,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 	public void onStart(){
 		log("onStart");
 		super.onStart();
-		networkStateReceiver = new NetworkStateReceiver();
-		networkStateReceiver.addListener(this);
-		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 	}
 
 	@SuppressLint("NewApi") @Override
@@ -1629,7 +1638,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdatePosition, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiverUpdate2FA, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-		LocalBroadcastManager.getInstance(this).registerReceiver(inviteContactsReceiver, new IntentFilter(AddContactActivityLollipop.BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(networkReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
 		nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -1674,6 +1683,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (megaApi != null){
 			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
+		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
 		}
 
 		transfersInProgress = new ArrayList<Integer>();
@@ -3970,16 +3983,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			megaChatApi.removeChatCallListener(this);
 		}
 
-		if(networkStateReceiver!=null){
-			this.unregisterReceiver(networkStateReceiver);
-		}
-
 		showStorageAlmostFullDialog = true;
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdatePosition);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverUpdate2FA);
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(inviteContactsReceiver);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(networkReceiver);
 
     	super.onDestroy();
 	}
@@ -4402,38 +4411,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 	public void showOnlineMode(){
 		log("showOnlineMode");
-		if(rootNode!=null){
-			Menu nVMenu = nV.getMenu();
-			if(nVMenu!=null){
-				resetNavigationViewMenu(nVMenu);
-			}
-			clickDrawerItemLollipop(drawerItem);
 
-			if(sttFLol!=null){
-				if(sttFLol.isAdded()){
-					sttFLol.setOnlineOptions(true);
+		if(usedSpaceLayout!=null){
+
+			if(rootNode!=null){
+				Menu nVMenu = nV.getMenu();
+				if(nVMenu!=null){
+					resetNavigationViewMenu(nVMenu);
+				}
+				clickDrawerItemLollipop(drawerItem);
+
+				if(sttFLol!=null){
+					if(sttFLol.isAdded()){
+						sttFLol.setOnlineOptions(true);
+					}
+				}
+
+				supportInvalidateOptionsMenu();
+			}
+			else{
+				log("showOnlineMode - Root is NULL");
+				if(getApplicationContext()!=null){
+					showConfirmationConnect();
 				}
 			}
 
-			supportInvalidateOptionsMenu();
-		}
-		else{
-			log("showOnlineMode - Root is NULL");
-			if(getApplicationContext()!=null){
-				showConfirmationConnect();
-			}
-		}
-
-		if (rChatFL != null){
-			if(rChatFL.isAdded()){
-				log("ONLINE: Update screen RecentChats");
-				if(!Util.isChatEnabled()){
-					rChatFL.showDisableChatScreen();
+			if (rChatFL != null){
+				if(rChatFL.isAdded()){
+					log("ONLINE: Update screen RecentChats");
+					if(!Util.isChatEnabled()){
+						rChatFL.showDisableChatScreen();
+					}
 				}
 			}
-		}
 
-		usedSpaceLayout.setVisibility(View.VISIBLE);
+			usedSpaceLayout.setVisibility(View.VISIBLE);
+		}
 	}
 
 	public void showConfirmationConnect(){
@@ -4717,6 +4730,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 
 		setToolbarTitle();
 
+		if(Util.isChatEnabled()) {
+			MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+			if (parentNode == null) {
+				log("Create folder: " + Constants.CHAT_FOLDER);
+				megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+			}
+		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -5536,8 +5556,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
     	}
 
-    	if (newAccount || isEnable2FADialogShown) {
-    		showEnable2FADialog();
+		if (megaApi.multiFactorAuthAvailable()) {
+			if (newAccount || isEnable2FADialogShown) {
+				showEnable2FADialog();
+			}
 		}
 	}
 
@@ -7100,6 +7122,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		if (megaApi != null){
 			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
+		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
 		}
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -9142,6 +9168,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
 		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
+		}
+
 		try {
 			statusDialog.dismiss();
 		}
@@ -15362,7 +15393,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			}
 			else if(e.getErrorCode() == MegaError.API_ENOENT){
 				log("Email not changed -- API_ENOENT");
-				Util.showAlert(this, "Email not changed!", getString(R.string.general_error_word));
+				Util.showAlert(this, "Email not changed!" + getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
 			}
 			else{
 				log("Error when asking for change mail link");
@@ -15801,35 +15832,45 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Show snackbar!!!!!!!!!!!!!!!!!!!");
-				showSnackbar(getString(R.string.context_correctly_copied));
-
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-
-					int index = viewPagerCDrive.getCurrentItem();
-					log("----------------------------------------INDEX: "+index);
-					if(index==1){
-						//Rubbish bin
-						rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
-						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-						}
-					}
-					else{
-						//Cloud Drive
-						fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-						if (fbFLol != null && fbFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-							fbFLol.setNodes(nodes);
-							fbFLol.getRecyclerView().invalidate();
-						}
+				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+						&& drawerItem == DrawerItem.SHARED_ITEMS && getTabItemShares() == 0) {
+					log("Incoming node copied to Send to chat");
+					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
+					if (attachNode != null) {
+						nC.selectChatsToSendNode(attachNode);
 					}
 				}
-				else if (drawerItem == DrawerItem.INBOX){
-					if (iFLol != null && iFLol.isAdded()){
-						iFLol.getRecyclerView().invalidate();
+				else {
+					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+					showSnackbar(getString(R.string.context_correctly_copied));
+
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+
+						int index = viewPagerCDrive.getCurrentItem();
+						log("----------------------------------------INDEX: "+index);
+						if(index==1){
+							//Rubbish bin
+							rubbishBinFLol = (RubbishBinFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 1);
+							if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+								rubbishBinFLol.setNodes(nodes);
+								rubbishBinFLol.getRecyclerView().invalidate();
+							}
+						}
+						else{
+							//Cloud Drive
+							fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
+							if (fbFLol != null && fbFLol.isAdded()){
+								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+								fbFLol.setNodes(nodes);
+								fbFLol.getRecyclerView().invalidate();
+							}
+						}
+					}
+					else if (drawerItem == DrawerItem.INBOX){
+						if (iFLol != null && iFLol.isAdded()){
+							iFLol.getRecyclerView().invalidate();
+						}
 					}
 				}
 			}
@@ -15847,6 +15888,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 					showSnackbar(getString(R.string.context_no_copied));
 				}
 			}
+			sendToChat = false;
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try {
@@ -17616,21 +17658,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		catch (Exception ex) {}
 	}
 
-	@Override
-	public void networkAvailable() {
-		log("networkAvailable");
-		if(megaApi!=null){
-			megaApi.retryPendingConnections();
-		}
-		showOnlineMode();
-	}
-
-	@Override
-	public void networkUnavailable() {
-		log("networkUnavailable: network NOT available");
-		showOfflineMode();
-	}
-
 	public void uploadTakePicture(String imagePath){
 		log("uploadTakePicture");
 
@@ -17919,6 +17946,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 		this.newMail = newMail;
 	}
 
+	public void setSendToChat (boolean sendToChat) {
+			this.sendToChat = sendToChat;
+	}
 
 	public boolean isCameraUploads(MegaNode n){
 		log("isCameraUploads()");

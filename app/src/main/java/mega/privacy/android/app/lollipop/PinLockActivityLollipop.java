@@ -1602,7 +1602,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	@Override
 	protected void onResume() {
 		log("onResume");
-
+		Util.setAppFontSize(this);
 		super.onResume();
 
 		MegaApplication.activityResumed();

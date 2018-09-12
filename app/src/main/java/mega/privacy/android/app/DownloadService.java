@@ -40,6 +40,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -593,36 +594,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try {
 				if (openFile) {
 					log("openFile true");
-					//				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-					//					log("Download success of zip file!");
-					//
-					//					if(pathFileToOpen!=null){
-					//						Intent intentZip;
-					//						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
-					//						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-					//
-					//
-					//						if(intentZip!=null){
-					//							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					//							startActivity(intentZip);
-					//						}
-					//					}
-					//					else{
-					//						Intent intentZip = null;
-					//
-					//						intentZip = new Intent(this, ManagerActivityLollipop.class);
-					//						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
-					//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					//						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					//
-					//						startActivity(intentZip);
-					//					}
-					//
-					//					log("Lanzo intent al manager.....");
-					//				}
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
@@ -636,7 +607,37 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						fromMV = fromMediaViewers.get(handle);
 					}
 
-					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+					if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+						log("Download success of zip file!");
+
+						if(pathFileToOpen!=null){
+							Intent intentZip;
+							intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+							intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+
+
+							if(intentZip!=null){
+								intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								startActivity(intentZip);
+							}
+						}
+						else{
+							Intent intentZip = null;
+
+							intentZip = new Intent(this, ManagerActivityLollipop.class);
+							intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+
+							startActivity(intentZip);
+						}
+
+						log("Lanzo intent al manager.....");
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
 						if (!fromMV) {
