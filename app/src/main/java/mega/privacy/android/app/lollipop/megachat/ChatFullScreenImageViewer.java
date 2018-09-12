@@ -308,6 +308,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
+		screenHeight = outMetrics.heightPixels;
+		screenWidth = outMetrics.widthPixels;
 		float density  = getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
@@ -511,13 +513,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					viewPager.getViewTreeObserver().removeOnPreDrawListener(this);
 					int[] location = new int[2];
 					viewPager.getLocationOnScreen(location);
-					int[] getlocation = new int[2];
-					if (ChatActivityLollipop.imageDrag != null) {
-						ChatActivityLollipop.imageDrag.getLocationOnScreen(location);
-					}
+
 					if (screenPosition != null){
-						mLeftDelta = getlocation[0] - location[0];
-						mTopDelta = getlocation[1] - location[1];
+						mLeftDelta = screenPosition[0] - (screenPosition[2]/2) - location[0];
+						mTopDelta = screenPosition[1] - (screenPosition[3]/2) - location[1];
 
 						mWidthScale = (float) screenPosition[2] / viewPager.getWidth();
 						mHeightScale = (float) screenPosition[3] / viewPager.getHeight();
@@ -541,7 +540,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	public void runEnterAnimation() {
 		log("runEnterAnimation");
-		final long duration = 400;
+		final long duration = 600;
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
 				tB.animate().translationY(-220).setDuration(0)

@@ -150,8 +150,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static final String CONTACT_PREVIEW_PORTRAIT = "CONTACT_PREVIEW_PORTRAIT";
     public static final String CONTACT_THUMBNAIL = "CONTACT_THUMBNAIL";
 
-    public static ImageView imageDrag;
-    public static String type_imageDrag;
+    public String type_imageDrag;
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -3451,7 +3450,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio() ){
                                         log("itemClick:isFile:isVideoReproducibleOrIsAudio");
-
                                         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
                                         log("itemClick:FILENAME: " + node.getName() + " TYPE: "+mimeType);
 
@@ -7169,5 +7167,4 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         return screen;
     }
-
 }
