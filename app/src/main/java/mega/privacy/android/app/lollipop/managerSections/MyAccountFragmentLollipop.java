@@ -32,20 +32,25 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener{
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -71,7 +76,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	Button mkButton;
 	Button changePassButton;
 
-	RelativeLayout typeLayout;
+	LinearLayout typeLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
 
@@ -79,12 +84,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout achievementsSeparator;
 
 	LinearLayout parentLinearLayout;
+
+	ArrayList<MegaUser> lastContacted;
 	
 	DisplayMetrics outMetrics;
 	float density;
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
+
+	int numOfClicksLastSession = 0;
+	boolean stagingApiUrl = false;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -183,21 +193,20 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			achievementsSeparator.setVisibility(View.GONE);
 		}
 
-		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
+		typeLayout = (LinearLayout) v.findViewById(R.id.my_account_account_type_layout);
 
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
 
 		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
 
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			upgradeButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-		}
+
 		upgradeButton.setText(getString(R.string.my_account_upgrade_pro));
 		upgradeButton.setOnClickListener(this);
 		upgradeButton.setVisibility(View.VISIBLE);
 
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
+		lastSessionLayout.setOnClickListener(this);
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
 		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
@@ -205,13 +214,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			logoutButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
-		}
-		else{
-			logoutButton.setBackgroundResource(R.drawable.black_button_border);
-//			logoutButton.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-		}
+
 		logoutButton.setOnClickListener(this);
 		logoutButton.setVisibility(View.VISIBLE);
 
@@ -256,6 +259,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 		}		
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+
+		lastContacted = MegaApiUtils.getLastContactedUsers(context);
+		//Draw contact's connection component if lastContacted.size > 0
 
 		setAccountDetails();
 
@@ -467,13 +473,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				log("Logout button");
-
-				((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
-				megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
-//				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
-
-//				AccountController aC = new AccountController(this);
-//				aC.logout(this, megaApi);
+				Util.checkPendingTransfer(megaApi, getContext(), this);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -526,6 +526,29 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					Intent intent = new Intent(context, AchievementsActivity.class);
 //				intent.putExtra("orderGetChildren", orderGetChildren);
 					startActivity(intent);
+				}
+				break;
+			}
+			case R.id.my_account_last_session_layout:{
+				numOfClicksLastSession++;
+				if (numOfClicksLastSession == 5){
+					numOfClicksLastSession = 0;
+					if (!stagingApiUrl) {
+						stagingApiUrl = true;
+						megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+						Intent intent = new Intent(context, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setAction(Constants.ACTION_REFRESH);
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					}
+					else{
+						stagingApiUrl = false;
+						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+						Intent intent = new Intent(context, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setAction(Constants.ACTION_REFRESH);
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					}
 				}
 				break;
 			}
@@ -737,5 +760,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				setDefaultAvatar();
 			}
 		}
+	}
+
+	@Override
+	public void onAbortConfirm() {
+		log("onAbortConfirm");
+		megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+		megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+		((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
+		megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
+	}
+
+	@Override
+	public void onAbortCancel() {
+		log("onAbortCancel");
 	}
 }
