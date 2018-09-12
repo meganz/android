@@ -231,7 +231,13 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
             optionEditProfileChat.setVisibility(View.VISIBLE);
-            optionLeaveChat.setVisibility(View.VISIBLE);
+            if(permission<MegaChatRoom.PRIV_RO){
+                optionLeaveChat.setVisibility(View.GONE);
+            }
+            else{
+                optionLeaveChat.setVisibility(View.VISIBLE);
+            }
+
             optionContactInfoChat.setVisibility(View.GONE);
             optionStartConversationChat.setVisibility(View.GONE);
             optionChangePermissionsChat.setVisibility(View.GONE);

@@ -132,14 +132,6 @@
         <include
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            layout="@layout/layout_overquota_alert"
-            android:visibility="gone"
-            android:layout_alignParentBottom="true"/>
-
-        <include
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
             android:elevation="@dimen/elevation_high"
