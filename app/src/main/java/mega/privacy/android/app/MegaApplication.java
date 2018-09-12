@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -34,6 +35,7 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
@@ -61,7 +63,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
+public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
 	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
@@ -105,6 +107,24 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	private static boolean registeredChatListeners = false;
 
 	MegaChatApiAndroid megaChatApi = null;
+
+	private NetworkStateReceiver networkStateReceiver;
+
+	@Override
+	public void networkAvailable() {
+		log("Net available: Broadcast to ManagerActivity");
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+		intent.putExtra("actionType", Constants.GO_ONLINE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
+
+	@Override
+	public void networkUnavailable() {
+		log("Net unavailable: Broadcast to ManagerActivity");
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+		intent.putExtra("actionType", Constants.GO_OFFLINE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -433,6 +453,10 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
+
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();

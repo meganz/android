@@ -70,6 +70,9 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 }
             }
             else{
+
+                megaApi.retryPendingConnections();
+
                 if (megaChatApi != null){
                     log("retryPendingConnections");
                     megaChatApi.retryPendingConnections(false, null);
