@@ -7,7 +7,7 @@
     <string name="sdk_version" context="Not translate">8271d27</string>
     <string name="karere_version" context="Not translate">903f3d3</string>
 
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA cloud drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 8 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -> Take a picture and upload your photos to MEGA\nREAD_CONTACTS -> Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic and camera) -> MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
 
     <!--
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -260,7 +260,7 @@
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
 
-    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">No files in your Cloud drive</string>
+    <string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud drive">No files in your Cloud Drive</string>
     <!--
     <string name="file_browser_empty_rubbish_bin" context="option to empty rubbish bin">Empty Rubbish Bin</string>
     -->
@@ -383,8 +383,8 @@
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
     -->
     <string name="context_download_to" context="Menu item">Save to</string>
-    <string name="context_clear_rubbish" context="Menu option title">Clear rubbish bin</string>
-    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">You are about to permanently remove all items from your Rubbish bin.</string>
+    <string name="context_clear_rubbish" context="Menu option title">Clear Rubbish Bin</string>
+    <string name="clear_rubbish_confirmation" context="Ask for confirmation before removing all the elements of the rubbish bin">You are about to permanently remove all items from your Rubbish Bin.</string>
 
     <!--<string name="context_send_link" context="get the link and send it">Send link</string>-->
 
@@ -640,7 +640,7 @@
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
     <string name="cam_sync_stop" context="skip the step of camera upload">Stop</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera uploads?</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to stop Camera Uploads?</string>
     <!--
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     -->
@@ -655,7 +655,7 @@
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
-    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear offline files</string>
+    <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
 
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
 
@@ -1166,7 +1166,7 @@
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn't been successfully invited to a group chat">The participant is already included in this group chat</string>
 
-    <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were correctly invited</string>
+    <string name="number_correctly_add_participant" context="success message when inviting multiple contacts to a group chat">%d participants were successfully invited</string>
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
@@ -1420,19 +1420,19 @@
     </plurals>
 
     <string name="general_view" context="Menu option">View files</string>
-    <string name="add_to_cloud" context="Menu option">Add to Cloud drive</string>
+    <string name="add_to_cloud" context="Menu option">Add to Cloud Drive</string>
     <string name="save_for_offline" context="Menu option">Save for offline</string>
 
     <string name="general_view_contacts" context="Menu option">View contacts</string>
 
-    <string name="import_success_message" context="Menu option">Succesfully added to Cloud drive</string>
-    <string name="import_success_error" context="Menu option">Error. Not added to Cloud drive</string>
+    <string name="import_success_message" context="Menu option">Succesfully added to Cloud Drive</string>
+    <string name="import_success_error" context="Menu option">Error. Not added to Cloud Drive</string>
 
     <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Connecting&#8230;</string>
 
     <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%s was already invited. Consult your pending requests.</string>
 
-    <string name="confirm_email_misspelled" context="Hint text explaining that you can change the email and resend the create account link to the new email address">If you have misspelled your email address, correct it and click [A]Resend[A].</string>
+    <string name="confirm_email_misspelled" context="Hint text explaining that you can change the email and resend the create account link to the new email address">If you have misspelt your email address, correct it and click [A]Resend[A].</string>
     <string name="confirm_email_misspelled_resend" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Resend</string>
     <string name="confirm_email_misspelled_email_sent" context="Text shown after the confirmation email has been sent to the new email address">Email sent</string>
 
@@ -1463,7 +1463,7 @@
     <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture</string>
 
     <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">An error occurred when changing the name</string>
-    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
+    <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been successfully updated</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Participant added</string>
     <string name="add_participant_error" context="Message show when a participant hasn't been successfully invited to a group chat">Error. Participant not added</string>
@@ -1473,7 +1473,7 @@
 
     <string name="no_files_selected_warning">No files selected</string>
 
-    <string name="attachment_upload_panel_from_cloud">From Cloud drive</string>
+    <string name="attachment_upload_panel_from_cloud">From Cloud Drive</string>
     <string name="attachment_upload_panel_contact">Contact</string>
     <string name="attachment_upload_panel_photo">From device</string>
 
@@ -1667,7 +1667,7 @@
     <string name="section_my_code" context="Title of QR code section">MY CODE</string>
     <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Auto-Accept</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
+    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR Code will be automatically added to your contact list.</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
@@ -1676,15 +1676,15 @@
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
-    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error ocur trying to share the QR file. Maybe the file does not exists. Try ir later.</string>
-    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occur trying to upload the QR file. Maybe the file does not exists. Try ir later.</string>
-    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
+    <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error occurred while trying to share the QR file. Perhaps the file does not exist. Please, try again later.</string>
+    <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occurred while trying to upload the QR file. Perhaps the file does not exist. Please, try again later.</string>
+    <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occurred while trying to download the QR file. Perhaps the file does not exist. Please, try again later.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scann another valid code or to open another valid link.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
-    <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR&#8230;</string>
+    <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR Code&#8230;</string>
     <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scan QR code</string>
     <string name="button_copy_link" context="get the contact link and copy it">Copy link</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
@@ -1793,8 +1793,8 @@
     <string name="messages_forwarded_success" context="Alert message after forwarding one or several messages to several chats">Messages forwarded</string>
     <string name="messages_forwarded_error" context="Error message after forwarding one or several messages to several chats">Error. Not correctly forwarded</string>
     <plurals name="messages_forwarded_partial_error" formatted="false" context="Error message if any of the forwarded messages fails">
-        <item context="message item" quantity="one">Error. %1$d message not correctly forwarded</item>
-        <item context="message items" quantity="other">Error. %1$d messages not correctly forwarded</item>
+        <item context="message item" quantity="one">Error. %1$d message not successfully forwarded</item>
+        <item context="message items" quantity="other">Error. %1$d messages not successfully forwarded</item>
     </plurals>
     <plurals name="messages_forwarded_error_not_available" formatted="false" context="Error non existing resource after forwarding one or several messages to several chats">
         <item context="message item" quantity="one">Error. The resource is no longer available</item>
@@ -1803,7 +1803,7 @@
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">Turn on Notifications</string>
     <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">This way, you will see new messages\non your Android phone instantly.</string>
-    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android phone [A]Settings[/A]</string>
+    <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Open Android device [A]Settings[/A]</string>
     <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">Open [A]Apps &amp; notifications[/A]</string>
     <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">Select [A]MEGA[/A]</string>
     <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">Open [A]App notifications[/A]</string>
@@ -1889,7 +1889,7 @@
 
     <string name="text_enable_rich_links" context="Text of the dialog to enable the rich links previews on chat">Enhance the MEGAchat experience. URL content will be retrieved without end-to-end encryption.</string>
 
-    <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to write the decryption key</string>
+    <string name="subtitle_mega_rich_link_no_key" context="Subtitle of a MEGA rich link without the decryption key">Tap to enter the Decryption Key</string>
 
     <string name="call_starting" context="Subtitle of the call screen when a call is just starting">Calling&#8230;</string>
 
@@ -1919,12 +1919,12 @@
     <string name="title_2fa" context="Title of the screen Two-Factor Authentication">Why you need two-factor authentication?</string>
     <string name="two_factor_authentication_explain">Two-factor authentication is a second layer of security for your account. Which means that even if someone knows your password they cannot access it, without also having access to the six digit code only you have access to.</string>
     <string name="button_setup_2fa" context="Button that permits user begin with the process of enable Two-Factor Authentication">Begin setup</string>
-    <string name="explain_qr_seed_2fa" context="Text that explain how to do with Two-Factor Authentication QR">Scan or copy the seed directly into your authenticator app.</string>
+    <string name="explain_qr_seed_2fa" context="Text that explain how to do with Two-Factor Authentication QR">Scan or copy the seed to your Authenticator App. Be sure to backup this seed to a safe place in case you lose your phone.</string>
     <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Please enter the code generated by your authenticator app.</string>
     <string name="general_verify" context="Text button">Verify</string>
     <string name="general_next" context="Text button">Next</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code. Not translate">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
-    <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">An error occurred generating the seed or QR, please try again.</string>
+    <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">An error occurred generating the seed or QR code, please try again.</string>
     <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Two-Factor Authentication enabled</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Next time you login to your account you will be asked to enter a 6-digit code provided by your authentication app.</string>
     <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Back up your recovery key.</b></string>
@@ -1933,11 +1933,11 @@
     <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Login verification</string>
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Two-Factor Authentication\nChange password</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">Two-Factor Authentication\nCancel account</string>
-    <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Two-Factor Authentication\nChange mail</string>
+    <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Two-Factor Authentication\nChange email</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Disable Two-Factor Authentication</string>
     <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Lost your authenticator device?</string>
-    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">An error ocurred trying to disable Two-Factor Authentication. Please try again.</string>
-    <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">An error ocurred trying to enable Two-Factor Authentication. Please try again.</string>
+    <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to disable Two-Factor Authentication. Please try again.</string>
+    <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to enable Two-Factor Authentication. Please try again.</string>
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Enable Two-Factor Authentication</string>
     <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">Two-Factor Authentication disabled</string>
     <string name="open_app_button" context="Text of the button which action is to show the authentication apps">Open in</string>
@@ -1945,15 +1945,15 @@
     <string name="general_close" context="Text button">Close</string>
     <string name="general_rk" context="Text of the file name where the Recovery Key is saved. Not translate">MEGARecoveryKey.txt</string>
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">Export your Recovery Key to finish</string>
-    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Would you want to open Google Play to install some authenticator app?</string>
+    <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Would you want to open Google Play to install an Authenticator App?</string>
 
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d files were not shared</string>
     <string name="preview_content" context="button's text to open a full screen image">PREVIEW CONTENT</string>
 
-    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">The streaming can not be executed and the file is not been downloaded</string>
-    <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File already exists on Save for Offline</string>
+    <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">The streaming can not be executed and the file has not been downloaded</string>
+    <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File already exists in Saved for Offline</string>
 
     <plurals name="error_forwarding_messages" context="Error message if forwarding a message failed">
         <item context="one message" quantity="one">Message not forwarded</item>
@@ -1970,7 +1970,7 @@
     <string name="call_not_answered_messages" context="Message shown when a call ends.">[A]Call was not answered[/A]</string>
 
     <string name="contact_email" context="Indicates that can type a contact email">Contact’s email</string>
-    <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">Contact not added, is already added.</string>
+    <string name="contact_not_added" context="When it tries to add a contact in a list an is already added">You have already added this contact.</string>
 
     <plurals name="plural_call_ended_messages_with_minutes" context="Message shown when a call ends.">
         <item context="one minute" quantity="one">[A]Call ended[/A][C]. Duration: [/C][B]%1$s minute[/B]</item>
@@ -1992,12 +1992,12 @@
         <item context="more seconds" quantity="other">[A]Call ended[/A][C]. Duration: [/C][B]%1$d seconds[/B]</item>
     </plurals>
 
-    <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid format message</string>
-    <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid signature message</string>
+    <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid message format</string>
+    <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid message signature</string>
 
     <string name="add_to_cloud_import" context="Menu option">Add to Cloud</string>
 
-    <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error ocurred trying to create the streaming</string>
+    <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error occurred trying to create the stream</string>
 
     <string name="context_restore" context="Menu option to restore an item from the Rubbish bin">Restore</string>
 
@@ -2029,7 +2029,7 @@
     <string name="error_archive_chat" context="Error message shown when a chat has not be archived, it shows the name of the chat">Error. %s chat was not archived.</string>
 
     <string name="success_unarchive_chat" context="Message shown when a chat is successfully unarchived, it shows the name of the chat">%s chat was unarchived.</string>
-    <string name="error_unarchive_chat" context="Error message shown when a chat has not be unarchived, it shows the name of the chat">Error. %s chat was not unarchived.</string>
+    <string name="error_unarchive_chat" context="Error message shown when a chat has not be unarchived, it shows the name of the chat">Error. %s chat was not able to be unarchived.</string>
 
     <string name="archived_chats_empty" context="Message shown when the user has no archived chats">[A]No[/A] [B]Archived Chats[/B]</string>
 
@@ -2057,7 +2057,7 @@
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
 
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">File versions deleted successfully</string>
-    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Error. The file versions have not been deleted</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Error. The file versions were not able to be deleted</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File versioning</string>
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
@@ -2066,8 +2066,8 @@
     <string name="type_mail" context="Hint shown to guide user on activity add contacts">Tap, enter name or email</string>
 
     <string name="confirmation_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Add %s to your contacts?</string>
-    <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">Contact %s not added, is already a contact.</string>
-    <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">The contact %s was not added, is already added</string>
+    <string name="confirmation_not_invite_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and the contact is already a contact">You have already added the contact %s.</string>
+    <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">You have already added the contact %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Share with %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">New group chat</string>
     <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Add contacts</string>
@@ -2080,7 +2080,7 @@
 
     <string name="invalid_code" context="Error shown when it is scanning a QR code and it is invalid">Invalid code</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage is almost full">Cloud Drive is almost full. Upgrade to Pro and get up to 8 TB of storage and 16 TB of transfer quota.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
     <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get bonus</string>
@@ -2099,7 +2099,7 @@
 
     <plurals name="plural_select_file" context="Section title to select a file to perform an action">
         <item context="one file" quantity="one">Choose file</item>
-        <item context="more files" quantity="other">Choose files</item>
+        <item context="more files" quantity="other">Choose Files</item>
     </plurals>
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
