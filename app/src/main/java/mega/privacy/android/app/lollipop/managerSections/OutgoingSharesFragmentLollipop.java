@@ -349,7 +349,12 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 				}
 
 				if(allFiles){
-					showSendToChat = true;
+					if (Util.isChatEnabled()) {
+						showSendToChat = true;
+					}
+					else {
+						showSendToChat = false;
+					}
 				}else{
 					showSendToChat = false;
 				}

@@ -401,6 +401,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaApi.retryPendingConnections();
         }
 
+        if (megaChatApi != null){
+            megaChatApi.retryPendingConnections(false, null);
+        }
+
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
         }
