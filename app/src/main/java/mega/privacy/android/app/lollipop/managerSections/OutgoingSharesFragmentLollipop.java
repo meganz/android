@@ -164,13 +164,15 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
             }
             
             placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-            if (placeholderCount == 0) {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(folderCount + i,fileCount + " " + fileStr);
-                }
-            } else {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+            if(fileCount > 0 ) {
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
                 }
             }
         } else {
