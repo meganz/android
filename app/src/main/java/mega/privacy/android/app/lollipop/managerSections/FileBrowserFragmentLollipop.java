@@ -103,8 +103,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	Stack<Integer> lastPositionStack;
 
-    private boolean hasPlaceholder;
-
 	MegaApiAndroid megaApi;
 	RelativeLayout transfersOverViewLayout;
 	TextView transfersTitleText;
@@ -1533,6 +1531,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         int folderCount = 0;
         int fileCount = 0;
         for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
             if (node.isFolder()) {
                 folderCount++;
             }
@@ -1561,20 +1562,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                     sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
                 }
             }
-           
-           
-//            sections.put(folderCount + 1,fileCount + " " + fileStr);
-//            if (folderCount % 2 == 0) {
-//                sections.put(folderCount,fileCount + " " + fileStr);
-//                hasPlaceholder = false;
-//            } else {
-//                sections.put(folderCount+2,fileCount + " " + fileStr);
-//                hasPlaceholder = true;
-//            }
         } else {
             sections.put(0,folderCount + " " + folderStr);
             sections.put(folderCount,fileCount + " " + fileStr);
-            hasPlaceholder = false;
         }
         if (floatingItemDecoration == null) {
             floatingItemDecoration = new FloatingItemDecoration(context);

@@ -52,7 +52,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
@@ -107,14 +107,14 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
-	
-	private boolean hasPlaceholder;
 
 	DatabaseHandler dbH;
 	MegaPreferences prefs;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public ActionMode actionMode;
+	
+	private int placeholderCount;
 
 	public void activateActionMode(){
 		if (!adapter.isMultipleSelect()){
@@ -155,44 +155,54 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		return null;
 	}
-	
-	public void addSectionTitle(List<MegaNode> nodes,int type) {
-		Map<Integer, String> sections = new HashMap<>();
-		int folderCount = 0;
-		int fileCount = 0;
-		for (MegaNode node : nodes) {
-			if (node.isFolder()) {
-				folderCount++;
-			}
-			if (node.isFile()) {
-				fileCount++;
-			}
-		}
-		String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-		String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
-		if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
-			sections.put(0,folderCount + " " + folderStr);
-			sections.put(1,folderCount + " " + folderStr);
-			sections.put(folderCount + 1,fileCount + " " + fileStr);
-			if (folderCount % 2 == 0) {
-				hasPlaceholder = false;
-				sections.put(folderCount,fileCount + " " + fileStr);
-			} else {
-				hasPlaceholder = true;
-				sections.put(folderCount+2,fileCount + " " + fileStr);
-			}
-		} else {
-			hasPlaceholder = false;
-			sections.put(0,folderCount + " " + folderStr);
-			sections.put(folderCount,fileCount + " " + fileStr);
-		}
-		if (floatingItemDecoration == null) {
-			floatingItemDecoration = new FloatingItemDecoration(context);
-			recyclerView.addItemDecoration(floatingItemDecoration);
-		}
-		floatingItemDecoration.setType(type);
-		floatingItemDecoration.setKeys(sections);
-	}
+    
+    public void addSectionTitle(List<MegaNode> nodes,int type) {
+        Map<Integer, String> sections = new HashMap<>();
+        int folderCount = 0;
+        int fileCount = 0;
+        for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            }
+            if (node.isFile()) {
+                fileCount++;
+            }
+        }
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            for (int i = 0;i < spanCount;i++) {
+                sections.put(i,folderCount + " " + folderStr);
+            }
+            
+            placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+            if (placeholderCount == 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(folderCount + i,fileCount + " " + fileStr);
+                }
+            } else {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                }
+            }
+        } else {
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
+        if (floatingItemDecoration == null) {
+            floatingItemDecoration = new FloatingItemDecoration(context);
+            recyclerView.addItemDecoration(floatingItemDecoration);
+        }
+        floatingItemDecoration.setType(type);
+        floatingItemDecoration.setKeys(sections);
+    }
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
@@ -616,7 +626,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			log("Grid View");
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
@@ -874,10 +884,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -968,8 +978,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				//Is file
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-					//Put flag to notify FullScreenImageViewerLollipop.
-					intent.putExtra("placeholder",hasPlaceholder);
+                    //Put flag to notify FullScreenImageViewerLollipop.
+                    intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
