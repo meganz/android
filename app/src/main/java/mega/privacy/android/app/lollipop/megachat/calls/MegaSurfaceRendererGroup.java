@@ -58,7 +58,6 @@ import android.view.SurfaceHolder.Callback;
 import org.webrtc.Logging;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.BigGroupCallAdapter;
 import mega.privacy.android.app.utils.Util;
 
 public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
