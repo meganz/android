@@ -36,6 +36,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListFragmentLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -49,6 +50,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -71,6 +73,8 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     Object fragment;
     long parentHandle = -1;
     DisplayMetrics outMetrics;
+    
+    private int placeholderCount;
     
     private SparseBooleanArray selectedItems;
     
@@ -104,6 +108,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
         public ImageView fileGridSelected;
+    }
+    
+    public int getPlaceholderCount() {
+        return placeholderCount;
     }
     
     public void toggleAllSelection(int pos) {
@@ -280,9 +288,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {
-
+                        
                         }
-
+                        
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             if (selectedItems.size() <= 0) {
@@ -305,10 +313,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                                 }
                             }
                         }
-
+                        
                         @Override
                         public void onAnimationRepeat(Animation animation) {
-
+                        
                         }
                     });
                     view.imageViewIcon.startAnimation(flipAnimation);
@@ -363,7 +371,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         for (int i = 0;i < nodes.size();i++) {
             if (!isItemChecked(i)) {
                 //Exlude placeholder.
-                if(nodes.get(i) != null) {
+                if (nodes.get(i) != null) {
                     toggleAllSelection(i);
                 }
             }
@@ -375,7 +383,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         for (int i = 0;i < nodes.size();i++) {
             if (isItemChecked(i)) {
                 //Exlude placeholder.
-                if(nodes.get(i) != null) {
+                if (nodes.get(i) != null) {
                     toggleAllSelection(i);
                 }
             }
@@ -451,16 +459,24 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
         int folderCount = 0;
         for (MegaNode node : nodes) {
-            if(node == null) {
+            if (node == null) {
                 continue;
             }
             if (node.isFolder()) {
                 folderCount++;
             }
         }
-        if (folderCount > 0 && folderCount % 2 == 1 && adapterType == ITEM_VIEW_TYPE_GRID) {
-            //Add placeholder between folders and filse.
-            nodes.add(folderCount,null);
+        int spanCount = 2;
+        if (listFragment instanceof NewGridRecyclerView) {
+            spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
+        }
+        int placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+
+        if (folderCount > 0 && placeholderCount != 0 && adapterType == ITEM_VIEW_TYPE_GRID) {
+            //Add placeholder at folders' end.
+            for (int i = 0;i < placeholderCount;i++) {
+                nodes.add(folderCount + i,null);
+            }
         }
         return nodes;
     }
@@ -775,11 +791,11 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.textViewFileName.setVisibility(View.VISIBLE);
             holder.textViewFileSize.setVisibility(View.GONE);
-    
+            
             holder.textViewFileNameForFile.setText(node.getName());
             long nodeSize = node.getSize();
             holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-    
+            
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);

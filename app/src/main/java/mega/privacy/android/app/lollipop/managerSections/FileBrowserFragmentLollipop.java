@@ -56,8 +56,9 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -129,6 +130,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	boolean allFiles = true;
 	String downloadLocationDefaultPath = Util.downloadDIR;
+    
+    private int placeholderCount;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -651,7 +654,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             log("FileBrowserFragmentLollipop isGrid");
             View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
             
-            recyclerView = (CustomizedGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
+            recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
             fastScroller = (FastScroller)v.findViewById(R.id.fastscroll);
             
             recyclerView.setPadding(0,0,0,Util.scaleHeightPx(80,outMetrics));
@@ -882,10 +885,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -899,6 +902,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					log("itemClick:isFile:isImage");
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+                    //Put flag to notify FullScreenImageViewerLollipop.
+					intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.FILE_BROWSER_ADAPTER);
 					intent.putExtra("isFolderLink", false);
@@ -1538,16 +1543,34 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
         String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
         if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
-            sections.put(0,folderCount + " " + folderStr);
-            sections.put(1,folderCount + " " + folderStr);
-            sections.put(folderCount + 1,fileCount + " " + fileStr);
-            if (folderCount % 2 == 0) {
-                sections.put(folderCount,fileCount + " " + fileStr);
-                hasPlaceholder = false;
-            } else {
-                sections.put(folderCount+2,fileCount + " " + fileStr);
-                hasPlaceholder = true;
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
             }
+            for (int i = 0;i < spanCount;i++) {
+                sections.put(i,folderCount + " " + folderStr);
+            }
+            
+            placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+            if (placeholderCount == 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(folderCount + i,fileCount + " " + fileStr);
+                }
+            } else {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                }
+            }
+           
+           
+//            sections.put(folderCount + 1,fileCount + " " + fileStr);
+//            if (folderCount % 2 == 0) {
+//                sections.put(folderCount,fileCount + " " + fileStr);
+//                hasPlaceholder = false;
+//            } else {
+//                sections.put(folderCount+2,fileCount + " " + fileStr);
+//                hasPlaceholder = true;
+//            }
         } else {
             sections.put(0,folderCount + " " + folderStr);
             sections.put(folderCount,fileCount + " " + fileStr);
