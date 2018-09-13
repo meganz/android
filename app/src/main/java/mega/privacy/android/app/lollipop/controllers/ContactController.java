@@ -12,6 +12,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -336,6 +337,22 @@ public class ContactController {
 
             if (contactEmails.size() == 1){
                 megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (AchievementsActivity) context);
+            }
+            else if (contactEmails.size() > 1){
+                inviteMultipleListener = new MultipleRequestListener(-1, context);
+                for(int i=0; i<contactEmails.size();i++) {
+                    megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
+                }
+            }
+        }
+        else if (context instanceof AddContactActivityLollipop) {
+            if (!Util.isOnline(context)){
+                ((AddContactActivityLollipop) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
+            }
+
+            if (contactEmails.size() == 1){
+                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (AddContactActivityLollipop) context);
             }
             else if (contactEmails.size() > 1){
                 inviteMultipleListener = new MultipleRequestListener(-1, context);

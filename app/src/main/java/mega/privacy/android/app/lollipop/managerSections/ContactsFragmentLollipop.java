@@ -123,8 +123,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	ArrayList<MegaUser> contacts;
 	ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<MegaContactAdapter>();
 	
-	int orderContacts;
-
 	MegaUser selectedUser = null;
 
 	private boolean isContact = false;
@@ -684,11 +682,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if (Util.isChatEnabled()) {
+					menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+					menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+				else {
+					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
+				}
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -863,8 +867,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				visibleContacts.add(megaContactAdapter);
 			}
 		}
-		orderContacts = ((ManagerActivityLollipop)context).getOrderContacts();
-		sortBy(orderContacts);
+
+		sortBy();
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -1077,8 +1081,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 
-		orderContacts = ((ManagerActivityLollipop)context).getOrderContacts();
-		sortBy(orderContacts);
+		sortBy();
 		
 		adapter.setContacts(visibleContacts);
 
@@ -1091,12 +1094,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		}
 	}
 
-	public void updateOrder(){
-		if(isAdded()){
-			adapter.notifyDataSetChanged();
-		}
-	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -1253,10 +1250,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		}
 	}
 
-	public void sortBy(int orderContacts){
+	public void sortBy(){
 		log("sortBy");
 
-		if(orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
+		if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_DEFAULT_DESC){
 			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
 
 				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
@@ -1270,7 +1267,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			}));
 		}
-		else if(orderContacts == MegaApiJava.ORDER_CREATION_ASC){
+		else if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_CREATION_ASC){
 			Collections.sort(visibleContacts,  new Comparator<MegaContactAdapter>(){
 
 				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
@@ -1282,7 +1279,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 			});
 		}
-		else if(orderContacts == MegaApiJava.ORDER_CREATION_DESC){
+		else if(((ManagerActivityLollipop)context).orderContacts == MegaApiJava.ORDER_CREATION_DESC){
 			Collections.sort(visibleContacts,  Collections.reverseOrder(new Comparator<MegaContactAdapter>(){
 
 				public int compare(MegaContactAdapter c1, MegaContactAdapter c2) {
@@ -1309,7 +1306,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			});
 		}
 	}
-	
+
+	public void updateOrder(){
+
+//		for(int i=0; i<visibleContacts.size();i++){
+//			log("contact ordered "+i+ " "+visibleContacts.get(i).getFullName());
+//		}
+		if(isAdded()){
+			adapter.notifyDataSetChanged();
+		}
+	}
+
 	public boolean showSelectMenuItem(){
 		if (adapter != null){
 			return adapter.isMultipleSelect();
@@ -1323,11 +1330,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			return adapter.getItemCount();
 		}
 		return 0;
-	}
-	
-	public void setOrder(int orderContacts){
-		log("setOrder:Contacts");
-		this.orderContacts = orderContacts;
 	}
 
 	public ArrayList<MegaContactAdapter> getVisibleContacts() {

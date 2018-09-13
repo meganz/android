@@ -7,6 +7,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -24,12 +25,8 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
@@ -40,7 +37,9 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -67,7 +66,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
+public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
 	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
@@ -111,6 +110,24 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	private static boolean registeredChatListeners = false;
 
 	MegaChatApiAndroid megaChatApi = null;
+
+	private NetworkStateReceiver networkStateReceiver;
+
+	@Override
+	public void networkAvailable() {
+		log("Net available: Broadcast to ManagerActivity");
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+		intent.putExtra("actionType", Constants.GO_ONLINE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
+
+	@Override
+	public void networkUnavailable() {
+		log("Net unavailable: Broadcast to ManagerActivity");
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+		intent.putExtra("actionType", Constants.GO_OFFLINE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -269,13 +286,10 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 							log("getMegaAccountSESSION not Null");
 							dbH.setExtendedAccountDetailsTimestamp();
 							long mostRecentSession = megaAccountSession.getMostRecentUsage();
-							log("The last session: "+mostRecentSession);
-							java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-							Date date = new Date(mostRecentSession * 1000);
-							Calendar cal = Calendar.getInstance();
-							TimeZone tz = cal.getTimeZone();
-							df.setTimeZone(tz);
-							myAccountInfo.setLastSessionFormattedDate(df.format(date));
+
+							String date = TimeChatUtils.formatDateAndTime(mostRecentSession, TimeChatUtils.DATE_LONG_FORMAT);
+
+							myAccountInfo.setLastSessionFormattedDate(date);
 							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
 						}
 
@@ -461,6 +475,10 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
+
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
