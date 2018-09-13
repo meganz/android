@@ -682,11 +682,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				if (Util.isChatEnabled()) {
+					menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+					menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+					menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				}
+				else {
+					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
+					menu.findItem(R.id.cab_menu_start_conversation).setVisible(false);
+				}
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
