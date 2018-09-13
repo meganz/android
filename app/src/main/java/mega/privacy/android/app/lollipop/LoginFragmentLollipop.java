@@ -52,6 +52,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -71,13 +72,13 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
-
-public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener, AbortPendingTransferCallback {
 
     private Context context;
     private AlertDialog insertMailDialog;
@@ -198,6 +199,19 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     @Override
+    public void onAbortConfirm() {
+        log("onAbortConfirm");
+        megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+        megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+        submitForm();
+    }
+
+    @Override
+    public void onAbortCancel() {
+        log("onAbortCancel");
+    }
+
+    @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
         super.onCreate(savedInstanceState);
@@ -295,7 +309,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    submitForm();
+                    performLogin();
                     return true;
                 }
                 return false;
@@ -1427,10 +1441,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     private void submitForm() {
-        if (!validateForm()) {
-            return;
-        }
 
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 
         if(!Util.isOnline(context))
@@ -1592,7 +1604,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     public void onLoginClick(View v){
-        submitForm();
+        performLogin();
     }
 
     public void onRegisterClick(View v){
@@ -3047,6 +3059,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         }
         return false;
+    }
+
+    private void performLogin(){
+        if (validateForm()) {
+            Util.checkPendingTransfer(megaApi, getContext(), this);
+        }
     }
 
     private static void log(String log) {

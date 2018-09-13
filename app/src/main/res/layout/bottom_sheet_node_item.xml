@@ -265,12 +265,10 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_chat_w"
-                    android:tint="@android:color/black"
+                    android:src="@drawable/ic_b_send_to_contact"
                     android:visibility="visible" />
 
                 <TextView

@@ -1546,21 +1546,26 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					if(extras!=null){
 						if (!extras.containsKey(Intent.EXTRA_STREAM)) {
 							StringBuilder body = new StringBuilder();
-							String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
-							if (sharedText2 != null) {
-								body.append(getString(R.string.new_file_subject_when_uploading)+": ");
-								body.append(sharedText2);
-							}
+							String header = "[InternetShortcut]\n";
+							body.append(header);
+
 							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 							if (sharedText != null) {
-								body.append("\n");
-								body.append(getString(R.string.new_file_content_when_uploading)+": ");
+								body.append("URL=");
+//								body.append(getString(R.string.new_file_content_when_uploading)+": ");
 								body.append(sharedText);
 							}
+
+							String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+							if (sharedText2 != null) {
+								body.append("\nsubject=");
+								body.append(sharedText2);
+							}
+
 							String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
 							if (sharedText3 != null) {
-								body.append("\n");
-								body.append(getString(R.string.new_file_email_when_uploading)+": ");
+								body.append("\nemail=");
+//								body.append(getString(R.string.new_file_email_when_uploading)+": ");
 								body.append(sharedText3);
 							}
 
@@ -1687,7 +1692,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
     private void createFile(String name, String data, MegaNode parentNode){
 
-		File file = Util.createTemporalTextFile(name, data);
+		File file = Util.createTemporalURLFile(name, data);
 		if(file!=null){
 			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
 
@@ -2602,7 +2607,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_file_name));
+		input.setHint(getString(R.string.context_new_link_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 
@@ -2635,7 +2640,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		});
 
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -2646,8 +2651,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.dialog_title_new_file));
-		builder.setPositiveButton(getString(R.string.general_create),
+		builder.setTitle(getString(R.string.dialog_title_new_link));
+		builder.setPositiveButton(getString(R.string.cam_sync_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();
