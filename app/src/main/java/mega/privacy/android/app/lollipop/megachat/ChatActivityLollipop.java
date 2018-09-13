@@ -963,9 +963,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(idChat!=-1) {
 
-                    if(megaApi.getNumPendingUploads()<=0){
-                        dbH.setFinishedPendingMessages();
-                    }
+//                    if(megaApi.getNumPendingUploads()<=0){
+//                        dbH.setFinishedPendingMessages();
+//                    }
 
                     //REcover chat
                     log("Recover chat with id: " + idChat);
@@ -5191,10 +5191,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void loadPendingMessages(){
         log("loadPendingMessages");
         ArrayList<AndroidMegaChatMessage> pendMsgs = dbH.findAndroidMessagesNotSent(idChat);
-        dbH.findPendingMessagesBySent(1);
+//        dbH.findPendingMessagesBySent(1);
         log("Number of pending: "+pendMsgs.size());
         for(int i=0;i<pendMsgs.size();i++){
             if(pendMsgs.get(i)!=null){
+                pendMsgs.get(i).setUploading(true);
                 appendMessagePosition(pendMsgs.get(i));
             }
             else{
