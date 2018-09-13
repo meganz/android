@@ -293,11 +293,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if(chat.isArchived()){
                 archiveChatTitle.setText(getString(R.string.general_unarchive));
-                archiveChatIcon.setImageDrawable(getDrawable(R.drawable.ic_b_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
             }
             else{
                 archiveChatTitle.setText(getString(R.string.general_archive));
-                archiveChatIcon.setImageDrawable(getDrawable(R.drawable.ic_b_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
             }
 
             //Leave chat Layout
