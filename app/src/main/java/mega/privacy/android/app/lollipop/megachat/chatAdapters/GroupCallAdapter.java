@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -84,7 +85,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
     public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress) {
-        log("GroupCallAdapter( peers: "+peers.size()+")");
+        log("GroupCallAdapter(peers: "+peers.size()+")");
 
         this.context = context;
         this.recyclerViewFragment = recyclerView;
@@ -200,7 +201,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         }else if((numPeersOnCall > 4) && (numPeersOnCall < 7)){
             lp.height = Util.scaleWidthPx(180, outMetrics);
             lp.width = maxScreenWidth/2;
+        }else if(numPeersOnCall >= 7){
+            lp.height = Util.scaleWidthPx(90, outMetrics);
+            lp.width = Util.scaleWidthPx(90, outMetrics);
         }
+
         v.setLayoutParams(lp);
 
         holderGrid = new ViewHolderGroupCallGrid(v);
@@ -227,12 +232,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         if(numPeersOnCall < 7){
             log("onCreateViewHolder() - peers < 7");
-
-            ViewGroup.LayoutParams paramsGeneral = (ViewGroup.LayoutParams) holderGrid.rlGeneral.getLayoutParams();
-            paramsGeneral.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            paramsGeneral.height = ViewGroup.LayoutParams.MATCH_PARENT;
-            holderGrid.rlGeneral.setLayoutParams(paramsGeneral);
-
             holderGrid.avatarMicroLayout.setBackgroundColor(Color.TRANSPARENT);
 
             RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holderGrid.microAvatar.getLayoutParams());
@@ -245,14 +244,10 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             paramsAvatarImage.width = Util.scaleWidthPx(88, outMetrics);
             paramsAvatarImage.height = Util.scaleWidthPx(88, outMetrics);
             holderGrid.avatarImage.setLayoutParams(paramsAvatarImage);
-            holderGrid.avatarInitialLetter.setTextSize(Util.scaleWidthPx(25, outMetrics));
+            holderGrid.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 60f);
 
         }else{
-
-            ViewGroup.LayoutParams paramsGeneral = (ViewGroup.LayoutParams) holderGrid.rlGeneral.getLayoutParams();
-            paramsGeneral.width = Util.scaleWidthPx(90, outMetrics);
-            paramsGeneral.height = Util.scaleWidthPx(90, outMetrics);
-            holderGrid.rlGeneral.setLayoutParams(paramsGeneral);
+            log("onCreateViewHolder() - peers >= 7");
 
             holderGrid.avatarMicroLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent_black));
 
@@ -265,7 +260,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             paramsAvatarImage.height = Util.scaleWidthPx(60, outMetrics);
             holderGrid.avatarImage.setLayoutParams(paramsAvatarImage);
 
-            holderGrid.avatarInitialLetter.setTextSize(Util.scaleWidthPx(30, outMetrics));
+            holderGrid.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f);
         }
         v.setTag(holderGrid);
         return holderGrid;
@@ -279,7 +274,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolderGroupCall holder, int position) {
-        log("onBindViewHolder");
         ViewHolderGroupCallGrid holderGrid2 = (ViewHolderGroupCallGrid) holder;
         onBindViewHolderGrid(holderGrid2, position);
 
@@ -295,8 +289,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
         int numPeersOnCall = getItemCount();
         if(peer.isVideoOn()) {
-            log("Video ON");
+            log("Video ON - numPeersOnCall: "+numPeersOnCall);
             if(numPeersOnCall == 1){
+                log("1");
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
                 layoutParamsSurface.width = maxScreenWidth;
@@ -305,6 +300,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 2){
+                log("2");
+
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(320, outMetrics);
@@ -313,6 +310,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 3){
+                log("3");
+
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(212, outMetrics);
@@ -321,6 +320,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 4){
+                log("4");
+
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
@@ -335,6 +336,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
 
             }else if(numPeersOnCall == 5){
+                log("5");
+
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
@@ -350,6 +353,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 }
 
             }else if(numPeersOnCall == 6){
+                log("6");
+
                 //Surface Layout:
                 RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
                 layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
@@ -380,6 +385,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
             holder.surfaceViewLayout.addView(holder.surfaceView);
             if(numPeersOnCall > 6){
+                log("add listener in local Renderer");
+
                 holder.localRenderer.addListener(this);
             }
 
@@ -419,8 +426,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             }
 
         }else{
-            log("Video OFF");
+            log("Video OFF - numPeersOnCall: "+numPeersOnCall);
             if(numPeersOnCall == 1){
+                log("1");
                 //Avatar Layout:
                 RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
                 layoutParamsAvatar.width = maxScreenWidth;
@@ -429,6 +437,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
 
             }else if(numPeersOnCall == 2){
+                log("2");
+
                 //Avatar Layout:
                 RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
                 layoutParamsAvatar.width = Util.scaleWidthPx(320, outMetrics);
@@ -437,6 +447,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
 
             }else if(numPeersOnCall == 3){
+                log("3");
+
                 //Avatar Layout:
                 RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
                 layoutParamsAvatar.width = Util.scaleWidthPx(212, outMetrics);
@@ -445,6 +457,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
 
             }else if(numPeersOnCall == 4){
+                log("4");
+
                 //Avatar Layout:
                 RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
                 layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
@@ -459,6 +473,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
 
             }else if(numPeersOnCall == 5){
+                log("5");
+
                 //Avatar Layout:
                 RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
                 layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
@@ -475,6 +491,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 }
 
             }else if(numPeersOnCall == 6){
+                log("6");
+
                 //Avatar Layout:
                 RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
                 layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
@@ -533,8 +551,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public Object getItem(int position) {
-        log("getItem() position "+position);
-
         if (peers != null){
             return peers.get(position);
         }
@@ -543,8 +559,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
     public InfoPeerGroupCall getNodeAt(int position) {
-        log("getNodeAt() position "+position);
-
         try {
             if (peers != null) {
                 return peers.get(position);
@@ -556,12 +570,9 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
    //My AVATAR
    public void setProfileMyAvatar(ViewHolderGroupCall holder) {
-       log("setProfileMyAvatar()");
-
        Bitmap myBitmap = null;
        File avatar = null;
        if (context != null) {
-           log("context is not null");
            if (context.getExternalCacheDir() != null) {
                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
            } else {
@@ -592,8 +603,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
    }
 
     public void createMyDefaultAvatar(ViewHolderGroupCall holder) {
-        log("createMyDefaultAvatar()");
-
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
@@ -608,11 +617,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
 
         if(color!=null){
-            log("The color to set the avatar is "+color);
             p.setColor(Color.parseColor(color));
-        }
-        else{
-            log("Default color to the avatar");
+        }else{
             p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
@@ -631,7 +637,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
 
     public void setProfileContactAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
-        log("setProfileContactAvatar");
         Bitmap bitmap = null;
         File avatar = null;
         String contactMail = megaChatApi.getContactEmail(userHandle);
@@ -667,8 +672,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
                     createDefaultAvatar(userHandle, fullName, holder);
                 }
-            }
-            else{
+            }else{
                 UserAvatarListener listener = new UserAvatarListener(context);
 
                 if(!avatarRequested){
@@ -683,8 +687,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
                 createDefaultAvatar(userHandle, fullName, holder);
             }
-        }
-        else{
+        }else{
             UserAvatarListener listener = new UserAvatarListener(context);
 
             if(!avatarRequested){
@@ -702,8 +705,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     }
 
     public void createDefaultAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder) {
-        log("createDefaultAvatar");
-
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -771,7 +772,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 }
             }
         }else{
-            log("holder is NULL");
             notifyItemChanged(position);
         }
     }
