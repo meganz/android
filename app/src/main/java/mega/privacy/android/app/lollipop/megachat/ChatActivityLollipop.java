@@ -6766,6 +6766,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 setAsRead=false;
             }
         }
+        setChatSubtitle();
     }
 
     public void takePicture(){
