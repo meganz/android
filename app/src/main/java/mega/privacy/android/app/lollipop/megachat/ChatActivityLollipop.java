@@ -5195,7 +5195,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("Number of pending: "+pendMsgs.size());
         for(int i=0;i<pendMsgs.size();i++){
             if(pendMsgs.get(i)!=null){
-                pendMsgs.get(i).setUploading(true);
                 appendMessagePosition(pendMsgs.get(i));
             }
             else{
