@@ -42,7 +42,8 @@
                          android:layout_alignParentBottom="true"
                          android:layout_alignParentLeft="true"
                          android:layout_marginBottom="94dp"
-                         android:orientation="horizontal"/>
+                         android:orientation="horizontal"
+                         android:visibility="gone"/>
 
                 </RelativeLayout>
 

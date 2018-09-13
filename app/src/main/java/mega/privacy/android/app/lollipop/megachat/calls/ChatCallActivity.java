@@ -34,7 +34,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -72,7 +71,6 @@ import java.util.TimerTask;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
@@ -157,9 +155,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     LinearLayoutManager layoutManager;
     RecyclerView bigRecyclerView;
-
     GroupCallAdapter adapter;
-//    BigGroupCallAdapter BigAdapter;
 
     int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
 
@@ -613,8 +609,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setVisibility(GONE);
 
-        //Recycler View for 6-8 peers
-        log("onCreate()");
+        //Recycler View for 7-8 peers (because 9-10 without video)
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         bigRecyclerView = (RecyclerView) findViewById(R.id.big_recycler_view_cameras);
         bigRecyclerView.setLayoutManager(layoutManager);
@@ -725,22 +720,20 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
 
-                    //**** Descomentar
+                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+                    ringerTimer = new Timer();
+                    MyRingerTask myRingerTask = new MyRingerTask();
+                    ringerTimer.schedule(myRingerTask, 0, 500);
 
-//                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-//                    ringerTimer = new Timer();
-//                    MyRingerTask myRingerTask = new MyRingerTask();
-//                    ringerTimer.schedule(myRingerTask, 0, 500);
-//
-//                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                    long[] pattern = {0, 1000, 500, 500, 1000};
-//                    if (vibrator != null){
-//                        if (vibrator.hasVibrator()){
-//                            //FOR API>=26
-//                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
-//                            vibrator.vibrate(pattern, 0);
-//                        }
-//                    }
+                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    long[] pattern = {0, 1000, 500, 500, 1000};
+                    if (vibrator != null){
+                        if (vibrator.hasVibrator()){
+                            //FOR API>=26
+                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
+                            vibrator.vibrate(pattern, 0);
+                        }
+                    }
 
                     if(chat.isGroup()){
                         log("Incoming group call");
@@ -790,22 +783,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("onCreate()-InProgress");
-
                     updateScreenStatusInProgress();
 
                 }else{
-                    //**** Descomentar
 
-//
-//                    int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-//                    if (volume == 0) {
-//                        toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
-//                        toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE, 60000);
-//                    }else {
-//                        thePlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
-//                        thePlayer.setLooping(true);
-//                        thePlayer.start();
-//                    }
+                    int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                    if (volume == 0) {
+                        toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
+                        toneGenerator.startTone(ToneGenerator.TONE_SUP_RINGTONE, 60000);
+                    }else {
+                        thePlayer = MediaPlayer.create(getApplicationContext(), R.raw.outgoing_voice_video_call);
+                        thePlayer.setLooping(true);
+                        thePlayer.start();
+                    }
 
                     if(chat.isGroup()){
                         log("Outgoing group call");
@@ -826,6 +816,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                         peersOnCall.add(myPeer);
                         createNewAdapter(true);
+
                     }else{
                         log("Outgoing individual call");
 
