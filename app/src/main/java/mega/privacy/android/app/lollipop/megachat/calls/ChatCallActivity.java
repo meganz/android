@@ -281,9 +281,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("updateScreenStatusInProgress");
         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-        flagMyAvatar = false;
+        flagMyAvatar = true;
         setProfileMyAvatar();
-        flagContactAvatar = true;
+        flagContactAvatar = false;
         setProfileContactAvatar();
 
         stopAudioSignals();
