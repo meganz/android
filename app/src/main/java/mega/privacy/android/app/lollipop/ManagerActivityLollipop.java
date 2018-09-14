@@ -5574,9 +5574,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void showEnable2FADialog () {
 		log ("showEnable2FADialog newaccount: "+newAccount);
 		newAccount = false;
-		if (getIntent() != null) {
-			getIntent().putExtra("newAccount", false);
-		}
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
