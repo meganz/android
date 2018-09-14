@@ -547,6 +547,32 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
 	}
 
+	static public void startVideoCaptureWithParameters(int videoWidth, int videoHeight, int videoFps, long nativeAndroidVideoTrackSource, SurfaceTextureHelper surfaceTextureHelper) {
+		// Settings
+		boolean useCamera2 = false;
+		boolean captureToTexture = true;
+
+		stopVideoCapture();
+		Context context = ContextUtils.getApplicationContext();
+		if (Camera2Enumerator.isSupported(context) && useCamera2) {
+			videoCapturer = createCameraCapturer(new Camera2Enumerator(context));
+		} else {
+			videoCapturer = createCameraCapturer(new Camera1Enumerator(captureToTexture));
+		}
+
+		if (videoCapturer == null) {
+			log("Unable to create video capturer");
+			return;
+		}
+
+		// Link the capturer with the surfaceTextureHelper and the native video source
+		VideoCapturer.CapturerObserver capturerObserver = new AndroidVideoTrackSourceObserver(nativeAndroidVideoTrackSource);
+		videoCapturer.initialize(surfaceTextureHelper, context, capturerObserver);
+
+		// Start the capture!
+		videoCapturer.startCapture(videoWidth, videoHeight, videoFps);
+	}
+
 //	private void initializeGA(){
 //		// Set the log level to verbose.
 //		GoogleAnalytics.getInstance(this).getLogger().setLogLevel(LogLevel.VERBOSE);
