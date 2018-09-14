@@ -903,6 +903,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0) {
                         nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
                     }
+                    else {
+                        nC.selectChatsToSendNode(node);
+                    }
                 }
                 else {
                     nC.selectChatsToSendNode(node);
