@@ -244,7 +244,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             paramsAvatarImage.width = Util.scaleWidthPx(88, outMetrics);
             paramsAvatarImage.height = Util.scaleWidthPx(88, outMetrics);
             holderGrid.avatarImage.setLayoutParams(paramsAvatarImage);
-            holderGrid.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 60f);
+            holderGrid.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
 
         }else{
             log("onCreateViewHolder() - peers >= 7");
