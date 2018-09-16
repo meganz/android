@@ -51,8 +51,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -81,7 +81,7 @@ public class InboxFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 	CloudDriveAdapter adapter;
     FloatingItemDecoration floatingItemDecoration;
-    private boolean hasPlaceholder;
+    private int placeholderCount;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
@@ -133,6 +133,9 @@ public class InboxFragmentLollipop extends Fragment{
         int folderCount = 0;
         int fileCount = 0;
         for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
             if (node.isFolder()) {
                 folderCount++;
             }
@@ -143,18 +146,27 @@ public class InboxFragmentLollipop extends Fragment{
         String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
         String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
         if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
-            sections.put(0,folderCount + " " + folderStr);
-            sections.put(1,folderCount + " " + folderStr);
-            sections.put(folderCount + 1,fileCount + " " + fileStr);
-            if (folderCount % 2 == 0) {
-                hasPlaceholder = false;
-                sections.put(folderCount,fileCount + " " + fileStr);
-            } else {
-                hasPlaceholder = true;
-                sections.put(folderCount+2,fileCount + " " + fileStr);
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            for (int i = 0;i < spanCount;i++) {
+                sections.put(i,folderCount + " " + folderStr);
+            }
+            
+            placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+            if(fileCount > 0 ) {
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
+                }
             }
         } else {
-            hasPlaceholder = false;
             sections.put(0,folderCount + " " + folderStr);
             sections.put(folderCount,fileCount + " " + fileStr);
         }
@@ -517,7 +529,7 @@ public class InboxFragmentLollipop extends Fragment{
 			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
@@ -599,10 +611,10 @@ public class InboxFragmentLollipop extends Fragment{
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -626,7 +638,7 @@ public class InboxFragmentLollipop extends Fragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                     //Put flag to notify FullScreenImageViewerLollipop.
-                    intent.putExtra("placeholder",hasPlaceholder);
+                    intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
