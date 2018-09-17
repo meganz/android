@@ -38,6 +38,7 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
+import mega.privacy.android.app.lollipop.listeners.CustomItemClickListener;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
@@ -72,6 +73,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     float scaleH;
     float widthScreenPX, heightScreenPX;
     boolean isCallInProgress = false;
+    CustomItemClickListener listener;
 
     RecyclerView recyclerViewFragment;
 
@@ -84,7 +86,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     private int adapterType;
 
 
-    public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress) {
+    public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, CustomItemClickListener listener) {
         log("GroupCallAdapter(peers: "+peers.size()+")");
 
         this.context = context;
@@ -93,6 +95,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         this.chatId = chatId;
         this.adapterType = adapterType;
         this.isCallInProgress = isCallInProgress;
+        this.listener = listener;
 
         MegaApplication app = (MegaApplication) ((Activity) context).getApplication();
         if (megaApi == null) {
@@ -113,27 +116,29 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     @Override
     public void onClick(View v) {
-        log("onClick");
+        log("****** onClick() of general");
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-        switch (v.getId()) {
-            case R.id.general:{
-                ((ChatCallActivity) context).remoteCameraClick();
-                break;
-            }
-        }
+//        switch (v.getId()) {
+//            case R.id.general:{
+//                ((ChatCallActivity) context).remoteCameraClick();
+//                break;
+//            }
+//        }
     }
 
     @Override
     public void resetSize(Long userHandle) {
-        log("resetSize");
+        log("***** resetSize");
         if(getItemCount()!=0){
             for(InfoPeerGroupCall peer:peers){
                 if(peer.getHandle() == userHandle){
                     if(peer.getListener()!=null){
                         if(peer.getListener().getWidth()!=0){
+                            log("****** resetSize() -setWidth(0)");
                             peer.getListener().setWidth(0);
                         }
                         if(peer.getListener().getHeight()!=0){
+                            log("****** resetSize() -getHeight(0)");
                             peer.getListener().setHeight(0);
                         }
                     }
@@ -198,10 +203,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             lp.height = maxScreenHeight / 2;
             lp.width = maxScreenWidth/2;
 
-        }else if((numPeersOnCall > 4) && (numPeersOnCall < 7)){
+        }else if((numPeersOnCall > 4) && (numPeersOnCall < 6)){
             lp.height = Util.scaleWidthPx(180, outMetrics);
             lp.width = maxScreenWidth/2;
-        }else if(numPeersOnCall >= 7){
+
+        }else if(numPeersOnCall >= 6){
             lp.height = Util.scaleWidthPx(90, outMetrics);
             lp.width = Util.scaleWidthPx(90, outMetrics);
         }
@@ -209,8 +215,15 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         v.setLayoutParams(lp);
 
         holderGrid = new ViewHolderGroupCallGrid(v);
+
+
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
-        holderGrid.rlGeneral.setOnClickListener(this);
+
+//        if(numPeersOnCall<6){
+//            holderGrid.rlGeneral.setOnClickListener(this);
+//        }else{
+//            holderGrid.rlGeneral.setOnClickListener(null);
+//        }
 
         holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
         holderGrid.surfaceViewLayout.removeAllViewsInLayout();
@@ -230,8 +243,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holderGrid.avatarImage = (RoundedImageView) v.findViewById(R.id.avatar_image);
         holderGrid.avatarInitialLetter = (TextView) v.findViewById(R.id.avatar_initial_letter);
 
-        if(numPeersOnCall < 7){
-            log("onCreateViewHolder() - peers < 7");
+        if(numPeersOnCall < 6){
+            log("onCreateViewHolder() - peers < 6");
             holderGrid.avatarMicroLayout.setBackgroundColor(Color.TRANSPARENT);
 
             RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holderGrid.microAvatar.getLayoutParams());
@@ -247,12 +260,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holderGrid.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
 
         }else{
-            log("onCreateViewHolder() - peers >= 7");
+            log("onCreateViewHolder() - peers >= 6");
 
             holderGrid.avatarMicroLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent_black));
 
             RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holderGrid.microAvatar.getLayoutParams());
             paramsMicroAvatar.setMargins(0, 0, 0, 0);
+            paramsMicroAvatar.addRule(RelativeLayout.RIGHT_OF, R.id.avatar_rl);
+            paramsMicroAvatar.addRule(RelativeLayout.ALIGN_TOP, R.id.avatar_rl);
             holderGrid.microAvatar.setLayoutParams(paramsMicroAvatar);
 
             ViewGroup.LayoutParams paramsAvatarImage = (ViewGroup.LayoutParams) holderGrid.avatarImage.getLayoutParams();
@@ -279,7 +294,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     }
 
-    public void onBindViewHolderGrid (ViewHolderGroupCallGrid holder, int position){
+    public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, int position){
         log("onBindViewHolderGrid()");
 
         InfoPeerGroupCall peer = getNodeAt(position);
@@ -287,7 +302,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
         }
 
+        holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("***** onClick() send my positon: "+holder.getPosition());
+                listener.onItemClick(holder.getPosition());
+            }
+        });
+
         int numPeersOnCall = getItemCount();
+
         if(peer.isVideoOn()) {
             log("Video ON - numPeersOnCall: "+numPeersOnCall);
             if(numPeersOnCall == 1){
@@ -352,16 +376,18 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     holder.rlGeneral.setLayoutParams(layoutParamsPeer);
                 }
 
-            }else if(numPeersOnCall == 6){
-                log("6");
-
-                //Surface Layout:
-                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
-                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
             }
+//            else if(numPeersOnCall == 6){
+//                log("6");
+//
+//                //Surface Layout:
+//                RelativeLayout.LayoutParams layoutParamsSurface = (RelativeLayout.LayoutParams) holder.surfaceViewLayout.getLayoutParams();
+//                layoutParamsSurface.width = Util.scaleWidthPx(180, outMetrics);
+//                layoutParamsSurface.height = Util.scaleWidthPx(180, outMetrics);
+//                layoutParamsSurface.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+//                holder.surfaceViewLayout.setLayoutParams(layoutParamsSurface);
+//            }
+
 
 
             holder.avatarMicroLayout.setVisibility(GONE);
@@ -384,7 +410,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             holder.localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
             holder.localRenderer = new MegaSurfaceRendererGroup(holder.surfaceView, peer.getHandle());
             holder.surfaceViewLayout.addView(holder.surfaceView);
-            if(numPeersOnCall > 6){
+            if(numPeersOnCall >= 6){
                 log("add listener in local Renderer");
 
                 holder.localRenderer.addListener(this);
@@ -395,7 +421,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            if(numPeersOnCall < 7){
+            if(numPeersOnCall < 6){
                 paramsMicroSurface.setMargins(0, 50, 50, 0);
             }else{
                 paramsMicroSurface.setMargins(0, 4, 4, 0);
@@ -490,17 +516,18 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     holder.rlGeneral.setLayoutParams(layoutParamsPeer);
                 }
 
-            }else if(numPeersOnCall == 6){
-                log("6");
-
-                //Avatar Layout:
-                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
-                layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.height = Util.scaleWidthPx(180, outMetrics);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-                layoutParamsAvatar.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
             }
+//            else if(numPeersOnCall == 6){
+//                log("6");
+//
+//                //Avatar Layout:
+//                RelativeLayout.LayoutParams layoutParamsAvatar = (RelativeLayout.LayoutParams) holder.avatarMicroLayout.getLayoutParams();
+//                layoutParamsAvatar.width = Util.scaleWidthPx(180, outMetrics);
+//                layoutParamsAvatar.height = Util.scaleWidthPx(180, outMetrics);
+//                layoutParamsAvatar.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+//                layoutParamsAvatar.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+//                holder.avatarMicroLayout.setLayoutParams(layoutParamsAvatar);
+//            }
 
             holder.microSurface.setVisibility(View.GONE);
 

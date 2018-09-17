@@ -34,6 +34,23 @@
                         android:scrollbars="horizontal"
                         android:layout_centerHorizontal="true"
                         android:nestedScrollingEnabled="false"/>
+                    <!--Remote camera in Group call-->
+                    <RelativeLayout
+                        android:id="@+id/parent_layout_big_camera_group_call"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_above="@+id/big_recycler_view_cameras"
+                        android:background="@android:color/transparent">
+                        <FrameLayout
+                            android:id="@+id/fragment_container_big_camera_group_call"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            android:background="@android:color/transparent"/>
+                    </RelativeLayout>
 
                      <android.support.v7.widget.RecyclerView
                          android:id="@+id/big_recycler_view_cameras"
