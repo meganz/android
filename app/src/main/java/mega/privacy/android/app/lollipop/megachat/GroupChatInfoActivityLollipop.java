@@ -549,7 +549,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void setChatPermissions(){
-        log("setChatPermissions");
+        log("setChatSubtitle");
         if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
             editImageView.setVisibility(View.VISIBLE);
             dividerClearLayout.setVisibility(View.VISIBLE);
@@ -1249,7 +1249,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSingleLine();
         input.setText(chat.getTitle());
         input.setSelectAllOnFocus(true);
-        input.setTextColor(getResources().getColor(R.color.text_secondary));
+        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);

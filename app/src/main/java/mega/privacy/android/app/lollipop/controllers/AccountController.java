@@ -48,7 +48,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaUser;
 
 public class AccountController implements View.OnClickListener{
 
@@ -106,50 +105,45 @@ public class AccountController implements View.OnClickListener{
     }
 
     public boolean existsAvatar(){
-        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
-        String myEmail = myContact.getEmail();
-        if(myEmail!=null){
-            File avatar = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-            }
 
-            if (avatar.exists()) {
-                log("avatar exists in: " + avatar.getAbsolutePath());
-                return true;
-            }
+
+        File avatar = null;
+        if (context.getExternalCacheDir() != null){
+            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
         }
+        else{
+            avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail()+ ".jpg");
+        }
+
+        if (avatar.exists()) {
+            log("avatar exists in: " + avatar.getAbsolutePath());
+            return true;
+        }
+
         return false;
     }
 
     public void removeAvatar(){
         log("removeAvatar");
 
-        MegaUser myContact = ((ManagerActivityLollipop)context).getMyAccountInfo().getMyUser();
-        String myEmail = myContact.getEmail();
-        if(myEmail!=null){
-            File avatar = null;
-            File qrFile = null;
-            if (context.getExternalCacheDir() != null){
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
-            else{
-                avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
-                qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-            }
+        File avatar = null;
+        File qrFile = null;
+        if (context.getExternalCacheDir() != null){
+            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
+            qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
+        }
+        else{
+            avatar = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + ".jpg");
+            qrFile = new File(context.getCacheDir().getAbsolutePath(), megaApi.getMyEmail() + "QRcode.jpg");
+        }
 
-            if (avatar.exists()) {
-                log("avatar to delete: " + avatar.getAbsolutePath());
-                avatar.delete();
-            }
+        if (avatar.exists()) {
+            log("avatar to delete: " + avatar.getAbsolutePath());
+            avatar.delete();
+        }
 
-            if (qrFile.exists()){
-                qrFile.delete();
-            }
+        if (qrFile.exists()){
+            qrFile.delete();
         }
 
         megaApi.setAvatar(null, (ManagerActivityLollipop)context);

@@ -5,6 +5,7 @@ import java.util.List;
 import mega.privacy.android.app.utils.Util;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,46 +72,46 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 		switch(position){
 			case 0:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cloud_drive,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background_odd));
 				break;			
 			case 1:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_saved_for_offline,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background));
 				break;
 			case 2:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background_odd));
 				break;
 			case 3:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_inbox,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background));
 				break;
 			case 4:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shared_with_me,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background_odd));
 				break;
 			case 5:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background));
 				break;
 			case 6:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_transfers,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background_odd));
 				break;
 			case 7:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_rubbish_light,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background));
 				break;
 			case 8:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_settings,0,0,0);
-				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
+				holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.navigation_drawer_background_odd));
 //			case 7:
 //				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_my_account,0,0,0);
 				break;
 		}
 		
 		if (positionClicked == position){
-			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.color_navigation_drawer_selected));
+			holder.layout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_navigation_drawer_selected));
 		}
 //		else{
 //			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));

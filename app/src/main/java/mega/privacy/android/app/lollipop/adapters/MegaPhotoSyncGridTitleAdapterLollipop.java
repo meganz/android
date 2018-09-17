@@ -45,8 +45,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -1094,10 +1092,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             intent.putExtra("handlesNodesSearch",arrayHandles);
                         }
 
-                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                        if(accountInfo!=null){
-                            intent.putExtra("typeAccount", accountInfo.getAccountType());
-                        }
                         log("Position in nodes: "+positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             intent.putExtra("parentNodeHandle", -1L);
@@ -1117,16 +1111,16 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         log("FILENAME: " + file.getName());
 
                         Intent mediaIntent;
+                        boolean internalIntent;
                         if (MimeTypeThumbnail.typeForName(n.getName()).isVideoNotSupported()){
                             mediaIntent = new Intent(Intent.ACTION_VIEW);
+                            internalIntent = false;
                         }
                         else {
+                            internalIntent = true;
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         }
-                        MyAccountInfo accountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-                        if(accountInfo!=null){
-                            mediaIntent.putExtra("typeAccount", accountInfo.getAccountType());
-                        }
+
                         mediaIntent.putExtra("position", positionInNodes);
                         if (megaApi.getParentNode(nodes.get(positionInNodes)).getType() == MegaNode.TYPE_ROOT){
                             mediaIntent.putExtra("parentNodeHandle", -1L);
@@ -1152,7 +1146,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             mediaIntent.putExtra("handlesNodesSearch",arrayHandles);
                         }
                         String localPath = findLocalPath(file.getName(), file.getSize(), file);
-                        if (localPath != null && (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
+                        if (localPath != null && (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath)))){
                             File mediaFile = new File(localPath);
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1184,17 +1178,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                             String url = megaApi.httpServerGetLocalLink(file);
                             mediaIntent.setDataAndType(Uri.parse(url), mimeType);
                         }
-                        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                        if (internalIntent) {
                             context.startActivity(mediaIntent);
                         }
-                        else{
-                            Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-                            ArrayList<Long> handleList = new ArrayList<Long>();
-                            handleList.add(n.getHandle());
-                            NodeController nC = new NodeController(context);
-                            nC.prepareForDownload(handleList);
+                        else {
+                            if (MegaApiUtils.isIntentAvailable(context, mediaIntent)) {
+                                context.startActivity(mediaIntent);
+                            } else {
+                                ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                ArrayList<Long> handleList = new ArrayList<Long>();
+                                handleList.add(n.getHandle());
+                                NodeController nC = new NodeController(context);
+                                nC.prepareForDownload(handleList);
+                            }
                         }
-                        ((ManagerActivityLollipop) context).overridePendingTransition(0,0);
+                        ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
                         CameraUploadFragmentLollipop.imageDrag = imageView;
                     }
                     else{
@@ -1242,7 +1240,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             if(f.exists() && (f.length() == file.getSize())){
                 isOnMegaDownloads = true;
             }
-            if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+            if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
                 return localPath;
             }
         }
@@ -1274,7 +1272,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         if(f.exists() && (f.length() == file.getSize())){
                             isOnMegaDownloads = true;
                         }
-                        if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
+                        if (path != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(path))))){
 //                            log("path number X: "+path);
                             return path;
                         }

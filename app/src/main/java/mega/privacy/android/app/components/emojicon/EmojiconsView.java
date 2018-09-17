@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -98,7 +99,7 @@ public class EmojiconsView extends FrameLayout implements ViewPager.OnPageChange
     private void addTabDivider() {
         View divider = new View(getContext());
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mViewPager.setBackgroundColor(getContext().getResources().getColor(R.color.horizontal_vertical));
+            mViewPager.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.horizontal_vertical));
         } else {
             mViewPager.setBackgroundColor(getContext().getColor(R.color.horizontal_vertical));
         }
@@ -113,9 +114,9 @@ public class EmojiconsView extends FrameLayout implements ViewPager.OnPageChange
         icon.setBackground(null);
         icon.setScaleType(ImageView.ScaleType.CENTER);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            icon.setImageDrawable(getContext().getResources().getDrawable(page.getIcon()));
+            icon.setImageDrawable(ContextCompat.getDrawable(getContext(), page.getIcon()));
         } else {
-            icon.setImageDrawable(getContext().getDrawable(page.getIcon()));
+            icon.setImageDrawable(ContextCompat.getDrawable(getContext(), page.getIcon()));
         }
         mTabsContainer.addView(icon, mTabsContainer.getChildCount() - 2, params);
         mTabs[index] = icon;

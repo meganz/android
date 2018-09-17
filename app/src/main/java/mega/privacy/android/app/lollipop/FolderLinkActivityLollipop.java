@@ -19,6 +19,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
@@ -339,7 +340,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					screenPosition[2] = imageDrag.getWidth();
 					screenPosition[3] = imageDrag.getHeight();
 
-					Intent intent1 =  new Intent(Constants.ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
+					Intent intent1 =  new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
 					intent1.putExtra("screenPosition", screenPosition);
 					LocalBroadcastManager.getInstance(folderLinkActivity).sendBroadcast(intent1);
 				}
@@ -374,7 +375,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		megaApi = app.getMegaApi();
 		megaApi.httpServerStop();
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.ACTION_INTENT_FILTER_UPDATE_POSITION));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION));
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 
@@ -640,7 +641,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	    layout.addView(input, params);		
 		
 		input.setSingleLine();
-		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setHint(getString(R.string.alert_decryption_key));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -1330,12 +1331,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
-				}else{
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
+				else{
 					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 				}
 
 			}else{
-				log("OK");
+				log("onRequestFinish:OK");
 				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 				clearSelections();
 				hideMultipleSelect();
@@ -1750,17 +1759,25 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					overridePendingTransition(0,0);
 					imageDrag = imageView;
 				}
-				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 
 					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					log("FILENAME: " + file.getName());
 
 					Intent mediaIntent;
+					boolean internalIntent;
+					boolean opusFile = false;
 					if (MimeTypeList.typeForName(file.getName()).isVideoNotSupported() || MimeTypeList.typeForName(file.getName()).isAudioNotSupported()){
 						mediaIntent = new Intent(Intent.ACTION_VIEW);
+						internalIntent = false;
+						String[] s = file.getName().split("\\.");
+						if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+							opusFile = true;
+						}
 					}
 					else {
+						internalIntent = true;
 						mediaIntent = new Intent(FolderLinkActivityLollipop.this, AudioVideoPlayerLollipop.class);
 					}
 					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
@@ -1776,10 +1793,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							mediaIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -1808,16 +1825,24 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						String url = megaApiFolder.httpServerGetLocalLink(file);
 						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 					}
-			  		if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
-			  			startActivity(mediaIntent);
-			  		}
-			  		else{
-			  			Snackbar.make(fragmentContainer, getResources().getString(R.string.intent_not_available), Snackbar.LENGTH_SHORT).show();
-						adapterList.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						onFileClick(handleList);
-			  		}
+					if (opusFile){
+						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+					}
+					if (internalIntent) {
+						startActivity(mediaIntent);
+					}
+					else {
+						if (MegaApiUtils.isIntentAvailable(this, mediaIntent)){
+							startActivity(mediaIntent);
+						}
+						else{
+							Snackbar.make(fragmentContainer, getResources().getString(R.string.intent_not_available), Snackbar.LENGTH_SHORT).show();
+							adapterList.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(nodes.get(position).getHandle());
+							onFileClick(handleList);
+						}
+					}
 			  		overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
@@ -1835,9 +1860,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
 							pdfIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
 						else{
@@ -2175,6 +2200,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		startActivity(intent);
 		finish();
 	}
+
+	public void errorPreOverquota() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+		startActivity(intent);
+		finish();
+	}
+
 	public void successfulCopy(){
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
