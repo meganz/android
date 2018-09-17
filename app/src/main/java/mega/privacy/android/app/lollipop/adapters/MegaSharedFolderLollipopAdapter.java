@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -330,7 +331,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				if(this.isItemChecked(position)){
 					holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 					holder.initialLetter.setVisibility(View.GONE);
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+					holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 				}
 				else{
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -431,11 +432,11 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			}
 			else{
 				log("Default color to the avatar");
-				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+				p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			}
 		}
 		else{
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 		
 		int radius; 

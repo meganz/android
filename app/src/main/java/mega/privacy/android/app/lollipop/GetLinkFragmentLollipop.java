@@ -307,7 +307,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
             }
             case R.id.advanced_options_layout:{
                 if(linkWithKeyLayout.isShown()){
-                    advancedOptionsImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
+                    advancedOptionsImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
                     linkWithoutKeyLayout.setVisibility(View.GONE);
                     linkDecryptionKeyLayout.setVisibility(View.GONE);
                     linkWithKeyLayout.setVisibility(View.GONE);
@@ -317,7 +317,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
                     separatorPass.setVisibility(View.GONE);
 
                 }else{
-                    advancedOptionsImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+                    advancedOptionsImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
                     linkWithoutKeyLayout.setVisibility(View.VISIBLE);
                     linkDecryptionKeyLayout.setVisibility(View.VISIBLE);
                     linkWithKeyLayout.setVisibility(View.VISIBLE);

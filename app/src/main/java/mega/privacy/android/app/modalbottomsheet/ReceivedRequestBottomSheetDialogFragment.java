@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -142,7 +143,7 @@ public class ReceivedRequestBottomSheetDialogFragment extends BottomSheetDialogF
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
         p.setAntiAlias(true);
-        p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+        p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 
         int radius;
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())

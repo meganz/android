@@ -11,7 +11,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -32,7 +31,6 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
     private LinearLayout items_layout;
 
     public LinearLayout mainLinearLayout;
-    public TextView titleText;
     public LinearLayout optionChoosePicture;
     public LinearLayout optionTakePicture;
     public LinearLayout optionRemovePicture;
@@ -71,8 +69,6 @@ public class MyAccountBottomSheetDialogFragment extends BottomSheetDialogFragmen
 
         mainLinearLayout = (LinearLayout) contentView.findViewById(R.id.my_account_bottom_sheet);
         items_layout = (LinearLayout) contentView.findViewById(R.id.items_layout);
-
-        titleText = (TextView) contentView.findViewById(R.id.my_account_title_text);
 
         optionChoosePicture= (LinearLayout) contentView.findViewById(R.id.my_account_choose_photo_layout);
         optionTakePicture = (LinearLayout) contentView.findViewById(R.id.my_account_take_photo_layout);

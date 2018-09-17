@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -519,11 +520,11 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             }
             else{
                 log("Default color to the avatar");
-                p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
         else {
-            p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+            p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
         }
 
         int radius;
@@ -540,8 +541,8 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         log("DENSITY: " + density + ":::: " + avatarTextSize);
 
         String fullName = "";
-        if(contactName.getText() != null){
-            fullName = contactName.getText().toString();
+        if(contactNameContent != null){
+            fullName = contactNameContent;
         }
         else{
             //No name, ask for it and later refresh!!
@@ -685,6 +686,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             log("Contact link query " + request.getNodeHandle() + "_" + MegaApiAndroid.handleToBase64(request.getNodeHandle()) + "_" + request.getEmail() + "_" + request.getName() + "_" + request.getText());
             handleContactLink = request.getNodeHandle();
             contactNameContent = request.getName() + " " + request.getText();
+            myEmail = request.getEmail();
             userQuery = queryIfIsContact();
             showInviteDialog();
         } else if (e.getErrorCode() == MegaError.API_EEXIST) {
