@@ -35,7 +35,9 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
+import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -102,6 +104,20 @@ public class ChatController {
         }
     }
 
+    public void selectChatsToAttachContact(MegaUser contact){
+        log("selectChatsToSendNode");
+
+        long[] longArray = new long[1];
+        longArray[0] = contact.getHandle();
+
+        Intent i = new Intent(context, ChatExplorerActivity.class);
+        i.putExtra("USER_HANDLES", longArray);
+
+        if(context instanceof ManagerActivityLollipop){
+            ((ManagerActivityLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
+        }
+    }
+
     public void leaveChat(long chatId){
         if(context instanceof ManagerActivityLollipop){
             megaChatApi.leaveChat(chatId, (ManagerActivityLollipop) context);
@@ -135,6 +151,57 @@ public class ChatController {
         }
 
         dbH.removePendingMessageByChatId(chatId);
+    }
+
+    public void archiveChat(long chatId){
+        log("archiveChat: "+chatId);
+        if(context instanceof ManagerActivityLollipop){
+            megaChatApi.archiveChat(chatId, true, (ManagerActivityLollipop) context);
+        }
+    }
+
+    public void archiveChat(MegaChatListItem chatItem){
+        log("archiveChat: "+chatItem.getChatId());
+        if(context instanceof ManagerActivityLollipop){
+            if(chatItem.isArchived()){
+                megaChatApi.archiveChat(chatItem.getChatId(), false, (ManagerActivityLollipop) context);
+            }
+            else{
+                megaChatApi.archiveChat(chatItem.getChatId(), true, (ManagerActivityLollipop) context);
+            }
+        }
+        else if(context instanceof ArchivedChatsActivity){
+            if(chatItem.isArchived()){
+                megaChatApi.archiveChat(chatItem.getChatId(), false, (ArchivedChatsActivity) context);
+            }
+            else{
+                megaChatApi.archiveChat(chatItem.getChatId(), true, (ArchivedChatsActivity) context);
+            }
+        }
+    }
+
+    public void archiveChats(ArrayList<MegaChatListItem> chats){
+        log("archiveChats: "+chats.size());
+        if(context instanceof ManagerActivityLollipop){
+            for(int i=0; i<chats.size(); i++){
+                if(chats.get(i).isArchived()){
+                    megaChatApi.archiveChat(chats.get(i).getChatId(), false,null);
+                }
+                else{
+                    megaChatApi.archiveChat(chats.get(i).getChatId(), true, null);
+                }
+            }
+        }
+        else if(context instanceof ArchivedChatsActivity){
+            for(int i=0; i<chats.size(); i++){
+                if(chats.get(i).isArchived()){
+                    megaChatApi.archiveChat(chats.get(i).getChatId(), false, null);
+                }
+                else{
+                    megaChatApi.archiveChat(chats.get(i).getChatId(), true, null);
+                }
+            }
+        }
     }
 
     public void deleteMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
@@ -610,7 +677,100 @@ public class ChatController {
                     }else{
                        return "";
                     }
-                }else{
+                } else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                    String textToShow = "";
+                    switch(message.getTermCode()){
+                        case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+                            int minutes = (message.getDuration() % 3600) / 60;
+                            int seconds = message.getDuration() % 60;
+
+                            if(minutes == 0){
+                                textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                            }
+                            else{
+                                if(seconds == 0){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+                                }
+                                else if (seconds == 1){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+                                }
+                                else{
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                                }
+                            }
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                                textToShow = textToShow.replace("[C]", "");
+                                textToShow = textToShow.replace("[/C]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+                            textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+                            textToShow = String.format(context.getString(R.string.call_not_answered_messages));
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+                            textToShow = String.format(context.getString(R.string.call_failed_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+                            textToShow = String.format(context.getString(R.string.call_cancelled_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                    }
+
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else{
                     return "";
                 }
             } else {
@@ -692,7 +852,101 @@ public class ChatController {
                     }else{
                         return "";
                     }
-                }else{
+                }
+                else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
+                    String textToShow = "";
+                    switch(message.getTermCode()){
+                        case MegaChatMessage.END_CALL_REASON_ENDED:{
+
+                            int minutes = (message.getDuration() % 3600) / 60;
+                            int seconds = message.getDuration() % 60;
+
+                            if(minutes == 0){
+                                textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_just_seconds, seconds, seconds);
+                            }
+                            else{
+                                if(seconds == 0){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_minutes, minutes, minutes);
+                                }
+                                else if (seconds == 1){
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_one_second, minutes, minutes, seconds);
+                                }
+                                else{
+                                    textToShow = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_with_more_seconds, minutes, minutes, seconds);
+                                }
+                            }
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                                textToShow = textToShow.replace("[C]", "");
+                                textToShow = textToShow.replace("[/C]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_REJECTED:{
+
+                            textToShow = String.format(context.getString(R.string.call_rejected_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+
+                            textToShow = String.format(context.getString(R.string.call_missed_messages));
+
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_FAILED:{
+
+                            textToShow = String.format(context.getString(R.string.call_failed_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+
+                            textToShow = String.format(context.getString(R.string.call_missed_messages));
+                            try {
+                                textToShow = textToShow.replace("[A]", "");
+                                textToShow = textToShow.replace("[/A]", "");
+                                textToShow = textToShow.replace("[B]", "");
+                                textToShow = textToShow.replace("[/B]", "");
+                            } catch (Exception e) {
+                            }
+
+                            break;
+                        }
+                    }
+
+                    builder.append(textToShow);
+                    return builder.toString();
+                }
+                else{
                     log("Type message: " + message.getType());
                     log("Content: " + message.getContent());
                     return "";
@@ -1176,12 +1430,6 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                 service.putExtra("fromMV", true);
-                if (context instanceof AudioVideoPlayerLollipop){
-                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                }
             }
             context.startService(service);
         }
@@ -1264,12 +1512,6 @@ public class ChatController {
             service.putExtra(DownloadService.EXTRA_PATH, path);
             if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                 service.putExtra("fromMV", true);
-                if (context instanceof AudioVideoPlayerLollipop){
-                    service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                }
-                else if (context instanceof PdfViewerActivityLollipop){
-                    service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                }
             }
             context.startService(service);
         }
@@ -1540,23 +1782,61 @@ public class ChatController {
                                 File mediaFile = new File(localPath);
 
                                 Intent mediaIntent;
+                                boolean internalIntent;
+                                boolean opusFile = false;
                                 if (MimeTypeList.typeForName(tempNode.getName()).isVideoNotSupported() || MimeTypeList.typeForName(tempNode.getName()).isAudioNotSupported()){
                                     mediaIntent = new Intent(Intent.ACTION_VIEW);
+                                    internalIntent = false;
+                                    String[] s = tempNode.getName().split("\\.");
+                                    if (s != null && s.length > 1 && s[s.length-1].equals("opus")) {
+                                        opusFile = true;
+                                    }
                                 }
                                 else {
+                                    internalIntent = true;
                                     mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                                 }
                                 mediaIntent.putExtra("isPlayList", false);
                                 mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                                 mediaIntent.putExtra("adapterType", Constants.FROM_CHAT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
                                 else{
                                     mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
                                 mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                context.startActivity(mediaIntent);
+                                if (opusFile){
+                                    mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
+                                }
+                                if (internalIntent) {
+                                    context.startActivity(mediaIntent);
+                                }
+                                else {
+                                    if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
+                                        context.startActivity(mediaIntent);
+                                    }
+                                    else {
+                                        if(context instanceof  ChatActivityLollipop){
+                                            ((ChatActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        else if(context instanceof  NodeAttachmentActivityLollipop){
+                                            ((NodeAttachmentActivityLollipop) context).showSnackbar(context.getString(R.string.intent_not_available));
+                                        }
+                                        Intent intentShare = new Intent(Intent.ACTION_SEND);
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
+                                            intentShare.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        else {
+                                            intentShare.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(tempNode.getName()).getType());
+                                        }
+                                        intentShare.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        if (MegaApiUtils.isIntentAvailable(context, intentShare)) {
+                                            log("call to startActivity(intentShare)");
+                                            context.startActivity(intentShare);
+                                        }
+                                    }
+                                }
                             }
                         }
                         else if (MimeTypeList.typeForName(tempNode.getName()).isPdf()){
@@ -1571,7 +1851,7 @@ public class ChatController {
                                 pdfIntent.putExtra("inside", true);
                                 pdfIntent.putExtra("HANDLE", tempNode.getHandle());
                                 pdfIntent.putExtra("adapterType", Constants.FROM_CHAT);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", pdfFile), MimeTypeList.typeForName(tempNode.getName()).getType());
                                 }
                                 else{
@@ -1657,12 +1937,6 @@ public class ChatController {
                         service.putExtra(DownloadService.EXTRA_PATH, path);
                         if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer){
                             service.putExtra("fromMV", true);
-                            if (context instanceof AudioVideoPlayerLollipop){
-                                service.putExtra("typeAccount", ((AudioVideoPlayerLollipop) context).getAccountType());
-                            }
-                            else if (context instanceof PdfViewerActivityLollipop){
-                                service.putExtra("typeAccount", ((PdfViewerActivityLollipop) context).getAccountType());
-                            }
                         }
                         context.startService(service);
                     }

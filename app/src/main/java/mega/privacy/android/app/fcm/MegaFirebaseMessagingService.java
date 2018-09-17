@@ -540,7 +540,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
             } else {
-                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+                d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
             }
 
             notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());

@@ -31,6 +31,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.UtilsModalBottomSheet;
@@ -42,7 +43,6 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -67,7 +67,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public LinearLayout optionMuteChat;
     public ImageView optionMuteChatIcon;
     public TextView optionMuteChatText;
-
+    public LinearLayout optionArchiveChat;
+    public TextView archiveChatText;
+    public ImageView archiveChatIcon;
 
     boolean notificationsEnabled;
     ChatItemPreferences chatPrefs;
@@ -101,7 +103,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             log("Bundle NULL");
             if(context instanceof ManagerActivityLollipop){
                 chatId = ((ManagerActivityLollipop) context).selectedChatItemId;
-
+            }
+            else if(context instanceof ArchivedChatsActivity){
+                chatId = ((ArchivedChatsActivity) context).selectedChatItemId;
             }
         }
 
@@ -142,6 +146,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionMuteChat = (LinearLayout) contentView.findViewById(R.id.chat_list_mute_chat_layout);
         optionMuteChatIcon = (ImageView) contentView.findViewById(R.id.chat_list_mute_chat_image);
         optionMuteChatText = (TextView) contentView.findViewById(R.id.chat_list_mute_chat_text);
+        optionArchiveChat = (LinearLayout) contentView.findViewById(R.id.chat_list_archive_chat_layout);
+        archiveChatText = (TextView) contentView.findViewById(R.id.chat_list_archive_chat_text);
+        archiveChatIcon = (ImageView) contentView.findViewById(R.id.file_archive_chat_image);
 
         titleNameContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         titleMailContactChatPanel.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
@@ -150,6 +157,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionMuteChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
         optionClearHistory.setOnClickListener(this);
+        optionArchiveChat.setOnClickListener(this);
 
         titleNameContactChatPanel.setText(chat.getTitle());
 
@@ -157,11 +165,42 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
 			iconStateChatPanel.setVisibility(View.GONE);
 			addAvatarChatPanel(null, chat);
+
+            infoChatText.setText(getString(R.string.group_chat_info_label));
+            optionInfoChat.setVisibility(View.GONE);
+
+            if(chat.isActive()){
+                optionLeaveChat.setVisibility(View.VISIBLE);
+            }
+            else{
+                optionLeaveChat.setVisibility(View.GONE);
+            }
 		}
 		else{
 			iconStateChatPanel.setVisibility(View.VISIBLE);
 
             long userHandle = chat.getPeerHandle();
+            MegaUser contact = megaApi.getContact(MegaApiJava.userHandleToBase64(userHandle));
+            if(contact!=null){
+                log("User email: "+contact.getEmail());
+                titleMailContactChatPanel.setText(contact.getEmail());
+                addAvatarChatPanel(contact.getEmail(), chat);
+
+                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                    optionInfoChat.setVisibility(View.VISIBLE);
+                    infoChatText.setText(getString(R.string.contact_properties_activity));
+                }
+                else{
+                    optionInfoChat.setVisibility(View.GONE);
+                    optionClearHistory.setVisibility(View.GONE);
+                }
+            }
+            else{
+                optionInfoChat.setVisibility(View.GONE);
+                optionClearHistory.setVisibility(View.GONE);
+            }
+
+            optionLeaveChat.setVisibility(View.GONE);
             int state = megaChatApi.getUserOnlineStatus(userHandle);
 
             if(state == MegaChatApi.STATUS_ONLINE){
@@ -192,62 +231,20 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 log("This user status is: "+state);
                 iconStateChatPanel.setVisibility(View.GONE);
             }
-
-			String userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle);
-			MegaUser user = megaApi.getContact(userHandleEncoded);
-			if(user!=null){
-				log("El email del user es: "+user.getEmail());
-				titleMailContactChatPanel.setText(user.getEmail());
-				addAvatarChatPanel(user.getEmail(), chat);
-			}
-			else{
-				log("El user es NULL");
-			}
 		}
 
-		if(chat.isGroup()){
-			infoChatText.setText(getString(R.string.group_chat_info_label));
 
-			optionLeaveChat.setVisibility(View.VISIBLE);
-
-            if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-                optionClearHistory.setVisibility(View.GONE);
+        if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
+            optionClearHistory.setVisibility(View.GONE);
+        }
+        else{
+            if(chat.isActive()){
+                optionClearHistory.setVisibility(View.VISIBLE);
             }
             else{
-                if(chat.getOwnPrivilege()!= MegaChatRoom.PRIV_MODERATOR){
-                    optionClearHistory.setVisibility(View.GONE);
-                }
-                else{
-                    optionClearHistory.setVisibility(View.VISIBLE);
-                }
-            }
-		}
-		else{
-            long userHandle = chat.getPeerHandle();
-            MegaUser contact = megaApi.getContact(MegaApiJava.handleToBase64(userHandle));
-            if(contact!=null){
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    optionInfoChat.setVisibility(View.VISIBLE);
-                    infoChatText.setText(getString(R.string.contact_properties_activity));
-
-                    if(chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID){
-                        optionClearHistory.setVisibility(View.GONE);
-                    }
-                    else{
-                        optionClearHistory.setVisibility(View.VISIBLE);
-                    }
-                }
-                else{
-                    optionInfoChat.setVisibility(View.GONE);
-                    optionClearHistory.setVisibility(View.GONE);
-                }
-            }
-            else{
-                optionInfoChat.setVisibility(View.GONE);
                 optionClearHistory.setVisibility(View.GONE);
             }
-			optionLeaveChat.setVisibility(View.GONE);
-		}
+        }
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {
@@ -273,6 +270,19 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 			optionMuteChatText.setText(getString(R.string.general_mute));
 			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
 		}
+
+        if(chat.isArchived()){
+            archiveChatText.setText(getString(R.string.unarchive_chat_option));
+            archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
+            optionInfoChat.setVisibility(View.GONE);
+            optionMuteChat.setVisibility(View.GONE);
+            optionLeaveChat.setVisibility(View.GONE);
+            optionClearHistory.setVisibility(View.GONE);
+        }
+        else{
+            archiveChatText.setText(getString(R.string.archive_chat_option));
+            archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
+        }
 
         dialog.setContentView(contentView);
 
@@ -324,7 +334,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         p.setAntiAlias(true);
 
         if(chat.isGroup()){
-            p.setColor(getResources().getColor(R.color.divider_upgrade_account));
+            p.setColor(ContextCompat.getColor(context, R.color.divider_upgrade_account));
         }
         else{
             MegaUser contact = megaApi.getContact(contactMail);
@@ -335,11 +345,11 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                     p.setColor(Color.parseColor(color));
                 } else {
                     log("Default color to the avatar");
-                    p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                    p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
                 }
             } else {
                 log("Contact is NULL");
-                p.setColor(getResources().getColor(R.color.lollipop_primary_color));
+                p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
             }
         }
 
@@ -459,6 +469,15 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 }
 
                 ((ManagerActivityLollipop)context).showMuteIcon(chat);
+                break;
+            }
+            case R.id.chat_list_archive_chat_layout:{
+                if(chat==null){
+                    log("Selected chat NULL");
+                }
+
+                ChatController chatC = new ChatController(context);
+                chatC.archiveChat(chat);
                 break;
             }
         }

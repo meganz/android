@@ -7,27 +7,6 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <!-- Title -->
-    <LinearLayout
-        android:id="@+id/my_account_title_layout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/my_account_title_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/title_options_avatar_panel"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp"/>
-    </LinearLayout>
-
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

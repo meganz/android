@@ -2,6 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
+    <item
+        android:id="@+id/cab_menu_archive"
+        android:orderInCategory="100"
+        android:title="@string/general_mute"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_w_archive"/>
+
+    <item
+        android:id="@+id/cab_menu_unarchive"
+        android:orderInCategory="100"
+        android:title="@string/general_mute"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_w_unarchive"/>
 
     <item
         android:id="@+id/cab_menu_mute"
@@ -16,13 +29,6 @@
         android:title="@string/general_mute"
         MEGA:showAsAction="always"
         android:icon="@drawable/ic_unmute_white"/>
-
-    <item
-        android:id="@+id/cab_menu_archive"
-        android:orderInCategory="105"
-        android:title="@string/tab_archive_chat"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_archive"/>
 
     <item
         android:id="@+id/cab_menu_delete"

@@ -183,7 +183,7 @@
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:layout_marginLeft="18dp"
-                        android:text="@string/group_chat_start_conversation_label"
+                        android:text="@string/context_send_message"
                         android:textColor="@color/name_my_account"
                         android:textSize="16sp"/>
                 </LinearLayout>

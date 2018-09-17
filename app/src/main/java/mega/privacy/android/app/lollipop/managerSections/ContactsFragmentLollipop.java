@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -35,8 +36,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.google.zxing.Result;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -419,11 +418,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				log("Default color to the avatar");
-				p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+				p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 			}
 		}
 		else {
-			p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		}
 
 		int radius;
@@ -838,8 +837,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 //		}
 
 		if(myAccountInfo == null){
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
-
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		for (int i=0;i<contacts.size();i++){
@@ -1338,5 +1336,9 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	public void setVisibleContacts(ArrayList<MegaContactAdapter> visibleContacts) {
 		this.visibleContacts = visibleContacts;
+	}
+
+	public boolean isMultipleselect(){
+		return adapter.isMultipleSelect();
 	}
 }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.format.DateUtils;
@@ -127,7 +128,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 
 			if(this.isItemChecked(position)){
 				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
+				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 			}
 			else{
 				log("NOT selected");
@@ -225,7 +226,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.lollipop_primary_color));
+		p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
 		
 		int radius; 
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
