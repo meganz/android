@@ -243,16 +243,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		this.updateAvatar(true);
 
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
-
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}		
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		updateContactsCount();
 
 		lastContacted = MegaApiUtils.getLastContactedUsers(context);
 		//Draw contact's connection component if lastContacted.size > 0
@@ -287,6 +278,20 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         lastContacted = MegaApiUtils.getLastContactedUsers(context);
         lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
     }
+
+    public void updateContactsCount(){
+    	log("updateContactsCounts");
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
+
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}
+		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+	}
 
 	public void setMkButtonText(){
 		log("setMkButtonText");

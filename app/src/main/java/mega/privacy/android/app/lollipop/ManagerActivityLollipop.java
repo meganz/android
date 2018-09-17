@@ -15982,6 +15982,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Netw
 						//When last contact changes avatar, update view.
 						if(maFLol != null) {
 						    if(maFLol.isAdded()) {
+								maFLol.updateContactsCount();
                                 maFLol.updateView();
                             }
                         }

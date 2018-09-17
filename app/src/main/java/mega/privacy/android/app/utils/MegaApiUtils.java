@@ -284,7 +284,7 @@ public class MegaApiUtils {
                 if(!chatItem.isGroup()){
                     long peer = chatItem.getPeerHandle();
                     MegaUser user = megaApi.getContact(MegaApiJava.userHandleToBase64(peer));
-                    if(user!=null){
+                    if(user!=null && user.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                         lastContacted.add(user);
                     }
                 }
