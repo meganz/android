@@ -100,16 +100,20 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 
 		if(DBUtil.callToPricing(context)){
 			log("megaApi.getPricing SEND");
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}else{
 			getPaymentId();
 		}
-        
+
 		return v;
 	}
 
 	public void getPaymentId(){
 		log("getPaymentId");
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
+
 		ArrayList<Product> p = myAccountInfo.getProductAccounts();
 		for (int i=0;i<p.size();i++){
 			Product account = p.get(i);
@@ -214,10 +218,5 @@ public class FortumoFragmentLollipop extends Fragment implements MegaRequestList
 	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
 
-	}
-
-	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
-		log("setMyAccountInfo");
-		this.myAccountInfo = myAccountInfo;
 	}
 }

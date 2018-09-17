@@ -48,15 +48,26 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
                 counter --;
                 if (e.getErrorCode() != MegaError.API_OK) {
                     error ++;
-                    if((success == 0) && (e.getErrorCode()==MegaError.API_EOVERQUOTA)){
-                        //first error is OVERQUOTA
+                    if(success == 0){
                         counter = -1;
-                        if(elementToImport == FOLDER_LINK){
-                            ((FolderLinkActivityLollipop) context).errorOverquota();
-                        }else if(elementToImport == FILE_LINK){
-                            ((FileLinkActivityLollipop) context).errorOverquota();
+                        if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                            //first error is OVERQUOTA
+                            if(elementToImport == FOLDER_LINK){
+                                ((FolderLinkActivityLollipop) context).errorOverquota();
+                            }else if(elementToImport == FILE_LINK){
+                                ((FileLinkActivityLollipop) context).errorOverquota();
+                            }
+                        }
+                        else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+
+                            if(elementToImport == FOLDER_LINK){
+                                ((FolderLinkActivityLollipop) context).errorPreOverquota();
+                            }else if(elementToImport == FILE_LINK){
+                                ((FileLinkActivityLollipop) context).errorPreOverquota();
+                            }
                         }
                     }
+
                 }else{
                     success ++;
                 }
