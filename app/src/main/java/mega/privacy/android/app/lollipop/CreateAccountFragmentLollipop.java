@@ -100,24 +100,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextView passwdAdvice;
     private boolean passwdValid;
 
-     /*
-     * Task to process email and password
-     */
-    private class HashTask extends AsyncTask<String, Void, String[]> {
-
-        @Override
-        protected String[] doInBackground(String... args) {
-            String privateKey = megaApi.getBase64PwKey(args[1]);
-            String publicKey = megaApi.getStringHash(privateKey, args[0]);
-            return new String[]{new String(privateKey), new String(publicKey)};
-        }
-
-        @Override
-        protected void onPostExecute(String[] key) {
-            onKeysGenerated(key[0], key[1]);
-        }
-    }
-
     @Override
     public void onCreate (Bundle savedInstanceState){
         log("onCreate");
@@ -601,8 +583,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         log("[CREDENTIALS]userEmail: _" + userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH) + "_");
         log("[CREDENTIALS]userPassword: _" + userPassword.getText().toString() +"_");
         megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), userLastName.getText().toString(),this);
-
-//        new HashTask().execute(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim(), userPassword.getText().toString());
     }
 
     private boolean validateForm() {

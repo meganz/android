@@ -45,6 +45,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     ArrayList<Long> handles;
     ArrayList<MegaNode> nodes;
     ArrayList<MegaOffline> offNodes;
+    ArrayList<File> zipFiles;
     long parentHandle;
     String parentPath;
     RecyclerView recyclerView;
@@ -54,6 +55,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     int itemChecked;
     MegaNode nodeChecked;
     MegaOffline offNodeChecked;
+    File zipChecked;
 
     @Override
     public String getSectionTitle(int position) {
@@ -116,6 +118,23 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         setOffNodes(_offNodes);
     }
 
+    public PlayListAdapter(Context _context, Fragment _fragment, ArrayList<File> _zipFiles, RecyclerView _recyclerView, int adapterType) {
+
+        this.context = _context;
+        this.fragment = _fragment;
+        this.zipFiles =  new ArrayList<>();
+        this.recyclerView = _recyclerView;
+        this.adapterType = adapterType;
+
+        setZipNodes(_zipFiles);
+    }
+
+    public void setZipNodes (ArrayList<File> files) {
+        log("setZipNodes");
+        this.zipFiles = files;
+        notifyDataSetChanged();
+    }
+
     public void setOffNodes(ArrayList<MegaOffline> nodes) {
         log("setOffNodes");
         this.offNodes = nodes;
@@ -153,6 +172,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         MegaOffline offNode = null;
         File mediaFile = null;
+        File zipFile = null;
         MegaNode node = null;
 
         if (adapterType == Constants.OFFLINE_ADAPTER){
@@ -169,6 +189,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + offNode.getPath() + "/" + offNode.getName());
             }
             holder.path = offNode.getPath();
+        }
+        else if (adapterType == Constants.ZIP_ADAPTER) {
+            zipFile = (File) getItem(position);
+            holder.path = zipFile.getPath();
         }
         else {
             node = (MegaNode) getItem(position);
@@ -199,6 +223,29 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 holder.textViewState.setVisibility(View.GONE);
             }
             holder.imageView.setImageResource(MimeTypeList.typeForName(offNode.getName()).getIconResourceId());
+        }
+        else if (adapterType == Constants.ZIP_ADAPTER) {
+            holder.textViewFileName.setText(zipFile.getName());
+            holder.textViewFileSize.setText(Util.getSizeString(zipFile.length()));
+
+            if ((position == itemChecked && !((PlaylistFragment) fragment).isSearchOpen()) && ((AudioVideoPlayerLollipop) context).querySearch.equals("")
+                    || (((PlaylistFragment) fragment).isSearchOpen() || !((AudioVideoPlayerLollipop) context).querySearch.equals("")) && (zipFile.getName().equals(zipChecked.getName()))) {
+                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.file_playlist_playing));
+                holder.textViewFileSize.setVisibility(View.GONE);
+                holder.textViewState.setVisibility(View.VISIBLE);
+                if (((PlaylistFragment) fragment).getPlayer().getPlayWhenReady()){
+                    holder.textViewState.setText(context.getString(R.string.playlist_state_playing));
+                }
+                else {
+                    holder.textViewState.setText(context.getString(R.string.playlist_state_paused));
+                }
+            }
+            else {
+                holder.itemLayout.setBackgroundColor(Color.WHITE);
+                holder.textViewFileSize.setVisibility(View.VISIBLE);
+                holder.textViewState.setVisibility(View.GONE);
+            }
+            holder.imageView.setImageResource(MimeTypeList.typeForName(zipFile.getName()).getIconResourceId());
         }
         else {
             holder.textViewFileName.setText(node.getName());
@@ -232,7 +279,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
         log("Check the thumb");
 
-        if (adapterType == Constants.OFFLINE_ADAPTER){
+        if (adapterType == Constants.OFFLINE_ADAPTER || adapterType == Constants.ZIP_ADAPTER){
 
         }
         else{
@@ -312,6 +359,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 return offNodes.get(position);
             }
         }
+        else if (adapterType == Constants.ZIP_ADAPTER) {
+            if (zipFiles != null) {
+                return zipFiles.get(position);
+            }
+        }
         else {
             if (nodes != null){
                 return nodes.get(position);
@@ -327,18 +379,18 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             if (offNodes != null){
                 return offNodes.size();
             }
-            else {
-                return 0;
+        }
+        else if (adapterType == Constants.ZIP_ADAPTER) {
+            if (zipFiles != null) {
+                return zipFiles.size();
             }
         }
         else{
             if (nodes != null){
                 return nodes.size();
             }
-            else{
-                return 0;
-            }
         }
+        return 0;
     }
 
     @Override
@@ -389,6 +441,19 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     }
                 }
             }
+            else if (adapterType == Constants.ZIP_ADAPTER) {
+                if (name.equals(zipChecked.getName())) {
+                    playPauseItem();
+                }
+                else {
+                    for (int i=0; i<zipFiles.size(); i++){
+                        if (zipFiles.get(i).getName().equals(name)){
+                            changeItem(i);
+                            break;
+                        }
+                    }
+                }
+            }
             else {
                 if (name.equals(nodeChecked.getName())){
                     playPauseItem();
@@ -427,6 +492,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         this.itemChecked = position;
         if (adapterType == Constants.OFFLINE_ADAPTER){
             offNodeChecked = offNodes.get(position);
+        }
+        else if (adapterType == Constants.ZIP_ADAPTER){
+            zipChecked = zipFiles.get(position);
         }
         else{
             nodeChecked = nodes.get(position);

@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaChatApiJava;
@@ -75,6 +76,14 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                 }
                 else{
                     ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.files_send_to_chat_error));
+                }
+            }
+            else if(context instanceof ContactInfoActivityLollipop){
+                if(success>0){
+                   ((ContactInfoActivityLollipop) context).openChat(chatId, null);
+                }
+                else{
+                    ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.files_send_to_chat_error));
                 }
             }
         }

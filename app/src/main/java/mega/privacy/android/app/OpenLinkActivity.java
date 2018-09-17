@@ -15,6 +15,7 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.utils.Constants;
@@ -28,7 +29,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 
-public class OpenLinkActivity extends PinActivity implements MegaRequestListenerInterface, View.OnClickListener {
+public class OpenLinkActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -108,7 +109,11 @@ public class OpenLinkActivity extends PinActivity implements MegaRequestListener
 //			megaApi.localLogout();
 			urlConfirmationLink = url;
 
-			megaApi.querySignupLink(url, this);
+//			megaApi.querySignupLink(url, this);
+			AccountController aC = new AccountController(this);
+			MegaApplication.setUrlConfirmationLink(urlConfirmationLink);
+
+			aC.logout(this, megaApi);
 
 			return;
 		}

@@ -35,7 +35,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +59,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -1104,7 +1110,16 @@ public class OfflineFragmentLollipop extends Fragment{
 				if(currentFile.exists() && currentFile.isFile()){			
 					
 					//Open it!
-					if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+					if(MimeTypeList.typeForName(currentFile.getName()).isZip()){
+						log("MimeTypeList ZIP");
+						Intent intentZip = new Intent();
+						intentZip.setClass(context, ZipBrowserActivityLollipop.class);
+						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathNavigation);
+						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						context.startActivity(intentZip);
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
@@ -1209,6 +1224,47 @@ public class OfflineFragmentLollipop extends Fragment{
 						((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 						imageDrag = imageView;
 					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
+						log("Is URL file");
+						InputStream instream = null;
+						try {
+							// open the file for reading
+							instream = new FileInputStream(currentFile.getAbsolutePath());
+
+							// if file the available for reading
+							if (instream != null) {
+								// prepare the file for reading
+								InputStreamReader inputreader = new InputStreamReader(instream);
+								BufferedReader buffreader = new BufferedReader(inputreader);
+
+								String line1 = buffreader.readLine();
+								if (line1 != null) {
+									String line2 = buffreader.readLine();
+
+									String url = line2.replace("URL=", "");
+
+									log("Is URL - launch browser intent");
+									Intent i = new Intent(Intent.ACTION_VIEW);
+									i.setData(Uri.parse(url));
+									startActivity(i);
+								} else {
+									log("Not expected format: Exception on processing url file");
+									openFile(currentFile);
+								}
+							}
+						} catch (Exception ex) {
+
+							openFile(currentFile);
+
+						} finally {
+							// close the file.
+							try {
+								instream.close();
+							} catch (IOException e) {
+								log("EXCEPTION closing InputStream");
+							}
+						}
+					}
 					else{
 						openFile(currentFile);
 					}
@@ -1220,11 +1276,20 @@ public class OfflineFragmentLollipop extends Fragment{
     public void openFile (File currentFile){
 		log("openFile");
     	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+
+    	String type = "";
+		if (MimeTypeList.typeForName(currentFile.getName()).isURL()){
+			type = "text/plain";
 		}
 		else{
-			viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+			type = MimeTypeList.typeForName(currentFile.getName()).getType();
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			viewIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", currentFile), type);
+		}
+		else{
+			viewIntent.setDataAndType(Uri.fromFile(currentFile), type);
 		}
 		viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		if (MegaApiUtils.isIntentAvailable(context, viewIntent)){

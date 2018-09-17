@@ -9,34 +9,129 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="vertical">
-	    
 
-	    <CheckedTextView
-		    android:id="@+id/change_permissions_dialog_administrator"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-		    android:ellipsize="marquee"
-		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>	    
-	    
-	    <CheckedTextView
-		    android:id="@+id/change_permissions_dialog_member"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-		    android:ellipsize="marquee"
-		    android:gravity="center_vertical"
-		    android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-		<CheckedTextView
-			android:id="@+id/change_permissions_dialog_observer"
+		<LinearLayout
+			android:id="@+id/change_permissions_dialog_administrator_layout"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
-			android:ellipsize="marquee"
-			android:gravity="center_vertical"
-			android:textAppearance="?android:attr/textAppearanceMedium"/>
+			android:layout_height="match_parent"
+			android:orientation="horizontal">
+
+			<CheckedTextView
+				android:id="@+id/change_permissions_dialog_administrator"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+				android:ellipsize="marquee"
+				android:layout_gravity="center_vertical"
+				android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+			<LinearLayout
+				android:id="@+id/administrator_text_layout"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<TextView
+					android:id="@+id/administrator_title"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/name_my_account"
+					android:fontFamily="roboto"
+					android:gravity="left"/>
+
+				<TextView
+					android:id="@+id/administrator_subtitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/mail_my_account"
+					android:fontFamily="roboto"
+					android:gravity="left"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/change_permissions_dialog_member_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="horizontal">
+
+			<CheckedTextView
+				android:id="@+id/change_permissions_dialog_member"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+				android:ellipsize="marquee"
+				android:layout_gravity="center_vertical"
+				android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+			<LinearLayout
+				android:id="@+id/member_text_layout"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<TextView
+					android:id="@+id/member_title"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/name_my_account"
+					android:fontFamily="roboto"
+					android:gravity="left"/>
+
+				<TextView
+					android:id="@+id/member_subtitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/mail_my_account"
+					android:fontFamily="roboto"
+					android:gravity="left"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/change_permissions_dialog_observer_layout"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="horizontal">
+
+			<CheckedTextView
+				android:id="@+id/change_permissions_dialog_observer"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+				android:ellipsize="marquee"
+				android:layout_gravity="center_vertical"
+				android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+			<LinearLayout
+				android:id="@+id/observer_text_layout"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:orientation="vertical">
+
+				<TextView
+					android:id="@+id/observer_title"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/name_my_account"
+					android:fontFamily="roboto"
+					android:gravity="left"/>
+
+				<TextView
+					android:id="@+id/observer_subtitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textColor="@color/mail_my_account"
+					android:fontFamily="roboto"
+					android:gravity="left"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
 
 	</LinearLayout>
 </ScrollView>
