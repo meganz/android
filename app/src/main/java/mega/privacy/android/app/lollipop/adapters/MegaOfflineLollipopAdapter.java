@@ -40,8 +40,10 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -61,6 +63,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	private ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();
 	public int folderCount = 0;
+    private int placeholderCount;
+	
 //	int getAdapterType();
 	
 	RecyclerView listFragment;
@@ -194,7 +198,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     public void toggleSelection(int pos) {
 		log("toggleSelection");
 		//Otherwise out of bounds exception happens.
-        if (pos >= folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && fragment.hasPlaceholder) {
+        if (pos >= folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
             pos += 1;
         }
 		//Check if it's the Master Key file
@@ -276,7 +280,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 
 	public void toggleAllSelection(int pos) {
         //Otherwise out of bounds exception happens.
-        if (pos >= folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && fragment.hasPlaceholder) {
+        if (pos >= folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
             pos += 1;
         }
         final int positionToflip = pos;
@@ -341,7 +345,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
     
     public void selectAll() {
-        boolean b = (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && fragment.hasPlaceholder);
+        boolean b = (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0);
         for (int i = 0;i < getItemCount();i++) {
             if (!isItemChecked(i)) {
                 //Notice.
@@ -366,7 +370,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 //	}
     
     public void clearSelections() {
-        boolean b = (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && fragment.hasPlaceholder);
+        boolean b = (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0);
         for (int i = 0;i < this.getItemCount();i++) {
             if (isItemChecked(i)) {
                 if (b && i > folderCount) {
@@ -424,15 +428,16 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		this.fragment = _fragment;
 		this.context = _context;
 //		this.getAdapterType() =  getAdapterType();
-		this.mOffList = insertPlaceHolderNode(_mOffList);
-
-		this.listFragment = listView;
-		this.emptyImageViewFragment = emptyImageView;
-		this.emptyTextViewFragment = emptyTextView;
-		this.aB = aB;
-		
-		this.positionClicked = -1;
-	}
+        
+        this.listFragment = listView;
+        this.emptyImageViewFragment = emptyImageView;
+        this.emptyTextViewFragment = emptyTextView;
+        this.aB = aB;
+        
+        this.positionClicked = -1;
+        //After this.listFragment = listView;
+        this.mOffList = insertPlaceHolderNode(_mOffList);
+    }
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
@@ -569,19 +574,28 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	 * @return Nodes list with placeholder.
 	 */
 	private ArrayList<MegaOffline> insertPlaceHolderNode(ArrayList<MegaOffline> nodes) {
-		folderCount = 0;
-		CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList(nodes);
-		for (MegaOffline node : safeList) {
-			if (node == null) {
-				safeList.remove(node);
-			} else if (node.isFolder()) {
-				folderCount++;
-			}
-		}
+	    //need re-calculate
+	    folderCount = 0;
+        CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList(nodes);
+        for (MegaOffline node : safeList) {
+            if (node == null) {
+                safeList.remove(node);
+            } else if (node.isFolder()) {
+                folderCount++;
+            }
+        }
 		boolean isGrid = !(((ManagerActivityLollipop)context).isList);
-		if (folderCount > 0 && folderCount % 2 == 1 && isGrid) {
-			//Add placeholder between folders and filse.
-			safeList.add(folderCount,null);
+        int spanCount = 2;
+        if (listFragment instanceof NewGridRecyclerView) {
+            spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
+        }
+        int placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+        
+        if (folderCount > 0 && placeholderCount != 0 && isGrid) {
+            //Add placeholder at folders' end.
+            for (int i = 0;i < placeholderCount;i++) {
+                safeList.add(folderCount + i,null);
+            }
 		}
 		return new ArrayList<>(safeList);
 	}
@@ -1096,7 +1110,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		ViewHolderOffline holder = (ViewHolderOffline) v.getTag();
 		
 		int currentPosition = holder.getAdapterPosition();
-		
+        TL.log(this,"currentPosition: " + currentPosition);
+//		if(getAdapterType() == ITEM_VIEW_TYPE_GRID && currentPosition >= folderCount) {
+//		    currentPosition -= placeholderCount;
+//        }
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
 		
 		switch (v.getId()){
