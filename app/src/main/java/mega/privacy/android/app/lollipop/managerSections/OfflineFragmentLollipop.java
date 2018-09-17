@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -52,19 +53,20 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -83,7 +85,6 @@ public class OfflineFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
-	public boolean hasPlaceholder;
 	public FloatingItemDecoration floatingItemDecoration;
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -107,6 +108,8 @@ public class OfflineFragmentLollipop extends Fragment{
 	Display display;
 
 	private ActionMode actionMode;
+	
+	private int placeholderCount;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -131,49 +134,58 @@ public class OfflineFragmentLollipop extends Fragment{
 	private int getAdapterType() {
 		return ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
 	}
-	
-	public void addSectionTitle(List<MegaOffline> nodes) {
-//		type = ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
-		Map<Integer, String> sections = new HashMap<>();
-		int folderCount = 0;
-		int fileCount = 0;
-		for (MegaOffline node : nodes) {
-			if(node == null) {
-				continue;
-			}
-			if (node.isFolder()) {
-				folderCount++;
-			} else {
-				fileCount++;
-			}
-		}
-		String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-		String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
-		if (getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
-			sections.put(0,folderCount + " " + folderStr);
-			sections.put(1,folderCount + " " + folderStr);
-			if(fileCount != 0) {
-				sections.put(folderCount + 1,fileCount + " " + fileStr);
-				if (folderCount % 2 == 0) {
-					sections.put(folderCount,fileCount + " " + fileStr);
-					hasPlaceholder = false;
-				} else {
-					hasPlaceholder = true;
-					sections.put(folderCount+2,fileCount + " " + fileStr);
-				}
-			}
-		} else {
-			hasPlaceholder = false;
-			sections.put(0,folderCount + " " + folderStr);
-			sections.put(folderCount,fileCount + " " + fileStr);
-		}
-		if (floatingItemDecoration == null) {
-			floatingItemDecoration = new FloatingItemDecoration(context);
-			recyclerView.addItemDecoration(floatingItemDecoration);
-		}
-		floatingItemDecoration.setType(getAdapterType());
-		floatingItemDecoration.setKeys(sections);
-	}
+    
+    public void addSectionTitle(List<MegaOffline> nodes) {
+        Map<Integer, String> sections = new HashMap<>();
+        int folderCount = 0;
+        int fileCount = 0;
+        for (MegaOffline node : nodes) {
+            if (node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            } else {
+                fileCount++;
+            }
+        }
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            if(folderCount > 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(i,folderCount + " " + folderStr);
+                }
+            }
+            
+            if(fileCount > 0 ) {
+                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
+                }
+            }
+        } else {
+            placeholderCount = 0;
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
+        if (floatingItemDecoration == null) {
+            floatingItemDecoration = new FloatingItemDecoration(context);
+            recyclerView.addItemDecoration(floatingItemDecoration);
+        }
+        floatingItemDecoration.setType(getAdapterType());
+        floatingItemDecoration.setKeys(sections);
+    }
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
@@ -543,7 +555,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("onCreateGRID");
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
 			recyclerView.removeItemDecoration(floatingItemDecoration);
 			floatingItemDecoration = null;
 			recyclerView.setHasFixedSize(true);
@@ -793,9 +805,9 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 //		contentText.setText(getInfoFolder(mOffList));
 	}
-
-	
-	public void sortByNameAscending(){
+    
+    
+    public void sortByNameAscending() {
 		log("sortByNameAscending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
@@ -814,6 +826,9 @@ public class OfflineFragmentLollipop extends Fragment{
 				
 		for(int k = 0; k < mOffList.size() ; k++) {
 			MegaOffline node = mOffList.get(k);
+			if(node == null) {
+			    continue;
+            }
 			if(node.getType().equals("1")){
 				foldersOrder.add(node.getName());
 			}
@@ -828,9 +843,13 @@ public class OfflineFragmentLollipop extends Fragment{
 		for(int k = 0; k < foldersOrder.size() ; k++) {
 			for(int j = 0; j < mOffList.size() ; j++) {
 				String name = foldersOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
+                MegaOffline offline = mOffList.get(j);
+                if(offline == null) {
+                    continue;
+                }
+                String nameOffline = offline.getName();
 				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
+					tempOffline.add(offline);
 				}				
 			}			
 		}
@@ -838,9 +857,13 @@ public class OfflineFragmentLollipop extends Fragment{
 		for(int k = 0; k < filesOrder.size() ; k++) {
 			for(int j = 0; j < mOffList.size() ; j++) {
 				String name = filesOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
+                MegaOffline offline = mOffList.get(j);
+                if(offline == null) {
+                    continue;
+                }
+                String nameOffline = offline.getName();
 				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
+					tempOffline.add(offline);
 				}				
 			}
 			
@@ -980,11 +1003,18 @@ public class OfflineFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
+        for (MegaOffline offline : mOffList) {
+            if (offline == null) {
+                TL.log(this,"null");
+            } else {
+                TL.log(this,offline.getName());
+            }
+        }
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		//Otherwise out of bounds exception happens.
-		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && hasPlaceholder) {
-			position -= 1;
+		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+			position -= placeholderCount;
 		}
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
@@ -1032,10 +1062,10 @@ public class OfflineFragmentLollipop extends Fragment{
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -1154,8 +1184,6 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-						//Put flag to notify FullScreenImageViewerLollipop.
-//						intent.putExtra("placeholder",hasPlaceholder);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
