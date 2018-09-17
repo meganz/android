@@ -16257,6 +16257,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								updateContactsView(true, false, false);
 							}
 						}
+						//When last contact changes avatar, update view.
+						if(maFLol != null) {
+						    if(maFLol.isAdded()) {
+								maFLol.updateContactsCount();
+                                maFLol.updateView();
+                            }
+                        }
 					}
 				}
 				else{
