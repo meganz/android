@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -85,14 +83,19 @@ import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaContactRequest;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener{
+public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface{
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
@@ -1399,6 +1402,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (megaApi != null){
             log("---------retryPendingConnections");
             megaApi.retryPendingConnections();
+        }
+
+        if (megaChatApi != null){
+            megaChatApi.retryPendingConnections(false, null);
         }
 
         dbH = DatabaseHandler.getDbHandler(this);
@@ -2711,9 +2718,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             case R.id.invite_contact_button:
             case R.id.layout_invite_contact: {
                 log("Invite contact pressed");
-                Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-                finish();
+                Intent in = new Intent(this, AddContactActivityLollipop.class);
+                in.putExtra("contactType", Constants.CONTACT_TYPE_DEVICE);
+                startActivityForResult(in, Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE);
                 break;
             }
             case R.id.group_chat_button:
@@ -2746,6 +2753,21 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 confirmAddMail = mail;
                 queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
                 queryIfContactSouldBeAddedTask.execute();
+            }
+        }
+        else if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
+            log("onActivityResult REQUEST_INVITE_CONTACT_FROM_DEVICE OK");
+
+            if (intent == null) {
+                log("Return.....");
+                return;
+            }
+
+            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
+
+            if (contactsData != null){
+                ContactController cC = new ContactController(this);
+                cC.inviteMultipleContacts(contactsData);
             }
         }
     }
@@ -3093,6 +3115,56 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     @Override
     public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+    }
+
+    @Override
+    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+        log("onRequestStart: " + request.getRequestString());
+    }
+
+    @Override
+    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+        if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
+            log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+
+            if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
+                showSnackbar(getString(R.string.context_contact_invitation_resent));
+            }
+            else{
+                if (e.getErrorCode() == MegaError.API_OK){
+                    log("OK INVITE CONTACT: "+request.getEmail());
+                    if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD){
+                        showSnackbar(getString(R.string.context_contact_request_sent, request.getEmail()));
+                    }
+                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE){
+                        showSnackbar(getString(R.string.context_contact_invitation_deleted));
+                    }
+                }
+                else{
+                    log("Code: "+e.getErrorString());
+                    if(e.getErrorCode()==MegaError.API_EEXIST){
+                        showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+                    }
+                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS){
+                        showSnackbar(getString(R.string.error_own_email_as_contact));
+                    }
+                    else{
+                        showSnackbar(getString(R.string.general_error));
+                    }
+                    log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
     }
 

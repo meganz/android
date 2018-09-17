@@ -242,6 +242,16 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}
 
 					((ManagerActivityLollipop) context).showConfirmationLeaveMultipleShares(handleList);
+					break;
+				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.checkIfNodeIsMineAndSelectChatsToSendNode(nodesSelected.get(0));
+					clearSelections();
+					hideMultipleSelect();
+					break;
 				}
 			}
 			return false;
@@ -267,6 +277,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
+			boolean showSendToChat = false;
+
 			if (selected.size() != 0) {
 
 				showCopy = true;
@@ -277,11 +289,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-          if(selected.size()==1){
-               showRename=true;
-          }else{
-                        showRename=false;
-                    }
+				  	if(selected.size()==1){
+				  		showRename=true;
+					}else{
+						showRename=false;
+					}
 					showMove = false;
 					showTrash=false;
 
@@ -300,7 +312,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 						showRename = false;
 					}
-				}else{
+
+ 				}else{
 
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -328,6 +341,20 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
+
+				if(selected.size() == 1 && selected.get(0).isFile()){
+					if (Util.isChatEnabled()) {
+						showSendToChat = true;
+					}
+					else {
+						showSendToChat = false;
+					}
+				}else{
+					showSendToChat = false;
+				}
+
+				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 //				for(int i=0; i<selected.size();i++)	{
 //                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -453,7 +480,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				log("ParentHandle to find children: "+((ManagerActivityLollipop)context).parentHandleIncoming);
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -575,7 +602,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 			}
 
@@ -680,7 +707,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 			else {
 				parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 			}
 		}
@@ -809,7 +836,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 
-				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				visibilityFastScroller();
@@ -1254,7 +1281,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
-			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 
 		adapter.setNodes(nodes);
@@ -1406,7 +1433,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
-				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderOthers);
+				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				adapter.setNodes(nodes);
 				visibilityFastScroller();
 				int lastVisiblePosition = 0;
