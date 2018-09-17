@@ -169,12 +169,14 @@ public class RubbishBinFragmentLollipop extends Fragment{
             if (recyclerView instanceof NewGridRecyclerView) {
                 spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
             }
-            for (int i = 0;i < spanCount;i++) {
-                sections.put(i,folderCount + " " + folderStr);
+            if(folderCount > 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(i,folderCount + " " + folderStr);
+                }
             }
             
-            placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
             if(fileCount > 0 ) {
+                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
                 if (placeholderCount == 0) {
                     for (int i = 0;i < spanCount;i++) {
                         sections.put(folderCount + i,fileCount + " " + fileStr);
@@ -186,6 +188,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
                 }
             }
         } else {
+            placeholderCount = 0;
             sections.put(0,folderCount + " " + folderStr);
             sections.put(folderCount,fileCount + " " + fileStr);
         }
