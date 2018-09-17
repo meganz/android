@@ -35,7 +35,7 @@
         android:orderInCategory="115"
         android:title="@string/context_send_file"
         android:showAsAction="never"
-        android:icon="@drawable/ic_send_file_w"
+        android:icon="@drawable/ic_w_send_to_contact"
         MEGA:showAsAction="never" />
     
     <item
