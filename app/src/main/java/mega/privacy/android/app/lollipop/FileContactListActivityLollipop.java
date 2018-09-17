@@ -548,9 +548,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				removeShare = false;
 				changeShare = false;
 
-		    	Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+		    	Intent intent = new Intent();
 		    	intent.setClass(this, AddContactActivityLollipop.class);
-				intent.putExtra("SEND_FILE",0);
 		    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 		    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		    	
@@ -789,7 +788,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				removeShare = false;
 				changeShare = false;
 
-				Intent intent = new Intent(AddContactActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+				Intent intent = new Intent();
 				intent.setClass(this, AddContactActivityLollipop.class);
 				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
 				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
@@ -1008,12 +1007,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					});
 					permissionsDialog = dialogBuilder.create();
 					permissionsDialog.show();
-				}
-				else{ 
-					for (int i=0;i<emails.size();i++){
-						MegaUser u = megaApi.getContact(emails.get(i));
-						megaApi.sendFileToUser(node, u, fileContactListActivityLollipop);
-					}
 				}
 			}
 		}			
