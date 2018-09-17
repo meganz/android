@@ -499,7 +499,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				positionG = newPosition;
 
 				try{
-					TouchImageView tIV = adapterMega.getVisibleImage(oldPosition);
+					TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
@@ -526,7 +526,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(getResources().getColor(R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -590,7 +590,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 
-		log("onRequestFinish");
+		log("onRequestFinish: "+e.getErrorCode());
 		if(request.getType() == MegaRequest.TYPE_COPY){
 			if (e.getErrorCode() != MegaError.API_OK) {
 
@@ -602,6 +602,16 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 					intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 					startActivity(intent);
 					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(Constants.ACTION_PRE_OVERQUOTA_STORAGE);
+					startActivity(intent);
+					finish();
+				}
+				else if(e.getErrorCode()==MegaError.API_ENOENT){
+					Snackbar.make(fragmentContainer, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available, 1, 1), Snackbar.LENGTH_LONG).show();
 				}
 				else
 				{
@@ -891,14 +901,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	protected void hideActionBar(){
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(800L)
+				tB.animate().translationY(-220).setDuration(400L)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
 							}
 						}).start();
-				bottomLayout.animate().translationY(220).setDuration(800L).start();
+				bottomLayout.animate().translationY(220).setDuration(400L).start();
 			} else {
 				aB.hide();
 			}
@@ -908,8 +918,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(800L).start();
-				bottomLayout.animate().translationY(0).setDuration(800L).start();
+				tB.animate().translationY(0).setDuration(400L).start();
+				bottomLayout.animate().translationY(0).setDuration(400L).start();
 			}
 
 		}

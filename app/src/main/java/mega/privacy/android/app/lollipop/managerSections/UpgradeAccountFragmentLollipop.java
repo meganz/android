@@ -572,13 +572,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		log("Check the last call to callToPricing");
 		if(DBUtil.callToPricing(context)){
 			log("megaApi.getPricing SEND");
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 		}
 
 		log("Check the last call to callToPaymentMethods");
 		if(DBUtil.callToPaymentMethods(context)){
 			log("megaApi.getPaymentMethods SEND");
-			megaApi.getPaymentMethods(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPaymentMethods();
 		}
 	}
 
@@ -587,12 +587,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		DecimalFormat df = new DecimalFormat("#.##");
 
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
+
 		if(myAccountInfo!=null){
 			ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
 
 			if (productAccounts == null){
 				log("productAccounts == null");
-				megaApi.getPricing(myAccountInfo);
+				((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 				return;
 			}
 
@@ -733,7 +737,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
-			myAccountInfo = ((ManagerActivityLollipop)context).getMyAccountInfo();
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
 		log("showAvailableAccount: "+myAccountInfo.getAccountType());
@@ -997,14 +1001,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		Util.log("UpgradeAccountFragmentLollipop", log);
 	}
 
-	public MyAccountInfo getMyAccountInfo() {
-		return myAccountInfo;
-	}
-
-	public void setMyAccountInfo(MyAccountInfo myAccountInfo) {
-		this.myAccountInfo = myAccountInfo;
-	}
-
 	public void showNextPaymentFragment(int paymentMethod){
 		log("showNextPaymentFragment: paymentMethod: "+paymentMethod);
 
@@ -1113,11 +1109,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	public void showPaymentMethods(int parameterType){
 		log("showPaymentMethods");
 
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+		}
+
+		if(myAccountInfo==null){
+			return;
+		}
+
 		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
 		if (accounts == null){
 			log("accounts == null");
-			megaApi.getPricing(myAccountInfo);
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 			return;
 		}
 
