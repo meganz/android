@@ -116,7 +116,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     @Override
     public void onClick(View v) {
-        log("****** onClick() of general");
+        log("onClick()");
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 //        switch (v.getId()) {
 //            case R.id.general:{
@@ -128,17 +128,15 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 
     @Override
     public void resetSize(Long userHandle) {
-        log("***** resetSize");
+        log("resetSize");
         if(getItemCount()!=0){
             for(InfoPeerGroupCall peer:peers){
                 if(peer.getHandle() == userHandle){
                     if(peer.getListener()!=null){
                         if(peer.getListener().getWidth()!=0){
-                            log("****** resetSize() -setWidth(0)");
                             peer.getListener().setWidth(0);
                         }
                         if(peer.getListener().getHeight()!=0){
-                            log("****** resetSize() -getHeight(0)");
                             peer.getListener().setHeight(0);
                         }
                     }
@@ -305,7 +303,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                log("***** onClick() send my positon: "+holder.getPosition());
+                log("onClick() send my positon: "+holder.getPosition());
                 listener.onItemClick(holder.getPosition());
             }
         });
