@@ -7,11 +7,13 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApiAndroid;
 
 
 public class PinActivityLollipop extends AppCompatActivity{
 	
 	private MegaApiAndroid megaApi;
+	private MegaChatApiAndroid megaChatApi;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +21,12 @@ public class PinActivityLollipop extends AppCompatActivity{
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+			}
 		}
 	}
 
@@ -28,6 +36,13 @@ public class PinActivityLollipop extends AppCompatActivity{
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
+
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+			}
+		}
+
 		PinUtil.pause(this);
 
 		MegaApplication.activityPaused();
@@ -40,7 +55,7 @@ public class PinActivityLollipop extends AppCompatActivity{
 		log("onResume");
 
 		super.onResume();
-
+        Util.setAppFontSize(this);
 		MegaApplication.activityResumed();
 
 		if (megaApi == null){
@@ -49,6 +64,17 @@ public class PinActivityLollipop extends AppCompatActivity{
 		
 		log("retryPendingConnections()");
 		megaApi.retryPendingConnections();
+
+
+		if(Util.isChatEnabled()){
+			if (megaChatApi == null){
+				megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
+			}
+		}
+
+		if (megaChatApi != null){
+			megaChatApi.retryPendingConnections(false, null);
+		}
 
 		if(MegaApplication.isShowPinScreen()){
 			PinUtil.resume(this);
