@@ -12909,7 +12909,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
-                        //yuan
+                       
                         if(fbFLol != null && fbFLol.isAdded()){
                             String handle = mOff.getHandle();
                             if(handle != null && !handle.equals("")){
@@ -16879,7 +16879,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         fbFLol.refresh(transfer.getNodeHandle());
                     }
                 }
-    //yuan
+    
 				if(inSFLol != null && inSFLol.isAdded()){
                     inSFLol.refresh();
                 }
