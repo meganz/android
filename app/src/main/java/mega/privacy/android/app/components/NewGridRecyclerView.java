@@ -9,8 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 
-import mega.privacy.android.app.utils.TL;
-
 public class NewGridRecyclerView extends RecyclerView {
     
     private CustomizedGridLayoutManager manager;
