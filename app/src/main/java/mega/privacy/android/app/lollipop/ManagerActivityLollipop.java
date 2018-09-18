@@ -12909,7 +12909,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
-
+                        //yuan
+                        if(fbFLol != null && fbFLol.isAdded()){
+                            String handle = mOff.getHandle();
+                            if(handle != null && !handle.equals("")){
+                                fbFLol.refresh(Long.parseLong(handle));
+                            }
+                        }
+                        
+                        if(inSFLol != null && inSFLol.isAdded()){
+                            inSFLol.refresh();
+                        }
+                        
+                        if(outSFLol != null && outSFLol.isAdded()){
+                            outSFLol.refresh();
+                        }
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13877,9 +13891,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(requestCode == Constants.REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK){
-		    if(fbFLol != null){
+		    if(fbFLol != null && fbFLol.isAdded()){
                 long handle = intent.getLongExtra(NODE_HANDLE, -1);
                 fbFLol.refresh(handle);
+            }
+            
+            if(inSFLol != null && inSFLol.isAdded()){
+                inSFLol.refresh();
+            }
+            
+            if(outSFLol != null && outSFLol.isAdded()){
+                outSFLol.refresh();
             }
         }
 		else{
@@ -16848,19 +16870,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						playTransfersMenuIcon.setVisible(false);
 						cancelAllTransfersMenuItem.setVisible(false);
 					}
-
-//					showSnackbar(getString(R.string.message_transfers_completed));
 				}
-
-				if(cloudPageAdapter!=null){
-					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null){
-						if(fbFLol.isAdded()){
-							fbFLol.setOverviewLayout();
-                            fbFLol.refresh(transfer.getNodeHandle());
-						}
-					}
-				}
+                
+                if (cloudPageAdapter != null) {
+                    fbFLol = (FileBrowserFragmentLollipop)cloudPageAdapter.instantiateItem(viewPagerCDrive,0);
+                    if (fbFLol != null && fbFLol.isAdded()) {
+                        fbFLol.setOverviewLayout();
+                        fbFLol.refresh(transfer.getNodeHandle());
+                    }
+                }
+    //yuan
+				if(inSFLol != null && inSFLol.isAdded()){
+                    inSFLol.refresh();
+                }
+                
+                if(outSFLol != null && outSFLol.isAdded()){
+                    outSFLol.refresh();
+                }
 
 				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
