@@ -279,6 +279,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
@@ -291,7 +292,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updateScreenStatusInProgress(){
-        log("updateScreenStatusInProgress()");
+        log("updateScreenStatusInProgress");
+        relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
+        relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
+        flagMyAvatar = true;
+        setProfileMyAvatar();
+        flagContactAvatar = false;
+        setProfileContactAvatar();
 
         if(chat.isGroup()){
 
@@ -488,6 +495,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             megaApi.retryPendingConnections();
         }
 
+        if (megaChatApi != null){
+            megaChatApi.retryPendingConnections(false, null);
+        }
+
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
         }
@@ -549,6 +560,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setTitle(" ");
+
         myChrono = new Chronometer(context);
 
         smallElementsIndividualCallLayout = (RelativeLayout) findViewById(R.id.small_elements_individual_call);

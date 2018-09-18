@@ -210,6 +210,18 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory
+		android:key="settings_2fa"
+		android:title="@string/settings_2fa"
+		android:textColor="@color/pressed_mega">
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_2fa_activated"
+			android:title="@string/settings_2fa"
+			android:summary="@string/setting_subtitle_2fa"/>
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
 		android:key="settings_qrcode"
 		android:title="@string/section_qr_code"
 		android:textColor="@color/pressed_mega">

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -28,6 +27,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -73,6 +73,7 @@ public class PlaylistFragment extends Fragment{
     Long parentHandle;
     String parenPath;
     ArrayList<MegaOffline> offNodes;
+    ArrayList<File> zipFiles;
     int adapterType;
 
     PlaylistFragment playlistFragment;
@@ -170,12 +171,16 @@ public class PlaylistFragment extends Fragment{
 
         adapterType = ((AudioVideoPlayerLollipop) context).getAdapterType();
         if (adapterType == Constants.OFFLINE_ADAPTER){
-            parenPath = ((AudioVideoPlayerLollipop) context).getPathNavigation();
 //            OFFLINE CODE
             parenPath = ((AudioVideoPlayerLollipop) context).getPathNavigation();
             offNodes = ((AudioVideoPlayerLollipop) context).getMediaOffList();
             contentText.setText(""+offNodes.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodes.size()));
             adapter = new PlayListAdapter(context, this, offNodes, parenPath, recyclerView, adapterType);
+        }
+        else if (adapterType == Constants.ZIP_ADAPTER) {
+            zipFiles = ((AudioVideoPlayerLollipop) context).getZipMediaFiles();
+            contentText.setText(""+zipFiles.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, zipFiles.size()));
+            adapter = new PlayListAdapter(context, this, zipFiles, recyclerView, adapterType);
         }
         else {
             parentHandle = ((AudioVideoPlayerLollipop) context).getParentNodeHandle();
@@ -276,7 +281,7 @@ public class PlaylistFragment extends Fragment{
 
     public void itemClick(int position) {
         log("item click position: " + position);
-        if (player != null) {
+        if (player != null && !((AudioVideoPlayerLollipop) context).isCreatingPlaylist()) {
             player.seekTo(position, 0);
         }
     }
@@ -311,6 +316,24 @@ public class PlaylistFragment extends Fragment{
             else {
                 containerContentText.setVisibility(View.VISIBLE);
                 contentText.setText(""+offNodesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, offNodesSearch.size()));
+            }
+        }
+        else if (adapterType == Constants.ZIP_ADAPTER) {
+            ArrayList<File> zipFilesSearch = new ArrayList<>();
+            File zipFile;
+            for (int i=0; i<zipFiles.size(); i++) {
+                zipFile = zipFiles.get(i);
+                if (zipFile.getName().toLowerCase().contains(query.toLowerCase())) {
+                    zipFilesSearch.add(zipFile);
+                }
+            }
+            adapter.setZipNodes(zipFilesSearch);
+            if (zipFilesSearch.size() == 0) {
+                containerContentText.setVisibility(View.GONE);
+            }
+            else {
+                containerContentText.setVisibility(View.VISIBLE);
+                contentText.setText(""+zipFilesSearch.size()+" "+context.getResources().getQuantityString(R.plurals.general_num_files, zipFilesSearch.size()));
             }
         }
         else {
