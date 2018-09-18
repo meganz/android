@@ -425,7 +425,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		this.fragment = _fragment;
 		this.context = _context;
 //		this.getAdapterType() =  getAdapterType();
-        
         this.listFragment = listView;
         this.emptyImageViewFragment = emptyImageView;
         this.emptyTextViewFragment = emptyTextView;
@@ -476,9 +475,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	@Override
 	public ViewHolderOffline onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
-		
-		listFragment = (RecyclerView) parent;
-		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -571,6 +567,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	 * @return Nodes list with placeholder.
 	 */
 	private ArrayList<MegaOffline> insertPlaceHolderNode(ArrayList<MegaOffline> nodes) {
+	    if(getAdapterType() == ITEM_VIEW_TYPE_LIST) {
+	        placeholderCount = 0;
+	        return nodes;
+        }
 	    //need re-calculate
 	    folderCount = 0;
         CopyOnWriteArrayList<MegaOffline> safeList = new CopyOnWriteArrayList(nodes);
@@ -587,7 +587,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
         placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-        
         if (folderCount > 0 && placeholderCount != 0 && isGrid) {
             //Add placeholder at folders' end.
             for (int i = 0;i < placeholderCount;i++) {
