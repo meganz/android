@@ -15,43 +15,83 @@ public class FileExplorerPagerAdapter extends FragmentPagerAdapter {
 
     final int PAGE_COUNT = 3;
     private Context context;
+    boolean chatFirst = false;
+
+    public FileExplorerPagerAdapter(FragmentManager fm, Context context, boolean chatFirst) {
+        super(fm);
+        this.context = context;
+        this.chatFirst = chatFirst;
+    }
 
     public FileExplorerPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
+        this.chatFirst = false;
     }
 
     @Override
     public Fragment getItem(int position) {
         log("getItem: "+position);
-        switch (position){
-            case 0: {
-                return CloudDriveExplorerFragmentLollipop.newInstance();
-            }
-            case 1:{
-                return IncomingSharesExplorerFragmentLollipop.newInstance();
-            }
-            case 2:{
-                return ChatExplorerFragment.newInstance();
+        if(chatFirst){
+            switch (position){
+                case 0:{
+                    return ChatExplorerFragment.newInstance();
+                }
+                case 1: {
+                    return CloudDriveExplorerFragmentLollipop.newInstance();
+                }
+                case 2:{
+                    return IncomingSharesExplorerFragmentLollipop.newInstance();
+                }
             }
         }
+        else{
+            switch (position){
+                case 0: {
+                    return CloudDriveExplorerFragmentLollipop.newInstance();
+                }
+                case 1:{
+                    return IncomingSharesExplorerFragmentLollipop.newInstance();
+                }
+                case 2:{
+                    return ChatExplorerFragment.newInstance();
+                }
+            }
+        }
+
         return null;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
         // Generate title based on item position
-        switch (position){
-            case 0: {
-                return context.getString(R.string.section_cloud_drive);
-            }
-            case 1:{
-                return context.getString(R.string.tab_incoming_shares);
-            }
-            case 2:{
-                return context.getString(R.string.section_chat);
+        if(chatFirst){
+            switch (position){
+                case 0:{
+                    return context.getString(R.string.section_chat);
+                }
+                case 1: {
+                    return context.getString(R.string.section_cloud_drive);
+                }
+                case 2:{
+                    return context.getString(R.string.tab_incoming_shares);
+                }
             }
         }
+        else{
+            switch (position){
+                case 0: {
+                    return context.getString(R.string.section_cloud_drive);
+                }
+                case 1:{
+                    return context.getString(R.string.tab_incoming_shares);
+                }
+                case 2:{
+                    return context.getString(R.string.section_chat);
+                }
+            }
+        }
+
         return null;
     }
 

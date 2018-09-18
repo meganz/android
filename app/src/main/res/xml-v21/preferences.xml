@@ -216,6 +216,18 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory
+		android:key="settings_2fa"
+		android:title="@string/settings_2fa"
+		android:layout="@layout/my_category_preference">
+
+		<SwitchPreference
+			android:key="settings_2fa_activated"
+			android:title="@string/settings_2fa"
+			android:summary="@string/setting_subtitle_2fa"/>
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
 		android:key="settings_qrcode"
 		android:title="@string/section_qr_code"
 		android:layout="@layout/my_category_preference">

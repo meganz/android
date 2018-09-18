@@ -32,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/recent_chat_empty"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/adapters_background"
                 android:textSize="18sp" />

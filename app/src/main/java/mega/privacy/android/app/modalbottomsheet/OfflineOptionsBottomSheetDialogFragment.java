@@ -83,7 +83,13 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
             log("Bundle is NOT NULL");
             String handle = savedInstanceState.getString("handle");
             log("Handle of the node offline: "+handle);
-            nodeOffline = dbH.findByHandle(handle);
+            if(handle.equals("0")){
+                //recovery key will have handle as 0 and have to be handled specifically
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath()+Util.rKFile;
+                nodeOffline = new MegaOffline("0", path, "MEGARecoveryKey.txt", 0, "0", 0, "0");
+            }else{
+                nodeOffline = dbH.findByHandle(handle);
+            }
         }
         else{
             log("Bundle NULL");

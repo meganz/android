@@ -209,7 +209,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_send_contact"
+                    android:src="@drawable/ic_b_share_to_contact"
                     android:visibility="visible" />
 
                 <TextView

@@ -119,8 +119,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	
 	private String lastEmail;
 	private String lastPassword;
-	private String gPublicKey;
-	private String gPrivateKey;
 
 
 	private MenuItem searchMenuItem;
@@ -962,8 +960,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		lastPassword = et_password.getText().toString();
 		
 		log("generating keys");
-		
-		new HashTask().execute(lastEmail, lastPassword);
+
+		onKeysGenerated(lastEmail, lastPassword);
 	}
 
 	@Override
@@ -996,36 +994,16 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	}
 
-	/*
-	 * Task to process email and password
-	 */
-	private class HashTask extends AsyncTask<String, Void, String[]> {
-
-		@Override
-		protected String[] doInBackground(String... args) {
-			String privateKey = megaApi.getBase64PwKey(args[1]);
-			String publicKey = megaApi.getStringHash(privateKey, args[0]);
-			return new String[]{new String(privateKey), new String(publicKey)}; 
-		}
-
-		
-		@Override
-		protected void onPostExecute(String[] key) {
-			onKeysGenerated(key[0], key[1]);
-		}
-
-	}
-	
-	private void onKeysGenerated(String privateKey, String publicKey) {
+	private void onKeysGenerated(String email, String password) {
 		log("key generation finished");
 
-		this.gPrivateKey = privateKey;
-		this.gPublicKey = publicKey;		
+		this.lastEmail = email;
+		this.lastPassword = password;
 
-		onKeysGeneratedLogin(privateKey, publicKey);
+		onKeysGeneratedLogin(email, password);
 	}
 	
-	private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
+	private void onKeysGeneratedLogin(final String email, final String password) {
 
 		if(!Util.isOnline(this)){
 			loginLoggingIn.setVisibility(View.GONE);
@@ -1066,14 +1044,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				log("onKeysGeneratedLogin: result of init ---> " + ret);
 				if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
 					log("startFastLogin: condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-					megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+					megaApi.login(lastEmail, lastPassword, this);
 				} else {
 					log("ERROR INIT CHAT: " + ret);
 					megaChatApi.logout(this);
 				}
 			} else {
 				log("onKeysGeneratedLogin: Chat is NOT ENABLED");
-				megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
+				megaApi.login(lastEmail, lastPassword, this);
 			}
 		}
 	}
