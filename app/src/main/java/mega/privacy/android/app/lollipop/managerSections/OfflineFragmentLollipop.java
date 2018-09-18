@@ -134,6 +134,9 @@ public class OfflineFragmentLollipop extends Fragment{
 	}
     
     public void addSectionTitle(List<MegaOffline> nodes) {
+	    if(adapter != null) {
+	        adapter.setRecylerView(recyclerView);
+        }
         Map<Integer, String> sections = new HashMap<>();
         int folderCount = 0;
         int fileCount = 0;
@@ -544,6 +547,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 			}
 			else{
+			    adapter.setRecylerView(recyclerView);
 //				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 		
@@ -612,6 +616,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 			}
 			else{
+                adapter.setRecylerView(recyclerView);
 //				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 

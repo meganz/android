@@ -223,7 +223,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
-
 		if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 			MegaOfflineLollipopAdapter.ViewHolderOfflineList view = (MegaOfflineLollipopAdapter.ViewHolderOfflineList) listFragment.findViewHolderForLayoutPosition(pos);
 			if(view!=null){
@@ -238,7 +237,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					@Override
 					public void onAnimationEnd(Animation animation) {
 						if (selectedItems.size() <= 0){
-							((OfflineFragmentLollipop) fragment).hideMultipleSelect();
+							fragment.hideMultipleSelect();
 						}
 					}
 
@@ -433,6 +432,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         this.positionClicked = -1;
         //After this.listFragment = listView;
         this.mOffList = insertPlaceHolderNode(_mOffList);
+    }
+    
+    public void setRecylerView(RecyclerView recylerView) {
+	    this.listFragment = recylerView;
     }
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
@@ -1131,11 +1134,14 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			case R.id.offline_list_three_dots_layout:
             case R.id.file_grid_three_dots_for_file:
 			case R.id.offline_grid_three_dots:{
-
-				if(context instanceof ManagerActivityLollipop){
-					log("Connection! - ManagerActivity instance!");
-					((ManagerActivityLollipop) context).showOptionsPanel(mOff);
-				}
+			    if(!isMultipleSelect()) {
+                    if(context instanceof ManagerActivityLollipop){
+                        log("Connection! - ManagerActivity instance!");
+                        ((ManagerActivityLollipop) context).showOptionsPanel(mOff);
+                    }
+                } else {
+                    fragment.itemClick(currentPosition,null,null);
+                }
 				break;
 			}
 		}		
