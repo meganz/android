@@ -8446,12 +8446,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        	}
 		        	case SHARED_ITEMS: {
 
-		        		if (viewPagerShares.getCurrentItem()==0){
-		        			//Incoming Shares
-							sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-		        		}
-
 						if(firstNavigationLevel){
+
+							if (viewPagerShares.getCurrentItem()==0){
+								//Incoming Shares
+								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
+							}
+							else{
+								sortByNameTV.setText(getString(R.string.sortby_name));
+							}
+
 							sortByDateTV.setVisibility(View.GONE);
 							newestCheck.setVisibility(View.GONE);
 							oldestCheck.setVisibility(View.GONE);
@@ -8493,6 +8497,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						else{
 							log("No first level navigation on Incoming Shares");
+							sortByNameTV.setText(getString(R.string.sortby_name));
+
 							ascendingCheck.setOnClickListener(new OnClickListener() {
 
 								@Override
