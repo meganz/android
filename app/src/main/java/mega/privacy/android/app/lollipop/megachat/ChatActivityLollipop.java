@@ -2540,20 +2540,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                boolean iAmOnACall = false;
+                boolean inProgressCall = false;
 
                 MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
                 if(callInProgress != null){
                     if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
-                        iAmOnACall = true;
+                        inProgressCall = true;
                     }else{
-                        iAmOnACall = false;
+                        inProgressCall = false;
                     }
                 }else{
-                    iAmOnACall = false;
+                    inProgressCall = false;
                 }
 
-                if(!iAmOnACall){
+                if(!inProgressCall){
                     openCameraApp();
                 }else{
                     showConfirmationOpenCamera(chatRoom);
