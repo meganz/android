@@ -3,7 +3,7 @@
     android:id="@+id/general"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="@color/green_free_account">
 
     <!--Surface view-->
     <RelativeLayout
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:background="@android:color/transparent"
+        android:background="@android:color/holo_blue_light"
         android:visibility="gone">
 
         <!--Big Avatar-->
@@ -35,7 +35,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:background="@android:color/transparent">
+            android:background="@android:color/holo_orange_dark">
 
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/avatar_image"
