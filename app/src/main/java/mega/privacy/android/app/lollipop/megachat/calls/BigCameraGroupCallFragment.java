@@ -33,16 +33,18 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     MegaChatApiAndroid megaChatApi;
     Context context;
     long chatId;
+    Long userHandle;
 
-    public SurfaceView localFullScreenSurfaceView;
-    MegaSurfaceRenderer localRenderer;
+    public SurfaceView fullScreenSurfaceView;
+    MegaSurfaceRenderer renderer;
 
-    public static BigCameraGroupCallFragment newInstance(long chatId) {
+    public static BigCameraGroupCallFragment newInstance(long chatId, long userHandle) {
         log("newInstance");
         BigCameraGroupCallFragment f = new BigCameraGroupCallFragment();
 
         Bundle args = new Bundle();
         args.putLong("chatId", chatId);
+        args.putLong("userHandle",userHandle);
         f.setArguments(args);
         return f;
     }
@@ -56,7 +58,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
-
+        this.userHandle = args.getLong("userHandle", -1);
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -71,13 +73,18 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
         View v = inflater.inflate(R.layout.fragment_local_camera_call_full_screen, container, false);
 
-        localFullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
-        localFullScreenSurfaceView.setZOrderMediaOverlay(true);
-        SurfaceHolder localSurfaceHolder = localFullScreenSurfaceView.getHolder();
+        fullScreenSurfaceView = (SurfaceView)v.findViewById(R.id.surface_local_video);
+        fullScreenSurfaceView.setZOrderMediaOverlay(true);
+        SurfaceHolder localSurfaceHolder = fullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        localRenderer = new MegaSurfaceRenderer(localFullScreenSurfaceView);
+        renderer = new MegaSurfaceRenderer(fullScreenSurfaceView);
 
-        megaChatApi.addChatLocalVideoListener(chatId, this);
+        if(userHandle.equals(megaChatApi.getMyUserHandle())){
+            megaChatApi.addChatLocalVideoListener(chatId, this);
+        }else{
+            megaChatApi.addChatRemoteVideoListener(chatId, userHandle, this);
+        }
+
 
         return v;
     }
@@ -92,10 +99,10 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
             this.width = width;
             this.height = height;
 
-            SurfaceHolder holder = localFullScreenSurfaceView.getHolder();
+            SurfaceHolder holder = fullScreenSurfaceView.getHolder();
             if (holder != null) {
-                int viewWidth = localFullScreenSurfaceView.getWidth();
-                int viewHeight = localFullScreenSurfaceView.getHeight();
+                int viewWidth = fullScreenSurfaceView.getWidth();
+                int viewHeight = fullScreenSurfaceView.getHeight();
                 if ((viewWidth != 0) && (viewHeight != 0)) {
                     int holderWidth = viewWidth < width ? viewWidth : width;
                     int holderHeight = holderWidth * viewHeight / viewWidth;
@@ -103,7 +110,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                         holderHeight = viewHeight;
                         holderWidth = holderHeight * viewWidth / viewHeight;
                     }
-                    this.bitmap = localRenderer.CreateBitmap(width, height);
+                    this.bitmap = renderer.CreateBitmap(width, height);
                     holder.setFixedSize(holderWidth, holderHeight);
                 }
                 else{
@@ -118,7 +125,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
             // Instead of using this WebRTC renderer, we should probably draw the image by ourselves.
             // The renderer has been modified a bit and an update of WebRTC could break our app
-            localRenderer.DrawBitmap(false);
+            renderer.DrawBitmap(false);
         }
     }
 
@@ -139,7 +146,11 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     @Override
     public void onDestroy(){
-        megaChatApi.removeChatVideoListener(chatId, -1, this);
+        if(userHandle.equals(megaChatApi.getMyUserHandle())){
+            megaChatApi.removeChatVideoListener(chatId, -1, this);
+        }else{
+            megaChatApi.removeChatVideoListener(chatId, userHandle, this);
+        }
         super.onDestroy();
     }
     @Override
@@ -152,10 +163,10 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
 
     public void setVideoFrame(boolean visible){
         if(visible){
-            localFullScreenSurfaceView.setVisibility(View.VISIBLE);
+            fullScreenSurfaceView.setVisibility(View.VISIBLE);
         }
         else{
-            localFullScreenSurfaceView.setVisibility(View.GONE);
+            fullScreenSurfaceView.setVisibility(View.GONE);
         }
     }
 
