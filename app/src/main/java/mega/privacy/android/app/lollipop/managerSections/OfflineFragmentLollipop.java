@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -66,7 +65,6 @@ import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1003,13 +1001,6 @@ public class OfflineFragmentLollipop extends Fragment{
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
-        for (MegaOffline offline : mOffList) {
-            if (offline == null) {
-                TL.log(this,"null");
-            } else {
-                TL.log(this,offline.getName());
-            }
-        }
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		//Otherwise out of bounds exception happens.
