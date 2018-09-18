@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -24,7 +23,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -41,7 +39,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -63,7 +60,6 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.MySwitch;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
@@ -152,12 +148,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	EditText et_password;
 	TextView bRegisterLol;
 	TextView bLoginLol;
-	ImageView loginThreeDots;
-	TextView loginABC;
-	SwitchCompat loginSwitchLol;
-	MySwitch loginSwitch;
-	Button bRegister;
-	Button bLogin;
+
 	RelativeLayout relativeLayout;
 	
 	public static int CLOUD_TAB = 0;
@@ -498,32 +489,20 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	@SuppressLint("NewApi")
 	public void checkLogin(){
+
 		setContentView(R.layout.fragment_login);
-		
+
 		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
 		
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
-		//Left margin
-		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
-		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
-		loginTitle.setLayoutParams(textParams);
-		
+
 		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
 		et_user = (EditText) findViewById(R.id.login_email_text);
-		android.view.ViewGroup.LayoutParams paramsb1 = et_user.getLayoutParams();		
-		paramsb1.width = Util.scaleWidthPx(280, outMetrics);		
-		et_user.setLayoutParams(paramsb1);
-		//Left margin
-		textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
-		et_user.setLayoutParams(textParams);		
-		
-		et_password = (EditText) findViewById(R.id.login_password_text);	
-		et_password.setLayoutParams(paramsb1);
-		et_password.setLayoutParams(textParams);	
-		
+
+		et_password = (EditText) findViewById(R.id.login_password_text);
+
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
 			
 			@Override
@@ -535,44 +514,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				return false;
 			}
 		});			
-//		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
-//		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-//		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
-//		loginThreeDots.setLayoutParams(textThreeDots);
-//
-//		loginABC = (TextView) findViewById(R.id.ABC);
-//
-//		loginSwitchLol = (SwitchCompat) findViewById(R.id.switch_login);
-//		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitchLol.getLayoutParams();
-//		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-//		loginSwitchLol.setLayoutParams(switchParams);
-//		loginSwitchLol.setChecked(false);
-//
-//		loginSwitchLol.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-//
-//			@Override
-//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//				if(!isChecked){
-//						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//						et_password.setSelection(et_password.getText().length());
-//				}else{
-//						et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-//						et_password.setSelection(et_password.getText().length());
-//			    }
-//			}
-//		});
+
 		
 		bLoginLol = (TextView) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-//		android.view.ViewGroup.LayoutParams paramsbLogin = bLoginLol.getLayoutParams();		
-//		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
-//		bLoginLol.setLayoutParams(paramsbLogin);
-		//Margin
-		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLoginLol.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
-		bLoginLol.setLayoutParams(textParamsLogin);
-		
+
 		bLoginLol.setOnClickListener(this);
 		
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
@@ -580,23 +526,15 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 	    newToMega = (TextView) findViewById(R.id.text_newToMega);
 		//Margins (left, top, right, bottom)
-		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
-		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics)); 
-		newToMega.setLayoutParams(textnewToMega);	
-		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+//		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
+//		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
+//		newToMega.setLayoutParams(textnewToMega);
+//		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
 	    bRegisterLol = (TextView) findViewById(R.id.button_create_account_login);
 	    
 	    bRegisterLol.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-//		android.view.ViewGroup.LayoutParams paramsb2 = bRegisterLol.getLayoutParams();		
-//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
-//		bRegisterLol.setLayoutParams(paramsb2);
-		//Margin
-		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegisterLol.getLayoutParams();
-		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
-		bRegisterLol.setLayoutParams(textParamsRegister);
-	    
+
 	    bRegisterLol.setOnClickListener(this);
 		
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
@@ -610,8 +548,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		serversBusyText = (TextView) findViewById(R.id.login_servers_busy_text);
-
 	}
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
