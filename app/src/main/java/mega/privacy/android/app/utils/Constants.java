@@ -240,8 +240,21 @@ public class Constants {
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 
+	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA Upload";
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
+	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
+	public static String NOTIFICATION_CHANNEL_CHATCALLS_ID = "ChatCallNotification";
+	public static String NOTIFICATION_CHANNEL_CHATCALLS_NAME = "MEGA Chat Call";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
+	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_ID = "CloudDriveNotification";
+	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
+
 
 	public static String CHAT_FOLDER = "My chat files";
 
