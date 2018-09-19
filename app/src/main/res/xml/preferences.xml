@@ -178,6 +178,10 @@
 			android:title="@string/context_clear_rubbish" />
 
 		<mega.privacy.android.app.components.TwoLineCheckPreference
+			android:key="settings_rb_scheduler_switch"
+			android:title="@string/settings_rb_scheduler_title"/>
+
+		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_file_versioning_switch"
 			android:title="@string/settings_enable_file_versioning_title"
 			android:summary="@string/settings_enable_file_versioning_subtitle"/>
