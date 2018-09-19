@@ -77,7 +77,9 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -99,6 +101,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.FileInfoSharedContactsListFragment.NODE_HANDLE;
+
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
@@ -115,7 +119,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	static int FROM_FILE_BROWSER = 13;
 	static public int FROM_INCOMING_SHARES= 14;
 	static public int FROM_INBOX= 16;
-
+    FileInfoActivityLollipop fileInfoActivityLollipop = this;
 	boolean firstIncomingLevel=true;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -144,6 +148,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	ActionBar aB;
 
 	private boolean isGetLink = false;
+	private boolean isShareContactExpanded = false;
+    boolean removeShare = false;
+    boolean changeShare = false;
 
 	float scaleText;
 
@@ -278,6 +285,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
  	private File file;
  	private long fragmentHandle  = -1;
  	private String pathNavigation;
+ 	private FileInfoSharedContactsListFragment sharedContactFragment;
+ 	private MegaShare selectedShare;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -1483,45 +1492,25 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		return (int)textSize;
 	}
-
-//	private boolean checkChildrenStatus(ArrayList<MegaNode> childrenList){
-//
-//		boolean children = true;
-//		ArrayList<MegaNode> childrenListRec;
-//
-//		if(childrenList.size()>0){
-//			for(int i=0;i<childrenList.size();i++){
-//
-//				if(!dbH.exists(childrenList.get(i).getHandle())){
-//					children=false;
-//					return children;
-//				}
-//				else{
-//					if(childrenList.get(i).isFolder()){
-//
-//						childrenListRec=megaApi.getChildren(childrenList.get(i));
-//
-//						if(childrenListRec.size()>0){
-//							boolean result=checkChildrenStatus(childrenListRec);
-//							if(!result){
-//								children=false;
-//								return children;
-//							}
-//						}
-//					}
-//					else{
-//
-//						if(!dbH.exists(childrenList.get(i).getHandle())){
-//							children=false;
-//							return children;
-//						}
-//
-//					}
-//				}
-//			}
-//		}
-//		return children;
-//	}
+    
+    private void sharedContactClicked() {
+        RelativeLayout sharedContactLayout = (RelativeLayout)findViewById(R.id.shared_contact_list_container);
+        if (isShareContactExpanded) {
+            sharedContactLayout.setVisibility(View.GONE);
+        } else {
+            sharedContactLayout.setVisibility(View.VISIBLE);
+            if (sharedContactFragment == null){
+                sharedContactFragment = new FileInfoSharedContactsListFragment();
+                Bundle bundle = new Bundle();
+				bundle.putLong(NODE_HANDLE, node.getHandle());
+				sharedContactFragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_shared_contacts, sharedContactFragment, "sCF").commitNow();
+            }
+        }
+    
+        isShareContactExpanded = !isShareContactExpanded;
+    }
+    
 	@Override
 	public void onClick(View v) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -1548,9 +1537,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 			case R.id.file_properties_shared_layout:
 			case R.id.file_properties_shared_info_button:{
-				Intent i = new Intent(this, FileContactListActivityLollipop.class);
-				i.putExtra("name", node.getHandle());
-				startActivity(i);
+                sharedContactClicked();
 				break;
 			}
 			case R.id.file_properties_switch:{
@@ -2931,7 +2918,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			separatorVersions.setVisibility(View.GONE);
 		}
 
-
+        if(sharedContactFragment != null && sharedContactFragment.isAdded()){
+		    sharedContactFragment.refresh();
+        }
 	}
 
 	@Override
@@ -3124,7 +3113,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         builder.setView(confirmationLayout);
 
-//				builder.setTitle(getString(R.string.confirmation_required));
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
         builder.setPositiveButton(getString(R.string.general_download),
                 new DialogInterface.OnClickListener() {
@@ -3154,5 +3142,157 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         Snackbar mySnackbar = Snackbar.make(fragmentContainer, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
         mySnackbar.setAction("Settings", new SnackbarNavigateOption(this));
         mySnackbar.show();
+    }
+    
+    public void itemClick(int position) {
+        log("itemClick");
+        ((MegaApplication)getApplication()).sendSignalPresenceActivity();
+        MegaFileInfoSharedContactLollipopAdapter adapter = sharedContactFragment.getAdapter();
+        if (adapter.isMultipleSelect()) {
+            adapter.toggleSelection(position);
+            //updateActionModeTitle();
+        } else {
+            String megaUser = sharedContactFragment.getUser(position);
+            MegaUser contact = megaApi.getContact(megaUser);
+            if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+                Intent i = new Intent(this,ContactInfoActivityLollipop.class);
+                i.putExtra("name",megaUser);
+                startActivity(i);
+            }
+        
+        }
+    }
+    
+    public void showOptionsPanel(MegaShare sShare){
+        log("showNodeOptionsPanel");
+        if(node!=null){
+            this.selectedShare = sShare;
+            FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+        }
+    }
+    
+    
+    public void hideMultipleSelect() {
+//        adapter.setMultipleSelect(false);
+//        if (actionMode != null) {
+//            actionMode.finish();
+//        }
+    }
+    
+    public MegaUser getSelectedContact() {
+        String email = selectedShare.getUser();
+        return megaApi.getContact(email);
+    }
+    
+    public MegaShare getSelectedShare() {
+        return selectedShare;
+    }
+    
+    public void setSelectedShare(MegaShare selectedShare) {
+        this.selectedShare = selectedShare;
+    }
+    
+    public void changePermissions(){
+        log("changePermissions");
+        //notifyDataSetChanged();
+        android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+        final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only),getString(R.string.file_properties_shared_folder_read_write),getString(R.string.file_properties_shared_folder_full_access)};
+        dialogBuilder.setSingleChoiceItems(items,selectedShare.getAccess(),new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int item) {
+                removeShare = false;
+                changeShare = true;
+                ProgressDialog temp = null;
+                try {
+                    temp = new ProgressDialog(fileInfoActivityLollipop);
+                    temp.setMessage(getString(R.string.context_permissions_changing_folder));
+                    temp.show();
+                } catch (Exception e) {
+                    return;
+                }
+                statusDialog = temp;
+                permissionsDialog.dismiss();
+            
+                switch (item) {
+                    case 0: {
+                        MegaUser u = megaApi.getContact(selectedShare.getUser());
+                        if (u != null) {
+                            megaApi.share(node,u,MegaShare.ACCESS_READ,fileInfoActivityLollipop);
+                        } else {
+                            megaApi.share(node,selectedShare.getUser(),MegaShare.ACCESS_READ,fileInfoActivityLollipop);
+                        }
+                    
+                        break;
+                    }
+                    case 1: {
+                        MegaUser u = megaApi.getContact(selectedShare.getUser());
+                        if (u != null) {
+                            megaApi.share(node,u,MegaShare.ACCESS_READWRITE,fileInfoActivityLollipop);
+                        } else {
+                            megaApi.share(node,selectedShare.getUser(),MegaShare.ACCESS_READWRITE,fileInfoActivityLollipop);
+                        }
+                        break;
+                    }
+                    case 2: {
+                        MegaUser u = megaApi.getContact(selectedShare.getUser());
+                        if (u != null) {
+                            megaApi.share(node,u,MegaShare.ACCESS_FULL,fileInfoActivityLollipop);
+                        } else {
+                            megaApi.share(node,selectedShare.getUser(),MegaShare.ACCESS_FULL,fileInfoActivityLollipop);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        
+        permissionsDialog = dialogBuilder.create();
+        permissionsDialog.show();
+    }
+    
+    public void removeFileContactShare(){
+        log("removeFileContactShare");
+        showConfirmationRemoveContactFromShare(selectedShare.getUser());
+    }
+    
+    public void showConfirmationRemoveContactFromShare (final String email){
+        log("showConfirmationRemoveContactFromShare");
+        
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE: {
+                        removeShare(email);
+                        break;
+                    }
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+        
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        String message= getResources().getString(R.string.remove_contact_shared_folder,email);
+        builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+    
+    public void removeShare (String email)
+    {
+        ProgressDialog temp = new ProgressDialog(this);
+            temp.setMessage(getString(R.string.context_removing_contact_folder));
+            temp.show();
+       
+        statusDialog = temp;
+        if (email != null){
+            removeShare = true;
+            megaApi.share(node, email, MegaShare.ACCESS_UNKNOWN, this);
+        }
+        else{
+            megaApi.disableExport(node, this);
+        }
     }
 }

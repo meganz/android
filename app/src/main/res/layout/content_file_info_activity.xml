@@ -218,6 +218,21 @@
                 android:textColor="@color/accentColor" />
         </RelativeLayout>
 
+	    <!--shared contact list view-->
+	    <RelativeLayout
+		    android:id="@+id/shared_contact_list_container"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@color/white"
+		    android:visibility="gone">
+
+		    <FrameLayout
+			    android:id="@+id/fragment_container_shared_contacts"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content"/>
+
+	    </RelativeLayout>
+
         <View
             android:id="@+id/divider_shared_layout"
             android:layout_width="fill_parent"
