@@ -17,6 +17,7 @@ package mega.privacy.android.app.fcm;
  */
 
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -513,6 +514,8 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
             }
 
             int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+            String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
+            String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
 
             Intent intent = new Intent(this, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -521,34 +524,60 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
                     PendingIntent.FLAG_ONE_SHOT);
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
-                    .setContentText(notificationContent)
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(notificationContent))
-                    .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                notificationBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_HIGH);
+                channel.setShowBadge(true);
+                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.createNotificationChannel(channel);
+
+                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(this, notificationChannelId);
+                notificationBuilderO
+                        .setSmallIcon(R.drawable.ic_stat_notify)
+                        .setContentTitle(getString(R.string.title_incoming_folder_notification))
+                        .setContentText(notificationContent)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(notificationContent))
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent)
+                        .setColor(ContextCompat.getColor(this, R.color.mega));
+
+                Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+                notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
+
+                notificationManager.notify(notificationId, notificationBuilderO.build());
             }
+            else {
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_notify)
+                        .setContentTitle(getString(R.string.title_incoming_folder_notification))
+                        .setContentText(notificationContent)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(notificationContent))
+                        .setAutoCancel(true)
+                        .setSound(defaultSoundUri)
+                        .setContentIntent(pendingIntent);
 
-            Drawable d;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    notificationBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+                }
 
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-            } else {
-                d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
+                Drawable d;
+
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+                } else {
+                    d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
+                }
+
+                notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
+
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                notificationManager.notify(notificationId, notificationBuilder.build());
             }
-
-            notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
-
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(notificationId, notificationBuilder.build());
         } catch (Exception e) {
             log("Exception: " + e.toString());
         }
