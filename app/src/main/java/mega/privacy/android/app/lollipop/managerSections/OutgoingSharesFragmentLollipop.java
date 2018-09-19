@@ -1172,7 +1172,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					else{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+
+					if(((ManagerActivityLollipop)context).parentHandleOutgoing==-1){
+						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					}
+					else{
+						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					}
+
 					intent.putExtra("screenPosition", screenPosition);
 					startActivity(intent);
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -1206,7 +1213,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+
+					if(((ManagerActivityLollipop)context).parentHandleOutgoing==-1){
+						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					}
+					else{
+						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					}
+
 					mediaIntent.putExtra("screenPosition", screenPosition);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());
