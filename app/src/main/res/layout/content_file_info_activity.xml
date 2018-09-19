@@ -219,19 +219,38 @@
         </RelativeLayout>
 
 	    <!--shared contact list view-->
-	    <RelativeLayout
+	    <FrameLayout
 		    android:id="@+id/shared_contact_list_container"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:background="@color/white"
 		    android:visibility="gone">
 
-		    <FrameLayout
-			    android:id="@+id/fragment_container_shared_contacts"
-			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content"/>
+		    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		                    android:id="@+id/file_info_contact_list_container"
+		                    android:layout_width="match_parent"
+		                    android:layout_height="wrap_content"
+		                    android:background="@color/white">
 
-	    </RelativeLayout>
+			    <android.support.v7.widget.RecyclerView
+				    android:id="@+id/file_info_contact_list_view"
+				    android:layout_width="match_parent"
+				    android:layout_height="wrap_content"
+				    android:choiceMode="multipleChoice"/>
+
+			    <Button android:id="@+id/more_button"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:layout_alignParentBottom="true"
+			            android:layout_alignParentRight="true"
+			            android:layout_below="@+id/file_info_contact_list_view"
+			            android:background="@android:color/transparent"
+			            android:text="4 More"
+			            android:textColor="@color/accentColor"/>
+
+		    </RelativeLayout>
+
+	    </FrameLayout>
 
         <View
             android:id="@+id/divider_shared_layout"

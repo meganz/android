@@ -865,13 +865,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		});
 		permissionsDialog = dialogBuilder.create();
 		permissionsDialog.show();
-//				Resources resources = permissionsDialog.getContext().getResources();
-//				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-//				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-//		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-//				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-//				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 	}
 	
 	public void setPositionClicked(int positionClicked){
