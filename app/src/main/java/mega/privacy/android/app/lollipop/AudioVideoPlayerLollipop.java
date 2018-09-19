@@ -4350,7 +4350,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             case MotionEvent.ACTION_UP: {
                 if (creatingPlaylist && player != null){
-                    currentWindowIndex++;
+                    if (v.getId() == R.id.exo_next) {
+                        currentWindowIndex++;
+                    }
                     setPlaylist(currentWindowIndex, 0);
                 }
                 break;
