@@ -97,7 +97,9 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -2607,7 +2609,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-					getIntent().putExtra("newAccount", false);
+					
+                    //reset flag to fix incorrect view loaded when orientation changes
+                    getIntent().removeExtra("newAccount");
+                    getIntent().removeExtra("upgradeAccount");
 	        		if(upgradeAccount){
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
@@ -2671,7 +2676,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	if (intentRec != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					newAccount = getIntent().getBooleanExtra("newAccount", false);
-					getIntent().putExtra("newAccount", false);
+					
+					//reset flag to fix incorrect view loaded when orientation changes
+                    getIntent().removeExtra("newAccount");
+                    getIntent().removeExtra("upgradeAccount");
 					firstTimeCam = intentRec.getBooleanExtra("firstTimeCam", firstTimeCam);
 					if(upgradeAccount){
 						drawerLayout.closeDrawer(Gravity.LEFT);
@@ -4062,6 +4070,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			FillDBContactsTask fillDBContactsTask = new FillDBContactsTask(this);
 			fillDBContactsTask.execute();
 			firstTime = false;
+            dbH.setFirstTime(false);
 		}
 	}
 
@@ -5566,9 +5575,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void showEnable2FADialog () {
 		log ("showEnable2FADialog newaccount: "+newAccount);
 		newAccount = false;
-		if (getIntent() != null) {
-			getIntent().putExtra("newAccount", false);
-		}
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
@@ -13124,6 +13131,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("Return.....");
 					return;
 				}
+				
+				boolean isImageAvailable = checkProfileImageExistence(intent.getData());
+				if(!isImageAvailable){
+					log("error when changing avatar: image not exist");
+					showSnackbar(getString(R.string.error_changing_user_avatar_image_not_available));
+					return;
+				}
+				
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(intent);
@@ -16102,6 +16117,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				sttFLol.setVersionsInfo();
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
+			String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+			if (maFLol != null && maFLol.isAdded()) {
+				maFLol.initCreateQR(request, e);
+			}
+		}
 	}
 
 	public void updateAccountStorageInfo(){
@@ -16264,6 +16286,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								updateContactsView(true, false, false);
 							}
 						}
+						//When last contact changes avatar, update view.
+						if(maFLol != null) {
+						    if(maFLol.isAdded()) {
+								maFLol.updateContactsCount();
+                                maFLol.updateView();
+                            }
+                        }
 					}
 				}
 				else{
@@ -18035,5 +18064,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		return false;
+	}
+	
+	//need to check image existence before use due to android content provider issue.
+	//Can not check query count - still get count = 1 even file does not exist
+	private boolean checkProfileImageExistence(Uri uri){
+		boolean isFileExist = false;
+		InputStream inputStream;
+		try {
+			inputStream = this.getContentResolver().openInputStream(uri);
+			if(inputStream != null){
+				isFileExist = true;
+			}
+			inputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return isFileExist;
 	}
 }

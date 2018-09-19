@@ -138,14 +138,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="14dp"
                     android:layout_below="@+id/explain_qr_seed_2fa">
 
                     <ImageView
                         android:id="@+id/qr_2fa"
-                        android:layout_width="140dp"
-                        android:layout_height="140dp"
-                        android:layout_centerInParent="true"/>
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_centerInParent="true" />
 
                     <ProgressBar
                         android:id="@+id/qr_progress_bar"
@@ -164,7 +164,7 @@
                     android:layout_below="@id/layout_qr_2fa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="14dp"
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
                     android:padding="22dp"
