@@ -2032,7 +2032,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 
         if (!Util.isOnline(this)){
-        	log("No network >> SHOW OFFLINE MODE");
+        	log("No network: SHOW OFFLINE MODE");
 
 			if(drawerItem==null){
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
@@ -7773,7 +7773,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_grid:{
 	        	log("action_grid selected");
-
+	        	//Redraw the section headers.
+	        	if(oFLol != null) {
+                    oFLol.floatingItemDecoration = null;
+                }
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		log("action_grid_list in CameraUploads");
 	        		isListCameraUploads = !isListCameraUploads;
@@ -7843,7 +7846,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(sharesPageAdapter!=null){
 						sharesPageAdapter.notifyDataSetChanged();
 					}
-
+					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
+                    if (oFLol != null && oFLol.isAdded()){
+                        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+                        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+                        fragTransaction.detach(currentFragment);
+                        fragTransaction.commitNowAllowingStateLoss();
+                        oFLol.floatingItemDecoration = null;
+                        oFLol.setIsList(isList);
+                        oFLol.setPathNavigation(pathNavigationOffline);
+                        //oFLol.setGridNavigation(false);
+                        //oFLol.setParentHandle(parentHandleSharedWithMe);
+    
+                        fragTransaction = getSupportFragmentManager().beginTransaction();
+                        fragTransaction.attach(currentFragment);
+                        fragTransaction.commitNowAllowingStateLoss();
+                    }
+                    
 	    			if(drawerItem == DrawerItem.INBOX){
 	    				selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -7864,24 +7883,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        		}
 	    			}
-	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-	    				if (oFLol != null && oFLol.isAdded()){
-	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
-	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-	        				oFLol.setIsList(isList);
-	        				oFLol.setPathNavigation(pathNavigationOffline);
-	        				//oFLol.setGridNavigation(false);
-	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
-
-	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-		        		}
-	    			}
+//	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+//	    				if (oFLol != null && oFLol.isAdded()){
+//	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+//	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        				fragTransaction.detach(currentFragment);
+//	        				fragTransaction.commitNowAllowingStateLoss();
+//
+//	        				oFLol.setIsList(isList);
+//	        				oFLol.setPathNavigation(pathNavigationOffline);
+//	        				//oFLol.setGridNavigation(false);
+//	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
+//
+//	        				fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        				fragTransaction.attach(currentFragment);
+//	        				fragTransaction.commitNowAllowingStateLoss();
+//
+//		        		}
+//	    			}
 	    			else if (drawerItem == DrawerItem.SEARCH){
 						selectDrawerItemLollipop(drawerItem);
 	    			}
