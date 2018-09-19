@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -52,79 +54,70 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     private LinearLayout mainLinearLayout;
     private ScrollView scrollView;
 
+    //free elements:
     private RelativeLayout freeLayout;
+    private RelativeLayout freeTransparentLayout;
+    private TextView titleFree;
+    private TextView monthSectionFree;
+    private TextView storageSectionFree;
+    private TextView bandwidthSectionFree;
+    private TextView achievementsSectionFree;
+
     private RelativeLayout proLiteLayout;
     private RelativeLayout pro1Layout;
     private RelativeLayout pro3Layout;
     private RelativeLayout pro2Layout;
 
-    private RelativeLayout freeTransparentLayout;
     private RelativeLayout proLiteTransparentLayout;
     private RelativeLayout pro1TransparentLayout;
     private RelativeLayout pro3TransparentLayout;
     private RelativeLayout pro2TransparentLayout;
 
-    private RelativeLayout leftFreeLayout;
     private RelativeLayout leftProLiteLayout;
     private RelativeLayout leftPro1Layout;
     private RelativeLayout leftPro3Layout;
     private RelativeLayout leftPro2Layout;
 
-    private TextView titleFree;
     private TextView titleProLite;
     private TextView titlePro1;
     private TextView titlePro2;
     private TextView titlePro3;
 
-    private View verticalDividerFree;
+//    private View verticalDividerFree;
     private View verticalDividerProLite;
     private View verticalDividerPro1;
     private View verticalDividerPro2;
     private View verticalDividerPro3;
 
-    private RelativeLayout rightFreeLayout;
     private RelativeLayout rightProLiteLayout;
     private RelativeLayout rightPro1Layout;
     private RelativeLayout rightPro3Layout;
     private RelativeLayout rightPro2Layout;
 
-    private TableRow tableRowFree;
     private TableRow tableRowProLite;
     private TableRow tableRowPro1;
     private TableRow tableRowPro2;
     private TableRow tableRowPro3;
 
-    private TextView storageValueFree;
     private TextView storageValueProLite;
     private TextView storageValuePro1;
     private TextView storageValuePro2;
     private TextView storageValuePro3;
 
-    private TextView emptyTextFree;
     private TextView emptyTextProLite;
     private TextView emptyTextPro1;
     private TextView emptyTextPro2;
     private TextView emptyTextPro3;
 
-    private TextView bandwidthValueFree;
     private TextView bandwidthValueProLite;
     private TextView bandwidthValuePro1;
     private TextView bandwidthValuePro2;
     private TextView bandwidthValuePro3;
 
-    private TextView emptyTextBandwidthFree;
     private TextView emptyTextBandwidthProLite;
     private TextView emptyTextBandwidthPro1;
     private TextView emptyTextBandwidthPro2;
     private TextView emptyTextBandwidthPro3;
-
-    private TextView freePriceInteger;
-    private TextView freePriceDecimal;
-    private TextView freeStorageTitle;
-    private TextView freeStorageInteger;
-    private TextView freeStorageGb;
-    private TextView freeBandwidthInteger;
-    private TextView freeBandwidthTb;
 
     private TextView proLitePriceInteger;
     private TextView proLitePriceDecimal;
@@ -210,85 +203,15 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         //FREE ACCOUNT
         freeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout);
         freeLayout.setOnClickListener(this);
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) freeLayout.getLayoutParams();
-        layoutParams.setMargins(Util.scaleWidthPx(8, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(8, outMetrics), 0);
-        freeLayout.setLayoutParams(layoutParams);
-
-        //Replace elevation
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            freeLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-        }
-
-        leftFreeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_left_side);
-        RelativeLayout.LayoutParams leftLayoutParams = (RelativeLayout.LayoutParams) leftFreeLayout.getLayoutParams();
-        leftLayoutParams.width = Util.scaleWidthPx(125, outMetrics);
-        leftLayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
-        leftFreeLayout.setLayoutParams(leftLayoutParams);
-
-        titleFree= (TextView) v.findViewById(R.id.choose_account_free_title_text);
-        RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) titleFree.getLayoutParams();
-        titleParams.setMargins(0,0,0,Util.scaleHeightPx(11, outMetrics));
-        titleFree.setLayoutParams(titleParams);
-
-        verticalDividerFree = (View) v.findViewById(R.id.choose_account_free_vertical_divider);
-        verticalDividerFree.getLayoutParams().width = Util.scaleWidthPx(2, outMetrics);
-        verticalDividerFree.getLayoutParams().height = Util.scaleHeightPx(86, outMetrics);
-
-        rightFreeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout_right_side);
-        RelativeLayout.LayoutParams rightLayoutParams = (RelativeLayout.LayoutParams) rightFreeLayout.getLayoutParams();
-        rightLayoutParams.height = Util.scaleHeightPx(HEIGHT_ACCOUNT_LAYOUT, outMetrics);
-        rightLayoutParams.setMargins(Util.scaleWidthPx(12, outMetrics),0,0,0);
-        rightFreeLayout.setLayoutParams(rightLayoutParams);
-
-        tableRowFree = (TableRow) v.findViewById(R.id.table_row_free);
-        TableLayout.LayoutParams tableRowParams = (TableLayout.LayoutParams) tableRowFree.getLayoutParams();
-        tableRowParams.setMargins(0,0,0,Util.scaleHeightPx(25, outMetrics));
-        tableRowFree.setLayoutParams(tableRowParams);
-
-        storageValueFree = (TextView) v.findViewById(R.id.choose_account_free_storage_value_integer);
-        TableRow.LayoutParams storageValueParams = (TableRow.LayoutParams) storageValueFree.getLayoutParams();
-        storageValueParams.width = Util.scaleWidthPx(40, outMetrics);
-        storageValueFree.setLayoutParams(storageValueParams);
-
-        emptyTextFree = (TextView) v.findViewById(R.id.choose_account_free_empty_text);
-        TableRow.LayoutParams emptyTextParams = (TableRow.LayoutParams) emptyTextFree.getLayoutParams();
-        emptyTextParams.width = Util.scaleWidthPx(12, outMetrics);
-        emptyTextFree.setLayoutParams(emptyTextParams);
-
-        bandwidthValueFree = (TextView) v.findViewById(R.id.choose_account_free_bandwidth_value_integer);
-        TableRow.LayoutParams bandwidthValueParams = (TableRow.LayoutParams) bandwidthValueFree.getLayoutParams();
-        bandwidthValueParams.width = Util.scaleWidthPx(40, outMetrics);
-        bandwidthValueFree.setLayoutParams(bandwidthValueParams);
-
-        emptyTextBandwidthFree = (TextView) v.findViewById(R.id.choose_account_free_empty_text_bandwidth);
-        TableRow.LayoutParams emptyTextBandwidthParams = (TableRow.LayoutParams) emptyTextBandwidthFree.getLayoutParams();
-        emptyTextBandwidthParams.width = Util.scaleWidthPx(12, outMetrics);
-        emptyTextBandwidthFree.setLayoutParams(emptyTextBandwidthParams);
-
-        TextView perMonth = (TextView) v.findViewById(R.id.choose_account_free_per_month_text);
-        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
-        RelativeLayout.LayoutParams perMonthParams = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
-        perMonthParams.setMargins(0,0,0,Util.scaleHeightPx(4, outMetrics));
-        perMonth.setLayoutParams(perMonthParams);
-
-        freeStorageTitle = (TextView) v.findViewById(R.id.choose_account_free_storage_label);
-        String storageTitle = getString(R.string.general_storage)+" *";
-        freeStorageTitle.setText(storageTitle.toUpperCase(Locale.getDefault()));
-
-        freePriceInteger = (TextView) v.findViewById(R.id.choose_account_free_integer_text);
-        freePriceDecimal = (TextView) v.findViewById(R.id.choose_account_free_decimal_text);
-        RelativeLayout.LayoutParams priceDecimalParams = (RelativeLayout.LayoutParams) freePriceDecimal.getLayoutParams();
-        priceDecimalParams.setMargins(0,0,0,Util.scaleHeightPx(4, outMetrics));
-        freePriceDecimal.setLayoutParams(priceDecimalParams);
-
-        freeStorageInteger = (TextView) v.findViewById(R.id.choose_account_free_storage_value_integer);
-        freeStorageGb = (TextView) v.findViewById(R.id.choose_account_free_storage_value_gb);
-        freeBandwidthInteger = (TextView) v.findViewById(R.id.choose_account_free_bandwidth_value_integer);
-        freeBandwidthTb = (TextView) v.findViewById(R.id.choose_account_free_bandwith_value_tb);
-
+        titleFree = (TextView) v.findViewById(R.id.choose_account_free_title_text);
+        titleFree.setText(getString(R.string.free_account).toUpperCase());
+        monthSectionFree = (TextView) v.findViewById(R.id.month_free);
+        storageSectionFree = (TextView) v.findViewById(R.id.storage_free);
+        bandwidthSectionFree = (TextView) v.findViewById(R.id.bandwidth_free);
+        achievementsSectionFree = (TextView) v.findViewById(R.id.achievements_free);
         freeTransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout_transparent);
         freeTransparentLayout.setVisibility(View.INVISIBLE);
-        //END -- FREE ACCOUNT
+        //END -- PRO LITE ACCOUNT
 
         //PRO LITE ACCOUNT
         proLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout);
@@ -425,12 +348,12 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         emptyTextBandwidthPro1Params.width = Util.scaleWidthPx(12, outMetrics);
         emptyTextBandwidthPro1.setLayoutParams(emptyTextBandwidthPro1Params);
 
-        perMonth = (TextView) v.findViewById(R.id.choose_account_pro_i_per_month_text);
-        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+//        perMonth = (TextView) v.findViewById(R.id.choose_account_pro_i_per_month_text);
+//        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 
-        RelativeLayout.LayoutParams perMonthPro1Params = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
-        perMonthPro1Params.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
-        perMonth.setLayoutParams(perMonthPro1Params);
+//        RelativeLayout.LayoutParams perMonthPro1Params = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
+//        perMonthPro1Params.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+//        perMonth.setLayoutParams(perMonthPro1Params);
 
         pro1PriceInteger = (TextView) v.findViewById(R.id.choose_account_pro_i_integer_text);
 
@@ -505,12 +428,12 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         emptyTextBandwidthPro2Params.width = Util.scaleWidthPx(12, outMetrics);
         emptyTextBandwidthPro2.setLayoutParams(emptyTextBandwidthPro2Params);
 
-        perMonth = (TextView) v.findViewById(R.id.choose_account_pro_ii_per_month_text);
-        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
-
-        RelativeLayout.LayoutParams perMonthPro2Params = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
-        perMonthPro2Params.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
-        perMonth.setLayoutParams(perMonthPro2Params);
+//        perMonth = (TextView) v.findViewById(R.id.choose_account_pro_ii_per_month_text);
+//        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+//
+//        RelativeLayout.LayoutParams perMonthPro2Params = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
+//        perMonthPro2Params.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+//        perMonth.setLayoutParams(perMonthPro2Params);
 
         pro2PriceInteger = (TextView) v.findViewById(R.id.choose_account_pro_ii_integer_text);
         pro2PriceDecimal = (TextView) v.findViewById(R.id.choose_account_pro_ii_decimal_text);
@@ -586,12 +509,12 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         emptyTextBandwidthPro3Params.width = Util.scaleWidthPx(12, outMetrics);
         emptyTextBandwidthPro3.setLayoutParams(emptyTextBandwidthPro3Params);
 
-        perMonth = (TextView) v.findViewById(R.id.choose_account_pro_iii_per_month_text);
-        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
-
-        RelativeLayout.LayoutParams perMonthPro3Params = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
-        perMonthPro3Params.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
-        perMonth.setLayoutParams(perMonthPro3Params);
+//        perMonth = (TextView) v.findViewById(R.id.choose_account_pro_iii_per_month_text);
+//        perMonth.setText("/" + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+//
+//        RelativeLayout.LayoutParams perMonthPro3Params = (RelativeLayout.LayoutParams) perMonth.getLayoutParams();
+//        perMonthPro3Params.setMargins(0,0,0,Util.scaleHeightPx(3, outMetrics));
+//        perMonth.setLayoutParams(perMonthPro3Params);
 
         pro3PriceInteger = (TextView) v.findViewById(R.id.choose_account_pro_iii_integer_text);
         pro3PriceDecimal = (TextView) v.findViewById(R.id.choose_account_pro_iii_decimal_text);
@@ -734,16 +657,72 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             log("Return - getPricing NULL");
             return;
         }
+        //Free
+        String textToShowA = "[A]"+getString(R.string.free_account)+"[/A]";
+        try{
+            textToShowA = textToShowA.replace("[A]", "<font color=\'#31b404\'>");
+            textToShowA = textToShowA.replace("[/A]", "</font>");
+        }catch (Exception e){}
+        Spanned resultA = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultA = Html.fromHtml(textToShowA,Html.FROM_HTML_MODE_LEGACY);
+        }else {
+            resultA = Html.fromHtml(textToShowA);
+        }
+        monthSectionFree.setText(resultA);
 
-        freePriceInteger.setText("0");
-        freePriceDecimal.setText("." + "00 €");
+        String textToShowB = "[A] 50 GB [/A]"+getString(R.string.tab_my_account_storage);
+        try{
+            textToShowB = textToShowB.replace("[A]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[/A]", "</font>");
+        }
+        catch (Exception e){}
 
-        freeStorageInteger.setVisibility(View.GONE);
-        freeStorageGb.setText("50 GB");
+        Spanned resultB = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultB = Html.fromHtml(textToShowB+"<sup><small>1</small></sup>",Html.FROM_HTML_MODE_LEGACY);
 
-        freeBandwidthInteger.setVisibility(View.GONE);
-        freeBandwidthTb.setText(getString(R.string.limited_bandwith));
+        }else {
+            resultB = Html.fromHtml(textToShowB+"<sup><small>1</small></sup>");
+        }
+        storageSectionFree.setText(resultB);
 
+        String textToShowC = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.transfer_quota);
+        try{
+            textToShowC = textToShowC.replace("[A]", "<font color=\'#000000\'>");
+            textToShowC = textToShowC.replace("[/A]", "</font>");
+        }catch (Exception e){}
+        Spanned resultC = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultC = Html.fromHtml(textToShowC,Html.FROM_HTML_MODE_LEGACY);
+        }else {
+            resultC = Html.fromHtml(textToShowC);
+        }
+        bandwidthSectionFree.setText(resultC);
+
+        Spanned ScripText = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            ScripText = Html.fromHtml("<sup><small>1</small></sup>",Html.FROM_HTML_MODE_LEGACY);
+        }else {
+            ScripText = Html.fromHtml("<sup><small>1</small></sup>");
+        }
+
+        String textToShowD = getString(R.string.footnote_achievements)+"[A]"+ScripText+"[/A]";
+
+        try{
+            textToShowD = textToShowD.replace("[A]", "<font color=\'#ff333a\'>");
+            textToShowD = textToShowD.replace("[/A]", "</font>");
+        }catch (Exception e){}
+
+        Spanned resultD = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultD = Html.fromHtml(textToShowD,Html.FROM_HTML_MODE_LEGACY);
+        }else {
+            resultD = Html.fromHtml(textToShowD);
+        }
+        achievementsSectionFree.setText(resultD);
+
+        //Pro
         for (int i=0;i<p.getNumProducts();i++){
             log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
 

@@ -767,7 +767,7 @@
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
     <string name="renews_on" context="title of the Expiration Date">Renews on&#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
-    <string name="free_account">FREE</string>
+    <string name="free_account">Free</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
     <string name="pro2_account" context="Not translate">PRO II</string>
@@ -1657,8 +1657,6 @@
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
 
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
-
     <string name="choose_qr_option_panel" context="Option of the sliding panel to go to QR code section">My QR code</string>
     <string name="section_qr_code" context="Title of the screen that shows the options to the QR code">QR Code</string>
     <string name="action_reset_qr" context="Option in menu of section  My QR code to reset the QR code">Reset QR code</string>
@@ -2110,5 +2108,11 @@
     <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to logout?</string>
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
+
+    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">[A]%s[/A] is your current account</string>
+    <string name="type_month" context=" ">[A]From[/A] %s [A]month[/A][B] *[/B]</string>
+    <string name="upgrade_account_comment" context="the meaning of the asterisk in month*">[A]* [/A]Recurring subscription can be cancelled anytime before renewal date.</string>
+
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievement program.</string>
 
 </resources>

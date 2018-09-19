@@ -10,165 +10,134 @@
     	android:layout_height="wrap_content" 
     	android:orientation="vertical"
     	android:background="@color/white">
-    	
-        <!-- Free -->
+
+        <!-- FREE -->
 		<RelativeLayout
 			android:id="@+id/choose_account_free_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:background="@drawable/card_corner"
-			android:elevation="3dp">
+			android:background="@null">
 
 			<RelativeLayout
 				android:id="@+id/choose_account_free_layout_content"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content">
 
-				<!-- Left side (title and price) -->
+				<!-- Left side (title) -->
 				<RelativeLayout
 					android:id="@+id/choose_account_free_left_side"
-					android:layout_width="125dp"
-					android:layout_height="118dp"
-					android:background="@color/white"
-					android:gravity="center_vertical">
-
-					<TextView
-						android:id="@+id/choose_account_free_title_text"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:textColor="@color/green_free_account"
-						android:text="@string/free_account"
-						android:textAllCaps="true"
-						android:layout_centerHorizontal="true"
-						android:textSize="24sp"/>
+					android:layout_width="128dp"
+					android:layout_height="wrap_content"
+					android:paddingTop="18dp"
+					android:paddingBottom="18dp"
+					android:gravity="center">
 
 					<RelativeLayout
+						android:background="@android:color/transparent"
 						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_below="@id/choose_account_free_title_text"
-						android:layout_centerHorizontal="true"
-						android:gravity="bottom">
-
-						<TextView
-							android:id="@+id/choose_account_free_integer_text"
+						android:layout_height="wrap_content">
+						<ImageView
+							android:id="@+id/image_free"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:textColor="@color/name_my_account"
-							android:textSize="28sp"/>
-
+							android:background="@null"
+							android:layout_centerHorizontal="true"
+							android:layout_marginBottom="5dp"
+							android:src="@drawable/ic_free_crest"/>
 						<TextView
-							android:id="@+id/choose_account_free_decimal_text"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:textColor="@color/name_my_account"
-							android:layout_toRightOf="@id/choose_account_free_integer_text"
-							android:layout_alignBottom="@id/choose_account_free_integer_text"
-							android:textSize="14sp" />
-
-						<TextView
-							android:id="@+id/choose_account_free_per_month_text"
+							android:id="@+id/choose_account_free_title_text"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:textColor="@color/green_free_account"
-							android:layout_toRightOf="@id/choose_account_free_decimal_text"
-							android:layout_alignBottom="@id/choose_account_free_integer_text"
-							android:textSize="14sp"/>
+							android:layout_below="@+id/image_free"
+							android:textAllCaps="true"
+							android:textSize="18sp"/>
 					</RelativeLayout>
 				</RelativeLayout>
 
-				<View
-					android:id="@+id/choose_account_free_vertical_divider"
-					android:layout_width="2dp"
-					android:layout_height="86dp"
-					android:layout_toRightOf="@id/choose_account_free_left_side"
-					android:layout_centerVertical="true"
-					android:background="@color/divider_upgrade_account" />
-
-				<!-- Right side (storage and bandwidth)-->
+				<!-- Right side (price, storage and bandwidth)-->
 				<RelativeLayout
 					android:id="@+id/choose_account_free_layout_right_side"
 					android:layout_width="match_parent"
-					android:layout_height="118dp"
+					android:layout_height="wrap_content"
 					android:gravity="center_vertical"
-					android:layout_toRightOf="@id/choose_account_free_vertical_divider">
+					android:paddingBottom="17dp"
+					android:paddingTop="16dp"
+					android:layout_toRightOf="@id/choose_account_free_left_side">
 
 					<TableLayout
+						android:id="@+id/table_free"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:layout_centerVertical="true">
-						<TableRow
-							android:id="@+id/table_row_free">
-							<TextView
-								android:id="@+id/choose_account_free_storage_value_integer"
-								android:layout_width="40dp"
-								android:layout_height="wrap_content"
-								android:gravity="right"
-								android:textColor="@color/green_free_account"
-								android:textSize="16sp"/>
-
-							<TextView
-								android:id="@+id/choose_account_free_storage_value_gb"
+						<TableRow>
+							<RelativeLayout
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/green_free_account"
-								android:textSize="16sp"
-								android:gravity="right"/>
-
-							<TextView
-								android:id="@+id/choose_account_free_empty_text"
-								android:layout_width="12dp"
-								android:layout_height="wrap_content"
-								android:gravity="right"/>
-
-							<TextView
-								android:id="@+id/choose_account_free_storage_label"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:gravity="left"
-								android:textSize="14sp"
-								android:ellipsize="end"
-								android:text="@string/general_storage"
-								android:textColor="@color/file_properties_text_available"
-								android:textAllCaps="true" />
-
+								android:layout_gravity="left"
+								android:layout_marginBottom="6dp">
+								<TextView
+									android:id="@+id/month_free"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:textColor="@color/name_my_account"
+									android:textSize="15sp"/>
+							</RelativeLayout>
 						</TableRow>
 						<TableRow>
-							<TextView
-								android:id="@+id/choose_account_free_bandwidth_value_integer"
-								android:layout_width="40dp"
-								android:layout_height="wrap_content"
-								android:gravity="right"
-								android:textColor="@color/green_free_account"
-								android:textSize="16sp"/>
-
-							<TextView
-								android:id="@+id/choose_account_free_bandwith_value_tb"
+							<RelativeLayout
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:gravity="right"
-								android:textAllCaps="true"
-								android:textColor="@color/green_free_account"
-								android:textSize="14sp"/>
-
-							<TextView
-								android:id="@+id/choose_account_free_empty_text_bandwidth"
-								android:layout_width="12dp"
+								android:layout_gravity="left"
+								android:layout_marginBottom="6dp">
+								<TextView
+									android:id="@+id/storage_free"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:textColor="@color/mail_my_account"
+									android:textSize="15sp"/>
+							</RelativeLayout>
+						</TableRow>
+						<TableRow>
+							<RelativeLayout
+								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:gravity="right"/>
-
-							<TextView
-								android:id="@+id/choose_account_free_bandwith_label"
-								android:layout_width="match_parent"
+								android:layout_gravity="left"
+								android:layout_marginBottom="6dp">
+								<TextView
+									android:id="@+id/bandwidth_free"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:textColor="@color/mail_my_account"
+									android:textSize="15sp"/>
+							</RelativeLayout>
+						</TableRow>
+						<TableRow>
+							<RelativeLayout
+								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:gravity="left"
-								android:textColor="@color/file_properties_text_available"
-								android:ellipsize="end"
-								android:text="@string/general_bandwidth"
-								android:textAllCaps="true"
-								android:textSize="14sp" />
-
+								android:layout_gravity="left"
+								android:layout_marginBottom="16dp"
+								android:layout_marginRight="8dp">
+								<TextView
+									android:id="@+id/achievements_free"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:maxWidth="200dp"
+									android:textColor="@color/mail_my_account"
+									android:textSize="11sp"
+									android:layout_marginRight="8dp" />
+							</RelativeLayout>
 						</TableRow>
 					</TableLayout>
+
+					<LinearLayout
+						android:id="@+id/linear_divider"
+						android:orientation="horizontal"
+						android:layout_width="match_parent"
+						android:layout_height="1dp"
+						android:background="@color/grid_item_separator"
+						android:layout_alignBottom="@id/table_free"/>
 
 				</RelativeLayout>
 			</RelativeLayout>
@@ -179,10 +148,9 @@
 				android:layout_height="match_parent"
 				android:visibility="invisible"
 				android:background="#80ffffff">
-
 			</RelativeLayout>
-
 		</RelativeLayout>
+		<!-- End FREE -->
 
 		<!-- Pro Lite -->
 		<RelativeLayout
@@ -869,21 +837,897 @@
 			</RelativeLayout>
 		</RelativeLayout>
 
-		<RelativeLayout
-			android:id="@+id/achievements_layout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
 
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/file_properties_text_available"
-				android:textSize="11sp"
-				android:layout_marginBottom="8dp"
-				android:layout_marginTop="8dp"
-				android:layout_marginLeft="12dp"
-				android:layout_marginRight="8dp"
-				android:text="@string/footnote_achievements"/>
-		</RelativeLayout>
     </LinearLayout>
 </ScrollView>
+
+
+<!--<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--android:background="@color/white"-->
+<!--android:id="@+id/scroll_view_choose_account">-->
+
+<!--<LinearLayout-->
+	<!--android:id="@+id/choose_account_main_linear_layout"-->
+	<!--android:layout_width="match_parent"-->
+	<!--android:layout_height="wrap_content"-->
+	<!--android:orientation="vertical"-->
+	<!--android:background="@color/white">-->
+
+	<!--&lt;!&ndash; Free &ndash;&gt;-->
+	<!--<RelativeLayout-->
+		<!--android:id="@+id/choose_account_free_layout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:background="@drawable/card_corner"-->
+		<!--android:elevation="3dp">-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_free_layout_content"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="wrap_content">-->
+
+			<!--&lt;!&ndash; Left side (title and price) &ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_free_left_side"-->
+				<!--android:layout_width="125dp"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:background="@color/white"-->
+				<!--android:gravity="center_vertical">-->
+
+				<!--<TextView-->
+					<!--android:id="@+id/choose_account_free_title_text"-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:textColor="@color/green_free_account"-->
+					<!--android:text="@string/free_account"-->
+					<!--android:textAllCaps="true"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:textSize="24sp"/>-->
+
+				<!--<RelativeLayout-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_below="@id/choose_account_free_title_text"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:gravity="bottom">-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_free_integer_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:textSize="28sp"/>-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_free_decimal_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:layout_toRightOf="@id/choose_account_free_integer_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_free_integer_text"-->
+						<!--android:textSize="14sp" />-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_free_per_month_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/green_free_account"-->
+						<!--android:layout_toRightOf="@id/choose_account_free_decimal_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_free_integer_text"-->
+						<!--android:textSize="14sp"/>-->
+				<!--</RelativeLayout>-->
+			<!--</RelativeLayout>-->
+
+			<!--<View-->
+				<!--android:id="@+id/choose_account_free_vertical_divider"-->
+				<!--android:layout_width="2dp"-->
+				<!--android:layout_height="86dp"-->
+				<!--android:layout_toRightOf="@id/choose_account_free_left_side"-->
+				<!--android:layout_centerVertical="true"-->
+				<!--android:background="@color/divider_upgrade_account" />-->
+
+			<!--&lt;!&ndash; Right side (storage and bandwidth)&ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_free_layout_right_side"-->
+				<!--android:layout_width="match_parent"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:gravity="center_vertical"-->
+				<!--android:layout_toRightOf="@id/choose_account_free_vertical_divider">-->
+
+				<!--<TableLayout-->
+					<!--android:layout_width="match_parent"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_centerVertical="true">-->
+					<!--<TableRow-->
+						<!--android:id="@+id/table_row_free">-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_storage_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/green_free_account"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_storage_value_gb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:textColor="@color/green_free_account"-->
+							<!--android:textSize="16sp"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_empty_text"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_storage_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textSize="14sp"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_storage"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:textAllCaps="true" />-->
+
+					<!--</TableRow>-->
+					<!--<TableRow>-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_bandwidth_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/green_free_account"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_bandwith_value_tb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textAllCaps="true"-->
+							<!--android:textColor="@color/green_free_account"-->
+							<!--android:textSize="14sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_empty_text_bandwidth"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_free_bandwith_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_bandwidth"-->
+							<!--android:textAllCaps="true"-->
+							<!--android:textSize="14sp" />-->
+
+					<!--</TableRow>-->
+				<!--</TableLayout>-->
+
+			<!--</RelativeLayout>-->
+		<!--</RelativeLayout>-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_free_layout_transparent"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:visibility="invisible"-->
+			<!--android:background="#80ffffff">-->
+
+		<!--</RelativeLayout>-->
+
+	<!--</RelativeLayout>-->
+
+	<!--&lt;!&ndash; Pro Lite &ndash;&gt;-->
+	<!--<RelativeLayout-->
+		<!--android:id="@+id/choose_account_prolite_layout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:background="@drawable/card_corner"-->
+		<!--android:elevation="3dp">-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_prolite_layout_content"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="wrap_content">-->
+
+			<!--&lt;!&ndash; Left side (title and price) &ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_prolite_left_side"-->
+				<!--android:layout_width="125dp"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:background="@color/white"-->
+				<!--android:gravity="center_vertical">-->
+
+				<!--<TextView-->
+					<!--android:id="@+id/choose_account_prolite_title_text"-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:textColor="@color/upgrade_orange"-->
+					<!--android:text="@string/prolite_account"-->
+					<!--android:textAllCaps="true"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:textSize="24sp"/>-->
+
+				<!--<RelativeLayout-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_below="@id/choose_account_prolite_title_text"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:gravity="bottom">-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_prolite_integer_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:textSize="28sp"/>-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_prolite_decimal_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:layout_toRightOf="@id/choose_account_prolite_integer_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_prolite_integer_text"-->
+						<!--android:textSize="14sp" />-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_prolite_per_month_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/upgrade_orange"-->
+						<!--android:layout_toRightOf="@id/choose_account_prolite_decimal_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_prolite_integer_text"-->
+						<!--android:textSize="14sp"/>-->
+				<!--</RelativeLayout>-->
+			<!--</RelativeLayout>-->
+
+			<!--<View-->
+				<!--android:id="@+id/choose_account_prolite_vertical_divider"-->
+				<!--android:layout_width="2dp"-->
+				<!--android:layout_height="86dp"-->
+				<!--android:layout_toRightOf="@id/choose_account_prolite_left_side"-->
+				<!--android:layout_centerVertical="true"-->
+				<!--android:background="@color/divider_upgrade_account" />-->
+
+			<!--&lt;!&ndash; Right side (storage and bandwidth)&ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_prolite_layout_right_side"-->
+				<!--android:layout_width="match_parent"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:gravity="center_vertical"-->
+				<!--android:layout_toRightOf="@id/choose_account_prolite_vertical_divider">-->
+
+				<!--<TableLayout-->
+					<!--android:layout_width="match_parent"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_centerVertical="true">-->
+					<!--<TableRow-->
+						<!--android:id="@+id/table_row_pro_lite">-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_storage_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/upgrade_orange"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_storage_value_gb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:textColor="@color/upgrade_orange"-->
+							<!--android:textSize="16sp"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_empty_text"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_storage_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textSize="14sp"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_storage"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:textAllCaps="true" />-->
+
+					<!--</TableRow>-->
+					<!--<TableRow>-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_bandwidth_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/upgrade_orange"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_bandwith_value_tb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/upgrade_orange"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_empty_text_bandwidth"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_prolite_bandwith_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_bandwidth"-->
+							<!--android:textAllCaps="true"-->
+							<!--android:textSize="14sp" />-->
+
+					<!--</TableRow>-->
+				<!--</TableLayout>-->
+
+			<!--</RelativeLayout>-->
+		<!--</RelativeLayout>-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_prolite_layout_transparent"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:visibility="invisible"-->
+			<!--android:background="#80ffffff">-->
+
+		<!--</RelativeLayout>-->
+
+	<!--</RelativeLayout>-->
+
+	<!--&lt;!&ndash; Pro I &ndash;&gt;-->
+	<!--<RelativeLayout-->
+		<!--android:id="@+id/choose_account_pro_i_layout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:background="@drawable/card_corner"-->
+		<!--android:elevation="3dp">-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_pro_i_layout_content"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="wrap_content">-->
+
+			<!--&lt;!&ndash; Left side (title and price) &ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_pro_i_left_side"-->
+				<!--android:layout_width="125dp"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:background="@color/white"-->
+				<!--android:gravity="center_vertical">-->
+
+				<!--<TextView-->
+					<!--android:id="@+id/choose_account_pro_i_title_text"-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:textColor="@color/lollipop_primary_color"-->
+					<!--android:text="@string/pro1_account"-->
+					<!--android:textAllCaps="true"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:textSize="24sp"/>-->
+
+				<!--<RelativeLayout-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_below="@id/choose_account_pro_i_title_text"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:gravity="bottom">-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_i_integer_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:textSize="28sp"/>-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_i_decimal_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:layout_toRightOf="@id/choose_account_pro_i_integer_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_pro_i_integer_text"-->
+						<!--android:textSize="14sp" />-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_i_per_month_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/lollipop_primary_color"-->
+						<!--android:layout_toRightOf="@id/choose_account_pro_i_decimal_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_pro_i_integer_text"-->
+						<!--android:textSize="14sp"/>-->
+				<!--</RelativeLayout>-->
+			<!--</RelativeLayout>-->
+
+			<!--<View-->
+				<!--android:id="@+id/choose_account_pro_i_vertical_divider"-->
+				<!--android:layout_width="2dp"-->
+				<!--android:layout_height="86dp"-->
+				<!--android:layout_toRightOf="@id/choose_account_pro_i_left_side"-->
+				<!--android:layout_centerVertical="true"-->
+				<!--android:background="@color/divider_upgrade_account" />-->
+
+			<!--&lt;!&ndash; Right side (storage and bandwidth)&ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_pro_i_layout_right_side"-->
+				<!--android:layout_width="match_parent"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:gravity="center_vertical"-->
+				<!--android:layout_toRightOf="@id/choose_account_pro_i_vertical_divider">-->
+
+				<!--<TableLayout-->
+					<!--android:layout_width="match_parent"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_centerVertical="true">-->
+					<!--<TableRow-->
+						<!--android:id="@+id/table_row_pro_i">-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_storage_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_storage_value_gb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_empty_text"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_storage_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textSize="14sp"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_storage"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:textAllCaps="true" />-->
+
+					<!--</TableRow>-->
+					<!--<TableRow>-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_bandwidth_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_bandwith_value_tb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_empty_text_bandwidth"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_i_bandwith_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_bandwidth"-->
+							<!--android:textAllCaps="true"-->
+							<!--android:textSize="14sp" />-->
+
+					<!--</TableRow>-->
+				<!--</TableLayout>-->
+
+			<!--</RelativeLayout>-->
+		<!--</RelativeLayout>-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_pro_i_layout_transparent"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:visibility="invisible"-->
+			<!--android:background="#80ffffff">-->
+		<!--</RelativeLayout>-->
+
+	<!--</RelativeLayout>-->
+
+	<!--&lt;!&ndash; Pro II &ndash;&gt;-->
+	<!--<RelativeLayout-->
+		<!--android:id="@+id/choose_account_pro_ii_layout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:background="@drawable/card_corner"-->
+		<!--android:elevation="3dp">-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_pro_ii_layout_content"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="wrap_content">-->
+
+			<!--&lt;!&ndash; Left side (title and price) &ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_pro_ii_left_side"-->
+				<!--android:layout_width="125dp"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:background="@color/white"-->
+				<!--android:gravity="center_vertical">-->
+
+				<!--<TextView-->
+					<!--android:id="@+id/choose_account_pro_ii_title_text"-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:textColor="@color/lollipop_primary_color"-->
+					<!--android:text="@string/pro2_account"-->
+					<!--android:textAllCaps="true"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:textSize="24sp"/>-->
+
+				<!--<RelativeLayout-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_below="@id/choose_account_pro_ii_title_text"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:gravity="bottom">-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_ii_integer_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:textSize="28sp"/>-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_ii_decimal_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:layout_toRightOf="@id/choose_account_pro_ii_integer_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_pro_ii_integer_text"-->
+						<!--android:textSize="14sp" />-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_ii_per_month_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/lollipop_primary_color"-->
+						<!--android:layout_toRightOf="@id/choose_account_pro_ii_decimal_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_pro_ii_integer_text"-->
+						<!--android:textSize="14sp"/>-->
+				<!--</RelativeLayout>-->
+			<!--</RelativeLayout>-->
+
+			<!--<View-->
+				<!--android:id="@+id/choose_account_pro_ii_vertical_divider"-->
+				<!--android:layout_width="2dp"-->
+				<!--android:layout_height="86dp"-->
+				<!--android:layout_toRightOf="@id/choose_account_pro_ii_left_side"-->
+				<!--android:layout_centerVertical="true"-->
+				<!--android:background="@color/divider_upgrade_account" />-->
+
+			<!--&lt;!&ndash; Right side (storage and bandwidth)&ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_pro_ii_layout_right_side"-->
+				<!--android:layout_width="match_parent"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:gravity="center_vertical"-->
+				<!--android:layout_toRightOf="@id/choose_account_pro_ii_vertical_divider">-->
+
+				<!--<TableLayout-->
+					<!--android:layout_width="match_parent"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_centerVertical="true">-->
+					<!--<TableRow-->
+						<!--android:id="@+id/table_row_pro_ii">-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_storage_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_storage_value_gb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_empty_text"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_storage_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textSize="14sp"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_storage"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:textAllCaps="true" />-->
+
+					<!--</TableRow>-->
+					<!--<TableRow>-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_bandwidth_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_bandwith_value_tb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_empty_text_bandwidth"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_ii_bandwith_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_bandwidth"-->
+							<!--android:textAllCaps="true"-->
+							<!--android:textSize="14sp" />-->
+
+					<!--</TableRow>-->
+				<!--</TableLayout>-->
+
+			<!--</RelativeLayout>-->
+		<!--</RelativeLayout>-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_pro_ii_layout_transparent"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:visibility="invisible"-->
+			<!--android:background="#80ffffff">-->
+
+		<!--</RelativeLayout>-->
+
+	<!--</RelativeLayout>-->
+
+	<!--&lt;!&ndash; Pro III &ndash;&gt;-->
+	<!--<RelativeLayout-->
+		<!--android:id="@+id/choose_account_pro_iii_layout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:background="@drawable/card_corner"-->
+		<!--android:elevation="3dp">-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_pro_iii_layout_content"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="wrap_content">-->
+
+			<!--&lt;!&ndash; Left side (title and price) &ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_pro_iii_left_side"-->
+				<!--android:layout_width="125dp"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:background="@color/white"-->
+				<!--android:gravity="center_vertical">-->
+
+				<!--<TextView-->
+					<!--android:id="@+id/choose_account_pro_iii_title_text"-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:textColor="@color/lollipop_primary_color"-->
+					<!--android:text="@string/pro3_account"-->
+					<!--android:textAllCaps="true"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:textSize="24sp"/>-->
+
+				<!--<RelativeLayout-->
+					<!--android:layout_width="wrap_content"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_below="@id/choose_account_pro_iii_title_text"-->
+					<!--android:layout_centerHorizontal="true"-->
+					<!--android:gravity="bottom">-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_iii_integer_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:textSize="28sp"/>-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_iii_decimal_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/name_my_account"-->
+						<!--android:layout_toRightOf="@id/choose_account_pro_iii_integer_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_pro_iii_integer_text"-->
+						<!--android:textSize="14sp" />-->
+
+					<!--<TextView-->
+						<!--android:id="@+id/choose_account_pro_iii_per_month_text"-->
+						<!--android:layout_width="wrap_content"-->
+						<!--android:layout_height="wrap_content"-->
+						<!--android:textColor="@color/lollipop_primary_color"-->
+						<!--android:layout_toRightOf="@id/choose_account_pro_iii_decimal_text"-->
+						<!--android:layout_alignBottom="@id/choose_account_pro_iii_integer_text"-->
+						<!--android:textSize="14sp"/>-->
+				<!--</RelativeLayout>-->
+			<!--</RelativeLayout>-->
+
+			<!--<View-->
+				<!--android:id="@+id/choose_account_pro_iii_vertical_divider"-->
+				<!--android:layout_width="2dp"-->
+				<!--android:layout_height="86dp"-->
+				<!--android:layout_toRightOf="@id/choose_account_pro_iii_left_side"-->
+				<!--android:layout_centerVertical="true"-->
+				<!--android:background="@color/divider_upgrade_account" />-->
+
+			<!--&lt;!&ndash; Right side (storage and bandwidth)&ndash;&gt;-->
+			<!--<RelativeLayout-->
+				<!--android:id="@+id/choose_account_pro_iii_layout_right_side"-->
+				<!--android:layout_width="match_parent"-->
+				<!--android:layout_height="118dp"-->
+				<!--android:gravity="center_vertical"-->
+				<!--android:layout_toRightOf="@id/choose_account_pro_iii_vertical_divider">-->
+
+				<!--<TableLayout-->
+					<!--android:layout_width="match_parent"-->
+					<!--android:layout_height="wrap_content"-->
+					<!--android:layout_centerVertical="true">-->
+					<!--<TableRow-->
+						<!--android:id="@+id/table_row_pro_iii">-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_storage_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_storage_value_gb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_empty_text"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_storage_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textSize="14sp"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_storage"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:textAllCaps="true" />-->
+
+					<!--</TableRow>-->
+					<!--<TableRow>-->
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_bandwidth_value_integer"-->
+							<!--android:layout_width="40dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_bandwith_value_tb"-->
+							<!--android:layout_width="wrap_content"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"-->
+							<!--android:textColor="@color/lollipop_primary_color"-->
+							<!--android:textSize="16sp"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_empty_text_bandwidth"-->
+							<!--android:layout_width="12dp"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="right"/>-->
+
+						<!--<TextView-->
+							<!--android:id="@+id/choose_account_pro_iii_bandwith_label"-->
+							<!--android:layout_width="match_parent"-->
+							<!--android:layout_height="wrap_content"-->
+							<!--android:gravity="left"-->
+							<!--android:textColor="@color/file_properties_text_available"-->
+							<!--android:ellipsize="end"-->
+							<!--android:text="@string/general_bandwidth"-->
+							<!--android:textAllCaps="true"-->
+							<!--android:textSize="14sp" />-->
+
+					<!--</TableRow>-->
+				<!--</TableLayout>-->
+			<!--</RelativeLayout>-->
+		<!--</RelativeLayout>-->
+
+		<!--<RelativeLayout-->
+			<!--android:id="@+id/choose_account_pro_iii_layout_transparent"-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:visibility="invisible"-->
+			<!--android:background="#80ffffff">-->
+
+		<!--</RelativeLayout>-->
+	<!--</RelativeLayout>-->
+
+	<!--<RelativeLayout-->
+		<!--android:id="@+id/achievements_layout"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content">-->
+
+		<!--<TextView-->
+			<!--android:layout_width="wrap_content"-->
+			<!--android:layout_height="wrap_content"-->
+			<!--android:textColor="@color/file_properties_text_available"-->
+			<!--android:textSize="11sp"-->
+			<!--android:layout_marginBottom="8dp"-->
+			<!--android:layout_marginTop="8dp"-->
+			<!--android:layout_marginLeft="12dp"-->
+			<!--android:layout_marginRight="8dp"-->
+			<!--android:text="@string/footnote_achievements"/>-->
+	<!--</RelativeLayout>-->
+<!--</LinearLayout>-->
+<!--</ScrollView>-->
