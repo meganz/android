@@ -317,10 +317,10 @@
     <!--<string name="context_contact_added" context="success message when adding a contact">Kontakt pridaný</string>-->
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Žiadosť zmazaná</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Žiadosť odoslaná</string>
-    <!--<string name="context_invitacion_reply" context="success message when adding a contact">Odpoveď na odoslanú pozvánku</string>-->
+    <!--<string name="context_invitation_reply" context="success message when adding a contact">Odpoveď na odoslanú pozvánku</string>-->
     <string name="context_contact_removed" context="success message when removing a contact">Kontakt zmazaný</string>
     <string name="context_contact_not_removed" context="error message">Chyba. Kontakt nebol odstránený</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">Povolenia zmenené</string>
+    <string name="context_permissions_changed" context="success message when changing the permissions">Povolenia zmenené</string>
     <string name="context_permissions_not_changed" context="error message">Chyba. Povolenia neboli zmenené</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Priečinok už existuje</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s už je medzi vašimi kontaktami.</string>
@@ -401,7 +401,7 @@
 	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">nahrané</string>
 	<!--<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Chcete zrušiť tento upload?</string>-->
 	<string name="upload_prepare" context="Status text at the beginning of an upload">Spracovanie súboru</string>
-	<string name="error_temporary_unavaible" context="error message when downloading a file">Zdroj momentálne nedostupný, prosím skúste to neskôr</string>
+	<string name="error_temporary_unavailable" context="error message when downloading a file">Zdroj momentálne nedostupný, prosím skúste to neskôr</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Zvolený súbor sa nedá otvoriť</string>
 	<string name="upload_began" context="when an upload starts, a message is shown to the user">Nahrávanie začalo</string>
 	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Rozbaľovanie súboru</string>

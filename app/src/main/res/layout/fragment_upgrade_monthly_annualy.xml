@@ -136,20 +136,20 @@
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/monthly_annualy_bandwith_value_tb"
+								android:id="@+id/monthly_annualy_bandwidth_value_tb"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:gravity="right"
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/monthly_annualy_bandwith_empty_text"
+								android:id="@+id/monthly_annualy_bandwidth_empty_text"
 								android:layout_width="12dp"
 								android:layout_height="wrap_content"
 								android:gravity="right"/>
 
 							<TextView
-								android:id="@+id/monthly_annualy_bandwith_label"
+								android:id="@+id/monthly_annualy_bandwidth_label"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:gravity="left"

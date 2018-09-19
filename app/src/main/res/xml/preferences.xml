@@ -217,7 +217,7 @@
 		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_qrcode_autoaccept"
 			android:title="@string/settings_qrcode_autoaccept"
-			android:summary="@string/setting_subtitle_qrcode_autoccept"/>
+			android:summary="@string/setting_subtitle_qrcode_autoaccept"/>
 
 	</PreferenceCategory>
 	

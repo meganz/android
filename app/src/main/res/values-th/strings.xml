@@ -158,7 +158,7 @@
     <!--
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     -->
-    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s จะถูกดาวน์โหลด</string>
+    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be downloaded">%s จะถูกดาวน์โหลด</string>
     <string name="alert_no_app" context="Alert text before download">ไม่มีแอปพลิเคชันเพื่อเปิดไฟล์ %s คุณต้องการดาวน์โหลดต่อหรือไม่</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">ไม่ต้องแสดงอีก</string>
 
@@ -419,7 +419,7 @@
 
     <string name="context_contact_removed" context="success message when removing a contact">รายการติดต่อถูกลบออกแล้ว</string>
     <string name="context_contact_not_removed" context="error message">ผิดพลาด รายการติดต่อไม่ได้ถูกลบออก</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">สิทธิ์เปลี่ยนแปลงแล้ว</string>
+    <string name="context_permissions_changed" context="success message when changing the permissions">สิทธิ์เปลี่ยนแปลงแล้ว</string>
     <string name="context_permissions_not_changed" context="error message">ผิดพลาด สิทธิ์ยังไม่ถูกเปลี่ยนแปลง</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">โฟลเดอร์นี้มีการใช้งานแล้ว</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s มีในรายการผู้ติดต่อแล้ว</string>
@@ -527,7 +527,7 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
     <string name="upload_prepare" context="Status text at the beginning of an upload">กำลังประมวลผลไฟล์</string>
-    <string name="error_temporary_unavaible" context="error message when downloading a file">ระบบทรัพยากรไม่สามารถใช้ได้ชั่วคราว กรุณาลองอีกครั้งในภายหลัง</string>
+    <string name="error_temporary_unavailable" context="error message when downloading a file">ระบบทรัพยากรไม่สามารถใช้ได้ชั่วคราว กรุณาลองอีกครั้งในภายหลัง</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">ไม่สามารถเปิดไฟล์ที่เลือกได้</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">การอัปโหลดได้เริ่มต้นแล้ว</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">กำลังแยกไฟล์</string>
@@ -985,10 +985,10 @@
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">บัญชีนี้ยังไม่ผ่านการตรวจสอบ กรุณาตรวจสอบอีเมลของคุณ</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">ลิงก์โฟลเดอร์ยังไม่พร้อมใช้งาน</string>
-    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">ลิงก์โฟลเดอร์ถูกลบออกแล้ว เนื่องจากละเมิด ToS/AUP</string>
+    <string name="folder_link_unavailable_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">ลิงก์โฟลเดอร์ถูกลบออกแล้ว เนื่องจากละเมิด ToS/AUP</string>
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">ลิงก์ไฟล์ไม่พร้อมใช้งาน</string>
-    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ลิงก์ไฟล์ถูกลบ เนื่องจากมีการละเมิด ToS/AUP</string>
+    <string name="file_link_unavailable_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ลิงก์ไฟล์ถูกลบ เนื่องจากมีการละเมิด ToS/AUP</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">กำลังรอการยืนยันทางอีเมล</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">โปรดตรวจสอบอีเมลของคุณและคลิกลิงก์เพื่อยืนยันบัญชีของคุณ</string>
@@ -998,12 +998,12 @@
         <item context="Plural of items which contains a folder. 2 items" quantity="other">รายการ</item>
     </plurals>
 
-    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">บัญชีผู้ใช้ที่เชื่อมโยงได้ถูกยกเลิกแล้ว เนื่องจากมีการละเมิดข้อกำหนดในการบริการของเราหลายครั้ง</string>
+    <string name="file_link_unavailable_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">บัญชีผู้ใช้ที่เชื่อมโยงได้ถูกยกเลิกแล้ว เนื่องจากมีการละเมิดข้อกำหนดในการบริการของเราหลายครั้ง</string>
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">คีย์ถอดรหัสสำหรับลิงก์โฟลเดอร์ไม่ถูกต้อง</string>
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">ข้อมูลประจำตัวของฉัน</string>
-    <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">ถูกจำกัด</string>
+    <string name="limited_bandwidth" context="Word to indicate the limited bandwidth of the free accounts">ถูกจำกัด</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">แชท</string>
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">แชท [A](%1$d)[/A]</string>
@@ -1193,7 +1193,7 @@
     <!--
     <string name="changing_status_to_busy_success" context="message shown when the status of the user successfully changed to offline">You\'re now busy</string>
     -->
-    <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">ผิดพลาด สถานะของคุณยังไม่ได้ถูกเปลี่ยน</string>
+    <string name="changing_status_error" context="message shown when the status of the user couldn't be changed">ผิดพลาด สถานะของคุณยังไม่ได้ถูกเปลี่ยน</string>
     <string name="leave_chat_error" context="message shown when a user couldn't leave chat">เกิดข้อผิดพลาดขณะออกจากการแชท</string>
     <string name="create_chat_error" context="message shown when a chat has not been created">เกิดข้อผิดพลาดขณะสร้างการแชท</string>
 
@@ -1281,9 +1281,9 @@
 
     <string name="general_dismiss" context="Answer for confirmation dialog.">ละทิ้ง</string>
 
-    <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">ยอมรับคำเชิญแล้ว</string>
-    <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">คำเชิญถูกปฏิเสธ</string>
-    <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">คำเชิญถูกละเลย</string>
+    <string name="context_invitation_reply_accepted" context="Accepted request invitation alert">ยอมรับคำเชิญแล้ว</string>
+    <string name="context_invitation_reply_declined" context="Declined request invitation alert">คำเชิญถูกปฏิเสธ</string>
+    <string name="context_invitation_reply_ignored" context="Ignored request invitation alert">คำเชิญถูกละเลย</string>
 
     <string name="error_message_unrecognizable" context="Content of a normal message that cannot be recognized">ไม่รู้จักข้อความ</string>
 
@@ -1418,7 +1418,7 @@
     <string name="import_success_message" context="Menu option">เพิ่มลงในคลาวด์ไดรฟ์</string>
     <string name="import_success_error" context="Menu option">ผิดพลาด ไม่ได้เพิ่มลงในคลาวด์ไดรฟ์</string>
 
-    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">กำลังเชื่อมต่อ&#8230;</string>
+    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization process">กำลังเชื่อมต่อ&#8230;</string>
 
     <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%s ได้รับเชิญไปแล้ว พิจารณาคำขอที่รอดำเนินการของคุณ</string>
 
@@ -1448,11 +1448,11 @@
     <string name="camera_uploads_upload_videos">อัปโหลดวิดีโอ</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">อัปเดตรูปโปรไฟล์แล้ว</string>
-    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">เกิดข้อผิดพลาดในการเปลี่ยนรูปโปรไฟล์</string>
+    <string name="error_changing_user_avatar" context="Message when an error occurred when changing an user avatar">เกิดข้อผิดพลาดในการเปลี่ยนรูปโปรไฟล์</string>
     <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">ลบรูปโปรไฟล์แล้ว</string>
-    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">เกิดข้อผิดพลาดในการลบรูปโปรไฟล์</string>
+    <string name="error_deleting_user_avatar" context="Message when an error occurred when deleting an user avatar">เกิดข้อผิดพลาดในการลบรูปโปรไฟล์</string>
 
-    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">เกิดข้อผิดพลาดระหว่างเปลี่ยนชื่อ</string>
+    <string name="error_changing_user_attributes" context="Message when an error occurred when changing an user attribute">เกิดข้อผิดพลาดระหว่างเปลี่ยนชื่อ</string>
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">ชื่อของคุณได้อัปเดตอย่างถูกต้องแล้ว</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">เพิ่มผู้เข้าร่วมแล้ว</string>
@@ -1540,11 +1540,11 @@
 
     <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">โควต้าพื้นที่เก็บข้อมูล</string>
 
-    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">โบนัสการแนะนำ</string>
-    <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">ติดตั้งแอปบนอุปกรณ์เคลื่อนที่</string>
-    <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">โบนัสการลงทะเบียน</string>
-    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">ติดตั้งแอป MEGA บนเดสก์ท็อป </string>
-    <string name="title_base_quota" context="title of the section for base quota in achivements section">โควต้าบัญชีพื้นฐาน</string>
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achievements section (maximum 24 chars)">โบนัสการแนะนำ</string>
+    <string name="title_install_app" context="title of the section for install a mobile app in achievements section (maximum 24 chars)">ติดตั้งแอปบนอุปกรณ์เคลื่อนที่</string>
+    <string name="title_regitration" context="title of the section for install megasync in achievements section (maximum 24 chars)">โบนัสการลงทะเบียน</string>
+    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achievements section (maximum 24 chars)">ติดตั้งแอป MEGA บนเดสก์ท็อป </string>
+    <string name="title_base_quota" context="title of the section for base quota in achievements section">โควต้าบัญชีพื้นฐาน</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">ไม่มีสื่อในการอัปโหลดจากกล้อง</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">เหลืออีก %1$d วัน</string>
     <string name="expired_achievement" context="state to indicate the achievement has expired">หมดอายุแล้ว</string>
@@ -1629,7 +1629,7 @@
 
     <string name="not_download" context="before sharing a file, has to be downloaded">ยังไม่ได้ดาวน์โหลดไฟล์</string>
 
-    <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">สามารถเพิ่มได้แค่รายชื่อติดต่อ MEGA เท่านั้น</string>
+    <string name="not_permitted_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">สามารถเพิ่มได้แค่รายชื่อติดต่อ MEGA เท่านั้น</string>
 
     <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">แชทขาดการเชื่อมต่อ</string>
 
@@ -1654,12 +1654,12 @@
     <string name="section_my_code" context="Title of QR code section">MY CODE</string>
     <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Auto-Accept</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
+    <string name="setting_subtitle_qrcode_autoaccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
-    <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
+    <string name="qrcode_reset_successfully" context="Text shown when it has been reset the QR code successfully">QR code successfully reset</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reset the QR code successfully">QR code not reset due to any error. Please, try again.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
@@ -1668,7 +1668,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scann another valid code.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scan another valid code.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
@@ -1677,9 +1677,9 @@
     <string name="button_copy_link" context="get the contact link and copy it">คัดลอกลิงก์</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
-    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device's camera</string>
+    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device\'s camera</string>
 
-    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">เปิดด้วย</string>
+    <string name="external_play" context="Item menu option to reproduce audio or video in external reproducer">เปิดด้วย</string>
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Share using</string>
 
@@ -1711,10 +1711,10 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">กำลังประมวลผลลิงก์&#8230;</string>
 
-    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">รหัสผ่านของคุณอาจถูกคาดเดาได้ง่าย กรุณากรอกรหัสผ่านให้ยาวขึ้นกว่าเดิม และควรมีการใช้ตัวอักษรที่เป็นตัวพิมพ์ใหญ่, ตัวพิมพ์เล็กและเพิ่มอักขระพิเศษลงไปด้วย ที่สำคัญอย่าใช้ชื่อหรือคำที่มีอยู่ในพจนานุกรมเด็ดขาด</string>
-    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">รหัสผ่านของคุณพร้อมที่จะดำเนินการต่อไปแล้ว แต่เราก็ยังคงแนะนำให้คุณใช้รหัสผ่านที่คาดเดาได้ยากต่อไปอีก</string>
-    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ brute-force ได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
-    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ brute-force ที่มีความซับซ้อนได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
+    <string name="passwd_weak" context="Message shown when it is creating an account and it is been introduced a very weak or weak password">รหัสผ่านของคุณอาจถูกคาดเดาได้ง่าย กรุณากรอกรหัสผ่านให้ยาวขึ้นกว่าเดิม และควรมีการใช้ตัวอักษรที่เป็นตัวพิมพ์ใหญ่, ตัวพิมพ์เล็กและเพิ่มอักขระพิเศษลงไปด้วย ที่สำคัญอย่าใช้ชื่อหรือคำที่มีอยู่ในพจนานุกรมเด็ดขาด</string>
+    <string name="passwd_medium" context="Message shown when it is creating an account and it is been introduced a medium password">รหัสผ่านของคุณพร้อมที่จะดำเนินการต่อไปแล้ว แต่เราก็ยังคงแนะนำให้คุณใช้รหัสผ่านที่คาดเดาได้ยากต่อไปอีก</string>
+    <string name="passwd_good" context="Message shown when it is creating an account and it is been introduced a good password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ brute-force ได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
+    <string name="passwd_strong" context="Message shown when it is creating an account and it is been introduced a strong password">รหัสผ่านนี้จะสามารถป้องกันการโจมตีแบบ brute-force ที่มีความซับซ้อนได้ กรุณาตรวจสอบอีกครั้งว่าคุณจะสามารถจำรหัสผ่านเหล่านี้ได้</string>
     <string name="pass_very_weak" context="Password very weak">คาดเดาได้ง่ายมาก</string>
     <string name="pass_weak" context="Password weak">คาดเดาได้ง่าย</string>
     <string name="pass_medium" context="Password medium">คาดเดาได้ปานกลาง</string>
@@ -1726,7 +1726,7 @@
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">บัญชีของคุณถูกระงับเนื่องจากมีการละเมิดข้อกำหนดในการให้บริการของ MEGA หลายครั้ง กรุณาตรวจสอบกล่องจดหมายอีเมลของคุณ</string>
-    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">บัญชีของคุณถูกยุติการใช้งานเนื่องจากละเมิดข้อกำหนดในการให้บริการของ MEGA เช่น การสวมสิทธิผู้อื่น การแชร์และ/หรือการนำเข้าข้อมูลที่ผิดกฎหมาย หรือการละเมิดระบบ</string>
+    <string name="account_suspended_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">บัญชีของคุณถูกยุติการใช้งานเนื่องจากละเมิดข้อกำหนดในการให้บริการของ MEGA เช่น การสวมสิทธิผู้อื่น การแชร์และ/หรือการนำเข้าข้อมูลที่ผิดกฎหมาย หรือการละเมิดระบบ</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
 

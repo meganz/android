@@ -142,7 +142,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/choose_account_free_bandwith_value_tb"
+								android:id="@+id/choose_account_free_bandwidth_value_tb"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:gravity="right"
@@ -157,7 +157,7 @@
 								android:gravity="right"/>
 
 							<TextView
-								android:id="@+id/choose_account_free_bandwith_label"
+								android:id="@+id/choose_account_free_bandwidth_label"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:gravity="left"
@@ -315,7 +315,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/choose_account_prolite_bandwith_value_tb"
+								android:id="@+id/choose_account_prolite_bandwidth_value_tb"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:gravity="right"
@@ -329,7 +329,7 @@
 								android:gravity="right"/>
 
 							<TextView
-								android:id="@+id/choose_account_prolite_bandwith_label"
+								android:id="@+id/choose_account_prolite_bandwidth_label"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:gravity="left"
@@ -487,7 +487,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/choose_account_pro_i_bandwith_value_tb"
+								android:id="@+id/choose_account_pro_i_bandwidth_value_tb"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:gravity="right"
@@ -501,7 +501,7 @@
 								android:gravity="right"/>
 
 							<TextView
-								android:id="@+id/choose_account_pro_i_bandwith_label"
+								android:id="@+id/choose_account_pro_i_bandwidth_label"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:gravity="left"
@@ -658,7 +658,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/choose_account_pro_ii_bandwith_value_tb"
+								android:id="@+id/choose_account_pro_ii_bandwidth_value_tb"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:gravity="right"
@@ -672,7 +672,7 @@
 								android:gravity="right"/>
 
 							<TextView
-								android:id="@+id/choose_account_pro_ii_bandwith_label"
+								android:id="@+id/choose_account_pro_ii_bandwidth_label"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:gravity="left"
@@ -830,7 +830,7 @@
 								android:textSize="16sp"/>
 
 							<TextView
-								android:id="@+id/choose_account_pro_iii_bandwith_value_tb"
+								android:id="@+id/choose_account_pro_iii_bandwidth_value_tb"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
 								android:gravity="right"
@@ -844,7 +844,7 @@
 								android:gravity="right"/>
 
 							<TextView
-								android:id="@+id/choose_account_pro_iii_bandwith_label"
+								android:id="@+id/choose_account_pro_iii_bandwidth_label"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:gravity="left"

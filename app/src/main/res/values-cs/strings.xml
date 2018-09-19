@@ -424,11 +424,11 @@
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Požadavek odstraněn</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Požadavek znovu odeslán</string>
     <!--
-    <string name="context_invitacion_reply" context="success message when adding a contact">Odpověď na pozvánku odeslána</string>
+    <string name="context_invitation_reply" context="success message when adding a contact">Odpověď na pozvánku odeslána</string>
     -->
     <string name="context_contact_removed" context="success message when removing a contact">Kontakt odebrán</string>
     <string name="context_contact_not_removed" context="error message">Chyba. Kontakt neodebrán</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">Oprávnění změněna</string>
+    <string name="context_permissions_changed" context="success message when changing the permissions">Oprávnění změněna</string>
     <string name="context_permissions_not_changed" context="error message">Chyba. Oprávnění nezměněna</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Složka již existuje</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s již je kontaktem.</string>
@@ -533,7 +533,7 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Chcete zrušit nahrávání?</string>
     -->
 	<string name="upload_prepare" context="Status text at the beginning of an upload">Zpracování souboru</string>
-	<string name="error_temporary_unavaible" context="error message when downloading a file">Zdroj je dočasně nedostupný, zkuste to znovu později</string>
+	<string name="error_temporary_unavailable" context="error message when downloading a file">Zdroj je dočasně nedostupný, zkuste to znovu později</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Nelze otevřít vybraný soubor</string>
 	<string name="upload_began" context="when an upload starts, a message is shown to the user">Nahrávání zahájeno</string>
 	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Rozbalování souboru</string>

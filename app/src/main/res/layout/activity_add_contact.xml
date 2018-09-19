@@ -70,12 +70,12 @@
 				<RelativeLayout
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:id="@+id/not_permited_add_contact_error">
+					android:id="@+id/not_permitted_add_contact_error">
 
 					<ImageView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:id="@+id/not_permited_add_contact_error_icon"
+						android:id="@+id/not_permitted_add_contact_error_icon"
 						android:layout_alignParentRight="true"
 						android:src="@drawable/ic_input_warning"
 						android:tint="@color/login_warning"
@@ -84,12 +84,12 @@
 					<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:id="@+id/not_permited_add_contact_text"
+						android:id="@+id/not_permitted_add_contact_text"
 						android:textColor="@color/login_warning"
-						android:layout_toLeftOf="@id/not_permited_add_contact_error_icon"
+						android:layout_toLeftOf="@id/not_permitted_add_contact_error_icon"
 						android:layout_alignParentLeft="true"
 						android:layout_marginLeft="4dp"
-						android:text="@string/not_permited_add_email_to_invite"
+						android:text="@string/not_permitted_add_email_to_invite"
 						android:layout_centerInParent="true"/>
 
 				</RelativeLayout>

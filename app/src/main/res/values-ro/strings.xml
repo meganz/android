@@ -158,7 +158,7 @@
     <!--
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     -->
-    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s va fi descărcat.</string>
+    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be downloaded">%s va fi descărcat.</string>
     <string name="alert_no_app" context="Alert text before download">Nu există nicio aplicaţie care să deschidă fişierul %s. Doreşti să continui cu descărcarea?</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">Nu afişa din nou</string>
 
@@ -419,7 +419,7 @@
 
     <string name="context_contact_removed" context="success message when removing a contact">Contact eliminat</string>
     <string name="context_contact_not_removed" context="error message">Eroare. Contactul nu a fost eliminat</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">Permisiuni schimbate</string>
+    <string name="context_permissions_changed" context="success message when changing the permissions">Permisiuni schimbate</string>
     <string name="context_permissions_not_changed" context="error message">Eroare. Permisiunile nu au fost schimbate</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folderul există deja</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s este deja un contact</string>
@@ -527,7 +527,7 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
     <string name="upload_prepare" context="Status text at the beginning of an upload">Se procesează fişierul</string>
-    <string name="error_temporary_unavaible" context="error message when downloading a file">Resursă temporar indisponibilă, te rugăm să reîncerci mai târziu</string>
+    <string name="error_temporary_unavailable" context="error message when downloading a file">Resursă temporar indisponibilă, te rugăm să reîncerci mai târziu</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Nu se poate deschide fişierul selectat</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">Încărcarea a început</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Se dezarhivează fişierul</string>
@@ -985,10 +985,10 @@
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Acest cont nu a fost încă validat. Te rugăm să îţi verifici e-mailul.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">Linkul folderului indisponibil</string>
-    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">Linkul folderului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
+    <string name="folder_link_unavailable_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">Linkul folderului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">Linkul fişierului indisponibil</string>
-    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Linkul fişierului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
+    <string name="file_link_unavailable_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">Linkul fişierului a fost eliminat din cauza unei încălcări a ToS/AUP.</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">Se aşteaptă confirmarea e-mailului</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Te rugăm să verifici e-mailul şi să dai clic pe link pentru a confirma contul.</string>
@@ -998,12 +998,12 @@
         <item context="Plural of items which contains a folder. 2 items" quantity="other">elemente</item>
     </plurals>
 
-    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">Contul de utilizator asociat a fost desfiinţat din cauza mai multor încălcări ale Termenilor de utilizare a serviciului nostru.</string>
+    <string name="file_link_unavailable_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">Contul de utilizator asociat a fost desfiinţat din cauza mai multor încălcări ale Termenilor de utilizare a serviciului nostru.</string>
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">Cheia de decriptare furnizată pentru linkul folderului este nevalidă.</string>
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">Credenţialele mele</string>
-    <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">Limitat</string>
+    <string name="limited_bandwidth" context="Word to indicate the limited bandwidth of the free accounts">Limitat</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">Chat</string>
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat [A](%1$d)[/A]</string>
@@ -1193,7 +1193,7 @@
     <!--
     <string name="changing_status_to_busy_success" context="message shown when the status of the user successfully changed to offline">You\'re now busy</string>
     -->
-    <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">Eroare. Statusul tău nu a fost schimbat</string>
+    <string name="changing_status_error" context="message shown when the status of the user couldn't be changed">Eroare. Statusul tău nu a fost schimbat</string>
     <string name="leave_chat_error" context="message shown when a user couldn't leave chat">A apărut o eroare la părăsirea chatului</string>
     <string name="create_chat_error" context="message shown when a chat has not been created">A apărut o eroare la crearea chatului</string>
 
@@ -1281,9 +1281,9 @@
 
     <string name="general_dismiss" context="Answer for confirmation dialog.">Îndepărtează</string>
 
-    <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">Invitaţie acceptată</string>
-    <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">Invitaţie refuzată</string>
-    <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">Invitaţie ignorată</string>
+    <string name="context_invitation_reply_accepted" context="Accepted request invitation alert">Invitaţie acceptată</string>
+    <string name="context_invitation_reply_declined" context="Declined request invitation alert">Invitaţie refuzată</string>
+    <string name="context_invitation_reply_ignored" context="Ignored request invitation alert">Invitaţie ignorată</string>
 
     <string name="error_message_unrecognizable" context="Content of a normal message that cannot be recognized">Mesaj nerecunoscut</string>
 
@@ -1418,7 +1418,7 @@
     <string name="import_success_message" context="Menu option">Adăugat cu succes în unitatea cloud</string>
     <string name="import_success_error" context="Menu option">Eroare. Neadăugat în unitatea cloud</string>
 
-    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">Se conectează…</string>
+    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization process">Se conectează…</string>
 
     <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%s a fost invitat deja. Consultă cererile în aşteptare.</string>
 
@@ -1448,11 +1448,11 @@
     <string name="camera_uploads_upload_videos">Încarcă videoclipuri</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Poza de profil actualizată</string>
-    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Eroare la schimbarea pozei de profil</string>
+    <string name="error_changing_user_avatar" context="Message when an error occurred when changing an user avatar">Eroare la schimbarea pozei de profil</string>
     <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Poza de profil ştearsă</string>
-    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Eroare la ştergerea pozei de profil</string>
+    <string name="error_deleting_user_avatar" context="Message when an error occurred when deleting an user avatar">Eroare la ştergerea pozei de profil</string>
 
-    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">A apărut o eroare la schimbarea numelui</string>
+    <string name="error_changing_user_attributes" context="Message when an error occurred when changing an user attribute">A apărut o eroare la schimbarea numelui</string>
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">Your name has been correctly updated</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">Participant adăugat</string>
@@ -1540,11 +1540,11 @@
 
     <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">Cotă de stocare</string>
 
-    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">Bonusuri pentru recomandări</string>
-    <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">Instalează o aplicaţie mobilă</string>
-    <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">Bonus de înregistrare</string>
-    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">Instalează aplicaţia desktop MEGA</string>
-    <string name="title_base_quota" context="title of the section for base quota in achivements section">Cotă de bază a contului</string>
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achievements section (maximum 24 chars)">Bonusuri pentru recomandări</string>
+    <string name="title_install_app" context="title of the section for install a mobile app in achievements section (maximum 24 chars)">Instalează o aplicaţie mobilă</string>
+    <string name="title_regitration" context="title of the section for install megasync in achievements section (maximum 24 chars)">Bonus de înregistrare</string>
+    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achievements section (maximum 24 chars)">Instalează aplicaţia desktop MEGA</string>
+    <string name="title_base_quota" context="title of the section for base quota in achievements section">Cotă de bază a contului</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">Fără conţinut media în Încărcări cameră</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">%1$d z rămase</string>
     <string name="expired_achievement" context="state to indicate the achievement has expired">Expirat</string>
@@ -1629,7 +1629,7 @@
 
     <string name="not_download" context="before sharing a file, has to be downloaded">The file has not been downloaded yet</string>
 
-    <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">Only MEGA contacts can be added</string>
+    <string name="not_permitted_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">Only MEGA contacts can be added</string>
 
     <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">Chat disconnected</string>
 
@@ -1654,12 +1654,12 @@
     <string name="section_my_code" context="Title of QR code section">MY CODE</string>
     <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">Auto-Accept</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
+    <string name="setting_subtitle_qrcode_autoaccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
-    <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
+    <string name="qrcode_reset_successfully" context="Text shown when it has been reset the QR code successfully">QR code successfully reset</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reset the QR code successfully">QR code not reset due to any error. Please, try again.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
@@ -1668,7 +1668,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scann another valid code.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scan another valid code.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
@@ -1677,9 +1677,9 @@
     <string name="button_copy_link" context="get the contact link and copy it">Copiază linkul</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
-    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device's camera</string>
+    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device\'s camera</string>
 
-    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">Open with</string>
+    <string name="external_play" context="Item menu option to reproduce audio or video in external reproducer">Open with</string>
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">Share using</string>
 
@@ -1711,10 +1711,10 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">Processing link&#8230;</string>
 
-    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">Parola ta e uşor de ghicit. Încearcă să faci parola mai lungă. Combină litere mari şi litere mici. Adaugă caractere speciale. Nu folosi nume sau cuvinte din dicţionar.</string>
-    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">Parola ta este suficientă de bună pentru a continua, dar este recomandat să o faci mai puternică parola pe viitor.</string>
-    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">Această parolă va rezista în faţa celor mai tipice atacuri de tip „brute-force”. Te rugăm să te asiguri că o vei reţine.</string>
-    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">Această parolă va rezista în faţa celor mai sofisticate atacuri de tip „brute-force”.  Te rugăm să te asiguri că o vei reţine.</string>
+    <string name="passwd_weak" context="Message shown when it is creating an account and it is been introduced a very weak or weak password">Parola ta e uşor de ghicit. Încearcă să faci parola mai lungă. Combină litere mari şi litere mici. Adaugă caractere speciale. Nu folosi nume sau cuvinte din dicţionar.</string>
+    <string name="passwd_medium" context="Message shown when it is creating an account and it is been introduced a medium password">Parola ta este suficientă de bună pentru a continua, dar este recomandat să o faci mai puternică parola pe viitor.</string>
+    <string name="passwd_good" context="Message shown when it is creating an account and it is been introduced a good password">Această parolă va rezista în faţa celor mai tipice atacuri de tip „brute-force”. Te rugăm să te asiguri că o vei reţine.</string>
+    <string name="passwd_strong" context="Message shown when it is creating an account and it is been introduced a strong password">Această parolă va rezista în faţa celor mai sofisticate atacuri de tip „brute-force”.  Te rugăm să te asiguri că o vei reţine.</string>
     <string name="pass_very_weak" context="Password very weak">Foarte slabă</string>
     <string name="pass_weak" context="Password weak">Slabă</string>
     <string name="pass_medium" context="Password medium">Medie</string>
@@ -1726,7 +1726,7 @@
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Revino la apel</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of MEGA\'s Terms of Service. Please check your email inbox.</string>
-    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to a breach of MEGA\'s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
+    <string name="account_suspended_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Your account was terminated due to a breach of MEGA\'s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
 

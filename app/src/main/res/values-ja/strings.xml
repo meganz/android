@@ -158,7 +158,7 @@
     <!--
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     -->
-    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%sがダウンロードされます。</string>
+    <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be downloaded">%sがダウンロードされます。</string>
     <string name="alert_no_app" context="Alert text before download">ファイル%sを開くアプリがありません。ダウンロードを続行しますか？　</string>
     <string name="checkbox_not_show_again" context="Alert checkbox before download">次回から表示しない</string>
 
@@ -419,7 +419,7 @@
 
     <string name="context_contact_removed" context="success message when removing a contact">知り合いを削除しました。</string>
     <string name="context_contact_not_removed" context="error message">エラー発生。知り合いは削除されていません。</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">許可を変更しました。</string>
+    <string name="context_permissions_changed" context="success message when changing the permissions">許可を変更しました。</string>
     <string name="context_permissions_not_changed" context="error message">エラー発生。許可は変更されていません。</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">そのフォルダは存在しています。</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%sさんはすでに連絡先に入っています</string>
@@ -527,7 +527,7 @@
     <string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
     -->
     <string name="upload_prepare" context="Status text at the beginning of an upload">ファイルを処理しています</string>
-    <string name="error_temporary_unavaible" context="error message when downloading a file">容量不足です。後でもう一度トライして下さい。</string>
+    <string name="error_temporary_unavailable" context="error message when downloading a file">容量不足です。後でもう一度トライして下さい。</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">選択したファイルを開くことができません</string>
     <string name="upload_began" context="when an upload starts, a message is shown to the user">アップロード開始</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">ファイル解凍中</string>
@@ -985,10 +985,10 @@
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">このアカウントはまだ検証されていません。メールを確認してください。</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn't exist">利用できないリンク</string>
-    <string name="folder_link_unavaible_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">そのリンクは利用規約/ポリシー違反のため削除されました。</string>
+    <string name="folder_link_unavailable_ToS_violation" context="Error message shown when opening a folder link which has been removed due to ToS/AUP violation">そのリンクは利用規約/ポリシー違反のため削除されました。</string>
 
     <string name="general_error_file_not_found" context="Error message shown when opening a file link which doesn't exist">ファイルリンクがありません</string>
-    <string name="file_link_unavaible_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ファイルリングはToS/AUP違反により削除されました。</string>
+    <string name="file_link_unavailable_ToS_violation" context="Error message shown when opening a file link which has been removed due to ToS/AUP violation">ファイルリングはToS/AUP違反により削除されました。</string>
 
     <string name="confirm_email_text" context="Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email">メールの確認を待っています</string>
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">アカウントを確認するためにMEGAからのメール内のリンクをアクセスしてください。</string>
@@ -998,12 +998,12 @@
         <item context="Plural of items which contains a folder. 2 items" quantity="other">項目</item>
     </plurals>
 
-    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">この関連付けられたユーザーアカウントは、当社のご利用規約に複数違反したため、終了しました。</string>
+    <string name="file_link_unavailable_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">この関連付けられたユーザーアカウントは、当社のご利用規約に複数違反したため、終了しました。</string>
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">このフォルダリンク用の指定された復号キーは無効です。</string>
 
     <string name="my_account_my_credentials" context="Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts">私の資格情報</string>
-    <string name="limited_bandwith" context="Word to indicate the limited bandwidth of the free accounts">制限付き</string>
+    <string name="limited_bandwidth" context="Word to indicate the limited bandwidth of the free accounts">制限付き</string>
 
     <string name="section_chat" context="Item of the navigation title for the chat section">チャット</string>
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">チャット [A](%1$d)[/A]</string>
@@ -1193,7 +1193,7 @@
     <!--
     <string name="changing_status_to_busy_success" context="message shown when the status of the user successfully changed to offline">You\'re now busy</string>
     -->
-    <string name="changing_status_error" context="message shown when the status of the user coudn't be changed">エラー。あなたのステータスは変更されていません</string>
+    <string name="changing_status_error" context="message shown when the status of the user couldn't be changed">エラー。あなたのステータスは変更されていません</string>
     <string name="leave_chat_error" context="message shown when a user couldn't leave chat">チャットから離れる際にエラーが発生しました</string>
     <string name="create_chat_error" context="message shown when a chat has not been created">チャットの作成時にエラーが発生しました</string>
 
@@ -1281,9 +1281,9 @@
 
     <string name="general_dismiss" context="Answer for confirmation dialog.">終了する</string>
 
-    <string name="context_invitacion_reply_accepted" context="Accepted request invitacion alert">招待が受け入れられました</string>
-    <string name="context_invitacion_reply_declined" context="Declined request invitacion alert">招待が拒否されました</string>
-    <string name="context_invitacion_reply_ignored" context="Ignored request invitacion alert">招待が無視されました</string>
+    <string name="context_invitation_reply_accepted" context="Accepted request invitation alert">招待が受け入れられました</string>
+    <string name="context_invitation_reply_declined" context="Declined request invitation alert">招待が拒否されました</string>
+    <string name="context_invitation_reply_ignored" context="Ignored request invitation alert">招待が無視されました</string>
 
     <string name="error_message_unrecognizable" context="Content of a normal message that cannot be recognized">メッセージを認識できません</string>
 
@@ -1418,7 +1418,7 @@
     <string name="import_success_message" context="Menu option">クラウドドライブに正常に追加されました</string>
     <string name="import_success_error" context="Menu option">エラー。クラウドドライブに正常に追加されていません</string>
 
-    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization proccess">接続中&#8230;</string>
+    <string name="chat_connecting" context="Label in login screen to inform about the chat initialization process">接続中&#8230;</string>
 
     <string name="context_contact_already_invited" context="message when trying to invite a contact with a pending request">%sさんはすでに招待されました。あなたの保留中の要求を確認してください。</string>
 
@@ -1448,11 +1448,11 @@
     <string name="camera_uploads_upload_videos">動画アップロード</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">プロファイル画像が更新されました</string>
-    <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">プロファイル画像を変更する際にエラーが発生しました</string>
+    <string name="error_changing_user_avatar" context="Message when an error occurred when changing an user avatar">プロファイル画像を変更する際にエラーが発生しました</string>
     <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">プロファイル画像が削除されました</string>
-    <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">プロファイル画像を削除する際にエラーが発生しました</string>
+    <string name="error_deleting_user_avatar" context="Message when an error occurred when deleting an user avatar">プロファイル画像を削除する際にエラーが発生しました</string>
 
-    <string name="error_changing_user_attributes" context="Message when an error ocurred when changing an user attribute">名前の変更時にエラーが発生しました</string>
+    <string name="error_changing_user_attributes" context="Message when an error occurred when changing an user attribute">名前の変更時にエラーが発生しました</string>
     <string name="success_changing_user_attributes" context="Message when an user attribute has been changed successfully">あなたの名前は正しく更新されました</string>
 
     <string name="add_participant_success" context="Message show when a participant has been successfully invited to a group chat">参加者が追加されました</string>
@@ -1540,11 +1540,11 @@
 
     <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">ストレージ容量制限</string>
 
-    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">ご紹介ボーナス</string>
-    <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">モバイルアプリをインストール</string>
-    <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">ご登録ボーナス</string>
-    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">MEGAデスクトップアプリをインストール</string>
-    <string name="title_base_quota" context="title of the section for base quota in achivements section">アカウントベースの容量</string>
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achievements section (maximum 24 chars)">ご紹介ボーナス</string>
+    <string name="title_install_app" context="title of the section for install a mobile app in achievements section (maximum 24 chars)">モバイルアプリをインストール</string>
+    <string name="title_regitration" context="title of the section for install megasync in achievements section (maximum 24 chars)">ご登録ボーナス</string>
+    <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achievements section (maximum 24 chars)">MEGAデスクトップアプリをインストール</string>
+    <string name="title_base_quota" context="title of the section for base quota in achievements section">アカウントベースの容量</string>
     <string name="camera_uploads_empty" context="Text that indicates that no pictures have been uploaded to the Camera Uploads section">カメラアップロードにメディアがありません</string>
     <string name="general_num_days_left" context="indicates the number of days left related to a achievement">残り%1$d d</string>
     <string name="expired_achievement" context="state to indicate the achievement has expired">失効済み</string>
@@ -1629,7 +1629,7 @@
 
     <string name="not_download" context="before sharing a file, has to be downloaded">このファイルはまだダウンロードされていません。</string>
 
-    <string name="not_permited_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">MEGA連絡先のみ追加できます</string>
+    <string name="not_permitted_add_email_to_invite" context="Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added">MEGA連絡先のみ追加できます</string>
 
     <string name="invalid_connection_state" context="Info label about the connectivity state of an individual chat">チャットが切断されました</string>
 
@@ -1654,12 +1654,12 @@
     <string name="section_my_code" context="Title of QR code section">MY CODE</string>
     <string name="section_scan_code" context="Title of QR code scan section">SCAN CODE</string>
     <string name="settings_qrcode_autoaccept" context="Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list">自動承認</string>
-    <string name="setting_subtitle_qrcode_autoccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
+    <string name="setting_subtitle_qrcode_autoaccept" context="Subtitle of QR code settings auto-accept">Contacts that scan your QR code will be automatically added to your contact list</string>
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
-    <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
+    <string name="qrcode_reset_successfully" context="Text shown when it has been reset the QR code successfully">QR code successfully reset</string>
     <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reset the QR code successfully">QR code not reset due to any error. Please, try again.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
@@ -1668,7 +1668,7 @@
     <string name="error_download_qr" context="Text shown when it tries to download to File System the QR and occurs an error to process the action">An error occur trying to download the QR file. Maybe the file does not exists. Try ir later.</string>
     <string name="success_download_qr" context="Text shown when it tries to download to File System the QR and the action has success">The QR Code has been downloaded successfully to %s</string>
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
-    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scann another valid code.</string>
+    <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code is invalid. Try to scan another valid code.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR...</string>
@@ -1677,9 +1677,9 @@
     <string name="button_copy_link" context="get the contact link and copy it">リンクをコピーする</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
     <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
-    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device's camera</string>
+    <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device\'s camera</string>
 
-    <string name="external_play" context="Item menu option to reproduce audio or video in external reproductors">以下で開く：</string>
+    <string name="external_play" context="Item menu option to reproduce audio or video in external reproducer">以下で開く：</string>
 
     <string name="context_share" context="to share a file using Facebook, Whatsapp, etc">以下で共有：</string>
 
@@ -1711,10 +1711,10 @@
 
     <string name="processing_link" context="Message shown when a link is being processing">リンクを処理中&#8230;</string>
 
-    <string name="passwd_weak" context="Message shown when it is creating an acount and it is been introduced a very weak or weak password">あなたのパスワードは簡単に当てられてしまいます。もっと長くしてみて下さい。大文字と小文字を組み合わせて下さい。記号も入れて下さい。名前や辞書にある言葉はよくありません。</string>
-    <string name="passwd_medium" context="Message shown when it is creating an acount and it is been introduced a medium password">あなたのパスワードはそのままでも行けますが、更に強度を高めることをお勧めします。</string>
-    <string name="passwd_good" context="Message shown when it is creating an acount and it is been introduced a good password">このパスワードは、大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
-    <string name="passwd_strong" context="Message shown when it is creating an acount and it is been introduced a strong password">このパスワードは大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
+    <string name="passwd_weak" context="Message shown when it is creating an account and it is been introduced a very weak or weak password">あなたのパスワードは簡単に当てられてしまいます。もっと長くしてみて下さい。大文字と小文字を組み合わせて下さい。記号も入れて下さい。名前や辞書にある言葉はよくありません。</string>
+    <string name="passwd_medium" context="Message shown when it is creating an account and it is been introduced a medium password">あなたのパスワードはそのままでも行けますが、更に強度を高めることをお勧めします。</string>
+    <string name="passwd_good" context="Message shown when it is creating an account and it is been introduced a good password">このパスワードは、大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
+    <string name="passwd_strong" context="Message shown when it is creating an account and it is been introduced a strong password">このパスワードは大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
     <string name="pass_very_weak" context="Password very weak">非常に弱い</string>
     <string name="pass_weak" context="Password weak">弱い</string>
     <string name="pass_medium" context="Password medium">普通</string>
@@ -1726,7 +1726,7 @@
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">通話に戻る</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">あなたのアカウントは、MEGAのご利用規約に複数違反したため、凍結されました。メールの受信トレイを確認してください。</string>
-    <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">あなたのアカウントは、他人の権利の乱用、違法データの共有やインポート、システムの乱用など、MEGAのご利用規約に違反したために終了しました。</string>
+    <string name="account_suspended_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">あなたのアカウントは、他人の権利の乱用、違法データの共有やインポート、システムの乱用など、MEGAのご利用規約に違反したために終了しました。</string>
 
     <string name="file_storage_empty_folder" context="In a chat conversation when you try to send device's images but there aren't available images">No files</string>
 
