@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -138,6 +139,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
 	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
 	public static String KEY_ENABLE_RB_SCHEDULER = "settings_rb_scheduler_switch";
+	public static String KEY_DAYS_RB_SCHEDULER = "settings_days_rb_scheduler";
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
@@ -233,6 +235,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	SwitchPreference enableRbSchedulerSwitch;
 	TwoLineCheckPreference enableRbSchedulerCheck;
+	Preference daysRbSchedulerPreference;
 
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
@@ -476,11 +479,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		updateEnabledFileVersions();
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			enableRbSchedulerSwitch = (SwitchPreference) findPreference(KEY_ENABLE_VERSIONS);
+			enableRbSchedulerSwitch = (SwitchPreference) findPreference(KEY_ENABLE_RB_SCHEDULER);
 		}
 		else{
-			enableRbSchedulerCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_VERSIONS);
+			enableRbSchedulerCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_RB_SCHEDULER);
 		}
+
+		daysRbSchedulerPreference = (Preference) findPreference(KEY_DAYS_RB_SCHEDULER);
 
 		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
 			log("RubbishBinAutopurgeEnabled --> request userAttribute info");
@@ -491,6 +496,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				fileManagementCategory.addPreference(enableRbSchedulerCheck);
 			}
+
+			fileManagementCategory.addPreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
 		}
 		else{
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -499,6 +507,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				fileManagementCategory.removePreference(enableRbSchedulerCheck);
 			}
+
+			fileManagementCategory.removePreference(daysRbSchedulerPreference);
 		}
 
 		recoveryKey = findPreference(KEY_RECOVERY_KEY);
@@ -2028,28 +2038,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
-		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
+		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
 				return false;
 			}
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if(!enableRbSchedulerSwitch.isChecked()){
-//					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
-				}
-				else{
-//					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
-				}
-			}
-			else{
-				if(!enableRbSchedulerCheck.isChecked()){
-//					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
-				}
-				else{
-//					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
-				}
-			}
+			((ManagerActivityLollipop)context).showRbSchedulerValueDialog();
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
 			if (!Util.isOnline(context)){
@@ -2640,6 +2635,68 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				enableVersionsCheck.setChecked(false);
 			}
 			enableVersionsCheck.setOnPreferenceClickListener(this);
+		}
+	}
+
+	public void updateRBScheduler(String days){
+		log("updateRBScheduler: "+days);
+
+		int daysCount = Integer.parseInt(days);
+
+		if(daysCount<1){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+				enableRbSchedulerSwitch.setChecked(false);
+				enableRbSchedulerSwitch.setSummary(null);
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+			}
+			else{
+				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+				enableRbSchedulerCheck.setChecked(false);
+				enableRbSchedulerSwitch.setSummary(null);
+				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+			}
+
+			//Hide preference to show days
+			fileManagementCategory.removePreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(null);
+		}
+		else{
+			MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+				enableRbSchedulerSwitch.setChecked(true);
+				if(myAccountInfo!=null ){
+					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+						enableRbSchedulerSwitch.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_FREE));
+					}
+					else{
+						enableRbSchedulerSwitch.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_PRO));
+					}
+				}
+
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+			}
+			else{
+				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+				enableRbSchedulerCheck.setChecked(true);
+				if(myAccountInfo!=null ){
+					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+						enableRbSchedulerCheck.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_FREE));
+					}
+					else{
+						enableRbSchedulerCheck.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_PRO));
+					}
+				}
+
+				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+			}
+
+			//Show and set preference to show days
+			fileManagementCategory.addPreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
+			daysRbSchedulerPreference.setSummary(getString(R.string.settings_rb_scheduler_select_days_subtitle, days));
 		}
 	}
 
