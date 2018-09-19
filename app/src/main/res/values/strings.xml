@@ -2111,4 +2111,6 @@
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
 
+    <string name="settings_rb_scheduler_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Rubbish bin clearing scheduler</string>
+
 </resources>

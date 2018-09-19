@@ -48,17 +48,18 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
@@ -136,6 +137,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
 	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
 	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
+	public static String KEY_ENABLE_RB_SCHEDULER = "settings_rb_scheduler_switch";
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
@@ -228,6 +230,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference clearVersionsFileManagement;
 	SwitchPreference enableVersionsSwitch;
 	TwoLineCheckPreference enableVersionsCheck;
+
+	SwitchPreference enableRbSchedulerSwitch;
+	TwoLineCheckPreference enableRbSchedulerCheck;
 
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
@@ -469,6 +474,32 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 
 		updateEnabledFileVersions();
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableRbSchedulerSwitch = (SwitchPreference) findPreference(KEY_ENABLE_VERSIONS);
+		}
+		else{
+			enableRbSchedulerCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_VERSIONS);
+		}
+
+		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
+			log("RubbishBinAutopurgeEnabled --> request userAttribute info");
+			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_RUBBISH_TIME, (ManagerActivityLollipop)context);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fileManagementCategory.addPreference(enableRbSchedulerSwitch);
+			}
+			else{
+				fileManagementCategory.addPreference(enableRbSchedulerCheck);
+			}
+		}
+		else{
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fileManagementCategory.removePreference(enableRbSchedulerSwitch);
+			}
+			else{
+				fileManagementCategory.removePreference(enableRbSchedulerCheck);
+			}
+		}
 
 		recoveryKey = findPreference(KEY_RECOVERY_KEY);
 		recoveryKey.setOnPreferenceClickListener(this);
@@ -1994,6 +2025,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 				else{
 					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
+				}
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableRbSchedulerSwitch.isChecked()){
+//					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
+				}
+				else{
+//					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
+				}
+			}
+			else{
+				if(!enableRbSchedulerCheck.isChecked()){
+//					megaApi.setFileVersionsOption(true, (ManagerActivityLollipop)context);
+				}
+				else{
+//					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
 				}
 			}
 		}
