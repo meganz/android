@@ -185,7 +185,11 @@
 
 		<SwitchPreference
 			android:key="settings_rb_scheduler_switch"
-			android:title="@string/settings_rb_scheduler_title"/>
+			android:title="@string/settings_rb_scheduler_enable_title"/>
+
+		<Preference
+			android:key="settings_days_rb_scheduler"
+			android:title="@string/settings_rb_scheduler_select_days_title" />
 
 		<SwitchPreference
 			android:key="settings_file_versioning_switch"

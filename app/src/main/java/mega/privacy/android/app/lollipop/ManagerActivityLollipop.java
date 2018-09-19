@@ -11060,13 +11060,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		TextView message = (TextView) dialogLayout.findViewById(R.id.dialog_cancel_text);
 		final EditText text = (EditText) dialogLayout.findViewById(R.id.dialog_cancel_feedback);
 
-		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
 		float density = getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 
 		message.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
 		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
@@ -11341,6 +11337,135 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			}
 		});
+	}
+
+	public void showRbSchedulerValueDialog(){
+		log("showRbSchedulerValueDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setHint(getString(R.string.hint_days));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+//					setRBSchedulerValue(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		final TextView text = new TextView(ManagerActivityLollipop.this);
+
+		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+			text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
+		}
+		else{
+			text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
+		}
+
+		float density = getResources().getDisplayMetrics().density;
+		float scaleW = Util.getScaleW(outMetrics, density);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (11*scaleW));
+		layout.addView(text);
+
+		LinearLayout.LayoutParams params_text_error = (LinearLayout.LayoutParams) text.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+//		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+//		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(25, outMetrics), 0,Util.scaleWidthPx(25, outMetrics),0);
+		text.setLayoutParams(params_text_error);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
+		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+
+						if (value.length() == 0) {
+							return;
+						}
+
+						try{
+							int daysCount = Integer.parseInt(value);
+
+							if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+								//PRO account
+								if(daysCount>6){
+									//Set new value
+									setRBSchedulerValue(value);
+								}
+								else{
+									//Show again the dialog
+
+								}
+							}
+							else{
+								//PRO account
+								if(daysCount>6 && daysCount<31){
+									//Set new value
+									setRBSchedulerValue(value);
+								}
+								else{
+									//Show again the dialog
+
+								}
+							}
+						}
+						catch (Exception e){
+
+						}
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new android.content.DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+			}
+		});
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+
+	public void setRBSchedulerValue(String value){
+		log("setRBSchedulerValue: "+ value);
+
+		int timeout = Integer.parseInt(value);
+		if(megaApi!=null){
+//			megaApi.setUserAttribute();
+		}
+
 	}
 
 	public void showAutoAwayValueDialog(){
@@ -15357,6 +15482,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				MegaApplication.setDisableFileVersions(request.getFlag());
 				if(sttFLol!=null && sttFLol.isAdded()){
 					sttFLol.updateEnabledFileVersions();
+				}
+			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
+				if(sttFLol!=null && sttFLol.isAdded()){
+					if (e.getErrorCode() == MegaError.API_ENOENT){
+						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							sttFLol.updateRBScheduler("30");
+						}
+						else{
+							sttFLol.updateRBScheduler("90");
+						}
+					}
+					else{
+						sttFLol.updateRBScheduler(request.getText());
+					}
 				}
 			}
 		}
