@@ -64,7 +64,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	RecyclerView listFragment;
 	
 	AlertDialog permissionsDialog;
-	private SparseBooleanArray selectedItems;
+	SparseBooleanArray selectedItems;
 	
 	final MegaSharedFolderLollipopAdapter megaSharedFolderAdapter;
 	
@@ -559,7 +559,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		notifyDataSetChanged();
 	}
 	
-	private static void log(String log) {
+	protected static void log(String log) {
 		Util.log("MegaSharedFolderLollipopAdapter", log);
 	}
 	
