@@ -868,7 +868,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		int id = item.getItemId();
 		switch (id) {
 			case android.R.id.home: {
-				finish();
+                onBackPressed();
 				break;
 			}
 			case R.id.cab_menu_file_info_download: {
