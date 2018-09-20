@@ -11,14 +11,12 @@
 		android:background="@color/camera_uploads_list_view"
 		android:gravity="center"
 		android:layout_marginBottom="8dp">
-
 		<TextView
 			android:id="@+id/text_of_my_account"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:textColor="@color/mail_my_account"
 			android:textSize="14sp"/>
-
 	</RelativeLayout>
 
 	<ScrollView
@@ -27,7 +25,6 @@
 		android:background="@android:color/transparent"
 		android:layout_below="@+id/title_my_account_type"
 		android:id="@+id/scroll_view_upgrade">
-
 		<LinearLayout
 			android:id="@+id/linear_layout_upgrade"
 			android:layout_width="match_parent"
@@ -38,22 +35,19 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_prolite_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:background="@null">
-
+				android:layout_height="wrap_content">
 				<RelativeLayout
 					android:id="@+id/upgrade_prolite_layout_content"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
 
-					<!-- Left side (title and price) -->
+					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_prolite_left_side"
 						android:layout_width="128dp"
 						android:layout_height="wrap_content"
-						android:paddingTop="18dp"
-						android:paddingBottom="18dp"
-						android:gravity="center">
+						android:gravity="center"
+						android:layout_centerVertical="true">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
@@ -66,7 +60,6 @@
 								android:layout_centerHorizontal="true"
 								android:layout_marginBottom="5dp"
 								android:src="@drawable/ic_lite_crest"/>
-
 							<TextView
 								android:id="@+id/upgrade_prolite_title_text"
 								android:layout_width="wrap_content"
@@ -79,23 +72,23 @@
 						</RelativeLayout>
 					</RelativeLayout>
 
-					<!-- Right side (storage and bandwidth)-->
+					<!-- Right side (price, storage and bandwidth)-->
 					<RelativeLayout
 						android:id="@+id/upgrade_prolite_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:gravity="center_vertical"
-						android:paddingBottom="17dp"
-						android:paddingTop="16dp"
-						android:layout_toRightOf="@id/upgrade_prolite_left_side">
+						android:layout_toRightOf="@id/upgrade_prolite_left_side"
+						android:gravity="center_vertical">
 
 						<TableLayout
 							android:id="@+id/table_lite"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+							android:layout_centerVertical="true"
+							android:layout_marginTop="20dp">
 
 							<TableRow>
+
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
@@ -106,7 +99,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/name_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
@@ -127,8 +120,7 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:layout_marginBottom="16dp">
+									android:layout_gravity="left">
 									<TextView
 										android:id="@+id/bandwidth_lite"
 										android:layout_width="wrap_content"
@@ -138,23 +130,23 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
+
 						<LinearLayout
 							android:id="@+id/linear_divider"
-							android:orientation="horizontal"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
+							android:layout_marginTop="20dp"
+							android:layout_alignBottom="@id/table_lite"
 							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_lite"/>
+							android:orientation="horizontal" />
 					</RelativeLayout>
 				</RelativeLayout>
-
 				<RelativeLayout
 					android:id="@+id/upgrade_prolite_layout_transparent"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
 					android:visibility="invisible">
 				</RelativeLayout>
-
 			</RelativeLayout>
 
 			<!-- Pro I -->
@@ -163,20 +155,18 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@android:color/transparent">
-
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_i_layout_content"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
 
-					<!-- Left side (title and price) -->
+					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_i_left_side"
 						android:layout_width="128dp"
-						android:layout_height="match_parent"
-						android:paddingTop="18dp"
-						android:paddingBottom="18dp"
-						android:gravity="center">
+						android:layout_height="wrap_content"
+						android:gravity="center"
+						android:layout_centerVertical="true">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
@@ -201,21 +191,20 @@
 						</RelativeLayout>
 					</RelativeLayout>
 
-					<!-- Right side (storage and bandwidth)-->
+					<!-- Right side (price, storage and bandwidth)-->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_i_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:gravity="center_vertical"
-						android:paddingBottom="17dp"
-						android:paddingTop="16dp"
-						android:layout_toRightOf="@id/upgrade_pro_i_left_side">
+						android:layout_toRightOf="@id/upgrade_pro_i_left_side"
+						android:gravity="center_vertical">
 
 						<TableLayout
 							android:id="@+id/table_pro_i"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+							android:layout_centerVertical="true"
+							android:layout_marginTop="20dp">
 
 							<TableRow>
 								<RelativeLayout
@@ -228,7 +217,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/name_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
@@ -242,36 +231,35 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:layout_marginBottom="16dp">
+									android:layout_gravity="left">
 									<TextView
 										android:id="@+id/bandwidth_pro_i"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
 
 						<LinearLayout
 							android:id="@+id/linear_divider_pro_i"
-							android:orientation="horizontal"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
+							android:layout_marginTop="20dp"
+							android:layout_alignBottom="@id/table_pro_i"
 							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_pro_i"/>
+							android:orientation="horizontal" />
 
 					</RelativeLayout>
 				</RelativeLayout>
-
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_i_layout_transparent"
 					android:layout_width="match_parent"
@@ -279,9 +267,6 @@
 					android:visibility="invisible"
 					android:background="#80ffffff">
 				</RelativeLayout>
-
-
-
 			</RelativeLayout>
 
 			<!-- Pro II -->
@@ -296,13 +281,12 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
 
-					<!-- Left side (title and price) -->
+					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_ii_left_side"
 						android:layout_width="128dp"
-						android:layout_height="match_parent"
-						android:paddingTop="18dp"
-						android:paddingBottom="18dp"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
 						android:gravity="center">
 						<RelativeLayout
 							android:background="@android:color/transparent"
@@ -328,21 +312,20 @@
 						</RelativeLayout>
 					</RelativeLayout>
 
-					<!-- Right side (storage and bandwidth)-->
+					<!-- Right side (price, storage and bandwidth)-->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_ii_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:gravity="center_vertical"
-						android:paddingBottom="17dp"
-						android:paddingTop="16dp"
-						android:layout_toRightOf="@id/upgrade_pro_ii_left_side">
+						android:layout_toRightOf="@id/upgrade_pro_ii_left_side"
+						android:gravity="center_vertical">
 
 						<TableLayout
 							android:id="@+id/table_pro_ii"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+							android:layout_centerVertical="true"
+							android:layout_marginTop="20dp">
 
 							<TableRow>
 								<RelativeLayout
@@ -355,7 +338,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/name_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
@@ -369,36 +352,35 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:layout_marginBottom="16dp">
+									android:layout_gravity="left">
 									<TextView
 										android:id="@+id/bandwidth_pro_ii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
 
 						<LinearLayout
 							android:id="@+id/linear_divider_pro_ii"
-							android:orientation="horizontal"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
+							android:layout_marginTop="20dp"
+							android:layout_alignBottom="@id/table_pro_ii"
 							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_pro_ii"/>
+							android:orientation="horizontal" />
 
 					</RelativeLayout>
 				</RelativeLayout>
-
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_ii_layout_transparent"
 					android:layout_width="match_parent"
@@ -406,7 +388,6 @@
 					android:visibility="invisible"
 					android:background="#80ffffff">
 				</RelativeLayout>
-
 			</RelativeLayout>
 
 			<!-- Pro III -->
@@ -421,13 +402,12 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
 
-					<!-- Left side (title and price) -->
+					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_iii_left_side"
 						android:layout_width="128dp"
-						android:layout_height="match_parent"
-						android:paddingTop="18dp"
-						android:paddingBottom="18dp"
+						android:layout_height="wrap_content"
+						android:layout_centerVertical="true"
 						android:gravity="center">
 						<RelativeLayout
 							android:background="@android:color/transparent"
@@ -453,21 +433,20 @@
 						</RelativeLayout>
 					</RelativeLayout>
 
-					<!-- Right side (storage and bandwidth)-->
+					<!-- Right side (price, storage and bandwidth)-->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_iii_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
-						android:gravity="center_vertical"
-						android:paddingBottom="17dp"
-						android:paddingTop="16dp"
-						android:layout_toRightOf="@id/upgrade_pro_iii_left_side">
+						android:layout_toRightOf="@id/upgrade_pro_iii_left_side"
+						android:gravity="center_vertical">
 
 						<TableLayout
 							android:id="@+id/table_pro_iii"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true">
+							android:layout_centerVertical="true"
+							android:layout_marginTop="20dp">
 
 							<TableRow>
 								<RelativeLayout
@@ -480,7 +459,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/name_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
@@ -494,36 +473,36 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 							<TableRow>
+
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:layout_marginBottom="16dp">
+									android:layout_gravity="left">
 									<TextView
 										android:id="@+id/bandwidth_pro_iii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/mail_my_account"
-										android:textSize="15sp"/>
+										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
 
 						<LinearLayout
 							android:id="@+id/linear_divider_pro_iii"
-							android:orientation="horizontal"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
+							android:layout_marginTop="20dp"
+							android:layout_alignBottom="@id/table_pro_iii"
 							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_pro_iii"/>
+							android:orientation="horizontal" />
 
 					</RelativeLayout>
 				</RelativeLayout>
-
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_iii_layout_transparent"
 					android:layout_width="match_parent"
@@ -531,18 +510,15 @@
 					android:visibility="invisible"
 					android:background="#80ffffff">
 				</RelativeLayout>
-
-
 			</RelativeLayout>
+
 			<RelativeLayout
-				android:id="@+id/layout_upgrade_account_comment"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@android:color/transparent"
-				android:layout_below="@+id/scroll_view_upgrade"
 				android:layout_marginLeft="128dp"
 				android:layout_marginRight="8dp"
-				android:layout_marginBottom="10dp">
+				android:layout_marginTop="16dp">
 				<TextView
 					android:id="@+id/upgrade_account_comment"
 					android:layout_width="wrap_content"
