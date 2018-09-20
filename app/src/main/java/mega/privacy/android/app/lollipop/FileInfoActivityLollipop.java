@@ -3175,7 +3175,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					sharedLayout.setVisibility(View.VISIBLE);
 					dividerSharedLayout.setVisibility(View.VISIBLE);
-					usersSharedWithTextButton.setText((sl.size())+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+                    usersSharedWithTextButton.setText((sl.size()) + " " + getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 				}
 			}
 		}
