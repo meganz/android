@@ -1744,7 +1744,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if (aB != null){
 			if(title == null){
 				log("reset title and subtitle");
-				aB.setTitle(R.string.title_incoming_shares_explorer);
+				aB.setTitle(R.string.title_incoming_shares_with_explorer);
 				aB.setSubtitle(fullName);
 
 			}

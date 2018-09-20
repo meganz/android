@@ -255,7 +255,8 @@
     <string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
     <string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
 
-    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares with</string>
+    <string name="title_incoming_shares_explorer" context="Title of the file explorer in tab INCOMING">Incoming Shares</string>
+	<string name="title_incoming_shares_with_explorer" context="Title of the share with file explorer">Incoming Shares with</string>
     <!--
     <string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
     -->
