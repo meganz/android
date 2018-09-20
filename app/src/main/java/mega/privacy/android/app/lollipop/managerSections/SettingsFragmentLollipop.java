@@ -2038,6 +2038,33 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
+			log("Change KEY_ENABLE_RB_SCHEDULER");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableRbSchedulerSwitch.isChecked()){
+					log("Disable RB schedule");
+					((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+				}
+				else{
+					log("ENABLE RB schedule");
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog();
+				}
+			}
+			else{
+				if(!enableRbSchedulerCheck.isChecked()){
+					((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+				}
+				else{
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog();
+				}
+			}
+		}
 		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
 			if (!Util.isOnline(context)){
 				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));

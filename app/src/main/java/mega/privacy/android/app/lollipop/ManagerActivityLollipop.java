@@ -61,6 +61,7 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -11409,41 +11410,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setPositiveButton(getString(R.string.cam_sync_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
 
-						if (value.length() == 0) {
-							return;
-						}
-
-						try{
-							int daysCount = Integer.parseInt(value);
-
-							if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-								//PRO account
-								if(daysCount>6){
-									//Set new value
-									setRBSchedulerValue(value);
-								}
-								else{
-									//Show again the dialog
-
-								}
-							}
-							else{
-								//PRO account
-								if(daysCount>6 && daysCount<31){
-									//Set new value
-									setRBSchedulerValue(value);
-								}
-								else{
-									//Show again the dialog
-
-								}
-							}
-						}
-						catch (Exception e){
-
-						}
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new android.content.DialogInterface.OnClickListener() {
@@ -11456,14 +11423,67 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+
+		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+
+				String value = input.getText().toString().trim();
+
+				if (value.length() == 0) {
+					return;
+				}
+
+				try{
+					int daysCount = Integer.parseInt(value);
+
+					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+						//PRO account
+						if(daysCount>6){
+							//Set new value
+							setRBSchedulerValue(value);
+							newFolderDialog.dismiss();
+						}
+						else{
+							//Show again the dialog
+							input.setText("");
+							input.requestFocus();
+						}
+					}
+					else{
+						//PRO account
+						if(daysCount>6 && daysCount<31){
+							//Set new value
+							setRBSchedulerValue(value);
+							newFolderDialog.dismiss();
+						}
+						else{
+							//Show again the dialog
+							input.setText("");
+							input.requestFocus();
+						}
+					}
+				}
+				catch (Exception e){
+					//Show again the dialog
+					input.setText("");
+					input.requestFocus();
+				}
+			}
+		});
 	}
 
 	public void setRBSchedulerValue(String value){
 		log("setRBSchedulerValue: "+ value);
+//		int intValue = Integer.parseInt(value);
 
-		int timeout = Integer.parseInt(value);
+		String authorizationString = Base64.encodeToString(value.getBytes(),Base64.NO_WRAP);
+
+
 		if(megaApi!=null){
-//			megaApi.setUserAttribute();
+			megaApi.setUserAttribute(MegaApiJava.USER_ATTR_RUBBISH_TIME, authorizationString, this);
 		}
 
 	}
@@ -15280,6 +15300,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					log("File versioning attribute changed correctly");
+				}
+			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
+				log("change RB scheduler - USER_ATTR_RUBBISH_TIME finished");
+				if(sttFLol!=null && sttFLol.isAdded()){
+					if (e.getErrorCode() != MegaError.API_OK){
+						showSnackbar(getString(R.string.error_general_nodes));
+					}
+					else{
+						sttFLol.updateRBScheduler(request.getText());
+					}
 				}
 			}
 		}
