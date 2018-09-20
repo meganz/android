@@ -28,8 +28,8 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
+    boolean oneNode = true;
     int counter = 0;
-    int size = 0;
     MegaNode parentNode;
     ArrayList<MegaNode> nodesCopied = new ArrayList<>();
 
@@ -44,31 +44,19 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
         }
-        size = 1;
+        oneNode = true;
+        counter = 0;
         parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
-    }
-
-    public CopyAndSendToChatListener(Context context, ArrayList<MegaNode> ownerNodes) {
-        super();
-        this.context = context;
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-        }
-        size = 1;
-        parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
-        nodesCopied.addAll(ownerNodes);
     }
 
     public void copyNode(MegaNode node) {
         megaApi.copyNode(node, parentNode, this);
     }
 
-    public void copyNodes (ArrayList<MegaNode> nodes) {
+    public void copyNodes (ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes) {
+
+        oneNode = false;
+        nodesCopied.addAll(ownerNodes);
         counter = nodes.size();
         for (int i=0; i<nodes.size(); i++) {
             copyNode(nodes.get(i));
@@ -91,14 +79,14 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
         if (request.getType() == MegaRequest.TYPE_COPY){
             counter --;
             if (e.getErrorCode() == MegaError.API_OK){
-                if (size == 1) {
+                if (oneNode) {
                     MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
                     if (node != null) {
                         NodeController nC = new NodeController(context);
                         nC.selectChatsToSendNode(node);
                     }
                 }
-                else {
+                else if (counter >= 0){
                     nodesCopied.add(megaApi.getNodeByHandle(request.getNodeHandle()));
                     if (counter == 0){
                         if (nodesCopied != null) {
@@ -116,7 +104,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface {
 
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-        log("onRequestFinish");
+        log("onRequestTemporaryError");
     }
 
     private static void log(String log) {
