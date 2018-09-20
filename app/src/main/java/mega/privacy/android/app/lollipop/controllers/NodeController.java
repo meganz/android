@@ -272,8 +272,8 @@ public class NodeController {
             selectChatsToSendNodes(ownerNodes);
         }
         else {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, ownerNodes);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes);
+            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
         }
     }
 
