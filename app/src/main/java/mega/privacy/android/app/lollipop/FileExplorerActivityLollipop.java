@@ -771,7 +771,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				else{
 					log("action = UPLOAD");
 					mode = UPLOAD;
-					aB.setTitle(getString(R.string.title_cloud_explorer));
 
 					if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
 						if ("text/plain".equals(intent.getType())) {
@@ -786,6 +785,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 					if(isChatFirst){
+						aB.setTitle(getString(R.string.title_chat_explorer));
 						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 
 						if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
@@ -800,6 +800,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					else{
+						aB.setTitle(getString(R.string.title_cloud_explorer));
 						if (mTabsAdapterExplorer == null){
 							fileExplorerSectionLayout.setVisibility(View.VISIBLE);
 							viewPagerExplorer.setVisibility(View.VISIBLE);
