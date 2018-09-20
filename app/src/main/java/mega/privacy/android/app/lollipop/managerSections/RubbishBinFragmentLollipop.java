@@ -508,7 +508,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
