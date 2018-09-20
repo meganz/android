@@ -61,7 +61,6 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -11477,15 +11476,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setRBSchedulerValue(String value){
 		log("setRBSchedulerValue: "+ value);
-//		int intValue = Integer.parseInt(value);
-
-		String authorizationString = Base64.encodeToString(value.getBytes(),Base64.NO_WRAP);
-
+		int intValue = Integer.parseInt(value);
 
 		if(megaApi!=null){
-			megaApi.setUserAttribute(MegaApiJava.USER_ATTR_RUBBISH_TIME, authorizationString, this);
+			megaApi.setRubbishBinAutopurgePeriod(intValue, this);
 		}
-
 	}
 
 	public void showAutoAwayValueDialog(){
@@ -15309,7 +15304,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						showSnackbar(getString(R.string.error_general_nodes));
 					}
 					else{
-						sttFLol.updateRBScheduler(request.getText());
+						sttFLol.updateRBScheduler(request.getNumber());
 					}
 				}
 			}
@@ -15519,14 +15514,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if(sttFLol!=null && sttFLol.isAdded()){
 					if (e.getErrorCode() == MegaError.API_ENOENT){
 						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-							sttFLol.updateRBScheduler("30");
+							sttFLol.updateRBScheduler(30);
 						}
 						else{
-							sttFLol.updateRBScheduler("90");
+							sttFLol.updateRBScheduler(90);
 						}
 					}
 					else{
-						sttFLol.updateRBScheduler(request.getText());
+						sttFLol.updateRBScheduler(request.getNumber());
 					}
 				}
 			}
