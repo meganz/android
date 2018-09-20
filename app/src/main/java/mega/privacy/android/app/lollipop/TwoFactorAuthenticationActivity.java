@@ -24,6 +24,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -139,6 +140,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     DisplayMetrics outMetrics;
     String url;
 
+    AlertDialog noAppsDialog;
+    boolean isNoAppsDialogShown = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,6 +186,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (qrByteArray != null){
                 qr = BitmapFactory.decodeByteArray(qrByteArray, 0, qrByteArray.length);
             }
+            isNoAppsDialogShown = savedInstanceState.getBoolean("isNoAppsDialogShown", false);
         }
         else {
             rkSaved = false;
@@ -191,6 +196,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (getIntent() != null) {
                 newAccount = getIntent().getBooleanExtra("newAccount", false);
             }
+            isNoAppsDialogShown = false;
         }
 
         container2FA = (RelativeLayout) findViewById(R.id.container_2fa);
@@ -626,6 +632,10 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         else {
             megaApi.multiFactorAuthGetCode(this);
         }
+
+        if (isNoAppsDialogShown) {
+            showAlertNotAppAvailable();
+        }
     }
 
     @Override
@@ -860,6 +870,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         outState.putBoolean("isErrorShown", isErrorShown);
         outState.putBoolean("firstTime", firstTime);
         outState.putBoolean("rkSaved", rkSaved);
+        outState.putBoolean("isNoAppsDialogShown", isNoAppsDialogShown);
 
         if (scanOrCopyIsShown){
             log("scanOrCopyIsShown");
@@ -962,37 +973,51 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 this.finish();
                 break;
             }
+            case R.id.cancel_button_no_app: {
+                try {
+                    noAppsDialog.dismiss();
+                }catch (Exception e){}
+                isNoAppsDialogShown = false;
+                break;
+            }
+            case R.id.open_button_no_app: {
+                try {
+                    noAppsDialog.dismiss();
+                }catch (Exception e){}
+                isNoAppsDialogShown = false;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
+                startActivity(intent);
+                break;
+            }
         }
     }
 
     void showAlertNotAppAvailable () {
+        log("showAlertNotAppAvailable");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(15, outMetrics), Util.scaleWidthPx(15, outMetrics), 0);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_no_authentication_apps, null);
+        builder.setView(v);
 
-        final TextView text = new TextView(this);
-        text.setText(getString(R.string.intent_not_available_2fa)+".\n\n"+getString(R.string.open_play_store_2fa));
-        text.setTextSize(15);
-        text.setGravity(Gravity.CENTER_HORIZONTAL);
-        text.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
-        confirmationLayout.addView(text, params);
-        builder.setView(confirmationLayout);
+        Button cancelButton = (Button) v.findViewById(R.id.cancel_button_no_app);
+        cancelButton.setOnClickListener(this);
+        Button openButton = (Button) v.findViewById(R.id.open_button_no_app);
+        openButton.setOnClickListener(this);
 
-        builder.setPositiveButton(getString(R.string.context_open_link),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
-                        startActivity(intent);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
+        noAppsDialog = builder.create();
+        noAppsDialog.setCanceledOnTouchOutside(false);
+        noAppsDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isNoAppsDialogShown = false;
             }
         });
-        builder.create().show();
+        try {
+            noAppsDialog.show();
+        }catch (Exception e){}
+
+        isNoAppsDialogShown = true;
     }
 
     @Override
