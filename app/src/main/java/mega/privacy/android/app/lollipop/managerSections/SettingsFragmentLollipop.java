@@ -60,7 +60,6 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
@@ -489,7 +488,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
 			log("RubbishBinAutopurgeEnabled --> request userAttribute info");
-			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_RUBBISH_TIME, (ManagerActivityLollipop)context);
+			megaApi.getRubbishBinAutopurgePeriod((ManagerActivityLollipop)context);
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				fileManagementCategory.addPreference(enableRbSchedulerSwitch);
 			}
@@ -2665,10 +2664,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 	}
 
-	public void updateRBScheduler(String days){
-		log("updateRBScheduler: "+days);
-
-		int daysCount = Integer.parseInt(days);
+	public void updateRBScheduler(long daysCount){
+		log("updateRBScheduler: "+daysCount);
 
 		if(daysCount<1){
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -2723,7 +2720,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Show and set preference to show days
 			fileManagementCategory.addPreference(daysRbSchedulerPreference);
 			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
-			daysRbSchedulerPreference.setSummary(getString(R.string.settings_rb_scheduler_select_days_subtitle, days));
+			daysRbSchedulerPreference.setSummary(getString(R.string.settings_rb_scheduler_select_days_subtitle, daysCount));
 		}
 	}
 
