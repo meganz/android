@@ -366,7 +366,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         monthSectionFree.setText(resultFreeMonth);
 
-        String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.tab_my_account_storage);
+        String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.tab_my_account_storage)+" ";
         try{
             textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'#000000\'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
@@ -375,10 +375,10 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         Spanned resultFreeStorage = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultFreeStorage = Html.fromHtml(textToShowFreeStorage+"<sup><small>1</small></sup>",Html.FROM_HTML_MODE_LEGACY);
+            resultFreeStorage = Html.fromHtml(textToShowFreeStorage+"<sup><small><font color=\'#ff333a\'>1</font></small></sup>",Html.FROM_HTML_MODE_LEGACY);
 
         }else {
-            resultFreeStorage = Html.fromHtml(textToShowFreeStorage+"<sup><small>1</small></sup>");
+            resultFreeStorage = Html.fromHtml(textToShowFreeStorage+"<sup><small><font color=\'#ff333a\'>1</font></small></sup>");
         }
         storageSectionFree.setText(resultFreeStorage);
 
@@ -389,33 +389,20 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }catch (Exception e){}
         Spanned resultFreeBandwidth = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultFreeBandwidth = Html.fromHtml(textToShowFreeBandwidth,Html.FROM_HTML_MODE_LEGACY);
+            resultFreeBandwidth = Html.fromHtml(textToShowFreeBandwidth, Html.FROM_HTML_MODE_LEGACY);
         }else {
             resultFreeBandwidth = Html.fromHtml(textToShowFreeBandwidth);
         }
         bandwidthSectionFree.setText(resultFreeBandwidth);
 
-        Spanned ScriptText = null;
+        String textToShowFreeAchievements = " "+getString(R.string.footnote_achievements);
+        Spanned resultFreeAchievements = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            ScriptText = Html.fromHtml("<sup><small>1</small></sup>",Html.FROM_HTML_MODE_LEGACY);
+            resultFreeAchievements = Html.fromHtml("<sup><small><font color=\'#ff333a\'>1</font></small></sup>"+textToShowFreeAchievements, Html.FROM_HTML_MODE_LEGACY);
         }else {
-            ScriptText = Html.fromHtml("<sup><small>1</small></sup>");
+            resultFreeAchievements = Html.fromHtml("<sup><small><font color=\'#ff333a\'>1</font></small></sup>"+textToShowFreeAchievements);
         }
-
-        String textToShowFreeBandwidthSuperScript = getString(R.string.footnote_achievements)+"[A]"+ScriptText+"[/A]";
-
-        try{
-            textToShowFreeBandwidthSuperScript = textToShowFreeBandwidthSuperScript.replace("[A]", "<font color=\'#ff333a\'>");
-            textToShowFreeBandwidthSuperScript = textToShowFreeBandwidthSuperScript.replace("[/A]", "</font>");
-        }catch (Exception e){}
-
-        Spanned FreeBandwidthSuperScript = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            FreeBandwidthSuperScript = Html.fromHtml(textToShowFreeBandwidthSuperScript,Html.FROM_HTML_MODE_LEGACY);
-        }else {
-            FreeBandwidthSuperScript = Html.fromHtml(textToShowFreeBandwidthSuperScript);
-        }
-        achievementsSectionFree.setText(FreeBandwidthSuperScript);
+        achievementsSectionFree.setText(resultFreeAchievements);
 
         //Pro
         for (int i=0;i<p.getNumProducts();i++){
