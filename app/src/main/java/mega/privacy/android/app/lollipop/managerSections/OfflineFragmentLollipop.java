@@ -491,7 +491,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
             recyclerView.removeItemDecoration(floatingItemDecoration);
             floatingItemDecoration = null;
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
