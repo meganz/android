@@ -1458,6 +1458,7 @@
     <string name="camera_uploads_upload_videos">Upload videos</string>
 
     <string name="success_changing_user_avatar" context="Message when an user avatar has been changed successfully">Profile picture updated</string>
+    <string name="error_changing_user_avatar_image_not_available" context="Message when an error ocurred when changing an user avatar">Error. Selected image does not exist</string>
     <string name="error_changing_user_avatar" context="Message when an error ocurred when changing an user avatar">Error when changing the profile picture</string>
     <string name="success_deleting_user_avatar" context="Message when an user avatar has been deleted successfully">Profile picture deleted</string>
     <string name="error_deleting_user_avatar" context="Message when an error ocurred when deleting an user avatar">Error when deleting the profile picture</string>
@@ -1945,6 +1946,7 @@
     <string name="general_close" context="Text button">Close</string>
     <string name="general_rk" context="Text of the file name where the Recovery Key is saved. Not translate">MEGARecoveryKey.txt</string>
     <string name="backup_rk_2fa_end" context="Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process">Export your Recovery Key to finish</string>
+    <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">Two-Factor Authentication app</string>
     <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">Would you want to open Google Play to install an Authenticator App?</string>
 
 
