@@ -761,21 +761,21 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
-//*DES
-//                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
-//                    ringerTimer = new Timer();
-//                    MyRingerTask myRingerTask = new MyRingerTask();
-//                    ringerTimer.schedule(myRingerTask, 0, 500);
-//
-//                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                    long[] pattern = {0, 1000, 500, 500, 1000};
-//                    if (vibrator != null){
-//                        if (vibrator.hasVibrator()){
-//                            //FOR API>=26
-//                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
-//                            vibrator.vibrate(pattern, 0);
-//                        }
-//                    }
+
+                    ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
+                    ringerTimer = new Timer();
+                    MyRingerTask myRingerTask = new MyRingerTask();
+                    ringerTimer.schedule(myRingerTask, 0, 500);
+
+                    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    long[] pattern = {0, 1000, 500, 500, 1000};
+                    if (vibrator != null){
+                        if (vibrator.hasVibrator()){
+                            //FOR API>=26
+                            //vibrator.vibrate(createWaveform(pattern, 0), USAGE_NOTIFICATION_RINGTONE); ??
+                            vibrator.vibrate(pattern, 0);
+                        }
+                    }
 
                     if(chat.isGroup()){
                         log("onCreate()-> Incoming group call");
