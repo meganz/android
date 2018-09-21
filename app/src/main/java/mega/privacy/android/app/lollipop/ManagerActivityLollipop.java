@@ -227,6 +227,8 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
 
@@ -2032,7 +2034,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 
         if (!Util.isOnline(this)){
-        	log("No network: SHOW OFFLINE MODE");
+        	log("No network -> SHOW OFFLINE MODE");
 
 			if(drawerItem==null){
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
@@ -12935,7 +12937,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						NodeController nC = new NodeController(managerActivity);
 						nC.deleteOffline(mOff, pathNavigation);
-
+                       
+                        if(fbFLol != null && fbFLol.isAdded()){
+                            String handle = mOff.getHandle();
+                            if(handle != null && !handle.equals("")){
+                                fbFLol.refresh(Long.parseLong(handle));
+                            }
+                        }
+                        
+                        if(inSFLol != null && inSFLol.isAdded()){
+                            inSFLol.refresh();
+                        }
+                        
+                        if(outSFLol != null && outSFLol.isAdded()){
+                            outSFLol.refresh();
+                        }
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13910,6 +13926,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ac.exportMK(path, true);
 			}
 		}
+		else if(requestCode == Constants.REQUEST_CODE_FILE_INFO && resultCode == RESULT_OK){
+		    if(fbFLol != null && fbFLol.isAdded()){
+                long handle = intent.getLongExtra(NODE_HANDLE, -1);
+                fbFLol.refresh(handle);
+            }
+            
+            if(inSFLol != null && inSFLol.isAdded()){
+                inSFLol.refresh();
+            }
+            
+            if(outSFLol != null && outSFLol.isAdded()){
+                outSFLol.refresh();
+            }
+        }
 		else{
 			log("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
@@ -16876,18 +16906,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						playTransfersMenuIcon.setVisible(false);
 						cancelAllTransfersMenuItem.setVisible(false);
 					}
-
-//					showSnackbar(getString(R.string.message_transfers_completed));
 				}
-
-				if(cloudPageAdapter!=null){
-					fbFLol = (FileBrowserFragmentLollipop) cloudPageAdapter.instantiateItem(viewPagerCDrive, 0);
-					if (fbFLol != null){
-						if(fbFLol.isAdded()){
-							fbFLol.setOverviewLayout();
-						}
-					}
-				}
+                
+                if (cloudPageAdapter != null) {
+                    fbFLol = (FileBrowserFragmentLollipop)cloudPageAdapter.instantiateItem(viewPagerCDrive,0);
+                    if (fbFLol != null && fbFLol.isAdded()) {
+                        fbFLol.setOverviewLayout();
+                        fbFLol.refresh(transfer.getNodeHandle());
+                    }
+                }
+    
+				if(inSFLol != null && inSFLol.isAdded()){
+                    inSFLol.refresh();
+                }
+                
+                if(outSFLol != null && outSFLol.isAdded()){
+                    outSFLol.refresh();
+                }
 
 				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);
