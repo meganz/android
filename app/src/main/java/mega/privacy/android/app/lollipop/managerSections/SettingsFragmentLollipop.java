@@ -2052,7 +2052,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 				else{
 					log("ENABLE RB schedule");
-					((ManagerActivityLollipop)context).showRbSchedulerValueDialog();
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
 				}
 			}
 			else{
@@ -2060,7 +2060,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					((ManagerActivityLollipop)context).setRBSchedulerValue("0");
 				}
 				else{
-					((ManagerActivityLollipop)context).showRbSchedulerValueDialog();
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
 				}
 			}
 		}
@@ -2070,7 +2070,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				return false;
 			}
 
-			((ManagerActivityLollipop)context).showRbSchedulerValueDialog();
+			((ManagerActivityLollipop)context).showRbSchedulerValueDialog(false);
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
 			if (!Util.isOnline(context)){
@@ -2677,7 +2677,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
 				enableRbSchedulerCheck.setChecked(false);
-				enableRbSchedulerSwitch.setSummary(null);
+                enableRbSchedulerCheck.setSummary(null);
 				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
 			}
 
@@ -2692,11 +2692,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
 				enableRbSchedulerSwitch.setChecked(true);
 				if(myAccountInfo!=null ){
+
+					String subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle);
+
 					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
-						enableRbSchedulerSwitch.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_FREE));
+						enableRbSchedulerSwitch.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_FREE));
 					}
 					else{
-						enableRbSchedulerSwitch.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_PRO));
+						enableRbSchedulerSwitch.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_PRO));
 					}
 				}
 
@@ -2706,11 +2709,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
 				enableRbSchedulerCheck.setChecked(true);
 				if(myAccountInfo!=null ){
+					String subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle);
+
 					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
-						enableRbSchedulerCheck.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_FREE));
+						enableRbSchedulerCheck.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_FREE));
 					}
 					else{
-						enableRbSchedulerCheck.setSummary(getString(R.string.settings_rb_scheduler_enable_subtitle_PRO));
+						enableRbSchedulerCheck.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_PRO));
 					}
 				}
 
