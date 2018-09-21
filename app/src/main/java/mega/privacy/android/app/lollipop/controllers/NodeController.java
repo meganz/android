@@ -1489,14 +1489,12 @@ public class NodeController {
                             log("Navigate to TAB CLOUD first level"+ parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
-                            ((ManagerActivityLollipop) context).setTabItemCloud(0);
                         }
                         else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
-                            drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                            drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
                             log("Navigate to TAB RUBBISH first level"+ parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
-                            ((ManagerActivityLollipop) context).setTabItemCloud(1);
                         }
                         else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
                             log("Navigate to INBOX first level"+ parentIntentN.getName());
@@ -1514,15 +1512,13 @@ public class NodeController {
                                     drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
                                     log("Navigate to TAB CLOUD with parentHandle");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
-                                    ((ManagerActivityLollipop) context).setTabItemCloud(0);
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 1:{
                                     log("Navigate to TAB RUBBISH");
-                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
                                     ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
-                                    ((ManagerActivityLollipop) context).setTabItemCloud(1);
                                     firstNavigationLevel=false;
                                     break;
                                 }
@@ -1537,7 +1533,6 @@ public class NodeController {
                                     drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
                                     log("Navigate to TAB CLOUD general");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(-1);
-                                    ((ManagerActivityLollipop) context).setTabItemCloud(0);
                                     firstNavigationLevel=true;
                                     break;
                                 }
@@ -1571,7 +1566,6 @@ public class NodeController {
                         log("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
                         ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                         drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
-                        ((ManagerActivityLollipop) context).setTabItemCloud(0);
                         firstNavigationLevel=true;
                         break;
                     }

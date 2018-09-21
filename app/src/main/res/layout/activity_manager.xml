@@ -38,21 +38,12 @@
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     tools:context=".ManagerActivityLollipop" />
 
-
-                    <android.support.design.widget.TabLayout
-                        android:id="@+id/sliding_tabs_cloud_drive"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/mega"
-                        style="@style/MyCustomTabLayout"/>
-
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
-
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_shares"
