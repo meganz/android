@@ -20,11 +20,11 @@
 	</RelativeLayout>
 
 	<ScrollView
+		android:id="@+id/scroll_view_upgrade"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@android:color/transparent"
-		android:layout_below="@+id/title_my_account_type"
-		android:id="@+id/scroll_view_upgrade">
+		android:layout_below="@+id/title_my_account_type">
 		<LinearLayout
 			android:id="@+id/linear_layout_upgrade"
 			android:layout_width="match_parent"
@@ -528,7 +528,6 @@
 					android:textSize="11sp"/>
 			</RelativeLayout>
 		</LinearLayout>
-
 
 	</ScrollView>
 

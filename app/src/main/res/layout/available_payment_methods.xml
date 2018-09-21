@@ -1,60 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="232dp"
     android:id="@+id/select_payments_layout">
 
     <RelativeLayout
         android:id="@+id/payment_layout_select_inside"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/card_corner"
-        android:gravity="center">
+        android:paddingLeft="16dp"
+        android:paddingTop="24dp"
+        android:background="@drawable/card_corner">
+
+        <TextView
+            android:id="@+id/payment_text_payment_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textAllCaps="true"
+            android:layout_gravity="left"
+            android:layout_marginBottom="24dp"
+            android:text="Lite"/>
 
         <TextView
             android:id="@+id/payment_text_payment_method"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/payment_text_payment_title"
             android:text="@string/select_payment_method"
-            android:textAllCaps="true"
             android:textSize="16sp"
-            android:textColor="@color/lollipop_primary_color"
-            android:layout_centerHorizontal="true"/>
+            android:textColor="@color/mail_my_account"
+            android:layout_gravity="left"/>
 
     </RelativeLayout>
-
     <RelativeLayout
         android:id="@+id/payment_method_google_wallet"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="70dp"
         android:background="@drawable/card_corner">
 
         <ImageView
             android:id="@+id/payment_method_google_wallet_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/google_wallet_ic"/>
+            android:src="@drawable/google_wallet_ic"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/payment_method_google_wallet_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="@string/payment_method_google_wallet"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/payment_method_google_wallet_icon"/>
+            android:layout_toRightOf="@id/payment_method_google_wallet_icon"
+            android:text="@string/payment_method_google_wallet"
+            android:textSize="17sp" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/payment_method_credit_card"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="70dp"
         android:background="@drawable/card_corner">
 
         <ImageView
             android:id="@+id/payment_method_credit_card_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_centerVertical="true"
             android:src="@drawable/cc_ic"/>
 
         <TextView
@@ -70,13 +84,14 @@
     <RelativeLayout
         android:id="@+id/payment_method_fortumo"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="70dp"
         android:background="@drawable/card_corner">
 
         <ImageView
             android:id="@+id/payment_method_fortumo_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_centerVertical="true"
             android:src="@drawable/fortumo_ic"/>
 
         <TextView
@@ -92,13 +107,14 @@
     <RelativeLayout
         android:id="@+id/payment_method_centili"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="70dp"
         android:background="@drawable/card_corner">
 
         <ImageView
             android:id="@+id/payment_method_centili_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_centerVertical="true"
             android:src="@drawable/centili_ic"/>
 
         <TextView
@@ -111,17 +127,17 @@
             android:layout_toRightOf="@id/payment_method_centili_icon"/>
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/close_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/close_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
-        <ImageView
-            android:id="@+id/close_layout_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/ic_collapse"/>
-    </RelativeLayout>
+        <!--<ImageView-->
+            <!--android:id="@+id/close_layout_icon"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:src="@drawable/ic_collapse"/>-->
+    <!--</RelativeLayout>-->
 
 </LinearLayout>
