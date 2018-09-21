@@ -68,11 +68,14 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     private Bitmap bitmap = null;
     private ByteBuffer byteBuffer = null;
     private SurfaceHolder surfaceHolder;
+
     // Rect of the source bitmap to draw
     private Rect srcRect = new Rect();
+
     // Rect of the destination canvas to draw to
     private Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
+
     Paint paint;
     PorterDuffXfermode modesrcover;
     PorterDuffXfermode modesrcin;
@@ -110,13 +113,13 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        log("surfaceCreated()");
+        log("**** surfaceCreated()");
 
         Canvas canvas = holder.lockCanvas();
         if(canvas != null) {
             Rect dst = holder.getSurfaceFrame();
             if(dst != null) {
-                notifyStateToAll();
+//                notifyStateToAll();
                 changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
                 Logging.d(TAG, "ViESurfaceRender::surfaceCreated" +
                         " dst.left:" + dst.left +
@@ -155,7 +158,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        log("surfaceDestroyed(): ");
+        log("****** surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
         byteBuffer = null;
@@ -176,26 +179,36 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         }
 
         if(height == width){
+
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             srcRect.top = 0;
             srcRect.bottom = height;
             srcRect.left = 0;
             srcRect.right = width;
+            log("CreateBitmap(): width == height. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+
 
         }else if(height > width){
+
             int newHeight = width;
             bitmap = Bitmap.createBitmap(width, newHeight, Bitmap.Config.ARGB_8888);
             srcRect.top = 0;
             srcRect.bottom = newHeight;
             srcRect.left = 0;
             srcRect.right = width;
+            log("CreateBitmap(): height > width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+
         }else{
+            log("CreateBitmap(): height < width");
+
             int newWidth = height;
             bitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888);
             srcRect.left = 0;
             srcRect.right = newWidth;
             srcRect.top = 0;
             srcRect.bottom = height;
+            log("CreateBitmap(): height < width. sRect(T "+srcRect.top+" -B "+srcRect.bottom+")(L "+srcRect.left+" - R "+srcRect.right+")");
+
         }
         return bitmap;
     }
@@ -229,16 +242,21 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     private void notifyStateToAll() {
+        log("notifyStateToAll()");
         for(MegaSurfaceRendererGroupListener listener : listeners)
             notifyState(listener);
     }
 
     public void addListener(MegaSurfaceRendererGroupListener l) {
+        log("addListener()");
+
         listeners.add(l);
         notifyState(l);
     }
 
     private void notifyState(MegaSurfaceRendererGroupListener listener) {
+        log("notifyState()");
+
         if(listener == null)
             return;
         listener.resetSize(handleUser);

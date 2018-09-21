@@ -1,9 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/general"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/green_free_account">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/black">
 
     <!--Surface view-->
     <RelativeLayout
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:background="@android:color/holo_blue_light"
+        android:background="@android:color/transparent"
         android:visibility="gone">
 
         <!--Big Avatar-->
@@ -35,7 +35,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:background="@android:color/holo_orange_dark">
+            android:background="@android:color/transparent">
 
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/avatar_image"

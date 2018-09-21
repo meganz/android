@@ -139,7 +139,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     Toolbar tB;
     ActionBar aB;
     boolean avatarRequested = false;
-    InfoPeerGroupCall peerSelected = null;
+//    InfoPeerGroupCall peerSelected = null;
 
     ArrayList<InfoPeerGroupCall> peersOnCall = new ArrayList<>();
     ArrayList<InfoPeerGroupCall> peersBeforeCall = new ArrayList<>();
@@ -198,13 +198,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     private LocalCameraCallFullScreenFragment localCameraFragmentFS = null;
     private RemoteCameraCallFullScreenFragment remoteCameraFragmentFS = null;
 
-    //Big elements for group call (more than 6 users)
-    FrameLayout fragmentContainerBigCameraGroupCall;
-    ViewGroup parentBigCameraGroupCall;
-    private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
-    RelativeLayout bigAvatarGroupCallLayout;
-    RoundedImageView bigAvatarGroupCallImage;
-    TextView bigAvatarGroupCallInitialLetter;
+//    //Big elements for group call (more than 6 users)
+//    FrameLayout fragmentContainerBigCameraGroupCall;
+//    ViewGroup parentBigCameraGroupCall;
+//    private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
+//    RelativeLayout bigAvatarGroupCallLayout;
+//    RoundedImageView bigAvatarGroupCallImage;
+//    TextView bigAvatarGroupCallInitialLetter;
 
     private SensorManager mSensorManager;
     private Sensor mSensor;
@@ -329,6 +329,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
                         if (!peerContain) {
                             if(userHandle == megaChatApi.getMyUserHandle()){
+                                log("updateScreenStatusInProgress()-peersOnCall.add("+megaChatApi.getMyFullname()+")-> ME");
+
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                                 peersOnCall.add(myPeer);
                                 changes = true;
@@ -336,6 +338,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                                 if(userSession!=null){
                                     if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
+                                        log("updateScreenStatusInProgress()-peersOnCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
                                         InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), null, null);
                                         peersOnCall.add(0, userPeer);
                                         changes = true;
@@ -432,7 +435,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        log("onNewIntent");
+        log("onNewIntent()");
 
         Bundle extras = intent.getExtras();
         log(getIntent().getAction());
@@ -441,8 +444,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             log("New chat id: "+newChatId);
             if(chatId==newChatId){
                 log("Its the same call");
-            }
-            else{
+            }else{
                 log("New intent to the activity with a new chatId");
                 //Check the new call if in progress
                 chatId = newChatId;
@@ -464,7 +466,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        log("onCreate");
+        log("onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calls_chat);
 
@@ -628,31 +630,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         bigRecyclerView = (RecyclerView) findViewById(R.id.big_recycler_view_cameras);
         bigRecyclerView.setLayoutManager(layoutManager);
-
+        bigRecyclerView.setClipToPadding(false);
+        bigRecyclerView.setHasFixedSize(true);
         bigRecyclerView.setVisibility(GONE);
 
-        //Big elements group calls
-        parentBigCameraGroupCall = (ViewGroup) findViewById(R.id.parent_layout_big_camera_group_call);
-        ViewGroup.LayoutParams paramsBigCameraGroupCall = (ViewGroup.LayoutParams) parentBigCameraGroupCall.getLayoutParams();
-        if(widthScreenPX<heightScreenPX){
-            paramsBigCameraGroupCall.width = (int)widthScreenPX;
-            paramsBigCameraGroupCall.height = (int)widthScreenPX;
-        }else{
-            paramsBigCameraGroupCall.width = (int)heightScreenPX;
-            paramsBigCameraGroupCall.height = (int)heightScreenPX;
-        }
-
-        parentBigCameraGroupCall.setLayoutParams(paramsBigCameraGroupCall);
-
-        fragmentContainerBigCameraGroupCall = (FrameLayout) findViewById(R.id.fragment_container_big_camera_group_call);
-        fragmentContainerBigCameraGroupCall.setVisibility(View.GONE);
-
-        bigAvatarGroupCallLayout = (RelativeLayout) findViewById(R.id.big_camera_group_call_avatar_rl);
-        bigAvatarGroupCallImage = (RoundedImageView) findViewById(R.id.big_camera_group_call_image);
-        bigAvatarGroupCallInitialLetter = (TextView) findViewById(R.id.big_camera_group_call_initial_letter);
-        bigAvatarGroupCallLayout.setVisibility(View.GONE);
-
-        parentBigCameraGroupCall.setVisibility(View.GONE);
+//        //Big elements group calls
+//        parentBigCameraGroupCall = (ViewGroup) findViewById(R.id.parent_layout_big_camera_group_call);
+//        ViewGroup.LayoutParams paramsBigCameraGroupCall = (ViewGroup.LayoutParams) parentBigCameraGroupCall.getLayoutParams();
+//        if(widthScreenPX<heightScreenPX){
+//            paramsBigCameraGroupCall.width = (int)widthScreenPX;
+//            paramsBigCameraGroupCall.height = (int)widthScreenPX;
+//        }else{
+//            paramsBigCameraGroupCall.width = (int)heightScreenPX;
+//            paramsBigCameraGroupCall.height = (int)heightScreenPX;
+//        }
+//
+//        parentBigCameraGroupCall.setLayoutParams(paramsBigCameraGroupCall);
+//
+//        fragmentContainerBigCameraGroupCall = (FrameLayout) findViewById(R.id.fragment_container_big_camera_group_call);
+//        fragmentContainerBigCameraGroupCall.setVisibility(View.GONE);
+//
+//        bigAvatarGroupCallLayout = (RelativeLayout) findViewById(R.id.big_camera_group_call_avatar_rl);
+//        bigAvatarGroupCallImage = (RoundedImageView) findViewById(R.id.big_camera_group_call_image);
+//        bigAvatarGroupCallInitialLetter = (TextView) findViewById(R.id.big_camera_group_call_initial_letter);
+//        bigAvatarGroupCallLayout.setVisibility(View.GONE);
+//
+//        parentBigCameraGroupCall.setVisibility(View.GONE);
 
         //Local camera small
         parentLocal = (ViewGroup) findViewById(R.id.parent_layout_local_camera);
@@ -794,8 +797,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             boolean changes = false;
                             for(int i = 0; i < callChat.getParticipants().size(); i++){
                                 long userHandle = callChat.getParticipants().get(i);
-
-                                log("onCreate()-Incoming Call: peersBeforeCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
                                 InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, null, null);
                                 peersBeforeCall.add(0, userPeer);
                                 changes = true;
@@ -851,7 +852,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             peersBeforeCall.clear();
                         }
 
-                        log("onCreate()-OutgoingCall: peersOnCall.add("+megaChatApi.getMyFullname()+")");
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null, null);
                         peersOnCall.add(myPeer);
                         createNewAdapter(true);
@@ -1162,21 +1162,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     protected void onResume() {
-        log("onResume");
+        log("onResume()");
         if(peersOnCall!=null){
             if(peersOnCall.size()!=0){
-                for(InfoPeerGroupCall peer :peersOnCall){
-                    if(peer.getListener()!=null){
-                        if(peer.getListener().getHeight() != 0){
-                            peer.getListener().setHeight(0);
+                if(peersOnCall.size()<7){
+                    for(InfoPeerGroupCall peer :peersOnCall){
+                        if(peer.getListener()!=null){
+                            if(peer.getListener().getHeight() != 0){
+                                peer.getListener().setHeight(0);
+                            }
+                            if(peer.getListener().getWidth() != 0){
+                                peer.getListener().setWidth(0);
+                            }
                         }
-                        if(peer.getListener().getWidth() != 0){
+                    }
+                }else{
+                    for(InfoPeerGroupCall peer :peersOnCall){
+                        if(peer.getListener()!=null){
+                            peer.getListener().setHeight(0);
                             peer.getListener().setWidth(0);
                         }
                     }
                 }
+
             }
         }
+
 
         super.onResume();
 //        adapter.notifyDataSetChanged();
@@ -1192,7 +1203,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onDestroy(){
-        log("onDestroy");
+        log("onDestroy()");
 
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
@@ -1352,9 +1363,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 int callStatus = callChat.getStatus();
                 switch (callStatus){
                     case MegaChatCall.CALL_STATUS_IN_PROGRESS:{
-                        log("CALL_STATUS_IN_PROGRESS");
 
                         if(chat.isGroup()){
+                            log("CALL_STATUS_IN_PROGRESS");
 
                             if((peersBeforeCall != null)&&(peersBeforeCall.size() != 0)){
                                 peersBeforeCall.clear();
@@ -1369,16 +1380,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     }
                                 }
                                 if(!peerContain){
-                                    log("CALL_STATUS_IN_PROGRESS- peersOnCall.add("+megaChatApi.getMyFullname()+")");
                                     InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null,null);
                                     peersOnCall.add(myPeer);
+                                    log("createNewAdapter() -> change my status to IN PROGRESS");
                                     createNewAdapter(true);
                                 }
                             }else{
-                                log("CALL_STATUS_IN_PROGRESS- peersOnCall.add("+megaChatApi.getMyFullname()+")");
                                 InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), null,null);
                                 peersOnCall.add(myPeer);
-                                createNewAdapter(true);
+//                                createNewAdapter(true);
                             }
                             updateLocalVideoStatus();
                             updateLocalAudioStatus();
@@ -1468,11 +1478,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     MegaChatSession userSession = callChat.getMegaChatSession(userHandle);
                     if(userSession != null){
                         if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_IN_PROGRESS){
+                            log("SESSION_STATUS_IN_PROGRESS");
 
                             updateSubTitle();
 
                             //contact joined the group call
+                            log(chat.getPeerFullnameByHandle(userHandle)+" joined in the group call");
+                            boolean changes = false;
+
                             if((peersOnCall != null)&&(peersOnCall.size() != 0)){
+
                                 boolean peerContain = false;
                                 for(InfoPeerGroupCall peer : peersOnCall) {
                                     if (peer.getHandle().equals(userHandle)) {
@@ -1481,26 +1496,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     }
                                 }
                                 if(!peerContain){
-                                    log("CHANGE_TYPE_SESSION_STATUS: peersOnCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
+
                                     InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), userSession.hasVideo(), userSession.hasAudio(), null, null);
                                     peersOnCall.add(0, userPeer);
+                                    changes = true;
+                                }
+                                if(changes){
                                     createNewAdapter(true);
                                 }
                             }
 
                         }else if(userSession.getStatus()==MegaChatSession.SESSION_STATUS_DESTROYED){
+                            log("SESSION_STATUS_DESTROYED");
 
                             updateSubTitle();
 
                             //contact left the group call
                             log(chat.getPeerFullnameByHandle(userHandle)+" left the group call");
                             boolean changes = false;
-                            for(int i=0;i<peersOnCall.size();i++){
-                                if(peersOnCall.get(i).getHandle() == userHandle){
-                                    log("CHANGE_TYPE_SESSION_STATUS: peersOnCall.remove("+chat.getPeerFullnameByHandle(userHandle)+")");
-                                    peersOnCall.remove(i);
-                                    changes = true;
-                                    break;
+                            if((peersOnCall != null)&&(peersOnCall.size() != 0)){
+
+                                for(int i=0;i<peersOnCall.size();i++){
+                                    if(peersOnCall.get(i).getHandle() == userHandle){
+                                        peersOnCall.remove(i);
+                                        changes = true;
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1530,7 +1551,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_REMOTE_AVFLAGS)){
-                log("CHANGE_TYPE_REMOTE_AVFLAGS");
+                log("onChatCallUpdate()-CHANGE_TYPE_REMOTE_AVFLAGS");
                 if(chat.isGroup()){
                     updateRemoteVideoStatus(call.getPeerSessionStatusChange());
                     updateRemoteAudioStatus(call.getPeerSessionStatusChange());
@@ -1543,15 +1564,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
             }
             else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)){
-                log("CHANGE_TYPE_LOCAL_AVFLAGS");
+                log("onChatCallUpdate()-CHANGE_TYPE_LOCAL_AVFLAGS");
                 updateLocalAudioStatus();
                 updateLocalVideoStatus();
 
             }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)){
-                log("CHANGE_TYPE_RINGING_STATUS");
+                log("onChatCallUpdate()-CHANGE_TYPE_RINGING_STATUS");
 
             }else if(call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION)){
-                log("CHANGE_TYPE_CALL_COMPOSITION");
+                log("onChatCallUpdate()-CHANGE_TYPE_CALL_COMPOSITION");
                 if(call.getStatus() ==  MegaChatCall.CALL_STATUS_RING_IN){
 
                     if((peersBeforeCall!=null)&&(peersBeforeCall.size()!=0)){
@@ -1559,8 +1580,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
 
                     boolean isMe = false;
-                    for(InfoPeerGroupCall peer : peersBeforeCall) {
-                        if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
+                    for(int i = 0; i < call.getParticipants().size(); i++){
+                        Long userHandle = call.getParticipants().get(i);
+                        if (userHandle.equals(megaChatApi.getMyUserHandle())) {
                             isMe = true;
                             break;
                         }
@@ -1572,7 +1594,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         for(int i = 0; i < call.getParticipants().size(); i++){
                             long userHandle = call.getParticipants().get(i);
 
-                            log("CHANGE_TYPE_CALL_COMPOSITION: peersBeforeCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
+                            log("onChatCallUpdate()-peersBeforeCall.add("+chat.getPeerFullnameByHandle(userHandle)+")");
                             InfoPeerGroupCall userPeer = new InfoPeerGroupCall(userHandle,  chat.getPeerFullnameByHandle(userHandle), false, false, null,null);
                             peersBeforeCall.add(0, userPeer);
                             changes = true;
@@ -1663,8 +1685,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("onClick");
 
         switch (v.getId()) {
-            case R.id.call_chat_contact_image_rl:
-            case R.id.parent_layout_big_camera_group_call:{
+            case R.id.call_chat_contact_image_rl:{
+//            case R.id.parent_layout_big_camera_group_call:{
                 remoteCameraClick();
                 break;
             }
@@ -2145,9 +2167,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     for(int i=0;i<peersOnCall.size();i++){
                         if(peersOnCall.get(i).getHandle().equals(userHandle)){
                             if(!peersOnCall.get(i).isVideoOn()){
-                                log("remove Remote Video for "+peersOnCall.get(i).getName()+" camera TRUE");
+                                log("activate Remote Video for "+peersOnCall.get(i).getName()+" camera TRUE");
                                 peersOnCall.get(i).setVideoOn(true);
                                 adapter.notifyItemChanged(i);
+                                break;
                             }
 //                            if(peerSelected!=null){
 //                                log("updateRemoteVideoStatus()-> peerSelected.getHandle(): "+peerSelected.getHandle()+", userHandle: "+userHandle);
@@ -2156,7 +2179,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                                    createBigFragment(peerSelected.getHandle());
 //                                }
 //                            }
-                            break;
+//                            break;
                         }
                     }
                 }
@@ -2169,6 +2192,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 log("remove Remote Video for "+peersOnCall.get(i).getName()+" camera FALSE");
                                 peersOnCall.get(i).setVideoOn(false);
                                 adapter.notifyItemChanged(i);
+                                break;
                             }
 //                            if(peerSelected != null){
 //                                log("updateRemoteVideoStatus()-> peerSelected.getHandle(): "+peerSelected.getHandle()+", userHandle: "+userHandle);
@@ -2177,7 +2201,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                                    removeBigFragment(peerSelected.getHandle(), peerSelected.getName());
 //                                }
 //                            }
-                            break;
+//                            break;
                         }
                     }
                 }
@@ -2473,21 +2497,30 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void createNewAdapter(boolean flag){
-        log("createNewAdapter");
+        log("createNewAdapter()");
 
         if(flag){
+
             //arrayList-> peersOnCall
             if(peersOnCall.size() < 7){
+
                 bigRecyclerView.setAdapter(null);
                 bigRecyclerView.setVisibility(GONE);
-                parentBigCameraGroupCall.setOnClickListener(null);
-                parentBigCameraGroupCall.setVisibility(View.GONE);
+//                parentBigCameraGroupCall.setOnClickListener(null);
+//                parentBigCameraGroupCall.setVisibility(View.GONE);
 
-                if(peersOnCall.size() <= 4){
+                if(peersOnCall.size() < 4){
                     ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     params.height = ViewGroup.LayoutParams.MATCH_PARENT;
                     recyclerView.setLayoutParams(params);
+
+                }else if(peersOnCall.size()==4){
+                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    params.height = Util.scaleWidthPx(360, outMetrics);
+                    recyclerView.setLayoutParams(params);
+
                 }else{
                     ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -2502,7 +2535,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 recyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag,null);
+//                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag,null);
+                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag);
                 recyclerView.setAdapter(adapter);
                 if (adapter.getItemCount() == 0){
                     recyclerView.setVisibility(View.GONE);
@@ -2513,24 +2547,28 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }else{
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
-                parentBigCameraGroupCall.setOnClickListener(this);
-                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
-
+//                parentBigCameraGroupCall.setOnClickListener(this);
+//                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+//                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag,null);
                 bigRecyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag, new CustomItemClickListener(){
-                    @Override
-                    public void onItemClick(int position) {
+
+                adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
+
+//                bigRecyclerView.setAdapter(null);
+//                adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag, new CustomItemClickListener(){
+//                    @Override-̣
+//                    public void onItemClick(int position) {
                         // do what ever you want to do with it
-                        peerSelected = adapter.getNodeAt(position);
+//                        peerSelected = adapter.getNodeAt(position);
 //                        if(peerSelected.getHandle().equals(megaChatApi.getMyUserHandle())){
 //                            updateLocalVideoStatus();
 //                        }else{
 //                            updateRemoteVideoStatus(peerSelected.getHandle());
 //
 //                        }
-
-                    }
-                });
+//
+//                    }
+//                });
                 bigRecyclerView.setAdapter(adapter);
 
                 if (adapter.getItemCount() == 0){
@@ -2541,21 +2579,41 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
         }else{
-            parentBigCameraGroupCall.setVisibility(View.GONE);
+
+//            parentBigCameraGroupCall.setVisibility(View.GONE);
 
             //arrayList-> peersBeforeCall
             if(peersBeforeCall.size() < 7) {
 
                 bigRecyclerView.setAdapter(null);
                 bigRecyclerView.setVisibility(GONE);
-                parentBigCameraGroupCall.setOnClickListener(null);
-                parentBigCameraGroupCall.setVisibility(View.GONE);
+//                parentBigCameraGroupCall.setOnClickListener(null);
+//                parentBigCameraGroupCall.setVisibility(View.GONE);
 
-                if(peersBeforeCall.size() <= 4){
+//                if(peersBeforeCall.size() <= 4){
+//                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+//                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+//                    params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//                    recyclerView.setLayoutParams(params);
+//                }else{
+//                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+//                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+//                    params.height = Util.scaleWidthPx(540, outMetrics);
+//                    recyclerView.setLayoutParams(params);
+//                }
+
+                if(peersBeforeCall.size() < 4){
                     ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     params.height = ViewGroup.LayoutParams.MATCH_PARENT;
                     recyclerView.setLayoutParams(params);
+
+                }else if(peersBeforeCall.size()==4){
+                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    params.height = Util.scaleWidthPx(360, outMetrics);
+                    recyclerView.setLayoutParams(params);
+
                 }else{
                     ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -2567,10 +2625,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     recyclerView.setColumnWidth((int) widthScreenPX);
                 }else if((peersBeforeCall.size() > 3)&&(peersBeforeCall.size() <= 6)){
                     recyclerView.setColumnWidth((int) widthScreenPX/2);
+
                 }
 
                 recyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag, null);
+//                adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag, null);
+                adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag);
+
                 recyclerView.setAdapter(adapter);
                 if (adapter.getItemCount() == 0){
                     recyclerView.setVisibility(View.GONE);
@@ -2579,15 +2640,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
-                log("createNewAdapter() - peersBeforeCall:  "+peersBeforeCall.size()+" >= 7");
-
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
-                parentBigCameraGroupCall.setOnClickListener(null);
-                parentBigCameraGroupCall.setVisibility(View.GONE);
+//                parentBigCameraGroupCall.setOnClickListener(null);
+//                parentBigCameraGroupCall.setVisibility(View.GONE);
 
                 bigRecyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag, null);
+//                adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag, null);
+                adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
+
                 bigRecyclerView.setAdapter(adapter);
 
                 if (adapter.getItemCount() == 0){
@@ -2601,217 +2662,217 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     }
 
-    public void createBigFragment(Long handle){
-        log("createBigFragment()");
-        if(bigCameraGroupCallFragment != null){
-            log("REMOVE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment.setVideoFrame(false);
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(bigCameraGroupCallFragment);
-            bigCameraGroupCallFragment = null;
-        }
+//    public void createBigFragment(Long handle){
+//        log("createBigFragment()");
+//        if(bigCameraGroupCallFragment != null){
+//            log("REMOVE bigCameraGroupCallFragment");
+//            bigCameraGroupCallFragment.setVideoFrame(false);
+//            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+//            ftFS.remove(bigCameraGroupCallFragment);
+//            bigCameraGroupCallFragment = null;
+//        }
+//
+//        //Camera
+//        if(bigCameraGroupCallFragment == null){
+//            log("CREATE bigCameraGroupCallFragment");
+//            bigCameraGroupCallFragment = BigCameraGroupCallFragment.newInstance(chatId, handle);
+//            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+//            ftFS.replace(R.id.fragment_container_big_camera_group_call, bigCameraGroupCallFragment, "bigCameraGroupCallFragment");
+//            ftFS.commitNowAllowingStateLoss();
+//        }
+//        fragmentContainerBigCameraGroupCall.setVisibility(View.VISIBLE);
+//
+//        //Avatar
+//        bigAvatarGroupCallLayout.setVisibility(View.GONE);
+//
+//        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+//
+//    }
 
-        //Camera
-        if(bigCameraGroupCallFragment == null){
-            log("CREATE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment = BigCameraGroupCallFragment.newInstance(chatId, handle);
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.replace(R.id.fragment_container_big_camera_group_call, bigCameraGroupCallFragment, "bigCameraGroupCallFragment");
-            ftFS.commitNowAllowingStateLoss();
-        }
-        fragmentContainerBigCameraGroupCall.setVisibility(View.VISIBLE);
+//    public void removeBigFragment(Long handle, String fullName){
+//
+//        //Camera
+//        if (bigCameraGroupCallFragment != null) {
+//            log("REMOVE bigCameraGroupCallFragment");
+//            bigCameraGroupCallFragment.setVideoFrame(false);
+//            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
+//            ftFS.remove(bigCameraGroupCallFragment);
+//            bigCameraGroupCallFragment = null;
+//        }
+//        fragmentContainerBigCameraGroupCall.setVisibility(View.GONE);
+//
+//        //Avatar
+//        if(handle.equals(megaChatApi.getMyUserHandle())){
+//            setProfileMyAvatarGroupCall();
+//        }else{
+//            setProfileContactAvatarGroupCall(handle,fullName);
+//        }
+//        bigAvatarGroupCallLayout.setVisibility(View.VISIBLE);
+//
+//        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+//    }
+//
+//    public void setProfileMyAvatarGroupCall() {
+//        log("setProfileMyAvatarGroupCall");
+//        Bitmap myBitmap = null;
+//        File avatar = null;
+//        if (context != null) {
+//            log("context is not null");
+//            if (context.getExternalCacheDir() != null) {
+//                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
+//            } else {
+//                avatar = new File(context.getCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
+//            }
+//        }
+//        if (avatar.exists()) {
+//            if (avatar.length() > 0) {
+//                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+//                bOpts.inPurgeable = true;
+//                bOpts.inInputShareable = true;
+//                myBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+//                myBitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, myBitmap, 3);
+//                if (myBitmap != null) {
+//                    bigAvatarGroupCallImage.setImageBitmap(myBitmap);
+//                    bigAvatarGroupCallInitialLetter.setVisibility(GONE);
+//                }else{
+//                    createMyDefaultAvatarGroupCall();
+//                }
+//            }else {
+//                createMyDefaultAvatarGroupCall();
+//            }
+//        }else {
+//            createMyDefaultAvatarGroupCall();
+//        }
+//    }
 
-        //Avatar
-        bigAvatarGroupCallLayout.setVisibility(View.GONE);
+//    public void createMyDefaultAvatarGroupCall() {
+//        log("createMyDefaultAvatarGroupCall");
+//        String myFullName = megaChatApi.getMyFullname();
+//        String myFirstLetter = myFullName.charAt(0) + "";
+//        myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
+//        long userHandle = megaChatApi.getMyUserHandle();
+//
+//        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+//        Canvas c = new Canvas(defaultAvatar);
+//        Paint p = new Paint();
+//        p.setAntiAlias(true);
+//        p.setColor(Color.TRANSPARENT);
+//
+//        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
+//        if (color != null) {
+//            p.setColor(Color.parseColor(color));
+//        }else {
+//            p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+//        }
+//
+//        int radius;
+//        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
+//            radius = defaultAvatar.getWidth() / 2;
+//        }else {
+//            radius = defaultAvatar.getHeight() / 2;
+//        }
+//        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+//        bigAvatarGroupCallImage.setImageBitmap(defaultAvatar);
+//        bigAvatarGroupCallInitialLetter.setText(myFirstLetter);
+//        bigAvatarGroupCallInitialLetter.setVisibility(View.VISIBLE);
+//    }
 
-        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+//    public void setProfileContactAvatarGroupCall(long userHandle,  String fullName){
+//        log("setProfileContactAvatarGroupCall");
+//        Bitmap bitmap = null;
+//        File avatar = null;
+//        String contactMail = megaChatApi.getContactEmail(userHandle);
+//        if (context.getExternalCacheDir() != null) {
+//            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
+//        } else {
+//            avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
+//        }
+//
+//        if (avatar.exists()) {
+//            if (avatar.length() > 0) {
+//                BitmapFactory.Options bOpts = new BitmapFactory.Options();
+//                bOpts.inPurgeable = true;
+//                bOpts.inInputShareable = true;
+//                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+//                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
+//                if (bitmap != null) {
+//                    bigAvatarGroupCallImage.setVisibility(View.VISIBLE);
+//                    bigAvatarGroupCallImage.setImageBitmap(bitmap);
+//                    bigAvatarGroupCallInitialLetter.setVisibility(GONE);
+//                }else{
+//                    UserAvatarListener listener = new UserAvatarListener(context);
+//                    avatar.delete();
+//                    if(!avatarRequested){
+//                        avatarRequested = true;
+//                        if (context.getExternalCacheDir() != null){
+//                            megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+//                        }
+//                        else{
+//                            megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+//                        }
+//                    }
+//
+//                    createDefaultAvatarGroupCall(userHandle, fullName);
+//                }
+//            }else{
+//                UserAvatarListener listener = new UserAvatarListener(context);
+//
+//                if(!avatarRequested){
+//                    avatarRequested = true;
+//                    if (context.getExternalCacheDir() != null){
+//                        megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+//                    }
+//                    else{
+//                        megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+//                    }
+//                }
+//
+//                createDefaultAvatarGroupCall(userHandle, fullName);
+//            }
+//        }else{
+//            UserAvatarListener listener = new UserAvatarListener(context);
+//
+//            if(!avatarRequested){
+//                avatarRequested = true;
+//                if (context.getExternalCacheDir() != null){
+//                    megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+//                }
+//                else{
+//                    megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
+//                }
+//            }
+//            createDefaultAvatarGroupCall(userHandle, fullName);
+//        }
+//    }
 
-    }
-
-    public void removeBigFragment(Long handle, String fullName){
-
-        //Camera
-        if (bigCameraGroupCallFragment != null) {
-            log("REMOVE bigCameraGroupCallFragment");
-            bigCameraGroupCallFragment.setVideoFrame(false);
-            FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
-            ftFS.remove(bigCameraGroupCallFragment);
-            bigCameraGroupCallFragment = null;
-        }
-        fragmentContainerBigCameraGroupCall.setVisibility(View.GONE);
-
-        //Avatar
-        if(handle.equals(megaChatApi.getMyUserHandle())){
-            setProfileMyAvatarGroupCall();
-        }else{
-            setProfileContactAvatarGroupCall(handle,fullName);
-        }
-        bigAvatarGroupCallLayout.setVisibility(View.VISIBLE);
-
-        parentBigCameraGroupCall.setVisibility(View.VISIBLE);
-    }
-
-    public void setProfileMyAvatarGroupCall() {
-        log("setProfileMyAvatarGroupCall");
-        Bitmap myBitmap = null;
-        File avatar = null;
-        if (context != null) {
-            log("context is not null");
-            if (context.getExternalCacheDir() != null) {
-                avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
-            } else {
-                avatar = new File(context.getCacheDir().getAbsolutePath(), megaChatApi.getMyEmail() + ".jpg");
-            }
-        }
-        if (avatar.exists()) {
-            if (avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                myBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                myBitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, myBitmap, 3);
-                if (myBitmap != null) {
-                    bigAvatarGroupCallImage.setImageBitmap(myBitmap);
-                    bigAvatarGroupCallInitialLetter.setVisibility(GONE);
-                }else{
-                    createMyDefaultAvatarGroupCall();
-                }
-            }else {
-                createMyDefaultAvatarGroupCall();
-            }
-        }else {
-            createMyDefaultAvatarGroupCall();
-        }
-    }
-
-    public void createMyDefaultAvatarGroupCall() {
-        log("createMyDefaultAvatarGroupCall");
-        String myFullName = megaChatApi.getMyFullname();
-        String myFirstLetter = myFullName.charAt(0) + "";
-        myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
-        long userHandle = megaChatApi.getMyUserHandle();
-
-        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setColor(Color.TRANSPARENT);
-
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
-        if (color != null) {
-            p.setColor(Color.parseColor(color));
-        }else {
-            p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-        }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-            radius = defaultAvatar.getWidth() / 2;
-        }else {
-            radius = defaultAvatar.getHeight() / 2;
-        }
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        bigAvatarGroupCallImage.setImageBitmap(defaultAvatar);
-        bigAvatarGroupCallInitialLetter.setText(myFirstLetter);
-        bigAvatarGroupCallInitialLetter.setVisibility(View.VISIBLE);
-    }
-
-    public void setProfileContactAvatarGroupCall(long userHandle,  String fullName){
-        log("setProfileContactAvatarGroupCall");
-        Bitmap bitmap = null;
-        File avatar = null;
-        String contactMail = megaChatApi.getContactEmail(userHandle);
-        if (context.getExternalCacheDir() != null) {
-            avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        } else {
-            avatar = new File(context.getCacheDir().getAbsolutePath(), contactMail + ".jpg");
-        }
-
-        if (avatar.exists()) {
-            if (avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                bOpts.inPurgeable = true;
-                bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                bitmap = ThumbnailUtilsLollipop.getRoundedRectBitmap(context, bitmap, 3);
-                if (bitmap != null) {
-                    bigAvatarGroupCallImage.setVisibility(View.VISIBLE);
-                    bigAvatarGroupCallImage.setImageBitmap(bitmap);
-                    bigAvatarGroupCallInitialLetter.setVisibility(GONE);
-                }else{
-                    UserAvatarListener listener = new UserAvatarListener(context);
-                    avatar.delete();
-                    if(!avatarRequested){
-                        avatarRequested = true;
-                        if (context.getExternalCacheDir() != null){
-                            megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                        }
-                        else{
-                            megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                        }
-                    }
-
-                    createDefaultAvatarGroupCall(userHandle, fullName);
-                }
-            }else{
-                UserAvatarListener listener = new UserAvatarListener(context);
-
-                if(!avatarRequested){
-                    avatarRequested = true;
-                    if (context.getExternalCacheDir() != null){
-                        megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                    }
-                    else{
-                        megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                    }
-                }
-
-                createDefaultAvatarGroupCall(userHandle, fullName);
-            }
-        }else{
-            UserAvatarListener listener = new UserAvatarListener(context);
-
-            if(!avatarRequested){
-                avatarRequested = true;
-                if (context.getExternalCacheDir() != null){
-                    megaApi.getUserAvatar(contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }
-                else{
-                    megaApi.getUserAvatar(contactMail, context.getCacheDir().getAbsolutePath() + "/" + contactMail + ".jpg", listener);
-                }
-            }
-            createDefaultAvatarGroupCall(userHandle, fullName);
-        }
-    }
-
-    public void createDefaultAvatarGroupCall(long userHandle,  String fullName) {
-        log("createDefaultAvatarGroupCall");
-        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(defaultAvatar);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setColor(Color.TRANSPARENT);
-
-        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
-        if (color != null) {
-            p.setColor(Color.parseColor(color));
-        }else{
-            p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-        }
-
-        int radius;
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-            radius = defaultAvatar.getWidth() / 2;
-        }else {
-            radius = defaultAvatar.getHeight() / 2;
-        }
-        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-        bigAvatarGroupCallImage.setImageBitmap(defaultAvatar);
-        String contactFirstLetter = fullName.charAt(0) + "";
-        contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
-        bigAvatarGroupCallInitialLetter.setText(contactFirstLetter);
-        bigAvatarGroupCallInitialLetter.setVisibility(View.VISIBLE);
-    }
+//    public void createDefaultAvatarGroupCall(long userHandle,  String fullName) {
+//        log("createDefaultAvatarGroupCall");
+//        Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+//        Canvas c = new Canvas(defaultAvatar);
+//        Paint p = new Paint();
+//        p.setAntiAlias(true);
+//        p.setColor(Color.TRANSPARENT);
+//
+//        String color = megaApi.getUserAvatarColor(MegaApiAndroid.userHandleToBase64(userHandle));
+//        if (color != null) {
+//            p.setColor(Color.parseColor(color));
+//        }else{
+//            p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+//        }
+//
+//        int radius;
+//        if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
+//            radius = defaultAvatar.getWidth() / 2;
+//        }else {
+//            radius = defaultAvatar.getHeight() / 2;
+//        }
+//        c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+//        bigAvatarGroupCallImage.setImageBitmap(defaultAvatar);
+//        String contactFirstLetter = fullName.charAt(0) + "";
+//        contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
+//        bigAvatarGroupCallInitialLetter.setText(contactFirstLetter);
+//        bigAvatarGroupCallInitialLetter.setVisibility(View.VISIBLE);
+//    }
 
 
 }
