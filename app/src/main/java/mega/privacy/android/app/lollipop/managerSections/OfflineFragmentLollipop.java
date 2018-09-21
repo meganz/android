@@ -1,8 +1,10 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -73,6 +76,7 @@ import nz.mega.sdk.MegaNode;
 public class OfflineFragmentLollipop extends Fragment{
 
 	public static ImageView imageDrag;
+	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
 	
 	MegaPreferences prefs;
 	
@@ -108,6 +112,26 @@ public class OfflineFragmentLollipop extends Fragment{
 	private ActionMode actionMode;
 	
 	private int placeholderCount;
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			refresh();
+		}
+	};
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter(REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+	}
+
+	@Override
+	public void onPause(){
+		super.onPause();
+		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+	}
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -207,7 +231,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		return null;
 	}
-	
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -455,7 +479,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		
-		mOffList = new ArrayList<MegaOffline>();		
+		mOffList = new ArrayList<MegaOffline>();
 	}
 	
 	@Override
