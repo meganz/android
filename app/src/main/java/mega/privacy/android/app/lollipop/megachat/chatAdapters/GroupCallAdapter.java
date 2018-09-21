@@ -423,6 +423,11 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     layoutParamsPeer.width = maxScreenWidth;
                     layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
                     holder.rlGeneral.setLayoutParams(layoutParamsPeer);
+                }else{
+                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+                    layoutParamsPeer.width = (maxScreenWidth/2);
+                    layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
+                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
                 }
 
             }else if(numPeersOnCall == 6){
@@ -551,6 +556,11 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 if(peer.getHandle().equals(megaChatApi.getMyUserHandle())){
                     ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
                     layoutParamsPeer.width = maxScreenWidth;
+                    layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
+                    holder.rlGeneral.setLayoutParams(layoutParamsPeer);
+                }else{
+                    ViewGroup.LayoutParams layoutParamsPeer = (ViewGroup.LayoutParams) holder.rlGeneral.getLayoutParams();
+                    layoutParamsPeer.width = (maxScreenWidth/2);
                     layoutParamsPeer.height = Util.scaleWidthPx(180, outMetrics);
                     holder.rlGeneral.setLayoutParams(layoutParamsPeer);
                 }
