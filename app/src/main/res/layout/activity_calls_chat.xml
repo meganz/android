@@ -25,6 +25,7 @@
                     android:id="@+id/big_elements_group_call"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:gravity="center_vertical"
                     android:background="@color/black">
 
                     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
@@ -33,57 +34,58 @@
                         android:layout_height="match_parent"
                         android:scrollbars="horizontal"
                         android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
                         android:nestedScrollingEnabled="false"/>
 
-                    <RelativeLayout
-                        android:id="@+id/parent_layout_big_camera_group_call"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:layout_centerVertical="true"
-                        android:layout_centerHorizontal="true"
-                        android:layout_above="@+id/big_recycler_view_cameras"
-                        android:background="@android:color/transparent"
-                        android:visibility="gone">
+                    <!--<RelativeLayout-->
+                        <!--android:id="@+id/parent_layout_big_camera_group_call"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:layout_centerInParent="true"-->
+                        <!--android:layout_centerVertical="true"-->
+                        <!--android:layout_centerHorizontal="true"-->
+                        <!--android:layout_above="@+id/big_recycler_view_cameras"-->
+                        <!--android:background="@android:color/transparent"-->
+                        <!--android:visibility="gone">-->
 
-                        <!--Remote camera in Group call-->
-                        <FrameLayout
-                            android:id="@+id/fragment_container_big_camera_group_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                            android:background="@android:color/transparent"/>
+                        <!--&lt;!&ndash;Remote camera in Group call&ndash;&gt;-->
+                        <!--<FrameLayout-->
+                            <!--android:id="@+id/fragment_container_big_camera_group_call"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+                            <!--android:background="@android:color/transparent"/>-->
 
-                        <!--Big Avatar in Group call-->
-                        <RelativeLayout
-                            android:id="@+id/big_camera_group_call_avatar_rl"
-                            android:layout_centerInParent="true"
-                            android:layout_width="120dp"
-                            android:layout_height="120dp"
-                            android:gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent">
-                            <mega.privacy.android.app.components.RoundedImageView
-                                android:id="@+id/big_camera_group_call_image"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:scaleType="fitCenter"
-                                android:layout_centerInParent="true"
-                                rounded:border_color="#4DFFFFFF"
-                                rounded:border_width="3dp"
-                                rounded:corner_radius="60dp" />
-                            <TextView
-                                android:id="@+id/big_camera_group_call_initial_letter"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_centerInParent="true"
-                                android:textSize="40dp"
-                                android:textColor="@color/white"
-                                android:gravity="center_horizontal|center_vertical"
-                                android:paddingBottom="3dp"
-                                android:visibility="gone"/>
-                        </RelativeLayout>
+                        <!--&lt;!&ndash;Big Avatar in Group call&ndash;&gt;-->
+                        <!--<RelativeLayout-->
+                            <!--android:id="@+id/big_camera_group_call_avatar_rl"-->
+                            <!--android:layout_centerInParent="true"-->
+                            <!--android:layout_width="120dp"-->
+                            <!--android:layout_height="120dp"-->
+                            <!--android:gravity="center_horizontal|center_vertical"-->
+                            <!--android:background="@android:color/transparent">-->
+                            <!--<mega.privacy.android.app.components.RoundedImageView-->
+                                <!--android:id="@+id/big_camera_group_call_image"-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="match_parent"-->
+                                <!--android:scaleType="fitCenter"-->
+                                <!--android:layout_centerInParent="true"-->
+                                <!--rounded:border_color="#4DFFFFFF"-->
+                                <!--rounded:border_width="3dp"-->
+                                <!--rounded:corner_radius="60dp" />-->
+                            <!--<TextView-->
+                                <!--android:id="@+id/big_camera_group_call_initial_letter"-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="match_parent"-->
+                                <!--android:layout_centerInParent="true"-->
+                                <!--android:textSize="40dp"-->
+                                <!--android:textColor="@color/white"-->
+                                <!--android:gravity="center_horizontal|center_vertical"-->
+                                <!--android:paddingBottom="3dp"-->
+                                <!--android:visibility="gone"/>-->
+                        <!--</RelativeLayout>-->
 
-                    </RelativeLayout>
+                    <!--</RelativeLayout>-->
 
 
                      <android.support.v7.widget.RecyclerView
