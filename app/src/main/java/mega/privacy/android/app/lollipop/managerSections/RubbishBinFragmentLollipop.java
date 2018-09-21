@@ -1195,7 +1195,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	public int onBackPressed(){
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-
 		if (adapter == null){
 			return 0;
 		}
