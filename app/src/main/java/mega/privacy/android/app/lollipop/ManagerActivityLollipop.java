@@ -5129,6 +5129,44 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("END selectDrawerItem for Cloud Drive");
     			break;
     		}
+			case RUBBISH_BIN:{
+				tB.setVisibility(View.VISIBLE);
+				rubbishBinFLol = new RubbishBinFragmentLollipop().newInstance();
+
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
+					hidden.setChecked(true);
+				}
+
+				tabLayoutContacts.setVisibility(View.GONE);
+				viewPagerContacts.setVisibility(View.GONE);
+				tabLayoutShares.setVisibility(View.GONE);
+				viewPagerShares.setVisibility(View.GONE);
+				tabLayoutMyAccount.setVisibility(View.GONE);
+				viewPagerMyAccount.setVisibility(View.GONE);
+				tabLayoutTransfers.setVisibility(View.GONE);
+				viewPagerTransfers.setVisibility(View.GONE);
+
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, rubbishBinFLol, "rubbishBinFLol");
+				ft.commitNow();
+
+				fragmentContainer.setVisibility(View.VISIBLE);
+
+				drawerLayout.closeDrawer(Gravity.LEFT);
+
+				if (openFolderFromSearch){
+					onNodesCloudDriveUpdate();
+					openFolderFromSearch = false;
+				}
+				supportInvalidateOptionsMenu();
+				setToolbarTitle();
+				showFabButton();
+
+				break;
+			}
     		case SAVED_FOR_OFFLINE:{
 
 				tB.setVisibility(View.VISIBLE);
@@ -5448,37 +5486,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showFabButton();
     			break;
     		}
-			case RUBBISH_BIN:{
-				tB.setVisibility(View.VISIBLE);
-				rubbishBinFLol = new RubbishBinFragmentLollipop().newInstance();
-
-				tabLayoutContacts.setVisibility(View.GONE);
-				viewPagerContacts.setVisibility(View.GONE);
-				tabLayoutShares.setVisibility(View.GONE);
-				viewPagerShares.setVisibility(View.GONE);
-				tabLayoutMyAccount.setVisibility(View.GONE);
-				viewPagerMyAccount.setVisibility(View.GONE);
-				tabLayoutTransfers.setVisibility(View.GONE);
-				viewPagerTransfers.setVisibility(View.GONE);
-
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, rubbishBinFLol, "rubbishBinFLol");
-				ft.commitNow();
-
-				fragmentContainer.setVisibility(View.VISIBLE);
-
-				drawerLayout.closeDrawer(Gravity.LEFT);
-
-				if (openFolderFromSearch){
-					onNodesCloudDriveUpdate();
-					openFolderFromSearch = false;
-				}
-				supportInvalidateOptionsMenu();
-				setToolbarTitle();
-				showFabButton();
-
-				break;
-			}
 			case CHAT:{
 				log("chat selected");
 				if (megaApi != null) {
