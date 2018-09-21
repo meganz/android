@@ -11339,7 +11339,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 	}
 
-	public void showRbSchedulerValueDialog(){
+	public void showRbSchedulerValueDialog(final boolean isEnabling){
 		log("showRbSchedulerValueDialog");
 
 		LinearLayout layout = new LinearLayout(this);
@@ -11365,8 +11365,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (value.length() == 0) {
 						return true;
 					}
-//					setRBSchedulerValue(value);
-					newFolderDialog.dismiss();
+
+					try{
+						int daysCount = Integer.parseInt(value);
+
+						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+							//PRO account
+							if(daysCount>6){
+								//Set new value
+								setRBSchedulerValue(value);
+								newFolderDialog.dismiss();
+							}
+							else{
+								//Show again the dialog
+								input.setText("");
+								input.requestFocus();
+							}
+						}
+						else{
+							//PRO account
+							if(daysCount>6 && daysCount<31){
+								//Set new value
+								setRBSchedulerValue(value);
+								newFolderDialog.dismiss();
+							}
+							else{
+								//Show again the dialog
+								input.setText("");
+								input.requestFocus();
+							}
+						}
+					}
+					catch (Exception e){
+						//Show again the dialog
+						input.setText("");
+						input.requestFocus();
+					}
+
 					return true;
 				}
 				return false;
@@ -11416,7 +11451,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-
+				if(isEnabling){
+					if(sttFLol!=null && sttFLol.isAdded()){
+						sttFLol.updateRBScheduler(0);
+					}
+				}
 			}
 		});
 		builder.setView(layout);
