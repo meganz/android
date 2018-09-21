@@ -26,6 +26,7 @@ import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.TimeoutException;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
@@ -41,7 +42,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	static int HEIGHT_ACCOUNT_LAYOUT=109;
 
-	static int HEIGHT_PAYMENT_METHODS_LAYOUT=50;
+	static int HEIGHT_PAYMENT_METHODS_LAYOUT=80;
 
 	private MegaApiAndroid megaApi;
 	public MyAccountInfo myAccountInfo;
@@ -82,8 +83,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	View selectPaymentMethodLayoutPro1;
 	View selectPaymentMethodLayoutPro2;
 	View selectPaymentMethodLayoutPro3;
-	RelativeLayout closeLayout;
+//	RelativeLayout closeLayout;
 	private TextView selectPaymentMethod;
+	private TextView paymentTitle;
 
 	RelativeLayout googlePlayLayout;
 	RelativeLayout creditCardLayout;
@@ -585,6 +587,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		switch (account){
 			case Constants.PRO_LITE:{
+				log("onUpgradeClick:PRO_LITE ");
+
 				selectPaymentMethodClicked = (LinearLayout) selectPaymentMethodLayoutLite;
 				break;
 			}
@@ -607,11 +611,41 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		}
 
 		if (myAccountInfo.getPaymentBitSet() != null){
+			log("onUpgradeClick:myAccountInfo.getPaymentBitSet() != null");
 
 			selectPaymentMethod = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_method);
-			RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) selectPaymentMethod.getLayoutParams();
-			titleParams.setMargins(0,Util.scaleHeightPx(18, outMetrics),0,Util.scaleHeightPx(14, outMetrics));
-			selectPaymentMethod.setLayoutParams(titleParams);
+			paymentTitle = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_text_payment_title);
+
+
+//			RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams) selectPaymentMethod.getLayoutParams();
+//			titleParams.setMargins(0,Util.scaleHeightPx(18, outMetrics),0,Util.scaleHeightPx(14, outMetrics));
+//			selectPaymentMethod.setLayoutParams(titleParams);
+
+			switch (account){
+				case Constants.PRO_LITE:{
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_orange));
+					paymentTitle.setText(getString(R.string.prolite_account));
+					break;
+				}
+				case Constants.PRO_I:{
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+					paymentTitle.setText(getString(R.string.pro1_account));
+					break;
+				}
+				case Constants.PRO_II:{
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+					paymentTitle.setText(getString(R.string.pro2_account));
+					break;
+				}
+				case Constants.PRO_III:{
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+					paymentTitle.setText(getString(R.string.pro3_account));
+					break;
+				}
+				default:{
+					break;
+				}
+			}
 
 			googlePlayLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet);
 			googlePlayLayout.setOnClickListener(this);
@@ -697,20 +731,20 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			centiliTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
 			centiliText.setLayoutParams(centiliTextParams);
 
-			closeLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.close_layout);
-			closeLayout.setOnClickListener(this);
+//			closeLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.close_layout);
+//			closeLayout.setOnClickListener(this);
 
-			LinearLayout.LayoutParams closeLayoutParams = (LinearLayout.LayoutParams) closeLayout.getLayoutParams();
-			closeLayoutParams.setMargins(0,Util.scaleHeightPx(5, outMetrics),0,0);
-			closeLayout.setLayoutParams(closeLayoutParams);
-
-			closeIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.close_layout_icon);
-
-			RelativeLayout.LayoutParams closeIconParams = (RelativeLayout.LayoutParams) closeIcon.getLayoutParams();
-			closeIconParams.setMargins(0,0,Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics));
-			closeIcon.setLayoutParams(closeIconParams);
-
-			closeLayout.setVisibility(View.VISIBLE);
+//			LinearLayout.LayoutParams closeLayoutParams = (LinearLayout.LayoutParams) closeLayout.getLayoutParams();
+//			closeLayoutParams.setMargins(0,Util.scaleHeightPx(5, outMetrics),0,0);
+//			closeLayout.setLayoutParams(closeLayoutParams);
+//
+//			closeIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.close_layout_icon);
+//
+//			RelativeLayout.LayoutParams closeIconParams = (RelativeLayout.LayoutParams) closeIcon.getLayoutParams();
+//			closeIconParams.setMargins(0,0,Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics));
+//			closeIcon.setLayoutParams(closeIconParams);
+//
+//			closeLayout.setVisibility(View.VISIBLE);
 			googlePlayLayout.setVisibility(View.GONE);
 			creditCardLayout.setVisibility(View.GONE);
 			fortumoLayout.setVisibility(View.GONE);
@@ -727,6 +761,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			log("Just before show the layout");
 
 			selectPaymentMethodClicked.setVisibility(View.VISIBLE);
+			semitransparentLayer.setVisibility(View.VISIBLE);
 
 			switch (account){
 				case Constants.PRO_I:{
@@ -768,28 +803,40 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 
 	private void hideProLite(){
+		log("hideProLite");
+
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
 	}
-	
+
 	private void hideProI(){
+		log("hideProI");
+
 		pro1TransparentLayout.setVisibility(View.VISIBLE);
-		
+
 //		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-//		alpha.setDuration(0); 
-//		alpha.setFillAfter(true); 
+//		alpha.setDuration(0);
+//		alpha.setFillAfter(true);
 //		pro1.startAnimation(alpha);
-		
+
 	}
-	
+
 	private void hideProII(){
+		log("hideProII");
+
+
 		pro2TransparentLayout.setVisibility(View.VISIBLE);
 	}
-	
+
 	private void hideProIII(){
+		log("hideProIII");
+
+
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
 	}
-	
+
 	public String sizeTranslation(long size, int type) {
+		log("sizeTranslation");
+
 		switch(type){
 			case 0:{
 				//From GB to TB
@@ -841,15 +888,23 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
+
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){
 			case R.id.upgrade_prolite_layout:{
+				log("onClick()-upgrade_prolite_layout");
+
 				if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
+					log("onClick()-upgrade_prolite_layout VISIBLE");
+
 					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 					semitransparentLayer.setVisibility(View.GONE);
 				}
 				else{
+					log("onClick()-upgrade_prolite_layout GONE");
+
 					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
@@ -857,23 +912,24 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 				break;
 			}
-			case R.id.close_layout:{
-				log("onClick close layout");
-				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
-				semitransparentLayer.setVisibility(View.GONE);
-
-				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
-				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
-				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-				break;
-			}
+//			case R.id.close_layout:{
+//				log("onClick()-close_layout");
+//				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+//				semitransparentLayer.setVisibility(View.GONE);
+//
+//				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+//				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
+//				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
+//				break;
+//			}
 			case R.id.upgrade_pro_i_layout:{
+				log("onClick()-upgrade_pro_i_layout");
+
 				if (selectPaymentMethodLayoutPro1.getVisibility() == View.VISIBLE) {
 					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 				} else {
 					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 					semitransparentLayer.setVisibility(View.GONE);
-
 					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
 					onUpgradeClick(Constants.PRO_I);
@@ -881,12 +937,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_pro_ii_layout:{
+				log("onClick()-upgrade_pro_ii_layout");
+
 				if (selectPaymentMethodLayoutPro2.getVisibility() == View.VISIBLE) {
 					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 				} else {
 					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 					semitransparentLayer.setVisibility(View.GONE);
-
 					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
 					onUpgradeClick(Constants.PRO_II);
@@ -894,12 +951,13 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_pro_iii_layout:{
+				log("onClick()-upgrade_pro_iii_layout");
+
 				if (selectPaymentMethodLayoutPro3.getVisibility() == View.VISIBLE) {
 					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
 				} else {
 					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 					semitransparentLayer.setVisibility(View.GONE);
-
 					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 					onUpgradeClick(Constants.PRO_III);
@@ -907,18 +965,26 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.payment_method_google_wallet:{
+				log("onClick()-payment_method_google_wallet");
+
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
 				break;
 			}
 			case R.id.payment_method_credit_card:{
+				log("onClick()-payment_method_credit_card");
+
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD);
 				break;
 			}
 			case R.id.payment_method_fortumo:{
+				log("onClick()-payment_method_fortumo");
+
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_FORTUMO);
 				break;
 			}
 			case R.id.payment_method_centili:{
+				log("onClick()-payment_method_centili");
+
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CENTILI);
 				break;
 			}
