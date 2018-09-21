@@ -97,7 +97,9 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7773,7 +7775,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_grid:{
 	        	log("action_grid selected");
-
+	        	//Redraw the section headers.
+	        	if(oFLol != null) {
+                    oFLol.floatingItemDecoration = null;
+                }
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		log("action_grid_list in CameraUploads");
 	        		isListCameraUploads = !isListCameraUploads;
@@ -7843,7 +7848,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(sharesPageAdapter!=null){
 						sharesPageAdapter.notifyDataSetChanged();
 					}
-
+					//Refresh OfflineFragmentLollipop layout even current fragment isn't OfflineFragmentLollipop.
+                    if (oFLol != null && oFLol.isAdded()){
+                        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+                        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+                        fragTransaction.detach(currentFragment);
+                        fragTransaction.commitNowAllowingStateLoss();
+                        oFLol.floatingItemDecoration = null;
+                        oFLol.setIsList(isList);
+                        oFLol.setPathNavigation(pathNavigationOffline);
+                        //oFLol.setGridNavigation(false);
+                        //oFLol.setParentHandle(parentHandleSharedWithMe);
+    
+                        fragTransaction = getSupportFragmentManager().beginTransaction();
+                        fragTransaction.attach(currentFragment);
+                        fragTransaction.commitNowAllowingStateLoss();
+                    }
+                    
 	    			if(drawerItem == DrawerItem.INBOX){
 	    				selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -7864,24 +7885,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        		}
 	    			}
-	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-	    				if (oFLol != null && oFLol.isAdded()){
-	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
-	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-	        				oFLol.setIsList(isList);
-	        				oFLol.setPathNavigation(pathNavigationOffline);
-	        				//oFLol.setGridNavigation(false);
-	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
-
-	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commitNowAllowingStateLoss();
-
-		        		}
-	    			}
+//	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+//	    				if (oFLol != null && oFLol.isAdded()){
+//	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+//	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        				fragTransaction.detach(currentFragment);
+//	        				fragTransaction.commitNowAllowingStateLoss();
+//
+//	        				oFLol.setIsList(isList);
+//	        				oFLol.setPathNavigation(pathNavigationOffline);
+//	        				//oFLol.setGridNavigation(false);
+//	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
+//
+//	        				fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        				fragTransaction.attach(currentFragment);
+//	        				fragTransaction.commitNowAllowingStateLoss();
+//
+//		        		}
+//	    			}
 	    			else if (drawerItem == DrawerItem.SEARCH){
 						selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -13126,6 +13147,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("Return.....");
 					return;
 				}
+				
+				boolean isImageAvailable = checkProfileImageExistence(intent.getData());
+				if(!isImageAvailable){
+					log("error when changing avatar: image not exist");
+					showSnackbar(getString(R.string.error_changing_user_avatar_image_not_available));
+					return;
+				}
+				
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(intent);
@@ -18070,5 +18099,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		return false;
+	}
+	
+	//need to check image existence before use due to android content provider issue.
+	//Can not check query count - still get count = 1 even file does not exist
+	private boolean checkProfileImageExistence(Uri uri){
+		boolean isFileExist = false;
+		InputStream inputStream;
+		try {
+			inputStream = this.getContentResolver().openInputStream(uri);
+			if(inputStream != null){
+				isFileExist = true;
+			}
+			inputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return isFileExist;
 	}
 }

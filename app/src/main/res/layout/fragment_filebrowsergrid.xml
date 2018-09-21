@@ -66,7 +66,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:id="@+id/content_text_nested_layout">
+            android:id="@+id/content_text_nested_layout"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/content_grid_text"
@@ -75,14 +76,16 @@
                 android:textColor="@color/mail_my_account"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="72dp"
+                android:text="jasjdskjdskljd"
                 android:textSize="14sp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
 
-            <mega.privacy.android.app.components.CustomizedGridRecyclerView
+            <mega.privacy.android.app.components.NewGridRecyclerView
                 android:id="@+id/file_grid_view_browser"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -90,6 +93,7 @@
                 android:layout_centerInParent="true"
                 android:choiceMode="multipleChoice"
                 android:columnWidth ="172dp"
+
                 android:paddingRight="4dp"
                 android:paddingLeft="4dp"/>
 
