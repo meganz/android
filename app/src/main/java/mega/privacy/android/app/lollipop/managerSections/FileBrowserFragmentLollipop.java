@@ -56,7 +56,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
@@ -1735,26 +1734,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         Util.log("FileBrowserFragmentLollipop",log);
     }
 
-//    public void setContentText() {
-//        log("setContentText");
-//
-//        if (megaApi.getRootNode() != null) {
-//            if (((ManagerActivityLollipop)context).parentHandleBrowser == megaApi.getRootNode().getHandle() || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
-//                log("in ROOT node");
-//                MegaNode infoNode = megaApi.getRootNode();
-//                if (infoNode != null) {
-//                    contentText.setText(MegaApiUtils.getInfoFolder(infoNode,context));
-//                }
-//            } else {
-//                MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleBrowser);
-//                if (infoNode != null) {
-//                    contentText.setText(MegaApiUtils.getInfoFolder(infoNode,context));
-//                }
-//            }
-//            log("contentText: " + contentText.getText());
-//        }
-//    }
-    
     public boolean isMultipleselect() {
         if (adapter != null) {
             return adapter.isMultipleSelect();
@@ -1780,4 +1759,24 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             }
         }
     }
+
+	//refresh list when item updated
+	public void refresh(long handle) {
+		if (handle == -1) {
+			return;
+		}
+		updateNode(handle);
+		adapter.notifyDataSetChanged();
+	}
+
+	private void updateNode(long handle) {
+		for (int i = 0; i < nodes.size(); i++) {
+			MegaNode node = nodes.get(i);
+			if (node.getHandle() == handle) {
+				MegaNode updated = megaApi.getNodeByHandle(handle);
+				nodes.set(i, updated);
+				break;
+			}
+		}
+	}
 }
