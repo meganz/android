@@ -114,7 +114,8 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
         int pos = parent.getChildViewHolder(view).getAdapterPosition();
         if (keys.containsKey(pos)) {
             outRect.set(0,mTitleHeight,0,0);
-        } else {
+        }
+        else {
             outRect.set(0,mDivider.getIntrinsicHeight(),0,0);
         }
     }
@@ -158,6 +159,14 @@ public class FloatingItemDecoration extends RecyclerView.ItemDecoration {
                     mDivider.draw(c);
                 }
             }
+            //Draw the separator for the last item.
+            if(i == parent.getChildCount() -1) {
+				if (type == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
+					float leftOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,LEFT_OFFSET,mContext.getResources().getDisplayMetrics());
+					mDivider.setBounds((int)(left + leftOffset),child.getBottom(),right,child.getBottom() + mDivider.getIntrinsicHeight());
+					mDivider.draw(c);
+				}
+			}
         }
     }
     
