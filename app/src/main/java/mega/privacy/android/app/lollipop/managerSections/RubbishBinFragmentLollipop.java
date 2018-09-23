@@ -511,8 +511,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 //			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			//Add bottom padding for recyclerView like in other fragments.
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
