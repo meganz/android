@@ -68,13 +68,6 @@
 
             </android.support.design.widget.AppBarLayout>
 
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/cloud_drive_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
             <android.support.v4.view.ViewPager
                 android:id="@+id/contact_tabs_pager"
                 android:layout_width="match_parent"

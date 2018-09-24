@@ -5985,7 +5985,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else if(drawerItem == DrawerItem.RUBBISH_BIN){
 				if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 					//Show
-					selectMenuItem.setVisible(true);
+
 					if(!firstTimeCam){
 						thumbViewMenuItem.setVisible(true);
 					}else{
@@ -6004,7 +6004,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					createFolderMenuItem.setVisible(false);
 					addMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
-					upgradeAccountMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);
 					addMenuItem.setEnabled(false);
 					changePass.setVisible(false);
@@ -6035,6 +6035,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					rubbishBinMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
+					newChatMenuItem.setVisible(false);
+					setStatusMenuItem.setVisible(false);
 				}
 			}
 			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
