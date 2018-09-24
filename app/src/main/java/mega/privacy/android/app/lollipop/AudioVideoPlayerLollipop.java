@@ -1301,13 +1301,17 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         builder.setCancelable(false);
         String accept = getResources().getString(R.string.cam_sync_ok).toUpperCase();
-        builder.setMessage(R.string.corrupt_video_dialog_text)
-                .setPositiveButton(accept, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .show();
+        try {
+            builder.setMessage(R.string.corrupt_video_dialog_text)
+                    .setPositiveButton(accept, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .show();
+        }
+        catch (Exception e){}
+
         numErrors = 0;
     }
 
