@@ -156,6 +156,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     LinearLayoutManager layoutManager;
     RecyclerView bigRecyclerView;
+
     GroupCallAdapter adapter;
 
     int isRemoteVideo = REMOTE_VIDEO_NOT_INIT;
@@ -630,8 +631,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         bigRecyclerView = (RecyclerView) findViewById(R.id.big_recycler_view_cameras);
         bigRecyclerView.setLayoutManager(layoutManager);
-        bigRecyclerView.setClipToPadding(false);
-        bigRecyclerView.setHasFixedSize(true);
         bigRecyclerView.setVisibility(GONE);
 
 //        //Big elements group calls
@@ -761,6 +760,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
                 if(callStatus==MegaChatCall.CALL_STATUS_RING_IN){
+
 
                     ringtone = RingtoneManager.getRingtone(this, DEFAULT_RINGTONE_URI);
                     ringerTimer = new Timer();
@@ -2504,7 +2504,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             //arrayList-> peersOnCall
             if(peersOnCall.size() < 7){
-
                 bigRecyclerView.setAdapter(null);
                 bigRecyclerView.setVisibility(GONE);
 //                parentBigCameraGroupCall.setOnClickListener(null);
@@ -2580,12 +2579,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
 
         }else{
-
 //            parentBigCameraGroupCall.setVisibility(View.GONE);
-
             //arrayList-> peersBeforeCall
             if(peersBeforeCall.size() < 7) {
-
                 bigRecyclerView.setAdapter(null);
                 bigRecyclerView.setVisibility(GONE);
 //                parentBigCameraGroupCall.setOnClickListener(null);
@@ -2641,6 +2637,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
+
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
 //                parentBigCameraGroupCall.setOnClickListener(null);
