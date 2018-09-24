@@ -25,7 +25,6 @@
                     android:id="@+id/big_elements_group_call"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical"
                     android:background="@color/black">
 
                     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
@@ -33,8 +32,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:scrollbars="horizontal"
+                        android:layout_gravity="center_vertical"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
+                        android:layout_centerInParent="true"
                         android:nestedScrollingEnabled="false"/>
 
                     <!--<RelativeLayout-->

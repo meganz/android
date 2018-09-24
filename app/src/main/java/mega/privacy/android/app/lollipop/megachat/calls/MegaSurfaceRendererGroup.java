@@ -119,7 +119,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
         if(canvas != null) {
             Rect dst = holder.getSurfaceFrame();
             if(dst != null) {
-//                notifyStateToAll();
+                notifyStateToAll();
                 changeDestRect(dst.right - dst.left, dst.bottom - dst.top);
                 Logging.d(TAG, "ViESurfaceRender::surfaceCreated" +
                         " dst.left:" + dst.left +
@@ -242,20 +242,20 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     private void notifyStateToAll() {
-        log("notifyStateToAll()");
+        log("**** notifyStateToAll()");
         for(MegaSurfaceRendererGroupListener listener : listeners)
             notifyState(listener);
     }
 
     public void addListener(MegaSurfaceRendererGroupListener l) {
-        log("addListener()");
+        log("**** addListener()");
 
         listeners.add(l);
         notifyState(l);
     }
 
     private void notifyState(MegaSurfaceRendererGroupListener listener) {
-        log("notifyState()");
+        log("**** notifyState()");
 
         if(listener == null)
             return;
