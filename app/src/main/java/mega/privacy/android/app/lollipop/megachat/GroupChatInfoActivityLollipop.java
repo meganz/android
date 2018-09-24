@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -30,6 +31,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -214,6 +217,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
             setContentView(R.layout.activity_group_chat_properties);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = this.getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+            }
 
             fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_group_chat);
             toolbar = (Toolbar) findViewById(R.id.toolbar_group_chat_properties);
