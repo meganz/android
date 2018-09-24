@@ -1848,6 +1848,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
+		if (!Util.isOnline(this)){
+			usedSpaceLayout.setVisibility(View.GONE);
+		}
+		else{
+			usedSpaceLayout.setVisibility(View.VISIBLE);
+		}
 
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
@@ -3510,8 +3516,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						radius = imBitmap.getHeight() / 2;
 
 					c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
-					nVPictureProfile.setImageBitmap(circleBitmap);
-					nVPictureProfileTextView.setVisibility(View.GONE);
+					if (nVPictureProfile != null){
+						nVPictureProfile.setImageBitmap(circleBitmap);
+					}
+					if (nVPictureProfileTextView != null){
+						nVPictureProfileTextView.setVisibility(View.GONE);
+					}
 					return;
 				}
 			}
@@ -3549,16 +3559,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			radius = defaultAvatar.getHeight()/2;
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		nVPictureProfile.setImageBitmap(defaultAvatar);
+		if (nVPictureProfile != null){
+			nVPictureProfile.setImageBitmap(defaultAvatar);
+		}
 
 		int avatarTextSize = Util.getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(32);
-		nVPictureProfileTextView.setTextColor(Color.WHITE);
-		nVPictureProfileTextView.setVisibility(View.VISIBLE);
-
+		if (nVPictureProfileTextView != null) {
+			nVPictureProfileTextView.setText(firstLetter);
+			nVPictureProfileTextView.setTextSize(32);
+			nVPictureProfileTextView.setTextColor(Color.WHITE);
+			nVPictureProfileTextView.setVisibility(View.VISIBLE);
+		}
 	}
 
 	public void showDialogChangeUserAttribute(){
@@ -4493,13 +4506,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("megaApi is Null in Offline mode");
 		}
 
-		usedSpaceLayout.setVisibility(View.GONE);
+		if (usedSpaceLayout != null){
+			usedSpaceLayout.setVisibility(View.GONE);
+		}
 
 		UserCredentials credentials = dbH.getCredentials();
 		if(credentials!=null){
 			String emailCredentials = credentials.getEmail();
 			if(emailCredentials!=null){
-				nVEmail.setText(emailCredentials);
+				if (nVEmail != null){
+					nVEmail.setText(emailCredentials);
+				}
 			}
 
 			String myHandleCredentials = credentials.getMyHandle();
@@ -4537,7 +4554,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("Full name set by default: "+fullName);
 			}
 
-			nVDisplayName.setText(fullName);
+			if (nVDisplayName != null){
+				nVDisplayName.setText(fullName);
+			}
 
 			String firstLetter = fullName.charAt(0) + "";
 			firstLetter = firstLetter.toUpperCase(Locale.getDefault());
