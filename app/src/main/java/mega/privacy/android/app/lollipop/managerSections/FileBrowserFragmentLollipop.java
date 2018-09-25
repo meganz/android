@@ -1772,6 +1772,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	private void updateNode(long handle) {
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode node = nodes.get(i);
+			//in grid view, we have to ignore the placholder.
+			if(node == null) {
+				continue;
+			}
 			if (node.getHandle() == handle) {
 				MegaNode updated = megaApi.getNodeByHandle(handle);
 				nodes.set(i, updated);
