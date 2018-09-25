@@ -520,13 +520,13 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
 			
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+//			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
 				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, Constants.RUBBISH_BIN_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
-				adapter.setNodes(nodes);
+//				adapter.setNodes(nodes);
 				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
@@ -545,6 +545,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
+
+			setNodes(nodes);
 
 			if (adapter.getItemCount() == 0){
 				
@@ -1280,9 +1282,16 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				return;
 			}
 		}
+
+		this.nodes = nodes;
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+		}
+		else {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+		}
 		
 		if (adapter != null){
-			addSectionTitle(this.nodes,adapter.getAdapterType());
 			adapter.setNodes(this.nodes);
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
