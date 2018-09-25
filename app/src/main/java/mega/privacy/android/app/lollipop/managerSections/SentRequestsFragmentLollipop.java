@@ -352,6 +352,18 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.empty_text_contacts_requests);

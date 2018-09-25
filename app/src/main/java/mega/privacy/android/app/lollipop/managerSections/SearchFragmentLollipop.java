@@ -467,6 +467,18 @@ public class SearchFragmentLollipop extends Fragment{
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
 			progressBar.setVisibility(View.GONE);
@@ -516,6 +528,18 @@ public class SearchFragmentLollipop extends Fragment{
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
 

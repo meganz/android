@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -74,6 +75,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 	final int WIDTH = 500;
 
+	ScrollView scrollView;
 	Context context;
 	MyAccountInfo myAccountInfo;
 
@@ -148,6 +150,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
+
+		scrollView = (ScrollView) v.findViewById(R.id.my_account_complete_relative_layout);
+		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				if (v.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		if(megaApi.getMyUser() == null){
 			return null;
