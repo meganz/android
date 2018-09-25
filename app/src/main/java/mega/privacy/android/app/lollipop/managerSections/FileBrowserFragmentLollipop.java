@@ -110,7 +110,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RelativeLayout actionLayout;
 	RelativeLayout dotsOptionsTransfersLayout;
 
-    FloatingItemDecoration floatingItemDecoration;
+    public FloatingItemDecoration floatingItemDecoration;
 
 	float density;
 	DisplayMetrics outMetrics;

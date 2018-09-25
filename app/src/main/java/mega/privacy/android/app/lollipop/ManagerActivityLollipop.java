@@ -5174,13 +5174,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (oFLol == null){
 					log("New OfflineFragment");
     				oFLol = new OfflineFragmentLollipop();
-    				oFLol.setIsList(isList);
 //    				oFLol.setPathNavigation("/");
     			}
     			else{
 					log("OfflineFragment exist");
 //    				oFLol.setPathNavigation("/");
-    				oFLol.setIsList(isList);
 					oFLol.findNodes();
     			}
 
@@ -7780,32 +7778,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//Refresh Cloud Fragment
 					if (fbFLol != null && fbFLol.isAdded()){
-						ArrayList<MegaNode> nodes;
-						if(parentHandleBrowser==-1){
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(megaApi.getRootNode().getHandle()), orderCloud);
-						}
-						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-						}
-						log("nodes: "+nodes.size());
-						fbFLol.hideMultipleSelect();
-						fbFLol.setNodes(nodes);
-						fbFLol.setOverviewLayout();
-						fbFLol.getRecyclerView().invalidate();
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fbFLol");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commitNowAllowingStateLoss();
+						fbFLol.floatingItemDecoration = null;
+
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commitNowAllowingStateLoss();
 					}
 
 					//Refresh Rubbish Fragment
 					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-						ArrayList<MegaNode> nodes;
-						if(parentHandleRubbish == -1){
-							nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderCloud);
-						}
-						else{
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-						}
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("rubbishBinFLol");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commitNowAllowingStateLoss();
+						rubbishBinFLol.floatingItemDecoration = null;
 
-						rubbishBinFLol.setNodes(nodes);
-						rubbishBinFLol.getRecyclerView().invalidate();
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commitNowAllowingStateLoss();
 					}
 
 					if(sharesPageAdapter!=null){
@@ -7818,11 +7812,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         fragTransaction.detach(currentFragment);
                         fragTransaction.commitNowAllowingStateLoss();
                         oFLol.floatingItemDecoration = null;
-                        oFLol.setIsList(isList);
                         oFLol.setPathNavigation(pathNavigationOffline);
-                        //oFLol.setGridNavigation(false);
-                        //oFLol.setParentHandle(parentHandleSharedWithMe);
-    
+
                         fragTransaction = getSupportFragmentManager().beginTransaction();
                         fragTransaction.attach(currentFragment);
                         fragTransaction.commitNowAllowingStateLoss();
@@ -7848,45 +7839,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		        		}
 	    			}
-//	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-//	    				if (oFLol != null && oFLol.isAdded()){
-//	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
-//	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        				fragTransaction.detach(currentFragment);
-//	        				fragTransaction.commitNowAllowingStateLoss();
-//
-//	        				oFLol.setIsList(isList);
-//	        				oFLol.setPathNavigation(pathNavigationOffline);
-//	        				//oFLol.setGridNavigation(false);
-//	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
-//
-//	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        				fragTransaction.attach(currentFragment);
-//	        				fragTransaction.commitNowAllowingStateLoss();
-//
-//		        		}
-//	    			}
 	    			else if (drawerItem == DrawerItem.SEARCH){
 						selectDrawerItemLollipop(drawerItem);
 	    			}
-
-//		        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-//
-//		        	}
-//		        	if (drawerItem == DrawerItem.INBOX){
-//
-//		        	}
-//		        	if (drawerItem == DrawerItem.CONTACTS){
-//
-//		        	}
-//		        	if (drawerItem == DrawerItem.SHARED_ITEMS){
-//
-//
-//
-//		        	}
-//		        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-//
-//	        		}
 	        	}
 
 	        	return true;
