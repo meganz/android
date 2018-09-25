@@ -90,7 +90,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
 //    public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, CustomItemClickListener listener) {
 public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress) {
 
-    log("**** GroupCallAdapter(peers: "+peers.size()+")");
+    log("GroupCallAdapter(peers: "+peers.size()+")");
 
         this.context = context;
         this.recyclerViewFragment = recyclerView;
@@ -131,7 +131,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
     @Override
     public void resetSize(Long userHandle) {
-        log("**** resetSize");
+        log("resetSize");
         if(getItemCount()!=0){
             for(InfoPeerGroupCall peer:peers){
                 if(peer.getHandle() == userHandle){
@@ -151,6 +151,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     public class ViewHolderGroupCall extends RecyclerView.ViewHolder{
 
         RelativeLayout rlGeneral;
+        RelativeLayout greenLayer;
         RelativeLayout avatarMicroLayout;
         RelativeLayout avatarLayout;
         RoundedImageView avatarImage;
@@ -220,6 +221,9 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             holderGrid.rlGeneral.setOnClickListener(null);
         }
 
+        holderGrid.greenLayer = (RelativeLayout) v.findViewById(R.id.green_layer);
+        holderGrid.greenLayer.setVisibility(GONE);
+
         holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
         holderGrid.surfaceViewLayout.removeAllViewsInLayout();
 
@@ -282,7 +286,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     }
 
     public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, int position){
-        log("**** onBindViewHolderGrid()");
+        log("onBindViewHolderGrid()");
 
         InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
@@ -781,6 +785,39 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             notifyItemChanged(position);
         }
     }
+
+    public void addLayer(int position, ViewHolderGroupCall holder){
+        if(getItemCount()>=7){
+            if(holder == null){
+                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+            }
+            if(holder!=null){
+                InfoPeerGroupCall peer = getNodeAt(position);
+                if (peer == null){
+                    return;
+                }
+                holder.greenLayer.setVisibility(View.VISIBLE);
+            }
+        }
+
+    }
+
+    public void removeLayer(int position, ViewHolderGroupCall holder){
+        if(getItemCount()>=7){
+            if(holder == null){
+                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+            }
+            if(holder!=null){
+                InfoPeerGroupCall peer = getNodeAt(position);
+                if (peer == null){
+                    return;
+                }
+                holder.greenLayer.setVisibility(View.GONE);
+            }
+        }
+
+    }
+
 
     public ArrayList<InfoPeerGroupCall> getPeers() {
         return peers;

@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/black">
 
+
     <!--Surface view-->
     <RelativeLayout
         android:id="@+id/rl_surface"
@@ -67,5 +68,12 @@
             android:src="@drawable/ic_mic_off"/>
 
     </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/green_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/user_layer_group_call"
+        android:visibility="gone"/>
 
 </RelativeLayout>

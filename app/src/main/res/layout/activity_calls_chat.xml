@@ -38,55 +38,55 @@
                         android:layout_centerInParent="true"
                         android:nestedScrollingEnabled="false"/>
 
-                    <!--<RelativeLayout-->
-                        <!--android:id="@+id/parent_layout_big_camera_group_call"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent"-->
-                        <!--android:layout_centerInParent="true"-->
-                        <!--android:layout_centerVertical="true"-->
-                        <!--android:layout_centerHorizontal="true"-->
-                        <!--android:layout_above="@+id/big_recycler_view_cameras"-->
-                        <!--android:background="@android:color/transparent"-->
-                        <!--android:visibility="gone">-->
+                    <RelativeLayout
+                        android:id="@+id/parent_layout_big_camera_group_call"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_above="@+id/big_recycler_view_cameras"
+                        android:background="@android:color/transparent"
+                        android:visibility="gone">
 
-                        <!--&lt;!&ndash;Remote camera in Group call&ndash;&gt;-->
-                        <!--<FrameLayout-->
-                            <!--android:id="@+id/fragment_container_big_camera_group_call"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-                            <!--android:background="@android:color/transparent"/>-->
+                        <!--Remote camera in Group call-->
+                        <FrameLayout
+                            android:id="@+id/fragment_container_big_camera_group_call"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            android:background="@android:color/transparent"/>
 
-                        <!--&lt;!&ndash;Big Avatar in Group call&ndash;&gt;-->
-                        <!--<RelativeLayout-->
-                            <!--android:id="@+id/big_camera_group_call_avatar_rl"-->
-                            <!--android:layout_centerInParent="true"-->
-                            <!--android:layout_width="120dp"-->
-                            <!--android:layout_height="120dp"-->
-                            <!--android:gravity="center_horizontal|center_vertical"-->
-                            <!--android:background="@android:color/transparent">-->
-                            <!--<mega.privacy.android.app.components.RoundedImageView-->
-                                <!--android:id="@+id/big_camera_group_call_image"-->
-                                <!--android:layout_width="match_parent"-->
-                                <!--android:layout_height="match_parent"-->
-                                <!--android:scaleType="fitCenter"-->
-                                <!--android:layout_centerInParent="true"-->
-                                <!--rounded:border_color="#4DFFFFFF"-->
-                                <!--rounded:border_width="3dp"-->
-                                <!--rounded:corner_radius="60dp" />-->
-                            <!--<TextView-->
-                                <!--android:id="@+id/big_camera_group_call_initial_letter"-->
-                                <!--android:layout_width="match_parent"-->
-                                <!--android:layout_height="match_parent"-->
-                                <!--android:layout_centerInParent="true"-->
-                                <!--android:textSize="40dp"-->
-                                <!--android:textColor="@color/white"-->
-                                <!--android:gravity="center_horizontal|center_vertical"-->
-                                <!--android:paddingBottom="3dp"-->
-                                <!--android:visibility="gone"/>-->
-                        <!--</RelativeLayout>-->
+                        <!--Big Avatar in Group call-->
+                        <RelativeLayout
+                            android:id="@+id/big_camera_group_call_avatar_rl"
+                            android:layout_centerInParent="true"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:gravity="center_horizontal|center_vertical"
+                            android:background="@android:color/transparent">
+                            <mega.privacy.android.app.components.RoundedImageView
+                                android:id="@+id/big_camera_group_call_image"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:layout_centerInParent="true"
+                                rounded:border_color="#4DFFFFFF"
+                                rounded:border_width="3dp"
+                                rounded:corner_radius="60dp" />
+                            <TextView
+                                android:id="@+id/big_camera_group_call_initial_letter"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerInParent="true"
+                                android:textSize="50dp"
+                                android:textColor="@color/white"
+                                android:gravity="center_horizontal|center_vertical"
+                                android:paddingBottom="3dp"
+                                android:visibility="gone"/>
+                        </RelativeLayout>
 
-                    <!--</RelativeLayout>-->
+                    </RelativeLayout>
 
 
                      <android.support.v7.widget.RecyclerView
@@ -178,7 +178,59 @@
                 android:background="@drawable/gradient_shape_callschat"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                android:fitsSystemWindows="true"/>
+                android:fitsSystemWindows="true">
+                <LinearLayout
+                    android:id="@+id/toolbar_elements"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/title_toolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:maxLines="1"
+                        android:layout_marginRight="20dp"
+                        android:ellipsize="end"/>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/subtitle_toolbar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:layout_marginRight="8dp"/>
+                        <LinearLayout
+                            android:id="@+id/ll_participants"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+                            <TextView
+                                android:id="@+id/participants_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:layout_marginRight="4dp"/>
+                            <ImageView
+                                android:id="@+id/participants_image"
+                                android:layout_height="18dp"
+                                android:layout_width="18dp"
+                                android:src="@drawable/ic_videocam_white"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.Toolbar>
+
 
             <RelativeLayout
                 android:id="@+id/small_elements_individual_call"
