@@ -113,7 +113,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        log("**** surfaceCreated()");
+        log("surfaceCreated()");
 
         Canvas canvas = holder.lockCanvas();
         if(canvas != null) {
@@ -158,7 +158,7 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        log("****** surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
+        log("surfaceDestroyed() -> surfaceWidth = 0 && surfaceHeight = 0");
         Logging.d(TAG, "ViESurfaceRenderer::surfaceDestroyed");
         bitmap = null;
         byteBuffer = null;
@@ -242,20 +242,20 @@ public class MegaSurfaceRendererGroup implements SurfaceHolder.Callback {
     }
 
     private void notifyStateToAll() {
-        log("**** notifyStateToAll()");
+        log("notifyStateToAll()");
         for(MegaSurfaceRendererGroupListener listener : listeners)
             notifyState(listener);
     }
 
     public void addListener(MegaSurfaceRendererGroupListener l) {
-        log("**** addListener()");
+        log("addListener()");
 
         listeners.add(l);
         notifyState(l);
     }
 
     private void notifyState(MegaSurfaceRendererGroupListener listener) {
-        log("**** notifyState()");
+        log("notifyState()");
 
         if(listener == null)
             return;
