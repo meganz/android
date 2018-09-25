@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -80,6 +81,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 	Stack<Integer> lastPositionStack;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -124,6 +127,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -132,6 +136,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -204,6 +209,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		parentHandle = -1;
 		dbH = DatabaseHandler.getDbHandler(context);
 		lastPositionStack = new Stack<>();
+		handler = new Handler();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
 	}
 
 	@Override

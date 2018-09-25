@@ -203,7 +203,7 @@
                 android:background="@color/lollipop_primary_color"
                 android:elevation="4dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextAppearance="@style/ToolbarTitle"
+                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 tools:context=".lollipop.twofa.LoginActivityLollipop" />
 

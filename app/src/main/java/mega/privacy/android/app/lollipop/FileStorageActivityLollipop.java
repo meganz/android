@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -154,6 +155,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
+	Handler handler;
+
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 	    public void onLongPress(MotionEvent e) {
@@ -222,6 +225,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_storage_action, menu);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 
@@ -229,6 +233,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public void onDestroyActionMode(ActionMode arg0) {
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -349,12 +354,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
+	    handler = new Handler();
 
 		setContentView(R.layout.activity_filestorage);
 		
@@ -522,7 +522,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		log("Path to show: "+path);
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
-	
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
+	}
+
 	@Override
 	public void onSaveInstanceState(Bundle state) {
 		state.putString("path", path.getAbsolutePath());

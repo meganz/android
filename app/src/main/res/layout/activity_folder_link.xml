@@ -18,7 +18,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:elevation="8dp"
-            app:titleTextAppearance="@style/ToolbarTitle"
+            app:titleTextAppearance="@style/ToolbarTitle.Secondary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             tools:context=".FolderLinkActivityLollipop" />

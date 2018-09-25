@@ -662,7 +662,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                     }
                     else if(context instanceof ArchivedChatsActivity){
-                        ((ArchivedChatsActivity)context).changeStatusBarColor();
+                        ((ArchivedChatsActivity)context).changeStatusBarColor(1);
                     }
 
                     selectAll();
@@ -899,7 +899,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
         }
         else if(context instanceof ArchivedChatsActivity){
-            ((ArchivedChatsActivity)context).changeStatusBarColor();
+            ((ArchivedChatsActivity)context).changeStatusBarColor(0);
         }
 
         if (actionMode != null) {
@@ -936,7 +936,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                 }
                 else if(context instanceof ArchivedChatsActivity){
-                    ((ArchivedChatsActivity)context).changeStatusBarColor();
+                    ((ArchivedChatsActivity)context).changeStatusBarColor(1);
                 }
             }
         }

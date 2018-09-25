@@ -21,7 +21,7 @@
              android:layout_height="match_parent"
              android:fitsSystemWindows="true"
              android:background="@color/content_text_background"
-             app:collapsedTitleTextAppearance="@style/ToolbarTitle"
+             app:collapsedTitleTextAppearance="@style/ToolbarTitle.Secondary"
              app:contentScrim="?attr/colorPrimary"
              app:theme="@style/CollapsingToolbarContactInfo"
              app:layout_scrollFlags="scroll|exitUntilCollapsed"
@@ -74,7 +74,7 @@
                       android:ellipsize="end"
                       android:maxLines="1"
                       android:singleLine="true"
-                      android:textAppearance="@style/ToolbarTitle"/>
+                      android:textAppearance="@style/ToolbarTitle.Secondary"/>
 
                   <TextView
                       android:id="@+id/email_length"
@@ -87,7 +87,7 @@
                       android:ellipsize="end"
                       android:maxLines="1"
                       android:singleLine="true"
-                      android:textAppearance="@style/ToolbarTitle"
+                      android:textAppearance="@style/ToolbarTitle.Secondary"
                       android:paddingBottom="9dp"/>
 
 
@@ -131,7 +131,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:singleLine="true"
-                        android:textAppearance="@style/ToolbarTitle" />
+                        android:textAppearance="@style/ToolbarTitle.Secondary" />
 
                     <TextView
                         android:id="@+id/email_contact"
@@ -144,7 +144,7 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:textAppearance="@style/ToolbarTitle"
+                        android:textAppearance="@style/ToolbarTitle.Secondary"
                         android:paddingBottom="9dp"/>
                 </RelativeLayout>
 
