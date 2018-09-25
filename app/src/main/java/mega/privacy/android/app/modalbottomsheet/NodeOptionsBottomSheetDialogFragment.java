@@ -49,6 +49,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_FILE_INFO;
+
 public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
     private Context context;
@@ -272,117 +274,119 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     } else {
                         nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     }
-
-                    optionSendChat.setVisibility(View.VISIBLE);
+                    if (Util.isChatEnabled()) {
+                        optionSendChat.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        optionSendChat.setVisibility(View.GONE);
+                    }
                 }
             }
 
             switch (drawerItem) {
                 case CLOUD_DRIVE: {
-                    int tabSelected = ((ManagerActivityLollipop) context).getTabItemCloud();
-                    if (tabSelected == 0) {
-                        log("show Cloud bottom sheet");
+                    log("show Cloud bottom sheet");
 
-                        if (node.isFolder()) {
-                            optionInfoText.setText(R.string.general_folder_info);
-                            optionShare.setVisibility(View.VISIBLE);
-                            if (node.isOutShare() || megaApi.isPendingShare(node)) {
-                                optionShareText.setText(R.string.context_sharing_folder);
-                            } else {
-                                optionShareText.setText(R.string.context_share_folder);
-                            }
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                        optionShare.setVisibility(View.VISIBLE);
+                        if (node.isOutShare() || megaApi.isPendingShare(node)) {
+                            optionShareText.setText(R.string.context_sharing_folder);
                         } else {
-                            optionInfoText.setText(R.string.general_file_info);
-                            optionShare.setVisibility(View.GONE);
+                            optionShareText.setText(R.string.context_share_folder);
                         }
+                    } else {
+                        optionInfoText.setText(R.string.general_file_info);
+                        optionShare.setVisibility(View.GONE);
+                    }
 
-                        if (node.isExported()) {
-                            //Node has public link
-                            nodeIconLayout.setVisibility(View.VISIBLE);
-                            nodeIcon.setImageResource(R.drawable.link_ic);
+                    if (node.isExported()) {
+                        //Node has public link
+                        nodeIconLayout.setVisibility(View.VISIBLE);
+                        nodeIcon.setImageResource(R.drawable.link_ic);
 
-                            optionLinkText.setText(R.string.edit_link_option);
-                            optionRemoveLink.setVisibility(View.VISIBLE);
-                            if (node.isExpired()) {
-                                log("Node exported but expired!!");
-                            }
-                        } else {
-                            nodeIconLayout.setVisibility(View.GONE);
-                            optionLinkText.setText(R.string.context_get_link_menu);
-                            optionRemoveLink.setVisibility(View.GONE);
+                        optionLinkText.setText(R.string.edit_link_option);
+                        optionRemoveLink.setVisibility(View.VISIBLE);
+                        if (node.isExpired()) {
+                            log("Node exported but expired!!");
                         }
+                    } else {
+                        nodeIconLayout.setVisibility(View.GONE);
+                        optionLinkText.setText(R.string.context_get_link_menu);
+                        optionRemoveLink.setVisibility(View.GONE);
+                    }
 
-                        if (node.isShared()) {
-                            if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
-                                log("Visible clear shares - firstNavigationLevel true!");
-                                optionClearShares.setVisibility(View.VISIBLE);
+                    if (node.isShared()) {
+                        if (((ManagerActivityLollipop) context).isFirstNavigationLevel()) {
+                            log("Visible clear shares - firstNavigationLevel true!");
+                            optionClearShares.setVisibility(View.VISIBLE);
 
-                            } else {
-                                optionClearShares.setVisibility(View.GONE);
-                            }
                         } else {
                             optionClearShares.setVisibility(View.GONE);
                         }
-
-                        optionDownload.setVisibility(View.VISIBLE);
-                        optionInfo.setVisibility(View.VISIBLE);
-                        optionRubbishBin.setVisibility(View.VISIBLE);
-                        optionLink.setVisibility(View.VISIBLE);
-
-                        optionRubbishBin.setVisibility(View.VISIBLE);
-                        optionRename.setVisibility(View.VISIBLE);
-                        optionMove.setVisibility(View.VISIBLE);
-                        optionCopy.setVisibility(View.VISIBLE);
-
-                        //Hide
-                        optionRemove.setVisibility(View.GONE);
-                        optionLeaveShares.setVisibility(View.GONE);
-                        optionOpenFolder.setVisibility(View.GONE);
-                        optionRestoreFromRubbish.setVisibility(View.GONE);
-
-                    } else if (tabSelected == 1) {
-                        log("show Rubbish bottom sheet");
-                        if (node.isFolder()) {
-                            optionInfoText.setText(R.string.general_folder_info);
-                        } else {
-                            optionInfoText.setText(R.string.general_file_info);
-                        }
-
-                        long restoreHandle = node.getRestoreHandle();
-                        if(restoreHandle!=-1){
-                            MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
-                            if((!megaApi.isInRubbish(node)) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
-                                optionRestoreFromRubbish.setVisibility(View.GONE);
-                            }
-                            else{
-                                optionRestoreFromRubbish.setVisibility(View.VISIBLE);
-                            }
-                        }
-                        else{
-                            optionRestoreFromRubbish.setVisibility(View.GONE);
-                        }
-
-                        nodeIconLayout.setVisibility(View.GONE);
-
-                        optionMove.setVisibility(View.VISIBLE);
-                        optionRemove.setVisibility(View.VISIBLE);
-                        optionInfo.setVisibility(View.VISIBLE);
-                        optionRename.setVisibility(View.VISIBLE);
-                        optionCopy.setVisibility(View.VISIBLE);
-
-                        //Hide
+                    } else {
                         optionClearShares.setVisibility(View.GONE);
-                        optionLeaveShares.setVisibility(View.GONE);
-                        optionRubbishBin.setVisibility(View.GONE);
-                        optionShare.setVisibility(View.GONE);
-                        optionLink.setVisibility(View.GONE);
-                        optionRemoveLink.setVisibility(View.GONE);
-                        optionOpenFolder.setVisibility(View.GONE);
-                        optionDownload.setVisibility(View.GONE);
-                        optionSendChat.setVisibility(View.GONE);
                     }
+
+                    optionDownload.setVisibility(View.VISIBLE);
+                    optionInfo.setVisibility(View.VISIBLE);
+                    optionRubbishBin.setVisibility(View.VISIBLE);
+                    optionLink.setVisibility(View.VISIBLE);
+
+                    optionRubbishBin.setVisibility(View.VISIBLE);
+                    optionRename.setVisibility(View.VISIBLE);
+                    optionMove.setVisibility(View.VISIBLE);
+                    optionCopy.setVisibility(View.VISIBLE);
+
+                    //Hide
+                    optionRemove.setVisibility(View.GONE);
+                    optionLeaveShares.setVisibility(View.GONE);
+                    optionOpenFolder.setVisibility(View.GONE);
+                    optionRestoreFromRubbish.setVisibility(View.GONE);
                     break;
 
+                }
+                case RUBBISH_BIN: {
+                    log("show Rubbish bottom sheet");
+                    if (node.isFolder()) {
+                        optionInfoText.setText(R.string.general_folder_info);
+                    } else {
+                        optionInfoText.setText(R.string.general_file_info);
+                    }
+
+                    long restoreHandle = node.getRestoreHandle();
+                    if(restoreHandle!=-1){
+                        MegaNode restoreNode = megaApi.getNodeByHandle(restoreHandle);
+                        if((!megaApi.isInRubbish(node)) || restoreNode==null || megaApi.isInRubbish(restoreNode)){
+                            optionRestoreFromRubbish.setVisibility(View.GONE);
+                        }
+                        else{
+                            optionRestoreFromRubbish.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    else{
+                        optionRestoreFromRubbish.setVisibility(View.GONE);
+                    }
+
+                    nodeIconLayout.setVisibility(View.GONE);
+
+                    optionMove.setVisibility(View.VISIBLE);
+                    optionRemove.setVisibility(View.VISIBLE);
+                    optionInfo.setVisibility(View.VISIBLE);
+                    optionRename.setVisibility(View.VISIBLE);
+                    optionCopy.setVisibility(View.VISIBLE);
+
+                    //Hide
+                    optionClearShares.setVisibility(View.GONE);
+                    optionLeaveShares.setVisibility(View.GONE);
+                    optionRubbishBin.setVisibility(View.GONE);
+                    optionShare.setVisibility(View.GONE);
+                    optionLink.setVisibility(View.GONE);
+                    optionRemoveLink.setVisibility(View.GONE);
+                    optionOpenFolder.setVisibility(View.GONE);
+                    optionDownload.setVisibility(View.GONE);
+                    optionSendChat.setVisibility(View.GONE);
+                    break;
                 }
                 case INBOX: {
 
@@ -436,8 +440,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         if (node.isFolder()) {
                             optionInfoText.setText(R.string.general_folder_info);
+                            optionSendChat.setVisibility(View.GONE);
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
+                            if (Util.isChatEnabled()) {
+                                optionSendChat.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                optionSendChat.setVisibility(View.GONE);
+                            }
                         }
 
                         nodeIconLayout.setVisibility(View.VISIBLE);
@@ -449,7 +460,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionInfo.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
-                        optionSendChat.setVisibility(View.GONE);
 
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
                         log("DeepTree value:" + dBT);
@@ -822,7 +832,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
                 i.putExtra("name", node.getName());
 
-                context.startActivity(i);
+                ((ManagerActivityLollipop)context).startActivityForResult(i, REQUEST_CODE_FILE_INFO);
                 dismissAllowingStateLoss();
                 break;
             }
@@ -888,8 +898,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-
-                nC.selectChatsToSendNode(node);
+                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
+                    if(((ManagerActivityLollipop) context).getTabItemShares()==0) {
+                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
+                    }
+                    else {
+                        nC.selectChatsToSendNode(node);
+                    }
+                }
+                else {
+                    nC.selectChatsToSendNode(node);
+                }
 
                 dismissAllowingStateLoss();
                 break;

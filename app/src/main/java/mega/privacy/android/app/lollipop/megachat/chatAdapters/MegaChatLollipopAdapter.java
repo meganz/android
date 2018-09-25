@@ -786,7 +786,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
             int radius = Util.scaleWidthPx(15, outMetrics);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
-            holder.contentOwnMessageThumbLand.setBorderWidth(0);
+            holder.contentOwnMessageThumbLand.setBorderWidth(1);
+            holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentOwnMessageThumbLand.setOval(false);
 
             holder.gradientOwnMessageThumbLand = (RelativeLayout) v.findViewById(R.id.gradient_own_message_thumb_landscape);
@@ -799,7 +800,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentOwnMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
             holder.contentOwnMessageThumbPort.setCornerRadius(radius);
-            holder.contentOwnMessageThumbPort.setBorderWidth(0);
+            holder.contentOwnMessageThumbPort.setBorderWidth(1);
+            holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentOwnMessageThumbPort.setOval(false);
 
             holder.ownTriangleIconFile = (RelativeLayout) v.findViewById(R.id.own_triangle_icon_file);
@@ -912,7 +914,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageThumbLand = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
-            holder.contentContactMessageThumbLand.setBorderWidth(0);
+            holder.contentContactMessageThumbLand.setBorderWidth(1);
+            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentContactMessageThumbLand.setOval(false);
             holder.forwardContactPreviewLandscape = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_landscape);
             holder.forwardContactPreviewLandscape.setTag(holder);
@@ -957,7 +960,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             holder.contentContactMessageThumbPort = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
-            holder.contentContactMessageThumbPort.setBorderWidth(0);
+            holder.contentContactMessageThumbPort.setBorderWidth(1);
+            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
             holder.contentContactMessageThumbPort.setOval(false);
             holder.forwardContactPreviewPortrait = (RelativeLayout) v.findViewById(R.id.forward_contact_preview_portrait);
             holder.forwardContactPreviewPortrait.setTag(holder);
@@ -5454,15 +5458,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
-                log("Names of attached contacts: " + name);
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setText(name);
-
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setText(email);
-
-                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, true);
+                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, true, userCount);
             }
-
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -5652,8 +5652,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactEmail.setText(email);
-
-                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, false);
+                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, false, userCount);
             }
 
             if (!multipleSelect) {
@@ -6591,10 +6590,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ChatAttachmentAvatarListener listener;
         if (myUserHandle == message.getUserHandle()) {
-            createDefaultAvatar(holder, userHandleEncoded, name, true);
+            createDefaultAvatar(holder, userHandleEncoded, name, true,0);
             listener = new ChatAttachmentAvatarListener(context, holder, this, true);
         } else {
-            createDefaultAvatar(holder, userHandleEncoded, name, false);
+            createDefaultAvatar(holder, userHandleEncoded, name, false, 0);
             listener = new ChatAttachmentAvatarListener(context, holder, this, false);
         }
 
@@ -6769,8 +6768,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void createDefaultAvatar(ViewHolderMessageChat holder, String userHandle, String name, boolean isMyMsg) {
-        log("createDefaultAvatar()");
+    public void createDefaultAvatar(ViewHolderMessageChat holder, String userHandle, String name, boolean isMyMsg, long userCount) {
+        log(" createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -6805,29 +6804,58 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (isMyMsg) {
             holder.contentOwnMessageContactThumb.setImageBitmap(defaultAvatar);
+            if(userHandle!=null){
+                if (name != null) {
+                    if (name.trim().length() > 0) {
+                        String firstLetter = name.charAt(0) + "";
+                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                        holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
+                        holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
+                        holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    }
+                    holder.contentOwnMessageContactInitialLetter.setTextSize(24);
 
-            if (name != null) {
-                if (name.trim().length() > 0) {
-                    String firstLetter = name.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                }
+            }else{
+                if (name != null) {
+                    String firstLetter = userCount + "";
+
+//                    holder.contentOwnMessageContactInitialLetter.setText(name);
                     holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
                     holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
                     holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageContactInitialLetter.setTextSize(24);
+
                 }
             }
-            holder.contentOwnMessageContactInitialLetter.setTextSize(24);
+
         } else {
             holder.contentContactMessageContactThumb.setImageBitmap(defaultAvatar);
-            if (name != null) {
-                if (name.trim().length() > 0) {
-                    String firstLetter = name.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+            if(userHandle!=null){
+                if (name != null) {
+                    if (name.trim().length() > 0) {
+                        String firstLetter = name.charAt(0) + "";
+                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                        holder.contentContactMessageContactInitialLetter.setText(firstLetter);
+                        holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
+                        holder.contentContactMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    }
+                    holder.contentContactMessageContactInitialLetter.setTextSize(24);
+
+                }
+            }else{
+                if (name != null) {
+//                    holder.contentContactMessageContactInitialLetter.setText(name);
+                    String firstLetter = userCount + "";
                     holder.contentContactMessageContactInitialLetter.setText(firstLetter);
                     holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
                     holder.contentContactMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    holder.contentContactMessageContactInitialLetter.setTextSize(24);
+
                 }
             }
-            holder.contentContactMessageContactInitialLetter.setTextSize(24);
+
         }
     }
 

@@ -20,16 +20,19 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +41,8 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -58,7 +63,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-
 
 /*
  * Background service to download files
@@ -591,36 +595,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try {
 				if (openFile) {
 					log("openFile true");
-					//				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-					//					log("Download success of zip file!");
-					//
-					//					if(pathFileToOpen!=null){
-					//						Intent intentZip;
-					//						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
-					//						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-					//
-					//
-					//						if(intentZip!=null){
-					//							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					//							startActivity(intentZip);
-					//						}
-					//					}
-					//					else{
-					//						Intent intentZip = null;
-					//
-					//						intentZip = new Intent(this, ManagerActivityLollipop.class);
-					//						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
-					//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					//						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					//
-					//						startActivity(intentZip);
-					//					}
-					//
-					//					log("Lanzo intent al manager.....");
-					//				}
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
@@ -634,7 +608,37 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						fromMV = fromMediaViewers.get(handle);
 					}
 
-					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+					if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+						log("Download success of zip file!");
+
+						if(pathFileToOpen!=null){
+							Intent intentZip;
+							intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+							intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+
+
+							if(intentZip!=null){
+								intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								startActivity(intentZip);
+							}
+						}
+						else{
+							Intent intentZip = null;
+
+							intentZip = new Intent(this, ManagerActivityLollipop.class);
+							intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+
+							startActivity(intentZip);
+						}
+
+						log("Lanzo intent al manager.....");
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
 						if (!fromMV) {
@@ -805,8 +809,97 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 						}
 
-					} else {
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isURL()) {
+						log("Is URL file");
+						InputStream instream = null;
 
+						try {
+							// open the file for reading
+							instream = new FileInputStream(currentFile.getAbsolutePath());
+
+							// if file the available for reading
+							if (instream != null) {
+								// prepare the file for reading
+								InputStreamReader inputreader = new InputStreamReader(instream);
+								BufferedReader buffreader = new BufferedReader(inputreader);
+
+								String line1 = buffreader.readLine();
+								if(line1!=null){
+									String line2= buffreader.readLine();
+
+									String url = line2.replace("URL=","");
+
+									log("Is URL - launch browser intent");
+									Intent i = new Intent(Intent.ACTION_VIEW);
+									i.setData(Uri.parse(url));
+									startActivity(i);
+								}
+								else{
+									log("Not expected format: Exception on processing url file");
+									intent = new Intent(Intent.ACTION_VIEW);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+										intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), "text/plain");
+									} else {
+										intent.setDataAndType(Uri.fromFile(currentFile), "text/plain");
+									}
+									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+									if (MegaApiUtils.isIntentAvailable(this, intent)){
+										startActivity(intent);
+									}
+									else{
+										log("No app to url file as text: show notification");
+										mBuilderCompat
+												.setSmallIcon(R.drawable.ic_stat_notify)
+												.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+												.setAutoCancel(true).setTicker(notificationTitle)
+												.setContentTitle(notificationTitle).setContentText(size)
+												.setOngoing(false);
+
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+											mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+										}
+
+										mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+									}
+								}
+							}
+						} catch (Exception ex) {
+
+							intent = new Intent(Intent.ACTION_VIEW);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), "text/plain");
+							} else {
+								intent.setDataAndType(Uri.fromFile(currentFile), "text/plain");
+							}
+							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+							if (MegaApiUtils.isIntentAvailable(this, intent)){
+								startActivity(intent);
+							}
+							else{
+								log("Exception on processing url file: show notification");
+								mBuilderCompat
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+									mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+								}
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							}
+
+						} finally {
+							// close the file.
+							instream.close();
+						}
+
+					}else {
 						log("Download is OTHER FILE");
 						intent = new Intent(Intent.ACTION_VIEW);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -892,6 +985,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		}
 	}
+
 
 	/*
 	 * Update notification download progress
@@ -1234,6 +1328,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else{
 							saveOfflineChatFile(transfer);
 						}
+
+						refreshOfflineFragment();
 					}
 				}
 				else
@@ -2035,5 +2131,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	private void refreshOfflineFragment(){
+		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }

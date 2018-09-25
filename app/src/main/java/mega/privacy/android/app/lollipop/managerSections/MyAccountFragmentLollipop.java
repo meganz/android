@@ -9,6 +9,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,28 +29,50 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener{
+import static android.graphics.Color.WHITE;
+
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, AbortPendingTransferCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
+	final int WIDTH = 500;
 
 	Context context;
 	MyAccountInfo myAccountInfo;
@@ -73,18 +98,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	LinearLayout typeLayout;
 	LinearLayout lastSessionLayout;
-	LinearLayout connectionsLayout;
+    RelativeLayout connectionsLayout;
+    private CustomizedGridRecyclerView lastContactsGridView;
 
 	LinearLayout achievementsLayout;
 	LinearLayout achievementsSeparator;
 
 	LinearLayout parentLinearLayout;
+
+	ArrayList<MegaUser> lastContacted;
 	
 	DisplayMetrics outMetrics;
 	float density;
 
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
+
+	private Bitmap qrAvatarSave;
+
+	int numOfClicksLastSession = 0;
+	boolean stagingApiUrl = false;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -121,8 +154,31 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		log("My user handle string: "+megaApi.getMyUserHandle());
+
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.avatar_qr_background));
 		avatarLayout.setOnClickListener(this);
+
+		if (savedInstanceState != null) {
+			byte[] avatarByteArray = savedInstanceState.getByteArray("qrAvatar");
+			if (avatarByteArray != null) {
+				log("savedInstanceState avatarByteArray != null");
+				qrAvatarSave = BitmapFactory.decodeByteArray(avatarByteArray, 0, avatarByteArray.length);
+				if (qrAvatarSave != null) {
+					log("savedInstanceState qrAvatarSave != null");
+					avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
+				}
+				else {
+					megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+				}
+			}
+			else {
+				megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+			}
+		}
+		else {
+			megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+		}
 
 		nameView = (TextView) v.findViewById(R.id.my_account_name);
 		nameView.setOnClickListener(this);
@@ -196,10 +252,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton.setVisibility(View.VISIBLE);
 
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
+		lastSessionLayout.setOnClickListener(this);
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
-
+		connectionsLayout = (RelativeLayout) v.findViewById(R.id.my_account_connections_layout);
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
@@ -238,16 +294,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		this.updateAvatar(true);
 
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
+		updateContactsCount();
 
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}		
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		lastContacted = MegaApiUtils.getLastContactedUsers(context);
+		//Draw contact's connection component if lastContacted.size > 0
+        lastContactsGridView = (CustomizedGridRecyclerView)v.findViewById(R.id.last_contacts_gridview);
+        
+        lastContactsGridView.setColumnCount(LastContactsAdapter.MAX_COLUMN);
+        lastContactsGridView.setClipToPadding(false);
+        lastContactsGridView.setHasFixedSize(false);
+        
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
 
 		setAccountDetails();
 
@@ -256,6 +313,36 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
+	}
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Refresh
+		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+        updateView();
+    }
+    
+    /**
+     * Update last contacts list and refresh last contacts' avatar.
+     */
+    public void updateView() {
+        lastContacted = MegaApiUtils.getLastContactedUsers(context);
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+    }
+
+    public void updateContactsCount(){
+    	log("updateContactsCounts");
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
+
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}
+		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 	}
 
 	public void setMkButtonText(){
@@ -459,13 +546,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 			case R.id.logout_button:{
 				log("Logout button");
-
-				((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
-				megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
-//				((ManagerActivityLollipop) getContext()).showRememberPasswordDialog(true);
-
-//				AccountController aC = new AccountController(this);
-//				aC.logout(this, megaApi);
+				Util.checkPendingTransfer(megaApi, getContext(), this);
 				break;
 			}
 			case R.id.my_account_relative_layout_avatar:{
@@ -518,6 +599,29 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					Intent intent = new Intent(context, AchievementsActivity.class);
 //				intent.putExtra("orderGetChildren", orderGetChildren);
 					startActivity(intent);
+				}
+				break;
+			}
+			case R.id.my_account_last_session_layout:{
+				numOfClicksLastSession++;
+				if (numOfClicksLastSession == 5){
+					numOfClicksLastSession = 0;
+					if (!stagingApiUrl) {
+						stagingApiUrl = true;
+						megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+						Intent intent = new Intent(context, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setAction(Constants.ACTION_REFRESH);
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					}
+					else{
+						stagingApiUrl = false;
+						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+						Intent intent = new Intent(context, LoginActivityLollipop.class);
+						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+						intent.setAction(Constants.ACTION_REFRESH);
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					}
 				}
 				break;
 			}
@@ -729,5 +833,138 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				setDefaultAvatar();
 			}
 		}
+	}
+
+	public Bitmap queryQR (String contactLink) {
+		log("queryQR");
+
+		Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
+		hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+
+		BitMatrix bitMatrix = null;
+
+		try {
+			bitMatrix = new MultiFormatWriter().encode(contactLink, BarcodeFormat.QR_CODE, 40, 40, hints);
+		} catch (WriterException e) {
+			e.printStackTrace();
+			return null;
+		}
+		int w = bitMatrix.getWidth();
+		int h = bitMatrix.getHeight();
+		int[] pixels = new int[w * h];
+		int color = ContextCompat.getColor(context, R.color.grey_achievements_invite_friends_sub);
+		float resize = 12.2f;
+
+		Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(bitmap);
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		paint.setColor(WHITE);
+		c.drawRect(0, 0, WIDTH, WIDTH, paint);
+		paint.setColor(color);
+
+		for (int y = 0; y < h; y++) {
+			int offset = y * w;
+			for (int x = 0; x < w; x++) {
+				pixels[offset + x] = bitMatrix.get(x, y) ? color : WHITE;
+				if (pixels[offset + x] == color){
+					c.drawCircle(x*resize, y*resize, 5, paint);
+				}
+				log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
+			}
+		}
+		paint.setColor(WHITE);
+		c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
+		c.drawRect(28.5f*resize, 3*resize, 37*resize, 11.5f*resize, paint);
+		c.drawRect(3*resize, 28.5f*resize, 11.5f*resize, 37*resize, paint);
+
+		paint.setColor(color);
+
+		if (Build.VERSION.SDK_INT >= 21) {
+			c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 30, 30, paint);
+			c.drawRoundRect(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize, 30, 30, paint);
+			c.drawRoundRect(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize, 30, 30, paint);
+
+			paint.setColor(WHITE);
+			c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
+			c.drawRoundRect(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize, 25, 25, paint);
+			c.drawRoundRect(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize, 25, 25, paint);
+		}
+		else {
+			c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 30, 30, paint);
+			c.drawRoundRect(new RectF(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize), 30, 30, paint);
+			c.drawRoundRect(new RectF(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize), 30, 30, paint);
+
+			paint.setColor(WHITE);
+			c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
+			c.drawRoundRect(new RectF(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize), 25, 25, paint);
+			c.drawRoundRect(new RectF(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize), 25, 25, paint);
+		}
+
+		paint.setColor(color);
+		c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
+		c.drawCircle(32.75f*resize, 7.25f*resize, 17.5f, paint);
+		c.drawCircle(7.25f*resize, 32.75f*resize, 17.5f, paint);
+
+//        bitmap.setPixels(pixels, 0, w, 0, 0, w,  h);
+
+		return bitmap;
+	}
+
+	public void initCreateQR(MegaRequest request, MegaError e){
+		log("initCreateQR");
+		if (e.getErrorCode() == MegaError.API_OK) {
+			log("Contact link create LONG: " + request.getNodeHandle());
+			log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
+
+			String contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
+			new QRBackgroundTask().execute(contactLink);
+		}
+		else {
+			log("Error request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE: " + e.getErrorString());
+		}
+	}
+
+	class QRBackgroundTask extends AsyncTask<String, Void, Void> {
+
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			qrAvatarSave = queryQR(strings[0]);
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		if (qrAvatarSave != null){
+			log("onSaveInstanceState qrAvatarSave != null");
+			ByteArrayOutputStream qrAvatarOutputStream = new ByteArrayOutputStream();
+			qrAvatarSave.compress(Bitmap.CompressFormat.PNG, 100, qrAvatarOutputStream);
+			byte[] qrAvatarByteArray = qrAvatarOutputStream.toByteArray();
+			outState.putByteArray("qrAvatar", qrAvatarByteArray);
+		}
+	}
+
+	@Override
+	public void onAbortConfirm() {
+		log("onAbortConfirm");
+		megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
+		megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD);
+		((ManagerActivityLollipop)getContext()).setPasswordReminderFromMyAccount(true);
+		megaApi.shouldShowPasswordReminderDialog(true, (ManagerActivityLollipop)context);
+	}
+
+	@Override
+	public void onAbortCancel() {
+		log("onAbortCancel");
 	}
 }

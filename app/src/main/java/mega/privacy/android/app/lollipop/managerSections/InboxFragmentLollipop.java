@@ -33,9 +33,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -44,12 +51,14 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -70,7 +79,9 @@ public class InboxFragmentLollipop extends Fragment{
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
-	MegaBrowserLollipopAdapter adapter;
+	CloudDriveAdapter adapter;
+    FloatingItemDecoration floatingItemDecoration;
+    private int placeholderCount;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 
@@ -116,7 +127,59 @@ public class InboxFragmentLollipop extends Fragment{
 			}
 		}
 	}
-
+    
+    public void addSectionTitle(List<MegaNode> nodes,int type) {
+        Map<Integer, String> sections = new HashMap<>();
+        int folderCount = 0;
+        int fileCount = 0;
+        for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            }
+            if (node.isFile()) {
+                fileCount++;
+            }
+        }
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            if(folderCount > 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(i,folderCount + " " + folderStr);
+                }
+            }
+    
+            if(fileCount > 0 ) {
+                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
+                }
+            }
+        } else {
+            placeholderCount = 0;
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
+        if (floatingItemDecoration == null) {
+            floatingItemDecoration = new FloatingItemDecoration(context);
+            recyclerView.addItemDecoration(floatingItemDecoration);
+        }
+        floatingItemDecoration.setType(type);
+        floatingItemDecoration.setKeys(sections);
+    }
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
@@ -302,7 +365,12 @@ public class InboxFragmentLollipop extends Fragment{
 				}
 
 				if(allFiles){
-					showSendToChat = true;
+					if (Util.isChatEnabled()) {
+						showSendToChat = true;
+					}
+					else {
+						showSendToChat = false;
+					}
 				}else{
 					showSendToChat = false;
 				}
@@ -432,8 +500,11 @@ public class InboxFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
+			//Add bottom padding for recyclerView like in other fragments.
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -444,10 +515,11 @@ public class InboxFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+                addSectionTitle(nodes,MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
@@ -463,7 +535,7 @@ public class InboxFragmentLollipop extends Fragment{
 			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
@@ -480,10 +552,11 @@ public class InboxFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop) context).parentHandleInbox, recyclerView, null, Constants.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).parentHandleInbox);
+                addSectionTitle(nodes,MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -500,7 +573,7 @@ public class InboxFragmentLollipop extends Fragment{
 	
 	public void refresh(){
 		log("refresh");
-		if(((ManagerActivityLollipop) context).parentHandleInbox==-1||((ManagerActivityLollipop) context).parentHandleInbox==inboxNode.getHandle()){
+		if(inboxNode != null && (((ManagerActivityLollipop) context).parentHandleInbox==-1||((ManagerActivityLollipop) context).parentHandleInbox==inboxNode.getHandle())){
 			nodes = megaApi.getChildren(inboxNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
 		else{
@@ -544,10 +617,10 @@ public class InboxFragmentLollipop extends Fragment{
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -560,6 +633,7 @@ public class InboxFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
+                addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 
 				setContentText();
@@ -569,6 +643,8 @@ public class InboxFragmentLollipop extends Fragment{
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+                    //Put flag to notify FullScreenImageViewerLollipop.
+                    intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.INBOX_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
@@ -741,7 +817,95 @@ public class InboxFragmentLollipop extends Fragment{
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
-				else{
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
+					log("Is URL file");
+					MegaNode file = nodes.get(position);
+
+					boolean isOnMegaDownloads = false;
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if (f.exists() && (f.length() == file.getSize())) {
+						isOnMegaDownloads = true;
+					}
+					log("isOnMegaDownloads: " + isOnMegaDownloads);
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))) {
+						File mediaFile = new File(localPath);
+						InputStream instream = null;
+
+						try {
+							// open the file for reading
+							instream = new FileInputStream(f.getAbsolutePath());
+
+							// if file the available for reading
+							if (instream != null) {
+								// prepare the file for reading
+								InputStreamReader inputreader = new InputStreamReader(instream);
+								BufferedReader buffreader = new BufferedReader(inputreader);
+
+								String line1 = buffreader.readLine();
+								if (line1 != null) {
+									String line2 = buffreader.readLine();
+
+									String url = line2.replace("URL=", "");
+
+									log("Is URL - launch browser intent");
+									Intent i = new Intent(Intent.ACTION_VIEW);
+									i.setData(Uri.parse(url));
+									startActivity(i);
+								} else {
+									log("Not expected format: Exception on processing url file");
+									Intent intent = new Intent(Intent.ACTION_VIEW);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+									} else {
+										intent.setDataAndType(Uri.fromFile(f), "text/plain");
+									}
+									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+									if (MegaApiUtils.isIntentAvailable(context, intent)) {
+										startActivity(intent);
+									} else {
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(nodes.get(position).getHandle());
+										NodeController nC = new NodeController(context);
+										nC.prepareForDownload(handleList);
+									}
+								}
+							}
+						} catch (Exception ex) {
+
+							Intent intent = new Intent(Intent.ACTION_VIEW);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+							} else {
+								intent.setDataAndType(Uri.fromFile(f), "text/plain");
+							}
+							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+							if (MegaApiUtils.isIntentAvailable(context, intent)) {
+								startActivity(intent);
+							} else {
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(nodes.get(position).getHandle());
+								NodeController nC = new NodeController(context);
+								nC.prepareForDownload(handleList);
+							}
+
+						} finally {
+							// close the file.
+							try {
+								instream.close();
+							} catch (IOException e) {
+								log("EXCEPTION closing InputStream");
+							}
+						}
+					} else {
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						NodeController nC = new NodeController(context);
+						nC.prepareForDownload(handleList);
+					}
+				}else{
 					adapter.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
@@ -898,6 +1062,7 @@ public class InboxFragmentLollipop extends Fragment{
 		log("setNodes");
 		this.nodes = nodes;
 		if (adapter != null){
+            addSectionTitle(nodes,adapter.getAdapterType());
 			adapter.setNodes(nodes);
 			setContentText();
 		}	
@@ -966,7 +1131,7 @@ public class InboxFragmentLollipop extends Fragment{
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 
 			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).parentHandleInbox||((ManagerActivityLollipop) context).parentHandleInbox==-1) {
 
