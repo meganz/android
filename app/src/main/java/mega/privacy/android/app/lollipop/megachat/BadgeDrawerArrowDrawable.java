@@ -29,15 +29,15 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         super(context);
 
         backgroundPaint = new Paint();
-        backgroundPaint.setColor(Color.WHITE);
+        backgroundPaint.setColor(ContextCompat.getColor(context, R.color.copyright_title));
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
-        bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+        bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.white));
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
-        textPaint.setColor(Color.RED);
+        textPaint.setColor(Color.WHITE);
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);

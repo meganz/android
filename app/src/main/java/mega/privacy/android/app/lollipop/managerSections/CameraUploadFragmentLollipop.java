@@ -757,6 +757,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			listView.setClipToPadding(false);
 			listView.setHasFixedSize(true);
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
@@ -952,6 +964,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			listView.setDrawingCacheEnabled(true);
 			listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);

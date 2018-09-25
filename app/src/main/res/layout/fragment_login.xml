@@ -330,7 +330,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lost_your_authenticator_device"
-                        android:textColor="@color/file_playlist_state"
+                        android:textColor="@color/accentColor"
                         android:textSize="13sp"
                         android:layout_centerHorizontal="true"/>
 

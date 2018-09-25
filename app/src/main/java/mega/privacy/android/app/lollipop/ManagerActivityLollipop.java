@@ -24,8 +24,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +52,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -63,6 +66,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -297,7 +301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     float scaleText;
     FrameLayout fragmentContainer;
 //	boolean tranfersPaused = false;
-    Toolbar tB;
+public Toolbar tB;
     ActionBar aB;
     AppBarLayout abL;
 
@@ -4348,23 +4352,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void updateNavigationToolbarIcon(){
+		log("updateNavigationToolbarIcon");
 		//Just working on 4.4.+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			if(Util.isChatEnabled() && megaChatApi != null){
 				int numberUnread = megaChatApi.getUnreadChats();
 
 				if(numberUnread==0){
-
 					if(isFirstNavigationLevel()){
 						if (drawerItem == DrawerItem.SEARCH){
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 						}
 						else {
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
 						}
 					}
 					else{
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 					}
 				}
 				else{
@@ -4393,27 +4397,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				if(isFirstNavigationLevel()){
 					if (drawerItem == DrawerItem.SEARCH){
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 					}
 					else {
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
 					}
 				}
 				else{
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
 			}
 		} else {
 			if(isFirstNavigationLevel()){
 				if (drawerItem == DrawerItem.SEARCH){
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
 				else {
-					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
 				}
 			}
 			else{
-				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 			}
 		}
 	}
@@ -5818,9 +5822,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    inflater.inflate(R.menu.activity_manager, menu);
 //	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-	    final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
+		searchMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 		final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+		SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
+		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		searchAutoComplete.setHint(getString(R.string.action_search) + "...");
+		View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
+		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
 
 		if (searchView != null){
 			searchView.setIconifiedByDefault(true);
@@ -17746,15 +17758,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final Window window = this.getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-
-			if (option == 2){
+			if (option ==  1) {
+				getWindow().setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.accentColorDark));
+				changeActionBarElevation(true);
+			}
+			else {
 				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						window.setStatusBarColor(0);
+						getWindow().setStatusBarColor(0);
 					}
-				}, 500);
+				}, 300);
+				changeActionBarElevation(false);
 			}
 		}
 		if (option == 1){
@@ -17764,6 +17779,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 
+	}
+
+	public void changeActionBarElevation(boolean scrolled){
+		if(scrolled) {
+			getSupportActionBar().setElevation(Util.px2dp(4, outMetrics));
+//			tB.setElevation(Util.px2dp(8, outMetrics));
+		}
+		else {
+			getSupportActionBar().setElevation(0);
+//			tB.setElevation(0);
+		}
 	}
 
 	public long getParentHandleInbox() {
@@ -17806,6 +17832,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onActionModeStarted(ActionMode mode) {
+		super.onActionModeStarted(mode);
+		getTheme().applyStyle(R.style.ActionOverflowButtonStyle, true);
 	}
 
 	public void setChatTitleSection(){

@@ -543,7 +543,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 		if(!isAdded()){
 			return null;
@@ -599,6 +599,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
@@ -668,6 +680,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //				}
 //			});
             recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
             progressBar = (ProgressBar)v.findViewById(R.id.file_grid_download_progress_bar);
             
             emptyImageView = (ImageView)v.findViewById(R.id.file_grid_empty_image);
