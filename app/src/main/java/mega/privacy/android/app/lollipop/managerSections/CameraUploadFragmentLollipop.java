@@ -48,6 +48,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -146,6 +147,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	private ProgressDialog statusDialog;
 	private long photosyncHandle = -1;
+
+	ScrollView scrollView;
 
 	public class PhotoSyncHolder{
 		public boolean isNode;
@@ -715,6 +718,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
+				scrollView = (ScrollView) v.findViewById(R.id.cam_sync_scroll_view);
+				scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+					@Override
+					public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+						if (v.canScrollVertically(-1)){
+							((ManagerActivityLollipop) context).changeActionBarElevation(true);
+						}
+						else {
+							((ManagerActivityLollipop) context).changeActionBarElevation(false);
+						}
+					}
+				});
 
 				initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
 

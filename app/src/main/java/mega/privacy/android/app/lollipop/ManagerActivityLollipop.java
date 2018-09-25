@@ -24,10 +24,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,7 +50,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -337,7 +334,7 @@ public Toolbar tB;
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline);
+				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline_new);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.section_shared_items);
@@ -4097,7 +4094,7 @@ public Toolbar tB;
 						if (parentNode != null){
 							if(megaApi.getRootNode()!=null){
 								if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1){
-									aB.setTitle(getString(R.string.section_cloud_drive));
+									aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
 									firstNavigationLevel = true;
 								}
 								else{
@@ -4112,7 +4109,7 @@ public Toolbar tB;
 						else{
 							if(megaApi.getRootNode()!=null){
 								parentHandleBrowser = megaApi.getRootNode().getHandle();
-								aB.setTitle(getString(R.string.section_cloud_drive));
+								aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
 								firstNavigationLevel = true;
 							}
 							else{
@@ -4125,14 +4122,14 @@ public Toolbar tB;
 					case 1:{
 						log("setToolbarTitle: rubbish TAB");
 						if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
-							aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+							aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 							firstNavigationLevel = true;
 						}
 						else{
 							MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
 							if(node==null){
 								log("Node NULL - cannot be recovered");
-								aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+								aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 							}
 							else{
 								aB.setTitle(node.getName());
@@ -4143,7 +4140,7 @@ public Toolbar tB;
 						break;
 					}
 					default: {
-						aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+						aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 						firstNavigationLevel = true;
 						break;
 					}
@@ -4165,7 +4162,7 @@ public Toolbar tB;
 								MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
 								if(node==null){
 									log("Node NULL - cannot be recovered");
-									aB.setTitle(getResources().getString(R.string.section_shared_items));
+									aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
 								}
 								else{
 									aB.setTitle(node.getName());
@@ -4174,7 +4171,7 @@ public Toolbar tB;
 								firstNavigationLevel = false;
 							}
 							else{
-								aB.setTitle(getResources().getString(R.string.section_shared_items));
+								aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
 								firstNavigationLevel = true;
 							}
 						}
@@ -4193,14 +4190,14 @@ public Toolbar tB;
 								aB.setTitle(node.getName());
 								firstNavigationLevel = false;
 							} else {
-								aB.setTitle(getResources().getString(R.string.section_shared_items));
+								aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
 								firstNavigationLevel = true;
 							}
 						}
 						break;
 					}
 					default: {
-						aB.setTitle(getResources().getString(R.string.section_shared_items));
+						aB.setTitle(getResources().getString(R.string.section_shared_items).toUpperCase());
 						firstNavigationLevel = true;
 						break;
 					}
@@ -4214,7 +4211,7 @@ public Toolbar tB;
 
 					log("AFTER PathNavigation is: "+pathNavigationOffline);
 					if (pathNavigationOffline.equals("/")){
-						aB.setTitle(getString(R.string.section_saved_for_offline));
+						aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
 						firstNavigationLevel=true;
 					}
 					else{
@@ -4230,7 +4227,7 @@ public Toolbar tB;
 				}
 				else{
 					log("PathNavigation is NULL");
-					aB.setTitle(getString(R.string.section_saved_for_offline));
+					aB.setTitle(getString(R.string.section_saved_for_offline_new).toUpperCase());
 					firstNavigationLevel=true;
 				}
 
@@ -4239,7 +4236,7 @@ public Toolbar tB;
 			case INBOX:{
 				aB.setSubtitle(null);
 				if(parentHandleInbox==megaApi.getInboxNode().getHandle()||parentHandleInbox==-1){
-					aB.setTitle(getResources().getString(R.string.section_inbox));
+					aB.setTitle(getResources().getString(R.string.section_inbox).toUpperCase());
 					firstNavigationLevel = true;
 				}
 				else{
@@ -4251,13 +4248,13 @@ public Toolbar tB;
 			}
 			case CONTACTS:{
 				aB.setSubtitle(null);
-				aB.setTitle(getString(R.string.section_contacts));
+				aB.setTitle(getString(R.string.section_contacts).toUpperCase());
 				firstNavigationLevel = true;
 				break;
 			}
 			case CHAT:{
 				tB.setVisibility(View.VISIBLE);
-				aB.setTitle(getString(R.string.section_chat));
+				aB.setTitle(getString(R.string.section_chat).toUpperCase());
 				firstNavigationLevel = true;
 				break;
 			}
@@ -4270,12 +4267,12 @@ public Toolbar tB;
 					firstNavigationLevel = true;
 					if(searchQuery!=null){
 						if(!searchQuery.isEmpty()){
-							aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
+							aB.setTitle(getString(R.string.action_search).toUpperCase()+": "+searchQuery);
 						}else{
-							aB.setTitle(getString(R.string.action_search)+": "+"");
+							aB.setTitle(getString(R.string.action_search).toUpperCase()+": "+"");
 						}
 					}else{
-						aB.setTitle(getString(R.string.action_search)+": "+"");
+						aB.setTitle(getString(R.string.action_search).toUpperCase()+": "+"");
 					}
 
 				}else{
@@ -4289,33 +4286,33 @@ public Toolbar tB;
 			}
 			case SETTINGS:{
 				aB.setSubtitle(null);
-				aB.setTitle(getString(R.string.action_settings));
+				aB.setTitle(getString(R.string.action_settings).toUpperCase());
 				firstNavigationLevel = true;
 				break;
 			}
 			case ACCOUNT:{
 				aB.setSubtitle(null);
 				if(accountFragment==Constants.MY_ACCOUNT_FRAGMENT){
-					aB.setTitle(getString(R.string.section_account));
+					aB.setTitle(getString(R.string.section_account).toUpperCase());
 					setFirstNavigationLevel(true);
 				}
 				else if(accountFragment==Constants.MONTHLY_YEARLY_FRAGMENT){
-					aB.setTitle(R.string.action_upgrade_account);
+					aB.setTitle(getString(R.string.action_upgrade_account).toUpperCase());
 					setFirstNavigationLevel(false);
 				}
 				else if(accountFragment==Constants.UPGRADE_ACCOUNT_FRAGMENT){
-					aB.setTitle(R.string.action_upgrade_account);
+					aB.setTitle(getString(R.string.action_upgrade_account).toUpperCase());
 					setFirstNavigationLevel(false);
 				}
 				else{
-					aB.setTitle(getString(R.string.section_account));
+					aB.setTitle(getString(R.string.section_account).toUpperCase());
 					setFirstNavigationLevel(true);
 				}
 				break;
 			}
 			case TRANSFERS:{
 				aB.setSubtitle(null);
-				aB.setTitle(getString(R.string.section_transfers));
+				aB.setTitle(getString(R.string.section_transfers).toUpperCase());
 				setFirstNavigationLevel(true);
 				break;
 			}
@@ -4327,7 +4324,7 @@ public Toolbar tB;
 				else{
 					setFirstNavigationLevel(true);
 				}
-				aB.setTitle(getString(R.string.section_photo_sync));
+				aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
 				break;
 			}
 			case MEDIA_UPLOADS:{
@@ -4338,7 +4335,7 @@ public Toolbar tB;
 				else{
 					setFirstNavigationLevel(true);
 				}
-				aB.setTitle(getString(R.string.section_secondary_media_uploads));
+				aB.setTitle(getString(R.string.section_secondary_media_uploads).toUpperCase());
 				break;
 			}
 			default:{
@@ -7786,9 +7783,9 @@ public Toolbar tB;
 	        case R.id.action_grid:{
 	        	log("action_grid selected");
 	        	//Redraw the section headers.
-	        	if(oFLol != null) {
-                    oFLol.floatingItemDecoration = null;
-                }
+//	        	if(oFLol != null) {
+//                    oFLol.floatingItemDecoration = null;
+//                }
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		log("action_grid_list in CameraUploads");
 	        		isListCameraUploads = !isListCameraUploads;
@@ -7864,7 +7861,7 @@ public Toolbar tB;
                         FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
                         fragTransaction.detach(currentFragment);
                         fragTransaction.commitNowAllowingStateLoss();
-                        oFLol.floatingItemDecoration = null;
+//                        oFLol.floatingItemDecoration = null;
                         oFLol.setIsList(isList);
                         oFLol.setPathNavigation(pathNavigationOffline);
                         //oFLol.setGridNavigation(false);
@@ -17768,7 +17765,7 @@ public Toolbar tB;
 					public void run() {
 						getWindow().setStatusBarColor(0);
 					}
-				}, 300);
+				}, 500);
 				changeActionBarElevation(false);
 			}
 		}
@@ -17782,13 +17779,13 @@ public Toolbar tB;
 	}
 
 	public void changeActionBarElevation(boolean scrolled){
-		if(scrolled) {
-			getSupportActionBar().setElevation(Util.px2dp(4, outMetrics));
-//			tB.setElevation(Util.px2dp(8, outMetrics));
-		}
-		else {
-			getSupportActionBar().setElevation(0);
-//			tB.setElevation(0);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (scrolled) {
+				abL.setElevation(Util.px2dp(4, outMetrics));
+			}
+			else {
+				abL.setElevation(0);
+			}
 		}
 	}
 

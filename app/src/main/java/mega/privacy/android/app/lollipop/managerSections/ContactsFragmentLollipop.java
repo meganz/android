@@ -889,6 +889,18 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);
 		    recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
@@ -980,6 +992,18 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			});
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);

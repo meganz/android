@@ -126,7 +126,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
 
         display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -149,11 +149,12 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (recyclerView.canScrollVertically(-1)){
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-                }
-                else {
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                if (context instanceof ManagerActivityLollipop) {
+                    if (recyclerView.canScrollVertically(-1)) {
+                        ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                    } else {
+                        ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                    }
                 }
             }
         });

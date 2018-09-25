@@ -16,12 +16,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
@@ -33,6 +35,7 @@ import nz.mega.sdk.MegaUser;
 
 public class MyStorageFragmentLollipop extends Fragment {
 
+	ScrollView scrollView;
 	Context context;
 	MyAccountInfo myAccountInfo;
 
@@ -90,6 +93,19 @@ public class MyStorageFragmentLollipop extends Fragment {
 		display.getMetrics(outMetrics);
 
 		View v = inflater.inflate(R.layout.fragment_my_storage, container, false);
+
+		scrollView = (ScrollView) v.findViewById(R.id.my_storage_complete_relative_layout);
+		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				if (v.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		myUser = megaApi.getMyUser();
 		if(myUser == null){

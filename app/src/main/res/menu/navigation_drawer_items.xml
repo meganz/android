@@ -10,7 +10,7 @@
 	    <item
 	        android:id="@+id/navigation_item_saved_for_offline"
 	        android:icon="@drawable/saved_for_offline_grey"
-	        android:title="@string/section_saved_for_offline"/>
+	        android:title="@string/section_saved_for_offline_new"/>
 	    
 	    <item
 	        android:id="@+id/navigation_item_camera_uploads"

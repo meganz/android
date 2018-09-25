@@ -195,6 +195,17 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		View v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
+		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				if (v.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		linearLayoutMain = (LinearLayout) v.findViewById(R.id.linear_layout_upgrade);
 
 		//Replace elevation
