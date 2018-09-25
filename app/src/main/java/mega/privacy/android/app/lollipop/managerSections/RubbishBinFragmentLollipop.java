@@ -53,7 +53,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -79,11 +78,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 	CloudDriveAdapter adapter;
 	private int placeholderCount;
-	FloatingItemDecoration floatingItemDecoration;
-	public RubbishBinFragmentLollipop rubbishBinFragment = this;
+	public FloatingItemDecoration floatingItemDecoration;
 
 	ArrayList<MegaNode> nodes;
-	MegaNode selectedNode = null;
 	
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -1197,7 +1194,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	
 	public int onBackPressed(){
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
 
 		if (adapter == null){
 			return 0;
