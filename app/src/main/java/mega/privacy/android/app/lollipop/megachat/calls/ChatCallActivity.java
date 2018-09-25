@@ -2623,8 +2623,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }else{
             parentBigCameraGroupCall.setOnClickListener(null);
             parentBigCameraGroupCall.setVisibility(View.GONE);
-            linearParticipants.setVisibility(View.VISIBLE);
-
+            linearParticipants.setVisibility(View.GONE);
 
             //arrayList-> peersBeforeCall
             if(peersBeforeCall.size() < 7) {
