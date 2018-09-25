@@ -35,6 +35,7 @@ public class Constants {
 	public static int ACTION_SEARCH_BY_DATE = 1024;
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
+	public static int REQUEST_CODE_FILE_INFO = 1027;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -105,6 +106,9 @@ public class Constants {
 	final public static int UPDATE_CREDIT_CARD_SUBSCRIPTION = 9004;
 	final public static int UPDATE_PAYMENT_METHODS = 9005;
 
+	final public static int GO_OFFLINE = 9006;
+	final public static int GO_ONLINE = 9007;
+
 	public static final int REQUEST_WRITE_STORAGE = 1;
 	public static final int REQUEST_CAMERA = 2;
 	public static final int REQUEST_READ_CONTACTS = 3;
@@ -115,6 +119,7 @@ public class Constants {
 	public static final int REQUEST_DOWNLOAD_FOLDER = 7;
 
 	public static final int REQUEST_SAVE_MK_FROM_OFFLINE = 8;
+	public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
 	public static final int PRO_LITE = 4;
 	public static final int FREE = 0;
@@ -179,6 +184,7 @@ public class Constants {
 	public static String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
 	public static String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
+	public static String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
 
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

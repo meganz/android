@@ -55,6 +55,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
+import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+
 public class RecentChatsFragmentLollipop extends Fragment implements View.OnClickListener {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
@@ -1346,24 +1348,24 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             if(aB!=null){
                 switch(status){
                     case MegaChatApi.STATUS_ONLINE:{
-                        aB.setSubtitle(getString(R.string.online_status));
+                        aB.setSubtitle(adjustForLargeFont(getString(R.string.online_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_AWAY:{
-                        aB.setSubtitle(getString(R.string.away_status));
+                        aB.setSubtitle(adjustForLargeFont(getString(R.string.away_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_BUSY:{
-                        aB.setSubtitle(getString(R.string.busy_status));
+                        aB.setSubtitle(adjustForLargeFont(getString(R.string.busy_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_OFFLINE:{
-                        aB.setSubtitle(getString(R.string.offline_status));
+                        aB.setSubtitle(adjustForLargeFont(getString(R.string.offline_status)));
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID:{
                         if(!Util.isOnline(context)){
-                            aB.setSubtitle(getString(R.string.error_server_connection_problem));
+                            aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
                         else{
                             aB.setSubtitle(null);
@@ -1373,15 +1375,14 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     default:{
 
                         if(!Util.isOnline(context)){
-                            aB.setSubtitle(getString(R.string.error_server_connection_problem));
+                            aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
                         else{
                             int initStatus = megaChatApi.getInitState();
                             if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE){
-                                aB.setSubtitle(getString(R.string.chat_connecting));
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                             }
                             else{
-//                                aB.setSubtitle(getString(R.string.loading_status));
                                 aB.setSubtitle(null);
                             }
                         }
@@ -1665,6 +1666,10 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition=0;
+    
+        if(aB != null && aB.getTitle() != null){
+            aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
+        }
 
         super.onResume();
     }

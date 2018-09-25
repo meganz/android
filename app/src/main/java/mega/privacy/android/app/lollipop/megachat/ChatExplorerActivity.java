@@ -26,6 +26,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -239,7 +240,14 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
                         }
                     }
                     log("create group chat with participants: "+peers.size());
-                    megaChatApi.createChat(true, peers, this);
+                    final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
+                    if(chatTitle!=null){
+                        CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
+                        megaChatApi.createChat(true, peers, listener);
+                    }
+                    else{
+                        megaChatApi.createChat(true, peers, this);
+                    }
                 }
             }
         }
@@ -343,18 +351,24 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
 
        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
             log("Create chat request finish.");
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                log("Chat CREATED.");
+           onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
+        }
+    }
 
-                //Update chat view
-                if(chatExplorerFragment!=null && chatExplorerFragment.isAdded()){
-                    chatExplorerFragment.setChats();
-                }
+    public void onRequestFinishCreateChat(int errorCode, long chatHandle){
+        log("onRequestFinishCreateChat");
+
+        if(errorCode==MegaChatError.ERROR_OK){
+            log("Chat CREATED.");
+
+            //Update chat view
+            if(chatExplorerFragment!=null && chatExplorerFragment.isAdded()){
+                chatExplorerFragment.setChats();
             }
-            else{
-                log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
-                showSnackbar(getString(R.string.create_chat_error));
-            }
+        }
+        else{
+            log("EEEERRRRROR WHEN CREATING CHAT " + errorCode);
+            showSnackbar(getString(R.string.create_chat_error));
         }
     }
 
