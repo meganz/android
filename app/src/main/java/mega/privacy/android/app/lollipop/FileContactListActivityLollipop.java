@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -119,6 +120,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	MenuItem addSharingContact;
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
+
+	Handler handler;
 
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -273,6 +276,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			fab.setVisibility(View.GONE);
+			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 1);
 			return true;
 		}
 		
@@ -282,6 +286,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(fileContactListActivityLollipop, getWindow(), handler, 0);
 		}
 
 		@Override
@@ -368,6 +373,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		}
 		
 		megaApi.addGlobalListener(this);
+
+		handler = new Handler();
 		
 		listContacts = new ArrayList<MegaShare>();
 		
@@ -504,6 +511,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
     		megaApi.removeGlobalListener(this);
     		megaApi.removeRequestListener(this);
     	}
+    	handler.removeCallbacksAndMessages(null);
     }
 	
 	@Override

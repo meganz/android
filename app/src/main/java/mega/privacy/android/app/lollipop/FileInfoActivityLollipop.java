@@ -331,13 +331,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-        }
-
         iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
 
         iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);

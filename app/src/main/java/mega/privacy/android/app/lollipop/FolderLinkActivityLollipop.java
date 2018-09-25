@@ -226,6 +226,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 
@@ -235,6 +236,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -369,6 +371,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		else{
 			scaleText = scaleW;
 		}
+
+		handler = new Handler();
 
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
@@ -737,6 +741,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		handler.removeCallbacksAndMessages(null);
 
 		super.onDestroy();
 	}

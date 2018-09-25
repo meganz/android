@@ -207,14 +207,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-		}
-
-
 		/*Icon & image in Toolbar*/
 		iconViewLayout = (RelativeLayout) findViewById(R.id.file_link_icon_layout);
 		iconView = (ImageView) findViewById(R.id.file_link_icon);

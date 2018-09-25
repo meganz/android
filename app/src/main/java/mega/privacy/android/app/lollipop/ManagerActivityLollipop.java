@@ -1837,7 +1837,8 @@ public Toolbar tB;
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
 
-		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+//		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
@@ -5794,6 +5795,7 @@ public Toolbar tB;
 				levelsSearch = -1;
 				drawerItem = DrawerItem.SEARCH;
 				selectDrawerItemLollipop(DrawerItem.SEARCH);
+				changeStatusBarColor(3);
 				return true;
 			}
 
@@ -5803,6 +5805,7 @@ public Toolbar tB;
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
 				textSubmitted = true;
+				changeStatusBarColor(4);
 				return true;
 			}
 		});
@@ -6153,9 +6156,9 @@ public Toolbar tB;
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 						}else{
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview_small));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 						}
 
 //						if (isLargeGridCameraUploads){
@@ -6239,9 +6242,9 @@ public Toolbar tB;
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 						}else{
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview_small));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 						}
 
 //						if (isLargeGridCameraUploads){
@@ -7665,9 +7668,9 @@ public Toolbar tB;
 	        			dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
 						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 						}else{
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview_small));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 						}
 
 //						isLargeGridCameraUploads = !isLargeGridCameraUploads;
@@ -7696,9 +7699,9 @@ public Toolbar tB;
 						dbH.setSmallGridCamera(isSmallGridCameraUploads);
 
 						if (isSmallGridCameraUploads){
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 						}else{
-							gridSmallLargeMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_gridview_small));
+							gridSmallLargeMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview_small, R.color.black));
 						}
 
 //	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
@@ -17719,31 +17722,37 @@ public Toolbar tB;
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 			if (option ==  1) {
-				getWindow().setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.accentColorDark));
+				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.accentColorDark));
 				changeActionBarElevation(true);
 			}
-			else {
+			else if (option == 2){
 				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						getWindow().setStatusBarColor(0);
+						window.setStatusBarColor(0);
 					}
-				}, 500);
+				}, 300);
 				changeActionBarElevation(false);
+			}
+			else if (option == 3) {
+				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.status_bar_search));
+			}
+			else if (option == 4) {
+				window.setStatusBarColor(0);
 			}
 		}
 		if (option == 1){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		}
-		else {
+		else if (option == 2){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 
 	}
 
-	public void changeActionBarElevation(boolean scrolled){
+	public void changeActionBarElevation(boolean whitElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			if (scrolled) {
+			if (whitElevation) {
 				abL.setElevation(Util.px2dp(4, outMetrics));
 			}
 			else {

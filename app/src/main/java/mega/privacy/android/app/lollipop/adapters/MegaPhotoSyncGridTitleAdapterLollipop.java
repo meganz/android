@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +26,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -113,6 +117,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     MegaPreferences prefs;
     String downloadLocationDefaultPath;
     String defaultPath;
+
+    Handler handler;
 
     public static class ItemInformation{
         public int type = -1;
@@ -227,6 +233,19 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             log("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                final Window window = ((ManagerActivityLollipop) context).getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+                    }
+                }, 300);
+
+//                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+            }
             return true;
         }
 
@@ -236,6 +255,18 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             clearSelections();
             multipleSelect = false;
             actionMode = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                final Window window = ((ManagerActivityLollipop) context).getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        window.setStatusBarColor(0);
+                    }
+                }, 700);
+            }
         }
 
         @Override
@@ -355,6 +386,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 }
             }
         }
+
+        handler = new Handler();
 
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();

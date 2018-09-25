@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -112,6 +113,8 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	MegaPreferences prefs = null;
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -204,6 +207,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			fab.setVisibility(View.GONE);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -213,6 +217,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -326,6 +331,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 		}
 
 		lastPositionStack = new Stack<>();
+		handler = new Handler();
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -596,6 +602,7 @@ public class ContactFileListFragmentLollipop extends Fragment{
 	public void onDestroy(){
 
 		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
 	}
 	
 	public void itemClick(int position, int[] screenPosition, ImageView imageView) {

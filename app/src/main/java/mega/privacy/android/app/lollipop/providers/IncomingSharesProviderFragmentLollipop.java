@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -66,6 +67,8 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 	public ActionMode actionMode;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if(!adapter.isMultipleSelect()){
@@ -81,6 +84,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -173,6 +177,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			log("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			Util.changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
 
@@ -199,6 +204,8 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		lastPositionStack = new Stack<>();
 
 		nodes = new ArrayList<MegaNode>();
+
+		handler = new Handler();
 	}
 
 	@Override
@@ -292,8 +299,13 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 		changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 	}
-	
-	
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
+	}
+
 	public void changeActionBarTitle(String folder){
 		if (context instanceof FileProviderActivity){
 			int tabShown = ((FileProviderActivity)context).getTabShown();

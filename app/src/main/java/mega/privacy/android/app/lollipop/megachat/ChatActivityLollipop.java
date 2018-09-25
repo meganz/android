@@ -3005,7 +3005,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
 //                drawable.setAlpha(255);
 //            }
-            changeStatusBarColor(1);
+            Util.changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 1);
             return true;
         }
 
@@ -3016,7 +3016,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //            textChat.getText().clear();
             editingMessage = false;
             clearSelections();
-            changeStatusBarColor(0);
+            Util.changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 0);
         }
 
         @Override
@@ -3244,27 +3244,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             return false;
-        }
-
-    }
-
-    public void changeStatusBarColor(int option) {
-        log("changeStatusBarColor");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            if (option ==  1) {
-                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.accentColorDark));
-            }
-            else {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getWindow().setStatusBarColor(0);
-                    }
-                }, 500);
-            }
         }
 
     }

@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -114,6 +115,8 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 	
 	private ActionMode actionMode;
 
+	Handler handler;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapterList.isMultipleSelect()){
@@ -172,6 +175,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
+			Util.changeStatusBarColorActionMode(nodeAttachmentActivity, getWindow(), handler, 1);
 			return true;
 		}
 
@@ -181,6 +185,7 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(nodeAttachmentActivity, getWindow(), handler, 0);
 		}
 
 		@Override
@@ -240,6 +245,8 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
+
+		handler = new Handler();
 
 		if(megaApi==null||megaApi.getRootNode()==null){
 			log("Refresh session - sdk");
@@ -385,6 +392,12 @@ public class NodeAttachmentActivityLollipop extends PinActivityLollipop implemen
 				nodes.add(nodesTemp.get(i));
 			}
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
 	}
 
 	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){

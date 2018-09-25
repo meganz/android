@@ -3,56 +3,56 @@
 
     <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
 
-    <style name="mySwitchStyle">
-        <item name="switchTextAppearanceAttrib">@style/mySwitchTextAppearance</item>
-        <item name="textOn">ON</item>
-        <item name="textOff">OFF</item>
-        <item name="pushStyle">false</item>
-        <item name="textOnThumb">true</item>
-        <item name="thumbExtraMovement">0dp</item>
-        <item name="thumbTextPaddingMySwitch">6dp</item>
-        <item name="trackTextPadding">6dp</item>
-        <item name="switchMinWidthMySwitch">69dp</item>
-        <item name="switchMinHeight">36dp</item>
-        <item name="switchPaddingMySwitch">6dp</item>
-    </style>
+    <!--<style name="mySwitchStyle">-->
+        <!--<item name="switchTextAppearanceAttrib">@style/mySwitchTextAppearance</item>-->
+        <!--<item name="textOn">ON</item>-->
+        <!--<item name="textOff">OFF</item>-->
+        <!--<item name="pushStyle">false</item>-->
+        <!--<item name="textOnThumb">true</item>-->
+        <!--<item name="thumbExtraMovement">0dp</item>-->
+        <!--<item name="thumbTextPaddingMySwitch">6dp</item>-->
+        <!--<item name="trackTextPadding">6dp</item>-->
+        <!--<item name="switchMinWidthMySwitch">69dp</item>-->
+        <!--<item name="switchMinHeight">36dp</item>-->
+        <!--<item name="switchPaddingMySwitch">6dp</item>-->
+    <!--</style>-->
 
-    <style name="mySwitchTextAppearance">
-        <item name="textColor">#FFeeFFee</item>
-        <item name="textColorHighlight">#FFeeFFee</item>
-        <item name="textColorHint">#FFeeFFee</item>
-        <item name="textColorLink">#FFeeFFee</item>
-        <item name="textSize">16sp</item>
-        <item name="textStyle">normal</item>
-    </style>
+    <!--<style name="mySwitchTextAppearance">-->
+        <!--<item name="textColor">#FFeeFFee</item>-->
+        <!--<item name="textColorHighlight">#FFeeFFee</item>-->
+        <!--<item name="textColorHint">#FFeeFFee</item>-->
+        <!--<item name="textColorLink">#FFeeFFee</item>-->
+        <!--<item name="textSize">16sp</item>-->
+        <!--<item name="textStyle">normal</item>-->
+    <!--</style>-->
 
-    <style name="SpinnerFieldCC">
-        <item name="android:layout_marginTop">0dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
-        <item name="android:layout_marginLeft">20dp</item>
-        <item name="android:layout_marginRight">20dp</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
+    <!--<style name="SpinnerFieldCC">-->
+        <!--<item name="android:layout_marginTop">0dp</item>-->
+        <!--<item name="android:layout_marginBottom">0dp</item>-->
+        <!--<item name="android:layout_marginLeft">20dp</item>-->
+        <!--<item name="android:layout_marginRight">20dp</item>-->
+        <!--<item name="android:layout_width">fill_parent</item>-->
+        <!--<item name="android:layout_height">wrap_content</item>-->
+    <!--</style>-->
 
-    <style name="no_title_activity" parent="@style/Theme.AppCompat.Light">
-        <item name="android:windowNoTitle">true</item>
-        <item name="colorAccent">@color/accentColor</item>
-    </style>
+    <!--<style name="no_title_activity" parent="@style/Theme.AppCompat.Light">-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--<item name="colorAccent">@color/accentColor</item>-->
+    <!--</style>-->
 
-    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
-	    <item name="windowNoTitle">true</item>
-	    <item name="windowActionBar">false</item>
-	    <item name="android:windowFullscreen">true</item>
-	    <item name="android:windowContentOverlay">@null</item>
-	</style>
+    <!--<style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">-->
+	    <!--<item name="windowNoTitle">true</item>-->
+	    <!--<item name="windowActionBar">false</item>-->
+	    <!--<item name="android:windowFullscreen">true</item>-->
+	    <!--<item name="android:windowContentOverlay">@null</item>-->
+	<!--</style>-->
 
-    <style name="MEGAProgressBarTransfers" parent="Widget.AppCompat.ProgressBar.Horizontal">
-		 <item name="android:indeterminateOnly">false</item>
-          <item name="android:progressDrawable">@drawable/custom_progress_bar_horizontal_transfer</item>
-          <item name="android:minHeight">10dip</item>
-          <item name="android:maxHeight">20dip</item>
-	</style>
+    <!--<style name="MEGAProgressBarTransfers" parent="Widget.AppCompat.ProgressBar.Horizontal">-->
+		 <!--<item name="android:indeterminateOnly">false</item>-->
+          <!--<item name="android:progressDrawable">@drawable/custom_progress_bar_horizontal_transfer</item>-->
+          <!--<item name="android:minHeight">10dip</item>-->
+          <!--<item name="android:maxHeight">20dip</item>-->
+	<!--</style>-->
 
     <style name="MEGAProgressBarLogin" parent="Widget.AppCompat.ProgressBar.Horizontal">
 		 <item name="android:indeterminateOnly">false</item>
@@ -84,7 +84,7 @@
         <item name="colorPrimary">@color/white</item>
 
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/copyright_title</item>
+        <item name="colorPrimaryDark">@color/dark_primary_color</item>
 
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
@@ -115,10 +115,10 @@
         <!-- Customize your theme here. -->
 
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/copyright_title</item>
+        <item name="colorPrimary">@color/dark_primary_color</item>
 
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/status_bar_chat</item>
+        <item name="colorPrimaryDark">@color/dark_primary_color_secondary</item>
 
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
@@ -168,13 +168,13 @@
         <item name="android:background">@drawable/ic_dots_vertical_white</item>
     </style>
 
-    <style name="DropDownListView.Megaactionbar" parent="@style/Widget.AppCompat.Light.ListView.DropDown">
-        <item name="android:listSelector">@drawable/selectable_background_megaactionbar</item>
-    </style>
+    <!--<style name="DropDownListView.Megaactionbar" parent="@style/Widget.AppCompat.Light.ListView.DropDown">-->
+        <!--<item name="android:listSelector">@drawable/selectable_background_megaactionbar</item>-->
+    <!--</style>-->
 
-    <style name="ActionBarTabStyle.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar.TabView">
-        <item name="android:background">@drawable/tab_indicator</item>
-    </style>
+    <!--<style name="ActionBarTabStyle.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar.TabView">-->
+        <!--<item name="android:background">@drawable/tab_indicator</item>-->
+    <!--</style>-->
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/white</item>
@@ -191,61 +191,61 @@
         <item name="textAllCaps">true</item>
     </style>
 
-    <style name="Theme.Megaactionbar.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+    <!--<style name="Theme.Megaactionbar.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
+        <!--&lt;!&ndash; colorPrimary is used for the default action bar background &ndash;&gt;-->
+        <!--<item name="colorPrimary">@color/lollipop_primary_color</item>-->
 
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+        <!--&lt;!&ndash; colorPrimaryDark is used for the status bar &ndash;&gt;-->
+        <!--<item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>-->
 
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
+        <!--&lt;!&ndash; colorAccent is used as the default value for colorControlActivated-->
+             <!--which is used to tint widgets &ndash;&gt;-->
+        <!--<item name="colorAccent">@color/accentColor</item>-->
+        <!--<item name="colorControlNormal">@color/text_secondary</item>-->
 
-        <item name="android:windowFullscreen">true</item>
+        <!--<item name="android:windowFullscreen">true</item>-->
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
 
-        <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/lollipop_primary_color</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <!--<item name="windowActionModeOverlay">true</item>-->
+        <!--<item name="actionModeBackground">@color/lollipop_primary_color</item>-->
+        <!--<item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>-->
 
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
+        <!--&lt;!&ndash; You can also set colorControlNormal, colorControlActivated-->
+             <!--colorControlHighlight & colorSwitchThumbNormal. &ndash;&gt;-->
 
-    </style>
+    <!--</style>-->
 
-    <style name="Theme.Megaactionbar.Properties" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+    <!--<style name="Theme.Megaactionbar.Properties" parent="@style/Theme.AppCompat.Light.NoActionBar">-->
+        <!--&lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
+        <!--&lt;!&ndash; colorPrimary is used for the default action bar background &ndash;&gt;-->
+        <!--<item name="colorPrimary">@color/lollipop_primary_color</item>-->
 
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+        <!--&lt;!&ndash; colorPrimaryDark is used for the status bar &ndash;&gt;-->
+        <!--<item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>-->
 
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
+        <!--&lt;!&ndash; colorAccent is used as the default value for colorControlActivated-->
+             <!--which is used to tint widgets &ndash;&gt;-->
+        <!--<item name="colorAccent">@color/accentColor</item>-->
 
-        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!--<item name="android:windowDrawsSystemBarBackgrounds">false</item>-->
+        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
 
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
+        <!--&lt;!&ndash; You can also set colorControlNormal, colorControlActivated-->
+             <!--colorControlHighlight & colorSwitchThumbNormal. &ndash;&gt;-->
 
-    </style>
+    <!--</style>-->
 
-    <style name="NavDrawerAccountInfoText">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#b9b9b9</item>
-    </style>
+    <!--<style name="NavDrawerAccountInfoText">-->
+        <!--<item name="android:layout_height">wrap_content</item>-->
+        <!--<item name="android:layout_width">wrap_content</item>-->
+        <!--<item name="android:textSize">14sp</item>-->
+        <!--<item name="android:textColor">#b9b9b9</item>-->
+    <!--</style>-->
 
     <style name="NavDrawerAccountUsedSpaceText">
         <item name="android:layout_height">wrap_content</item>
@@ -269,7 +269,7 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="ToolbarTitle.ChatActivity" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+    <style name="ToolbarTitle.Secondary" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
 
@@ -304,17 +304,17 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Megaactionbar.General" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
+    <!--<style name="Theme.Megaactionbar.General" parent="@style/Theme.AppCompat.Light.NoActionBar">-->
+        <!--&lt;!&ndash; colorPrimary is used for the default action bar background &ndash;&gt;-->
+        <!--<item name="colorPrimary">@color/lollipop_primary_color</item>-->
 
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+        <!--&lt;!&ndash; colorPrimaryDark is used for the status bar &ndash;&gt;-->
+        <!--<item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>-->
 
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-    </style>
+        <!--&lt;!&ndash; colorAccent is used as the default value for colorControlActivated-->
+             <!--which is used to tint widgets &ndash;&gt;-->
+        <!--<item name="colorAccent">@color/accentColor</item>-->
+    <!--</style>-->
 
     <style name="Theme.Add.Contacts" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor">@color/status_bar_login</item>
