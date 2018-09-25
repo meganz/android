@@ -7778,28 +7778,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					//Refresh Cloud Fragment
 					if (fbFLol != null && fbFLol.isAdded()){
-						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fbFLol");
-						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-						fragTransaction.detach(currentFragment);
-						fragTransaction.commitNowAllowingStateLoss();
+						fbFLol = new FileBrowserFragmentLollipop().newInstance();
+
 						fbFLol.floatingItemDecoration = null;
 
-						fragTransaction = getSupportFragmentManager().beginTransaction();
-						fragTransaction.attach(currentFragment);
-						fragTransaction.commitNowAllowingStateLoss();
+						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+						ft.replace(R.id.fragment_container, fbFLol, "fbFLol");
+						ft.commitNowAllowingStateLoss();
 					}
 
 					//Refresh Rubbish Fragment
 					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("rubbishBinFLol");
-						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-						fragTransaction.detach(currentFragment);
-						fragTransaction.commitNowAllowingStateLoss();
+						rubbishBinFLol = new RubbishBinFragmentLollipop().newInstance();
+
 						rubbishBinFLol.floatingItemDecoration = null;
 
-						fragTransaction = getSupportFragmentManager().beginTransaction();
-						fragTransaction.attach(currentFragment);
-						fragTransaction.commitNowAllowingStateLoss();
+						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+						ft.replace(R.id.fragment_container, rubbishBinFLol, "rubbishBinFLol");
+						ft.commitNowAllowingStateLoss();
 					}
 
 					if(sharesPageAdapter!=null){
