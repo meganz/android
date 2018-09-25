@@ -176,13 +176,6 @@
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never" />
 
-	<item
-		android:id="@+id/action_rubbish_bin"
-		android:orderInCategory="125"
-		android:title="@string/section_rubbish_bin"
-		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
-
 	<!--
         <item
             android:id="@+id/action_rubbish_bin"
@@ -237,6 +230,13 @@
 		android:id="@+id/action_menu_cancel_all_transfers"
 		android:orderInCategory="165"
 		android:title="@string/menu_cancel_all_transfers"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="never" />
+
+	<item
+		android:id="@+id/action_menu_rubbish_bin"
+		android:orderInCategory="170"
+		android:title="@string/section_rubbish_bin"
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never" />
 

@@ -1,8 +1,10 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -54,7 +57,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -73,6 +75,7 @@ import nz.mega.sdk.MegaNode;
 public class OfflineFragmentLollipop extends Fragment{
 
 	public static ImageView imageDrag;
+	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
 	
 	MegaPreferences prefs;
 	
@@ -108,6 +111,26 @@ public class OfflineFragmentLollipop extends Fragment{
 	private ActionMode actionMode;
 	
 	private int placeholderCount;
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			refresh();
+		}
+	};
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter(REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+	}
+
+	@Override
+	public void onPause(){
+		super.onPause();
+		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+	}
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -207,7 +230,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		return null;
 	}
-	
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -406,10 +429,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		
 	}
-	
-	public void setIsListDB(boolean isList){
-		dbH.setPreferredViewList(isList);
-	}
 
 	public void selectAll(){
 		log("selectAll");
@@ -456,7 +475,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		
-		mOffList = new ArrayList<MegaOffline>();		
+		mOffList = new ArrayList<MegaOffline>();
 	}
 	
 	@Override
@@ -492,9 +511,12 @@ public class OfflineFragmentLollipop extends Fragment{
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
             recyclerView.removeItemDecoration(floatingItemDecoration);
             floatingItemDecoration = null;
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
+			//Add bottom padding for recyclerView like in other fragments.
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
@@ -1846,17 +1868,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			adapter.setNodes(dbH.findByPath(_pathNavigation));
 		}
 	}
-	
-	public void setIsList(boolean isList){
-		log("setIsList");
-//		this.isList = isList;
-	}
 
-	public boolean getIsList(){
-		log("getIsList");
-		return ((ManagerActivityLollipop)context).isList;
-	}
-	
 	public void setOrder(int orderGetChildren){
 		log("setOrder");
 		this.orderGetChildren = orderGetChildren;
