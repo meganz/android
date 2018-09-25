@@ -57,7 +57,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -428,10 +427,6 @@ public class OfflineFragmentLollipop extends Fragment{
 			return false;
 		}
 		
-	}
-	
-	public void setIsListDB(boolean isList){
-		dbH.setPreferredViewList(isList);
 	}
 
 	public void selectAll(){
@@ -1848,17 +1843,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			adapter.setNodes(dbH.findByPath(_pathNavigation));
 		}
 	}
-	
-	public void setIsList(boolean isList){
-		log("setIsList");
-//		this.isList = isList;
-	}
 
-	public boolean getIsList(){
-		log("getIsList");
-		return ((ManagerActivityLollipop)context).isList;
-	}
-	
 	public void setOrder(int orderGetChildren){
 		log("setOrder");
 		this.orderGetChildren = orderGetChildren;
