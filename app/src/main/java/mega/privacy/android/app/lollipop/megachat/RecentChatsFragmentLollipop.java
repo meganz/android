@@ -145,6 +145,18 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
+        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (recyclerView.canScrollVertically(-1)){
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                }
+            }
+        });
 //        listView.setClipToPadding(false);
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_chat_recent);

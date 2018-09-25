@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -349,6 +350,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			log("ActionBarCallBack::onPrepareActionMode");
+//			ContextCompat.getDrawable(context, R.drawable.ic_arrow_back_white)
 			List<MegaOffline> selected = adapter.getSelectedOfflineNodes();
 			
 			if (Util.isOnline(context)){
@@ -400,7 +402,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				menu.findItem(R.id.cab_menu_move).setVisible(false);
 				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 				menu.findItem(R.id.cab_menu_rename).setVisible(false);
-			}			
+			}
 			return false;
 		}
 		
@@ -495,6 +497,18 @@ public class OfflineFragmentLollipop extends Fragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text);
@@ -564,6 +578,18 @@ public class OfflineFragmentLollipop extends Fragment{
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.offline_empty_text_grid);

@@ -504,6 +504,18 @@ public class InboxFragmentLollipop extends Fragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
@@ -534,6 +546,18 @@ public class InboxFragmentLollipop extends Fragment{
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
 			recyclerView.setHasFixedSize(true);
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					if (recyclerView.canScrollVertically(-1)){
+						((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					}
+					else {
+						((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					}
+				}
+			});
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());

@@ -25,7 +25,7 @@
                 android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+                android:theme="@style/Theme.Megaactionbar">
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -33,11 +33,10 @@
                     android:layout_height="wrap_content"
                     android:minHeight="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:popupTheme="@style/Theme.Megaactionbar"
                     app:titleTextAppearance="@style/ToolbarTitle"
-                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                    tools:context=".ManagerActivityLollipop" />
-
+                    app:theme="@style/Theme.Megaactionbar"
+                    tools:context=".ManagerActivityLollipop"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_cloud_drive"

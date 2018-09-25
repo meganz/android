@@ -81,25 +81,57 @@
         <!-- Customize your theme here. -->
 
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
+        <item name="colorPrimary">@color/white</item>
 
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+        <item name="colorPrimaryDark">@color/copyright_title</item>
 
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
         <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlNormal">@color/black</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
 
         <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/lollipop_primary_color</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="actionModeBackground">@color/accentColor</item>
+        <item name="android:actionModeBackground">@color/accentColor</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="elevation">0dp</item>
+        <item name="android:elevation">0dp</item>
 
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
+    </style>
+
+    <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+    </style>
+
+    <style name="TitleTextStyle" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="textColor">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="textSize">20sp</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="ActionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="srcCompat">@drawable/ic_dots_vertical_white</item>
+        <item name="android:src">@drawable/ic_dots_vertical_white</item>
+        <item name="background">@drawable/ic_dots_vertical_white</item>
+        <item name="android:background">@drawable/ic_dots_vertical_white</item>
     </style>
 
     <style name="DropDownListView.Megaactionbar" parent="@style/Widget.AppCompat.Light.ListView.DropDown">
@@ -255,8 +287,8 @@
 
     <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:background">@color/white</item>
-        <item name="android:positiveButtonText">@color/file_playlist_state</item>
-        <item name="android:negativeButtonText">@color/file_playlist_state</item>
+        <item name="android:positiveButtonText">@color/accentColor</item>
+        <item name="android:negativeButtonText">@color/accentColor</item>
         <item name="android:content">@color/mail_my_account</item>
         <item name="colorControlNormal">@color/mail_my_account</item>
         <item name="android:textColorPrimary">@color/mail_my_account</item>

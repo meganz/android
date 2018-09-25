@@ -47,7 +47,7 @@
             android:text="@string/general_cancel"
             android:textSize="14sp"
             android:fontFamily="roboto"
-            android:textColor="@color/file_playlist_state"
+            android:textColor="@color/accentColor"
             android:layout_marginRight="8dp"/>
 
         <Button
@@ -58,7 +58,7 @@
             android:text="@string/context_open_link"
             android:textSize="14sp"
             android:fontFamily="roboto"
-            android:textColor="@color/file_playlist_state"/>
+            android:textColor="@color/accentColor"/>
 
     </LinearLayout>
 
