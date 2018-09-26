@@ -10,6 +10,7 @@ android {
         targetSdkVersion 25
         versionCode 205
         versionName "3.3.8 (205)"
+        multiDexEnabled true
     }
 
     sourceSets.main {
