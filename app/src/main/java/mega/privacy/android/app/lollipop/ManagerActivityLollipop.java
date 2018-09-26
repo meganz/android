@@ -1937,11 +1937,11 @@ public Toolbar tB;
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
 		viewPagerContacts.setOffscreenPageLimit(3);
 
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
-		}else{
-			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
-		}
+//		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//			tabLayoutContacts.setTabMode(TabLayout.MODE_FIXED);
+//		}else{
+//			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
+//		}
 
 		//TABS section Shared Items
 		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
@@ -1957,6 +1957,7 @@ public Toolbar tB;
 			public void onPageSelected(int position) {
 				log("selectDrawerItemSharedItems: TabId :"+ position);
 				supportInvalidateOptionsMenu();
+				checkScrollElevation();
 				if(position == 1){
 					if (inSFLol != null && inSFLol.isAdded()){
 						if(inSFLol.isMultipleselect()){
@@ -2812,6 +2813,8 @@ public Toolbar tB;
 			orientationSaved = getResources().getConfiguration().orientation;
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
+
+        checkScrollElevation();
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4071,14 +4074,14 @@ public Toolbar tB;
 			case RUBBISH_BIN: {
 				aB.setSubtitle(null);
 				if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
-					aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+					aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 					firstNavigationLevel = true;
 				}
 				else{
 					MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
 					if(node==null){
 						log("Node NULL - cannot be recovered");
-						aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+						aB.setTitle(getResources().getString(R.string.section_rubbish_bin).toUpperCase());
 					}
 					else{
 						aB.setTitle(node.getName());
@@ -4807,6 +4810,7 @@ public Toolbar tB;
 			@Override
 			public void onPageSelected(int position) {
 				log("onPageSelected");
+				checkScrollElevation();
 				indexContacts = position;
 				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);
 				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
@@ -4948,6 +4952,7 @@ public Toolbar tB;
 					@Override
 					public void onPageSelected(int position) {
 						supportInvalidateOptionsMenu();
+						checkScrollElevation();
 					}
 
 					@Override
@@ -5520,6 +5525,8 @@ public Toolbar tB;
 			}
     	}
 
+    	checkScrollElevation();
+
 		if (megaApi.multiFactorAuthAvailable()) {
 			if (newAccount || isEnable2FADialogShown) {
 				showEnable2FADialog();
@@ -5527,7 +5534,98 @@ public Toolbar tB;
 		}
 	}
 
-	void showEnable2FADialog () {
+    public void checkScrollElevation() {
+
+        switch (drawerItem) {
+            case CLOUD_DRIVE: {
+                if (fbFLol != null && fbFLol.isAdded()) {
+                    fbFLol.checkScroll();
+                }
+                break;
+            }
+            case SAVED_FOR_OFFLINE: {
+                if (oFLol != null && oFLol.isAdded()) {
+                    oFLol.checkScroll();
+                }
+                break;
+            }
+            case CAMERA_UPLOADS: {
+                if (cuFL != null && cuFL.isAdded()) {
+                    cuFL.checkScroll();
+                }
+                break;
+            }
+            case INBOX: {
+                if (iFLol != null && iFLol.isAdded()) {
+                    iFLol.checkScroll();
+                }
+                break;
+            }
+            case SHARED_ITEMS: {
+                if (viewPagerShares.getCurrentItem() == 0 && inSFLol != null && inSFLol.isAdded()) {
+                    inSFLol.checkScroll();
+                }
+                else if (viewPagerShares.getCurrentItem() == 1 && outSFLol != null && outSFLol.isAdded()) {
+                    outSFLol.checkScroll();
+                }
+                break;
+            }
+            case CONTACTS: {
+                if (viewPagerContacts.getCurrentItem() == 0 && cFLol != null && cFLol.isAdded()) {
+                    cFLol.checkScroll();
+                }
+                else if (viewPagerContacts.getCurrentItem() == 1 && sRFLol != null && sRFLol.isAdded()) {
+                    sRFLol.checkScroll();
+                }
+                else if (viewPagerContacts.getCurrentItem() == 2 && rRFLol != null && rRFLol.isAdded()) {
+                    rRFLol.checkScroll();
+                }
+                break;
+            }
+            case SETTINGS: {
+                if (sttFLol != null && sttFLol.isAdded()) {
+                    sttFLol.checkScroll();
+                }
+                break;
+            }
+            case ACCOUNT: {
+                if (viewPagerMyAccount.getCurrentItem() == 0 && maFLol != null && maFLol.isAdded()) {
+                    maFLol.checkScroll();
+                }
+                else if (viewPagerMyAccount.getCurrentItem() == 1 && mStorageFLol != null && mStorageFLol.isAdded()) {
+                    mStorageFLol.checkScroll();
+                }
+                break;
+            }
+            case SEARCH: {
+                if (sFLol != null && sFLol.isAdded()) {
+                    sFLol.checkScroll();
+                }
+                break;
+            }
+            case MEDIA_UPLOADS: {
+                if (muFLol != null && muFLol.isAdded()) {
+                    muFLol.checkScroll();
+                }
+                break;
+            }
+            case CHAT: {
+                if (rChatFL != null && rChatFL.isAdded()) {
+                    rChatFL.checkScroll();
+                }
+                break;
+            }
+            case RUBBISH_BIN: {
+                if (rubbishBinFLol != null && rubbishBinFLol.isAdded()) {
+                    rubbishBinFLol.checkScroll();
+                }
+                break;
+            }
+        }
+    }
+
+
+    void showEnable2FADialog () {
 		log ("showEnable2FADialog newaccount: "+newAccount);
 		newAccount = false;
 
@@ -17728,7 +17826,7 @@ public Toolbar tB;
 						window.setStatusBarColor(0);
 					}
 				}, 300);
-				changeActionBarElevation(false);
+				checkScrollElevation();
 			}
 			else if (option == 3) {
 				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.status_bar_search));
