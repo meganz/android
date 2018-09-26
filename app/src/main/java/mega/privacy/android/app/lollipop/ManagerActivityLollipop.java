@@ -568,8 +568,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
 
-	boolean sendToChat = false;
-
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -5778,6 +5776,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				if(Util.isChatEnabled()) {
+					MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+					if (parentNode == null) {
+						log("Create folder: " + Constants.CHAT_FOLDER);
+						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+					}
+				}
 				textsearchQuery = false;
 				searchQuery = "";
 				firstNavigationLevel = true;
@@ -16126,36 +16131,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-						&& drawerItem == DrawerItem.SHARED_ITEMS && getTabItemShares() == 0) {
-					log("Incoming node copied to Send to chat");
-					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-					if (attachNode != null) {
-						nC.selectChatsToSendNode(attachNode);
+				log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+				showSnackbar(getString(R.string.context_correctly_copied));
+
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null && fbFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+						fbFLol.setNodes(nodes);
+						fbFLol.getRecyclerView().invalidate();
 					}
 				}
-				else {
-					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
-					showSnackbar(getString(R.string.context_correctly_copied));
+				else if (drawerItem == DrawerItem.RUBBISH_BIN){
 
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						if (fbFLol != null && fbFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-							fbFLol.setNodes(nodes);
-							fbFLol.getRecyclerView().invalidate();
-						}
+					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
-					else if (drawerItem == DrawerItem.RUBBISH_BIN){
-						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-						}
-					}
-					else if (drawerItem == DrawerItem.INBOX){
-						if (iFLol != null && iFLol.isAdded()){
-							iFLol.getRecyclerView().invalidate();
-						}
+				}
+				else if (drawerItem == DrawerItem.INBOX){
+					if (iFLol != null && iFLol.isAdded()){
+						iFLol.getRecyclerView().invalidate();
 					}
 				}
 			}
@@ -16173,7 +16169,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					showSnackbar(getString(R.string.context_no_copied));
 				}
 			}
-			sendToChat = false;
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try {
@@ -18190,10 +18185,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setNewMail (String newMail) {
 		this.newMail = newMail;
-	}
-
-	public void setSendToChat (boolean sendToChat) {
-			this.sendToChat = sendToChat;
 	}
 
 	public boolean isCameraUploads(MegaNode n){
