@@ -1960,6 +1960,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         saveForOfflineMenuItem = menu.findItem(R.id.chat_full_video_viewer_save_for_offline);
         chatRemoveMenuItem = menu.findItem(R.id.chat_full_video_viewer_remove);
 
+        if (nC == null) {
+            nC = new NodeController(this);
+        }
+        boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+
         if (loop){
             loopMenuItem.setChecked(true);
             if (player != null) {
@@ -1994,7 +1999,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if(adapterType == Constants.SEARCH_ADAPTER){
+            else if(adapterType == Constants.SEARCH_ADAPTER && !fromIncoming){
                 log("onCreateOptionsMenu SEARCH_ADAPTER");
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
@@ -2142,7 +2147,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+            else if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 propertiesMenuItem.setVisible(true);
                 if(mega.privacy.android.app.utils.Util.isChatEnabled()){
                     chatMenuItem.setVisible(true);
@@ -3055,7 +3060,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             MegaNode node = megaApi.getNodeByHandle(handle);
             i.putExtra("handle", node.getHandle());
             i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
-            if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+            if (nC == null) {
+                nC = new NodeController(this);
+            }
+            boolean fromIncoming = nC.nodeComesFromIncoming(node);
+            if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);
             }
