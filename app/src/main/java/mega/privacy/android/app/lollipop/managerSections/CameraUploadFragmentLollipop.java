@@ -112,7 +112,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	private RelativeLayout contentTextLayout;
+//	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
 	private RelativeLayout transfersOverViewLayout;
 
@@ -787,8 +787,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			relativeLayoutTurnOnOff.setOnClickListener(this);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentTextLayout.setVisibility(View.GONE);
+//			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
+//			contentTextLayout.setVisibility(View.GONE);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
@@ -979,8 +979,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			relativeLayoutTurnOnOff.setOnClickListener(this);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
-			contentTextLayout.setVisibility(View.GONE);
+//			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
+//			contentTextLayout.setVisibility(View.GONE);
 
 			fragmentContainer = (RelativeLayout) v.findViewById(R.id.fragment_container_file_browser_grid);
 			fragmentContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));

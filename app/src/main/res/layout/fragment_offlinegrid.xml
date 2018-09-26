@@ -21,7 +21,7 @@
             android:textSize="14sp" />
     </RelativeLayout>
 
-    <mega.privacy.android.app.components.CustomizedGridRecyclerView
+    <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/offline_view_browser_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 

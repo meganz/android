@@ -35,6 +35,7 @@ public class Constants {
 	public static int ACTION_SEARCH_BY_DATE = 1024;
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
+	public static int REQUEST_CODE_FILE_INFO = 1027;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -206,6 +207,7 @@ public class Constants {
 	final public static int SEARCH_BY_ADAPTER = 2018;
 	final public static int FILE_LINK_ADAPTER = 2019;
 	final public static int FROM_CHAT = 2020;
+    final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
