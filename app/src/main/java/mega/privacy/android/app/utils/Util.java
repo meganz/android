@@ -32,6 +32,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
@@ -48,6 +49,8 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,7 +112,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static String mainDIR = "/MEGA";
 	public static String offlineDIR = "MEGA/MEGA Offline";
@@ -1982,6 +1985,25 @@ public class Util {
 			builder.show();
 		}else{
 			callback.onAbortConfirm();
+		}
+	}
+
+	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
+		log("changeStatusBarColor");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			if (option ==  1) {
+				window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+			}
+			else {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
+					}
+				}, 500);
+			}
 		}
 	}
 
