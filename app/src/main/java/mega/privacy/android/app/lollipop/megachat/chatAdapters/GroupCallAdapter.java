@@ -410,7 +410,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             }
 
             //Update micro icon
-            holder.microSurface.setImageResource(R.drawable.ic_mic_off);
+            holder.microSurface.setImageResource(R.drawable.ic_mic_off_contact);
             RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
