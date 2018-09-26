@@ -1,8 +1,10 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -40,7 +43,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -50,13 +55,14 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -69,6 +75,7 @@ import nz.mega.sdk.MegaNode;
 public class OfflineFragmentLollipop extends Fragment{
 
 	public static ImageView imageDrag;
+	public static final String REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list";
 	
 	MegaPreferences prefs;
 	
@@ -79,7 +86,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
-	
+	public FloatingItemDecoration floatingItemDecoration;
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
@@ -90,7 +97,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
 	TextView contentText;
-	boolean isList = true;
+//	boolean isList = true;
 	int orderGetChildren;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -102,6 +109,28 @@ public class OfflineFragmentLollipop extends Fragment{
 	Display display;
 
 	private ActionMode actionMode;
+	
+	private int placeholderCount;
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			refresh();
+		}
+	};
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		IntentFilter filter = new IntentFilter(REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+	}
+
+	@Override
+	public void onPause(){
+		super.onPause();
+		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+	}
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -114,7 +143,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -122,12 +151,70 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 		}
 	}
-
+	
+	private int getAdapterType() {
+		return ((ManagerActivityLollipop)context).isList ? MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST : MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID;
+	}
+    
+    public void addSectionTitle(List<MegaOffline> nodes) {
+	    if(adapter != null) {
+	        adapter.setRecylerView(recyclerView);
+        }
+        Map<Integer, String> sections = new HashMap<>();
+        int folderCount = 0;
+        int fileCount = 0;
+        for (MegaOffline node : nodes) {
+            if (node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            } else {
+                fileCount++;
+            }
+        }
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            if(folderCount > 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(i,folderCount + " " + folderStr);
+                }
+            }
+            
+            if(fileCount > 0 ) {
+                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
+                }
+            }
+        } else {
+            placeholderCount = 0;
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
+        if (floatingItemDecoration == null) {
+            floatingItemDecoration = new FloatingItemDecoration(context);
+            recyclerView.addItemDecoration(floatingItemDecoration);
+        }
+        floatingItemDecoration.setType(getAdapterType());
+        floatingItemDecoration.setKeys(sections);
+    }
 
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.offline_list_thumbnail);
@@ -143,7 +230,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		return null;
 	}
-	
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -341,10 +428,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		
 	}
-	
-	public void setIsListDB(boolean isList){
-		dbH.setPreferredViewList(isList);
-	}
 
 	public void selectAll(){
 		log("selectAll");
@@ -391,7 +474,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		dbH = DatabaseHandler.getDbHandler(context);
 		
-		mOffList = new ArrayList<MegaOffline>();		
+		mOffList = new ArrayList<MegaOffline>();
 	}
 	
 	@Override
@@ -409,7 +492,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		    isList = ((ManagerActivityLollipop)context).isList();
+//		    isList = ((ManagerActivityLollipop)context).isList();
 			orderGetChildren = ((ManagerActivityLollipop)context).getOrderOthers();
 		}
 
@@ -421,13 +504,18 @@ public class OfflineFragmentLollipop extends Fragment{
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		//Check pathNAvigation
-		if (isList){
+		if (((ManagerActivityLollipop)context).isList){
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+            recyclerView.removeItemDecoration(floatingItemDecoration);
+            floatingItemDecoration = null;
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
+			//Add bottom padding for recyclerView like in other fragments.
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
@@ -437,15 +525,11 @@ public class OfflineFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
 
 			findNodes();
-
+			addSectionTitle(mOffList);
 			if (adapter == null){
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				adapter.setNodes(mOffList);
-				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-
 				adapter.setPositionClicked(-1);
 				adapter.setMultipleSelect(false);
-
 				recyclerView.setAdapter(adapter);
 
 				if (adapter.getItemCount() == 0){
@@ -460,13 +544,14 @@ public class OfflineFragmentLollipop extends Fragment{
 						emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					}
 					String textToShow = String.format(getString(R.string.context_empty_offline), getString(R.string.section_saved_for_offline));
-					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+					try {
+						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]","</font>");
+						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]","</font>");
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					catch (Exception e){}
 					Spanned result = null;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
@@ -474,18 +559,18 @@ public class OfflineFragmentLollipop extends Fragment{
 						result = Html.fromHtml(textToShow);
 					}
 					emptyTextViewFirst.setText(result);
-
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					contentText.setText(getInfoFolder(mOffList));
+//					contentText.setText(getInfoFolder(mOffList));
 				}
 			}
 			else{
-				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			    adapter.setRecylerView(recyclerView);
+//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 		
 			return v;
@@ -494,7 +579,9 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("onCreateGRID");
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
+			recyclerView.removeItemDecoration(floatingItemDecoration);
+			floatingItemDecoration = null;
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
@@ -508,15 +595,11 @@ public class OfflineFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
 
 			findNodes();
-			
+			addSectionTitle(mOffList);
 			if (adapter == null){
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-				adapter.setNodes(mOffList);
-				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-
 				adapter.setPositionClicked(-1);
 				adapter.setMultipleSelect(false);
-
 				recyclerView.setAdapter(adapter);
 
 				if (adapter.getItemCount() == 0){
@@ -548,14 +631,15 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					contentText.setText(getInfoFolder(mOffList));
+//					contentText.setText(getInfoFolder(mOffList));
 				}
 			}
 			else{
-				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+                adapter.setRecylerView(recyclerView);
+//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
 			return v;
@@ -630,6 +714,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					i--;
 				}
 			}
+			addSectionTitle(mOffList);
 		}
 
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -640,11 +725,12 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 
 		if(adapter!=null){
+			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
-
+			
 			recyclerView.setAdapter(adapter);
 
 			if (adapter.getItemCount() == 0){
@@ -676,10 +762,10 @@ public class OfflineFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				contentText.setText(getInfoFolder(mOffList));
+//				contentText.setText(getInfoFolder(mOffList));
 			}
 		}
 	}
@@ -739,13 +825,14 @@ public class OfflineFragmentLollipop extends Fragment{
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 		if (adapter!= null) {
+			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 		}
-		contentText.setText(getInfoFolder(mOffList));
+//		contentText.setText(getInfoFolder(mOffList));
 	}
-
-	
-	public void sortByNameAscending(){
+    
+    
+    public void sortByNameAscending() {
 		log("sortByNameAscending");
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
@@ -764,6 +851,9 @@ public class OfflineFragmentLollipop extends Fragment{
 				
 		for(int k = 0; k < mOffList.size() ; k++) {
 			MegaOffline node = mOffList.get(k);
+			if(node == null) {
+			    continue;
+            }
 			if(node.getType().equals("1")){
 				foldersOrder.add(node.getName());
 			}
@@ -778,9 +868,13 @@ public class OfflineFragmentLollipop extends Fragment{
 		for(int k = 0; k < foldersOrder.size() ; k++) {
 			for(int j = 0; j < mOffList.size() ; j++) {
 				String name = foldersOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
+                MegaOffline offline = mOffList.get(j);
+                if(offline == null) {
+                    continue;
+                }
+                String nameOffline = offline.getName();
 				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
+					tempOffline.add(offline);
 				}				
 			}			
 		}
@@ -788,9 +882,13 @@ public class OfflineFragmentLollipop extends Fragment{
 		for(int k = 0; k < filesOrder.size() ; k++) {
 			for(int j = 0; j < mOffList.size() ; j++) {
 				String name = filesOrder.get(k);
-				String nameOffline = mOffList.get(j).getName();
+                MegaOffline offline = mOffList.get(j);
+                if(offline == null) {
+                    continue;
+                }
+                String nameOffline = offline.getName();
 				if(name.equals(nameOffline)){
-					tempOffline.add(mOffList.get(j));
+					tempOffline.add(offline);
 				}				
 			}
 			
@@ -799,9 +897,10 @@ public class OfflineFragmentLollipop extends Fragment{
 		mOffList.clear();
 		mOffList.addAll(tempOffline);
 		if (adapter!= null) {
+			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 		}
-		contentText.setText(getInfoFolder(mOffList));
+//		contentText.setText(getInfoFolder(mOffList));
 	}
 	
 //	public void updateView (){
@@ -923,12 +1022,18 @@ public class OfflineFragmentLollipop extends Fragment{
         super.onAttach(activity);
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
+        if(mOffList != null && mOffList.size() != 0) {
+			addSectionTitle(mOffList);
+		}
     }
 
     public void itemClick(int position, int[] screenPosition, ImageView imageView) {
 		log("itemClick");
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
+		//Otherwise out of bounds exception happens.
+		if(position >= adapter.folderCount && getAdapterType() == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID && placeholderCount != 0) {
+			position -= placeholderCount;
+		}
 		if (adapter.isMultipleSelect()){
 			log("multiselect");
 			MegaOffline item = mOffList.get(position);
@@ -971,14 +1076,14 @@ public class OfflineFragmentLollipop extends Fragment{
 			if(currentFile.exists() && currentFile.isDirectory()){
 
 				int lastFirstVisiblePosition = 0;
-				if(isList){
+				if(((ManagerActivityLollipop)context).isList){
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -1033,7 +1138,8 @@ public class OfflineFragmentLollipop extends Fragment{
 						}			
 					}
 				}
-				contentText.setText(getInfoFolder(mOffList));
+//				contentText.setText(getInfoFolder(mOffList));
+				addSectionTitle(mOffList);
 				adapter.setNodes(mOffList);
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1072,7 +1178,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -1080,7 +1186,6 @@ public class OfflineFragmentLollipop extends Fragment{
 				adapter.setPositionClicked(-1);
 				recyclerView.scrollToPosition(0);
 				notifyDataSetChanged();
-
 			}
 			else{
 				if(currentFile.exists() && currentFile.isFile()){			
@@ -1429,7 +1534,7 @@ public class OfflineFragmentLollipop extends Fragment{
 //				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();
 				mOffList = dbH.findByPath(pathNavigation);
 				
-				contentText.setText(getInfoFolder(mOffList));
+//				contentText.setText(getInfoFolder(mOffList));
 				
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1449,7 +1554,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 				if(lastVisiblePosition>=0){
 
-					if(isList){
+					if(((ManagerActivityLollipop)context).isList){
 						mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 					}
 					else{
@@ -1480,6 +1585,7 @@ public class OfflineFragmentLollipop extends Fragment{
 		this.mOffList = _mOff;
 
 		if (adapter != null){
+			addSectionTitle(mOffList);
 			adapter.setNodes(mOffList);
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
@@ -1533,16 +1639,6 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		mOffList=dbH.findByPath(pathNavigation);
 
-		if (adapter == null){
-			adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-			contentText.setText(getInfoFolder(mOffList));
-			adapter.setNodes(mOffList);
-			adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-		}
-		else{
-			contentText.setText(getInfoFolder(mOffList));
-			adapter.setNodes(mOffList);
-		}
 
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 			sortByNameDescending();
@@ -1550,7 +1646,27 @@ public class OfflineFragmentLollipop extends Fragment{
 		else{
 			sortByNameAscending();
 		}
-
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(mOffList);
+			if (adapter == null) {
+				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			} else {
+//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setNodes(mOffList);
+				adapter.notifyDataSetChanged();
+				recyclerView.invalidate();
+			}
+		} else {
+			addSectionTitle(mOffList);
+			if (adapter == null) {
+				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			} else {
+//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setNodes(mOffList);
+                adapter.notifyDataSetChanged();
+                recyclerView.invalidate();
+			}
+		}
 		if (adapter.getItemCount() == 0){
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
@@ -1580,11 +1696,12 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		}else{
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			contentText.setText(getInfoFolder(mOffList));
+//			contentText.setText(getInfoFolder(mOffList));
 		}
+		addSectionTitle(mOffList);
 		setPositionClicked(-1);
 		notifyDataSetChanged();
 	}
@@ -1599,7 +1716,24 @@ public class OfflineFragmentLollipop extends Fragment{
 		else{
 			sortByNameAscending();
 		}
-		
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(mOffList);
+			if (adapter == null) {
+				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			} else {
+//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter.setNodes(mOffList);
+			}
+		} else {
+			addSectionTitle(mOffList);
+			if (adapter == null) {
+				adapter = new MegaOfflineLollipopAdapter(this,context,mOffList,recyclerView,emptyImageView,emptyTextView,aB,MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			} else {
+//				adapter.setAdapterType(MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setNodes(mOffList);
+			}
+		}
+		addSectionTitle(mOffList);
 //		setNodes(mOffList);
 		recyclerView.invalidate();
 	}
@@ -1639,7 +1773,7 @@ public class OfflineFragmentLollipop extends Fragment{
 
 		((ManagerActivityLollipop)context).setToolbarTitle();
 		log("At the end of refreshPaths the path is: "+pathNavigation);
-		contentText.setText(getInfoFolder(mOffList));
+//		contentText.setText(getInfoFolder(mOffList));
 		setNodes(mOffList);
 	}
 	
@@ -1703,22 +1837,13 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void setPathNavigation(String _pathNavigation){
 		log("setPathNavigation(): "+pathNavigation);
 		this.pathNavigation = _pathNavigation;
-		if (adapter != null){	
+		addSectionTitle(mOffList);
+		if (adapter != null){
 //			contentText.setText(getInfoFolder(mOffList));
 			adapter.setNodes(dbH.findByPath(_pathNavigation));
 		}
 	}
-	
-	public void setIsList(boolean isList){
-		log("setIsList");
-		this.isList = isList;
-	}
-	
-	public boolean getIsList(){
-		log("getIsList");
-		return isList;
-	}
-	
+
 	public void setOrder(int orderGetChildren){
 		log("setOrder");
 		this.orderGetChildren = orderGetChildren;
@@ -1727,7 +1852,12 @@ public class OfflineFragmentLollipop extends Fragment{
 	private static void log(String log) {
 		Util.log("OfflineFragmentLollipop", log);
 	}
-
+	
+//	private void dlog(Object o) {
+//		String s = (o == null) ? "NULL" : o.toString();
+//		Log.e("@#$","---> " + s);
+//	}
+	
 	public String getPathNavigation() {
 		log("getPathNavigation");
 		return pathNavigation;
