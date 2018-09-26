@@ -751,7 +751,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			long delay = megaApi.getBandwidthOverquotaDelay();
 			if (delay == 0) {
-				transfersTitleText.setText(getString(R.string.section_transfers));
+//				transfersTitleText.setText(getString(R.string.section_transfers));
 			} else {
 				log("Overquota delay activated until: " + delay);
 				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
