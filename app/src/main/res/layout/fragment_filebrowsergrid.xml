@@ -5,12 +5,13 @@
     android:id="@+id/fragment_container_file_browser_grid"
     android:background="@color/new_background_fragment"
     tools:context=".FileBrowserGridFragment" >
-
+	<include layout="@layout/item_transfers_overview"/>
     <RelativeLayout
         android:id="@+id/content_grid_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="36dp"
-        android:background="@color/new_background_fragment" >
+        android:background="@color/new_background_fragment"
+        android:visibility="gone">
 
         <ProgressBar
             android:id="@+id/file_grid_download_progress_bar"
@@ -59,6 +60,7 @@
     </RelativeLayout>
 
     <LinearLayout
+	    android:id="@+id/linear_layout_recycler"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
