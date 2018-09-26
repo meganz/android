@@ -497,7 +497,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog downloadConfirmationDialog;
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
-	private AlertDialog getLinkDialog;
+	private AlertDialog generalDialog;
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageAlmostFull;
@@ -11337,6 +11337,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			}
 		});
+	}
+
+	public void showRBNotDisabledDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_two_vertical_buttons, null);
+		builder.setView(v);
+
+		TextView title = (TextView) v.findViewById(R.id.dialog_title);
+		title.setText(getString(R.string.settings_rb_scheduler_enable_title));
+		TextView text = (TextView) v.findViewById(R.id.dialog_text);
+		text.setText(getString(R.string.settings_rb_scheduler_alert_disabling));
+
+		Button firstButton = (Button) v.findViewById(R.id.dialog_first_button);
+		firstButton.setText(getString(R.string.button_plans_almost_full_warning));
+		firstButton.setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				generalDialog.dismiss();
+				//Show UpgradeAccountActivity
+				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+				selectDrawerItemAccount();
+			}
+		});
+
+		Button secondButton = (Button) v.findViewById(R.id.dialog_second_button);
+		secondButton.setText(getString(R.string.button_not_now_rich_links));
+		secondButton.setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				generalDialog.dismiss();
+			}
+		});
+
+		generalDialog = builder.create();
+		generalDialog.show();
 	}
 
 	public void showRbSchedulerValueDialog(final boolean isEnabling){
