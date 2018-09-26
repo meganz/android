@@ -684,6 +684,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		log("After recovering bundle type: "+type);
 	}
+
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -722,7 +733,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 					@Override
 					public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-						if (v.canScrollVertically(-1)){
+						if (scrollView.canScrollVertically(-1)){
 							((ManagerActivityLollipop) context).changeActionBarElevation(true);
 						}
 						else {
@@ -776,12 +787,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 
@@ -983,12 +989,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 

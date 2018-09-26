@@ -170,7 +170,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         log("onCreateView");
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
+        final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         float density = getResources().getDisplayMetrics().density;
 
@@ -199,17 +199,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         View v = inflater.inflate(R.layout.fragment_choose_account, container, false);
 
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_choose_account);
-        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (v.canScrollVertically(-1)){
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-                }
-                else {
-                    ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-                }
-            }
-        });
+
         mainLinearLayout = (LinearLayout) v.findViewById(R.id.choose_account_main_linear_layout);
 
         //Replace elevation
