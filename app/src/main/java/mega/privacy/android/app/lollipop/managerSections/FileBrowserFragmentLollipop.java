@@ -150,7 +150,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 	}
 
-
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
@@ -541,6 +540,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		log("after onCreate called super");
 	}
 
+	public void checkScroll() {
+		if (recyclerView != null) {
+			if (recyclerView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else if (!isMultipleselect()) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
@@ -602,12 +612,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 
@@ -683,12 +688,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
             progressBar = (ProgressBar)v.findViewById(R.id.file_grid_download_progress_bar);

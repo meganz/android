@@ -143,6 +143,17 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 		return null;
 	}
+
+	public void checkScroll() {
+		if (recyclerView != null) {
+			if (recyclerView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
     
     public void addSectionTitle(List<MegaNode> nodes,int type) {
         Map<Integer, String> sections = new HashMap<>();
@@ -516,12 +527,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 			
@@ -640,12 +646,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 			

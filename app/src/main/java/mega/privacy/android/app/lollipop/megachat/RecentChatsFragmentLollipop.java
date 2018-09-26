@@ -125,6 +125,17 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         }
     }
 
+    public void checkScroll() {
+        if (listView != null) {
+            if (listView.canScrollVertically(-1)) {
+                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+            }
+            else {
+                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+            }
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         log("onCreateView");
@@ -150,11 +161,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (context instanceof ManagerActivityLollipop) {
-                    if (recyclerView.canScrollVertically(-1)) {
-                        ((ManagerActivityLollipop) context).changeActionBarElevation(true);
-                    } else {
-                        ((ManagerActivityLollipop) context).changeActionBarElevation(false);
-                    }
+                    checkScroll();
                 }
             }
         });

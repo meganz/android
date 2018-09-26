@@ -1187,14 +1187,20 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 				@Override
 				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-					if (view.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
+		}
+	}
+
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
 		}
 	}
 
