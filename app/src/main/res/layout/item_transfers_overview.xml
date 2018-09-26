@@ -3,7 +3,8 @@
     android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
     android:background="@drawable/statelist_item_layout"
-    android:id="@+id/transfers_overview_item_layout" >
+    android:id="@+id/transfers_overview_item_layout"
+	android:visibility="gone">
 
 	<RelativeLayout
 		android:id="@+id/transfers_overview_three_dots_layout"
