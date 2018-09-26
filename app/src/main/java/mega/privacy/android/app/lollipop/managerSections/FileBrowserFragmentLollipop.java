@@ -650,7 +650,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             log("Grid View");
             log("FileBrowserFragmentLollipop isGrid");
             View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
-            
+			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
             recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
             fastScroller = (FastScroller)v.findViewById(R.id.fastscroll);
             
@@ -672,6 +672,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             emptyImageView = (ImageView)v.findViewById(R.id.file_grid_empty_image);
             emptyTextView = (LinearLayout)v.findViewById(R.id.file_grid_empty_text);
             emptyTextViewFirst = (TextView)v.findViewById(R.id.file_grid_empty_text_first);
+			
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
+			transfersNumberText = (TextView) v.findViewById(R.id.transfers_overview_number);
+			playButton = (ImageView) v.findViewById(R.id.transfers_overview_button);
+			actionLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_action_layout);
+			dotsOptionsTransfersLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_three_dots_layout);
+			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
+			
+			transfersOverViewLayout.setOnClickListener(this);
 
 //            contentTextLayout = (RelativeLayout)v.findViewById(R.id.content_grid_text_layout);
 //            contentTextLayout.setVisibility(View.GONE);
@@ -717,80 +727,54 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             return v;
         }
     }
-    
-    public void setOverviewLayout() {
-        log("setOverviewLayout");
-        if (((ManagerActivityLollipop)context).isList) {
-            
-            //Check transfers in progress
-            pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-            totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-            
-            totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
-            totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-            
-            if (pendingTransfers > 0) {
-                log("Transfers in progress");
-//                contentTextLayout.setVisibility(View.GONE);
-                transfersOverViewLayout.setVisibility(View.VISIBLE);
-                dotsOptionsTransfersLayout.setOnClickListener(this);
-                actionLayout.setOnClickListener(this);
-                
-                updateTransferButton();
-                
-                int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
-                progressBar.setProgress(progressPercent);
-                log("Progress Percent: " + progressPercent);
-                
-                long delay = megaApi.getBandwidthOverquotaDelay();
-                if (delay == 0) {
-                    transfersTitleText.setText(getString(R.string.section_transfers));
-                } else {
-                    log("Overquota delay activated until: " + delay);
-                    transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
-                }
-                
-                int inProgress = totalTransfers - pendingTransfers + 1;
-                String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
-                transfersNumberText.setText(progressText);
-                
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
-                params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
-                linearLayoutRecycler.setLayoutParams(params);
-            } else {
-                log("NO TRANSFERS in progress");
-                
-                if (adapter.getItemCount() == 0) {
-//                    contentTextLayout.setVisibility(View.GONE);
-//                    contentText.setVisibility(View.GONE);
-                } else {
-//                    contentTextLayout.setVisibility(View.VISIBLE);
-//                    contentText.setVisibility(View.VISIBLE);
-//                    setContentText();
-                }
-                if (transfersOverViewLayout != null) {
-                    transfersOverViewLayout.setVisibility(View.GONE);
-                }
-                dotsOptionsTransfersLayout.setOnClickListener(null);
-                actionLayout.setOnClickListener(null);
-                
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
-//                params.addRule(RelativeLayout.BELOW,contentTextLayout.getId());
-                linearLayoutRecycler.setLayoutParams(params);
-                
-            }
-        } else {
-            if (adapter.getItemCount() == 0) {
-//                contentTextLayout.setVisibility(View.GONE);
-//                contentText.setVisibility(View.GONE);
-            } else {
-//                contentTextLayout.setVisibility(View.VISIBLE);
-//                contentText.setVisibility(View.VISIBLE);
-//                setContentText();
-            }
-        }
-        
-    }
+	
+	public void setOverviewLayout() {
+		log("setOverviewLayout");
+		//Check transfers in progress
+		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+		
+		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
+		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+		
+		if (pendingTransfers > 0) {
+			log("Transfers in progress");
+			transfersOverViewLayout.setVisibility(View.VISIBLE);
+			dotsOptionsTransfersLayout.setOnClickListener(this);
+			actionLayout.setOnClickListener(this);
+			
+			updateTransferButton();
+			
+			int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
+			progressBar.setProgress(progressPercent);
+			log("Progress Percent: " + progressPercent);
+			
+			long delay = megaApi.getBandwidthOverquotaDelay();
+			if (delay == 0) {
+				transfersTitleText.setText(getString(R.string.section_transfers));
+			} else {
+				log("Overquota delay activated until: " + delay);
+				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
+			}
+			
+			int inProgress = totalTransfers - pendingTransfers + 1;
+			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
+			transfersNumberText.setText(progressText);
+			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
+			linearLayoutRecycler.setLayoutParams(params);
+		} else {
+			log("NO TRANSFERS in progress");
+			if (transfersOverViewLayout != null) {
+				transfersOverViewLayout.setVisibility(View.GONE);
+			}
+			dotsOptionsTransfersLayout.setOnClickListener(null);
+			actionLayout.setOnClickListener(null);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
+			linearLayoutRecycler.setLayoutParams(params);
+		}
+	}
     
     @Override
     public void onAttach(Activity activity) {
