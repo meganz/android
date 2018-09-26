@@ -10,7 +10,8 @@
         android:id="@+id/content_grid_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="36dp"
-        android:background="@color/new_background_fragment" >
+        android:background="@color/new_background_fragment"
+        android:visibility="gone">
 
         <RelativeLayout
             android:layout_width="wrap_content"

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -155,6 +156,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("My user handle string: "+megaApi.getMyUserHandle());
 
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.avatar_qr_background));
 		avatarLayout.setOnClickListener(this);
 
 		if (savedInstanceState != null) {
@@ -916,12 +918,26 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
 
 			String contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
-			Bitmap qrCodeBitmap = queryQR(contactLink);
-			qrAvatarSave = qrCodeBitmap;
-			avatarLayout.setBackground(new BitmapDrawable(qrCodeBitmap));
+			new QRBackgroundTask().execute(contactLink);
 		}
 		else {
 			log("Error request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE: " + e.getErrorString());
+		}
+	}
+
+	class QRBackgroundTask extends AsyncTask<String, Void, Void> {
+
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			qrAvatarSave = queryQR(strings[0]);
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
 		}
 	}
 
