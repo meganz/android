@@ -1607,138 +1607,76 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         
         visibilityFastScroller();
         this.nodes = nodes;
-        if (((ManagerActivityLollipop)context).isList) {
-            if (adapter != null) {
-                addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
-                adapter.setNodes(nodes);
-                
-                if (adapter.getItemCount() == 0) {
-                    recyclerView.setVisibility(View.GONE);
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+		}
+		else {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+		}
+
+		if (adapter != null) {
+			adapter.setNodes(nodes);
+
+			if (adapter.getItemCount() == 0) {
+				recyclerView.setVisibility(View.GONE);
 //                    contentText.setVisibility(View.GONE);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.VISIBLE);
-                    
-                    if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
-                        
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-                        }
-                        String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                        
-                    } else {
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-                        }
-                        String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                    }
-                } else {
-                    recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
+
+					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+					} else {
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					}
+					String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
+					try {
+						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]","</font>");
+						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]","</font>");
+					} catch (Exception e) {
+					}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
+
+				} else {
+					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					} else {
+						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					}
+					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					try {
+						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]","</font>");
+						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]","</font>");
+					} catch (Exception e) {
+					}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
+				}
+			} else {
+				recyclerView.setVisibility(View.VISIBLE);
 //                    contentText.setVisibility(View.VISIBLE);
-                    emptyImageView.setVisibility(View.GONE);
-                    emptyTextView.setVisibility(View.GONE);
-                }
-            } else {
-                log("adapter is NULL----------------");
-            }
-        } else {
-            if (adapter != null) {
-                addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
-                adapter.setNodes(nodes);
-                
-                if (adapter.getItemCount() == 0) {
-                    recyclerView.setVisibility(View.GONE);
-//                    contentText.setVisibility(View.GONE);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.VISIBLE);
-                    
-                    if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser) {
-                        
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-                        }
-                        String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                        
-                    } else {
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-                        }
-                        
-                        String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                    }
-                } else {
-                    recyclerView.setVisibility(View.VISIBLE);
-//                    contentText.setVisibility(View.VISIBLE);
-                    emptyImageView.setVisibility(View.GONE);
-                    emptyTextView.setVisibility(View.GONE);
-                }
-            } else {
-                log("grid adapter is NULL----------------");
-            }
-        }
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
+		} else {
+			log("adapter is NULL----------------");
+		}
         
         setOverviewLayout();
     }

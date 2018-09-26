@@ -599,7 +599,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             v.setTag(holderList);
             return holderList;
         } else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID) {
-            log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
+            log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_GRID");
             
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
             CloudDriveAdapter.ViewHolderBrowserGrid holderGrid = new CloudDriveAdapter.ViewHolderBrowserGrid(v);
@@ -971,7 +971,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     }
     
     public void onBindViewHolderList(ViewHolderBrowserList holder,int position) {
-        log("onBindViewHolderList");
+        log("onBindViewHolderList: "+position);
         
         MegaNode node = (MegaNode)getItem(position);
         holder.document = node.getHandle();

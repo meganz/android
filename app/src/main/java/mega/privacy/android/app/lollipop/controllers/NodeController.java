@@ -34,6 +34,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -648,6 +649,9 @@ public class NodeController {
             else if (context instanceof AudioVideoPlayerLollipop){
                 ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
             }
+            else if (context instanceof ContactInfoActivityLollipop){
+                ((ContactInfoActivityLollipop) context).showSnackbarNotSpace();
+            }
 
             log("Not enough space");
             return;
@@ -692,6 +696,9 @@ public class NodeController {
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
                 }
             }
             else{
@@ -780,6 +787,9 @@ public class NodeController {
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
                 }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
             }
             else{
                 download(parentPathC, urlC, sizeC, hashesC);
@@ -812,6 +822,9 @@ public class NodeController {
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 }
             }
         }
@@ -1019,6 +1032,9 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
+                                    else if(context instanceof ContactInfoActivityLollipop){
+                                        ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                         }
@@ -1126,6 +1142,9 @@ public class NodeController {
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).showSnackbar(msg);
                 }
             }
         }
