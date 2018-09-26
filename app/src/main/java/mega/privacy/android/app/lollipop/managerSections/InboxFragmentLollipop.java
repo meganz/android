@@ -463,6 +463,17 @@ public class InboxFragmentLollipop extends Fragment{
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
+
+	public void checkScroll () {
+		if (recyclerView != null) {
+			if (recyclerView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -511,12 +522,7 @@ public class InboxFragmentLollipop extends Fragment{
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 
@@ -553,12 +559,7 @@ public class InboxFragmentLollipop extends Fragment{
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 					super.onScrolled(recyclerView, dx, dy);
-					if (recyclerView.canScrollVertically(-1)){
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
+					checkScroll();
 				}
 			});
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();

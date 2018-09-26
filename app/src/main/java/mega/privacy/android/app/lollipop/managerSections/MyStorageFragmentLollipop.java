@@ -81,6 +81,17 @@ public class MyStorageFragmentLollipop extends Fragment {
 		super.onCreate(savedInstanceState);
 	}
 
+	public void checkScroll () {
+		if (scrollView != null) {
+			if (scrollView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
@@ -98,12 +109,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				if (v.canScrollVertically(-1)){
-					((ManagerActivityLollipop) context).changeActionBarElevation(true);
-				}
-				else {
-					((ManagerActivityLollipop) context).changeActionBarElevation(false);
-				}
+				checkScroll();
 			}
 		});
 		

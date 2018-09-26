@@ -42,28 +42,24 @@
                         android:id="@+id/sliding_tabs_contacts"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_shares"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_my_account"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
                     <android.support.design.widget.TabLayout
                         android:id="@+id/sliding_tabs_transfers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/mega"
                         style="@style/MyCustomTabLayout"/>
 
             </android.support.design.widget.AppBarLayout>
