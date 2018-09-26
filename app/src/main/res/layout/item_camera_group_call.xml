@@ -65,7 +65,7 @@
             android:layout_alignTop="@+id/avatar_rl"
             android:background="@android:color/transparent"
             android:visibility="gone"
-            android:src="@drawable/ic_mic_off"/>
+            android:src="@drawable/ic_mic_off_contact"/>
 
     </RelativeLayout>
 
