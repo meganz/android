@@ -1283,6 +1283,32 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		autoawayChatCategory.setEnabled(isOnline);
 		persistenceChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
+		securityCategory.setEnabled(isOnline);
+		qrCodeCategory.setEnabled(isOnline);
+
+		//Rubbish bin scheduler
+		daysRbSchedulerPreference.setEnabled(isOnline);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableRbSchedulerSwitch.setEnabled(isOnline);
+		}
+		else{
+			enableRbSchedulerCheck.setEnabled(isOnline);
+		}
+
+		//File versioning
+		fileVersionsFileManagement.setEnabled(isOnline);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch.setEnabled(isOnline);
+		}
+		else{
+			enableVersionsCheck.setEnabled(isOnline);
+		}
+
+		//Use of HTTP
+		useHttpsOnly.setEnabled(isOnline);
+
+		//Cancel account
+		cancelAccount.setEnabled(isOnline);
 	}
 
 	@Override
@@ -2048,7 +2074,19 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				if(!enableRbSchedulerSwitch.isChecked()){
 					log("Disable RB schedule");
-					((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+					//Check the account type
+					MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+					if(myAccountInfo!=null ){
+						if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							((ManagerActivityLollipop)context).showRBNotDisabledDialog();
+							enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+							enableRbSchedulerSwitch.setChecked(true);
+							enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+						}
+						else{
+							((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+						}
+					}
 				}
 				else{
 					log("ENABLE RB schedule");
@@ -2057,7 +2095,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 			else{
 				if(!enableRbSchedulerCheck.isChecked()){
-					((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+					MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+					if(myAccountInfo!=null ){
+						if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							((ManagerActivityLollipop)context).showRBNotDisabledDialog();
+							enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+							enableRbSchedulerCheck.setChecked(true);
+							enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+						}
+						else{
+							((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+						}
+					}
 				}
 				else{
 					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
