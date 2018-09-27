@@ -5,10 +5,6 @@
     android:versionCode="207"
     android:versionName="3.4.0 (207)" >
 
-    <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="25" />
-
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
