@@ -110,7 +110,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RelativeLayout actionLayout;
 	RelativeLayout dotsOptionsTransfersLayout;
 
-    FloatingItemDecoration floatingItemDecoration;
+    public FloatingItemDecoration floatingItemDecoration;
 
 	float density;
 	DisplayMetrics outMetrics;
@@ -650,7 +650,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             log("Grid View");
             log("FileBrowserFragmentLollipop isGrid");
             View v = inflater.inflate(R.layout.fragment_filebrowsergrid,container,false);
-            
+			linearLayoutRecycler = (LinearLayout) v.findViewById(R.id.linear_layout_recycler);
             recyclerView = (NewGridRecyclerView)v.findViewById(R.id.file_grid_view_browser);
             fastScroller = (FastScroller)v.findViewById(R.id.fastscroll);
             
@@ -672,6 +672,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             emptyImageView = (ImageView)v.findViewById(R.id.file_grid_empty_image);
             emptyTextView = (LinearLayout)v.findViewById(R.id.file_grid_empty_text);
             emptyTextViewFirst = (TextView)v.findViewById(R.id.file_grid_empty_text_first);
+			
+			transfersOverViewLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_item_layout);
+			transfersTitleText = (TextView) v.findViewById(R.id.transfers_overview_title);
+			transfersNumberText = (TextView) v.findViewById(R.id.transfers_overview_number);
+			playButton = (ImageView) v.findViewById(R.id.transfers_overview_button);
+			actionLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_action_layout);
+			dotsOptionsTransfersLayout = (RelativeLayout) v.findViewById(R.id.transfers_overview_three_dots_layout);
+			progressBar = (ProgressBar) v.findViewById(R.id.transfers_overview_progress_bar);
+			
+			transfersOverViewLayout.setOnClickListener(this);
 
 //            contentTextLayout = (RelativeLayout)v.findViewById(R.id.content_grid_text_layout);
 //            contentTextLayout.setVisibility(View.GONE);
@@ -717,80 +727,54 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
             return v;
         }
     }
-    
-    public void setOverviewLayout() {
-        log("setOverviewLayout");
-        if (((ManagerActivityLollipop)context).isList) {
-            
-            //Check transfers in progress
-            pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
-            totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
-            
-            totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
-            totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
-            
-            if (pendingTransfers > 0) {
-                log("Transfers in progress");
-//                contentTextLayout.setVisibility(View.GONE);
-                transfersOverViewLayout.setVisibility(View.VISIBLE);
-                dotsOptionsTransfersLayout.setOnClickListener(this);
-                actionLayout.setOnClickListener(this);
-                
-                updateTransferButton();
-                
-                int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
-                progressBar.setProgress(progressPercent);
-                log("Progress Percent: " + progressPercent);
-                
-                long delay = megaApi.getBandwidthOverquotaDelay();
-                if (delay == 0) {
-                    transfersTitleText.setText(getString(R.string.section_transfers));
-                } else {
-                    log("Overquota delay activated until: " + delay);
-                    transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
-                }
-                
-                int inProgress = totalTransfers - pendingTransfers + 1;
-                String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
-                transfersNumberText.setText(progressText);
-                
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
-                params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
-                linearLayoutRecycler.setLayoutParams(params);
-            } else {
-                log("NO TRANSFERS in progress");
-                
-                if (adapter.getItemCount() == 0) {
-//                    contentTextLayout.setVisibility(View.GONE);
-//                    contentText.setVisibility(View.GONE);
-                } else {
-//                    contentTextLayout.setVisibility(View.VISIBLE);
-//                    contentText.setVisibility(View.VISIBLE);
-//                    setContentText();
-                }
-                if (transfersOverViewLayout != null) {
-                    transfersOverViewLayout.setVisibility(View.GONE);
-                }
-                dotsOptionsTransfersLayout.setOnClickListener(null);
-                actionLayout.setOnClickListener(null);
-                
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
-//                params.addRule(RelativeLayout.BELOW,contentTextLayout.getId());
-                linearLayoutRecycler.setLayoutParams(params);
-                
-            }
-        } else {
-            if (adapter.getItemCount() == 0) {
-//                contentTextLayout.setVisibility(View.GONE);
-//                contentText.setVisibility(View.GONE);
-            } else {
-//                contentTextLayout.setVisibility(View.VISIBLE);
-//                contentText.setVisibility(View.VISIBLE);
-//                setContentText();
-            }
-        }
-        
-    }
+	
+	public void setOverviewLayout() {
+		log("setOverviewLayout");
+		//Check transfers in progress
+		pendingTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+		totalTransfers = megaApi.getTotalDownloads() + megaApi.getTotalUploads();
+		
+		totalSizePendingTransfer = megaApi.getTotalDownloadBytes() + megaApi.getTotalUploadBytes();
+		totalSizeTransfered = megaApi.getTotalDownloadedBytes() + megaApi.getTotalUploadedBytes();
+		
+		if (pendingTransfers > 0) {
+			log("Transfers in progress");
+			transfersOverViewLayout.setVisibility(View.VISIBLE);
+			dotsOptionsTransfersLayout.setOnClickListener(this);
+			actionLayout.setOnClickListener(this);
+			
+			updateTransferButton();
+			
+			int progressPercent = (int)Math.round((double)totalSizeTransfered / totalSizePendingTransfer * 100);
+			progressBar.setProgress(progressPercent);
+			log("Progress Percent: " + progressPercent);
+			
+			long delay = megaApi.getBandwidthOverquotaDelay();
+			if (delay == 0) {
+//				transfersTitleText.setText(getString(R.string.section_transfers));
+			} else {
+				log("Overquota delay activated until: " + delay);
+				transfersTitleText.setText(getString(R.string.title_depleted_transfer_overquota));
+			}
+			
+			int inProgress = totalTransfers - pendingTransfers + 1;
+			String progressText = getResources().getQuantityString(R.plurals.text_number_transfers,totalTransfers,inProgress,totalTransfers);
+			transfersNumberText.setText(progressText);
+			
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW,transfersOverViewLayout.getId());
+			linearLayoutRecycler.setLayoutParams(params);
+		} else {
+			log("NO TRANSFERS in progress");
+			if (transfersOverViewLayout != null) {
+				transfersOverViewLayout.setVisibility(View.GONE);
+			}
+			dotsOptionsTransfersLayout.setOnClickListener(null);
+			actionLayout.setOnClickListener(null);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)linearLayoutRecycler.getLayoutParams();
+			linearLayoutRecycler.setLayoutParams(params);
+		}
+	}
     
     @Override
     public void onAttach(Activity activity) {
@@ -1583,138 +1567,76 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         
         visibilityFastScroller();
         this.nodes = nodes;
-        if (((ManagerActivityLollipop)context).isList) {
-            if (adapter != null) {
-                addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
-                adapter.setNodes(nodes);
-                
-                if (adapter.getItemCount() == 0) {
-                    recyclerView.setVisibility(View.GONE);
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+		}
+		else {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+		}
+
+		if (adapter != null) {
+			adapter.setNodes(nodes);
+
+			if (adapter.getItemCount() == 0) {
+				recyclerView.setVisibility(View.GONE);
 //                    contentText.setVisibility(View.GONE);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.VISIBLE);
-                    
-                    if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
-                        
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-                        }
-                        String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                        
-                    } else {
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-                        }
-                        String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                    }
-                } else {
-                    recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+
+				if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser || ((ManagerActivityLollipop)context).parentHandleBrowser == -1) {
+
+					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
+					} else {
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					}
+					String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
+					try {
+						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]","</font>");
+						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]","</font>");
+					} catch (Exception e) {
+					}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
+
+				} else {
+					if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+					} else {
+						emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+					}
+					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+					try {
+						textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
+						textToShow = textToShow.replace("[/A]","</font>");
+						textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
+						textToShow = textToShow.replace("[/B]","</font>");
+					} catch (Exception e) {
+					}
+					Spanned result = null;
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+					} else {
+						result = Html.fromHtml(textToShow);
+					}
+					emptyTextViewFirst.setText(result);
+				}
+			} else {
+				recyclerView.setVisibility(View.VISIBLE);
 //                    contentText.setVisibility(View.VISIBLE);
-                    emptyImageView.setVisibility(View.GONE);
-                    emptyTextView.setVisibility(View.GONE);
-                }
-            } else {
-                log("adapter is NULL----------------");
-            }
-        } else {
-            if (adapter != null) {
-                addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
-                adapter.setNodes(nodes);
-                
-                if (adapter.getItemCount() == 0) {
-                    recyclerView.setVisibility(View.GONE);
-//                    contentText.setVisibility(View.GONE);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    emptyTextView.setVisibility(View.VISIBLE);
-                    
-                    if (megaApi.getRootNode().getHandle() == ((ManagerActivityLollipop)context).parentHandleBrowser) {
-                        
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-                        }
-                        String textToShow = String.format(context.getString(R.string.context_empty_inbox),getString(R.string.section_cloud_drive));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                        
-                    } else {
-                        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-                        } else {
-                            emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-                        }
-                        
-                        String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-                        try {
-                            textToShow = textToShow.replace("[A]","<font color=\'#000000\'>");
-                            textToShow = textToShow.replace("[/A]","</font>");
-                            textToShow = textToShow.replace("[B]","<font color=\'#7a7a7a\'>");
-                            textToShow = textToShow.replace("[/B]","</font>");
-                        } catch (Exception e) {
-                        }
-                        Spanned result = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-                        } else {
-                            result = Html.fromHtml(textToShow);
-                        }
-                        emptyTextViewFirst.setText(result);
-                    }
-                } else {
-                    recyclerView.setVisibility(View.VISIBLE);
-//                    contentText.setVisibility(View.VISIBLE);
-                    emptyImageView.setVisibility(View.GONE);
-                    emptyTextView.setVisibility(View.GONE);
-                }
-            } else {
-                log("grid adapter is NULL----------------");
-            }
-        }
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
+		} else {
+			log("adapter is NULL----------------");
+		}
         
         setOverviewLayout();
     }
@@ -1772,6 +1694,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	private void updateNode(long handle) {
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode node = nodes.get(i);
+			//in grid view, we have to ignore the placholder.
+			if(node == null) {
+				continue;
+			}
 			if (node.getHandle() == handle) {
 				MegaNode updated = megaApi.getNodeByHandle(handle);
 				nodes.set(i, updated);

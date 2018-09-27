@@ -53,7 +53,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -79,11 +78,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 	CloudDriveAdapter adapter;
 	private int placeholderCount;
-	FloatingItemDecoration floatingItemDecoration;
-	public RubbishBinFragmentLollipop rubbishBinFragment = this;
+	public FloatingItemDecoration floatingItemDecoration;
 
 	ArrayList<MegaNode> nodes;
-	MegaNode selectedNode = null;
 	
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
@@ -508,9 +505,12 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
 
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
+			//Add bottom padding for recyclerView like in other fragments.
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
@@ -520,13 +520,13 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
 			
-			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+//			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			if (adapter == null){
 				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleRubbish, recyclerView, null, Constants.RUBBISH_BIN_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop)context).parentHandleRubbish);
-				adapter.setNodes(nodes);
+//				adapter.setNodes(nodes);
 				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 
@@ -545,6 +545,8 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
+
+			setNodes(nodes);
 
 			if (adapter.getItemCount() == 0){
 				
@@ -1195,7 +1197,6 @@ public class RubbishBinFragmentLollipop extends Fragment{
 	public int onBackPressed(){
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
-
 		if (adapter == null){
 			return 0;
 		}
@@ -1281,9 +1282,16 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				return;
 			}
 		}
+
+		this.nodes = nodes;
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+		}
+		else {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+		}
 		
 		if (adapter != null){
-			addSectionTitle(this.nodes,adapter.getAdapterType());
 			adapter.setNodes(this.nodes);
 			if (adapter.getItemCount() == 0){
 				recyclerView.setVisibility(View.GONE);
