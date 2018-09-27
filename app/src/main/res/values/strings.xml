@@ -2114,5 +2114,11 @@
     <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievement program.</string>
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Payment</string>
 
+    <string name="billing_period_title" context="title of billing period">Billing period</string>
+    <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
+    <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
+    <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
+
 
 </resources>
