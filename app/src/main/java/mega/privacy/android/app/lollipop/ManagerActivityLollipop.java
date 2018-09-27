@@ -34,6 +34,7 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -359,6 +360,7 @@ public Toolbar tB;
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
 	static MenuItem drawerMenuItem = null;
+	BottomNavigationView bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
 	FrameLayout accountInfoFrame;
@@ -366,8 +368,7 @@ public Toolbar tB;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
 	TextView nVPictureProfileTextView;
-	TextView usedSpaceTV;
-	TextView totalSpaceTV;
+	TextView spaceTV;
 	ProgressBar usedSpacePB;
 
     //Tabs in Shares
@@ -1837,13 +1838,15 @@ public Toolbar tB;
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
 
+        bNV = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
+
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
 
-		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
-
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
+
+		usedSpaceLayout = (RelativeLayout) nVHeader.findViewById(R.id.nv_used_space_layout);
 
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
@@ -1928,9 +1931,8 @@ public Toolbar tB;
         nVPictureProfileTextView = (TextView) nVHeader.findViewById(R.id.navigation_drawer_user_account_picture_profile_textview);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
-        usedSpaceTV = (TextView) findViewById(R.id.navigation_drawer_used_space);
-        totalSpaceTV = (TextView) findViewById(R.id.navigation_drawer_total_space);
-        usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
+        spaceTV = (TextView) nVHeader.findViewById(R.id.navigation_drawer_space);
+        usedSpacePB = (ProgressBar) nVHeader.findViewById(R.id.manager_used_space_bar);
 
         //TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
@@ -3273,7 +3275,6 @@ public Toolbar tB;
 						resetNavigationViewMenu(nVMenu);
 						MenuItem menuItem = nVMenu.findItem(R.id.navigation_item_chat);
 						menuItem.setChecked(true);
-						menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat_red));
 					}
 
 					if (rChatFL != null){
@@ -4515,7 +4516,6 @@ public Toolbar tB;
 			if (drawerMenuItem != null){
 				disableNavigationViewMenu(nVMenu);
 				drawerMenuItem.setChecked(true);
-				drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_red));
 			}
 
 			selectDrawerItemLollipop(drawerItem);
@@ -4549,49 +4549,41 @@ public Toolbar tB;
 				case CLOUD_DRIVE:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					break;
 				}
 				case SAVED_FOR_OFFLINE:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_red));
 					break;
 				}
 				case CAMERA_UPLOADS:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
 					break;
 				}
 				case MEDIA_UPLOADS:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
 					break;
 				}
 				case INBOX:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_inbox);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_red));
 					break;
 				}
 				case SHARED_ITEMS:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_shared_items);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.shared_items_red));
 					break;
 				}
 				case CONTACTS:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_contacts);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.contacts_red));
 					break;
 				}
 				case SETTINGS:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_settings);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
 					break;
 				}
 				case SEARCH:{
@@ -4612,7 +4604,6 @@ public Toolbar tB;
 				case CHAT:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_chat);
 					drawerMenuItem.setChecked(true);
-					drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat_red));
 					break;
 				}
 			}
@@ -5997,7 +5988,6 @@ public Toolbar tB;
 	    			if (drawerMenuItem != null){
 	    				resetNavigationViewMenu(nVMenu);
 	    				drawerMenuItem.setChecked(true);
-	    				drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 	    				if (drawerLayout != null){
 	    					drawerLayout.openDrawer(Gravity.LEFT);
 	    				}
@@ -6018,7 +6008,6 @@ public Toolbar tB;
 		    			if (drawerMenuItem != null){
 		    				resetNavigationViewMenu(nVMenu);
 		    				drawerMenuItem.setChecked(true);
-		    				drawerMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 		    			}
 		    			break;
 		    		}
@@ -7289,7 +7278,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 						return true;
@@ -9326,7 +9314,6 @@ public Toolbar tB;
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
-						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
 					return;
@@ -9342,7 +9329,6 @@ public Toolbar tB;
 				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 				resetNavigationViewMenu(nVMenu);
 				cloudDrive.setChecked(true);
-				cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 			}
 			selectDrawerItemLollipop(drawerItem);
 			return;
@@ -9357,7 +9343,6 @@ public Toolbar tB;
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
-						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
 					return;
@@ -9376,7 +9361,6 @@ public Toolbar tB;
 					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 					resetNavigationViewMenu(nVMenu);
 					cloudDrive.setChecked(true);
-					cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 				}
 				selectDrawerItemLollipop(drawerItem);
 			}
@@ -9396,7 +9380,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
@@ -9414,7 +9397,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
@@ -9438,7 +9420,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 					}
@@ -9461,7 +9442,6 @@ public Toolbar tB;
 					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 					resetNavigationViewMenu(nVMenu);
 					cloudDrive.setChecked(true);
-					cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 				}
 				selectDrawerItemLollipop(drawerItem);
 			}
@@ -9481,7 +9461,6 @@ public Toolbar tB;
 								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 								resetNavigationViewMenu(nVMenu);
 								cloudDrive.setChecked(true);
-								cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 							}
 							selectDrawerItemLollipop(drawerItem);
 		    				return;
@@ -9499,7 +9478,6 @@ public Toolbar tB;
                             MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
                             cloudDrive.setChecked(true);
-                            cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
                         }
                         selectDrawerItemLollipop(drawerItem);
                         return;
@@ -9517,7 +9495,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
@@ -9540,7 +9517,6 @@ public Toolbar tB;
 								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 								resetNavigationViewMenu(nVMenu);
 								cloudDrive.setChecked(true);
-								cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 							}
 							selectDrawerItemLollipop(drawerItem);
 	    				}
@@ -9578,7 +9554,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -9598,7 +9573,6 @@ public Toolbar tB;
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 	    			}
@@ -9615,7 +9589,6 @@ public Toolbar tB;
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
-						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
     				return;
@@ -9632,7 +9605,6 @@ public Toolbar tB;
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
-						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
     				return;
@@ -9648,7 +9620,6 @@ public Toolbar tB;
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
-						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
     				selectDrawerItemLollipop(drawerItem);
     				return;
@@ -9678,12 +9649,10 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_saved_for_offline:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
 				if (nV != null){
@@ -9691,12 +9660,10 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_camera_uploads:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CAMERA_UPLOADS;
 				if (nV != null){
@@ -9704,12 +9671,10 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_inbox:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.INBOX;
 				if (nV != null){
@@ -9717,12 +9682,10 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_shared_items:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SHARED_ITEMS;
 				if (nV != null){
@@ -9730,7 +9693,6 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.shared_items_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -9742,12 +9704,10 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_contacts:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CONTACTS;
 				if (nV != null){
@@ -9755,12 +9715,10 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.contacts_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_settings:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				lastDrawerItem = drawerItem;
 				drawerItem = DrawerItem.SETTINGS;
 				if (nV != null){
@@ -9768,7 +9726,6 @@ public Toolbar tB;
 					resetNavigationViewMenu(nVMenu);
 				}
 				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -12365,7 +12322,6 @@ public Toolbar tB;
 			drawerMenuItem = cameraUploadsItem;
 			resetNavigationViewMenu(nVMenu);
 			cameraUploadsItem.setChecked(true);
-			cameraUploadsItem.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
 		}
 		selectDrawerItemLollipop(drawerItem);
 	}
@@ -12392,7 +12348,6 @@ public Toolbar tB;
 			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 			resetNavigationViewMenu(nVMenu);
 			cloudDrive.setChecked(true);
-			cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 		}
 		firstTime = true;
 		selectDrawerItemLollipop(drawerItem);
@@ -12406,7 +12361,6 @@ public Toolbar tB;
 			MenuItem cameraUploads = nVMenu.findItem(R.id.navigation_item_camera_uploads);
 			resetNavigationViewMenu(nVMenu);
 			cameraUploads.setChecked(true);
-			cameraUploads.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
 		}
 
 		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
@@ -12580,14 +12534,25 @@ public Toolbar tB;
 		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
-		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+		String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+		try{
+			textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
+			textToShow = textToShow.replace("[/A]", "</font>");
+			textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[/B]", "</font>");
+		}
+		catch (Exception e){}
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		spaceTV.setText(result);
 
 		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
-		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
 			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
@@ -14180,18 +14145,15 @@ public Toolbar tB;
 		log("disableNavigationViewMenu");
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_grey));
 			mi.setChecked(false);
 			mi.setEnabled(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_grey));
 			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_camera_uploads);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_grey));
 			mi.setChecked(false);
 			mi.setEnabled(false);
 		}
@@ -14203,7 +14165,6 @@ public Toolbar tB;
 			else{
 				boolean hasChildren = megaApi.hasChildren(inboxNode);
 				if(hasChildren){
-					mi.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_grey));
 					mi.setChecked(false);
 					mi.setEnabled(false);
 					mi.setVisible(true);
@@ -14215,24 +14176,20 @@ public Toolbar tB;
 		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.shared_items_grey));
 			mi.setChecked(false);
 			mi.setEnabled(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_chat);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat));
 			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.contacts_grey));
 			mi.setChecked(false);
 			mi.setEnabled(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_settings);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_grey));
 			mi.setChecked(false);
 		}
 	}
@@ -14247,19 +14204,16 @@ public Toolbar tB;
 
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_grey));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_grey));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_camera_uploads);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_grey));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
@@ -14272,7 +14226,6 @@ public Toolbar tB;
 			else{
 				boolean hasChildren = megaApi.hasChildren(inboxNode);
 				if(hasChildren){
-					mi.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_grey));
 					mi.setChecked(false);
 					mi.setEnabled(true);
 					mi.setVisible(true);
@@ -14285,25 +14238,21 @@ public Toolbar tB;
 		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.shared_items_grey));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_chat);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.contacts_grey));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
 		mi = menu.findItem(R.id.navigation_item_settings);
 		if (mi != null){
-			mi.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_grey));
 			mi.setChecked(false);
 			mi.setEnabled(true);
 		}
@@ -14324,12 +14273,10 @@ public Toolbar tB;
 					if(hasChildren){
 						if(drawerItem==DrawerItem.INBOX){
 							mi.setChecked(true);
-							mi.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_red));
 							mi.setEnabled(true);
 							mi.setVisible(true);
 						}
 						else{
-							mi.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_grey));
 							mi.setChecked(false);
 							mi.setEnabled(true);
 							mi.setVisible(true);
@@ -17620,7 +17567,6 @@ public Toolbar tB;
 			chat.setTitle(getString(R.string.section_chat));
 			MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
 			settings.setChecked(true);
-			settings.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
 		}
 
 		if (megaChatApi != null){

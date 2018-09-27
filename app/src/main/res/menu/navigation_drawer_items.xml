@@ -5,46 +5,37 @@
     <group android:checkableBehavior="single">
 	    <item
 	        android:id="@+id/navigation_item_cloud_drive"
-	        android:icon="@drawable/cloud_drive_grey"
 	        android:title="@string/section_cloud_drive"/>
 	    <item
 	        android:id="@+id/navigation_item_saved_for_offline"
-	        android:icon="@drawable/saved_for_offline_grey"
 	        android:title="@string/section_saved_for_offline_new"/>
-	    
+
 	    <item
 	        android:id="@+id/navigation_item_camera_uploads"
-	        android:icon="@drawable/camera_uploads_grey"
 	        android:title="@string/section_photo_sync"/>
-	    
+
 	    <item
 	        android:id="@+id/navigation_item_inbox"
-	        android:icon="@drawable/inbox_grey"
 	        android:title="@string/section_inbox"/>
-	    
+
 	    <item
 	        android:id="@+id/navigation_item_shared_items"
-	        android:icon="@drawable/shared_items_grey"
 	        android:title="@string/section_shared_items"/>
-	    
+
 	    <item
 	        android:id="@+id/navigation_item_contacts"
-	        android:icon="@drawable/contacts_grey"
 	        android:title="@string/section_contacts"/>
 
 		<item
 			android:id="@+id/navigation_item_chat"
-			android:icon="@drawable/ic_menu_chat"
 			android:title="@string/section_chat"/>
-	    
+
 	    <item
 	        android:id="@+id/navigation_item_settings"
-	        android:icon="@drawable/settings_grey"
 	        android:title="@string/action_settings"/>
-	    
+
 	    <item
 	        android:id="@+id/navigation_item_hidden"
-	        android:title="Hidden"
 	        android:icon="@drawable/settings_grey"
 	        android:visible="false" />
 	</group>

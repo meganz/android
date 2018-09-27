@@ -2115,4 +2115,6 @@
     <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to logout?</string>
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
+
+    <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]of %2$s used[/B]</string>
 </resources>

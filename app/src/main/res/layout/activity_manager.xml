@@ -19,7 +19,8 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="56dp">
 
             <android.support.design.widget.AppBarLayout
                 android:id="@+id/app_bar_layout"
@@ -98,16 +99,34 @@
 
         </LinearLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/floating_button"
-                android:layout_width="@dimen/fab_button_diameter"
-                android:layout_height="@dimen/fab_button_diameter"
-                android:elevation="@dimen/elevation_low"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_add_white"
-                android:stateListAnimator="@anim/button_elevation"
-                android:tint="@android:color/white"
-                android:layout_gravity="bottom|right|end"/>
+        <RelativeLayout
+            android:id="@+id/container_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/floating_button"
+                    android:layout_width="@dimen/fab_button_diameter"
+                    android:layout_height="@dimen/fab_button_diameter"
+                    android:elevation="@dimen/elevation_low"
+                    android:layout_margin="16dp"
+                    android:src="@drawable/ic_add_white"
+                    android:stateListAnimator="@anim/button_elevation"
+                    android:tint="@android:color/white"
+                    android:layout_above="@+id/bottom_navigation_view"
+                    android:layout_alignParentRight="true"/>
+
+                <android.support.design.widget.BottomNavigationView
+                    android:id="@+id/bottom_navigation_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_alignParentBottom="true"
+                    app:menu="@menu/bottom_navigation_items"
+                    app:itemIconTint="@color/white"
+                    android:background="@color/dark_primary_color"/>
+
+        </RelativeLayout>
 
         <include
             android:layout_width="fill_parent"
@@ -187,72 +206,12 @@
         android:layout_gravity="start"
         android:background="#ffffff"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"
         app:itemBackground="@drawable/navigation_view_item_background"
-        app:itemIconTint="@color/drawer_item_text"
-        app:itemTextColor="@color/drawer_item_text"
-        app:menu="@menu/navigation_drawer_items" >
+        app:itemTextColor="@color/name_my_account"
+        app:menu="@menu/navigation_drawer_items">
 
-        <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="-70dp">
+        <!--<include layout="@layout/navigation_view_layout"/>-->
 
-        <RelativeLayout
-            android:id="@+id/nv_used_space_layout"
-            android:layout_width="match_parent"
-            android:clickable="true"
-            android:layout_height="80dp"
-            android:background="#ffffff">
-
-            <TextView
-                android:id="@+id/navigation_drawer_used_space_text"
-                style="@style/NavDrawerAccountUsedSpaceText"
-                android:text="@string/my_account_used_space"
-                android:layout_marginLeft="6dp"
-                tools:fontFamily="roboto"
-                android:lineSpacingMultiplier="1.71" />
-
-
-            <ProgressBar
-                android:id="@+id/manager_used_space_bar"
-                style="@style/UsedSpaceProgressBar"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_below="@id/navigation_drawer_used_space_text"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="4dp"/>
-
-            <TextView
-                android:id="@+id/navigation_drawer_used_space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/manager_used_space_bar"
-                android:paddingLeft="16dp"
-                android:text="0"
-                android:lineSpacingMultiplier="1.17"
-                android:textColor="#ff9e9e9e"
-                android:textSize="12sp"
-                tools:fontFamily="roboto"/>
-
-            <TextView
-                android:id="@+id/navigation_drawer_total_space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/manager_used_space_bar"
-                android:paddingRight="16dp"
-                android:text="50GB"
-                android:lineSpacingMultiplier="1.17"
-                android:textColor="#ff9e9e9e"
-                android:textSize="12sp"
-                tools:fontFamily="roboto" />
-        </RelativeLayout>
-        </ScrollView>
     </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

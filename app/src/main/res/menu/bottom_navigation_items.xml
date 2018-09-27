@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context="mega.privacy.android.app.lollipop.ManagerActivityLollipop">
+	<item
+		android:id="@+id/navigation_item_cloud_drive"
+		android:icon="@drawable/cloud_drive_grey"
+		android:title=""/>
+
+	<item
+		android:id="@+id/navigation_item_camera_uploads"
+		android:icon="@drawable/camera_uploads_grey"
+		android:title=""/>
+
+	<item
+		android:id="@+id/navigation_item_chat"
+		android:icon="@drawable/ic_menu_chat"
+		android:title=""/>
+
+	<item
+		android:id="@+id/navigation_item_shared_items"
+		android:icon="@drawable/shared_items_grey"
+		android:title=""/>
+
+	<item
+		android:id="@+id/navigation_item_saved_for_offline"
+		android:icon="@drawable/saved_for_offline_grey"
+		android:title=""/>
+
+</menu>
