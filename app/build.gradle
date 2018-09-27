@@ -10,6 +10,7 @@ android {
         targetSdkVersion 27
         versionCode 207
         versionName "3.4.0 (207)"
+        multiDexEnabled true
     }
 
     sourceSets.main {

@@ -34,6 +34,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -44,6 +45,7 @@ import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
@@ -221,24 +223,58 @@ public class NodeController {
                     selectChatsToSendNode(nodeOwner);
                 }
                 else {
-                    MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
-                    if (parentNode != null) {
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (ManagerActivityLollipop) context);
-                        } else if (context instanceof AudioVideoPlayerLollipop) {
-                            ((AudioVideoPlayerLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (AudioVideoPlayerLollipop) context);
-                        } else if (context instanceof PdfViewerActivityLollipop) {
-                            ((PdfViewerActivityLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (PdfViewerActivityLollipop) context);
-                        } else if (context instanceof FullScreenImageViewerLollipop) {
-                            ((FullScreenImageViewerLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (FullScreenImageViewerLollipop) context);
+                    CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+                    copyAndSendToChatListener.copyNode(node);
+                }
+            }
+        }
+    }
+
+    public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
+        log("checkIfNodesAreMineAndSelectChatsToSendNodes");
+
+        MegaNode currentNode;
+        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
+        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
+
+        if (nodes == null) {
+            return;
+        }
+
+        for (int i=0; i<nodes.size(); i++) {
+            currentNode = nodes.get(i);
+            if (currentNode != null) {
+                if (megaApi.getAccess(currentNode) == MegaShare.ACCESS_OWNER) {
+                    ownerNodes.add(currentNode);
+                }
+                else {
+                    String nodeFP = megaApi.getFingerprint(currentNode);
+                    ArrayList<MegaNode> fNodes = megaApi.getNodesByFingerprint(nodeFP);
+                    MegaNode nodeOwner = null;
+                    if (fNodes != null) {
+                        for (int j=0; j<fNodes.size(); j++) {
+                            if (megaApi.getAccess(fNodes.get(j)) == MegaShare.ACCESS_OWNER){
+                                nodeOwner = fNodes.get(j);
+                                break;
+                            }
                         }
+                    }
+                    if (nodeOwner != null) {
+                        ownerNodes.add(nodeOwner);
+                    }
+                    else {
+                        notOwnerNodes.add(currentNode);
                     }
                 }
             }
+        }
+
+        if (notOwnerNodes.size() == 0) {
+            selectChatsToSendNodes(ownerNodes);
+        }
+        else {
+            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
         }
     }
 
@@ -269,6 +305,41 @@ public class NodeController {
         else if (context instanceof AudioVideoPlayerLollipop){
             ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+    }
+
+    public boolean nodeComesFromIncoming (MegaNode node) {
+        MegaNode parent = getParent(node);
+
+        if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
+                parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
+                parent.getHandle() == megaApi.getInboxNode().getHandle()){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    public MegaNode getParent (MegaNode node) {
+        MegaNode parent = node;
+
+        while (megaApi.getParentNode(parent) != null){
+            parent = megaApi.getParentNode(parent);
+        }
+
+        return parent;
+    }
+
+    public int getIncomingLevel(MegaNode node) {
+        int dBT = 0;
+        MegaNode parent = node;
+
+        while (megaApi.getParentNode(parent) != null){
+            dBT++;
+            parent = megaApi.getParentNode(parent);
+        }
+
+        return dBT;
     }
 
     public void prepareForDownload(ArrayList<Long> handleList){
@@ -648,6 +719,9 @@ public class NodeController {
             else if (context instanceof AudioVideoPlayerLollipop){
                 ((AudioVideoPlayerLollipop) context).showSnackbarNotSpace();
             }
+            else if (context instanceof ContactInfoActivityLollipop){
+                ((ContactInfoActivityLollipop) context).showSnackbarNotSpace();
+            }
 
             log("Not enough space");
             return;
@@ -692,6 +766,9 @@ public class NodeController {
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).askSizeConfirmationBeforeDownload(parentPathC, urlC, sizeC, hashesC);
                 }
             }
             else{
@@ -780,6 +857,9 @@ public class NodeController {
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
                 }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).askConfirmationNoAppInstaledBeforeDownload(parentPathC, urlC, sizeC, hashesC, nodeToDownload);
+                }
             }
             else{
                 download(parentPathC, urlC, sizeC, hashesC);
@@ -812,6 +892,9 @@ public class NodeController {
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ActivityCompat.requestPermissions(((AudioVideoPlayerLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
+                }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_STORAGE);
                 }
             }
         }
@@ -1019,6 +1102,9 @@ public class NodeController {
                                     else if(context instanceof ContactFileListActivityLollipop){
                                         ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
                                     }
+                                    else if(context instanceof ContactInfoActivityLollipop){
+                                        ((ContactInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_already_downloaded));
+                                    }
                                 }
                             }
                         }
@@ -1126,6 +1212,9 @@ public class NodeController {
                 }
                 else if(context instanceof AudioVideoPlayerLollipop){
                     ((AudioVideoPlayerLollipop) context).showSnackbar(msg);
+                }
+                else if(context instanceof ContactInfoActivityLollipop){
+                    ((ContactInfoActivityLollipop) context).showSnackbar(msg);
                 }
             }
         }
@@ -1489,14 +1578,12 @@ public class NodeController {
                             log("Navigate to TAB CLOUD first level"+ parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
-                            ((ManagerActivityLollipop) context).setTabItemCloud(0);
                         }
                         else if(parentIntentN.getHandle()==megaApi.getRubbishNode().getHandle()){
-                            drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                            drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
                             log("Navigate to TAB RUBBISH first level"+ parentIntentN.getName());
                             firstNavigationLevel=true;
                             ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
-                            ((ManagerActivityLollipop) context).setTabItemCloud(1);
                         }
                         else if(parentIntentN.getHandle()==megaApi.getInboxNode().getHandle()){
                             log("Navigate to INBOX first level"+ parentIntentN.getName());
@@ -1514,15 +1601,13 @@ public class NodeController {
                                     drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
                                     log("Navigate to TAB CLOUD with parentHandle");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
-                                    ((ManagerActivityLollipop) context).setTabItemCloud(0);
                                     firstNavigationLevel=false;
                                     break;
                                 }
                                 case 1:{
                                     log("Navigate to TAB RUBBISH");
-                                    drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
+                                    drawerItem = ManagerActivityLollipop.DrawerItem.RUBBISH_BIN;
                                     ((ManagerActivityLollipop) context).setParentHandleRubbish(parentIntentN.getHandle());
-                                    ((ManagerActivityLollipop) context).setTabItemCloud(1);
                                     firstNavigationLevel=false;
                                     break;
                                 }
@@ -1537,7 +1622,6 @@ public class NodeController {
                                     drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
                                     log("Navigate to TAB CLOUD general");
                                     ((ManagerActivityLollipop) context).setParentHandleBrowser(-1);
-                                    ((ManagerActivityLollipop) context).setTabItemCloud(0);
                                     firstNavigationLevel=true;
                                     break;
                                 }
@@ -1571,7 +1655,6 @@ public class NodeController {
                         log("DEFAULT: The intent set the parentHandleBrowser to " + parentIntentN.getHandle());
                         ((ManagerActivityLollipop) context).setParentHandleBrowser(parentIntentN.getHandle());
                         drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;
-                        ((ManagerActivityLollipop) context).setTabItemCloud(0);
                         firstNavigationLevel=true;
                         break;
                     }

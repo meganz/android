@@ -309,7 +309,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					log("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
-					nC.checkIfNodeIsMineAndSelectChatsToSendNode(nodesSelected.get(0));
+					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -403,14 +403,18 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 
-				if(selected.size() == 1 && selected.get(0).isFile()){
-					if (Util.isChatEnabled()) {
-						showSendToChat = true;
+				boolean areFiles = true;
+				for (int i=0; i<selected.size(); i++) {
+					if (selected.get(i).isFolder()) {
+						areFiles = false;
+						break;
 					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
+				}
+
+				if(areFiles && Util.isChatEnabled()) {
+					showSendToChat = true;
+				}
+				else {
 					showSendToChat = false;
 				}
 
@@ -507,7 +511,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
