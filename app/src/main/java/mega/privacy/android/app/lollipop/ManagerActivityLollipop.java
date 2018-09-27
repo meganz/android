@@ -140,7 +140,6 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.ContactNameListener;
 import mega.privacy.android.app.lollipop.listeners.CreateChatToPerformActionListener;
-import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithTitle;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
@@ -14096,8 +14095,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
 					if(chatTitle!=null){
-						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
-						megaChatApi.createChat(true, peers, listener);
+//						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
+//						megaChatApi.createChat(true, peers, listener);
+						megaChatApi.createPublicChat(peers, chatTitle, this);
 					}
 					else{
 						megaChatApi.createChat(true, peers, this);
