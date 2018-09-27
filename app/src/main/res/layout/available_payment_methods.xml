@@ -127,6 +127,84 @@
             android:layout_toRightOf="@id/payment_method_centili_icon"/>
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/options"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_corner">
+
+        <TextView
+            android:id="@+id/billing_period_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/mail_my_account"
+            android:layout_marginBottom="22dp"
+            android:layout_marginLeft="16dp"
+            android:text="@string/billing_period_title"/>
+
+        <RadioGroup
+            android:id="@+id/billing_period"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:orientation="vertical"
+            android:layout_marginBottom="38dp"
+            android:background="@drawable/card_corner">
+
+            <RadioButton
+                android:id="@+id/billed_monthly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:checked="false"
+                android:buttonTint="@color/accentColor"
+                android:textSize="18sp"
+                android:textColor="@color/mail_my_account"/>
+
+            <RadioButton android:id="@+id/billed_yearly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:checked="false"
+                android:buttonTint="@color/accentColor"
+                android:text="@string/billed_yearly_text"
+                android:textSize="18sp"
+                android:textColor="@color/black"/>
+        </RadioGroup>
+        <LinearLayout
+            android:id="@+id/layout_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:orientation="horizontal"
+            android:gravity="right"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:textAllCaps="true"
+                android:textSize="14sp"
+                android:text="@string/button_cancel"
+                android:layout_marginRight="24dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accentColor"
+                android:textAllCaps="true"
+                android:textSize="14sp"
+                android:text="@string/button_continue"
+                android:layout_marginRight="16dp"/>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
     <!--<RelativeLayout-->
         <!--android:id="@+id/close_layout"-->
         <!--android:layout_width="match_parent"-->

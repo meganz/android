@@ -291,7 +291,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 
 		switch(parameterType){
 			case 1:{
-
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -394,7 +393,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 2:{
-
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -497,7 +495,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 3:{
-
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -599,6 +596,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 4:{
+
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
