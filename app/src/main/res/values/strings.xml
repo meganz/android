@@ -2131,4 +2131,11 @@
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
 
+    <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
+    <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
+
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Make private</string>
+
+    <string name="message_created_chat_link" context="Text shown when a participant of a chat create a chat link">[A]%1$s[/A][B] created a chat link[/B]</string>
+
 </resources>
