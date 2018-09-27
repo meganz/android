@@ -363,7 +363,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
             }
         }
     }
@@ -587,7 +592,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
 
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 

@@ -1349,7 +1349,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 30 * 1000);
 		}
@@ -1375,18 +1377,24 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 			cameraUploadWhat.setSummary(fileUpload);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+			dbH.setCamSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 30 * 1000);
 		}
@@ -1689,7 +1697,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -1852,7 +1862,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -1901,10 +1913,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setCamSyncEnabled(false);
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryUpload = false;
-				Intent stopIntent = null;
-				stopIntent = new Intent(context, CameraSyncService.class);
-				stopIntent.setAction(CameraSyncService.ACTION_STOP);
-				context.startService(stopIntent);
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent stopIntent = null;
+					stopIntent = new Intent(context, CameraSyncService.class);
+					stopIntent.setAction(CameraSyncService.ACTION_STOP);
+					context.startService(stopIntent);
+				}
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
@@ -2376,18 +2390,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}
@@ -2425,18 +2443,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}
@@ -2447,18 +2469,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
-			
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
+
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}		
@@ -2475,18 +2501,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
-				
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent photosVideosIntent = null;
+					photosVideosIntent = new Intent(context, CameraSyncService.class);
+					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+					context.startService(photosVideosIntent);
+				}
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -2510,18 +2540,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
-				
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent photosVideosIntent = null;
+					photosVideosIntent = new Intent(context, CameraSyncService.class);
+					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+					context.startService(photosVideosIntent);
+				}
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
