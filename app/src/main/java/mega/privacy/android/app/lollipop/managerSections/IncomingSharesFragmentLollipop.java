@@ -309,7 +309,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					log("Send files to chat");
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
-					nC.checkIfNodeIsMineAndSelectChatsToSendNode(nodesSelected.get(0));
+					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -403,14 +403,18 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 
-				if(selected.size() == 1 && selected.get(0).isFile()){
-					if (Util.isChatEnabled()) {
-						showSendToChat = true;
+				boolean areFiles = true;
+				for (int i=0; i<selected.size(); i++) {
+					if (selected.get(i).isFolder()) {
+						areFiles = false;
+						break;
 					}
-					else {
-						showSendToChat = false;
-					}
-				}else{
+				}
+
+				if(areFiles && Util.isChatEnabled()) {
+					showSendToChat = true;
+				}
+				else {
 					showSendToChat = false;
 				}
 
@@ -1020,7 +1024,13 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
+						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					}
+					else{
+						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					}
+
 					intent.putExtra("fromShared", true);
 					intent.putExtra("screenPosition", screenPosition);
 					context.startActivity(intent);
@@ -1055,7 +1065,14 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+
+					if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
+						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					}
+					else{
+						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					}
+
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 

@@ -1704,7 +1704,7 @@ public class Util {
 		    return mimeType != null && mimeType.indexOf("video") == 0;
 		}
 		catch(Exception e){
-			log("CATCH EXCEPTION!!!: "+e.getMessage());
+			log("Exception: "+e.getMessage());
 			return false;
 		}	    
 	}
