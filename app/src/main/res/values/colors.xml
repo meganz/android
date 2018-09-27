@@ -165,5 +165,6 @@
     <color name="dark_primary_color">#FFF0373A</color>
     <color name="dark_primary_color_secondary">#FFCC282E</color>
     <color name="status_bar_search">#FFCCCCCC</color>
+    <color name="status_bar_navigation_view">#FF33CCB7</color>
 
 </resources>

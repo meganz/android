@@ -4,21 +4,20 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation_drawer_account_view"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:clickable="true"
     android:foreground="?selectableItemBackground"
-    tools:layout_height="100dp"
-    android:background="#333333">
+    tools:layout_height="wrap_content"
+    android:background="#ffffff">
     
     <RelativeLayout
 		android:id="@+id/navigation_drawer_account_section"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingBottom="16dp"
 		android:paddingEnd="16dp"
-		android:paddingLeft="16dp"
-		android:paddingRight="16dp"
-		android:paddingTop="44dp">
+		android:paddingRight="24dp"
+		android:paddingTop="44dp"
+		android:paddingLeft="24dp">
 		
         <RelativeLayout 
 	        android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
@@ -49,36 +48,69 @@
 	    <LinearLayout
 		    android:id="@+id/navigation_drawer_account_information"
 		    android:layout_width="wrap_content"
-		    android:layout_height="48dp"
-		    android:layout_alignParentTop="true"
-		    android:layout_toRightOf="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
+		    android:layout_height="wrap_content"
+		    android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
 		    android:gravity="center_vertical"
-		    android:orientation="vertical"
-		    android:layout_marginLeft="10dp">
+			android:layout_marginTop="16dp"
+		    android:orientation="vertical">
 		    
 	        <TextView
 		        android:id="@+id/navigation_drawer_account_information_display_name"
 		        android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textSize="14sp"
-				android:textColor="#ffffff"
+				android:textSize="16sp"
+				android:textColor="@color/name_my_account"
 		        android:text="User Name"
 		        android:singleLine="true"
 		        android:ellipsize="end"
-		        tools:fontFamily="sans-serif"/>
+				android:fontFamily="roboto"/>
 	        
 	        <TextView
 		        android:id="@+id/navigation_drawer_account_information_email"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="14sp"
-				android:textColor="#b3ffffff"
+				android:textColor="@color/mail_my_account"
 		        android:text="email@domain.com"
 		        android:singleLine="true"
 		        android:ellipsize="end"
-		        tools:fontFamily="sans-serif"/>
+				android:fontFamily="roboto"/>
 	        
-		</LinearLayout>		
+		</LinearLayout>
+
+		<RelativeLayout
+			android:id="@+id/nv_used_space_layout"
+			android:layout_width="match_parent"
+			android:clickable="true"
+			android:layout_height="wrap_content"
+			android:background="#ffffff"
+			android:layout_below="@+id/navigation_drawer_account_information">
+
+			<ProgressBar
+				android:id="@+id/manager_used_space_bar"
+				style="@style/UsedSpaceProgressBar"
+				android:layout_width="match_parent"
+				android:layout_height="2dp"
+				android:layout_marginTop="20dp"/>
+
+			<TextView
+				android:id="@+id/navigation_drawer_space"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/manager_used_space_bar"
+				android:layout_marginTop="12dp"
+				android:fontFamily="roboto"
+				android:textSize="13sp"
+				tools:fontFamily="roboto"/>
+		</RelativeLayout>
+
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_below="@+id/nv_used_space_layout"
+			android:layout_marginTop="16dp"
+			android:background="@color/divider_upgrade_account"/>
+
 	</RelativeLayout>
 </FrameLayout>
 
