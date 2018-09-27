@@ -801,6 +801,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         this.firstNameTemp = firstNameTemp;
     }
 
+    public void setLastNameTemp(String lastNameTemp) {
+        this.lastNameTemp = lastNameTemp;
+    }
+
     public String getFirstNameTemp() {
         return this.firstNameTemp;
     }
