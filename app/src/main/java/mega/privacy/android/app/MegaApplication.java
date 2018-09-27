@@ -1,15 +1,30 @@
 package mega.privacy.android.app;
 
 import android.app.Application;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -26,7 +41,9 @@ import java.util.Locale;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
@@ -57,13 +74,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
 public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.0_207";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -367,6 +385,29 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
+
+			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
+			//			jobInfoBuilder.setMinimumLatency(15000);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				jobInfoBuilder.setPeriodic(schedulerInterval);
+			}
+
+			if (mJobScheduler != null) {
+				int result = mJobScheduler.schedule(jobInfoBuilder.build());
+				if (result == JobScheduler.RESULT_SUCCESS) {
+					log("CameraUploadsService: Job scheduled SUCCESS");
+				} else {
+					log("CameraUploadsService: Job scheduled FAILED");
+				}
+			}
+		}
+
+
+
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		if (dbH != null) {
@@ -385,6 +426,9 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				fileLoggerSDK = false;
 			}
 		}
+
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 
 		if (Util.DEBUG){
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
@@ -416,6 +460,9 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 			}
 		}
 
+		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+
 		if (Util.DEBUG){
 			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		}
@@ -427,13 +474,6 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
 			}
 		}
-
-		//init logger only when pre-request are all ready
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, Util.getFileLoggerKarere()));
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		boolean useHttpsOnly = false;
 		if (dbH != null) {
@@ -824,7 +864,181 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
+		if (updatedNodes != null) {
+			log("updatedNodes: " + updatedNodes.size());
+
+			for (int i = 0; i < updatedNodes.size(); i++) {
+				MegaNode n = updatedNodes.get(i);
+				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
+					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
+
+					showSharedFolderNotification(n);
+				}
+			}
+		}
+		else{
+			log("Updated nodes is NULL");
+		}
 	}
+
+	public void showSharedFolderNotification(MegaNode n) {
+		log("showSharedFolderNotification");
+
+		try {
+			ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+			String name = "";
+			for (int j = 0; j < sharesIncoming.size(); j++) {
+				MegaShare mS = sharesIncoming.get(j);
+				if (mS.getNodeHandle() == n.getHandle()) {
+					MegaUser user = megaApi.getContact(mS.getUser());
+					if (user != null) {
+						MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+
+						if (contactDB != null) {
+							if (!contactDB.getName().equals("")) {
+								name = contactDB.getName() + " " + contactDB.getLastName();
+
+							} else {
+								name = user.getEmail();
+
+							}
+						} else {
+							log("The contactDB is null: ");
+							name = user.getEmail();
+
+						}
+					} else {
+						name = user.getEmail();
+					}
+				}
+			}
+
+			String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + name;
+			Spanned notificationContent;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				notificationContent = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				notificationContent = Html.fromHtml(source);
+			}
+
+			int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+			String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
+			String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
+
+			Intent intent = new Intent(this, ManagerActivityLollipop.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+					PendingIntent.FLAG_ONE_SHOT);
+
+			Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_HIGH);
+				channel.setShowBadge(true);
+				NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+				notificationManager.createNotificationChannel(channel);
+
+				NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(this, notificationChannelId);
+				notificationBuilderO
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setContentTitle(getString(R.string.title_incoming_folder_notification))
+						.setContentText(notificationContent)
+						.setStyle(new NotificationCompat.BigTextStyle()
+								.bigText(notificationContent))
+						.setAutoCancel(true)
+						.setSound(defaultSoundUri)
+						.setContentIntent(pendingIntent)
+						.setColor(ContextCompat.getColor(this, R.color.mega));
+
+				Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+				notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
+
+				notificationManager.notify(notificationId, notificationBuilderO.build());
+			}
+			else {
+				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setContentTitle(getString(R.string.title_incoming_folder_notification))
+						.setContentText(notificationContent)
+						.setStyle(new NotificationCompat.BigTextStyle()
+								.bigText(notificationContent))
+						.setAutoCancel(true)
+						.setSound(defaultSoundUri)
+						.setContentIntent(pendingIntent);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+				}
+
+				Drawable d;
+
+				if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+				} else {
+					d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
+				}
+
+				notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
+
+				NotificationManager notificationManager =
+						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+				notificationManager.notify(notificationId, notificationBuilder.build());
+			}
+		} catch (Exception e) {
+			log("Exception: " + e.toString());
+		}
+
+//        try{
+//            String source = "Tap to get more info";
+//            Spanned notificationContent;
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//                notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+//            } else {
+//                notificationContent = Html.fromHtml(source);
+//            }
+//
+//            int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+//
+//            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//                    PendingIntent.FLAG_ONE_SHOT);
+//
+//            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+//                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+//                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
+//                    .setContentText(notificationContent)
+//                    .setStyle(new NotificationCompat.BigTextStyle()
+//                            .bigText(notificationContent))
+//                    .setAutoCancel(true)
+//                    .setSound(defaultSoundUri)
+//                    .setColor(ContextCompat.getColor(this,R.color.mega))
+//                    .setContentIntent(pendingIntent);
+//
+//            Drawable d;
+//
+//            if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+//                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+//            } else {
+//                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+//            }
+//
+//            notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+//
+//            NotificationManager notificationManager =
+//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//            notificationManager.notify(notificationId, notificationBuilder.build());
+//        }
+//        catch(Exception e){
+//            log("Exception when showing shared folder notification: "+e.getMessage());
+//        }
+	}
+
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {

@@ -495,7 +495,7 @@ public Toolbar tB;
 	private AlertDialog downloadConfirmationDialog;
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
-	private AlertDialog getLinkDialog;
+	private AlertDialog generalDialog;
 	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageAlmostFull;
@@ -569,8 +569,6 @@ public Toolbar tB;
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
-
-	boolean sendToChat = false;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -3111,34 +3109,35 @@ public Toolbar tB;
 				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
-					Intent tempIntent = null;
-					String title = null;
-					String text = null;
-					if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						tempIntent = new Intent(this, CameraSyncService.class);
-						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-						title = getString(R.string.cam_sync_syncing);
-						text = getString(R.string.cam_sync_cancel_sync);
-					}
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						Intent tempIntent = null;
+						String title = null;
+						String text = null;
+						if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+							tempIntent = new Intent(this, CameraSyncService.class);
+							tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+							title = getString(R.string.cam_sync_syncing);
+							text = getString(R.string.cam_sync_cancel_sync);
+						}
 
-					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+						final Intent cancelIntent = tempIntent;
+						AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //					builder.setTitle(title);
-		            builder.setMessage(text);
+						builder.setMessage(text);
 
-					builder.setPositiveButton(getString(R.string.cam_sync_stop),
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int whichButton) {
-									startService(cancelIntent);
-								}
-							});
-					builder.setNegativeButton(getString(R.string.general_cancel), null);
-					final AlertDialog dialog = builder.create();
-					try {
-						dialog.show();
-					}
-					catch(Exception ex)	{
-						startService(cancelIntent);
+						builder.setPositiveButton(getString(R.string.cam_sync_stop),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
+										startService(cancelIntent);
+									}
+								});
+						builder.setNegativeButton(getString(R.string.general_cancel), null);
+						final AlertDialog dialog = builder.create();
+						try {
+							dialog.show();
+						} catch (Exception ex) {
+							startService(cancelIntent);
+						}
 					}
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
@@ -5877,6 +5876,13 @@ public Toolbar tB;
 		MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
+				if(Util.isChatEnabled()) {
+					MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
+					if (parentNode == null) {
+						log("Create folder: " + Constants.CHAT_FOLDER);
+						megaApi.createFolder(Constants.CHAT_FOLDER, megaApi.getRootNode(), null);
+					}
+				}
 				textsearchQuery = false;
 				searchQuery = "";
 				firstNavigationLevel = true;
@@ -8481,12 +8487,16 @@ public Toolbar tB;
 		        	}
 		        	case SHARED_ITEMS: {
 
-		        		if (viewPagerShares.getCurrentItem()==0){
-		        			//Incoming Shares
-							sortByNameTV.setText(getString(R.string.sortby_owner_mail));
-		        		}
-
 						if(firstNavigationLevel){
+
+							if (viewPagerShares.getCurrentItem()==0){
+								//Incoming Shares
+								sortByNameTV.setText(getString(R.string.sortby_owner_mail));
+							}
+							else{
+								sortByNameTV.setText(getString(R.string.sortby_name));
+							}
+
 							sortByDateTV.setVisibility(View.GONE);
 							newestCheck.setVisibility(View.GONE);
 							oldestCheck.setVisibility(View.GONE);
@@ -8528,6 +8538,8 @@ public Toolbar tB;
 						}
 						else{
 							log("No first level navigation on Incoming Shares");
+							sortByNameTV.setText(getString(R.string.sortby_name));
+
 							ascendingCheck.setOnClickListener(new OnClickListener() {
 
 								@Override
@@ -11124,13 +11136,9 @@ public Toolbar tB;
 		TextView message = (TextView) dialogLayout.findViewById(R.id.dialog_cancel_text);
 		final EditText text = (EditText) dialogLayout.findViewById(R.id.dialog_cancel_feedback);
 
-		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		display.getMetrics(outMetrics);
 		float density = getResources().getDisplayMetrics().density;
 
 		float scaleW = Util.getScaleW(outMetrics, density);
-		float scaleH = Util.getScaleH(outMetrics, density);
 
 		message.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
 		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
@@ -11405,6 +11413,230 @@ public Toolbar tB;
 
 			}
 		});
+	}
+
+	public void showRBNotDisabledDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = this.getLayoutInflater();
+		View v = inflater.inflate(R.layout.dialog_two_vertical_buttons, null);
+		builder.setView(v);
+
+		TextView title = (TextView) v.findViewById(R.id.dialog_title);
+		title.setText(getString(R.string.settings_rb_scheduler_enable_title));
+		TextView text = (TextView) v.findViewById(R.id.dialog_text);
+		text.setText(getString(R.string.settings_rb_scheduler_alert_disabling));
+
+		Button firstButton = (Button) v.findViewById(R.id.dialog_first_button);
+		firstButton.setText(getString(R.string.button_plans_almost_full_warning));
+		firstButton.setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				generalDialog.dismiss();
+				//Show UpgradeAccountActivity
+				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment=Constants.UPGRADE_ACCOUNT_FRAGMENT;
+				selectDrawerItemAccount();
+			}
+		});
+
+		Button secondButton = (Button) v.findViewById(R.id.dialog_second_button);
+		secondButton.setText(getString(R.string.button_not_now_rich_links));
+		secondButton.setOnClickListener(new   View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				generalDialog.dismiss();
+			}
+		});
+
+		generalDialog = builder.create();
+		generalDialog.show();
+	}
+
+	public void showRbSchedulerValueDialog(final boolean isEnabling){
+		log("showRbSchedulerValueDialog");
+
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		layout.addView(input, params);
+
+//		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setHint(getString(R.string.hint_days));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+
+					try{
+						int daysCount = Integer.parseInt(value);
+
+						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+							//PRO account
+							if(daysCount>6){
+								//Set new value
+								setRBSchedulerValue(value);
+								newFolderDialog.dismiss();
+							}
+							else{
+								//Show again the dialog
+								input.setText("");
+								input.requestFocus();
+							}
+						}
+						else{
+							//PRO account
+							if(daysCount>6 && daysCount<31){
+								//Set new value
+								setRBSchedulerValue(value);
+								newFolderDialog.dismiss();
+							}
+							else{
+								//Show again the dialog
+								input.setText("");
+								input.requestFocus();
+							}
+						}
+					}
+					catch (Exception e){
+						//Show again the dialog
+						input.setText("");
+						input.requestFocus();
+					}
+
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		final TextView text = new TextView(ManagerActivityLollipop.this);
+
+		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+			text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
+		}
+		else{
+			text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
+		}
+
+		float density = getResources().getDisplayMetrics().density;
+		float scaleW = Util.getScaleW(outMetrics, density);
+		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (11*scaleW));
+		layout.addView(text);
+
+		LinearLayout.LayoutParams params_text_error = (LinearLayout.LayoutParams) text.getLayoutParams();
+		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+//		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
+//		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error.setMargins(Util.scaleWidthPx(25, outMetrics), 0,Util.scaleWidthPx(25, outMetrics),0);
+		text.setLayoutParams(params_text_error);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
+		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), new android.content.DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if(isEnabling){
+					if(sttFLol!=null && sttFLol.isAdded()){
+						sttFLol.updateRBScheduler(0);
+					}
+				}
+			}
+		});
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+
+		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+
+				String value = input.getText().toString().trim();
+
+				if (value.length() == 0) {
+					return;
+				}
+
+				try{
+					int daysCount = Integer.parseInt(value);
+
+					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+						//PRO account
+						if(daysCount>6){
+							//Set new value
+							setRBSchedulerValue(value);
+							newFolderDialog.dismiss();
+						}
+						else{
+							//Show again the dialog
+							input.setText("");
+							input.requestFocus();
+						}
+					}
+					else{
+						//PRO account
+						if(daysCount>6 && daysCount<31){
+							//Set new value
+							setRBSchedulerValue(value);
+							newFolderDialog.dismiss();
+						}
+						else{
+							//Show again the dialog
+							input.setText("");
+							input.requestFocus();
+						}
+					}
+				}
+				catch (Exception e){
+					//Show again the dialog
+					input.setText("");
+					input.requestFocus();
+				}
+			}
+		});
+	}
+
+	public void setRBSchedulerValue(String value){
+		log("setRBSchedulerValue: "+ value);
+		int intValue = Integer.parseInt(value);
+
+		if(megaApi!=null){
+			megaApi.setRubbishBinAutopurgePeriod(intValue, this);
+		}
 	}
 
 	public void showAutoAwayValueDialog(){
@@ -15268,6 +15500,17 @@ public Toolbar tB;
 					log("File versioning attribute changed correctly");
 				}
 			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
+				log("change RB scheduler - USER_ATTR_RUBBISH_TIME finished");
+				if(sttFLol!=null && sttFLol.isAdded()){
+					if (e.getErrorCode() != MegaError.API_OK){
+						showSnackbar(getString(R.string.error_general_nodes));
+					}
+					else{
+						sttFLol.updateRBScheduler(request.getNumber());
+					}
+				}
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
@@ -15468,6 +15711,21 @@ public Toolbar tB;
 				MegaApplication.setDisableFileVersions(request.getFlag());
 				if(sttFLol!=null && sttFLol.isAdded()){
 					sttFLol.updateEnabledFileVersions();
+				}
+			}
+			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
+				if(sttFLol!=null && sttFLol.isAdded()){
+					if (e.getErrorCode() == MegaError.API_ENOENT){
+						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							sttFLol.updateRBScheduler(30);
+						}
+						else{
+							sttFLol.updateRBScheduler(90);
+						}
+					}
+					else{
+						sttFLol.updateRBScheduler(request.getNumber());
+					}
 				}
 			}
 		}
@@ -15937,36 +16195,27 @@ public Toolbar tB;
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
-						&& drawerItem == DrawerItem.SHARED_ITEMS && getTabItemShares() == 0) {
-					log("Incoming node copied to Send to chat");
-					MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
-					if (attachNode != null) {
-						nC.selectChatsToSendNode(attachNode);
+				log("Show snackbar!!!!!!!!!!!!!!!!!!!");
+				showSnackbar(getString(R.string.context_correctly_copied));
+
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null && fbFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
+						fbFLol.setNodes(nodes);
+						fbFLol.getRecyclerView().invalidate();
 					}
 				}
-				else {
-					log("Show snackbar!!!!!!!!!!!!!!!!!!!");
-					showSnackbar(getString(R.string.context_correctly_copied));
+				else if (drawerItem == DrawerItem.RUBBISH_BIN){
 
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						if (fbFLol != null && fbFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderCloud);
-							fbFLol.setNodes(nodes);
-							fbFLol.getRecyclerView().invalidate();
-						}
+					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
+						rubbishBinFLol.setNodes(nodes);
+						rubbishBinFLol.getRecyclerView().invalidate();
 					}
-					else if (drawerItem == DrawerItem.RUBBISH_BIN){
-						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderCloud);
-							rubbishBinFLol.setNodes(nodes);
-							rubbishBinFLol.getRecyclerView().invalidate();
-						}
-					}
-					else if (drawerItem == DrawerItem.INBOX){
-						if (iFLol != null && iFLol.isAdded()){
-							iFLol.getRecyclerView().invalidate();
-						}
+				}
+				else if (drawerItem == DrawerItem.INBOX){
+					if (iFLol != null && iFLol.isAdded()){
+						iFLol.getRecyclerView().invalidate();
 					}
 				}
 			}
@@ -15984,7 +16233,6 @@ public Toolbar tB;
 					showSnackbar(getString(R.string.context_no_copied));
 				}
 			}
-			sendToChat = false;
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try {
@@ -18026,10 +18274,6 @@ public Toolbar tB;
 
 	public void setNewMail (String newMail) {
 		this.newMail = newMail;
-	}
-
-	public void setSendToChat (boolean sendToChat) {
-			this.sendToChat = sendToChat;
 	}
 
 	public boolean isCameraUploads(MegaNode n){

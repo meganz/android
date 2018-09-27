@@ -17,35 +17,16 @@ package mega.privacy.android.app.fcm;
  */
 
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.text.Html;
-import android.text.Spanned;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -55,17 +36,11 @@ import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 
-public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaGlobalListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class MegaFirebaseMessagingService extends FirebaseMessagingService implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     MegaApplication app;
     MegaApiAndroid megaApi;
@@ -92,7 +67,7 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
         app = (MegaApplication) getApplication();
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-        megaApi.addGlobalListener(this);
+
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         showMessageNotificationAfterPush = false;
@@ -102,10 +77,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onDestroy() {
         log("onDestroyFCM");
-        if((!remoteMessageType.equals("1")) && (!remoteMessageType.equals("3"))){
-            megaApi.removeGlobalListener(this);
-        }
-
         super.onDestroy();
     }
 
@@ -311,23 +282,6 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
 
             }
         }
-
-//
-//        // Check if message contains a notification payload.
-//        if (remoteMessage.getNotification() != null) {
-//            log("Message Notification Body: " + remoteMessage.getNotification().getBody());
-//            sendNotification(remoteMessage.getNotification().getBody());
-//        }
-//
-//        if (megaApi.getRootNode() != null) {
-//            log("nullll!!!!!!!");
-//        }
-//        else{
-//            log("Tengo root node!!!!!");
-//        }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
     // [END receive_message]
 
@@ -470,216 +424,5 @@ public class MegaFirebaseMessagingService extends FirebaseMessagingService imple
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
-    }
-
-    public void showSharedFolderNotification(MegaNode n) {
-        log("showSharedFolderNotification");
-
-        try {
-            ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-            String name = "";
-            for (int j = 0; j < sharesIncoming.size(); j++) {
-                MegaShare mS = sharesIncoming.get(j);
-                if (mS.getNodeHandle() == n.getHandle()) {
-                    MegaUser user = megaApi.getContact(mS.getUser());
-                    if (user != null) {
-                        MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
-
-                        if (contactDB != null) {
-                            if (!contactDB.getName().equals("")) {
-                                name = contactDB.getName() + " " + contactDB.getLastName();
-
-                            } else {
-                                name = user.getEmail();
-
-                            }
-                        } else {
-                            log("The contactDB is null: ");
-                            name = user.getEmail();
-
-                        }
-                    } else {
-                        name = user.getEmail();
-                    }
-                }
-            }
-
-            String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + name;
-            Spanned notificationContent;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                notificationContent = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                notificationContent = Html.fromHtml(source);
-            }
-
-            int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-
-            Intent intent = new Intent(this, ManagerActivityLollipop.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                    PendingIntent.FLAG_ONE_SHOT);
-
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
-                    .setContentText(notificationContent)
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(notificationContent))
-                    .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                notificationBuilder.setColor(ContextCompat.getColor(this,R.color.mega));
-            }
-
-            Drawable d;
-
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-            } else {
-                d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
-            }
-
-            notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
-
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(notificationId, notificationBuilder.build());
-        } catch (Exception e) {
-            log("Exception: " + e.toString());
-        }
-
-//        try{
-//            String source = "Tap to get more info";
-//            Spanned notificationContent;
-//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//                notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
-//            } else {
-//                notificationContent = Html.fromHtml(source);
-//            }
-//
-//            int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
-//
-//            Intent intent = new Intent(this, ManagerActivityLollipop.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-//                    PendingIntent.FLAG_ONE_SHOT);
-//
-//            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                    .setSmallIcon(R.drawable.ic_stat_notify_download)
-//                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
-//                    .setContentText(notificationContent)
-//                    .setStyle(new NotificationCompat.BigTextStyle()
-//                            .bigText(notificationContent))
-//                    .setAutoCancel(true)
-//                    .setSound(defaultSoundUri)
-//                    .setColor(ContextCompat.getColor(this,R.color.mega))
-//                    .setContentIntent(pendingIntent);
-//
-//            Drawable d;
-//
-//            if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
-//                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
-//            } else {
-//                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
-//            }
-//
-//            notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
-//
-//            NotificationManager notificationManager =
-//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//            notificationManager.notify(notificationId, notificationBuilder.build());
-//        }
-//        catch(Exception e){
-//            log("Exception when showing shared folder notification: "+e.getMessage());
-//        }
-    }
-
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
-        log("onNodesUpdated");
-
-        if(remoteMessageType.equals("1")) {
-
-            if (updatedNodes != null) {
-                log("updatedNodes: " + updatedNodes.size());
-
-                for (int i = 0; i < updatedNodes.size(); i++) {
-                    MegaNode n = updatedNodes.get(i);
-                    if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
-                        log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
-
-                        showSharedFolderNotification(n);
-                    }
-                }
-            }
-            else{
-                log("Updated nodes is NULL");
-            }
-
-            megaApi.removeGlobalListener(this);
-        }
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-
-    }
-
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-        log("onContactRequestsUpdate");
-
-        if(remoteMessageType.equals("3")) {
-            try {
-                if (requests == null) {
-                    log("Return REQUESTS are NULL");
-                    return;
-                }
-
-//                for (int i = 0; i < requests.size(); i++) {
-//                    MegaContactRequest cr = requests.get(i);
-//                    if (cr != null) {
-//                        if ((cr.getStatus() == MegaContactRequest.STATUS_UNRESOLVED) && (!cr.isOutgoing())) {
-//
-//                            ContactsAdvancedNotificationBuilder notificationBuilder;
-//                            notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-//
-//                            notificationBuilder.removeAllIncomingContactNotifications();
-//                            notificationBuilder.showIncomingContactRequestNotification();
-//
-//                            log("onContactRequestUpdate: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
-//                        }
-//                    }
-//                }
-            } catch (Exception e) {
-                log("Exception when showing IPC request: " + e.getMessage());
-            }
-
-            megaApi.removeGlobalListener(this);
-        }
     }
 }

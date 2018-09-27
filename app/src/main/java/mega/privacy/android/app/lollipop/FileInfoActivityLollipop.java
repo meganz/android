@@ -532,11 +532,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 String name = node.getName();
 
                 collapsingToolbar.setTitle(name);
-
-                MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
-                while (megaApi.getParentNode(parent) != null){
-                    parent = megaApi.getParentNode(parent);
+                if (nC == null) {
+                    nC = new NodeController(this);
                 }
+                MegaNode parent = nC.getParent(node);
                 if (from == FROM_INCOMING_SHARES){
                     fragmentHandle = -1;
                     if (megaApi.getParentNode(node) != null){
@@ -1902,10 +1901,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		final MegaNode rubbishNode = megaApi.getRubbishNode();
 
-		MegaNode parent = megaApi.getNodeByHandle(handle);
-		while (megaApi.getParentNode(parent) != null){
-			parent = megaApi.getParentNode(parent);
-		}
+		MegaNode parent = nC.getParent(node);
 
 		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
 			moveToRubbish = true;

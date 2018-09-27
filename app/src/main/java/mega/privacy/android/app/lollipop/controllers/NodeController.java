@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
+import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
@@ -222,24 +223,58 @@ public class NodeController {
                     selectChatsToSendNode(nodeOwner);
                 }
                 else {
-                    MegaNode parentNode = megaApi.getNodeByPath("/" + Constants.CHAT_FOLDER);
-                    if (parentNode != null) {
-                        if (context instanceof ManagerActivityLollipop) {
-                            ((ManagerActivityLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (ManagerActivityLollipop) context);
-                        } else if (context instanceof AudioVideoPlayerLollipop) {
-                            ((AudioVideoPlayerLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (AudioVideoPlayerLollipop) context);
-                        } else if (context instanceof PdfViewerActivityLollipop) {
-                            ((PdfViewerActivityLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (PdfViewerActivityLollipop) context);
-                        } else if (context instanceof FullScreenImageViewerLollipop) {
-                            ((FullScreenImageViewerLollipop) context).setSendToChat(true);
-                            megaApi.copyNode(node, parentNode, (FullScreenImageViewerLollipop) context);
+                    CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+                    copyAndSendToChatListener.copyNode(node);
+                }
+            }
+        }
+    }
+
+    public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
+        log("checkIfNodesAreMineAndSelectChatsToSendNodes");
+
+        MegaNode currentNode;
+        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
+        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
+
+        if (nodes == null) {
+            return;
+        }
+
+        for (int i=0; i<nodes.size(); i++) {
+            currentNode = nodes.get(i);
+            if (currentNode != null) {
+                if (megaApi.getAccess(currentNode) == MegaShare.ACCESS_OWNER) {
+                    ownerNodes.add(currentNode);
+                }
+                else {
+                    String nodeFP = megaApi.getFingerprint(currentNode);
+                    ArrayList<MegaNode> fNodes = megaApi.getNodesByFingerprint(nodeFP);
+                    MegaNode nodeOwner = null;
+                    if (fNodes != null) {
+                        for (int j=0; j<fNodes.size(); j++) {
+                            if (megaApi.getAccess(fNodes.get(j)) == MegaShare.ACCESS_OWNER){
+                                nodeOwner = fNodes.get(j);
+                                break;
+                            }
                         }
+                    }
+                    if (nodeOwner != null) {
+                        ownerNodes.add(nodeOwner);
+                    }
+                    else {
+                        notOwnerNodes.add(currentNode);
                     }
                 }
             }
+        }
+
+        if (notOwnerNodes.size() == 0) {
+            selectChatsToSendNodes(ownerNodes);
+        }
+        else {
+            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
+            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
         }
     }
 
@@ -270,6 +305,41 @@ public class NodeController {
         else if (context instanceof AudioVideoPlayerLollipop){
             ((AudioVideoPlayerLollipop) context).startActivityForResult(i, Constants.REQUEST_CODE_SELECT_CHAT);
         }
+    }
+
+    public boolean nodeComesFromIncoming (MegaNode node) {
+        MegaNode parent = getParent(node);
+
+        if (parent.getHandle() == megaApi.getRootNode().getHandle() ||
+                parent.getHandle() == megaApi.getRubbishNode().getHandle() ||
+                parent.getHandle() == megaApi.getInboxNode().getHandle()){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    public MegaNode getParent (MegaNode node) {
+        MegaNode parent = node;
+
+        while (megaApi.getParentNode(parent) != null){
+            parent = megaApi.getParentNode(parent);
+        }
+
+        return parent;
+    }
+
+    public int getIncomingLevel(MegaNode node) {
+        int dBT = 0;
+        MegaNode parent = node;
+
+        while (megaApi.getParentNode(parent) != null){
+            dBT++;
+            parent = megaApi.getParentNode(parent);
+        }
+
+        return dBT;
     }
 
     public void prepareForDownload(ArrayList<Long> handleList){
