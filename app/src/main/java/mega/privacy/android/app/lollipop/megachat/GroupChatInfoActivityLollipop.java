@@ -59,6 +59,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -959,12 +960,62 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
                 else{
                     //Show options
-
+                    ManageChatLinkBottomSheetDialogFragment manageChatLinkBottomSheetDialogFragment = new ManageChatLinkBottomSheetDialogFragment();
+                    manageChatLinkBottomSheetDialogFragment.show(getSupportFragmentManager(), manageChatLinkBottomSheetDialogFragment.getTag());
                 }
                 break;
             }
         }
 
+    }
+
+    public void copyLink(){
+        log("copyLink");
+        if(chatLink!=null){
+            if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboard.setText(chatLink);
+            } else {
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
+                clipboard.setPrimaryClip(clip);
+            }
+            showSnackbar(getString(R.string.messages_copied_clipboard));
+        }
+        else {
+            showSnackbar(getString(R.string.email_verification_text_error));
+        }
+    }
+
+
+    public void showConfirmationRemoveChatLink (){
+        log("showConfirmationRemoveChatLink");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        removeChatLink();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+		builder.setTitle(getResources().getString(R.string.action_delete_link));
+        String message= getResources().getString(R.string.context_remove_link_warning_text);
+        builder.setMessage(message).setPositiveButton(R.string.delete_button, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
+    public void removeChatLink(){
+        log("removeChatLink");
+        megaChatApi.removeChatLink(chatHandle, this);
     }
 
     @Override
@@ -1392,47 +1443,61 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE){
             log("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!");
-            if(request.getNumRetry()==0){
-                if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                    chatLink = request.getText();
-                    chatLinkTitleText.setText(getString(R.string.manage_chat_link_option));
-                    chatLinkOptionsIcon.setVisibility(View.VISIBLE);
-                }
-                else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                    log("NOT privileges or private chatroom");
-                }
-                else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                    chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
-                    chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
-                }
-            }
-            else if(request.getNumRetry()==1){
-                log("Chat link exported!");
-                if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                    chatLink = request.getText();
-                    chatLinkTitleText.setText(getString(R.string.manage_chat_link_option));
-                    chatLinkOptionsIcon.setVisibility(View.VISIBLE);
-
-                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                        android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        clipboard.setText(chatLink);
-                    } else {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
-                        clipboard.setPrimaryClip(clip);
+            if(request.getFlag()==false){
+                if(request.getNumRetry()==0){
+                    if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                        chatLink = request.getText();
+                        chatLinkTitleText.setText(getString(R.string.manage_chat_link_option));
+                        chatLinkOptionsIcon.setVisibility(View.VISIBLE);
                     }
-                    showSnackbar(getString(R.string.messages_copied_clipboard));
+                    else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
+                        log("NOT privileges or private chatroom");
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+                        chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
+                        chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
+                    }
                 }
-                else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
-                    log("NOT public chatroom");
-                }
-                else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                    log("Chatroom not FOUND");
-                }
-                else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                    log("NOT privileges or private chatroom");
+                else if(request.getNumRetry()==1){
+                    log("Chat link exported!");
+                    if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                        chatLink = request.getText();
+                        chatLinkTitleText.setText(getString(R.string.manage_chat_link_option));
+                        chatLinkOptionsIcon.setVisibility(View.VISIBLE);
+
+                        copyLink();
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+                        log("NOT public chatroom");
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+                        log("Chatroom not FOUND");
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
+                        log("NOT privileges or private chatroom");
+                    }
                 }
             }
+            else{
+                if(request.getNumRetry()==0){
+                    log("Removing chat link");
+                    if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                        chatLink = null;
+                        chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
+                        chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+                        log("NOT public chatroom");
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+                        log("Chatroom not FOUND");
+                    }
+                    else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
+                        log("NOT privileges or private chatroom");
+                    }
+                }
+            }
+
         }
     }
 

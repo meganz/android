@@ -1385,8 +1385,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 bindCallEndedMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
-            case MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE: {
-                bindCreateChatLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
+            case MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE:
+            case MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE: {
+                bindChatLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
             case MegaChatMessage.TYPE_INVALID: {
@@ -5936,15 +5937,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void bindCreateChatLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        log("bindCreateChatLinkMessage");
+    public void bindChatLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        log("bindChatLinkMessage");
 
         MegaChatMessage message = androidMessage.getMessage();
         long userHandle = message.getUserHandle();
         log("Contact message!!: " + userHandle);
 
-        if (((ChatActivityLollipop) context).isGroup()) {
-
+        if(userHandle==megaChatApi.getMyUserHandle()){
+            ((ViewHolderMessageChat) holder).fullNameTitle = megaChatApi.getMyFullname();
+        }
+        else{
             ((ViewHolderMessageChat) holder).fullNameTitle = cC.getFullName(userHandle, chatRoom);
 
             if (((ViewHolderMessageChat) holder).fullNameTitle == null) {
@@ -5966,14 +5969,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("4-Name already asked and no name received: " + message.getUserHandle());
                 }
             }
-
-            ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.VISIBLE);
-            ((ViewHolderMessageChat) holder).nameContactText.setText(((ViewHolderMessageChat) holder).fullNameTitle);
-        } else {
-
-            ((ViewHolderMessageChat) holder).fullNameTitle = chatRoom.getTitle();
-            ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
         }
+
+        ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             holder.titleContactMessage.setPadding(Util.scaleWidthPx(MANAGEMENT_MESSAGE_LAND,outMetrics),0,0,0);
@@ -6042,7 +6040,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         setContactAvatar(((ViewHolderMessageChat) holder), userHandle, ((ViewHolderMessageChat) holder).fullNameTitle, true);
 
-        String textToShow = String.format(context.getString(R.string.message_created_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
+        String textToShow = "";
+        int messageType = message.getType();
+        if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE){
+            textToShow = String.format(context.getString(R.string.message_created_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
+        }
+        else{
+            textToShow = String.format(context.getString(R.string.message_deleted_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
+        }
+
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
