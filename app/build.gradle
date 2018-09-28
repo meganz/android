@@ -75,6 +75,7 @@ dependencies {
     implementation 'me.leolin:ShortcutBadger:1.1.21@aar'
     implementation 'com.brandongogetap:stickyheaders:0.5.1'
     implementation 'com.github.bumptech.glide:glide:3.8.0'
+    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

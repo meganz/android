@@ -97,6 +97,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -231,7 +232,7 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
-			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
+			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
 	public int accountFragment;
 
@@ -300,7 +301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     float scaleText;
     FrameLayout fragmentContainer;
 //	boolean tranfersPaused = false;
-public Toolbar tB;
+	public Toolbar tB;
     ActionBar aB;
     AppBarLayout abL;
 
@@ -360,7 +361,7 @@ public Toolbar tB;
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
 	static MenuItem drawerMenuItem = null;
-	BottomNavigationView bNV;
+	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
 	FrameLayout accountInfoFrame;
@@ -1831,12 +1832,17 @@ public Toolbar tB;
 		aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
+        bNV = (BottomNavigationViewEx) findViewById(R.id.bottom_navigation_view);
+		bNV.setOnNavigationItemSelectedListener(this);
+		bNV.enableAnimation(false);
+		bNV.enableItemShiftingMode(false);
+		bNV.enableShiftingMode(false);
+		bNV.setTextVisibility(false);
+
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
-
-        bNV = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
@@ -2554,7 +2560,7 @@ public Toolbar tB;
 					log("megaChatApi is NULL");
 				}
 
-				setChatTitleSection();
+//				setChatTitleSection();
 			}
 
 			log("onCreate - Check if there any INCOMING pendingRequest contacts");
@@ -3272,8 +3278,8 @@ public Toolbar tB;
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						resetNavigationViewMenu(nVMenu);
-						MenuItem menuItem = nVMenu.findItem(R.id.navigation_item_chat);
-						menuItem.setChecked(true);
+//						MenuItem menuItem = nVMenu.findItem(R.id.navigation_item_chat);
+//						menuItem.setChecked(true);
 					}
 
 					if (rChatFL != null){
@@ -4510,12 +4516,12 @@ public Toolbar tB;
 		if(drawerItem==null){
 			log("On start OFFLINE MODE");
 			drawerItem=DrawerItem.SAVED_FOR_OFFLINE;
-			Menu nVMenu = nV.getMenu();
-			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
-			if (drawerMenuItem != null){
-				disableNavigationViewMenu(nVMenu);
-				drawerMenuItem.setChecked(true);
-			}
+//			Menu nVMenu = nV.getMenu();
+//			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
+//			if (drawerMenuItem != null){
+//				disableNavigationViewMenu(nVMenu);
+//				drawerMenuItem.setChecked(true);
+//			}
 
 			selectDrawerItemLollipop(drawerItem);
 		}
@@ -4537,33 +4543,33 @@ public Toolbar tB;
 		log("clickDrawerItemLollipop: "+item);
 		Menu nVMenu = nV.getMenu();
 		if (nVMenu != null){
-			if(item==null){
-				drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-				onNavigationItemSelected(drawerMenuItem);
-				return;
-			}
+//			if(item==null){
+//				drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//				onNavigationItemSelected(drawerMenuItem);
+//				return;
+//			}
 
 //			drawerLayout.closeDrawer(Gravity.LEFT);
 			switch (item){
 				case CLOUD_DRIVE:{
-					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-					drawerMenuItem.setChecked(true);
-					break;
+//					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//					drawerMenuItem.setChecked(true);
+//					break;
 				}
 				case SAVED_FOR_OFFLINE:{
-					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
-					drawerMenuItem.setChecked(true);
-					break;
+//					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
+//					drawerMenuItem.setChecked(true);
+//					break;
 				}
 				case CAMERA_UPLOADS:{
-					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
-					drawerMenuItem.setChecked(true);
-					break;
+//					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+//					drawerMenuItem.setChecked(true);
+//					break;
 				}
 				case MEDIA_UPLOADS:{
-					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
-					drawerMenuItem.setChecked(true);
-					break;
+//					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+//					drawerMenuItem.setChecked(true);
+//					break;
 				}
 				case INBOX:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_inbox);
@@ -4571,9 +4577,9 @@ public Toolbar tB;
 					break;
 				}
 				case SHARED_ITEMS:{
-					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_shared_items);
-					drawerMenuItem.setChecked(true);
-					break;
+//					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_shared_items);
+//					drawerMenuItem.setChecked(true);
+//					break;
 				}
 				case CONTACTS:{
 					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_contacts);
@@ -4601,8 +4607,8 @@ public Toolbar tB;
 					break;
 				}
 				case CHAT:{
-					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_chat);
-					drawerMenuItem.setChecked(true);
+//					drawerMenuItem = nVMenu.findItem(R.id.navigation_item_chat);
+//					drawerMenuItem.setChecked(true);
 					break;
 				}
 			}
@@ -5989,15 +5995,15 @@ public Toolbar tB;
 	    		Menu nVMenu = nV.getMenu();
 	    		if (nVMenu != null){
 	    			drawerItem = DrawerItem.CLOUD_DRIVE;
-	    			resetNavigationViewMenu(nVMenu);
-	    			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-	    			if (drawerMenuItem != null){
-	    				resetNavigationViewMenu(nVMenu);
-	    				drawerMenuItem.setChecked(true);
-	    				if (drawerLayout != null){
-	    					drawerLayout.openDrawer(Gravity.LEFT);
-	    				}
-	    			}
+//	    			resetNavigationViewMenu(nVMenu);
+//	    			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//	    			if (drawerMenuItem != null){
+//	    				resetNavigationViewMenu(nVMenu);
+//	    				drawerMenuItem.setChecked(true);
+//	    				if (drawerLayout != null){
+//	    					drawerLayout.openDrawer(Gravity.LEFT);
+//	    				}
+//	    			}
 	    		}
 
 	    	}
@@ -6010,11 +6016,11 @@ public Toolbar tB;
 	    		Menu nVMenu = nV.getMenu();
 	    		switch(drawerItem){
 		    		case CLOUD_DRIVE:{
-		    			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-		    			if (drawerMenuItem != null){
-		    				resetNavigationViewMenu(nVMenu);
-		    				drawerMenuItem.setChecked(true);
-		    			}
+//		    			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//		    			if (drawerMenuItem != null){
+//		    				resetNavigationViewMenu(nVMenu);
+//		    				drawerMenuItem.setChecked(true);
+//		    			}
 		    			break;
 		    		}
 	    		}
@@ -7279,12 +7285,12 @@ public Toolbar tB;
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
 
 						drawerItem = DrawerItem.CLOUD_DRIVE;
-						if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//						if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 						return true;
 		    		}
@@ -9321,12 +9327,12 @@ public Toolbar tB;
 			if (rubbishBinFLol != null && rubbishBinFLol.isAdded()) {
 				if (rubbishBinFLol.onBackPressed() == 0) {
 					drawerItem = DrawerItem.CLOUD_DRIVE;
-					if (nV != null) {
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						resetNavigationViewMenu(nVMenu);
-						cloudDrive.setChecked(true);
-					}
+//					if (nV != null) {
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//						resetNavigationViewMenu(nVMenu);
+//						cloudDrive.setChecked(true);
+//					}
 					selectDrawerItemLollipop(drawerItem);
 					return;
 				}
@@ -9336,12 +9342,12 @@ public Toolbar tB;
 		else if (drawerItem == DrawerItem.TRANSFERS){
 
 			drawerItem = DrawerItem.CLOUD_DRIVE;
-			if (nV != null){
-				Menu nVMenu = nV.getMenu();
-				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-				resetNavigationViewMenu(nVMenu);
-				cloudDrive.setChecked(true);
-			}
+//			if (nV != null){
+//				Menu nVMenu = nV.getMenu();
+//				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//				resetNavigationViewMenu(nVMenu);
+//				cloudDrive.setChecked(true);
+//			}
 			selectDrawerItemLollipop(drawerItem);
 			return;
 
@@ -9350,12 +9356,12 @@ public Toolbar tB;
 			if (iFLol != null && iFLol.isAdded()){
 				if (iFLol.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
-					if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						resetNavigationViewMenu(nVMenu);
-						cloudDrive.setChecked(true);
-					}
+//					if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//						resetNavigationViewMenu(nVMenu);
+//						cloudDrive.setChecked(true);
+//					}
 					selectDrawerItemLollipop(drawerItem);
 					return;
 				}
@@ -9368,12 +9374,12 @@ public Toolbar tB;
 			}
 			else{
 				drawerItem = DrawerItem.CLOUD_DRIVE;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-					resetNavigationViewMenu(nVMenu);
-					cloudDrive.setChecked(true);
-				}
+//				if (nV != null){
+//					Menu nVMenu = nV.getMenu();
+//					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//					resetNavigationViewMenu(nVMenu);
+//					cloudDrive.setChecked(true);
+//				}
 				selectDrawerItemLollipop(drawerItem);
 			}
 
@@ -9387,12 +9393,12 @@ public Toolbar tB;
 				if (outSFLol != null && outSFLol.isAdded()){
 					if (outSFLol.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
-						if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//						if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
 					}
@@ -9404,12 +9410,12 @@ public Toolbar tB;
 				if (inSFLol != null && inSFLol.isAdded()){
 					if (inSFLol.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
-						if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//						if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
 					}
@@ -9427,12 +9433,12 @@ public Toolbar tB;
 
 					if (fbFLol != null){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
-						if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//						if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 					}
 					else{
@@ -9449,12 +9455,12 @@ public Toolbar tB;
 			}
 			else{
 				drawerItem = DrawerItem.CLOUD_DRIVE;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-					resetNavigationViewMenu(nVMenu);
-					cloudDrive.setChecked(true);
-				}
+//				if (nV != null){
+//					Menu nVMenu = nV.getMenu();
+//					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//					resetNavigationViewMenu(nVMenu);
+//					cloudDrive.setChecked(true);
+//				}
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
@@ -9468,12 +9474,12 @@ public Toolbar tB;
 		    		if (cFLol != null && cFLol.isAdded()){
 		    			if (cFLol.onBackPressed() == 0){
 		    				drawerItem = DrawerItem.CLOUD_DRIVE;
-		    				if (nV != null){
-								Menu nVMenu = nV.getMenu();
-								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-								resetNavigationViewMenu(nVMenu);
-								cloudDrive.setChecked(true);
-							}
+//		    				if (nV != null){
+//								Menu nVMenu = nV.getMenu();
+//								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//								resetNavigationViewMenu(nVMenu);
+//								cloudDrive.setChecked(true);
+//							}
 							selectDrawerItemLollipop(drawerItem);
 		    				return;
 		    			}
@@ -9485,12 +9491,12 @@ public Toolbar tB;
 					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		    		if (sRFLol != null){
                         drawerItem = DrawerItem.CLOUD_DRIVE;
-                        if (nV != null){
-                            Menu nVMenu = nV.getMenu();
-                            MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-                            cloudDrive.setChecked(true);
-                        }
+//                        if (nV != null){
+//                            Menu nVMenu = nV.getMenu();
+//                            MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//                            cloudDrive.setChecked(true);
+//                        }
                         selectDrawerItemLollipop(drawerItem);
                         return;
 		    		}
@@ -9502,12 +9508,12 @@ public Toolbar tB;
 		    		if (rRFLol != null){
 
 						drawerItem = DrawerItem.CLOUD_DRIVE;
-						if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//						if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
 		    		}
@@ -9524,12 +9530,12 @@ public Toolbar tB;
 	    			if (maFLol != null && maFLol.isAdded()){
 	    				if (maFLol.onBackPressed() == 0){
 		    				drawerItem = DrawerItem.CLOUD_DRIVE;
-		    				if (nV != null){
-								Menu nVMenu = nV.getMenu();
-								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-								resetNavigationViewMenu(nVMenu);
-								cloudDrive.setChecked(true);
-							}
+//		    				if (nV != null){
+//								Menu nVMenu = nV.getMenu();
+//								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//								resetNavigationViewMenu(nVMenu);
+//								cloudDrive.setChecked(true);
+//							}
 							selectDrawerItemLollipop(drawerItem);
 	    				}
 	    			}
@@ -9561,12 +9567,12 @@ public Toolbar tB;
 	    		case Constants.OVERQUOTA_ALERT:{
 	    			if (upAFL != null){
 	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-	    				if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//	    				if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 	    			}
 	    			return;
@@ -9580,12 +9586,12 @@ public Toolbar tB;
 	    		default:{
 	    			if (fbFLol != null){
 	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-	    				if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-						}
+//	    				if (nV != null){
+//							Menu nVMenu = nV.getMenu();
+//							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//							resetNavigationViewMenu(nVMenu);
+//							cloudDrive.setChecked(true);
+//						}
 						selectDrawerItemLollipop(drawerItem);
 	    			}
 	    		}
@@ -9596,12 +9602,12 @@ public Toolbar tB;
     			if (cuFL.onBackPressed() == 0){
 					visibilitySearch(false);
     				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						resetNavigationViewMenu(nVMenu);
-						cloudDrive.setChecked(true);
-					}
+//    				if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//						resetNavigationViewMenu(nVMenu);
+//						cloudDrive.setChecked(true);
+//					}
 					selectDrawerItemLollipop(drawerItem);
     				return;
     			}
@@ -9612,12 +9618,12 @@ public Toolbar tB;
     			if (muFLol.onBackPressed() == 0){
 					visibilitySearch(false);
 					drawerItem = DrawerItem.CLOUD_DRIVE;
-    				if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						resetNavigationViewMenu(nVMenu);
-						cloudDrive.setChecked(true);
-					}
+//    				if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//						resetNavigationViewMenu(nVMenu);
+//						cloudDrive.setChecked(true);
+//					}
 					selectDrawerItemLollipop(drawerItem);
     				return;
     			}
@@ -9627,12 +9633,12 @@ public Toolbar tB;
     		if (sFLol != null && sFLol.isAdded()){
     			if (sFLol.onBackPressed() == 0){
     				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						resetNavigationViewMenu(nVMenu);
-						cloudDrive.setChecked(true);
-					}
+//    				if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//						resetNavigationViewMenu(nVMenu);
+//						cloudDrive.setChecked(true);
+//					}
     				selectDrawerItemLollipop(drawerItem);
     				return;
     			}
@@ -9652,7 +9658,8 @@ public Toolbar tB;
 			dbH.setCamSyncEnabled(false);
 		}
 		switch (menuItem.getItemId()){
-			case R.id.navigation_item_cloud_drive:{
+			case R.id.bottom_navigation_item_cloud_drive: {
+//			case R.id.navigation_item_cloud_drive:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -9664,7 +9671,8 @@ public Toolbar tB;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
-			case R.id.navigation_item_saved_for_offline:{
+			case R.id.bottom_navigation_item_offline: {
+//			case R.id.navigation_item_saved_for_offline:{
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
 				if (nV != null){
@@ -9675,7 +9683,8 @@ public Toolbar tB;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
-			case R.id.navigation_item_camera_uploads:{
+			case R.id.bottom_navigation_item_camera_uploads: {
+//			case R.id.navigation_item_camera_uploads:{
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CAMERA_UPLOADS;
 				if (nV != null){
@@ -9697,7 +9706,8 @@ public Toolbar tB;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
-			case R.id.navigation_item_shared_items:{
+			case R.id.bottom_navigation_item_shared_items: {
+//			case R.id.navigation_item_shared_items:{
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SHARED_ITEMS;
 				if (nV != null){
@@ -9708,7 +9718,8 @@ public Toolbar tB;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
-			case R.id.navigation_item_chat:{
+			case R.id.bottom_navigation_item_chat: {
+//			case R.id.navigation_item_chat:{
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CHAT;
 				if (nV != null){
@@ -12548,13 +12559,13 @@ public Toolbar tB;
 	public void cameraUploadsClicked(){
 		log("cameraUplaodsClicked");
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
-		if (nV != null){
-			Menu nVMenu = nV.getMenu();
-			MenuItem cameraUploadsItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
-			drawerMenuItem = cameraUploadsItem;
-			resetNavigationViewMenu(nVMenu);
-			cameraUploadsItem.setChecked(true);
-		}
+//		if (nV != null){
+//			Menu nVMenu = nV.getMenu();
+//			MenuItem cameraUploadsItem = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+//			drawerMenuItem = cameraUploadsItem;
+//			resetNavigationViewMenu(nVMenu);
+//			cameraUploadsItem.setChecked(true);
+//		}
 		selectDrawerItemLollipop(drawerItem);
 	}
 
@@ -12575,12 +12586,12 @@ public Toolbar tB;
 	public void setInitialCloudDrive (){
 		drawerItem = DrawerItem.CLOUD_DRIVE;
 
-		if (nV != null){
-			Menu nVMenu = nV.getMenu();
-			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-			resetNavigationViewMenu(nVMenu);
-			cloudDrive.setChecked(true);
-		}
+//		if (nV != null){
+//			Menu nVMenu = nV.getMenu();
+//			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+//			resetNavigationViewMenu(nVMenu);
+//			cloudDrive.setChecked(true);
+//		}
 		firstTime = true;
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.openDrawer(Gravity.LEFT);
@@ -12588,12 +12599,12 @@ public Toolbar tB;
 
 	public void refreshCameraUpload(){
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
-		if (nV != null){
-			Menu nVMenu = nV.getMenu();
-			MenuItem cameraUploads = nVMenu.findItem(R.id.navigation_item_camera_uploads);
-			resetNavigationViewMenu(nVMenu);
-			cameraUploads.setChecked(true);
-		}
+//		if (nV != null){
+//			Menu nVMenu = nV.getMenu();
+//			MenuItem cameraUploads = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+//			resetNavigationViewMenu(nVMenu);
+//			cameraUploads.setChecked(true);
+//		}
 
 		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -14375,21 +14386,21 @@ public Toolbar tB;
 
 	void disableNavigationViewMenu(Menu menu){
 		log("disableNavigationViewMenu");
-		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(false);
-		}
-		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
-		if (mi != null){
-			mi.setChecked(false);
-		}
-		mi = menu.findItem(R.id.navigation_item_camera_uploads);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(false);
-		}
-		mi = menu.findItem(R.id.navigation_item_inbox);
+//		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(false);
+//		}
+//		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
+//		if (mi != null){
+//			mi.setChecked(false);
+//		}
+//		mi = menu.findItem(R.id.navigation_item_camera_uploads);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(false);
+//		}
+		MenuItem mi = menu.findItem(R.id.navigation_item_inbox);
 		if (mi != null){
 			if(inboxNode==null){
 				mi.setVisible(false);
@@ -14406,15 +14417,15 @@ public Toolbar tB;
 				}
 			}
 		}
-		mi = menu.findItem(R.id.navigation_item_shared_items);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(false);
-		}
-		mi = menu.findItem(R.id.navigation_item_chat);
-		if (mi != null){
-			mi.setChecked(false);
-		}
+//		mi = menu.findItem(R.id.navigation_item_shared_items);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(false);
+//		}
+//		mi = menu.findItem(R.id.navigation_item_chat);
+//		if (mi != null){
+//			mi.setChecked(false);
+//		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
 		if (mi != null){
 			mi.setChecked(false);
@@ -14434,22 +14445,22 @@ public Toolbar tB;
 			return;
 		}
 
-		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(true);
-		}
-		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(true);
-		}
-		mi = menu.findItem(R.id.navigation_item_camera_uploads);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(true);
-		}
-		mi = menu.findItem(R.id.navigation_item_inbox);
+//		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(true);
+//		}
+//		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(true);
+//		}
+//		mi = menu.findItem(R.id.navigation_item_camera_uploads);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(true);
+//		}
+		MenuItem mi = menu.findItem(R.id.navigation_item_inbox);
 		if (mi != null){
 			if(inboxNode==null){
 				mi.setVisible(false);
@@ -14468,16 +14479,16 @@ public Toolbar tB;
 				}
 			}
 		}
-		mi = menu.findItem(R.id.navigation_item_shared_items);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(true);
-		}
-		mi = menu.findItem(R.id.navigation_item_chat);
-		if (mi != null){
-			mi.setChecked(false);
-			mi.setEnabled(true);
-		}
+//		mi = menu.findItem(R.id.navigation_item_shared_items);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(true);
+//		}
+//		mi = menu.findItem(R.id.navigation_item_chat);
+//		if (mi != null){
+//			mi.setChecked(false);
+//			mi.setEnabled(true);
+//		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
 		if (mi != null){
 			mi.setChecked(false);
@@ -17811,8 +17822,8 @@ public Toolbar tB;
 		drawerItem = DrawerItem.SETTINGS;
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
-			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-			chat.setTitle(getString(R.string.section_chat));
+//			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+//			chat.setTitle(getString(R.string.section_chat));
 			MenuItem settings = nVMenu.findItem(R.id.navigation_item_settings);
 			settings.setChecked(true);
 		}
@@ -17846,7 +17857,7 @@ public Toolbar tB;
 		if(Util.isChatEnabled()){
 			if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
 				log("Change unread count: " + item.getTitle());
-				setChatTitleSection();
+//				setChatTitleSection();
 				updateNavigationToolbarIcon();
 			}
 		}
@@ -18097,36 +18108,36 @@ public Toolbar tB;
 		getTheme().applyStyle(R.style.ActionOverflowButtonStyle, true);
 	}
 
-	public void setChatTitleSection(){
-		log("setChatTitleSection");
-		if (nV != null){
-			Menu nVMenu = nV.getMenu();
-			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
-			int numberUnread = megaChatApi.getUnreadChats();
-			if(numberUnread==0){
-				chat.setTitle(getString(R.string.section_chat));
-			}
-			else{
-				String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
-				try {
-					textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-				}
-				catch(Exception e){
-					log("Formatted string: " + textToShow);
-				}
-
-				log("TEXTTOSHOW: " + textToShow);
-				Spanned result = null;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(textToShow);
-				}
-				chat.setTitle(result);
-			}
-		}
-	}
+//	public void setChatTitleSection(){
+//		log("setChatTitleSection");
+//		if (nV != null){
+//			Menu nVMenu = nV.getMenu();
+//			MenuItem chat = nVMenu.findItem(R.id.navigation_item_chat);
+//			int numberUnread = megaChatApi.getUnreadChats();
+//			if(numberUnread==0){
+//				chat.setTitle(getString(R.string.section_chat));
+//			}
+//			else{
+//				String textToShow = String.format(getString(R.string.section_chat_with_notification), numberUnread);
+//				try {
+//					textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+//					textToShow = textToShow.replace("[/A]", "</font>");
+//				}
+//				catch(Exception e){
+//					log("Formatted string: " + textToShow);
+//				}
+//
+//				log("TEXTTOSHOW: " + textToShow);
+//				Spanned result = null;
+//				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+//				} else {
+//					result = Html.fromHtml(textToShow);
+//				}
+//				chat.setTitle(result);
+//			}
+//		}
+//	}
 
 	public void showEvaluatedAppDialog(){
 		if(megaChatApi.isSignalActivityRequired()){

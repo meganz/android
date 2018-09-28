@@ -105,26 +105,27 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize">
 
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/floating_button"
-                    android:layout_width="@dimen/fab_button_diameter"
-                    android:layout_height="@dimen/fab_button_diameter"
-                    android:elevation="@dimen/elevation_low"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/ic_add_white"
-                    android:stateListAnimator="@anim/button_elevation"
-                    android:tint="@android:color/white"
-                    android:layout_above="@+id/bottom_navigation_view"
-                    android:layout_alignParentRight="true"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floating_button"
+                android:layout_width="@dimen/fab_button_diameter"
+                android:layout_height="@dimen/fab_button_diameter"
+                android:elevation="@dimen/elevation_low"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_add_white"
+                android:stateListAnimator="@anim/button_elevation"
+                android:tint="@android:color/white"
+                android:layout_above="@+id/bottom_navigation_view"
+                android:layout_alignParentRight="true"/>
 
-                <android.support.design.widget.BottomNavigationView
-                    android:id="@+id/bottom_navigation_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_alignParentBottom="true"
-                    app:menu="@menu/bottom_navigation_items"
-                    app:itemIconTint="@color/white"
-                    android:background="@color/dark_primary_color"/>
+            <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+                android:id="@+id/bottom_navigation_view"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/dark_primary_color"
+                android:layout_alignParentBottom="true"
+                app:itemIconTint="@drawable/bottom_navigation_item_tint"
+                app:itemTextColor="@drawable/bottom_navigation_item_tint"
+                app:menu="@menu/bottom_navigation_items"/>
 
         </RelativeLayout>
 
