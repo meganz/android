@@ -21,10 +21,6 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
-/**
- * Created by mega on 14/09/18.
- */
-
 public class BigCameraGroupCallFragment extends Fragment implements MegaChatVideoListenerInterface {
 
     int width = 0;
@@ -36,7 +32,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
     Long userHandle;
 
     public SurfaceView fullScreenSurfaceView;
-    MegaSurfaceRenderer renderer;
+    MegaSurfaceRendererGroup renderer;
 
     public static BigCameraGroupCallFragment newInstance(long chatId, long userHandle) {
         log("newInstance");
@@ -59,6 +55,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         Bundle args = getArguments();
         this.chatId = args.getLong("chatId", -1);
         this.userHandle = args.getLong("userHandle", -1);
+        this.width = 0;
+        this.height = 0;
         super.onCreate(savedInstanceState);
         log("after onCreate called super");
     }
@@ -77,7 +75,7 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
         fullScreenSurfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder localSurfaceHolder = fullScreenSurfaceView.getHolder();
         localSurfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        renderer = new MegaSurfaceRenderer(fullScreenSurfaceView);
+        renderer = new MegaSurfaceRendererGroup(fullScreenSurfaceView, userHandle);
 
         if(userHandle.equals(megaChatApi.getMyUserHandle())){
             megaChatApi.addChatLocalVideoListener(chatId, this);
@@ -119,6 +117,8 @@ public class BigCameraGroupCallFragment extends Fragment implements MegaChatVide
                 }
             }
         }
+
+
 
         if (bitmap != null) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer));
