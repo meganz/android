@@ -2136,6 +2136,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Make private</string>
 
-    <string name="message_created_chat_link" context="Text shown when a participant of a chat create a chat link">[A]%1$s[/A][B] created a chat link[/B]</string>
+    <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link">[A]%1$s[/A][B] created a chat link[/B]</string>
+    <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link">[A]%1$s[/A][B] deleted a chat link[/B]</string>
 
+    <string name="action_delete_link" context="Title of the option to delete a chat link">Delete link</string>
 </resources>

@@ -115,6 +115,14 @@ public class AndroidMegaRichLinkMessage {
         return false;
     }
 
+    public static boolean isChatLink(String url) {
+        if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
+            log("IS chat link found");
+            return true;
+        }
+        return false;
+    }
+
     private static void log(String log) {
         Util.log("AndroidMegaRichLinkMessage", log);
     }
