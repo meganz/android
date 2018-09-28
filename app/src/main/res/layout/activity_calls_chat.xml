@@ -27,6 +27,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/black">
 
+                    <!--RecyclerView (1-6 users)-->
                     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
                         android:id="@+id/recycler_view_cameras"
                         android:layout_width="wrap_content"
@@ -38,6 +39,7 @@
                         android:layout_centerInParent="true"
                         android:nestedScrollingEnabled="false"/>
 
+                    <!--Layout big Camera in Group call (7 + users)-->
                     <RelativeLayout
                         android:id="@+id/parent_layout_big_camera_group_call"
                         android:layout_width="match_parent"
@@ -48,16 +50,20 @@
                         android:layout_above="@+id/big_recycler_view_cameras"
                         android:background="@android:color/transparent"
                         android:visibility="gone">
+
+                        <!--Micro big Camera in Group call-->
                         <ImageView
+                            android:id="@+id/micro_big_camera_group_call"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/ic_mic_off_contact"
                             android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"/>
+                            android:layout_alignParentTop="true"
+                            android:visibility="gone"/>
 
                         <!--Remote camera in Group call-->
                         <FrameLayout
-                            android:id="@+id/fragment_container_big_camera_group_call"
+                            android:id="@+id/fragment_big_camera_group_call"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -65,14 +71,15 @@
 
                         <!--Big Avatar in Group call-->
                         <RelativeLayout
-                            android:id="@+id/big_camera_group_call_avatar_rl"
+                            android:id="@+id/rl_avatar_big_camera_group_call"
                             android:layout_centerInParent="true"
                             android:layout_width="120dp"
                             android:layout_height="120dp"
                             android:gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent">
+                            android:background="@android:color/holo_blue_light">
+
                             <mega.privacy.android.app.components.RoundedImageView
-                                android:id="@+id/big_camera_group_call_image"
+                                android:id="@+id/image_big_camera_group_call"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="fitCenter"
@@ -81,7 +88,7 @@
                                 rounded:border_width="3dp"
                                 rounded:corner_radius="60dp" />
                             <TextView
-                                android:id="@+id/big_camera_group_call_initial_letter"
+                                android:id="@+id/initial_letter_big_camera_group_call"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_centerInParent="true"
@@ -94,7 +101,7 @@
 
                     </RelativeLayout>
 
-
+                    <!--RecyclerView (7 + users)-->
                      <android.support.v7.widget.RecyclerView
                          android:id="@+id/big_recycler_view_cameras"
                          android:layout_width="match_parent"

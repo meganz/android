@@ -8,27 +8,21 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,17 +30,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
-import mega.privacy.android.app.lollipop.listeners.CustomItemClickListener;
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.InfoPeerGroupCall;
-import mega.privacy.android.app.lollipop.megachat.calls.LocalCameraCallFullScreenFragment;
 import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup;
-import mega.privacy.android.app.lollipop.megachat.calls.RemoteCameraCallFullScreenFragment;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -60,9 +48,7 @@ import static mega.privacy.android.app.utils.Util.context;
 import static mega.privacy.android.app.utils.Util.deleteFolderAndSubfolders;
 import static mega.privacy.android.app.utils.Util.percScreenLogin;
 
-public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements View.OnClickListener, MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
-
-//public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
+public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.ViewHolderGroupCall> implements MegaSurfaceRendererGroup.MegaSurfaceRendererGroupListener {
 
     Context context;
     MegaApiAndroid megaApi;
@@ -74,7 +60,6 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     float scaleH;
     float widthScreenPX, heightScreenPX;
     boolean isCallInProgress = false;
-//    CustomItemClickListener listener;
 
     RecyclerView recyclerViewFragment;
 
@@ -82,12 +67,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
     long chatId;
 
     int maxScreenWidth, maxScreenHeight;
-
     boolean avatarRequested = false;
-    private int adapterType;
 
-
-//    public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress, CustomItemClickListener listener) {
 public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<InfoPeerGroupCall> peers, long chatId, boolean isCallInProgress) {
 
     log("GroupCallAdapter(peers: "+peers.size()+")");
@@ -96,9 +77,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         this.recyclerViewFragment = recyclerView;
         this.peers = peers;
         this.chatId = chatId;
-        this.adapterType = adapterType;
         this.isCallInProgress = isCallInProgress;
-//        this.listener = listener;
 
         MegaApplication app = (MegaApplication) ((Activity) context).getApplication();
         if (megaApi == null) {
@@ -113,38 +92,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         if (megaChatApi == null) {
             megaChatApi = app.getMegaChatApi();
-        }
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        log("onClick()");
-        ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-        switch (v.getId()) {
-            case R.id.general:{
-                ((ChatCallActivity) context).remoteCameraClick();
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void resetSize(Long userHandle) {
-        log("resetSize");
-        if(getItemCount()!=0){
-            for(InfoPeerGroupCall peer:peers){
-                if(peer.getHandle() == userHandle){
-                    if(peer.getListener()!=null){
-                        if(peer.getListener().getWidth()!=0){
-                            peer.getListener().setWidth(0);
-                        }
-                        if(peer.getListener().getHeight()!=0){
-                            peer.getListener().setHeight(0);
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -173,7 +120,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         public ViewHolderGroupCallGrid(View v) {
             super(v);
         }
-
     }
 
     ViewHolderGroupCallGrid holderGrid = null;
@@ -214,12 +160,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid = new ViewHolderGroupCallGrid(v);
 
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
-
-        if(numPeersOnCall < 7){
-            holderGrid.rlGeneral.setOnClickListener(this);
-        }else{
-            holderGrid.rlGeneral.setOnClickListener(null);
-        }
 
         holderGrid.greenLayer = (RelativeLayout) v.findViewById(R.id.green_layer);
         holderGrid.greenLayer.setVisibility(GONE);
@@ -271,12 +211,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         v.setTag(holderGrid);
         return holderGrid;
-
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return adapterType;
     }
 
     @Override
@@ -285,27 +219,30 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         onBindViewHolderGrid(holderGrid2, position);
     }
 
-    public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, int position){
+    public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, final int position){
         log("onBindViewHolderGrid()");
 
-        InfoPeerGroupCall peer = getNodeAt(position);
+        final InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
             return;
         }
 
         int numPeersOnCall = getItemCount();
+        if(isCallInProgress){
+            holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(getItemCount() < 7){
+                        ((ChatCallActivity) context).remoteCameraClick();
+                    }else{
 
-//        holder.rlGeneral.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(getItemCount() < 7){
-//                    ((ChatCallActivity) context).remoteCameraClick();
-//                }else{
-//                    listener.onItemClick(holder.getPosition());
-//                }
-//
-//            }
-//        });
+                        ((ChatCallActivity) context).itemClicked(position, peer);
+                    }
+                }
+            });
+        }else{
+            holder.rlGeneral.setOnClickListener(null);
+        }
 
 
         if(peer.isVideoOn()) {
@@ -539,7 +476,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     holder.microAvatar.setVisibility(View.GONE);
                 }
             }
-
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
             //Remove listener
@@ -571,14 +507,12 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         return null;
     }
 
-
     public InfoPeerGroupCall getNodeAt(int position) {
         try {
             if (peers != null) {
                 return peers.get(position);
             }
-        } catch (IndexOutOfBoundsException e) {
-        }
+        } catch (IndexOutOfBoundsException e) {}
         return null;
     }
 
@@ -615,7 +549,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
            createMyDefaultAvatar(holder);
        }
    }
-
+    //My Default AVATAR
     public void createMyDefaultAvatar(ViewHolderGroupCall holder) {
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
@@ -648,6 +582,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
     }
 
+    //CONTACT AVATAR
     public void setProfileContactAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder){
         Bitmap bitmap = null;
         File avatar = null;
@@ -713,7 +648,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             createDefaultAvatar(userHandle, fullName, holder);
         }
     }
-
+    //CONTACT Default AVATAR
     public void createDefaultAvatar(long userHandle,  String fullName, ViewHolderGroupCall holder) {
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -741,12 +676,11 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
         holder.avatarInitialLetter.setText(contactFirstLetter);
         holder.avatarInitialLetter.setVisibility(View.VISIBLE);
-
     }
 
-    public void setAdapterType(int adapterType){
-        this.adapterType = adapterType;
-    }
+//    public void setAdapterType(int adapterType){
+//        this.adapterType = adapterType;
+//    }
 
     public RecyclerView getListFragment() {
         return recyclerViewFragment;
@@ -755,7 +689,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     public void setListFragment(RecyclerView recyclerViewFragment) {
         this.recyclerViewFragment = recyclerViewFragment;
     }
-
 
     public void changesInAudio(int position, ViewHolderGroupCall holder){
         log("changesInAudio");
@@ -786,38 +719,55 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
     }
 
-    public void addLayer(int position, ViewHolderGroupCall holder){
-        if(getItemCount()>=7){
-            if(holder == null){
-                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-            }
-            if(holder!=null){
-                InfoPeerGroupCall peer = getNodeAt(position);
-                if (peer == null){
-                    return;
+//    public void addLayer(int position, ViewHolderGroupCall holder){
+//        if(getItemCount()>=7){
+//            if(holder == null){
+//                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+//            }
+//            if(holder!=null){
+//                InfoPeerGroupCall peer = getNodeAt(position);
+//                if (peer == null){
+//                    return;
+//                }
+//                holder.greenLayer.setVisibility(View.VISIBLE);
+//            }
+//        }
+//
+//    }
+//
+//    public void removeLayer(int position, ViewHolderGroupCall holder){
+//        if(getItemCount()>=7){
+//            if(holder == null){
+//                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+//            }
+//            if(holder!=null){
+//                InfoPeerGroupCall peer = getNodeAt(position);
+//                if (peer == null){
+//                    return;
+//                }
+//                holder.greenLayer.setVisibility(View.GONE);
+//            }
+//        }
+//    }
+
+    @Override
+    public void resetSize(Long userHandle) {
+        log("resetSize");
+        if(getItemCount()!=0){
+            for(InfoPeerGroupCall peer:peers){
+                if(peer.getHandle() == userHandle){
+                    if(peer.getListener()!=null){
+                        if(peer.getListener().getWidth()!=0){
+                            peer.getListener().setWidth(0);
+                        }
+                        if(peer.getListener().getHeight()!=0){
+                            peer.getListener().setHeight(0);
+                        }
+                    }
                 }
-                holder.greenLayer.setVisibility(View.VISIBLE);
             }
         }
-
     }
-
-    public void removeLayer(int position, ViewHolderGroupCall holder){
-        if(getItemCount()>=7){
-            if(holder == null){
-                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-            }
-            if(holder!=null){
-                InfoPeerGroupCall peer = getNodeAt(position);
-                if (peer == null){
-                    return;
-                }
-                holder.greenLayer.setVisibility(View.GONE);
-            }
-        }
-
-    }
-
 
     public ArrayList<InfoPeerGroupCall> getPeers() {
         return peers;
