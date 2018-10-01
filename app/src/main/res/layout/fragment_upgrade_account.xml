@@ -35,17 +35,19 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_prolite_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:layout_height="95dp"
+				android:layout_marginTop="16dp">
+
 				<RelativeLayout
 					android:id="@+id/upgrade_prolite_layout_content"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+					android:layout_height="match_parent">
 
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_prolite_left_side"
 						android:layout_width="128dp"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:gravity="center"
 						android:layout_centerVertical="true">
 						<RelativeLayout
@@ -76,19 +78,18 @@
 					<RelativeLayout
 						android:id="@+id/upgrade_prolite_right_side"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:layout_toRightOf="@id/upgrade_prolite_left_side"
-						android:gravity="center_vertical">
+						android:gravity="center_vertical"
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_lite"
 							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_height="match_parent"
+							android:layout_centerVertical="true">
 
 							<TableRow>
-
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
@@ -120,7 +121,8 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_lite"
 										android:layout_width="wrap_content"
@@ -135,36 +137,39 @@
 							android:id="@+id/linear_divider"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
 							android:layout_alignBottom="@id/table_lite"
 							android:background="@color/grid_item_separator"
 							android:orientation="horizontal" />
 					</RelativeLayout>
+
 				</RelativeLayout>
 				<RelativeLayout
 					android:id="@+id/upgrade_prolite_layout_transparent"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
-					android:visibility="invisible">
+					android:visibility="gone"
+					android:background="#90ffffff">
 				</RelativeLayout>
+
 			</RelativeLayout>
 
 			<!-- Pro I -->
 			<RelativeLayout
 				android:id="@+id/upgrade_pro_i_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="95dp"
+				android:layout_marginTop="16dp"
 				android:background="@android:color/transparent">
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_i_layout_content"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+					android:layout_height="match_parent">
 
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_i_left_side"
 						android:layout_width="128dp"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:gravity="center"
 						android:layout_centerVertical="true">
 						<RelativeLayout
@@ -195,16 +200,16 @@
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_i_right_side"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:layout_toRightOf="@id/upgrade_pro_i_left_side"
-						android:gravity="center_vertical">
+						android:gravity="center_vertical"
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_pro_i"
 							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_height="match_parent"
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
@@ -238,7 +243,8 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_pro_i"
 										android:layout_width="wrap_content"
@@ -253,7 +259,6 @@
 							android:id="@+id/linear_divider_pro_i"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
 							android:layout_alignBottom="@id/table_pro_i"
 							android:background="@color/grid_item_separator"
 							android:orientation="horizontal" />
@@ -264,8 +269,8 @@
 					android:id="@+id/upgrade_pro_i_layout_transparent"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
+					android:visibility="gone"
+					android:background="#90ffffff">
 				</RelativeLayout>
 			</RelativeLayout>
 
@@ -273,21 +278,22 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_pro_ii_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="95dp"
+				android:layout_marginTop="16dp"
 				android:background="@android:color/transparent">
 
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_ii_layout_content"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+					android:layout_height="match_parent">
 
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_ii_left_side"
 						android:layout_width="128dp"
-						android:layout_height="wrap_content"
-						android:layout_centerVertical="true"
-						android:gravity="center">
+						android:layout_height="match_parent"
+						android:gravity="center"
+						android:layout_centerVertical="true">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
@@ -316,16 +322,16 @@
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_ii_right_side"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:layout_toRightOf="@id/upgrade_pro_ii_left_side"
-						android:gravity="center_vertical">
+						android:gravity="center_vertical"
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_pro_ii"
 							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_height="match_parent"
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
@@ -359,7 +365,8 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_pro_ii"
 										android:layout_width="wrap_content"
@@ -374,7 +381,6 @@
 							android:id="@+id/linear_divider_pro_ii"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
 							android:layout_alignBottom="@id/table_pro_ii"
 							android:background="@color/grid_item_separator"
 							android:orientation="horizontal" />
@@ -385,8 +391,8 @@
 					android:id="@+id/upgrade_pro_ii_layout_transparent"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
+					android:visibility="gone"
+					android:background="#90ffffff">
 				</RelativeLayout>
 			</RelativeLayout>
 
@@ -394,21 +400,22 @@
 			<RelativeLayout
 				android:id="@+id/upgrade_pro_iii_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="95dp"
+				android:layout_marginTop="16dp"
 				android:background="@android:color/transparent">
 
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_iii_layout_content"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+					android:layout_height="match_parent">
 
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_iii_left_side"
 						android:layout_width="128dp"
-						android:layout_height="wrap_content"
-						android:layout_centerVertical="true"
-						android:gravity="center">
+						android:layout_height="match_parent"
+						android:gravity="center"
+						android:layout_centerVertical="true">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
@@ -437,16 +444,16 @@
 					<RelativeLayout
 						android:id="@+id/upgrade_pro_iii_right_side"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:layout_toRightOf="@id/upgrade_pro_iii_left_side"
-						android:gravity="center_vertical">
+						android:gravity="center_vertical"
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_pro_iii"
 							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_height="match_parent"
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
@@ -481,7 +488,8 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_pro_iii"
 										android:layout_width="wrap_content"
@@ -496,7 +504,6 @@
 							android:id="@+id/linear_divider_pro_iii"
 							android:layout_width="match_parent"
 							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
 							android:layout_alignBottom="@id/table_pro_iii"
 							android:background="@color/grid_item_separator"
 							android:orientation="horizontal" />
@@ -507,8 +514,8 @@
 					android:id="@+id/upgrade_pro_iii_layout_transparent"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
+					android:visibility="gone"
+					android:background="#90ffffff">
 				</RelativeLayout>
 			</RelativeLayout>
 
