@@ -1608,6 +1608,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     }
                                     if(position != -1){
                                         peerSelected = adapter.getNodeAt(position);
+                                        log("audio detected: "+peerSelected.getName());
                                         updateUserSelected(true);
                                     }
                                 }
@@ -2388,14 +2389,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
     }
 
-    public void itemClicked(int position, InfoPeerGroupCall peer){
+    public void itemClicked(InfoPeerGroupCall peer){
         log("itemClicked-> "+peer.getName()+", userSelected: "+peerSelected.getName());
         if(peerSelected.getHandle().equals(peer.getHandle())){
             //I touched the same user that is now in big fragment:
             if(isManualMode){
                 isManualMode = false;
+                log("manual mode - False");
             }else{
                 isManualMode = true;
+                log("manual mode - True");
             }
             peerSelected = peer;
             updateUserSelected(true);
@@ -2404,12 +2407,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             if(!peer.getHandle().equals(megaChatApi.getMyUserHandle())){
                 if(!isManualMode) {
                     isManualMode = true;
+                    log("manual mode - True");
                 }
                 peerSelected = peer;
                 updateUserSelected(true);
             }
         }
-
     }
 
     @Override
@@ -2675,15 +2678,22 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     public void updateUserSelected(boolean flag){
         log("updateUserSelected()");
-        //Se llama a est función si: createNewAdapter, se detecta que toca o se detecta que habla alguien.
         if(flag){
+
+            int position=-1;
             //Call IN PROGRESS
             if(peerSelected == null){
+
                 //First case:
                 if(!isManualMode){
                     if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
+                        log("updateUserSelected() - call IN PROGRESS - first case");
+                        position = peersOnCall.size()-2;
+                        peerSelected = peersOnCall.get(position);
+                        if((adapter != null)&&(position !=-1)){
+                            adapter.addLayer(position, null);
+                        }
 
-                        peerSelected = peersOnCall.get((peersOnCall.size())-2);
                         if(peerSelected.isVideoOn()){
                             createBigFragment(peerSelected.getHandle());
                         }else{
@@ -2697,26 +2707,45 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
             }else{
-                //Rest of cases:
-                if(peerSelected.isVideoOn()){
-                    createBigFragment(peerSelected.getHandle());
-                }else{
-                    createBigAvatar(peerSelected.getHandle(), peerSelected.getName());
+
+                if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
+                    log("updateUserSelected() - call IN PROGRESS - rest of cases");
+
+                    for(int i=0; i<peersOnCall.size(); i++){
+                        if(peersOnCall.get(i).getHandle().equals(peerSelected.getHandle())){
+                            position = i;
+                        }
+                    }
+                    if((adapter != null)&&(position !=-1)){
+                        adapter.addLayer(position, null);
+                    }
+                    //Rest of cases:
+                    if(peerSelected.isVideoOn()){
+                        createBigFragment(peerSelected.getHandle());
+                    }else{
+                        createBigAvatar(peerSelected.getHandle(), peerSelected.getName());
+                    }
+                    if(peerSelected.isAudioOn()){
+                        //Disable audio icon GONE
+                    }else{
+                        //Disable audio icon VISIBLE
+                    }
                 }
-                if(peerSelected.isAudioOn()){
-                    //Disable audio icon GONE
-                }else{
-                    //Disable audio icon VISIBLE
-                }
+
+
+
 
             }
 
         }else{
+
             //Call INCOMING
             parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
             if((peerSelected == null)){
-            //First time:
+                log("updateUserSelected() - call INCOMING");
+
+                //First time:
                 //Remove Camera element, because with incoming, avatar is the only showed
                 if (bigCameraGroupCallFragment != null) {
                     bigCameraGroupCallFragment.setVideoFrame(false);
