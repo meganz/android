@@ -2140,4 +2140,7 @@
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link">[A]%1$s[/A][B] deleted a chat link[/B]</string>
 
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete link</string>
+
+    <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
+
 </resources>
