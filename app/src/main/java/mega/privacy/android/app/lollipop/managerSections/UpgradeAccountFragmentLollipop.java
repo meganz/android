@@ -157,7 +157,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		bandwidthSectionLite = (TextView) v.findViewById(R.id.bandwidth_lite);
 		selectPaymentMethodLayoutLite = v.findViewById(R.id.available_payment_methods_prolite);
 		proLiteTransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout_transparent);
-		proLiteTransparentLayout.setVisibility(View.INVISIBLE);
+		proLiteTransparentLayout.setVisibility(View.GONE);
 		//END -- PRO LITE ACCOUNT
 
 		//PRO I ACCOUNT
@@ -168,7 +168,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		bandwidthSectionPro1 = (TextView) v.findViewById(R.id.bandwidth_pro_i);
 		selectPaymentMethodLayoutPro1 = v.findViewById(R.id.available_payment_methods_pro_i);
 		pro1TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_i_layout_transparent);
-		pro1TransparentLayout.setVisibility(View.INVISIBLE);
+		pro1TransparentLayout.setVisibility(View.GONE);
 		//END -- PRO I ACCOUNT
 
 		//PRO II ACCOUNT
@@ -179,7 +179,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		bandwidthSectionPro2 = (TextView) v.findViewById(R.id.bandwidth_pro_ii);
 		selectPaymentMethodLayoutPro2 = v.findViewById(R.id.available_payment_methods_pro_ii);
 		pro2TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_ii_layout_transparent);
-		pro2TransparentLayout.setVisibility(View.INVISIBLE);
+		pro2TransparentLayout.setVisibility(View.GONE);
 		//END -- PRO II ACCOUNT
 
 		//PRO III ACCOUNT
@@ -190,7 +190,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		bandwidthSectionPro3 = (TextView) v.findViewById(R.id.bandwidth_pro_iii);
 		selectPaymentMethodLayoutPro3 = v.findViewById(R.id.available_payment_methods_pro_iii);
 		pro3TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_iii_layout_transparent);
-		pro3TransparentLayout.setVisibility(View.INVISIBLE);
+		pro3TransparentLayout.setVisibility(View.GONE);
 		//END -- PRO III ACCOUNT
 
 		upgradeComment = (TextView) v.findViewById(R.id.upgrade_account_comment);
@@ -556,7 +556,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	}
 	
 	public void showAvailableAccount(){
-		log("showAvailableAccount");
+		log("showAvailableAccount()");
 
 		if(myAccountInfo==null){
 			log("MyAccountInfo is NULL");
@@ -568,21 +568,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		switch(myAccountInfo.getAccountType()){
 
 			case Constants.PRO_I:{
-				hideProLite();
+				hideProI();
 				break;
 			}
 			case Constants.PRO_II:{
-				hideProLite();
-				hideProI();
-				break;
-			}
-			case Constants.PRO_III:{
-				hideProLite();
-				hideProI();
 				hideProII();
 				break;
 			}
+			case Constants.PRO_III:{
+				hideProIII();
+				break;
+			}
 			case Constants.PRO_LITE:{
+				hideProLite();
 				break;
 			}
 		}
@@ -823,33 +821,21 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	private void hideProLite(){
 		log("hideProLite");
-
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
 	}
 
 	private void hideProI(){
 		log("hideProI");
-
 		pro1TransparentLayout.setVisibility(View.VISIBLE);
-
-//		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-//		alpha.setDuration(0);
-//		alpha.setFillAfter(true);
-//		pro1.startAnimation(alpha);
-
 	}
 
 	private void hideProII(){
 		log("hideProII");
-
-
 		pro2TransparentLayout.setVisibility(View.VISIBLE);
 	}
 
 	private void hideProIII(){
 		log("hideProIII");
-
-
 		pro3TransparentLayout.setVisibility(View.VISIBLE);
 	}
 
@@ -994,7 +980,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.payment_method_google_wallet:{
-				log("****** onClick()-payment_method_google_wallet");
+				log("onClick()-payment_method_google_wallet");
 				optionsBilling.setVisibility(View.VISIBLE);
 				setPricingBillingPeriod(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
 
