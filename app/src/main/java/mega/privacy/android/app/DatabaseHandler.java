@@ -26,7 +26,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 40;
+	private static final int DATABASE_VERSION = 41;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -98,6 +98,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_USE_HTTPS_ONLY = "usehttpsonly";
 	private static final String KEY_SHOW_COPYRIGHT = "showcopyright";
 	private static final String KEY_SHOW_NOTIF_OFF = "shownotifoff";
+	private static final String KEY_STAGING = "staging";
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
@@ -204,7 +205,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
         		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER_SDK +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
 				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT, " + KEY_FILE_LOGGER_KARERE +
-				" TEXT, " + KEY_USE_HTTPS_ONLY + " TEXT, " + KEY_SHOW_COPYRIGHT +" TEXT, " + KEY_SHOW_NOTIF_OFF +" TEXT" + ")";
+				" TEXT, " + KEY_USE_HTTPS_ONLY + " TEXT, " + KEY_SHOW_COPYRIGHT +" TEXT, " + KEY_SHOW_NOTIF_OFF +" TEXT, " + KEY_STAGING + " TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -560,6 +561,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 39){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SMALL_GRID_CAMERA + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + " = '" + encrypt("false") + "';");
+		}
+
+		if (oldVersion <= 40){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_STAGING + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + " = '" + encrypt("false") + "';");
 		}
 	}
 	
@@ -1554,6 +1560,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.getUseHttpsOnly()));
 		values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.getShowCopyright()));
 		values.put(KEY_SHOW_NOTIF_OFF, encrypt(attr.getShowNotifOff()));
+		values.put(KEY_STAGING, encrypt(attr.getStaging()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -1578,11 +1585,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String useHttpsOnly = decrypt(cursor.getString(12));
 			String showCopyright = decrypt(cursor.getString(13));
 			String showNotifOff = decrypt(cursor.getString(14));
+			String staging = decrypt(cursor.getString(15));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff, staging);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff, staging);
 			}
 		}
 		cursor.close();
@@ -3053,6 +3061,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 
 		return "true";
+	}
+
+	public void setStaging (boolean staging){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + "='" + encrypt(staging + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_STAGING, encrypt(staging + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public String getStaging (){
+
+		String selectQuery = "SELECT " + KEY_STAGING + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+
+			String staging = decrypt(cursor.getString(0));
+			return staging;
+		}
+		cursor.close();
+
+		return "false";
 	}
 
 	public void setInvalidateSdkCache(boolean invalidateSdkCache){
