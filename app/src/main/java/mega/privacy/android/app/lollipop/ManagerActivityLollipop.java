@@ -7372,7 +7372,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return true;
 			}
 	        case R.id.action_menu_kill_all_sessions:{
-				aC.killAllSessions(this);
+				showConfirmationCloseAllSessions();
 	        	return true;
 	        }
 	        case R.id.action_new_folder:{
@@ -13145,6 +13145,32 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+	}
+
+	public void showConfirmationCloseAllSessions(){
+		log("showConfirmationCloseAllSessions");
+
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case DialogInterface.BUTTON_POSITIVE:
+						AccountController aC = new AccountController(managerActivity);
+						aC.killAllSessions(managerActivity);
+						break;
+
+					case DialogInterface.BUTTON_NEGATIVE:
+						//No button clicked
+						break;
+				}
+			}
+		};
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		builder.setMessage(R.string.confirmation_close_sessions).setPositiveButton(R.string.general_close, dialogClickListener)
+				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+
 	}
 
 	public void showConfirmationRemoveFromOffline(){
