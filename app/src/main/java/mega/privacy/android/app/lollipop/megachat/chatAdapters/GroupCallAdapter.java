@@ -236,7 +236,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                         ((ChatCallActivity) context).remoteCameraClick();
                     }else{
 
-                        ((ChatCallActivity) context).itemClicked(position, peer);
+                        ((ChatCallActivity) context).itemClicked(peer);
                     }
                 }
             });
@@ -719,36 +719,28 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
     }
 
-//    public void addLayer(int position, ViewHolderGroupCall holder){
-//        if(getItemCount()>=7){
-//            if(holder == null){
-//                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-//            }
-//            if(holder!=null){
-//                InfoPeerGroupCall peer = getNodeAt(position);
-//                if (peer == null){
-//                    return;
-//                }
-//                holder.greenLayer.setVisibility(View.VISIBLE);
-//            }
-//        }
-//
-//    }
-//
-//    public void removeLayer(int position, ViewHolderGroupCall holder){
-//        if(getItemCount()>=7){
-//            if(holder == null){
-//                holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-//            }
-//            if(holder!=null){
-//                InfoPeerGroupCall peer = getNodeAt(position);
-//                if (peer == null){
-//                    return;
-//                }
-//                holder.greenLayer.setVisibility(View.GONE);
-//            }
-//        }
-//    }
+    public void addLayer(int position, ViewHolderGroupCall holder){
+        log(" addLayer()");
+        //Remove green layer for the rest of users:
+        for(int i=0; i<peers.size();i++){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
+            if(holder!=null){
+                InfoPeerGroupCall peer = getNodeAt(i);
+                if (peer == null){
+                    return;
+                }
+                if(i==position){
+                    holder.greenLayer.setVisibility(View.VISIBLE);
+                }else{
+                    if(holder.greenLayer.getVisibility()==View.VISIBLE){
+                        holder.greenLayer.setVisibility(View.GONE);
+                    }
+
+                }
+            }
+        }
+    }
+
 
     @Override
     public void resetSize(Long userHandle) {

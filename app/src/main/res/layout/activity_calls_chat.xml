@@ -76,7 +76,7 @@
                             android:layout_width="120dp"
                             android:layout_height="120dp"
                             android:gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/holo_blue_light">
+                            android:background="@android:color/transparent">
 
                             <mega.privacy.android.app.components.RoundedImageView
                                 android:id="@+id/image_big_camera_group_call"
