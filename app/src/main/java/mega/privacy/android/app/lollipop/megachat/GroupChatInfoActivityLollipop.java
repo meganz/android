@@ -965,6 +965,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
                 break;
             }
+            case R.id.chat_group_contact_properties_private_layout:{
+                megaChatApi.closeChatLink(chatHandle, this);
+                break;
+            }
         }
 
     }
@@ -1498,6 +1502,29 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             }
 
+        }
+        else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_CLOSE){
+            log("MegaChatRequest.TYPE_CHAT_LINK_CLOSE finished!!!");
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                chatLink = null;
+                log("Chat is PRIVATE now");
+                chatLinkLayout.setVisibility(View.GONE);
+                chatLinkSeparator.setVisibility(View.GONE);
+                privateLayout.setVisibility(View.GONE);
+                privateSeparator.setVisibility(View.GONE);
+            }
+            else{
+                log("Error on closeChatLink");
+                if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+                    log("NOT public chatroom");
+                }
+                else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+                    log("Chatroom not FOUND");
+                }
+                else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
+                    log("NOT privileges or private chatroom");
+                }
+            }
         }
     }
 
