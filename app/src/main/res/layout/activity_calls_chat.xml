@@ -51,16 +51,6 @@
                         android:background="@android:color/transparent"
                         android:visibility="gone">
 
-                        <!--Micro big Camera in Group call-->
-                        <ImageView
-                            android:id="@+id/micro_big_camera_group_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/ic_mic_off_contact"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"
-                            android:visibility="gone"/>
-
                         <!--Remote camera in Group call-->
                         <FrameLayout
                             android:id="@+id/fragment_big_camera_group_call"
@@ -68,6 +58,19 @@
                             android:layout_height="wrap_content"
                             app:layout_behavior="@string/appbar_scrolling_view_behavior"
                             android:background="@android:color/transparent"/>
+
+                        <!--Micro Video-->
+                        <ImageView
+                            android:id="@+id/micro_fragment_big_camera_group_call"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginRight="8dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@android:color/transparent"
+                            android:visibility="gone"
+                            android:src="@drawable/ic_mic_off_contact"/>
 
                         <!--Big Avatar in Group call-->
                         <RelativeLayout
@@ -98,6 +101,16 @@
                                 android:paddingBottom="3dp"
                                 android:visibility="gone"/>
                         </RelativeLayout>
+                        <!--Micro Avatar-->
+                        <ImageView
+                            android:id="@+id/micro_avatar_big_camera_group_call"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/rl_avatar_big_camera_group_call"
+                            android:layout_alignTop="@+id/rl_avatar_big_camera_group_call"
+                            android:background="@android:color/transparent"
+                            android:visibility="gone"
+                            android:src="@drawable/ic_mic_off_contact"/>
 
                     </RelativeLayout>
 
