@@ -16,8 +16,9 @@ public class MegaAttributes {
 	String useHttpsOnly = "false";
 	String showCopyright = "true";
 	String showNotifOff = "true";
+	String staging = "false";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String staging) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -32,9 +33,10 @@ public class MegaAttributes {
 		this.useHttpsOnly = "false";
 		this.showCopyright = showCopyright;
 		this.showNotifOff = showNotifOff;
+		this.staging = staging;
 	}
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -49,6 +51,7 @@ public class MegaAttributes {
 		this.useHttpsOnly = useHttpsOnly;
 		this.showCopyright = showCopyright;
 		this.showNotifOff = showNotifOff;
+		this.staging = staging;
 	}
 	
 	public String getOnline(){
@@ -161,5 +164,13 @@ public class MegaAttributes {
 
 	public void setShowNotifOff(String showNotifOff) {
 		this.showNotifOff = showNotifOff;
+	}
+
+	public String getStaging(){
+		return staging;
+	}
+
+	public void setStaging(String staging){
+		this.staging = staging;
 	}
 }

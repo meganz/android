@@ -2110,4 +2110,7 @@
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
 
+    <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Change to a testing server?</string>
+    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Are you sure you want to change to a test server? Your account may run irrecoverable problems</string>
+
 </resources>

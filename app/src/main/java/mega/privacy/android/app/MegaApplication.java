@@ -369,6 +369,7 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
+		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
@@ -381,9 +382,24 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				} else {
 					fileLoggerSDK = false;
 				}
-			} else {
-				fileLoggerSDK = false;
+
+				if (attrs.getStaging() != null){
+					try{
+						staging = Boolean.parseBoolean(attrs.getStaging());
+					} catch (Exception e){ staging = false;}
+				}
 			}
+			else {
+				fileLoggerSDK = false;
+				staging = false;
+			}
+		}
+
+		if (staging){
+			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+		}
+		else{
+			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 		}
 
 		if (Util.DEBUG){

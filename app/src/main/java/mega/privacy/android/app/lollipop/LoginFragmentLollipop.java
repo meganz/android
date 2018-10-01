@@ -192,6 +192,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean accountConfirmed = false;
     private boolean pinLongClick = false;
 
+    private boolean twoFA = false;
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         log("onSaveInstanceState");
@@ -871,6 +873,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (intentReceived.getAction().equals(Constants.ACTION_REFRESH)){
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
+                    return v;
+                }
+                else if (intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING)){
+                    twoFA = true;
+                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+                    startFastLogin();
                     return v;
                 }
                 else if (intentReceived.getAction().equals(Constants.ACTION_ENABLE_CHAT)){
@@ -2066,6 +2074,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                     log("(2) Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
+
+                    if (twoFA){
+                        intent.setAction(Constants.ACTION_REFRESH_STAGING);
+                        twoFA = false;
+                    }
 
                     startActivity(intent);
                     ((LoginActivityLollipop)context).finish();
