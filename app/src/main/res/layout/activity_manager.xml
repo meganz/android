@@ -17,6 +17,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <LinearLayout
+            android:id="@+id/fragment_layout"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -206,12 +207,15 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="#ffffff"
-        android:clipToPadding="false"
-        app:itemBackground="@drawable/navigation_view_item_background"
-        app:itemTextColor="@color/name_my_account"
-        app:menu="@menu/navigation_drawer_items">
+        android:clipToPadding="false">
 
-        <!--<include layout="@layout/navigation_view_layout"/>-->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/navigation_view_layout"/>
+
+        </ScrollView>
 
     </android.support.design.widget.NavigationView>
 
