@@ -37,7 +37,7 @@
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
 
     <application
-        android:name="MegaApplication"
+        android:name="mega.privacy.android.app.MegaApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
