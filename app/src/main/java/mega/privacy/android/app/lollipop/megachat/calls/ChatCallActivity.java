@@ -205,9 +205,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     //Big elements for group call (more than 6 users)
     FrameLayout fragmentBigCameraGroupCall;
+    ImageView microFragmentBigCameraGroupCall;
     ViewGroup parentBigCameraGroupCall;
     private BigCameraGroupCallFragment bigCameraGroupCallFragment = null;
     RelativeLayout avatarBigCameraGroupCallLayout;
+    ImageView avatarBigCameraGroupCallMicro;
     RoundedImageView avatarBigCameraGroupCallImage;
     TextView avatarBigCameraGroupCallInitialLetter;
 
@@ -656,17 +658,17 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             paramsBigCameraGroupCall.width = (int)heightScreenPX;
             paramsBigCameraGroupCall.height = (int)heightScreenPX;
         }
-
         parentBigCameraGroupCall.setLayoutParams(paramsBigCameraGroupCall);
-
-
         fragmentBigCameraGroupCall = (FrameLayout) findViewById(R.id.fragment_big_camera_group_call);
         fragmentBigCameraGroupCall.setVisibility(View.GONE);
+        microFragmentBigCameraGroupCall = (ImageView) findViewById(R.id.micro_fragment_big_camera_group_call);
+        microFragmentBigCameraGroupCall.setVisibility(View.GONE);
 
         avatarBigCameraGroupCallLayout = (RelativeLayout) findViewById(R.id.rl_avatar_big_camera_group_call);
-
+        avatarBigCameraGroupCallMicro = (ImageView) findViewById(R.id.micro_avatar_big_camera_group_call);
         avatarBigCameraGroupCallImage = (RoundedImageView) findViewById(R.id.image_big_camera_group_call);
         avatarBigCameraGroupCallInitialLetter = (TextView) findViewById(R.id.initial_letter_big_camera_group_call);
+        avatarBigCameraGroupCallMicro.setVisibility(GONE);
         avatarBigCameraGroupCallLayout.setVisibility(View.GONE);
         parentBigCameraGroupCall.setVisibility(View.GONE);
 
@@ -841,7 +843,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     updateScreenStatusInProgress();
 
                 }else{
-
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -2172,6 +2173,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 if((peersOnCall.size() >= 7) && (peerSelected != null)){
                                     if(peerSelected.getHandle().equals(userHandle)){
                                         createBigFragment(peerSelected.getHandle());
+                                        if(peerSelected.isAudioOn()){
+                                            //Disable audio icon GONE
+                                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                            microFragmentBigCameraGroupCall.setVisibility(GONE);
+                                        }else{
+                                            //Disable audio icon VISIBLE
+                                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                            microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                                        }
                                     }
                                 }
                                 break;
@@ -2191,6 +2201,15 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 if((peersOnCall.size() >= 7) && (peerSelected != null)){
                                     if(peerSelected.getHandle().equals(userHandle)){
                                         createBigAvatar(peerSelected.getHandle(),peerSelected.getName());
+                                        if(peerSelected.isAudioOn()){
+                                            //Disable audio icon GONE
+                                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                            microFragmentBigCameraGroupCall.setVisibility(GONE);
+                                        }else{
+                                            //Disable audio icon VISIBLE
+                                            avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
+                                            microFragmentBigCameraGroupCall.setVisibility(GONE);
+                                        }
                                     }
                                 }
                                 break;
@@ -2288,8 +2307,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     adapter.changesInAudio(i,null);
                                     if((peersOnCall.size() >= 7) && (peerSelected != null)){
                                         if(peerSelected.getHandle().equals(userHandle)){
-                                            //Disable audio icon GONE
-
+                                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                            microFragmentBigCameraGroupCall.setVisibility(GONE);
                                         }
                                     }
                                     break;
@@ -2307,7 +2326,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     adapter.changesInAudio(i,null);
                                     if((peersOnCall.size() >= 7) && (peerSelected != null)){
                                         if(peerSelected.getHandle().equals(userHandle)){
-                                            //Disable audio icon VISIBLE
+                                            if(peerSelected.isVideoOn()){
+                                                avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                                microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                                            }else{
+                                                avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
+                                                microFragmentBigCameraGroupCall.setVisibility(GONE);
+                                            }
                                         }
                                     }
                                     break;
@@ -2695,14 +2720,29 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }
 
                         if(peerSelected.isVideoOn()){
+                            //Video ON
                             createBigFragment(peerSelected.getHandle());
+                            if(peerSelected.isAudioOn()){
+                                //Disable audio icon GONE
+                                avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                microFragmentBigCameraGroupCall.setVisibility(GONE);
+                            }else{
+                                //Disable audio icon VISIBLE
+                                avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                            }
                         }else{
+                            //Video OFF
                             createBigAvatar(peerSelected.getHandle(), peerSelected.getName());
-                        }
-                        if(peerSelected.isAudioOn()){
-                            //Disable audio icon GONE
-                        }else{
-                            //Disable audio icon VISIBLE
+                            if(peerSelected.isAudioOn()){
+                                //Disable audio icon GONE
+                                avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                                microFragmentBigCameraGroupCall.setVisibility(GONE);
+                            }else{
+                                //Disable audio icon VISIBLE
+                                avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
+                                microFragmentBigCameraGroupCall.setVisibility(GONE);
+                            }
                         }
                     }
                 }
@@ -2721,24 +2761,34 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                     //Rest of cases:
                     if(peerSelected.isVideoOn()){
+                        //Video ON
                         createBigFragment(peerSelected.getHandle());
+                        if(peerSelected.isAudioOn()){
+                            //Disable audio icon GONE
+                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                            microFragmentBigCameraGroupCall.setVisibility(GONE);
+                        }else{
+                            //Disable audio icon VISIBLE
+                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                            microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                        }
                     }else{
+                        //Video OFF
                         createBigAvatar(peerSelected.getHandle(), peerSelected.getName());
-                    }
-                    if(peerSelected.isAudioOn()){
-                        //Disable audio icon GONE
-                    }else{
-                        //Disable audio icon VISIBLE
+                        if(peerSelected.isAudioOn()){
+                            //Disable audio icon GONE
+                            avatarBigCameraGroupCallMicro.setVisibility(GONE);
+                            microFragmentBigCameraGroupCall.setVisibility(GONE);
+                        }else{
+                            //Disable audio icon VISIBLE
+                            avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
+                            microFragmentBigCameraGroupCall.setVisibility(GONE);
+                        }
                     }
                 }
-
-
-
-
             }
 
         }else{
-
             //Call INCOMING
             parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
