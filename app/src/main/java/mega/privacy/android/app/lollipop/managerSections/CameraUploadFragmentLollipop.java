@@ -727,6 +727,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if (type == TYPE_CAMERA) {
 			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
+				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
 				scrollView = (ScrollView) v.findViewById(R.id.cam_sync_scroll_view);
@@ -1664,6 +1665,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				else{
 					cameraOnOffFirstTime();					
 				}
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 				break;
 			}
 			case R.id.cam_sync_button_skip:{

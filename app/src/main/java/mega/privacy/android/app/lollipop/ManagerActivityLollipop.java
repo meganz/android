@@ -361,6 +361,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	static DrawerItem drawerItem = null;
 	static DrawerItem lastDrawerItem = null;
 	static MenuItem drawerMenuItem = null;
+	LinearLayout fragmentLayout;
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
@@ -570,6 +571,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
 	private boolean pinLongClick = false;
+
+	RelativeLayout myAccountSection;
+	RelativeLayout inboxSection;
+	RelativeLayout contactsSection;
+	RelativeLayout settingsSection;
+	Button upgradeAccount;
+	TextView contactsSectionText;
 
 	private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
 		@Override
@@ -1832,6 +1840,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
+        fragmentLayout = (LinearLayout) findViewById(R.id.fragment_layout);
+
         bNV = (BottomNavigationViewEx) findViewById(R.id.bottom_navigation_view);
 		bNV.setOnNavigationItemSelectedListener(this);
 		bNV.enableAnimation(false);
@@ -1842,15 +1852,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         nV = (NavigationView) findViewById(R.id.navigation_view);
-        nV.setNavigationItemSelectedListener(this);
+
+        myAccountSection = (RelativeLayout) findViewById(R.id.my_account_section);
+        myAccountSection.setOnClickListener(this);
+        inboxSection = (RelativeLayout) findViewById(R.id.inbox_section);
+        inboxSection.setOnClickListener(this);
+        contactsSection = (RelativeLayout) findViewById(R.id.contacts_section);
+        contactsSection.setOnClickListener(this);
+        contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
+        settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
+        settingsSection.setOnClickListener(this);
+        upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
+        upgradeAccount.setOnClickListener(this);
+
+//        nV.setNavigationItemSelectedListener(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity);
 
-		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
-		nV.addHeaderView(nVHeader);
+//		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
+//		nV.addHeaderView(nVHeader);
 
-		usedSpaceLayout = (RelativeLayout) nVHeader.findViewById(R.id.nv_used_space_layout);
+		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
@@ -1926,17 +1949,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
-		accountInfoFrame = (FrameLayout) nVHeader.findViewById(R.id.navigation_drawer_account_view);
+		accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
 
-        nVDisplayName = (TextView) nVHeader.findViewById(R.id.navigation_drawer_account_information_display_name);
-		nVEmail = (TextView) nVHeader.findViewById(R.id.navigation_drawer_account_information_email);
-        nVPictureProfile = (RoundedImageView) nVHeader.findViewById(R.id.navigation_drawer_user_account_picture_profile);
-        nVPictureProfileTextView = (TextView) nVHeader.findViewById(R.id.navigation_drawer_user_account_picture_profile_textview);
+        nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
+		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
+        nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
+        nVPictureProfileTextView = (TextView) findViewById(R.id.navigation_drawer_user_account_picture_profile_textview);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
-        spaceTV = (TextView) nVHeader.findViewById(R.id.navigation_drawer_space);
-        usedSpacePB = (ProgressBar) nVHeader.findViewById(R.id.manager_used_space_bar);
+        spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
+        usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
 
         //TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
@@ -4306,7 +4329,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				if(numberUnread==0){
 					if(isFirstNavigationLevel()){
-						if (drawerItem == DrawerItem.SEARCH){
+						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX
+								|| drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN){
 							aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 						}
 						else {
@@ -4319,7 +4343,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					if(isFirstNavigationLevel()){
-						if (drawerItem == DrawerItem.SEARCH){
+						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX
+								|| drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN){
 							badgeDrawable.setProgress(1.0f);
 						}
 						else {
@@ -4342,7 +4367,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				if(isFirstNavigationLevel()){
-					if (drawerItem == DrawerItem.SEARCH){
+					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX
+							|| drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN){
 						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 					}
 					else {
@@ -4353,9 +4379,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
 			}
+
 		} else {
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH){
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX
+						|| drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN){
 						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
 				else {
@@ -5129,19 +5157,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			supportInvalidateOptionsMenu();
 				setToolbarTitle();
 				showFabButton();
+				showHideBottomNavigationView(false);
 				log("END selectDrawerItem for Cloud Drive");
     			break;
     		}
 			case RUBBISH_BIN:{
+				showHideBottomNavigationView(true);
 				tB.setVisibility(View.VISIBLE);
 				rubbishBinFLol = new RubbishBinFragmentLollipop().newInstance();
 
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
-					resetNavigationViewMenu(nVMenu);
-					hidden.setChecked(true);
-				}
+//				if (nV != null){
+//					Menu nVMenu = nV.getMenu();
+//					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+//					resetNavigationViewMenu(nVMenu);
+//					hidden.setChecked(true);
+//				}
 
 				tabLayoutContacts.setVisibility(View.GONE);
 				viewPagerContacts.setVisibility(View.GONE);
@@ -5167,7 +5197,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				supportInvalidateOptionsMenu();
 				setToolbarTitle();
 				showFabButton();
-
 				break;
 			}
     		case SAVED_FOR_OFFLINE:{
@@ -5224,6 +5253,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
 				showFabButton();
+				showHideBottomNavigationView(false);
     			break;
     		}
     		case CAMERA_UPLOADS:{
@@ -5286,6 +5316,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				setToolbarTitle();
     			supportInvalidateOptionsMenu();
 				showFabButton();
+				showHideBottomNavigationView(false);
       			break;
     		}
     		case MEDIA_UPLOADS:{
@@ -5340,10 +5371,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			supportInvalidateOptionsMenu();
     			setToolbarTitle();
 				showFabButton();
+				showHideBottomNavigationView(false);
       			break;
     		}
     		case INBOX:{
-
+				showHideBottomNavigationView(true);
 				tB.setVisibility(View.VISIBLE);
 				iFLol = new InboxFragmentLollipop().newInstance();
 
@@ -5382,16 +5414,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			supportInvalidateOptionsMenu();
 
 				showFabButton();
+				showHideBottomNavigationView(false);
     			break;
     		}
     		case CONTACTS:{
+				showHideBottomNavigationView(true);
 				selectDrawerItemContacts();
 				supportInvalidateOptionsMenu();
 				showFabButton();
     			break;
     		}
     		case SETTINGS:{
-
+				showHideBottomNavigationView(true);
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
 					megaApi.getFolderInfo(megaApi.getRootNode(), this);
 				}
@@ -5442,6 +5476,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
     		}
     		case SEARCH:{
+				showHideBottomNavigationView(true);
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
@@ -5473,6 +5508,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
 			case ACCOUNT:{
+				showHideBottomNavigationView(true);
 				log("case ACCOUNT: "+accountFragment);
 //    			tB.setVisibility(View.GONE);
 				aB.setSubtitle(null);
@@ -5481,6 +5517,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
     		case TRANSFERS:{
+				showHideBottomNavigationView(true);
 				aB.setSubtitle(null);
 				selectDrawerItemTransfers();
     			supportInvalidateOptionsMenu();
@@ -5511,6 +5548,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				selectDrawerItemChat();
 				supportInvalidateOptionsMenu();
+				showHideBottomNavigationView(false);
 				if (visibleContacts.size() == 0 || visibleContacts.isEmpty() || visibleContacts == null){
 					hideFabButton();
 				}
@@ -7198,7 +7236,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case android.R.id.home:{
 				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					drawerLayout.openDrawer(nV);
-				}else{
+				}
+				else{
 					log("NOT firstNavigationLevel");
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						//Cloud Drive
@@ -8919,6 +8958,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				startActivity(intent);
 				return true;
 			}
+			case R.id.my_account_section: {
+				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+				selectDrawerItemLollipop(drawerItem);
+				return true;
+			}
+			case R.id.inbox_section: {
+				drawerItem = DrawerItem.INBOX;
+				selectDrawerItemLollipop(drawerItem);
+				return true;
+			}
+			case R.id.contacts_section: {
+				drawerItem = DrawerItem.CONTACTS;
+				selectDrawerItemLollipop(drawerItem);
+				return true;
+			}
+			case R.id.settings_section: {
+				drawerItem = DrawerItem.SETTINGS;
+				selectDrawerItemLollipop(drawerItem);
+				return true;
+			}
+			case R.id.upgrade_navigation_view: {
+				drawerItem = DrawerItem.ACCOUNT;
+				accountFragment = Constants.UPGRADE_ACCOUNT_FRAGMENT;
+				displayedAccountType = -1;
+				selectDrawerItemLollipop(drawerItem);
+				return true;
+			}
             default:{
 	            return super.onOptionsItemSelected(item);
             }
@@ -9695,17 +9762,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
-			case R.id.navigation_item_inbox:{
-				drawerMenuItem = menuItem;
-				drawerItem = DrawerItem.INBOX;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				selectDrawerItemLollipop(drawerItem);
-				break;
-			}
+//			case R.id.navigation_item_inbox:{
+//				drawerMenuItem = menuItem;
+//				drawerItem = DrawerItem.INBOX;
+//				if (nV != null){
+//					Menu nVMenu = nV.getMenu();
+//					resetNavigationViewMenu(nVMenu);
+//				}
+//				menuItem.setChecked(true);
+//				selectDrawerItemLollipop(drawerItem);
+//				break;
+//			}
 			case R.id.bottom_navigation_item_shared_items: {
 //			case R.id.navigation_item_shared_items:{
 				drawerMenuItem = menuItem;
@@ -9730,28 +9797,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
-			case R.id.navigation_item_contacts:{
-				drawerMenuItem = menuItem;
-				drawerItem = DrawerItem.CONTACTS;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				selectDrawerItemLollipop(drawerItem);
-				break;
-			}
-			case R.id.navigation_item_settings:{
-				lastDrawerItem = drawerItem;
-				drawerItem = DrawerItem.SETTINGS;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				selectDrawerItemLollipop(drawerItem);
-				break;
-			}
+//			case R.id.navigation_item_contacts:{
+//				drawerMenuItem = menuItem;
+//				drawerItem = DrawerItem.CONTACTS;
+//				if (nV != null){
+//					Menu nVMenu = nV.getMenu();
+//					resetNavigationViewMenu(nVMenu);
+//				}
+//				menuItem.setChecked(true);
+//				selectDrawerItemLollipop(drawerItem);
+//				break;
+//			}
+//			case R.id.navigation_item_settings:{
+//				lastDrawerItem = drawerItem;
+//				drawerItem = DrawerItem.SETTINGS;
+//				if (nV != null){
+//					Menu nVMenu = nV.getMenu();
+//					resetNavigationViewMenu(nVMenu);
+//				}
+//				menuItem.setChecked(true);
+//				selectDrawerItemLollipop(drawerItem);
+//				break;
+//			}
 		}
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -13092,22 +13159,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 
-			case R.id.navigation_drawer_account_view:{
-//				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
-				if (Util.isOnline(this)){
-					drawerItem = DrawerItem.ACCOUNT;
-					accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
-					if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
-						resetNavigationViewMenu(nVMenu);
-						hidden.setChecked(true);
-					}
-					selectDrawerItemLollipop(drawerItem);
-				}
-
-				break;
-			}
+//			case R.id.navigation_drawer_account_view:{
+////				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
+//				if (Util.isOnline(this)){
+//					drawerItem = DrawerItem.ACCOUNT;
+//					accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
+//					if (nV != null){
+//						Menu nVMenu = nV.getMenu();
+//						MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+//						resetNavigationViewMenu(nVMenu);
+//						hidden.setChecked(true);
+//					}
+//					selectDrawerItemLollipop(drawerItem);
+//				}
+//
+//				break;
+//			}
 			case R.id.dialog_remember_pwd_checkbox: {
 				if (showRememberPaswordCheckBox.isChecked()){
 					log("passwordReminderDialogBlocked checked");
@@ -17483,10 +17550,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(drawerItem==null){
 			return;
 		}
+		RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) fabButton.getLayoutParams();
 		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
 		switch (drawerItem){
 			case CLOUD_DRIVE:{
 				log("showFabButton: Cloud Drive SECTION");
+				lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 				fabButton.setVisibility(View.VISIBLE);
 				break;
 			}
@@ -17517,6 +17586,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 										case MegaShare.ACCESS_OWNER:
 										case MegaShare.ACCESS_READWRITE:
 										case MegaShare.ACCESS_FULL: {
+											lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 											fabButton.setVisibility(View.VISIBLE);
 											break;
 										}
@@ -17541,6 +17611,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								fabButton.setVisibility(View.GONE);
 							}
 							else {
+								lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 								fabButton.setVisibility(View.VISIBLE);
 							}
 						}
@@ -17558,6 +17629,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				switch(indexContacts){
 					case 0:
 					case 1:{
+						lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+						fabButton.setLayoutParams(lp);
 						fabButton.setVisibility(View.VISIBLE);
 						break;
 					}
@@ -17573,6 +17646,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if(megaChatApi.getChatRooms().size()==0){
 						fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
 					}
+					lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 					fabButton.setVisibility(View.VISIBLE);
 				}
 				else{
@@ -17596,9 +17670,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								int accessLevel = megaApi.getAccess(node);
 
 								if(accessLevel== MegaShare.ACCESS_FULL||accessLevel== MegaShare.ACCESS_OWNER){
+									lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 									fabButton.setVisibility(View.VISIBLE);
 								}
 								else if(accessLevel== MegaShare.ACCESS_READWRITE){
+									lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 									fabButton.setVisibility(View.VISIBLE);
 								}
 								else{
@@ -17606,6 +17682,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else{
+								lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 								fabButton.setVisibility(View.VISIBLE);
 							}
 						}
@@ -18072,13 +18149,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setContactTitleSection(){
 		ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
 
-		if (nV != null) {
-			Menu nVMenu = nV.getMenu();
-			MenuItem contacts = nVMenu.findItem(R.id.navigation_item_contacts);
+//		if (nV != null) {
+//			Menu nVMenu = nV.getMenu();
+//			MenuItem contacts = nVMenu.findItem(R.id.navigation_item_contacts);
 			if(requests!=null){
 				int pendingRequest = requests.size();
 				if(pendingRequest==0){
-					contacts.setTitle(getString(R.string.section_contacts));
+//					contacts.setTitle(getString(R.string.section_contacts));
+					contactsSectionText.setText(getString(R.string.section_contacts));
 				}
 				else{
 					String textToShow = String.format(getString(R.string.section_contacts_with_notification), pendingRequest);
@@ -18096,10 +18174,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					} else {
 						result = Html.fromHtml(textToShow);
 					}
-					contacts.setTitle(result);
+//					contacts.setTitle(result);
+					contactsSectionText.setText(result);
 				}
 			}
-		}
+//		}
 	}
 
 	@Override
@@ -18380,5 +18459,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		
 		return isFileExist;
+	}
+
+	public void showHideBottomNavigationView(boolean hide) {
+
+		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+		if (bNV != null) {
+			if (hide && bNV.getVisibility() == View.VISIBLE) {
+				params.setMargins(0, 0, 0, 0);
+				fragmentLayout.setLayoutParams(params);
+				bNV.animate().translationY(220).setDuration(400L).withEndAction(new Runnable() {
+					@Override
+					public void run() {
+						bNV.setVisibility(View.GONE);
+					}
+				}).start();
+			}
+			else if (!hide && bNV.getVisibility() == View.GONE){
+				params.setMargins(0, 0, 0, Util.px2dp(56, outMetrics));
+				bNV.setVisibility(View.VISIBLE);
+				bNV.animate().translationY(0).setDuration(400L).withEndAction(new Runnable() {
+					@Override
+					public void run() {
+						fragmentLayout.setLayoutParams(params);
+					}
+				}).start();
+			}
+		}
 	}
 }
