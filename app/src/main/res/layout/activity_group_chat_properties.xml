@@ -176,6 +176,7 @@
                 </LinearLayout>
 
                 <View
+                    android:id="@+id/divider_notifications_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:background="@color/divider_upgrade_account" />
@@ -382,6 +383,72 @@
 
                 <View
                     android:id="@+id/divider_leave_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider_upgrade_account" />
+
+                <!-- Title Observer LAYOUT -->
+
+                <RelativeLayout
+                    android:id="@+id/chat_group_observers_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@color/white"
+                    android:gravity="left|center_vertical"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true">
+
+                        <TextView
+                            android:id="@+id/chat_group_observers_title_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/observers_chat_label"
+                            android:layout_marginLeft="16dp"
+                            android:layout_marginRight="16dp"
+                            android:textSize="14dp"
+                            android:textColor="@color/mail_my_account"/>
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:id="@+id/chat_group_observers_info_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:background="@color/white"
+                        android:gravity="right|center_vertical"
+                        android:layout_centerVertical="true">
+
+                        <ImageView
+                            android:id="@+id/chat_group_observer_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="1.5"
+                            android:layout_marginRight="24dp"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_b_shared_read_chat" />
+
+                        <TextView
+                            android:id="@+id/chat_group_observers_number_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/chat_group_observer_icon"
+                            android:textSize="14dp"
+                            android:layout_marginRight="16dp"
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/mail_my_account"/>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <View
+                    android:id="@+id/divider_observers_layout"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:background="@color/divider_upgrade_account" />

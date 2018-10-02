@@ -46,7 +46,8 @@
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -295,6 +296,38 @@
 
                     </RelativeLayout>
                 </LinearLayout>
+            </RelativeLayout>
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/join_chat_layout_chat_layout"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:background="@android:color/transparent"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/keyboard_chat_separator"
+                    android:orientation="horizontal" />
+
+                <Button
+                    android:id="@+id/join_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_centerInParent="true"
+                    android:background="@color/accentColor"
+                    android:elevation="@dimen/elevation_upgrade_low"
+                    android:minHeight="36dp"
+                    android:stateListAnimator="@anim/button_upgrade_elevation"
+                    android:text="@string/action_join"
+                    android:textColor="@color/white"
+                    android:tint="@android:color/white"/>
+
             </RelativeLayout>
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"

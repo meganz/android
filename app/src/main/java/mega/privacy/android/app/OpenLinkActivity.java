@@ -18,7 +18,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -137,8 +136,8 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 		if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
 			log("open link url");
 
-			Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-			openChatLinkIntent.setAction(Constants.ACTION_OPEN_MEGA_LINK);
+			Intent openChatLinkIntent = new Intent(this, ManagerActivityLollipop.class);
+			openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
 			openChatLinkIntent.setData(Uri.parse(url));
 			startActivity(openChatLinkIntent);
 			finish();
