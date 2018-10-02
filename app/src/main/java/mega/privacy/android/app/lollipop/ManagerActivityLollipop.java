@@ -227,6 +227,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatCallListenerInterface,MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 			NodeOptionsBottomSheetDialogFragment.CustomHeight, ContactsBottomSheetDialogFragment.CustomHeight, View.OnFocusChangeListener, View.OnLongClickListener{
@@ -3102,7 +3103,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
     			else if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
     				log("onPostResume: ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						Intent tempIntent = null;
 						String title = null;
 						String text = null;
@@ -3131,7 +3132,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						} catch (Exception ex) {
 							startService(cancelIntent);
 						}
-					}
+					} else {
+                        String title = null;
+                        String text = null;
+                        if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                            title = getString(R.string.cam_sync_syncing);
+                            text = getString(R.string.cam_sync_cancel_sync);
+                        }
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setMessage(text);
+
+                        builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        cancelAllJobs(ManagerActivityLollipop.this);
+                                    }
+                                });
+                        builder.setNegativeButton(getString(R.string.general_cancel), null);
+                        final AlertDialog dialog = builder.create();
+                        try {
+                            dialog.show();
+                        } catch (Exception ex) {
+                            cancelAllJobs(ManagerActivityLollipop.this);
+                        }
+                    }
 				}
     			else if (intent.getAction().equals(Constants.ACTION_SHOW_TRANSFERS)){
     				log("onPostResume: intent show transfers");

@@ -640,19 +640,17 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                             startService(cancelIntent);
                         }
                     } else {
-                        Intent tempIntent = null;
                         String title = null;
                         String text = null;
                         if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                            tempIntent = new Intent(this,CameraSyncService.class);
-                            tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
                             title = getString(R.string.cam_sync_syncing);
                             text = getString(R.string.cam_sync_cancel_sync);
                         }
-                        AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-                                title,text,null);
+                        AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,title,text,null);
                         builder.setPositiveButton(getString(R.string.cam_sync_stop),
                                 new DialogInterface.OnClickListener() {
+
+                                    @Override
                                     public void onClick(DialogInterface dialog,int whichButton) {
                                         cancelAllJobs(LoginActivityLollipop.this);
                                     }
