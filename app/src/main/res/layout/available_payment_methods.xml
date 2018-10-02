@@ -10,10 +10,8 @@
         android:id="@+id/payment_layout_select_inside"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
         android:paddingTop="24dp"
         android:background="@drawable/card_corner">
-
         <TextView
             android:id="@+id/payment_text_payment_title"
             android:layout_width="wrap_content"
@@ -21,8 +19,8 @@
             android:textSize="24sp"
             android:textAllCaps="true"
             android:layout_gravity="left"
-            android:layout_marginBottom="24dp"
-            android:text="Lite"/>
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="24dp"/>
 
         <TextView
             android:id="@+id/payment_text_payment_method"
@@ -31,20 +29,23 @@
             android:layout_below="@+id/payment_text_payment_title"
             android:text="@string/select_payment_method"
             android:textSize="16sp"
+            android:layout_marginLeft="16dp"
             android:textColor="@color/mail_my_account"
-            android:layout_gravity="left"/>
+            android:layout_gravity="left"
+            android:layout_marginBottom="15dp"/>
 
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/payment_method_google_wallet"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:background="@drawable/card_corner">
 
         <ImageView
             android:id="@+id/payment_method_google_wallet_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginLeft="16dp"
             android:src="@drawable/google_wallet_ic"
             android:layout_centerVertical="true"/>
 
@@ -54,77 +55,107 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/payment_method_google_wallet_icon"
-            android:text="@string/payment_method_google_wallet"
-            android:textSize="17sp" />
+            android:layout_marginLeft="16dp"
+            android:textSize="16sp" />
+        <RelativeLayout
+            android:id="@+id/payment_method_google_wallet_layer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80ffffff"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/payment_method_credit_card"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:background="@drawable/card_corner">
-
         <ImageView
             android:id="@+id/payment_method_credit_card_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/cc_ic"/>
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/cc_ic"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/payment_method_credit_card_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="@string/payment_method_credit_card"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/payment_method_credit_card_icon"/>
+            android:layout_toRightOf="@id/payment_method_credit_card_icon"
+            android:layout_marginLeft="16dp"
+            android:textSize="16sp" />
+
+        <RelativeLayout
+            android:id="@+id/payment_method_credit_card_layer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80ffffff"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/payment_method_fortumo"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:background="@drawable/card_corner">
 
         <ImageView
             android:id="@+id/payment_method_fortumo_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/fortumo_ic"/>
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/fortumo_ic"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/payment_method_fortumo_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="@string/payment_method_fortumo"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/payment_method_fortumo_icon"/>
+            android:layout_toRightOf="@id/payment_method_fortumo_icon"
+            android:layout_marginLeft="16dp"
+            android:textSize="16sp" />
+
+        <RelativeLayout
+            android:id="@+id/payment_method_fortumo_layer"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#80ffffff"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/payment_method_centili"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:background="@drawable/card_corner">
-
         <ImageView
             android:id="@+id/payment_method_centili_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/centili_ic"/>
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/centili_ic"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/payment_method_centili_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="@string/payment_method_centili"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/payment_method_centili_icon"/>
+            android:layout_toRightOf="@id/payment_method_centili_icon"
+            android:layout_marginLeft="16dp"
+            android:textSize="16sp" />
+
+        <RelativeLayout
+            android:id="@+id/payment_method_centili_layer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80ffffff"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <LinearLayout
@@ -140,6 +171,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="@color/mail_my_account"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="22dp"
             android:layout_marginLeft="16dp"
             android:text="@string/billing_period_title"/>
@@ -161,6 +193,7 @@
                 android:checked="false"
                 android:buttonTint="@color/accentColor"
                 android:textSize="18sp"
+                android:layout_marginBottom="28dp"
                 android:textColor="@color/mail_my_account"/>
 
             <RadioButton android:id="@+id/billed_yearly"
@@ -169,9 +202,8 @@
                 android:maxLines="1"
                 android:checked="false"
                 android:buttonTint="@color/accentColor"
-                android:text="@string/billed_yearly_text"
                 android:textSize="18sp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/mail_my_account"/>
         </RadioGroup>
         <LinearLayout
             android:id="@+id/layout_buttons"
@@ -182,6 +214,7 @@
             android:gravity="right"
             android:visibility="gone">
             <TextView
+                android:id="@+id/button_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/accentColor"

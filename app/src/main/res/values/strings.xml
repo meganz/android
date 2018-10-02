@@ -597,10 +597,6 @@
     <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
 
     <string name="no_available_payment_method" context="choose the payment method option when no method is available">At this moment, no method of payment is available for this plan</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
-    <string name="payment_method_centili" context="one of the payment methods">Mobile Carrier (one-off)</string>
-    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet (subscription)</string>
 
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>
@@ -2119,6 +2115,15 @@
     <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
     <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
+
+    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (subscription)</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+
+
+
+
 
 
 </resources>
