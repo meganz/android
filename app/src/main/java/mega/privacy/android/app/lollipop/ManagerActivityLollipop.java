@@ -5507,6 +5507,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
+
+				if (sttFLol != null){
+					sttFLol.update2FAVisibility();
+				}
 				break;
     		}
     		case SEARCH:{
