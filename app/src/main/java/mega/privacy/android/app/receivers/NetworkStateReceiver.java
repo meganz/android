@@ -17,6 +17,8 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
+import static mega.privacy.android.app.utils.JobUtil.startJob;
+
 public class NetworkStateReceiver extends BroadcastReceiver {
 
     protected List<NetworkStateReceiverListener> listeners;
@@ -86,8 +88,10 @@ public class NetworkStateReceiver extends BroadcastReceiver {
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                         c.startService(new Intent(c, CameraSyncService.class));
+                    }else{
+                        startJob(c);
                     }
                     handler.removeCallbacksAndMessages(null);
                 }
