@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -45,6 +46,7 @@ import android.text.format.Formatter;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1988,4 +1990,14 @@ public class Util {
 	private static void log(String message) {
 		log("Util", message);
 	}
+    
+    public static void logJobState(int result, String label){
+        if (result == JobScheduler.RESULT_SUCCESS) {
+            log(label + " SCHEDULED!");
+        }else{
+            log(label + " FAILED TO SCHEDULE!");
+        }
+    
+        Log.d("Yuan", label + " SCHEDULED " + (result == JobScheduler.RESULT_SUCCESS));
+    }
 }

@@ -137,47 +137,33 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     @Override
     public boolean onStartJob(JobParameters params) {
         log("onStartJob");
-
+    
+        Log.d("Yuan", "upload job on start");
         cameraUploadsService = this;
-
         globalParams = params;
-
         handler = new Handler();
 
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        log("startCameraSyncService");
-                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
-                    }
-                }, 30000);
-            }
-            else{
-                log("Start service here");
-
-                initService();
-
-                task = new Thread()
+            log("Start service here");
+            initService();
+            task = new Thread()
+            {
+                @Override
+                public void run()
                 {
-                    @Override
-                    public void run()
-                    {
-                        try{
-                            int result = shouldRun();
-                            if (result == 0){
-                                startCameraUploads();
-                            }
-                        } catch (Exception e) {}
+                    try{
+                        int result = shouldRun();
+                        if (result == 0){
+                            startCameraUploads();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                };
-
-                task.start();
-
-                return true;
-            }
+                }
+            };
+    
+            task.start();
+            return true;
         }
         catch (Exception e){
             log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
@@ -200,7 +186,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setOngoing(false)
                     .setContentTitle(getString(R.string.section_photo_sync))
-//                    .setSubText(getString(R.string.section_photo_sync))
                     .setContentText(getString(R.string.settings_camera_notif_title))
                     .setOnlyAlertOnce(true);
 
@@ -211,9 +196,11 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 
             try{
                 startUploads();
-            } catch (Exception e) {}
-
-//            stopForeground(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+            //            stopForeground(true);
 //            if (mNotificationManager != null){
 //                mNotificationManager.cancel(notificationId);
 //            }
@@ -1456,7 +1443,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock");
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock:");
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 

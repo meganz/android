@@ -37,11 +37,13 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.jobservices.BootJobService;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -77,6 +79,9 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
+import static mega.privacy.android.app.utils.Util.logJobState;
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
@@ -385,29 +390,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
-
-			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
-			//			jobInfoBuilder.setMinimumLatency(15000);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				jobInfoBuilder.setPeriodic(schedulerInterval);
-			}
-
-			if (mJobScheduler != null) {
-				int result = mJobScheduler.schedule(jobInfoBuilder.build());
-				if (result == JobScheduler.RESULT_SUCCESS) {
-					log("CameraUploadsService: Job scheduled SUCCESS");
-				} else {
-					log("CameraUploadsService: Job scheduled FAILED");
-				}
-			}
-		}
-
-
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;

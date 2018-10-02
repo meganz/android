@@ -35,6 +35,7 @@
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT" />
     <uses-permission android:name="android.permission.FLAG_SHOW_WHEN_LOCKED" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="mega.privacy.android.app.MegaApplication"
@@ -450,6 +451,11 @@
             android:name=".jobservices.CameraUploadsService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false" />
+
+	    <service
+		    android:name=".jobservices.BootJobService"
+		    android:permission="android.permission.BIND_JOB_SERVICE"
+		    android:exported="false" />
 
         <receiver
             android:name="mega.privacy.android.app.receivers.CustomInstallReferrerReceiver"
