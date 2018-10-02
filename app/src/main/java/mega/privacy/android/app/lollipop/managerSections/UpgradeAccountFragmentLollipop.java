@@ -900,8 +900,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){
             case R.id.button_continue:{
-                log("button_continue");
-				log("Button Subscribe pressed");
+				log("Button button_continue pressed");
 				if (selectedSubscription == Constants.PAYMENT_CC_MONTH) {
 					log("procced with PAYMENT_CC_MONTH");
 					//MONTHLY SUBSCRIPTION
