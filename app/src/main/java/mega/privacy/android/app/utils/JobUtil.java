@@ -10,7 +10,6 @@ import java.util.List;
 
 import mega.privacy.android.app.jobservices.BootJobService;
 
-import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
 import static mega.privacy.android.app.utils.Util.logJobState;
 
 public class JobUtil {
@@ -18,6 +17,8 @@ public class JobUtil {
     public static final long SCHEDULER_INTERVAL = 60 * DateUtils.MINUTE_IN_MILLIS;
 
     public static final int START_JOB_FAILED = -1;
+
+    public static final int BOOT_JOB_ID = Constants.BOOT_JOB_ID;
 
     public static boolean isJobScheduled(Context context,int id) {
         JobScheduler js = context.getSystemService(JobScheduler.class);
@@ -33,6 +34,9 @@ public class JobUtil {
     }
 
     public static int startJob(Context context) {
+        if(isJobScheduled(context, BOOT_JOB_ID)) {
+            return START_JOB_FAILED;
+        }
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
         if (jobScheduler != null) {
             JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(BOOT_JOB_ID,new ComponentName(context,BootJobService.class));

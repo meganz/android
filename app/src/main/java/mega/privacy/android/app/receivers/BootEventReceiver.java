@@ -45,7 +45,7 @@ public class BootEventReceiver extends BroadcastReceiver {
 				log("Now I start the service");
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					c.startService(new Intent(c, CameraSyncService.class));
-                } else if (!isJobScheduled(context,BOOT_JOB_ID)) {
+                } else {
                     startJob(context);
                 }
 			}

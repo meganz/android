@@ -9,6 +9,10 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Handler;
 
+import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
+import static mega.privacy.android.app.utils.JobUtil.isJobScheduled;
+import static mega.privacy.android.app.utils.JobUtil.startJob;
+
 
 public class CameraEventReceiver extends BroadcastReceiver {
 	
@@ -17,7 +21,7 @@ public class CameraEventReceiver extends BroadcastReceiver {
 	public CameraEventReceiver() {}
 
 	@Override
-	public void onReceive(Context context, Intent intent)
+	public void onReceive(final Context context, Intent intent)
 	{	
 		try
 		{
@@ -37,9 +41,11 @@ public class CameraEventReceiver extends BroadcastReceiver {
 			@Override
 			public void run() {
 				log("Now I start the service");
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					c.startService(new Intent(c, CameraSyncService.class));
-				}
+                } else {
+                    startJob(context);
+                }
 			}
 		}, 5 * 1000);
 	    
