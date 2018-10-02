@@ -55,6 +55,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private RelativeLayout semitransparentLayer;
 	private TextView textMyAccount;
 
+	int selectedSubscription = Constants.PAYMENT_CC_YEAR;
+
 	private RelativeLayout proLiteLayout;
 	private RelativeLayout pro1Layout;
 	private RelativeLayout pro2Layout;
@@ -899,6 +901,173 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		switch (v.getId()){
             case R.id.button_continue:{
                 log("button_continue");
+				log("Button Subscribe pressed");
+				if (selectedSubscription == Constants.PAYMENT_CC_MONTH) {
+					log("procced with PAYMENT_CC_MONTH");
+					//MONTHLY SUBSCRIPTION
+//					switch (parameterType) {
+//						case 1: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_I_MONTH);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//						case 2: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_II_MONTH);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//						case 3: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_III_MONTH);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//						case 4: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_MONTH, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_MONTH);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									((ManagerActivityLollipop) context).showFortumo();
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									((ManagerActivityLollipop) context).showCentili();
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//					}
+				} else {
+					//YEARLY SUBSCRIPTION
+					log("procced with PAYMENT_CC_YEAR");
+//					switch (parameterType) {
+//						case 1: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_I_YEAR);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//						case 2: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_II_YEAR);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//						case 3: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_III_YEAR);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//						case 4: {
+//							switch (paymentMethod) {
+//								case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD: {
+//									((ManagerActivityLollipop) context).showCC(parameterType, Constants.PAYMENT_CC_YEAR, true);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET: {
+//									((ManagerActivityLollipop) context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_YEAR);
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_FORTUMO: {
+//									break;
+//								}
+//								case MegaApiAndroid.PAYMENT_METHOD_CENTILI: {
+//									break;
+//								}
+//							}
+//							break;
+//						}
+//					}
+				}
+
                 break;
             }
 			case R.id.button_cancel:{
@@ -920,8 +1089,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_prolite_layout:{
-				log("onClick()-upgrade_prolite_layout");
-
 				if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
 					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 					semitransparentLayer.setVisibility(View.GONE);
@@ -934,8 +1101,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_pro_i_layout:{
-				log("onClick()-upgrade_pro_i_layout");
-
 				if (selectPaymentMethodLayoutPro1.getVisibility() == View.VISIBLE) {
 					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 				} else {
@@ -948,8 +1113,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_pro_ii_layout:{
-				log("onClick()-upgrade_pro_ii_layout");
-
 				if (selectPaymentMethodLayoutPro2.getVisibility() == View.VISIBLE) {
 					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 				} else {
@@ -962,8 +1125,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.upgrade_pro_iii_layout:{
-				log("onClick()-upgrade_pro_iii_layout");
-
 				if (selectPaymentMethodLayoutPro3.getVisibility() == View.VISIBLE) {
 					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
 				} else {
@@ -976,33 +1137,27 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case R.id.payment_method_google_wallet:{
-				log("onClick()-payment_method_google_wallet");
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
 				break;
 			}
 			case R.id.payment_method_credit_card:{
-				log("onClick()-payment_method_credit_card");
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD);
 				break;
 			}
 			case R.id.payment_method_fortumo:{
-				log("onClick()-payment_method_fortumo");
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_FORTUMO);
 				break;
 			}
 			case R.id.payment_method_centili:{
-				log("onClick()-payment_method_centili");
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CENTILI);
 				break;
 			}
 			case R.id.billed_monthly:{
-				log("onClick()-billed Monthly");
-
+				selectedSubscription = Constants.PAYMENT_CC_MONTH;
 				break;
 			}
 			case R.id.billed_yearly:{
-				log("onClick()-billed Yearly");
-
+				selectedSubscription = Constants.PAYMENT_CC_YEAR;
 				break;
 			}
 		}
@@ -1488,7 +1643,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
@@ -1500,11 +1654,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1513,11 +1665,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1526,7 +1676,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
@@ -1535,6 +1684,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
 								billedYearly.setChecked(true);
 							}
+							selectedSubscription = Constants.PAYMENT_CC_YEAR;
 							billedMonthly.setVisibility(View.GONE);
 						}
 
@@ -1542,9 +1692,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
 								billedMonthly.setChecked(true);
 							}
+							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 							billedYearly.setVisibility(View.GONE);
-
-//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
 					}
@@ -1640,11 +1789,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
@@ -1653,11 +1800,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1666,11 +1811,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1679,7 +1822,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
@@ -1689,6 +1831,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								billedYearly.setChecked(true);
 							}
 							billedMonthly.setVisibility(View.GONE);
+							selectedSubscription = Constants.PAYMENT_CC_YEAR;
 						}
 
 						if (myAccountInfo.getProIIYearly() != null) {
@@ -1696,7 +1839,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								billedMonthly.setChecked(true);
 							}
 							billedYearly.setVisibility(View.GONE);
-//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
 					}
@@ -1793,11 +1936,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
@@ -1806,11 +1947,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1819,11 +1958,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
-
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1832,7 +1969,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
@@ -1841,7 +1977,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								billedYearly.setChecked(true);
 							}
 							billedMonthly.setVisibility(View.GONE);
-
+							selectedSubscription = Constants.PAYMENT_CC_YEAR;
 						}
 
 						if (myAccountInfo.getProIIIYearly() != null) {
@@ -1849,10 +1985,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								billedMonthly.setChecked(true);
 							}
 							billedYearly.setVisibility(View.GONE);
-
-//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
-
 						break;
 					}
 				}
@@ -1947,14 +2081,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						fortumoLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedMonthly.setChecked(true);
-
+						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						billedYearly.setVisibility(View.GONE);
-
-//						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
@@ -1963,13 +2094,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedMonthly.setChecked(true);
-
+						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						billedYearly.setVisibility(View.GONE);
-//						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1978,23 +2107,19 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						googlePlayLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						billedYearly.setChecked(true);
-
-
+						selectedSubscription = Constants.PAYMENT_CC_YEAR;
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
 						log("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
-
 						fortumoLayer.setVisibility(View.VISIBLE);
 						creditCardLayer.setVisibility(View.VISIBLE);
 						centiliLayer.setVisibility(View.VISIBLE);
 						googlePlayLayer.setVisibility(View.GONE);
-
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
@@ -2003,18 +2128,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
 								billedYearly.setChecked(true);
 							}
+							selectedSubscription = Constants.PAYMENT_CC_YEAR;
 							billedMonthly.setVisibility(View.GONE);
-
 						}
 						if (myAccountInfo.getProLiteYearly() != null) {
 							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
 								billedMonthly.setChecked(true);
 							}
 							billedYearly.setVisibility(View.GONE);
-
-//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
-
 						break;
 					}
 				}
