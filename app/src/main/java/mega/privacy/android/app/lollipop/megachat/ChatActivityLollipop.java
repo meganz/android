@@ -2433,6 +2433,25 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
+    public void showAlertChatLink(){
+        log("showAlertChatLink");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        String message= getResources().getString(R.string.alert_already_participant_chat_link);
+        builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener).show();
+    }
+
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
@@ -6062,13 +6081,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
                 if(e.getErrorCode()==MegaChatError.ERROR_EXIST){
                     //ERROR_EXIST - If the user already participates in the chat.
-                    Util.showAlert(this, "You are already participating in this chat", null);
-                    finish();
+                    showAlertChatLink();
                 }
                 else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
                     //ERROR_ACCESS If the user is trying to preview a public chat which he was part of -> rejoinChatLink
                     idChat = request.getChatHandle();
-                    long ph = request.getUserHandle();
                     showConfirmationRejoinChat(request.getUserHandle());
                 }
                 else{
@@ -6094,9 +6111,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(request.getType() == MegaChatRequest.TYPE_CHAT_LINK_JOIN){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
 
-                setChatSubtitle();
-                observersLayout.setVisibility(View.GONE);
-                supportInvalidateOptionsMenu();
+                if(request.getUserHandle()!= -1){
+                    //Rejoin option
+                    showChat();
+                }
+                else{
+                    //Join
+                    setChatSubtitle();
+                    observersLayout.setVisibility(View.GONE);
+                    supportInvalidateOptionsMenu();
+                }
             }
             else{
                 log("EEEERRRRROR WHEN JOINING CHAT " + e.getErrorCode() + " " +e.getErrorString());
