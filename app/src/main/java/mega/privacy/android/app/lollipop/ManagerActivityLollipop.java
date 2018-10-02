@@ -2062,6 +2062,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						finish();
 						return;
 					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
+						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						openChatLinkIntent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(openChatLinkIntent);
+						finish();
+						return;
+					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
@@ -2419,6 +2427,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
+						getIntent().setAction(null);
+						setIntent(null);
+					}
+					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
+
+						drawerItem=DrawerItem.CHAT;
+						selectDrawerItemLollipop(drawerItem);
+						selectDrawerItemPending=false;
+
+						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+						openChatLinkIntent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(openChatLinkIntent);
+
 						getIntent().setAction(null);
 						setIntent(null);
 					}

@@ -63,6 +63,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
     public TextView infoChatText;
     public LinearLayout optionInfoChat;
     public LinearLayout optionLeaveChat;
+    public TextView optionLeaveText;
     public LinearLayout optionClearHistory;
     public LinearLayout optionMuteChat;
     public ImageView optionMuteChatIcon;
@@ -142,6 +143,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         infoChatText = (TextView) contentView.findViewById(R.id.chat_list_info_chat_text);
         optionInfoChat = (LinearLayout) contentView.findViewById(R.id.chat_list_info_chat_layout);
         optionLeaveChat= (LinearLayout) contentView.findViewById(R.id.chat_list_leave_chat_layout);
+        optionLeaveText = (TextView) contentView.findViewById(R.id.chat_list_leave_chat_text);
         optionClearHistory = (LinearLayout) contentView.findViewById(R.id.chat_list_clear_history_chat_layout);
         optionMuteChat = (LinearLayout) contentView.findViewById(R.id.chat_list_mute_chat_layout);
         optionMuteChatIcon = (ImageView) contentView.findViewById(R.id.chat_list_mute_chat_image);
@@ -161,127 +163,145 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
         titleNameContactChatPanel.setText(chat.getTitle());
 
-		if(chat.isGroup()){
-			titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
-			iconStateChatPanel.setVisibility(View.GONE);
-			addAvatarChatPanel(null, chat);
+        if(chat.isPreview()){
+            titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
+            iconStateChatPanel.setVisibility(View.GONE);
+            addAvatarChatPanel(null, chat);
 
             infoChatText.setText(getString(R.string.group_chat_info_label));
-            optionInfoChat.setVisibility(View.GONE);
 
-            if(chat.isActive()){
-                optionLeaveChat.setVisibility(View.VISIBLE);
+            optionInfoChat.setVisibility(View.GONE);
+            optionMuteChat.setVisibility(View.GONE);
+            optionLeaveChat.setVisibility(View.VISIBLE);
+            optionLeaveText.setText("Remove preview");
+            optionClearHistory.setVisibility(View.GONE);
+            optionArchiveChat.setVisibility(View.GONE);
+        }
+        else{
+            if(chat.isGroup()){
+                titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
+                iconStateChatPanel.setVisibility(View.GONE);
+                addAvatarChatPanel(null, chat);
+
+                infoChatText.setText(getString(R.string.group_chat_info_label));
+
+                optionInfoChat.setVisibility(View.GONE);
+
+                if(chat.isActive()){
+                    optionLeaveChat.setVisibility(View.VISIBLE);
+                }
+                else{
+                    optionLeaveChat.setVisibility(View.GONE);
+                }
+
             }
             else{
-                optionLeaveChat.setVisibility(View.GONE);
-            }
-		}
-		else{
-			iconStateChatPanel.setVisibility(View.VISIBLE);
+                iconStateChatPanel.setVisibility(View.VISIBLE);
 
-            long userHandle = chat.getPeerHandle();
-            MegaUser contact = megaApi.getContact(MegaApiJava.userHandleToBase64(userHandle));
-            if(contact!=null){
-                log("User email: "+contact.getEmail());
-                titleMailContactChatPanel.setText(contact.getEmail());
-                addAvatarChatPanel(contact.getEmail(), chat);
+                long userHandle = chat.getPeerHandle();
+                MegaUser contact = megaApi.getContact(MegaApiJava.userHandleToBase64(userHandle));
+                if(contact!=null){
+                    log("User email: "+contact.getEmail());
+                    titleMailContactChatPanel.setText(contact.getEmail());
+                    addAvatarChatPanel(contact.getEmail(), chat);
 
-                if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
-                    optionInfoChat.setVisibility(View.VISIBLE);
-                    infoChatText.setText(getString(R.string.contact_properties_activity));
+                    if(contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
+                        optionInfoChat.setVisibility(View.VISIBLE);
+                        infoChatText.setText(getString(R.string.contact_properties_activity));
+                    }
+                    else{
+                        optionInfoChat.setVisibility(View.GONE);
+                        optionClearHistory.setVisibility(View.GONE);
+                    }
                 }
                 else{
                     optionInfoChat.setVisibility(View.GONE);
                     optionClearHistory.setVisibility(View.GONE);
                 }
+
+                optionLeaveChat.setVisibility(View.GONE);
+                int state = megaChatApi.getUserOnlineStatus(userHandle);
+
+                if(state == MegaChatApi.STATUS_ONLINE){
+                    log("This user is connected");
+                    iconStateChatPanel.setVisibility(View.VISIBLE);
+                    iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
+                }
+                else if(state == MegaChatApi.STATUS_AWAY){
+                    log("This user is away");
+                    iconStateChatPanel.setVisibility(View.VISIBLE);
+                    iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
+                }
+                else if(state == MegaChatApi.STATUS_BUSY){
+                    log("This user is busy");
+                    iconStateChatPanel.setVisibility(View.VISIBLE);
+                    iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
+                }
+                else if(state == MegaChatApi.STATUS_OFFLINE){
+                    log("This user is offline");
+                    iconStateChatPanel.setVisibility(View.VISIBLE);
+                    iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
+                }
+                else if(state == MegaChatApi.STATUS_INVALID){
+                    log("INVALID status: "+state);
+                    iconStateChatPanel.setVisibility(View.GONE);
+                }
+                else{
+                    log("This user status is: "+state);
+                    iconStateChatPanel.setVisibility(View.GONE);
+                }
+            }
+
+
+            if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
+                optionClearHistory.setVisibility(View.GONE);
             }
             else{
+                if(chat.isActive()){
+                    optionClearHistory.setVisibility(View.VISIBLE);
+                }
+                else{
+                    optionClearHistory.setVisibility(View.GONE);
+                }
+            }
+
+            chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
+            if(chatPrefs!=null) {
+                log("Chat prefs exists!!!");
+                notificationsEnabled = true;
+                if (chatPrefs.getNotificationsEnabled() != null) {
+                    notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
+                }
+
+                if (!notificationsEnabled) {
+                    log("Chat is MUTE");
+                    optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
+                    optionMuteChatText.setText(getString(R.string.general_unmute));
+                }
+                else{
+                    log("Chat with notifications enabled!!");
+                    optionMuteChatText.setText(getString(R.string.general_mute));
+                    optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
+                }
+            }
+            else{
+                log("Chat prefs is NULL");
+                optionMuteChatText.setText(getString(R.string.general_mute));
+                optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
+            }
+
+            if(chat.isArchived()){
+                archiveChatText.setText(getString(R.string.unarchive_chat_option));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
                 optionInfoChat.setVisibility(View.GONE);
+                optionMuteChat.setVisibility(View.GONE);
+                optionLeaveChat.setVisibility(View.GONE);
                 optionClearHistory.setVisibility(View.GONE);
             }
-
-            optionLeaveChat.setVisibility(View.GONE);
-            int state = megaChatApi.getUserOnlineStatus(userHandle);
-
-            if(state == MegaChatApi.STATUS_ONLINE){
-                log("This user is connected");
-                iconStateChatPanel.setVisibility(View.VISIBLE);
-                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-            }
-            else if(state == MegaChatApi.STATUS_AWAY){
-                log("This user is away");
-                iconStateChatPanel.setVisibility(View.VISIBLE);
-                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-            }
-            else if(state == MegaChatApi.STATUS_BUSY){
-                log("This user is busy");
-                iconStateChatPanel.setVisibility(View.VISIBLE);
-                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-            }
-            else if(state == MegaChatApi.STATUS_OFFLINE){
-                log("This user is offline");
-                iconStateChatPanel.setVisibility(View.VISIBLE);
-                iconStateChatPanel.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-            }
-            else if(state == MegaChatApi.STATUS_INVALID){
-                log("INVALID status: "+state);
-                iconStateChatPanel.setVisibility(View.GONE);
-            }
             else{
-                log("This user status is: "+state);
-                iconStateChatPanel.setVisibility(View.GONE);
+                archiveChatText.setText(getString(R.string.archive_chat_option));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
             }
-		}
-
-
-        if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
-            optionClearHistory.setVisibility(View.GONE);
-        }
-        else{
-            if(chat.isActive()){
-                optionClearHistory.setVisibility(View.VISIBLE);
-            }
-            else{
-                optionClearHistory.setVisibility(View.GONE);
-            }
-        }
-
-		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-		if(chatPrefs!=null) {
-			log("Chat prefs exists!!!");
-			notificationsEnabled = true;
-			if (chatPrefs.getNotificationsEnabled() != null) {
-				notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-			}
-
-			if (!notificationsEnabled) {
-				log("Chat is MUTE");
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
-				optionMuteChatText.setText(getString(R.string.general_unmute));
-			}
-			else{
-				log("Chat with notifications enabled!!");
-				optionMuteChatText.setText(getString(R.string.general_mute));
-				optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
-			}
-		}
-		else{
-			log("Chat prefs is NULL");
-			optionMuteChatText.setText(getString(R.string.general_mute));
-			optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
-		}
-
-        if(chat.isArchived()){
-            archiveChatText.setText(getString(R.string.unarchive_chat_option));
-            archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
-            optionInfoChat.setVisibility(View.GONE);
-            optionMuteChat.setVisibility(View.GONE);
-            optionLeaveChat.setVisibility(View.GONE);
-            optionClearHistory.setVisibility(View.GONE);
-        }
-        else{
-            archiveChatText.setText(getString(R.string.archive_chat_option));
-            archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
         }
 
         dialog.setContentView(contentView);

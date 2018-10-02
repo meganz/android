@@ -130,6 +130,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     SwitchCompat notificationsSwitch;
     TextView notificationsTitle;
     TextView notificationSelectedText;
+    View dividerNotifications;
 
     LinearLayout chatLinkLayout;
     TextView chatLinkTitleText;
@@ -148,6 +149,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     RelativeLayout archiveChatLayout;
     TextView archiveChatTitle;
     ImageView archiveChatIcon;
+    View archiveChatSeparator;
+
+    RelativeLayout observersLayout;
+    TextView observersNumberText;
+    View observersSeparator;
 
     TextView participantsTitle;
     long participantsCount;
@@ -298,6 +304,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnClickListener(this);
 
+            dividerNotifications = (View) findViewById(R.id.divider_notifications_layout);
+
             //Chat links
             chatLinkLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_chat_link_layout);
             chatLinkTitleText = (TextView) findViewById(R.id.chat_group_contact_properties_chat_link);
@@ -307,34 +315,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             //Private chat
             privateLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_private_layout);
             privateSeparator = (View) findViewById(R.id.divider_private_layout);
-
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
-                if(chat.isPublic()){
-                    chatLinkLayout.setVisibility(View.VISIBLE);
-                    chatLinkLayout.setOnClickListener(this);
-                    chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
-                    chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
-                    chatLinkSeparator.setVisibility(View.VISIBLE);
-                    privateLayout.setVisibility(View.VISIBLE);
-                    privateLayout.setOnClickListener(this);
-                    privateSeparator.setVisibility(View.VISIBLE);
-
-                    megaChatApi.queryChatLink(chatHandle, this);
-                }
-                else{
-                    log("Private chat");
-                    chatLinkLayout.setVisibility(View.GONE);
-                    chatLinkSeparator.setVisibility(View.GONE);
-                    privateLayout.setVisibility(View.GONE);
-                    privateSeparator.setVisibility(View.GONE);
-                }
-            }
-            else{
-                chatLinkLayout.setVisibility(View.GONE);
-                chatLinkSeparator.setVisibility(View.GONE);
-                privateLayout.setVisibility(View.GONE);
-                privateSeparator.setVisibility(View.GONE);
-            }
 
             //Clear chat Layout
             clearChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_clear_layout);
@@ -346,25 +326,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             archiveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_archive_layout);
             archiveChatLayout.setOnClickListener(this);
 
+            archiveChatSeparator = (View) findViewById(R.id.divider_archive_layout);
+
             archiveChatTitle = (TextView) findViewById(R.id.chat_group_contact_properties_archive);
             archiveChatIcon = (ImageView) findViewById(R.id.chat_group_contact_properties_archive_icon);
-
-            if(chat.isArchived()){
-                archiveChatTitle.setText(getString(R.string.general_unarchive));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
-            }
-            else{
-                archiveChatTitle.setText(getString(R.string.general_archive));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
-            }
 
             //Leave chat Layout
             leaveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_leave_layout);
             leaveChatLayout.setOnClickListener(this);
-
             dividerLeaveLayout = (View) findViewById(R.id.divider_leave_layout);
 
-            setChatPermissions();
+            //Observers layout
+            observersLayout = (RelativeLayout) findViewById(R.id.chat_group_observers_layout);
+            observersNumberText = (TextView) findViewById(R.id.chat_group_observers_number_text);
+            observersSeparator = (View) findViewById(R.id.divider_observers_layout);
 
             participantsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_title_text);
 
@@ -378,26 +353,62 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             recyclerView.setNestedScrollingEnabled(false);
 
-            chatSettings = dbH.getChatSettings();
-            if(chatSettings==null){
-                log("Chat settings null - notifications ON");
-                setUpIndividualChatNotifications();
+            if(chat.isPreview()){
+                notificationsLayout.setVisibility(View.GONE);
+                dividerNotifications.setVisibility(View.GONE);
+                chatLinkLayout.setVisibility(View.GONE);
+                chatLinkSeparator.setVisibility(View.GONE);
+                privateLayout.setVisibility(View.GONE);
+                privateSeparator.setVisibility(View.GONE);
+                clearChatLayout.setVisibility(View.GONE);
+                dividerClearLayout.setVisibility(View.GONE);
+                archiveChatLayout.setVisibility(View.GONE);
+                archiveChatSeparator.setVisibility(View.GONE);
+                leaveChatLayout.setVisibility(View.GONE);
+                dividerLeaveLayout.setVisibility(View.GONE);
+                editImageView.setVisibility(View.GONE);
+
+                observersSeparator.setVisibility(View.VISIBLE);
+                observersLayout.setVisibility(View.VISIBLE);
+                observersNumberText.setText(chat.getNumPreviewers()+"");
             }
-            else {
-                log("There is chat settings");
-                if (chatSettings.getNotificationsEnabled() == null) {
-                    generalChatNotifications = true;
+            else{
 
-                } else {
-                    generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
+                observersSeparator.setVisibility(View.GONE);
+                observersLayout.setVisibility(View.GONE);
 
+                setChatPermissions();
+
+                if(chat.isArchived()){
+                    archiveChatTitle.setText(getString(R.string.general_unarchive));
+                    archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
+                }
+                else{
+                    archiveChatTitle.setText(getString(R.string.general_archive));
+                    archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
                 }
 
-                if (generalChatNotifications) {
+                chatSettings = dbH.getChatSettings();
+                if(chatSettings==null){
+                    log("Chat settings null - notifications ON");
                     setUpIndividualChatNotifications();
-                } else {
-                    log("General notifications OFF");
-                    notificationsSwitch.setChecked(false);
+                }
+                else {
+                    log("There is chat settings");
+                    if (chatSettings.getNotificationsEnabled() == null) {
+                        generalChatNotifications = true;
+
+                    } else {
+                        generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
+
+                    }
+
+                    if (generalChatNotifications) {
+                        setUpIndividualChatNotifications();
+                    } else {
+                        log("General notifications OFF");
+                        notificationsSwitch.setChecked(false);
+                    }
                 }
             }
 
@@ -431,17 +442,42 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void setChatPermissions(){
-        log("setChatSubtitle");
+        log("setChatPermissions");
+
         if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
             editImageView.setVisibility(View.VISIBLE);
             dividerClearLayout.setVisibility(View.VISIBLE);
             clearChatLayout.setVisibility(View.VISIBLE);
             dividerLeaveLayout.setVisibility(View.VISIBLE);
+
+            if(chat.isPublic()){
+                chatLinkLayout.setVisibility(View.VISIBLE);
+                chatLinkLayout.setOnClickListener(this);
+                chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
+                chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
+                chatLinkSeparator.setVisibility(View.VISIBLE);
+                privateLayout.setVisibility(View.VISIBLE);
+                privateLayout.setOnClickListener(this);
+                privateSeparator.setVisibility(View.VISIBLE);
+
+                megaChatApi.queryChatLink(chatHandle, this);
+            }
+            else{
+                log("Private chat");
+                chatLinkLayout.setVisibility(View.GONE);
+                chatLinkSeparator.setVisibility(View.GONE);
+                privateLayout.setVisibility(View.GONE);
+                privateSeparator.setVisibility(View.GONE);
+            }
         }
         else{
             editImageView.setVisibility(View.GONE);
             dividerClearLayout.setVisibility(View.GONE);
             clearChatLayout.setVisibility(View.GONE);
+            chatLinkLayout.setVisibility(View.GONE);
+            chatLinkSeparator.setVisibility(View.GONE);
+            privateLayout.setVisibility(View.GONE);
+            privateSeparator.setVisibility(View.GONE);
         }
 
         if(chat.getOwnPrivilege()<MegaChatRoom.PRIV_RO){
@@ -465,7 +501,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         participantsCount = chat.getPeerCount();
         log("Participants count: "+participantsCount);
         long participantsLabel = participantsCount+1; //Add one to include me
-        infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
+        infoNumParticipantsText.setText(getString(R.string.number_of_participants, participantsLabel));
 
         for(int i=0;i<participantsCount;i++){
             int peerPrivilege = chat.getPeerPrivilege(i);

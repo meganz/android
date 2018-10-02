@@ -2143,4 +2143,10 @@
 
     <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
 
+    <string name="number_of_participants" context="Subtitle to show the number of participants of a chat">%d participants</string>
+
+    <string name="action_join" context="Label of the button to join a chat by a chat link">Join</string>
+
+    <string name="observers_chat_label" context="Label for observers of a group chat">Observers</string>
+
 </resources>
