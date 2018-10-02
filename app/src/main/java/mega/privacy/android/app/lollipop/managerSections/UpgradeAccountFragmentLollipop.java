@@ -85,7 +85,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	View selectPaymentMethodLayoutPro1;
 	View selectPaymentMethodLayoutPro2;
 	View selectPaymentMethodLayoutPro3;
-//	RelativeLayout closeLayout;
 	private TextView selectPaymentMethod;
 	private TextView paymentTitle;
 
@@ -105,15 +104,11 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	RadioButton billedYearly;
 	LinearLayout layoutButtons;
 	TextView buttonCancel;
+    TextView buttonContinue;
 
-	ImageView closeIcon;
-//	ImageView fortumoIcon;
 	TextView fortumoText;
-//	ImageView centiliIcon;
 	TextView centiliText;
-//	ImageView creditCardIcon;
 	TextView creditCardText;
-//	ImageView googleWalletIcon;
 	TextView googleWalletText;
 
 	Context context;
@@ -751,16 +746,16 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			optionsBilling = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.options);
 
 			billingPeriod = (RadioGroup) selectPaymentMethodClicked.findViewById(R.id.billing_period);
-			billingPeriod.clearCheck();
-
 			billedMonthly = (RadioButton) selectPaymentMethodClicked.findViewById(R.id.billed_monthly);
 			billedMonthly.setOnClickListener(this);
 			billedYearly = (RadioButton) selectPaymentMethodClicked.findViewById(R.id.billed_yearly);
 			billedYearly.setOnClickListener(this);
+
 			layoutButtons = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.layout_buttons);
-			layoutButtons.setVisibility(View.GONE);
 			buttonCancel = (TextView) selectPaymentMethodClicked.findViewById(R.id.button_cancel);
 			buttonCancel.setOnClickListener(this);
+            buttonContinue = (TextView) selectPaymentMethodClicked.findViewById(R.id.button_continue);
+            buttonContinue.setOnClickListener(this);
 
 			googlePlayLayout.setVisibility(View.GONE);
 			creditCardLayout.setVisibility(View.GONE);
@@ -902,10 +897,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){
+            case R.id.button_continue:{
+                log("button_continue");
+                break;
+            }
 			case R.id.button_cancel:{
 				log("button_cancel");
-				billingPeriod.clearCheck();
-				layoutButtons.setVisibility(View.GONE);
 				semitransparentLayer.setVisibility(View.GONE);
 				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
@@ -915,8 +912,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 			case R.id.semitransparent_layer:{
 				log("semitransparent_layer");
-				billingPeriod.clearCheck();
-				layoutButtons.setVisibility(View.GONE);
 				semitransparentLayer.setVisibility(View.GONE);
 				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
@@ -1002,12 +997,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 			case R.id.billed_monthly:{
 				log("onClick()-billed Monthly");
-				layoutButtons.setVisibility(View.VISIBLE);
+
 				break;
 			}
 			case R.id.billed_yearly:{
 				log("onClick()-billed Yearly");
-				layoutButtons.setVisibility(View.VISIBLE);
+
 				break;
 			}
 		}
@@ -1381,8 +1376,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 	public void showmyF(int paymentMethod, int parameterType){
 		log("showmyF (method "+paymentMethod+", type "+parameterType+")");
-		billingPeriod.clearCheck();
-		layoutButtons.setVisibility(View.GONE);
 
 		String priceMonthlyInteger = "";
 		String priceMonthlyDecimal = "";
@@ -1511,6 +1504,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1523,6 +1517,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1535,12 +1530,20 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						if (myAccountInfo.getProIMonthly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
+								billedYearly.setChecked(true);
+							}
 							billedMonthly.setVisibility(View.GONE);
 						}
 
 						if (myAccountInfo.getProIYearly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
+								billedMonthly.setChecked(true);
+							}
 							billedYearly.setVisibility(View.GONE);
+
 //							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
 						break;
@@ -1641,6 +1644,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
@@ -1653,6 +1657,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1665,6 +1670,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1677,11 +1683,18 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						if (myAccountInfo.getProIIMonthly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
+								billedYearly.setChecked(true);
+							}
 							billedMonthly.setVisibility(View.GONE);
 						}
 
 						if (myAccountInfo.getProIIYearly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
+								billedMonthly.setChecked(true);
+							}
 							billedYearly.setVisibility(View.GONE);
 //							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
@@ -1784,6 +1797,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
@@ -1796,6 +1810,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
@@ -1808,6 +1823,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
@@ -1821,13 +1837,22 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
 						if (myAccountInfo.getProIIIMonthly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
+								billedYearly.setChecked(true);
+							}
 							billedMonthly.setVisibility(View.GONE);
+
 						}
 
 						if (myAccountInfo.getProIIIYearly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
+								billedMonthly.setChecked(true);
+							}
 							billedYearly.setVisibility(View.GONE);
+
 //							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
+
 						break;
 					}
 				}
@@ -1925,6 +1950,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
+						billedMonthly.setChecked(true);
+
 						billedYearly.setVisibility(View.GONE);
 
 //						selectedSubscription = Constants.PAYMENT_CC_MONTH;
@@ -1939,7 +1966,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
-						billedYearly.setVisibility(View.GONE);;
+						billedMonthly.setChecked(true);
+
+						billedYearly.setVisibility(View.GONE);
 //						selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						break;
 					}
@@ -1953,6 +1982,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						optionsBilling.setVisibility(View.VISIBLE);
 						billedMonthly.setVisibility(View.VISIBLE);
 						billedYearly.setVisibility(View.VISIBLE);
+						billedYearly.setChecked(true);
+
 
 						break;
 					}
@@ -1969,12 +2000,21 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						billedYearly.setVisibility(View.VISIBLE);
 
 						if (myAccountInfo.getProLiteMonthly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_monthly){
+								billedYearly.setChecked(true);
+							}
 							billedMonthly.setVisibility(View.GONE);
+
 						}
 						if (myAccountInfo.getProLiteYearly() != null) {
+							if(billingPeriod.getCheckedRadioButtonId()==R.id.billed_yearly){
+								billedMonthly.setChecked(true);
+							}
 							billedYearly.setVisibility(View.GONE);
+
 //							selectedSubscription = Constants.PAYMENT_CC_MONTH;
 						}
+
 						break;
 					}
 				}
