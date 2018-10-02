@@ -94,6 +94,8 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
+
 
 @SuppressLint("NewApi") 
 public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
@@ -1720,12 +1722,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						Intent stopIntent = null;
 						stopIntent = new Intent(this, CameraSyncService.class);
 						stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
 						startService(stopIntent);
-					}
+                    } else {
+                        cancelAllJobs(this);
+                    }
 				}
 			}
 			else{

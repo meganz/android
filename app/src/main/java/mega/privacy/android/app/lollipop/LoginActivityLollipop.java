@@ -56,6 +56,9 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
+import static mega.privacy.android.app.utils.JobUtil.startJob;
+
 
 public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
@@ -486,11 +489,13 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //					dbH.setPinLockCode("");
 //					dbH.setCamSyncEnabled(false);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             Intent stopIntent = null;
             stopIntent = new Intent(this, CameraSyncService.class);
             stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
             startService(stopIntent);
+        } else {
+            cancelAllJobs(this);
         }
     }
 
@@ -509,8 +514,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                         startService(new Intent(getApplicationContext(), CameraSyncService.class));
+                    } else {
+                        startJob(LoginActivityLollipop.this);
                     }
                 }
             }, time);
@@ -605,7 +612,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
                     log("ACTION_CANCEL_CAM_SYNC");
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                         Intent tempIntent = null;
                         String title = null;
                         String text = null;
@@ -631,6 +638,31 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                             dialog.show();
                         } catch (Exception ex) {
                             startService(cancelIntent);
+                        }
+                    } else {
+                        Intent tempIntent = null;
+                        String title = null;
+                        String text = null;
+                        if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                            tempIntent = new Intent(this,CameraSyncService.class);
+                            tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+                            title = getString(R.string.cam_sync_syncing);
+                            text = getString(R.string.cam_sync_cancel_sync);
+                        }
+                        AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+                                title,text,null);
+                        builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int whichButton) {
+                                        cancelAllJobs(LoginActivityLollipop.this);
+                                    }
+                                });
+                        builder.setNegativeButton(getString(R.string.general_cancel),null);
+                        final AlertDialog dialog = builder.create();
+                        try {
+                            dialog.show();
+                        } catch (Exception ex) {
+                            cancelAllJobs(LoginActivityLollipop.this);
                         }
                     }
                 }

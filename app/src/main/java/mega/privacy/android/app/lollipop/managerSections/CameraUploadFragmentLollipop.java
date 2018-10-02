@@ -86,6 +86,11 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
+import static mega.privacy.android.app.utils.JobUtil.isJobScheduled;
+import static mega.privacy.android.app.utils.JobUtil.startJob;
+
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
 
@@ -1390,9 +1395,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 		}
 
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			context.startService(new Intent(context, CameraSyncService.class));
-		}
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            context.startService(new Intent(context,CameraSyncService.class));
+        }  else {
+            startJob(context);
+        }
 		
 		((ManagerActivityLollipop)context).refreshCameraUpload();
 	}
@@ -1414,12 +1421,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setCamSyncEnabled(false);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent stopIntent = null;
 				stopIntent = new Intent(context, CameraSyncService.class);
 				stopIntent.setAction(CameraSyncService.ACTION_STOP);
 				context.startService(stopIntent);
-			}
+			} else {
+                cancelAllJobs(context);
+            }
 			
 			((ManagerActivityLollipop)context).refreshCameraUpload();
 		}
@@ -1436,18 +1445,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 									if (prefs.getCamSyncWifi().compareTo("") != 0){
 										dbH.setCamSyncTimeStamp(0);
 										dbH.setCamSyncEnabled(true);
-										
-										Handler handler = new Handler();
-										handler.postDelayed(new Runnable() {
-											
-																@Override
-																public void run() {
-																	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-																		log("Now I start the service");
-																		context.startService(new Intent(context, CameraSyncService.class));
-																	}
-																}
-															}, 5 * 1000);
+
+                                        Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                                                    log("Now I start the service");
+                                                    context.startService(new Intent(context,CameraSyncService.class));
+                                                } else {
+                                                    startJob(context);
+                                                }
+                                            }
+                                        },5 * 1000);
 									
 										((ManagerActivityLollipop)context).refreshCameraUpload();
 										
@@ -1479,16 +1490,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					String localPath = localFile.getAbsolutePath();
 					dbH.setCamSyncLocalPath(localPath);
 					dbH.setCameraFolderExternalSDCard(false);
-					
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {
-						
-											@Override
-											public void run() {
-												log("Now I start the service");
-												context.startService(new Intent(context, CameraSyncService.class));		
-											}
-										}, 5 * 1000);
+
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                                log("Now I start the service");
+                                context.startService(new Intent(context,CameraSyncService.class));
+                            } else {
+                                startJob(context);
+                            }
+                        }
+                    },5 * 1000);
 				
 					((ManagerActivityLollipop)context).refreshCameraUpload();
 					switch (which){

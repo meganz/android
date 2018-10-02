@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 
+import static mega.privacy.android.app.utils.JobUtil.startJob;
+
 
 public class ChargeEventReceiver extends BroadcastReceiver {
 	
@@ -34,9 +36,11 @@ public class ChargeEventReceiver extends BroadcastReceiver {
 			@Override
 			public void run() {
 				log("Now I start the service");
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					c.startService(new Intent(c, CameraSyncService.class));
-				}
+				} else {
+				    startJob(c);
+                }
 			}
 		}, 5 * 1000);
 	}
