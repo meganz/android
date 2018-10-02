@@ -400,6 +400,42 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/observers_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="6dp"
+                    android:animateLayoutChanges="true"
+                    android:visibility="gone"
+                    android:background="@drawable/dark_rounded_jump_to_latest">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_w_shared_read"
+                            android:layout_marginLeft="12dp"/>
+                        <TextView
+                            android:id="@+id/observers_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="12dp"
+                            android:layout_marginLeft="12dp"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:text="2"
+                            android:singleLine="true"
+                            android:fontFamily="Roboto"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:id="@+id/message_jump_layout"
                     android:layout_width="163dp"
                     android:layout_height="36dp"

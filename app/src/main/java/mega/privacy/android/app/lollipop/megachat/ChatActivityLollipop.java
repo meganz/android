@@ -46,6 +46,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -243,6 +244,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout disabledWritingLayout;
 
     RelativeLayout joinChatLinkLayout;
+    Button joinButton;
 
     RelativeLayout chatRelativeLayout;
     RelativeLayout userTypingLayout;
@@ -269,6 +271,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     EmojiconEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
+
+    RelativeLayout observersLayout;
+    TextView observersNumberText;
 
     FrameLayout emojiKeyboardLayout;
 
@@ -595,6 +600,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         writingContainerLayout = (RelativeLayout) findViewById(R.id.writing_container_layout_chat_layout);
 
         joinChatLinkLayout = (RelativeLayout) findViewById(R.id.join_chat_layout_chat_layout);
+        joinButton = (Button) findViewById(R.id.join_button);
+        joinButton.setOnClickListener(this);
 
         messageJumpLayout = (RelativeLayout) findViewById(R.id.message_jump_layout);
         messageJumpText = (TextView) findViewById(R.id.message_jump_text);
@@ -641,6 +648,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
+
+        observersLayout = (RelativeLayout) findViewById(R.id.observers_layout);
+        observersNumberText = (TextView) findViewById(R.id.observers_text);
 
 //        imageView = (ImageView) findViewById(R.id.imageView);
 
@@ -1076,6 +1086,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 }
                 log("Result of open chat: " + result);
+
+                if(chatRoom.isPreview()){
+                    observersNumberText.setText(chatRoom.getNumPreviewers()+"");
+                    observersLayout.setVisibility(View.VISIBLE);
+                }
+                else{
+                    observersLayout.setVisibility(View.GONE);
+                }
 
                 aB.setTitle(chatRoom.getTitle());
                 setChatSubtitle();
@@ -1703,6 +1721,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             videoMenuItem.setVisible(false);
             clearHistoryMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
+            contactInfoMenuItem.setVisible(false);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -2388,6 +2407,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
+    public void showConfirmationRejoinChat(final long publicHandle){
+        log("showConfirmationRejoinChat");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        log("Rejoin chat!: "+publicHandle);
+                        megaChatApi.rejoinChatLink(idChat, publicHandle, chatActivity);
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        finish();
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        String message= getResources().getString(R.string.confirmation_rejoin_chat_link);
+        builder.setMessage(message).setPositiveButton(R.string.action_join, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
     @Override
     public void onBackPressed() {
         log("onBackPressedLollipop");
@@ -2696,6 +2741,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.message_jump_layout:{
                 log("onClick:jump to least");
                 goToEnd();
+                break;
+            }
+            case R.id.join_button:{
+                megaChatApi.joinChatLink(idChat, this);
                 break;
             }
 		}
@@ -6009,17 +6058,49 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 idChat = request.getChatHandle();
                 showChat();
             }
-            else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
-
-            }
-            else if(e.getErrorCode()==MegaChatError.ERROR_EXIST){
-
-            }
-            else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-
-            }
             else {
+                log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+                if(e.getErrorCode()==MegaChatError.ERROR_EXIST){
+                    //ERROR_EXIST - If the user already participates in the chat.
+                    Util.showAlert(this, "You are already participating in this chat", null);
+                    finish();
+                }
+                else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
+                    //ERROR_ACCESS If the user is trying to preview a public chat which he was part of -> rejoinChatLink
+                    idChat = request.getChatHandle();
+                    long ph = request.getUserHandle();
+                    showConfirmationRejoinChat(request.getUserHandle());
+                }
+                else{
+                    showSnackbar(getString(R.string.error_general_nodes));
+                    emptyTextView.setText(getString(R.string.error_chat_link));
+                    emptyTextView.setVisibility(View.VISIBLE);
+                    emptyLayout.setVisibility(View.VISIBLE);
+                    chatRelativeLayout.setVisibility(View.GONE);
 
+                    LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyImageView.getLayoutParams();
+                    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                        emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+                        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+                    }else{
+                        emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+                        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(100, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+                    }
+
+                    emptyImageView.setLayoutParams(emptyTextViewParams1);
+                }
+            }
+        }
+        else if(request.getType() == MegaChatRequest.TYPE_CHAT_LINK_JOIN){
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
+                setChatSubtitle();
+                observersLayout.setVisibility(View.GONE);
+                supportInvalidateOptionsMenu();
+            }
+            else{
+                log("EEEERRRRROR WHEN JOINING CHAT " + e.getErrorCode() + " " +e.getErrorString());
+                showSnackbar(getString(R.string.error_general_nodes));
             }
         }
     }
