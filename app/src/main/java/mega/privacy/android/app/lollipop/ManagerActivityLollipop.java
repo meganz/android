@@ -7861,9 +7861,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	        	return true;
 //	        }
 	        case R.id.action_menu_clear_rubbish_bin:{
-	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		showClearRubbishBinDialog();
-	        	}
+	        	showClearRubbishBinDialog();
 	        	return true;
 	        }
 	        case R.id.action_menu_refresh:{
@@ -9232,8 +9230,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
-					return;
 				}
+                return;
 			}
 			super.onBackPressed();
 		}
