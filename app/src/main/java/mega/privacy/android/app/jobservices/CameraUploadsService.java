@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -151,6 +150,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 public void run() {
                     try {
                         int result = shouldRun();
+                        
                         if (result == 0) {
                             startCameraUploads();
                         }
@@ -494,6 +494,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 finish();
             }
             //TODO: The secondary media folder has to be here implemented also (or separate in two pieces - isExternal !isExternal)
+            Log.d("yuan", "upload finished");
         }
     }
 
@@ -1443,7 +1444,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         } else {
             finish();
         }
-        return true;
+        return false;
     }
 
     public static void log(String message) {

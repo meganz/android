@@ -7,10 +7,8 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import java.util.List;
@@ -76,6 +74,6 @@ public class BootJobService extends JobService {
     
     @Override
     public boolean onStopJob(JobParameters params) {
-        return true;
+        return false;
     }
 }

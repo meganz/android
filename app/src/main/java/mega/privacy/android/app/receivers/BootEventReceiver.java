@@ -1,25 +1,15 @@
 package mega.privacy.android.app.receivers;
 
-import mega.privacy.android.app.CameraSyncService;
-import mega.privacy.android.app.jobservices.BootJobService;
-import mega.privacy.android.app.utils.Util;
-
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
-import android.text.format.DateUtils;
 
-import java.util.List;
+import mega.privacy.android.app.CameraSyncService;
+import mega.privacy.android.app.utils.Util;
 
-import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
-import static mega.privacy.android.app.utils.JobUtil.isJobScheduled;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
-import static mega.privacy.android.app.utils.Util.logJobState;
 
 
 public class BootEventReceiver extends BroadcastReceiver {

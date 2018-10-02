@@ -8,7 +8,7 @@ import android.text.format.DateUtils;
 
 import java.util.List;
 
-import mega.privacy.android.app.jobservices.BootJobService;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 
 import static mega.privacy.android.app.utils.Util.logJobState;
 
@@ -19,6 +19,8 @@ public class JobUtil {
     public static final int START_JOB_FAILED = -1;
 
     public static final int BOOT_JOB_ID = Constants.BOOT_JOB_ID;
+    
+    public static final int PHOTOS_UPLOAD_JOB_ID = Constants.PHOTOS_UPLOAD_JOB_ID;
 
     public static boolean isJobScheduled(Context context,int id) {
         JobScheduler js = context.getSystemService(JobScheduler.class);
@@ -34,17 +36,17 @@ public class JobUtil {
     }
 
     public static int startJob(Context context) {
-        if(isJobScheduled(context, BOOT_JOB_ID)) {
+        if(isJobScheduled(context, PHOTOS_UPLOAD_JOB_ID)) {
             return START_JOB_FAILED;
         }
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
         if (jobScheduler != null) {
-            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(BOOT_JOB_ID,new ComponentName(context,BootJobService.class));
+            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(PHOTOS_UPLOAD_JOB_ID,new ComponentName(context,CameraUploadsService.class));
             jobInfoBuilder.setPeriodic(SCHEDULER_INTERVAL);
             jobInfoBuilder.setPersisted(true);
 
             int result = jobScheduler.schedule(jobInfoBuilder.build());
-            logJobState(result,BootJobService.class.getName());
+            logJobState(result,CameraUploadsService.class.getName());
             return result;
         }
         return START_JOB_FAILED;

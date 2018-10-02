@@ -4,9 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -17,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -31,7 +27,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +34,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.List;
 
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
@@ -48,7 +42,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.jobservices.BootJobService;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -72,8 +65,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
-import static mega.privacy.android.app.utils.Util.logJobState;
+import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
+import static mega.privacy.android.app.utils.JobUtil.startJob;
 
 //import android.support.v4.preference.PreferenceFragment;
 
@@ -1358,9 +1351,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				@Override
 				public void run() {
 					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						context.startService(new Intent(context, CameraSyncService.class));
-					}
+					}else{
+                        startJob(context);
+                    }
 				}
 			}, 30 * 1000);
 		}
@@ -1389,21 +1384,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
 				photosVideosIntent = new Intent(context, CameraSyncService.class);
 				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 				context.startService(photosVideosIntent);
-			}
+			}else{
+			    cancelAllJobs(context);
+            }
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						context.startService(new Intent(context, CameraSyncService.class));
-					}
+					}else{
+					    startJob(context);
+                    }
 				}
 			}, 30 * 1000);
 		}
@@ -1706,9 +1705,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 							context.startService(new Intent(context, CameraSyncService.class));
-						}
+						}else{
+						    startJob(context);
+                        }
 					}
 				}, 5 * 1000);
 				
@@ -1871,9 +1872,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 							context.startService(new Intent(context, CameraSyncService.class));
-						}
+						}else{
+						    startJob(context);
+                        }
 					}
 				}, 5 * 1000);
 				
@@ -1922,12 +1925,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setCamSyncEnabled(false);
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryUpload = false;
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					Intent stopIntent = null;
 					stopIntent = new Intent(context, CameraSyncService.class);
 					stopIntent.setAction(CameraSyncService.ACTION_STOP);
 					context.startService(stopIntent);
-				}
+				}else{
+				    cancelAllJobs(context);
+                }
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
@@ -2400,21 +2405,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			dbH.setCamSyncTimeStamp(0);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
 				photosVideosIntent = new Intent(context, CameraSyncService.class);
 				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 				context.startService(photosVideosIntent);
-			}
+			}else{
+			    cancelAllJobs(context);
+            }
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						context.startService(new Intent(context, CameraSyncService.class));
-					}
+					}else {
+					    startJob(context);
+                    }
 				}
 			}, 5 * 1000);
 		}
@@ -2453,21 +2462,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
 				photosVideosIntent = new Intent(context, CameraSyncService.class);
 				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 				context.startService(photosVideosIntent);
-			}
+			}else{
+			    cancelAllJobs(context);
+            }
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						context.startService(new Intent(context, CameraSyncService.class));
-					}
+					}else{
+					    startJob(context);
+                    }
 				}
 			}, 5 * 1000);
 		}
@@ -2479,21 +2492,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
 
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
 				photosVideosIntent = new Intent(context, CameraSyncService.class);
 				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 				context.startService(photosVideosIntent);
-			}
+			}else{
+			    cancelAllJobs(context);
+            }
 
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 						context.startService(new Intent(context, CameraSyncService.class));
-					}
+					}else{
+					    startJob(context);
+                    }
 				}
 			}, 5 * 1000);
 		}		
@@ -2511,21 +2528,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
 
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					Intent photosVideosIntent = null;
 					photosVideosIntent = new Intent(context, CameraSyncService.class);
 					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 					context.startService(photosVideosIntent);
-				}
+				}else{
+				    cancelAllJobs(context);
+                }
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 							context.startService(new Intent(context, CameraSyncService.class));
-						}
+						}else{
+						    startJob(context);
+                        }
 					}
 				}, 5 * 1000);
 				
@@ -2550,21 +2571,25 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
 
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					Intent photosVideosIntent = null;
 					photosVideosIntent = new Intent(context, CameraSyncService.class);
 					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 					context.startService(photosVideosIntent);
-				}
+				}else{
+				    cancelAllJobs(context);
+                }
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 							context.startService(new Intent(context, CameraSyncService.class));
-						}
+						}else{
+						    startJob(context);
+                        }
 					}
 				}, 5 * 1000);
 				
@@ -2956,50 +2981,4 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public boolean getAutoacceptSetting () {
 		return autoAccept;
 	}
-	
-	private void startCameraUpload(){
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !isJobScheduled(BOOT_JOB_ID)){
-            
-            long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
-            JobScheduler jobScheduler = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(BOOT_JOB_ID, new ComponentName(getActivity().getPackageName(), BootJobService.class.getName()));
-            jobInfoBuilder.setPeriodic(schedulerInterval);
-            jobInfoBuilder.setPersisted(true);
-            
-            if (jobScheduler != null) {
-                int result = jobScheduler.schedule(jobInfoBuilder.build());
-                logJobState(result, BootJobService.class.getName());
-            }
-        }else{
-            //todo start upload service
-        }
-    }
-    
-    //Cancel all jobs that have been scheduled by the calling application.
-    private void cancelAllScheduledJob(){
-        JobScheduler js = getActivity().getSystemService(JobScheduler.class);
-        js.cancelAll();
-    }
-    
-    //Cancel specific job
-    private void cancelScheduledJob(int id){
-        JobScheduler js = getActivity().getSystemService(JobScheduler.class);
-        js.cancel(id);
-    }
-    
-    // Check whether this job is currently scheduled.
-    private boolean isJobScheduled(int id) {
-        JobScheduler js = getActivity().getSystemService(JobScheduler.class);
-        List<JobInfo> jobs = js.getAllPendingJobs();
-        if (jobs == null) {
-            return false;
-        }
-        for (int i = 0;i < jobs.size();i++) {
-            if (jobs.get(i).getId() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
