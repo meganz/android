@@ -2465,14 +2465,23 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void update2FAVisibility(){
 		log("update2FAVisbility");
-		if (megaApi.multiFactorAuthAvailable()) {
-			log("update2FAVisbility true");
-			preferenceScreen.addPreference(twoFACategory);
-			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+		if (megaApi == null){
+			if (context != null){
+				if (((Activity)context).getApplication() != null){
+					megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+				}
+			}
 		}
-		else {
-			log("update2FAVisbility false");
-			preferenceScreen.removePreference(twoFACategory);
+
+		if (megaApi != null) {
+			if (megaApi.multiFactorAuthAvailable()) {
+				log("update2FAVisbility true");
+				preferenceScreen.addPreference(twoFACategory);
+				megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+			} else {
+				log("update2FAVisbility false");
+				preferenceScreen.removePreference(twoFACategory);
+			}
 		}
 	}
 
