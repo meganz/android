@@ -93,20 +93,27 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	RelativeLayout creditCardLayout;
 	RelativeLayout fortumoLayout;
 	RelativeLayout centiliLayout;
+
+	RelativeLayout googlePlayLayer;
+	RelativeLayout creditCardLayer;
+	RelativeLayout fortumoLayer;
+	RelativeLayout centiliLayer;
+
 	LinearLayout optionsBilling;
 	RadioGroup billingPeriod;
 	RadioButton billedMonthly;
 	RadioButton billedYearly;
 	LinearLayout layoutButtons;
+	TextView buttonCancel;
 
 	ImageView closeIcon;
-	ImageView fortumoIcon;
+//	ImageView fortumoIcon;
 	TextView fortumoText;
-	ImageView centiliIcon;
+//	ImageView centiliIcon;
 	TextView centiliText;
-	ImageView creditCardIcon;
+//	ImageView creditCardIcon;
 	TextView creditCardText;
-	ImageView googleWalletIcon;
+//	ImageView googleWalletIcon;
 	TextView googleWalletText;
 
 	Context context;
@@ -147,6 +154,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
 		textMyAccount = (TextView) v.findViewById(R.id.text_of_my_account);
 		semitransparentLayer = (RelativeLayout) v.findViewById(R.id.semitransparent_layer);
+		semitransparentLayer.setOnClickListener(this);
 		setAccountDetails();
 
 		//PRO LITE ACCOUNT
@@ -655,112 +663,105 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			googlePlayLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet);
 			googlePlayLayout.setOnClickListener(this);
 
-			LinearLayout.LayoutParams googlePlayParams = (LinearLayout.LayoutParams) googlePlayLayout.getLayoutParams();
-			googlePlayParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
-			googlePlayLayout.setLayoutParams(googlePlayParams);
-
-			googleWalletIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_icon);
-
-			RelativeLayout.LayoutParams googleIconParams = (RelativeLayout.LayoutParams) googleWalletIcon.getLayoutParams();
-			googleIconParams.height = Util.scaleHeightPx(40, outMetrics);
-			googleIconParams.width = Util.scaleWidthPx(40, outMetrics);
-			googleIconParams.setMargins(Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(8, outMetrics));
-
-			googleWalletIcon.setLayoutParams(googleIconParams);
+			googlePlayLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_layer);
+			googlePlayLayer.setVisibility(View.GONE);
 
 			googleWalletText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_text);
-			RelativeLayout.LayoutParams googleTextParams = (RelativeLayout.LayoutParams) googleWalletText.getLayoutParams();
-			googleTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
-			googleWalletText.setLayoutParams(googleTextParams);
+
+            String textGoogleWallet = getString(R.string.payment_method_google_wallet);
+            try{
+                textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'#000000\'>");
+                textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
+            }
+            catch (Exception e){}
+            Spanned resultGoogleWallet = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                resultGoogleWallet = Html.fromHtml(textGoogleWallet,Html.FROM_HTML_MODE_LEGACY);
+            }else {
+                resultGoogleWallet = Html.fromHtml(textGoogleWallet);
+            }
+            googleWalletText.setText(resultGoogleWallet);
+
 
 			creditCardLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
 			creditCardLayout.setOnClickListener(this);
 
-			LinearLayout.LayoutParams creditCardParams = (LinearLayout.LayoutParams) creditCardLayout.getLayoutParams();
-			creditCardParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
-			creditCardLayout.setLayoutParams(creditCardParams);
-
-			creditCardIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_icon);
-
-			RelativeLayout.LayoutParams creditCardIconParams = (RelativeLayout.LayoutParams) creditCardIcon.getLayoutParams();
-			creditCardIconParams.height = Util.scaleHeightPx(40, outMetrics);
-			creditCardIconParams.width = Util.scaleWidthPx(40, outMetrics);
-			creditCardIconParams.setMargins(Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(8, outMetrics));
-
-			creditCardIcon.setLayoutParams(creditCardIconParams);
+			creditCardLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_layer);
+			creditCardLayer.setVisibility(View.GONE);
 
 			creditCardText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card_text);
-			RelativeLayout.LayoutParams creditCardTextParams = (RelativeLayout.LayoutParams) creditCardText.getLayoutParams();
-			creditCardTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
-			creditCardText.setLayoutParams(creditCardTextParams);
+			String textCreditCardText = getString(R.string.payment_method_credit_card);
+			try{
+				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'#000000\'>");
+				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned resultCreditCardText = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				resultCreditCardText = Html.fromHtml(textCreditCardText,Html.FROM_HTML_MODE_LEGACY);
+			}else {
+				resultCreditCardText = Html.fromHtml(textCreditCardText);
+			}
+			creditCardText.setText(resultCreditCardText);
 
 			fortumoLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
 			fortumoLayout.setOnClickListener(this);
 
-			LinearLayout.LayoutParams fortumoParams = (LinearLayout.LayoutParams) fortumoLayout.getLayoutParams();
-			fortumoParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
-			fortumoLayout.setLayoutParams(fortumoParams);
-
-			fortumoIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_icon);
-
-			RelativeLayout.LayoutParams fortumoIconParams = (RelativeLayout.LayoutParams) fortumoIcon.getLayoutParams();
-			fortumoIconParams.height = Util.scaleHeightPx(40, outMetrics);
-			fortumoIconParams.width = Util.scaleWidthPx(40, outMetrics);
-			fortumoIconParams.setMargins(Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(8, outMetrics));
-
-			fortumoIcon.setLayoutParams(fortumoIconParams);
+			fortumoLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_layer);
+			fortumoLayer.setVisibility(View.GONE);
 
 			fortumoText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo_text);
-			RelativeLayout.LayoutParams fortumoTextParams = (RelativeLayout.LayoutParams) fortumoText.getLayoutParams();
-			fortumoTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
-			fortumoText.setLayoutParams(fortumoTextParams);
+
+			String textFortumoText = getString(R.string.payment_method_fortumo);
+			try{
+				textFortumoText = textFortumoText.replace("[A]", "<font color=\'#000000\'>");
+				textFortumoText = textFortumoText.replace("[/A]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned resultFortumoText = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				resultFortumoText = Html.fromHtml(textFortumoText,Html.FROM_HTML_MODE_LEGACY);
+			}else {
+				resultFortumoText = Html.fromHtml(textFortumoText);
+			}
+			fortumoText.setText(resultFortumoText);
 
 			centiliLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
 			centiliLayout.setOnClickListener(this);
 
-			LinearLayout.LayoutParams centiliParams = (LinearLayout.LayoutParams) centiliLayout.getLayoutParams();
-			centiliParams.height = Util.scaleHeightPx(HEIGHT_PAYMENT_METHODS_LAYOUT, outMetrics);
-			centiliLayout.setLayoutParams(centiliParams);
-
-			centiliIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_icon);
-
-			RelativeLayout.LayoutParams centiliIconParams = (RelativeLayout.LayoutParams) centiliIcon.getLayoutParams();
-			centiliIconParams.height = Util.scaleHeightPx(40, outMetrics);
-			centiliIconParams.width = Util.scaleWidthPx(40, outMetrics);
-			centiliIconParams.setMargins(Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics),0,Util.scaleHeightPx(8, outMetrics));
-
-			centiliIcon.setLayoutParams(fortumoIconParams);
+			centiliLayer = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_layer);
+			centiliLayer.setVisibility(View.GONE);
 
 			centiliText = (TextView) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili_text);
-			RelativeLayout.LayoutParams centiliTextParams = (RelativeLayout.LayoutParams) centiliText.getLayoutParams();
-			centiliTextParams.setMargins(Util.scaleWidthPx(16, outMetrics),0,0,0);
-			centiliText.setLayoutParams(centiliTextParams);
+
+			String textCentiliText = getString(R.string.payment_method_centili);
+			try{
+				textCentiliText = textCentiliText.replace("[A]", "<font color=\'#000000\'>");
+				textCentiliText = textCentiliText.replace("[/A]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned resultCentiliText = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				resultCentiliText = Html.fromHtml(textCentiliText,Html.FROM_HTML_MODE_LEGACY);
+			}else {
+				resultCentiliText = Html.fromHtml(textCentiliText);
+			}
+			centiliText.setText(resultCentiliText);
 
 			optionsBilling = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.options);
 
 			billingPeriod = (RadioGroup) selectPaymentMethodClicked.findViewById(R.id.billing_period);
+			billingPeriod.clearCheck();
 
 			billedMonthly = (RadioButton) selectPaymentMethodClicked.findViewById(R.id.billed_monthly);
 			billedMonthly.setOnClickListener(this);
 			billedYearly = (RadioButton) selectPaymentMethodClicked.findViewById(R.id.billed_yearly);
 			billedYearly.setOnClickListener(this);
 			layoutButtons = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.layout_buttons);
+			layoutButtons.setVisibility(View.GONE);
+			buttonCancel = (TextView) selectPaymentMethodClicked.findViewById(R.id.button_cancel);
+			buttonCancel.setOnClickListener(this);
 
-
-//			closeLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.close_layout);
-//			closeLayout.setOnClickListener(this);
-
-//			LinearLayout.LayoutParams closeLayoutParams = (LinearLayout.LayoutParams) closeLayout.getLayoutParams();
-//			closeLayoutParams.setMargins(0,Util.scaleHeightPx(5, outMetrics),0,0);
-//			closeLayout.setLayoutParams(closeLayoutParams);
-//
-//			closeIcon = (ImageView) selectPaymentMethodClicked.findViewById(R.id.close_layout_icon);
-//
-//			RelativeLayout.LayoutParams closeIconParams = (RelativeLayout.LayoutParams) closeIcon.getLayoutParams();
-//			closeIconParams.setMargins(0,0,Util.scaleWidthPx(16, outMetrics),Util.scaleHeightPx(8, outMetrics));
-//			closeIcon.setLayoutParams(closeIconParams);
-//
-//			closeLayout.setVisibility(View.VISIBLE);
 			googlePlayLayout.setVisibility(View.GONE);
 			creditCardLayout.setVisibility(View.GONE);
 			fortumoLayout.setVisibility(View.GONE);
@@ -886,9 +887,12 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		else{
 			parameterType=0;
 		}
+
 		((ManagerActivityLollipop)context).setSelectedAccountType(parameterType);
 		((ManagerActivityLollipop)context).setSelectedPaymentMethod(paymentMethod);
-		((ManagerActivityLollipop)context).showmyF(paymentMethod, parameterType);
+		showmyF(paymentMethod,parameterType);
+
+//		((ManagerActivityLollipop)context).showmyF(paymentMethod, parameterType);
 	}
 
 	@Override
@@ -898,18 +902,35 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		((ManagerActivityLollipop)context).setDisplayedAccountType(-1);
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 		switch (v.getId()){
+			case R.id.button_cancel:{
+				log("button_cancel");
+				billingPeriod.clearCheck();
+				layoutButtons.setVisibility(View.GONE);
+				semitransparentLayer.setVisibility(View.GONE);
+				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
+				break;
+			}
+			case R.id.semitransparent_layer:{
+				log("semitransparent_layer");
+				billingPeriod.clearCheck();
+				layoutButtons.setVisibility(View.GONE);
+				semitransparentLayer.setVisibility(View.GONE);
+				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
+				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
+				break;
+			}
 			case R.id.upgrade_prolite_layout:{
 				log("onClick()-upgrade_prolite_layout");
 
 				if(selectPaymentMethodLayoutLite.getVisibility()==View.VISIBLE){
-					log("onClick()-upgrade_prolite_layout VISIBLE");
-
 					selectPaymentMethodLayoutLite.setVisibility(View.GONE);
 					semitransparentLayer.setVisibility(View.GONE);
-				}
-				else{
-					log("onClick()-upgrade_prolite_layout GONE");
-
+				}else{
 					selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
 					selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
@@ -917,26 +938,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 				break;
 			}
-			case R.id.billed_monthly:{
-				log("onClick()-billed Monthly");
-				layoutButtons.setVisibility(View.VISIBLE);
-				break;
-			}
-			case R.id.billed_yearly:{
-				log("onClick()-billed Yearly");
-				layoutButtons.setVisibility(View.VISIBLE);
-				break;
-			}
-//			case R.id.close_layout:{
-//				log("onClick()-close_layout");
-//				selectPaymentMethodLayoutLite.setVisibility(View.GONE);
-//				semitransparentLayer.setVisibility(View.GONE);
-//
-//				selectPaymentMethodLayoutPro1.setVisibility(View.GONE);
-//				selectPaymentMethodLayoutPro2.setVisibility(View.GONE);
-//				selectPaymentMethodLayoutPro3.setVisibility(View.GONE);
-//				break;
-//			}
 			case R.id.upgrade_pro_i_layout:{
 				log("onClick()-upgrade_pro_i_layout");
 
@@ -981,28 +982,32 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 			case R.id.payment_method_google_wallet:{
 				log("onClick()-payment_method_google_wallet");
-				optionsBilling.setVisibility(View.VISIBLE);
-				setPricingBillingPeriod(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
-
-//				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
+				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET);
 				break;
 			}
 			case R.id.payment_method_credit_card:{
 				log("onClick()-payment_method_credit_card");
-
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD);
 				break;
 			}
 			case R.id.payment_method_fortumo:{
 				log("onClick()-payment_method_fortumo");
-
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_FORTUMO);
 				break;
 			}
 			case R.id.payment_method_centili:{
 				log("onClick()-payment_method_centili");
-
 				showNextPaymentFragment(MegaApiAndroid.PAYMENT_METHOD_CENTILI);
+				break;
+			}
+			case R.id.billed_monthly:{
+				log("onClick()-billed Monthly");
+				layoutButtons.setVisibility(View.VISIBLE);
+				break;
+			}
+			case R.id.billed_yearly:{
+				log("onClick()-billed Yearly");
+				layoutButtons.setVisibility(View.VISIBLE);
 				break;
 			}
 		}
@@ -1182,11 +1187,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						selectPaymentMethod.setText(getString(R.string.select_payment_method));
 					}
 				}
-
 				break;
 			}
 		}
-
 	}
 
 
@@ -1376,35 +1379,43 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 //
 //	}
 
+	public void showmyF(int paymentMethod, int parameterType){
+		log("showmyF (method "+paymentMethod+", type "+parameterType+")");
+		billingPeriod.clearCheck();
+		layoutButtons.setVisibility(View.GONE);
 
-
-	public void setPricingBillingPeriod(int paymentMethod){
-		log("setPricingBillingPeriod: paymentMethod: "+paymentMethod);
-
-		DecimalFormat df = new DecimalFormat("#.##");
 		String priceMonthlyInteger = "";
 		String priceMonthlyDecimal = "";
 		String priceYearlyInteger = "";
 		String priceYearlyDecimal = "";
 
-		if (myAccountInfo == null) {
-			myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
+		DecimalFormat df = new DecimalFormat("#.##");
+
+		if(myAccountInfo==null){
+			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
-		if (myAccountInfo != null) {
-			ArrayList<Product> productAccounts = myAccountInfo.getProductAccounts();
+		if(myAccountInfo == null){
+			return;
+		}
 
-			if (productAccounts == null) {
-				log("productAccounts == null");
-				((MegaApplication) ((Activity) context).getApplication()).askForPricing();
-				return;
-			}
+		ArrayList<Product> accounts = myAccountInfo.getProductAccounts();
 
-			for (int i = 0; i < productAccounts.size(); i++) {
-				Product account = productAccounts.get(i);
-				if (account.getLevel() == Constants.PRO_I && account.getMonths() == 1) {
-					log("PRO1: " + account.getStorage());
-					if(account.getMonths()==1){
+		if (accounts == null){
+			log("accounts == null");
+			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
+			return;
+		}
+
+		switch(parameterType){
+			case 1:{
+				log("case PRO I");
+
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==1 && account.getMonths()==1){
 						double price = account.getAmount()/100.00;
 						String priceString = df.format(price);
 						String [] s = priceString.split("\\.");
@@ -1438,8 +1449,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 							resultMonthly = Html.fromHtml(textToShowMonthly);
 						}
 						billedMonthly.setText(resultMonthly);
-
-					}else if(account.getMonths() == 12){
+					}
+					if (account.getLevel()==1 && account.getMonths()==12){
 						double price = account.getAmount()/100.00;
 						String priceString = df.format(price);
 						String [] s = priceString.split("\\.");
@@ -1475,302 +1486,500 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						billedYearly.setText(resultYearly);
 					}
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-
-				} else if (account.getLevel() == Constants.PRO_II && account.getMonths() == 1) {
-					log("PRO2: " + account.getStorage());
-					if(account.getMonths()==1){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceMonthlyInteger = s[0];
-							priceMonthlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
-
-						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
-						try{
-							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned resultMonthly = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							resultMonthly = Html.fromHtml(textToShowMonthly,Html.FROM_HTML_MODE_LEGACY);
-						}else {
-							resultMonthly = Html.fromHtml(textToShowMonthly);
-						}
-						billedMonthly.setText(resultMonthly);
-
-					}else if(account.getMonths() == 12){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceYearlyInteger = s[0];
-							priceYearlyDecimal = "." + s[1] + " €";
-						}
-						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
-
-						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
-						try{
-							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned resultYearly = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							resultYearly = Html.fromHtml(textToShowYearly,Html.FROM_HTML_MODE_LEGACY);
-						}else {
-							resultYearly = Html.fromHtml(textToShowYearly);
-						}
-						billedYearly.setText(resultYearly);
-					}
-
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-
-				} else if (account.getLevel() == Constants.PRO_III && account.getMonths() == 1) {
-					log("PRO3: " + account.getStorage());
-
-					if(account.getMonths()==1){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceMonthlyInteger = s1[0];
-								priceMonthlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceMonthlyInteger = s[0];
-							priceMonthlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
-
-						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
-						try{
-							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned resultMonthly = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							resultMonthly = Html.fromHtml(textToShowMonthly,Html.FROM_HTML_MODE_LEGACY);
-						}else {
-							resultMonthly = Html.fromHtml(textToShowMonthly);
-						}
-						billedMonthly.setText(resultMonthly);
-
-
-					}else if(account.getMonths() == 12){
-						double price = account.getAmount()/100.00;
-						String priceString = df.format(price);
-						String [] s = priceString.split("\\.");
-						if (s.length == 1){
-							String [] s1 = priceString.split(",");
-							if (s1.length == 1){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "";
-							}
-							else if (s1.length == 2){
-								priceYearlyInteger = s1[0];
-								priceYearlyDecimal = "." + s1[1] + " €";
-							}
-						}
-						else if (s.length == 2){
-							priceYearlyInteger = s[0];
-							priceYearlyDecimal = "." + s[1] + " €";
-						}
-
-						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
-
-						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
-						try{
-							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-						}
-						catch (Exception e){}
-						Spanned resultYearly = null;
-						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-							resultYearly = Html.fromHtml(textToShowYearly,Html.FROM_HTML_MODE_LEGACY);
-						}else {
-							resultYearly = Html.fromHtml(textToShowYearly);
-						}
-						billedYearly.setText(resultYearly);
-					}
-
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-
-					break;
-
-
-				} else if (account.getLevel() == Constants.PRO_LITE) {
-					log("Lite: " + account.getStorage());
-
-						if(account.getMonths()==1){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceMonthlyInteger = s1[0];
-									priceMonthlyDecimal = "";
-								}else if (s1.length == 2){
-									priceMonthlyInteger = s1[0];
-									priceMonthlyDecimal = "," + s1[1] + " €";
-								}
-							}else if (s.length == 2){
-								priceMonthlyInteger = s[0];
-								priceMonthlyDecimal = "," + s[1] + " €";
-							}
-
-							String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
-
-							String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
-							try{
-								textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
-								textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
-							}
-							catch (Exception e){}
-							Spanned resultMonthly = null;
-							if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-								resultMonthly = Html.fromHtml(textToShowMonthly,Html.FROM_HTML_MODE_LEGACY);
-							}else {
-								resultMonthly = Html.fromHtml(textToShowMonthly);
-							}
-							billedMonthly.setText(resultMonthly);
-
-						}else if(account.getMonths() == 12){
-							double price = account.getAmount()/100.00;
-							String priceString = df.format(price);
-							String [] s = priceString.split("\\.");
-							if (s.length == 1){
-								String [] s1 = priceString.split(",");
-								if (s1.length == 1){
-									priceYearlyInteger = s1[0];
-									priceYearlyDecimal = "";
-								}
-								else if (s1.length == 2){
-									priceYearlyInteger = s1[0];
-									priceYearlyDecimal = "," + s1[1] + " €";
-								}
-							}
-							else if (s.length == 2){
-								priceYearlyInteger = s[0];
-								priceYearlyDecimal = "," + s[1] + " €";
-							}
-
-							String priceYearly = priceYearlyInteger+priceYearlyDecimal;
-
-							String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
-							try{
-								textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
-								textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
-							}
-							catch (Exception e){}
-							Spanned resultYearly = null;
-							if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-								resultYearly = Html.fromHtml(textToShowYearly,Html.FROM_HTML_MODE_LEGACY);
-							}else {
-								resultYearly = Html.fromHtml(textToShowYearly);
-							}
-							billedYearly.setText(resultYearly);
-
-						}
-
-					switch (paymentMethod){
-						case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
-							break;
-						}
-						case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
-							break;
-						}
-					}
-
-					break;
 				}
-			}
 
-		} else {
-			log("MyAccountInfo is Null");
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						log("Pro I - PAYMENT_METHOD_FORTUMO");
+						creditCardLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						fortumoLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						log("Pro I - PAYMENT_METHOD_CENTILI");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						log("Pro I - PAYMENT_METHOD_CREDIT_CARD");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						log("Pro I - PAYMENT_METHOD_GOOGLE_WALLET");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						if (myAccountInfo.getProIMonthly() != null) {
+							billedMonthly.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProIYearly() != null) {
+							billedYearly.setVisibility(View.GONE);
+//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+						}
+						break;
+					}
+				}
+
+				break;
+			}
+			case 2:{
+				log(" case PRO II");
+
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==2 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceMonthlyInteger = s1[0];
+								priceMonthlyDecimal = "";
+							}
+							else if (s1.length == 2){
+								priceMonthlyInteger = s1[0];
+								priceMonthlyDecimal = "." + s1[1] + " €";
+							}
+						}
+						else if (s.length == 2){
+							priceMonthlyInteger = s[0];
+							priceMonthlyDecimal = "." + s[1] + " €";
+						}
+
+						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
+
+						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						try{
+							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
+							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned resultMonthly = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							resultMonthly = Html.fromHtml(textToShowMonthly,Html.FROM_HTML_MODE_LEGACY);
+						}else {
+							resultMonthly = Html.fromHtml(textToShowMonthly);
+						}
+						billedMonthly.setText(resultMonthly);
+					}
+					if (account.getLevel()==2 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceYearlyInteger = s1[0];
+								priceYearlyDecimal = "";
+							}
+							else if (s1.length == 2){
+								priceYearlyInteger = s1[0];
+								priceYearlyDecimal = "." + s1[1] + " €";
+							}
+						}
+						else if (s.length == 2){
+							priceYearlyInteger = s[0];
+							priceYearlyDecimal = "." + s[1] + " €";
+						}
+						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
+
+						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						try{
+							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
+							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned resultYearly = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							resultYearly = Html.fromHtml(textToShowYearly,Html.FROM_HTML_MODE_LEGACY);
+						}else {
+							resultYearly = Html.fromHtml(textToShowYearly);
+						}
+						billedYearly.setText(resultYearly);
+
+					}
+				}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						log("Pro II - PAYMENT_METHOD_FORTUMO");
+						creditCardLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						fortumoLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						log("Pro II - PAYMENT_METHOD_CENTILI");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						log("Pro II - PAYMENT_METHOD_CREDIT_CARD");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						log("Pro II - PAYMENT_METHOD_GOOGLE_WALLET");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						if (myAccountInfo.getProIIMonthly() != null) {
+							billedMonthly.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProIIYearly() != null) {
+							billedYearly.setVisibility(View.GONE);
+//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+						}
+						break;
+					}
+				}
+
+				break;
+			}
+			case 3:{
+				log("case PRO III");
+
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==3 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceMonthlyInteger = s1[0];
+								priceMonthlyDecimal = "";
+							}
+							else if (s1.length == 2){
+								priceMonthlyInteger = s1[0];
+								priceMonthlyDecimal = "." + s1[1] + " €";
+							}
+						}
+						else if (s.length == 2){
+							priceMonthlyInteger = s[0];
+							priceMonthlyDecimal = "." + s[1] + " €";
+						}
+
+						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
+
+						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						try{
+							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
+							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned resultMonthly = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							resultMonthly = Html.fromHtml(textToShowMonthly,Html.FROM_HTML_MODE_LEGACY);
+						}else {
+							resultMonthly = Html.fromHtml(textToShowMonthly);
+						}
+						billedMonthly.setText(resultMonthly);
+					}
+					if (account.getLevel()==3 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceYearlyInteger = s1[0];
+								priceYearlyDecimal = "";
+							}
+							else if (s1.length == 2){
+								priceYearlyInteger = s1[0];
+								priceYearlyDecimal = "." + s1[1] + " €";
+							}
+						}
+						else if (s.length == 2){
+							priceYearlyInteger = s[0];
+							priceYearlyDecimal = "." + s[1] + " €";
+						}
+
+						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
+
+						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						try{
+							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
+							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned resultYearly = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							resultYearly = Html.fromHtml(textToShowYearly,Html.FROM_HTML_MODE_LEGACY);
+						}else {
+							resultYearly = Html.fromHtml(textToShowYearly);
+						}
+						billedYearly.setText(resultYearly);
+
+					}
+				}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						log("Pro III - PAYMENT_METHOD_FORTUMO");
+						creditCardLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						fortumoLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						log("Pro III - PAYMENT_METHOD_CENTILI");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						log("Pro III - PAYMENT_METHOD_CREDIT_CARD");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						log("Pro III - PAYMENT_METHOD_GOOGLE_WALLET");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+						if (myAccountInfo.getProIIIMonthly() != null) {
+							billedMonthly.setVisibility(View.GONE);
+						}
+
+						if (myAccountInfo.getProIIIYearly() != null) {
+							billedYearly.setVisibility(View.GONE);
+//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+						}
+						break;
+					}
+				}
+
+				break;
+			}
+			case 4:{
+				log("case LITE");
+				for (int i=0;i<accounts.size();i++){
+
+					Product account = accounts.get(i);
+
+					if(account.getLevel()==4 && account.getMonths()==1){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceMonthlyInteger = s1[0];
+								priceMonthlyDecimal = "";
+							}else if (s1.length == 2){
+								priceMonthlyInteger = s1[0];
+								priceMonthlyDecimal = "," + s1[1] + " €";
+							}
+						}else if (s.length == 2){
+							priceMonthlyInteger = s[0];
+							priceMonthlyDecimal = "," + s[1] + " €";
+						}
+
+						String priceMonthly = priceMonthlyInteger+priceMonthlyDecimal;
+
+						String textToShowMonthly = getString(R.string.billed_monthly_text, priceMonthly);
+						try{
+							textToShowMonthly = textToShowMonthly.replace("[A]", "<font color=\'#000000\'>");
+							textToShowMonthly = textToShowMonthly.replace("[/A]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned resultMonthly = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							resultMonthly = Html.fromHtml(textToShowMonthly,Html.FROM_HTML_MODE_LEGACY);
+						}else {
+							resultMonthly = Html.fromHtml(textToShowMonthly);
+						}
+						billedMonthly.setText(resultMonthly);
+
+					}
+					if (account.getLevel()==4 && account.getMonths()==12){
+						double price = account.getAmount()/100.00;
+						String priceString = df.format(price);
+						String [] s = priceString.split("\\.");
+						if (s.length == 1){
+							String [] s1 = priceString.split(",");
+							if (s1.length == 1){
+								priceYearlyInteger = s1[0];
+								priceYearlyDecimal = "";
+							}
+							else if (s1.length == 2){
+								priceYearlyInteger = s1[0];
+								priceYearlyDecimal = "," + s1[1] + " €";
+							}
+						}
+						else if (s.length == 2){
+							priceYearlyInteger = s[0];
+							priceYearlyDecimal = "," + s[1] + " €";
+						}
+
+						String priceYearly = priceYearlyInteger+priceYearlyDecimal;
+
+
+						String textToShowYearly = getString(R.string.billed_yearly_text, priceYearly);
+						try{
+							textToShowYearly = textToShowYearly.replace("[A]", "<font color=\'#000000\'>");
+							textToShowYearly = textToShowYearly.replace("[/A]", "</font>");
+						}
+						catch (Exception e){}
+						Spanned resultYearly = null;
+						if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+							resultYearly = Html.fromHtml(textToShowYearly,Html.FROM_HTML_MODE_LEGACY);
+						}else {
+							resultYearly = Html.fromHtml(textToShowYearly);
+						}
+
+						billedYearly.setText(resultYearly);
+					}
+				}
+
+				switch (paymentMethod){
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:{
+						log("Lite - PAYMENT_METHOD_FORTUMO");
+						creditCardLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						fortumoLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.GONE);
+
+//						selectedSubscription = Constants.PAYMENT_CC_MONTH;
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CENTILI:{
+						log("Lite - PAYMENT_METHOD_CENTILI");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.GONE);;
+//						selectedSubscription = Constants.PAYMENT_CC_MONTH;
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:{
+						log("Lite - PAYMENT_METHOD_CREDIT_CARD");
+						fortumoLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+
+						break;
+					}
+					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						log("Lite - PAYMENT_METHOD_GOOGLE_WALLET");
+
+						fortumoLayer.setVisibility(View.VISIBLE);
+						creditCardLayer.setVisibility(View.VISIBLE);
+						centiliLayer.setVisibility(View.VISIBLE);
+						googlePlayLayer.setVisibility(View.GONE);
+
+						optionsBilling.setVisibility(View.VISIBLE);
+						billedMonthly.setVisibility(View.VISIBLE);
+						billedYearly.setVisibility(View.VISIBLE);
+
+						if (myAccountInfo.getProLiteMonthly() != null) {
+							billedMonthly.setVisibility(View.GONE);
+						}
+						if (myAccountInfo.getProLiteYearly() != null) {
+							billedYearly.setVisibility(View.GONE);
+//							selectedSubscription = Constants.PAYMENT_CC_MONTH;
+						}
+						break;
+					}
+				}
+				break;
+			}
 		}
 	}
-
 }
