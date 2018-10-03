@@ -167,4 +167,7 @@
     <color name="status_bar_search">#FFCCCCCC</color>
     <color name="status_bar_navigation_view">#FF33CCB7</color>
     <color name="white_50_opacity">#80FFFFFF</color>
+    <color name="white_15_opacity">#26FFFFFF</color>
+    <color name="black_15_opacity">#26000000</color>
+    <color name="accent_color_30_opacity">#4D00BFA5</color>
 </resources>
