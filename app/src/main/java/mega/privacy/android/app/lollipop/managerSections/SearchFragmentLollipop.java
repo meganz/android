@@ -500,6 +500,7 @@ public class SearchFragmentLollipop extends Fragment{
 
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
+		((ManagerActivityLollipop) context).changeStatusBarColor(3);
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
 			if(((ManagerActivityLollipop)context).searchQuery!=null){
 				if(!((ManagerActivityLollipop)context).searchQuery.isEmpty()){

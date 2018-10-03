@@ -122,6 +122,7 @@
             android:layout_height="56dp">
 
             <TextView
+                android:id="@+id/my_account_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
@@ -147,6 +148,7 @@
             android:layout_height="56dp">
 
             <TextView
+                android:id="@+id/inbox_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"
@@ -198,6 +200,7 @@
             android:layout_height="56dp">
 
             <TextView
+                android:id="@+id/settings_section_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left|center_vertical"

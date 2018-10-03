@@ -5998,12 +5998,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onDestroy(){
         log("onDestroy()");
 
-        megaChatApi.closeChatRoom(idChat, this);
-        MegaApplication.setClosedChat(true);
-        log("removeChatListener");
-        megaChatApi.removeChatListener(this);
-        megaChatApi.removeChatCallListener(this);
-        handler.removeCallbacksAndMessages(null);
+        if (megaChatApi != null) {
+            megaChatApi.closeChatRoom(idChat, this);
+            MegaApplication.setClosedChat(true);
+            log("removeChatListener");
+            megaChatApi.removeChatListener(this);
+            megaChatApi.removeChatCallListener(this);
+        }
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
 
         super.onDestroy();
     }
