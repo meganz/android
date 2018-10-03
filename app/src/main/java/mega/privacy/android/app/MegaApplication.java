@@ -1,12 +1,8 @@
 package mega.privacy.android.app;
 
-import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,7 +21,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -37,14 +32,11 @@ import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.jobservices.BootJobService;
-import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -80,8 +72,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
-import static mega.privacy.android.app.utils.Util.logJobState;
+import static mega.privacy.android.app.utils.JobUtil.startJob;
 
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
@@ -390,7 +381,11 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
-
+        
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+            startJob(getApplicationContext());
+        }
+		
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
 		if (dbH != null) {
