@@ -653,6 +653,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                                     @Override
                                     public void onClick(DialogInterface dialog,int whichButton) {
                                         cancelAllJobs(LoginActivityLollipop.this);
+                                        dbH.setCamSyncEnabled(false);
                                     }
                                 });
                         builder.setNegativeButton(getString(R.string.general_cancel),null);
@@ -661,6 +662,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                             dialog.show();
                         } catch (Exception ex) {
                             cancelAllJobs(LoginActivityLollipop.this);
+                            dbH.setCamSyncEnabled(false);
                         }
                     }
                 }

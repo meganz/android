@@ -1713,11 +1713,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
-						cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
-						cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		    			cancelTourIntent.setAction(newIntent.getAction());
-		    			startActivity(cancelTourIntent);
+		    		    if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N){
+                            Intent cancelTourIntent = new Intent(this, LoginActivityLollipop.class);
+                            cancelTourIntent.putExtra("visibleFragment", Constants. TOUR_FRAGMENT);
+                            cancelTourIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            cancelTourIntent.setAction(newIntent.getAction());
+                            startActivity(cancelTourIntent);
+                        }else{
+		    		        cancelAllJobs(getApplicationContext());
+                        }
+						
 		    			finish();
 		    			return;
 		    		}
@@ -2065,11 +2070,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
-						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(getIntent().getAction());
-						startActivity(intent);
+                        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N){
+                            Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+                            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setAction(getIntent().getAction());
+                            startActivity(intent);
+                        }else{
+                            cancelAllJobs(getApplicationContext());
+                        }
+						
 						finish();
 						return;
 					}
@@ -3147,6 +3157,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         cancelAllJobs(ManagerActivityLollipop.this);
+                                        dbH.setCamSyncEnabled(false);
                                     }
                                 });
                         builder.setNegativeButton(getString(R.string.general_cancel), null);
@@ -3155,6 +3166,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                             dialog.show();
                         } catch (Exception ex) {
                             cancelAllJobs(ManagerActivityLollipop.this);
+                            dbH.setCamSyncEnabled(false);
                         }
                     }
 				}
