@@ -1438,7 +1438,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
 //        stopped = true;
         if (megaApi != null) {
             megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
-            dbH.setCamSyncEnabled(false);
         } else {
             finish();
         }
