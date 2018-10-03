@@ -1386,7 +1386,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 break;
             }
             case MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE:
-            case MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE: {
+            case MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE:
+            case MegaChatMessage.TYPE_SET_PRIVATE_MODE:{
                 bindChatLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
@@ -6044,18 +6045,37 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         int messageType = message.getType();
         if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE){
             textToShow = String.format(context.getString(R.string.message_created_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
+            try {
+                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[/A]", "</font>");
+                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[/B]", "</font>");
+            } catch (Exception e) {
+            }
+        }
+        else if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE){
+            textToShow = String.format(context.getString(R.string.message_deleted_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
+            try {
+                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[/A]", "</font>");
+                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[/B]", "</font>");
+            } catch (Exception e) {
+            }
         }
         else{
-            textToShow = String.format(context.getString(R.string.message_deleted_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
+            textToShow = String.format(context.getString(R.string.message_set_chat_private), ((ViewHolderMessageChat) holder).fullNameTitle);
+            try {
+                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[/A]", "</font>");
+                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[/B]", "</font>");
+                textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[/C]", "</font>");
+            } catch (Exception e) {
+            }
         }
 
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-        }
         Spanned result = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
@@ -6064,7 +6084,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
 
         ((ViewHolderMessageChat) holder).contactManagementAvatarMessageText.setText(result);
-
     }
 
     public void bindTruncateMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {

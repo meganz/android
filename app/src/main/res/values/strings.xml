@@ -2154,4 +2154,5 @@
     <string name="confirmation_rejoin_chat_link" context="Message on the alert to join a group chat that the user previously was part of">You are trying to preview a chat that you were part of. Do you want to join to the chat again?</string>
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat</string>
 
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private">[A]%1$s[/A][B] set chat to [/B][C]private[/C]</string>
 </resources>
