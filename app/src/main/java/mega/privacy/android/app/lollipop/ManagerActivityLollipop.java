@@ -8035,9 +8035,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	        	return true;
 //	        }
 	        case R.id.action_menu_clear_rubbish_bin:{
-	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		showClearRubbishBinDialog();
-	        	}
+	        	showClearRubbishBinDialog();
 	        	return true;
 	        }
 	        case R.id.action_menu_refresh:{
@@ -9392,8 +9390,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (rubbishBinFLol != null && rubbishBinFLol.isAdded()) {
 				if (rubbishBinFLol.onBackPressed() == 0) {
 					backToDrawerItem(bottomNavigationCurrentItem);
-					return;
 				}
+                return;
 			}
 			super.onBackPressed();
 		}
