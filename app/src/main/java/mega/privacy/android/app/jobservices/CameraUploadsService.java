@@ -23,7 +23,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.provider.DocumentFile;
 import android.text.format.Time;
 import android.util.Log;
-import android.widget.RemoteViews;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -170,38 +169,37 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     }
 
     private void startCameraUploads() {
-
+    
+        Intent intent;
+        intent = new Intent(this,ManagerActivityLollipop.class);
+        intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+        Notification notification;
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
-
-            mBuilder = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
-
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setOngoing(false)
-                    .setContentTitle(getString(R.string.section_photo_sync))
-                    .setContentText(getString(R.string.settings_camera_notif_title))
-                    .setOnlyAlertOnce(true);
-
-            Notification notification = mBuilder.build();
-
-            isForeground = true;
-            startForeground(notificationId,notification);
-
-            try {
-                startUploads();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            //            stopForeground(true);
-//            if (mNotificationManager != null){
-//                mNotificationManager.cancel(notificationId);
-//            }
-//            jobFinished(globalParams, true);
+        }
+    
+        mBuilder = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
+        mBuilder
+                .setSmallIcon(R.drawable.ic_stat_camera_sync)
+                .setContentIntent(pendingIntent)
+                .setOngoing(false)
+                .setContentTitle(getString(R.string.section_photo_sync))
+                .setContentText(getString(R.string.settings_camera_notif_title))
+                .setOnlyAlertOnce(true);
+        notification = mBuilder.build();
+    
+        isForeground = true;
+        startForeground(notificationId,notification);
+        
+        try {
+            startUploads();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -1903,27 +1901,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setContentText(getString(R.string.settings_camera_notif_title))
                     .setOnlyAlertOnce(true);
             notification = mBuilder.getNotification();
-        } else if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            mBuilder
-                    .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setProgress(100,progressPercent,false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentTitle(message)
-                    .setContentInfo(info)
-                    .setContentText(getString(R.string.settings_camera_notif_title))
-                    .setOnlyAlertOnce(true);
-            notification = mBuilder.getNotification();
-//					notification = mBuilder.build();
-        } else {
-            notification = new Notification(R.drawable.ic_stat_camera_sync,null,1);
-            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-            notification.contentView = new RemoteViews(getApplicationContext().getPackageName(),R.layout.download_progress);
-            notification.contentIntent = pendingIntent;
-            notification.contentView.setImageViewResource(R.id.status_icon,R.drawable.ic_stat_camera_sync);
-            notification.contentView.setTextViewText(R.id.status_text,message);
-            notification.contentView.setTextViewText(R.id.progress_text,info);
-            notification.contentView.setProgressBar(R.id.status_progress,100,progressPercent,false);
         }
 
         mNotificationManager.notify(notificationId,notification);
