@@ -53,10 +53,20 @@
         android:layout_height="6dp"
         android:layout_alignTop="@id/recent_chat_list_name"
         android:layout_toRightOf="@id/recent_chat_list_name"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_marginLeft="6dp"
         android:background="@null"
         android:src="@drawable/circle_status_contact_offline" />
+
+    <ImageView
+        android:id="@+id/recent_chat_list_private_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/recent_chat_list_name"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="6dp"
+        android:background="@null"
+        android:src="@drawable/ic_make_private_small" />
 
     <ImageView
         android:id="@+id/recent_chat_list_call_in_progress"

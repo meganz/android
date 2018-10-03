@@ -143,6 +143,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RelativeLayout layoutPendingMessages;
 		ImageView muteIcon;
 		ImageView contactStateIcon;
+		ImageView privateChatIcon;
 		ImageView callInProgressIcon;
 		String contactMail;
 		String fullName = "";
@@ -216,6 +217,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						setUserAvatar(holder, userHandleEncoded);
 					}
 				}
+				((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.GONE);
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.VISIBLE);
 
 				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxWidth(Util.scaleWidthPx(6,outMetrics));
@@ -226,6 +228,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			else{
 				log("Group chat");
 				((ViewHolderNormalChatList)holder).contactStateIcon.setVisibility(View.GONE);
+
+				if(chat.isPublic()){
+					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.GONE);
+				}
+				else{
+					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
+				}
 
 				if (!multipleSelect) {
 					//Multiselect OFF
@@ -512,6 +521,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 			((ViewHolderNormalChatList)holder).contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
+			((ViewHolderNormalChatList)holder).privateChatIcon = (ImageView) v.findViewById(R.id.recent_chat_list_private_icon);
+
 			((ViewHolderNormalChatList)holder).callInProgressIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_in_progress);
 		}
 		else if(viewType == ITEM_VIEW_TYPE_ARCHIVED_CHATS){

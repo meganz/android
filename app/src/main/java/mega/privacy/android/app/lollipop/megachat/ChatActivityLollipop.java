@@ -4201,6 +4201,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("CHANGE_TYPE_ARCHIVE for the chat: "+chat.getChatId());
             setChatSubtitle();
         }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CHAT_MODE)){
+            log("CHANGE_TYPE_CHAT_MODE for the chat: "+chat.getChatId());
+
+        }
+        else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_UPDATE_PREVIEWERS)){
+            log("CHANGE_TYPE_UPDATE_PREVIEWERS for the chat: "+chat.getChatId());
+
+        }
     }
 
     private class IsTypingRunnable implements Runnable{
