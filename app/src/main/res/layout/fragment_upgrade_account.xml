@@ -525,7 +525,8 @@
 				android:background="@android:color/transparent"
 				android:layout_marginLeft="128dp"
 				android:layout_marginRight="8dp"
-				android:layout_marginTop="16dp">
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="16dp">
 				<TextView
 					android:id="@+id/upgrade_account_comment"
 					android:layout_width="wrap_content"
