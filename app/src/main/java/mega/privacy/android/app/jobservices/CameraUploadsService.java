@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -136,7 +137,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     public boolean onStartJob(JobParameters params) {
         log("onStartJob");
 
-        Log.d("Yuan","upload job on start");
+        TL.log(this,"onStartJob" );
         cameraUploadsService = this;
         globalParams = params;
         handler = new Handler();
@@ -1435,6 +1436,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     @Override
     public boolean onStopJob(JobParameters params) {
         log("onStopJob");
+        TL.log(this,"onStopJob" );
 //        stopped = true;
         if (megaApi != null) {
             megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);

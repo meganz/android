@@ -57,6 +57,7 @@ import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1357,7 +1358,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                         startJob(context);
                     }
 				}
-			}, 30 * 1000);
+			}, 5 * 1000);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_WHAT_TO) == 0){
 			switch(Integer.parseInt((String)newValue)){
@@ -1392,9 +1393,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}else{
 			    cancelAllJobs(context);
             }
-			
+
 			handler.postDelayed(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					log("Now I start the service");
@@ -1404,7 +1405,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					    startJob(context);
                     }
 				}
-			}, 30 * 1000);
+			}, 5 * 1000);
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			pinLockCodeTxt = (String) newValue;
