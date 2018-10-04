@@ -170,7 +170,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     long numberToLoad = -1;
 
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
-    private AlertDialog overquotaDialog;
+    private AlertDialog chatAlertDialog;
 
     boolean sendOriginalAttachments = false;
 
@@ -2447,7 +2447,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
-    public void showAlertChatLink(){
+    public void showAlertChatLink(boolean isInvalidPreview){
         log("showAlertChatLink");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -2455,15 +2455,28 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
+                        closeChat();
                         finish();
-                        break;
                 }
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-        String message= getResources().getString(R.string.alert_already_participant_chat_link);
-        builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String message="";
+        if(isInvalidPreview){
+            message= getResources().getString(R.string.alert_invalid_preview);
+        }
+        else{
+            message= getResources().getString(R.string.alert_already_participant_chat_link);
+        }
+
+        builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener);
+
+        chatAlertDialog = builder.create();
+        chatAlertDialog.setCanceledOnTouchOutside(false);
+        chatAlertDialog.setCancelable(false);
+
+        chatAlertDialog.show();
     }
 
     @Override
@@ -4002,10 +4015,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         this.chatRoom = chat;
         if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_CLOSED)){
             log("CHANGE_TYPE_CLOSED for the chat: "+chat.getChatId());
-            log("Permissions for the chat: "+chat.getOwnPrivilege());
-            //Hide field to write
-            setChatSubtitle();
-            supportInvalidateOptionsMenu();
+            int permission = chat.getOwnPrivilege();
+            log("Permissions for the chat: "+permission);
+
+            if(chat.isPreview()){
+                if(permission==MegaChatRoom.PRIV_RM){
+                    //Show alert to user
+                    showAlertChatLink(true);
+                }
+            }
+            else{
+                //Hide field to write
+                setChatSubtitle();
+                supportInvalidateOptionsMenu();
+            }
         }
         else if(chat.hasChanged(MegaChatRoom.CHANGE_TYPE_STATUS)){
             log("CHANGE_TYPE_STATUS for the chat: "+chat.getChatId());
@@ -6138,7 +6161,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
                 if(e.getErrorCode()==MegaChatError.ERROR_EXIST){
                     //ERROR_EXIST - If the user already participates in the chat.
-                    showAlertChatLink();
+                    showAlertChatLink(false);
                 }
                 else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
                     //ERROR_ACCESS If the user is trying to preview a public chat which he was part of -> rejoinChatLink
@@ -6146,8 +6169,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     showConfirmationRejoinChat(request.getUserHandle());
                 }
                 else{
-                    showSnackbar(getString(R.string.error_general_nodes));
-                    emptyTextView.setText(getString(R.string.error_chat_link));
+
+                    if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+                        emptyTextView.setText(getString(R.string.invalid_chat_link));
+                    }
+                    else{
+                        showSnackbar(getString(R.string.error_general_nodes));
+                        emptyTextView.setText(getString(R.string.error_chat_link));
+                    }
+
                     emptyTextView.setVisibility(View.VISIBLE);
                     emptyLayout.setVisibility(View.VISIBLE);
                     chatRelativeLayout.setVisibility(View.GONE);
@@ -6229,10 +6259,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void closeChat(){
-        megaChatApi.closeChatRoom(idChat, this);
+        if(idChat!=-1){
+            megaChatApi.closeChatRoom(idChat, this);
+        }
 
-        if(chatRoom.isPreview()){
-            megaChatApi.closePreview(idChat);
+        if(chatRoom!=null){
+            if(chatRoom.isPreview()){
+                megaChatApi.closePreview(idChat);
+            }
         }
 
         MegaApplication.setClosedChat(true);
@@ -6309,7 +6343,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 }
                 else if(intent.getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
-                    messages.clear();
+                    if(messages!=null){
+                        messages.clear();
+                    }
+
                     adapter.notifyDataSetChanged();
                     closeChat();
                     initAfterIntent(intent, null);
@@ -7180,7 +7217,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             dbH.setCamSyncEnabled(false);
         }
 
-        if(overquotaDialog==null){
+        if(chatAlertDialog ==null){
 
             builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
 
@@ -7194,15 +7231,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
-                    overquotaDialog=null;
+                    chatAlertDialog =null;
                 }
             });
 
-            overquotaDialog = builder.create();
-            overquotaDialog.setCanceledOnTouchOutside(false);
+            chatAlertDialog = builder.create();
+            chatAlertDialog.setCanceledOnTouchOutside(false);
         }
 
-        overquotaDialog.show();
+        chatAlertDialog.show();
     }
 
     public void showUpgradeAccount(){
