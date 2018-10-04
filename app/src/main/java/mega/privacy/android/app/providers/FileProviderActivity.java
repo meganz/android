@@ -1133,6 +1133,24 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
+	public void downloadAndAttachAfterClick(long size, long [] hashes){
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+
+		progressTransfersFinish = 0;
+		clipDataTransfers = null;
+
+		downloadAndAttach(size, hashes);
+	}
+
 	public void downloadAndAttach(long size, long [] hashes){
 		
 		log("downloadAndAttach");
