@@ -19,14 +19,31 @@ public class AndroidMegaRichLinkMessage {
     private MegaNode node = null;
     private boolean isFile;
 
+    private boolean isChat;
+    private String title;
+    private long numParticipants;
+
     public AndroidMegaRichLinkMessage (String url, MegaNode node){
         this.node = node;
         this.url = url;
 
         Uri uri = Uri.parse(url);
-        String server = uri.getAuthority();
 
-        this.server = server;
+        this.server = uri.getAuthority();
+    }
+
+    public AndroidMegaRichLinkMessage (String url, String title, long participants){
+
+        this.url = url;
+
+        Uri uri = Uri.parse(url);
+
+        this.server = uri.getAuthority();
+
+        this.isChat = true;
+
+        this.title = "New chat";
+        this.numParticipants = 5;
     }
 
     public String getUrl() {
@@ -38,7 +55,7 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public String getServer() {
-        return server;
+        return this.server;
     }
 
     public void setServer(String server) {
@@ -102,6 +119,10 @@ public class AndroidMegaRichLinkMessage {
                 log("folder link found");
                 return url;
             }
+            if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
+                log("folder link found");
+                return url;
+            }
         }
 
         return null;
@@ -121,6 +142,30 @@ public class AndroidMegaRichLinkMessage {
             return true;
         }
         return false;
+    }
+
+    public boolean isChat() {
+        return isChat;
+    }
+
+    public void setChat(boolean chat) {
+        isChat = chat;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public long getNumParticipants() {
+        return numParticipants;
+    }
+
+    public void setNumParticipants(long numParticipants) {
+        this.numParticipants = numParticipants;
     }
 
     private static void log(String log) {
