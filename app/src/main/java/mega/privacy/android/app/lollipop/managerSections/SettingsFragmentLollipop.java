@@ -1311,6 +1311,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		cameraUploadCategory.setEnabled(isOnline);
 		securityCategory.setEnabled(isOnline);
 		qrCodeCategory.setEnabled(isOnline);
+		twoFACategory.setEnabled(isOnline);
 
 		//Rubbish bin scheduler
 		daysRbSchedulerPreference.setEnabled(isOnline);

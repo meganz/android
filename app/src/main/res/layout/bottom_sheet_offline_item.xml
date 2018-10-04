@@ -176,35 +176,12 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/option_delete_offline_layout"
+                android:id="@+id/separator_rk"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_delete_offline_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:layout_marginLeft="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_remove"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_delete_offline_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
-                    android:text="@string/context_delete_offline"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/divider_upgrade_account"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -233,6 +210,45 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/external_play"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_open"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/divider_upgrade_account"/>
+
+            <LinearLayout
+                android:id="@+id/option_delete_offline_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_delete_offline_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:layout_marginLeft="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_remove"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_delete_offline_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginLeft="18dp"
+                    android:text="@string/context_delete_offline"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>

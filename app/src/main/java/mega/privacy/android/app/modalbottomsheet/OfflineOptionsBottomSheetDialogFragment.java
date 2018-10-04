@@ -133,6 +133,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
+        LinearLayout separatorRK = (LinearLayout) contentView.findViewById(R.id.separator_rk);
+        LinearLayout separatorOpen = (LinearLayout) contentView.findViewById(R.id.separator_open);
+
         nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
@@ -140,9 +143,11 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
 
             if (MimeTypeList.typeForName(nodeOffline.getName()).isVideoReproducible() || MimeTypeList.typeForName(nodeOffline.getName()).isVideo() || MimeTypeList.typeForName(nodeOffline.getName()).isAudio()) {
                 optionOpenWith.setVisibility(View.VISIBLE);
+                separatorOpen.setVisibility(View.VISIBLE);
             }
             else {
                 optionOpenWith.setVisibility(View.GONE);
+                separatorOpen.setVisibility(View.GONE);
             }
 
             nodeName.setText(nodeOffline.getName());
@@ -166,12 +171,14 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
                 copyClip.setVisibility(View.VISIBLE);
                 saveFilesystem.setVisibility(View.VISIBLE);
+                separatorRK.setVisibility(View.VISIBLE);
             }
             else{
 
                 optionPrint.setVisibility(View.GONE);
                 copyClip.setVisibility(View.GONE);
                 saveFilesystem.setVisibility(View.GONE);
+                separatorRK.setVisibility(View.GONE);
 
                 log("Set node info");
                 String path=null;
