@@ -224,15 +224,19 @@
             android:id="@+id/upgrade_navigation_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:elevation="6dp"
             android:background="@drawable/background_button_white"
             android:textColor="@color/accentColor"
             android:fontFamily="roboto"
+            android:layout_marginBottom="40dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_marginTop="14dp"
             android:textSize="14sp"
-            android:text="@string/my_account_upgrade_pro"
-            android:elevation="1dp"
-            android:stateListAnimator="@anim/button_upgrade_elevation"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="14dp"/>
+            android:text="@string/my_account_upgrade_pro"/>
 
     </LinearLayout>
 

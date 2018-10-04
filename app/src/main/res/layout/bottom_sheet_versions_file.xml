@@ -87,7 +87,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -134,6 +133,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:background="@color/sliding_panel_separator"/>
+
+            <LinearLayout
                 android:id="@+id/option_revert_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -163,6 +168,14 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_revert"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/option_delete_layout"

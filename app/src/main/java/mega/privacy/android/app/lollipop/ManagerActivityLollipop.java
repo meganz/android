@@ -546,7 +546,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem rubbishBinMenuItem;
 
-	int fromTakePicture = -1;
+	public int fromTakePicture = -1;
 
 	public static AlertDialog rememberPasswordDialog;
 	private TextView rememberPasswordDialogText;
@@ -1870,13 +1870,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
 			@Override
 			public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
+				if (!Util.isOnline(managerActivity)) {
+					disableNavigationViewLayout();
+				}
+				else {
+					resetNavigationViewLayout();
+				}
 			}
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
 				if (!Util.isOnline(managerActivity)) {
 					disableNavigationViewLayout();
+				}
+				else {
+					resetNavigationViewLayout();
 				}
 			}
 
@@ -1912,7 +1920,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		BottomNavigationItemView itemView = (BottomNavigationItemView) menuView.getChildAt(2);
 		chatBadge = LayoutInflater.from(this).inflate(R.layout.bottom_chat_badge, menuView, false);
 		itemView.addView(chatBadge);
-		chatBadge.setVisibility(View.GONE);
+		setChatBadge();
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
 
@@ -4596,9 +4604,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				log("Change to OFFLINE MODE");
-				if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.SAVED_FOR_OFFLINE || drawerItem == DrawerItem.CHAT) {
-					clickDrawerItemLollipop(drawerItem);
-				}
+				clickDrawerItemLollipop(drawerItem);
 			}
 
 			supportInvalidateOptionsMenu();
@@ -6148,9 +6154,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if (isList){
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
 					gridSmallLargeMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -6195,9 +6203,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if (isList){
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
 
 					if(rubbishBinFLol.getItemCount()>0){
@@ -6260,9 +6270,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if (isList){
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
 					gridSmallLargeMenuItem.setVisible(false);
 				}
@@ -6457,9 +6469,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if (isList){
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
 
 					searchMenuItem.setVisible(true);
@@ -6573,9 +6587,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						if (isList){
 							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+							thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 						}
 						else{
 							thumbViewMenuItem.setTitle(getString(R.string.action_list));
+							thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 						}
 					}
 				}
@@ -6630,9 +6646,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 						if (isList){
 							thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+							thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 						}
 						else{
 							thumbViewMenuItem.setTitle(getString(R.string.action_list));
+							thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 						}
 					}
 				}
@@ -6701,9 +6719,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					if (isList){
 						thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 					}
 
 					gridSmallLargeMenuItem.setVisible(false);
@@ -6750,7 +6770,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					logoutMenuItem.setVisible(false);
 					changePass.setVisible(false);
 					killAllSessions.setVisible(false);
-					thumbViewMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					forgotPassMenuItem.setVisible(false);
 				}
@@ -6793,7 +6812,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
-					thumbViewMenuItem.setVisible(false);
 					logoutMenuItem.setVisible(false);
 					killAllSessions.setVisible(false);
 					logoutMenuItem.setVisible(false);
@@ -6845,9 +6863,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 								if (isList){
 									thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+									thumbViewMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_menu_gridview, R.color.black));
 								}
 								else{
 									thumbViewMenuItem.setTitle(getString(R.string.action_list));
+									thumbViewMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_list_view));
 								}
 							}
 							else{

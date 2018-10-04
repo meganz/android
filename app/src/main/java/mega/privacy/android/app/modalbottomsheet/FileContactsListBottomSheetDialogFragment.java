@@ -134,6 +134,8 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         optionChangePermissions.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+
         if(contact!=null){
             fullName = getFullName(contact);
         }
@@ -145,9 +147,11 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
         if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
             optionInfo.setVisibility(View.VISIBLE);
+            separatorInfo.setVisibility(View.VISIBLE);
         }
         else{
             optionInfo.setVisibility(View.GONE);
+            separatorInfo.setVisibility(View.GONE);
         }
 
         titleNameContactPanel.setText(fullName);
