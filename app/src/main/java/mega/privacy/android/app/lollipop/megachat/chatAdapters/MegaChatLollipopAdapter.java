@@ -5458,15 +5458,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 for (int i = 1; i < userCount; i++) {
                     name.append(", " + message.getUserName(i));
                 }
-                log("Names of attached contacts: " + name);
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactEmail.setText(name);
-
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 ((ViewHolderMessageChat) holder).contentOwnMessageContactName.setText(email);
-
-                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, true);
+                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, true, userCount);
             }
-
 
             if (!multipleSelect) {
                 if (positionClicked != -1) {
@@ -5656,8 +5652,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 ((ViewHolderMessageChat) holder).contentContactMessageContactEmail.setText(email);
-
-                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, false);
+                createDefaultAvatar(((ViewHolderMessageChat) holder), null, email, false, userCount);
             }
 
             if (!multipleSelect) {
@@ -6595,10 +6590,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         ChatAttachmentAvatarListener listener;
         if (myUserHandle == message.getUserHandle()) {
-            createDefaultAvatar(holder, userHandleEncoded, name, true);
+            createDefaultAvatar(holder, userHandleEncoded, name, true,0);
             listener = new ChatAttachmentAvatarListener(context, holder, this, true);
         } else {
-            createDefaultAvatar(holder, userHandleEncoded, name, false);
+            createDefaultAvatar(holder, userHandleEncoded, name, false, 0);
             listener = new ChatAttachmentAvatarListener(context, holder, this, false);
         }
 
@@ -6773,8 +6768,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public void createDefaultAvatar(ViewHolderMessageChat holder, String userHandle, String name, boolean isMyMsg) {
-        log("createDefaultAvatar()");
+    public void createDefaultAvatar(ViewHolderMessageChat holder, String userHandle, String name, boolean isMyMsg, long userCount) {
+        log(" createDefaultAvatar()");
 
         Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
@@ -6809,29 +6804,58 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (isMyMsg) {
             holder.contentOwnMessageContactThumb.setImageBitmap(defaultAvatar);
+            if(userHandle!=null){
+                if (name != null) {
+                    if (name.trim().length() > 0) {
+                        String firstLetter = name.charAt(0) + "";
+                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                        holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
+                        holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
+                        holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    }
+                    holder.contentOwnMessageContactInitialLetter.setTextSize(24);
 
-            if (name != null) {
-                if (name.trim().length() > 0) {
-                    String firstLetter = name.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                }
+            }else{
+                if (name != null) {
+                    String firstLetter = userCount + "";
+
+//                    holder.contentOwnMessageContactInitialLetter.setText(name);
                     holder.contentOwnMessageContactInitialLetter.setText(firstLetter);
                     holder.contentOwnMessageContactInitialLetter.setTextColor(Color.WHITE);
                     holder.contentOwnMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    holder.contentOwnMessageContactInitialLetter.setTextSize(24);
+
                 }
             }
-            holder.contentOwnMessageContactInitialLetter.setTextSize(24);
+
         } else {
             holder.contentContactMessageContactThumb.setImageBitmap(defaultAvatar);
-            if (name != null) {
-                if (name.trim().length() > 0) {
-                    String firstLetter = name.charAt(0) + "";
-                    firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+
+            if(userHandle!=null){
+                if (name != null) {
+                    if (name.trim().length() > 0) {
+                        String firstLetter = name.charAt(0) + "";
+                        firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+                        holder.contentContactMessageContactInitialLetter.setText(firstLetter);
+                        holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
+                        holder.contentContactMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    }
+                    holder.contentContactMessageContactInitialLetter.setTextSize(24);
+
+                }
+            }else{
+                if (name != null) {
+//                    holder.contentContactMessageContactInitialLetter.setText(name);
+                    String firstLetter = userCount + "";
                     holder.contentContactMessageContactInitialLetter.setText(firstLetter);
                     holder.contentContactMessageContactInitialLetter.setTextColor(Color.WHITE);
                     holder.contentContactMessageContactInitialLetter.setVisibility(View.VISIBLE);
+                    holder.contentContactMessageContactInitialLetter.setTextSize(24);
+
                 }
             }
-            holder.contentContactMessageContactInitialLetter.setTextSize(24);
+
         }
     }
 

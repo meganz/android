@@ -48,16 +48,17 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -136,6 +137,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
 	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
 	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
+	public static String KEY_ENABLE_RB_SCHEDULER = "settings_rb_scheduler_switch";
+	public static String KEY_DAYS_RB_SCHEDULER = "settings_days_rb_scheduler";
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
@@ -228,6 +231,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference clearVersionsFileManagement;
 	SwitchPreference enableVersionsSwitch;
 	TwoLineCheckPreference enableVersionsCheck;
+
+	SwitchPreference enableRbSchedulerSwitch;
+	TwoLineCheckPreference enableRbSchedulerCheck;
+	Preference daysRbSchedulerPreference;
 
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
@@ -469,6 +476,39 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 
 		updateEnabledFileVersions();
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableRbSchedulerSwitch = (SwitchPreference) findPreference(KEY_ENABLE_RB_SCHEDULER);
+		}
+		else{
+			enableRbSchedulerCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_RB_SCHEDULER);
+		}
+
+		daysRbSchedulerPreference = (Preference) findPreference(KEY_DAYS_RB_SCHEDULER);
+
+		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
+			log("RubbishBinAutopurgeEnabled --> request userAttribute info");
+			megaApi.getRubbishBinAutopurgePeriod((ManagerActivityLollipop)context);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fileManagementCategory.addPreference(enableRbSchedulerSwitch);
+			}
+			else{
+				fileManagementCategory.addPreference(enableRbSchedulerCheck);
+			}
+
+			fileManagementCategory.addPreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
+		}
+		else{
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fileManagementCategory.removePreference(enableRbSchedulerSwitch);
+			}
+			else{
+				fileManagementCategory.removePreference(enableRbSchedulerCheck);
+			}
+
+			fileManagementCategory.removePreference(daysRbSchedulerPreference);
+		}
 
 		recoveryKey = findPreference(KEY_RECOVERY_KEY);
 		recoveryKey.setOnPreferenceClickListener(this);
@@ -1243,6 +1283,32 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		autoawayChatCategory.setEnabled(isOnline);
 		persistenceChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
+		securityCategory.setEnabled(isOnline);
+		qrCodeCategory.setEnabled(isOnline);
+
+		//Rubbish bin scheduler
+		daysRbSchedulerPreference.setEnabled(isOnline);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableRbSchedulerSwitch.setEnabled(isOnline);
+		}
+		else{
+			enableRbSchedulerCheck.setEnabled(isOnline);
+		}
+
+		//File versioning
+		fileVersionsFileManagement.setEnabled(isOnline);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch.setEnabled(isOnline);
+		}
+		else{
+			enableVersionsCheck.setEnabled(isOnline);
+		}
+
+		//Use of HTTP
+		useHttpsOnly.setEnabled(isOnline);
+
+		//Cancel account
+		cancelAccount.setEnabled(isOnline);
 	}
 
 	@Override
@@ -1283,7 +1349,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 30 * 1000);
 		}
@@ -1309,18 +1377,24 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 			cameraUploadWhat.setSummary(fileUpload);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+			dbH.setCamSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 30 * 1000);
 		}
@@ -1623,7 +1697,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -1786,7 +1862,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -1835,10 +1913,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setCamSyncEnabled(false);
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryUpload = false;
-				Intent stopIntent = null;
-				stopIntent = new Intent(context, CameraSyncService.class);
-				stopIntent.setAction(CameraSyncService.ACTION_STOP);
-				context.startService(stopIntent);
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent stopIntent = null;
+					stopIntent = new Intent(context, CameraSyncService.class);
+					stopIntent.setAction(CameraSyncService.ACTION_STOP);
+					context.startService(stopIntent);
+				}
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
@@ -1996,6 +2076,64 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
 				}
 			}
+		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
+			log("Change KEY_ENABLE_RB_SCHEDULER");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableRbSchedulerSwitch.isChecked()){
+					log("Disable RB schedule");
+					//Check the account type
+					MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+					if(myAccountInfo!=null ){
+						if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							((ManagerActivityLollipop)context).showRBNotDisabledDialog();
+							enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+							enableRbSchedulerSwitch.setChecked(true);
+							enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+						}
+						else{
+							((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+						}
+					}
+				}
+				else{
+					log("ENABLE RB schedule");
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
+				}
+			}
+			else{
+				if(!enableRbSchedulerCheck.isChecked()){
+					MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+					if(myAccountInfo!=null ){
+						if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							((ManagerActivityLollipop)context).showRBNotDisabledDialog();
+							enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+							enableRbSchedulerCheck.setChecked(true);
+							enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+						}
+						else{
+							((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+						}
+					}
+				}
+				else{
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
+				}
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			((ManagerActivityLollipop)context).showRbSchedulerValueDialog(false);
 		}
 		else if(preference.getKey().compareTo(KEY_CHAT_AUTOAWAY) == 0){
 			if (!Util.isOnline(context)){
@@ -2252,18 +2390,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}
@@ -2301,18 +2443,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}
@@ -2323,18 +2469,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
-			
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
+
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}		
@@ -2351,18 +2501,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
-				
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent photosVideosIntent = null;
+					photosVideosIntent = new Intent(context, CameraSyncService.class);
+					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+					context.startService(photosVideosIntent);
+				}
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -2386,18 +2540,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
-				
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent photosVideosIntent = null;
+					photosVideosIntent = new Intent(context, CameraSyncService.class);
+					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+					context.startService(photosVideosIntent);
+				}
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -2586,6 +2744,71 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				enableVersionsCheck.setChecked(false);
 			}
 			enableVersionsCheck.setOnPreferenceClickListener(this);
+		}
+	}
+
+	public void updateRBScheduler(long daysCount){
+		log("updateRBScheduler: "+daysCount);
+
+		if(daysCount<1){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+				enableRbSchedulerSwitch.setChecked(false);
+				enableRbSchedulerSwitch.setSummary(null);
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+			}
+			else{
+				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+				enableRbSchedulerCheck.setChecked(false);
+                enableRbSchedulerCheck.setSummary(null);
+				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+			}
+
+			//Hide preference to show days
+			fileManagementCategory.removePreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(null);
+		}
+		else{
+			MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+				enableRbSchedulerSwitch.setChecked(true);
+				if(myAccountInfo!=null ){
+
+					String subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle);
+
+					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+						enableRbSchedulerSwitch.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_FREE));
+					}
+					else{
+						enableRbSchedulerSwitch.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_PRO));
+					}
+				}
+
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+			}
+			else{
+				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+				enableRbSchedulerCheck.setChecked(true);
+				if(myAccountInfo!=null ){
+					String subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle);
+
+					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+						enableRbSchedulerCheck.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_FREE));
+					}
+					else{
+						enableRbSchedulerCheck.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_PRO));
+					}
+				}
+
+				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+			}
+
+			//Show and set preference to show days
+			fileManagementCategory.addPreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
+			daysRbSchedulerPreference.setSummary(getString(R.string.settings_rb_scheduler_select_days_subtitle, daysCount));
 		}
 	}
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fcm;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -52,6 +53,9 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     private String lastName = "";
 
     private NotificationCompat.Builder mBuilderCompat;
+
+    private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CONTACTS_ID;
+    private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CONTACTS_NAME;
 
     public static ContactsAdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi) {
         Context appContext = context.getApplicationContext();
@@ -279,39 +283,75 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_IPC);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)crToShow.getHandle() , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        Notification.Builder notificationBuilder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentTitle(context.getString(R.string.title_contact_request_notification))
-                .setContentText(notificationContent)
-                .setStyle(new Notification.BigTextStyle().bigText(notificationContent))
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .setGroup(GROUP_KEY_IPC);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            notificationManager.createNotificationChannel(channel);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
-        }
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            notificationBuilderO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentTitle(context.getString(R.string.title_contact_request_notification))
+                    .setContentText(notificationContent)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationContent))
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setGroup(GROUP_KEY_IPC)
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
 
-        if(beep){
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            notificationBuilder.setSound(defaultSoundUri);
-            notificationBuilder.setVibrate(new long[] {0, 500});
-        }
+            if (beep) {
+                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                notificationBuilderO.setSound(defaultSoundUri);
+                notificationBuilderO.setVibrate(new long[]{0, 500});
+            }
 
-        Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
-        if(largeIcon!=null){
-            notificationBuilder.setLargeIcon(largeIcon);
-        }
+            Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
+            if (largeIcon != null) {
+                notificationBuilderO.setLargeIcon(largeIcon);
+            }
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        }
-        else{
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-        }
+            notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
 
-        return notificationBuilder.build();
+            return notificationBuilderO.build();
+        }
+        else {
+
+            Notification.Builder notificationBuilder = new Notification.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentTitle(context.getString(R.string.title_contact_request_notification))
+                    .setContentText(notificationContent)
+                    .setStyle(new Notification.BigTextStyle().bigText(notificationContent))
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setGroup(GROUP_KEY_IPC);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+
+            if (beep) {
+                Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                notificationBuilder.setSound(defaultSoundUri);
+                notificationBuilder.setVibrate(new long[]{0, 500});
+            }
+
+            Bitmap largeIcon = createDefaultAvatar(crToShow.getSourceEmail());
+            if (largeIcon != null) {
+                notificationBuilder.setLargeIcon(largeIcon);
+            }
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                //API 25 = Android 7.1
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            } else {
+                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
+
+            return notificationBuilder.build();
+        }
     }
 
     public Notification buildAPCNotification() {
@@ -336,36 +376,69 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        Notification.Builder notificationBuilder = new Notification.Builder(context)
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentTitle(title)
-                .setContentText(email)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .setGroup(GROUP_KEY_APC);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            notificationManager.createNotificationChannel(channel);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            notificationBuilderO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentTitle(title)
+                    .setContentText(email)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setGroup(GROUP_KEY_APC)
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            notificationBuilderO.setSound(defaultSoundUri);
+            notificationBuilderO.setVibrate(new long[]{0, 500});
+
+            Bitmap largeIcon = setUserAvatar(email);
+            if (largeIcon != null) {
+                notificationBuilderO.setLargeIcon(largeIcon);
+            }
+
+            notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
+
+            return notificationBuilderO.build();
         }
+        else {
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        notificationBuilder.setSound(defaultSoundUri);
-        notificationBuilder.setVibrate(new long[] {0, 500});
+            Notification.Builder notificationBuilder = new Notification.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentTitle(title)
+                    .setContentText(email)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setGroup(GROUP_KEY_APC);
 
-        Bitmap largeIcon = setUserAvatar(email);
-        if(largeIcon!=null){
-            notificationBuilder.setLargeIcon(largeIcon);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            notificationBuilder.setSound(defaultSoundUri);
+            notificationBuilder.setVibrate(new long[]{0, 500});
+
+            Bitmap largeIcon = setUserAvatar(email);
+            if (largeIcon != null) {
+                notificationBuilder.setLargeIcon(largeIcon);
+            }
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                //API 25 = Android 7.1
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+            } else {
+                notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
+
+            return notificationBuilder.build();
         }
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
-            //API 25 = Android 7.1
-            notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        }
-        else{
-            notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
-        }
-
-        return notificationBuilder.build();
     }
 
     public Bitmap createDefaultAvatar(String email){
@@ -470,23 +543,46 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_IPC);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            notificationManager.createNotificationChannel(channel);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            builder.setColor(ContextCompat.getColor(context,R.color.mega));
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            notificationBuilderO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setShowWhen(true)
+                    .setGroup(groupKey)
+                    .setGroupSummary(true)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
+
+            return notificationBuilderO.build();
         }
-        builder.setSmallIcon(R.drawable.ic_stat_notify)
-                .setShowWhen(true)
-                .setGroup(groupKey)
-                .setGroupSummary(true)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+        else {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            builder.setColor(ContextCompat.getColor(context,R.color.mega));
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+            builder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setShowWhen(true)
+                    .setGroup(groupKey)
+                    .setGroupSummary(true)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+
+            return builder.build();
         }
-
-        return builder.build();
     }
 
     public Notification buildSummaryAPC(String groupKey) {
@@ -495,20 +591,43 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 2 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            notificationManager.createNotificationChannel(channel);
 
-        builder.setSmallIcon(R.drawable.ic_stat_notify)
-                .setShowWhen(true)
-                .setGroup(groupKey)
-                .setGroupSummary(true)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            notificationBuilderO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setShowWhen(true)
+                    .setGroup(groupKey)
+                    .setGroupSummary(true)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            builder.setColor(ContextCompat.getColor(context,R.color.mega));
+            return notificationBuilderO.build();
         }
+        else {
 
-        return builder.build();
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+            builder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setShowWhen(true)
+                    .setGroup(groupKey)
+                    .setGroupSummary(true)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+
+            return builder.build();
+        }
     }
 
     public void removeAllIncomingContactNotifications(){
@@ -522,40 +641,55 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
     public void showSimpleNotification(){
         log("showSimpleNotification");
 
-        mBuilderCompat = new NotificationCompat.Builder(context);
-
-        if(notificationManager == null){
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
-
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(Constants.ACTION_CHAT_SUMMARY);
         intent.putExtra("CHAT_ID", -1);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true).setTicker("Chat activity")
-                .setContentTitle("Chat activity").setContentText("You may have new messages")
-                .setOngoing(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            notificationManager.createNotificationChannel(channel);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            mBuilderCompat.setColor(ContextCompat.getColor(context,R.color.mega));
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            notificationBuilderO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true).setTicker("Chat activity")
+                    .setContentTitle("Chat activity").setContentText("You may have new messages")
+                    .setOngoing(false)
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
+
+            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
         }
+        else {
+            mBuilderCompat = new NotificationCompat.Builder(context);
 
-        notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true).setTicker("Chat activity")
+                    .setContentTitle("Chat activity").setContentText("You may have new messages")
+                    .setOngoing(false);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+
+            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
+        }
     }
 
     public void showSimpleNotificationAPC(){
         log("showSimpleNotificationAPC");
-
-        mBuilderCompat = new NotificationCompat.Builder(context);
-
-        if(notificationManager == null){
-            notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        }
 
         String title = context.getString(R.string.title_acceptance_contact_request_notification);
         String fullName = "";
@@ -576,35 +710,73 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         intent.setAction(Constants.ACTION_OPEN_CONTACTS_SECTION);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
 
-        mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true).setTicker(title)
-                .setContentTitle(title).setContentText(email)
-                .setOngoing(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            if (notificationManager == null) {
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            notificationManager.createNotificationChannel(channel);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            mBuilderCompat.setColor(ContextCompat.getColor(context,R.color.mega));
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            notificationBuilderO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true).setTicker(title)
+                    .setContentTitle(title).setContentText(email)
+                    .setOngoing(false)
+                    .setColor(ContextCompat.getColor(context, R.color.mega));
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            notificationBuilderO.setSound(defaultSoundUri);
+            notificationBuilderO.setVibrate(new long[]{0, 500});
+
+            Bitmap largeIcon = setUserAvatar(email);
+            if (largeIcon != null) {
+                notificationBuilderO.setLargeIcon(largeIcon);
+            }
+
+            notificationBuilderO.setPriority(NotificationManager.IMPORTANCE_HIGH);
+
+            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, notificationBuilderO.build());
         }
+        else {
 
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        mBuilderCompat.setSound(defaultSoundUri);
-        mBuilderCompat.setVibrate(new long[] {0, 500});
+            mBuilderCompat = new NotificationCompat.Builder(context);
 
-        Bitmap largeIcon = setUserAvatar(email);
-        if(largeIcon!=null){
-            mBuilderCompat.setLargeIcon(largeIcon);
+            if(notificationManager == null){
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true).setTicker(title)
+                    .setContentTitle(title).setContentText(email)
+                    .setOngoing(false);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.mega));
+            }
+
+            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            mBuilderCompat.setSound(defaultSoundUri);
+            mBuilderCompat.setVibrate(new long[]{0, 500});
+
+            Bitmap largeIcon = setUserAvatar(email);
+            if (largeIcon != null) {
+                mBuilderCompat.setLargeIcon(largeIcon);
+            }
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                //API 25 = Android 7.1
+                mBuilderCompat.setPriority(Notification.PRIORITY_HIGH);
+            } else {
+                mBuilderCompat.setPriority(NotificationManager.IMPORTANCE_HIGH);
+            }
+
+            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
         }
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1){
-            //API 25 = Android 7.1
-            mBuilderCompat.setPriority(Notification.PRIORITY_HIGH);
-        }
-        else{
-            mBuilderCompat.setPriority(NotificationManager.IMPORTANCE_HIGH);
-        }
-
-        notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
     }
 
     public static void log(String message) {

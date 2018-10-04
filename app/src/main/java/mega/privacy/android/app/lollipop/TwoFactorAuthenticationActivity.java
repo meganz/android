@@ -13,7 +13,6 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -25,6 +24,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,18 +40,20 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
@@ -71,7 +73,9 @@ import static android.graphics.Color.WHITE;
 public class TwoFactorAuthenticationActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface, View.OnLongClickListener, View.OnFocusChangeListener{
 
     final int LENGTH_SEED = 13;
-    final int WIDTH = 700;
+    final int WIDTH = 520;
+    final int FACTOR = 65;
+    final float RESIZE = 8f;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -136,6 +140,9 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
     DisplayMetrics outMetrics;
     String url;
 
+    AlertDialog noAppsDialog;
+    boolean isNoAppsDialogShown = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,6 +186,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (qrByteArray != null){
                 qr = BitmapFactory.decodeByteArray(qrByteArray, 0, qrByteArray.length);
             }
+            isNoAppsDialogShown = savedInstanceState.getBoolean("isNoAppsDialogShown", false);
         }
         else {
             rkSaved = false;
@@ -188,6 +196,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             if (getIntent() != null) {
                 newAccount = getIntent().getBooleanExtra("newAccount", false);
             }
+            isNoAppsDialogShown = false;
         }
 
         container2FA = (RelativeLayout) findViewById(R.id.container_2fa);
@@ -623,6 +632,10 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         else {
             megaApi.multiFactorAuthGetCode(this);
         }
+
+        if (isNoAppsDialogShown) {
+            showAlertNotAppAvailable();
+        }
     }
 
     @Override
@@ -746,11 +759,19 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         url = null;
         String myEmail = megaApi.getMyEmail();
+//        String myEmail = "aw+@mega.nz";
+//        String myEmail = "";
+//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@yopmail.com";
+//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@gmail.com";
+//        String myEmail = "abcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyzabcdabcdefghijklmnopqrstuvwxyz@gmail.com";
+
         if (myEmail != null & seed != null){
             url = getString(R.string.url_qr_2fa, myEmail, seed);
             setSeed();
         }
         if (url != null) {
+            Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
+            hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
             BitMatrix bitMatrix = null;
             try {
                 bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, null);
@@ -761,57 +782,64 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             int w = bitMatrix.getWidth();
             int h = bitMatrix.getHeight();
             int[] pixels = new int[w * h];
-            float resize = 15;
+            int width = (w * WIDTH) / FACTOR;
 
-            qr = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
+            qr = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(qr);
             Paint paint = new Paint();
             paint.setAntiAlias(true);
             paint.setColor(WHITE);
-            c.drawRect(0, 0, WIDTH, WIDTH, paint);
+            c.drawRect(0, 0, width, width, paint);
             paint.setColor(BLACK);
+
+            float size = w - 12;
 
             for (int y = 0; y < h; y++) {
                 int offset = y * w;
                 for (int x = 0; x < w; x++) {
                     pixels[offset + x] = bitMatrix.get(x, y) ? BLACK : WHITE;
                     if (pixels[offset + x] == BLACK){
-                        c.drawCircle(x*resize, y*resize, 5, paint);
+                        c.drawCircle(x*RESIZE, y*RESIZE, 3.5f, paint);
                     }
                 }
             }
+
+//            8.5 width
             paint.setColor(WHITE);
-            c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
-            c.drawRect(36.5f*resize, 3*resize, 45*resize, 11.5f*resize, paint);
-            c.drawRect(3*resize, 36.5f*resize, 11.5f*resize, 45*resize, paint);
+            c.drawRect(3*RESIZE, 3*RESIZE, 11.5f*RESIZE, 11.5f*RESIZE, paint);
+            c.drawRect(size*RESIZE, 3*RESIZE, (size+8.5f)*RESIZE, 11.5f*RESIZE, paint);
+            c.drawRect(3*RESIZE, size*RESIZE, 11.5f*RESIZE, (size+8.5f)*RESIZE, paint);
 
             paint.setColor(BLACK);
 
             if (Build.VERSION.SDK_INT >= 21) {
-                c.drawRoundRect(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize, 30, 30, paint);
-                c.drawRoundRect(37.25f * resize, 3.75f * resize, 44.25f * resize, 10.75f * resize, 30, 30, paint);
-                c.drawRoundRect(3.75f * resize, 37.25f * resize, 10.75f * resize, 44.25f * resize, 30, 30, paint);
+                c.drawRoundRect(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE, 15, 15, paint);
+//                7 width, 0.75 more than last
+                c.drawRoundRect((size+0.75f) * RESIZE, 3.75f * RESIZE, (size+0.75f+7f) * RESIZE, 10.75f * RESIZE, 15, 15, paint);
+                c.drawRoundRect(3.75f * RESIZE, (size+0.75f) * RESIZE, 10.75f * RESIZE, (size+0.75f+7f) * RESIZE, 15, 15, paint);
 
                 paint.setColor(WHITE);
-                c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
-                c.drawRoundRect(38.25f * resize, 4.75f * resize, 43.25f * resize, 9.75f * resize, 25, 25, paint);
-                c.drawRoundRect(4.75f * resize, 38.25f * resize, 9.75f * resize, 43.25f * resize, 25, 25, paint);
+                c.drawRoundRect(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
+//                5 width, 1.75 more than first
+                c.drawRoundRect((size+1.75f) * RESIZE, 4.75f * RESIZE, (size+1.75f+5f) * RESIZE, 9.75f * RESIZE, 12.5f, 12.5f, paint);
+                c.drawRoundRect(4.75f * RESIZE, (size+1.75f) * RESIZE, 9.75f * RESIZE, (size+1.75f+5f) * RESIZE, 12.5f, 12.5f, paint);
             }
             else {
-                c.drawRoundRect(new RectF(3.75f * resize, 3.75f * resize, 10.75f * resize, 10.75f * resize), 30, 30, paint);
-                c.drawRoundRect(new RectF(37.25f * resize, 3.75f * resize, 44.25f * resize, 10.75f * resize), 30, 30, paint);
-                c.drawRoundRect(new RectF(3.75f * resize, 37.25f * resize, 10.75f * resize, 44.25f * resize), 30, 30, paint);
+                c.drawRoundRect(new RectF(3.75f * RESIZE, 3.75f * RESIZE, 10.75f * RESIZE, 10.75f * RESIZE), 15, 15, paint);
+                c.drawRoundRect(new RectF((size+0.75f) * RESIZE, 3.75f * RESIZE, (size+0.75f+7f) * RESIZE, 10.75f * RESIZE), 15, 15, paint);
+                c.drawRoundRect(new RectF(3.75f * RESIZE, (size+0.75f) * RESIZE, 10.75f * RESIZE, (size+0.75f+7f) * RESIZE), 15, 15, paint);
 
                 paint.setColor(WHITE);
-                c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
-                c.drawRoundRect(new RectF(38.25f * resize, 4.75f * resize, 43.25f * resize, 9.75f * resize), 25, 25, paint);
-                c.drawRoundRect(new RectF(4.75f * resize, 38.25f * resize, 9.75f * resize, 43.25f * resize), 25, 25, paint);
+                c.drawRoundRect(new RectF(4.75f * RESIZE, 4.75f * RESIZE, 9.75f * RESIZE, 9.75f * RESIZE), 12.5f, 12.5f, paint);
+                c.drawRoundRect(new RectF((size+1.75f) * RESIZE, 4.75f * RESIZE, (size+1.75f+5f) * RESIZE, 9.75f * RESIZE), 12.5f, 12.5f, paint);
+                c.drawRoundRect(new RectF(4.75f * RESIZE, (size+1.75f) * RESIZE, 9.75f * RESIZE, (size+1.75f+5f) * RESIZE), 12.5f, 12.5f, paint);
             }
 
             paint.setColor(BLACK);
-            c.drawCircle(7.25f*resize, 7.25f*resize, 17.5f, paint);
-            c.drawCircle(40.75f*resize, 7.25f*resize, 17.5f, paint);
-            c.drawCircle(7.25f*resize, 40.75f*resize, 17.5f, paint);
+            c.drawCircle(7.25f*RESIZE, 7.25f*RESIZE, 12f, paint);
+//            4.25 more than first
+            c.drawCircle((size+4.25f)*RESIZE, 7.25f*RESIZE, 12f, paint);
+            c.drawCircle(7.25f*RESIZE, (size+4.25f)*RESIZE, 12f, paint);
 
             if (qr != null){
                 qrImage.setImageBitmap(qr);
@@ -842,6 +870,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         outState.putBoolean("isErrorShown", isErrorShown);
         outState.putBoolean("firstTime", firstTime);
         outState.putBoolean("rkSaved", rkSaved);
+        outState.putBoolean("isNoAppsDialogShown", isNoAppsDialogShown);
 
         if (scanOrCopyIsShown){
             log("scanOrCopyIsShown");
@@ -944,37 +973,51 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
                 this.finish();
                 break;
             }
+            case R.id.cancel_button_no_app: {
+                try {
+                    noAppsDialog.dismiss();
+                }catch (Exception e){}
+                isNoAppsDialogShown = false;
+                break;
+            }
+            case R.id.open_button_no_app: {
+                try {
+                    noAppsDialog.dismiss();
+                }catch (Exception e){}
+                isNoAppsDialogShown = false;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
+                startActivity(intent);
+                break;
+            }
         }
     }
 
     void showAlertNotAppAvailable () {
+        log("showAlertNotAppAvailable");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(15, outMetrics), Util.scaleWidthPx(15, outMetrics), 0);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_no_authentication_apps, null);
+        builder.setView(v);
 
-        final TextView text = new TextView(this);
-        text.setText(getString(R.string.intent_not_available_2fa)+".\n\n"+getString(R.string.open_play_store_2fa));
-        text.setTextSize(15);
-        text.setGravity(Gravity.CENTER_HORIZONTAL);
-        text.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
-        confirmationLayout.addView(text, params);
-        builder.setView(confirmationLayout);
+        Button cancelButton = (Button) v.findViewById(R.id.cancel_button_no_app);
+        cancelButton.setOnClickListener(this);
+        Button openButton = (Button) v.findViewById(R.id.open_button_no_app);
+        openButton.setOnClickListener(this);
 
-        builder.setPositiveButton(getString(R.string.context_open_link),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=authenticator&c=apps"));
-                        startActivity(intent);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
+        noAppsDialog = builder.create();
+        noAppsDialog.setCanceledOnTouchOutside(false);
+        noAppsDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                isNoAppsDialogShown = false;
             }
         });
-        builder.create().show();
+        try {
+            noAppsDialog.show();
+        }catch (Exception e){}
+
+        isNoAppsDialogShown = true;
     }
 
     @Override

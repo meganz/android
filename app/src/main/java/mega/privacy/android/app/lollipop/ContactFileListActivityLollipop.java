@@ -528,7 +528,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
 			userEmail = extras.getString("name");
-
+            int currNodePosition = extras.getInt("node_position", -1);
+			
 			setContentView(R.layout.activity_main_contact_properties);
 
 			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
@@ -570,6 +571,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				cflF = new ContactFileListFragmentLollipop();
 			}
 			cflF.setUserEmail(userEmail);
+			cflF.setCurrNodePosition(currNodePosition);
 
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
@@ -792,31 +794,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		this.parentHandle = parentHandle;
 	}
 
-	public void pickFolderToShare(String email){
-
-//		MegaUser user = megaApi.getContact(email);
-		if (email != null){
-			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER_TO_SHARE);
-			ArrayList<String> contacts = new ArrayList<String>();
-//			String[] longArray = new String[1];
-//			longArray[0] = email;
-			contacts.add(email);
-			intent.putExtra("SELECTED_CONTACTS", contacts);
-			startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
-		}
-		else{
-			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-			if(coordinatorFragment!=null){
-				showSnackbar(getString(R.string.error_sharing_folder), coordinatorFragment);
-			}
-			else{
-				showSnackbar(getString(R.string.error_sharing_folder), fragmentContainer);
-			}
-			log("Error sharing folder");
-		}
-	}
-
 	@SuppressLint("NewApi")
 	public void onFileClick(ArrayList<Long> handleList) {
 
@@ -824,29 +801,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			nC = new NodeController(this);
 		}
 		nC.prepareForDownload(handleList);
-	}
-
-	/*
-	 * Get list of all child files
-	 */
-	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent,
-			File folder) {
-
-		if (megaApi.getRootNode() == null)
-			return;
-
-		folder.mkdir();
-		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
-		for (int i = 0; i < nodeList.size(); i++) {
-			MegaNode document = nodeList.get(i);
-			if (document.getType() == MegaNode.TYPE_FOLDER) {
-				File subfolder = new File(folder,
-						new String(document.getName()));
-				getDlList(dlFiles, document, subfolder);
-			} else {
-				dlFiles.put(document, folder.getAbsolutePath());
-			}
-		}
 	}
 
 	public void moveToTrash(final ArrayList<Long> handleList){
@@ -1134,14 +1088,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				nC = new NodeController(this);
 			}
 			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-
-//			CoordinatorLayout coordinatorFragment = (CoordinatorLayout) fragmentContainer.findViewById(R.id.contact_file_list_coordinator_layout);
-//			if(coordinatorFragment!=null){
-//				showSnackbar(getString(R.string.download_began), coordinatorFragment);
-//			}
-//			else{
-//				showSnackbar(getString(R.string.download_began), fragmentContainer);
-//			}
 		} 
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
 			if (!Util.isOnline(this)) {
@@ -1212,7 +1158,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-//			final int totalMoves = moveHandles.length;
 			moveToRubbish=false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			
@@ -1319,9 +1264,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(ContextCompat.getColor(this, R.color.black));
-				/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
 			}
 		}		
 
@@ -1376,7 +1318,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 	}
 
 	public void onIntentProcessed(List<ShareInfo> infos) {
-//		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -1803,7 +1744,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if (aB != null){
 			if(title == null){
 				log("reset title and subtitle");
-				aB.setTitle(R.string.title_incoming_shares_explorer);
+				aB.setTitle(R.string.title_incoming_shares_with_explorer);
 				aB.setSubtitle(fullName);
 
 			}
@@ -1843,7 +1784,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 	public void openAdvancedDevices (long handleToDownload){
 		log("openAdvancedDevices");
-//		handleToDownload = handle;
 		String externalPath = Util.getExternalCardPath();
 
 		if(externalPath!=null){
@@ -1851,7 +1791,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			MegaNode node = megaApi.getNodeByHandle(handleToDownload);
 			if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
 				File newFile =  new File(node.getName());
 				log("File: "+newFile.getPath());
 				Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -1907,8 +1846,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		builder.setView(confirmationLayout);
 
-//				builder.setTitle(getString(R.string.confirmation_required));
-
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
 		builder.setPositiveButton(getString(R.string.general_download),
 				new DialogInterface.OnClickListener() {
@@ -1956,7 +1893,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 
 		builder.setView(confirmationLayout);
 
-//				builder.setTitle(getString(R.string.confirmation_required));
 		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
 		builder.setPositiveButton(getString(R.string.general_download),
 				new DialogInterface.OnClickListener() {

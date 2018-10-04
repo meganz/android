@@ -1217,22 +1217,22 @@ public class Util {
 	}
 	
 	public static String getLocalIpAddress()
-	  {
-	          try {
-	              for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-	                  NetworkInterface intf = en.nextElement();
-	                  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-	                      InetAddress inetAddress = enumIpAddr.nextElement();
-	                      if (!inetAddress.isLoopbackAddress()) {
-	                          return inetAddress.getHostAddress().toString();
-	                      }
-	                  }
-	              }
-	          } catch (Exception ex) {
-	              log("Error IP Address: " + ex.toString());
-	          }
-	          return null;
-	      }
+  {
+		  try {
+			  for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				  NetworkInterface intf = en.nextElement();
+				  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					  InetAddress inetAddress = enumIpAddr.nextElement();
+					  if (!inetAddress.isLoopbackAddress()) {
+						  return inetAddress.getHostAddress().toString();
+					  }
+				  }
+			  }
+		  } catch (Exception ex) {
+			  log("Error IP Address: " + ex.toString());
+		  }
+		  return null;
+   }
 	
 	@SuppressLint("InlinedApi") 
 	public static boolean isCharging(Context context) {
@@ -1701,7 +1701,7 @@ public class Util {
 		    return mimeType != null && mimeType.indexOf("video") == 0;
 		}
 		catch(Exception e){
-			log("CATCH EXCEPTION!!!: "+e.getMessage());
+			log("Exception: "+e.getMessage());
 			return false;
 		}	    
 	}

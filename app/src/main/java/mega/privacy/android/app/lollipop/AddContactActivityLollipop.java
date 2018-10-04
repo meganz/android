@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -1404,6 +1402,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (megaApi != null){
             log("---------retryPendingConnections");
             megaApi.retryPendingConnections();
+        }
+
+        if (megaChatApi != null){
+            megaChatApi.retryPendingConnections(false, null);
         }
 
         dbH = DatabaseHandler.getDbHandler(this);
