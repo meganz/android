@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -30,6 +31,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -215,6 +218,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             setContentView(R.layout.activity_group_chat_properties);
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = this.getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+            }
+
             fragmentContainer = (CoordinatorLayout) findViewById(R.id.fragment_container_group_chat);
             toolbar = (Toolbar) findViewById(R.id.toolbar_group_chat_properties);
             setSupportActionBar(toolbar);
@@ -293,11 +303,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             if(chat.isArchived()){
                 archiveChatTitle.setText(getString(R.string.general_unarchive));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
             }
             else{
                 archiveChatTitle.setText(getString(R.string.general_archive));
-                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,(R.drawable.ic_b_archive)));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
             }
 
             //Leave chat Layout
@@ -642,6 +652,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
 
+        final LinearLayout administratorLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator_layout);
         final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
         administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
@@ -657,6 +668,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
         administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
+        final LinearLayout memberLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_member_layout);
         final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
         memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
@@ -672,6 +684,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
         memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
+        final LinearLayout observerLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_observer_layout);
         final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
         observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
@@ -714,38 +727,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         final AlertDialog dialog = permissionsDialog;
-        administratorCheck.setOnClickListener(new View.OnClickListener() {
 
+        View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_MODERATOR);
+                switch (v.getId()) {
+                    case R.id.change_permissions_dialog_administrator_layout: {
+                        changePermissions(MegaChatRoom.PRIV_MODERATOR);
+                        break;
+                    }
+                    case R.id.change_permissions_dialog_member_layout: {
+                        changePermissions(MegaChatRoom.PRIV_STANDARD);
+                        break;
+                    }
+                    case R.id.change_permissions_dialog_observer_layout: {
+                        changePermissions(MegaChatRoom.PRIV_RO);
+                        break;
+                    }
+                }
                 if (dialog != null){
                     dialog.dismiss();
                 }
             }
-        });
-
-        memberCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_STANDARD);
-                if (dialog != null){
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        observerCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_RO);
-                if (dialog != null){
-                    dialog.dismiss();
-                }
-            }
-        });
+        };
+        administratorLayout.setOnClickListener(clickListener);
+        memberLayout.setOnClickListener(clickListener);
+        observerLayout.setOnClickListener(clickListener);
 
         log("Change permissions");
     }

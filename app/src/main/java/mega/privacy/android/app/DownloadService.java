@@ -2,6 +2,7 @@ package mega.privacy.android.app;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -20,6 +21,7 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -40,6 +42,8 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -60,7 +64,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-
 
 /*
  * Background service to download files
@@ -123,6 +126,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private int notificationId = Constants.NOTIFICATION_DOWNLOAD;
 	private int notificationIdFinal = Constants.NOTIFICATION_DOWNLOAD_FINAL;
+	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID;
+	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME;
 	private NotificationCompat.Builder mBuilderCompat;
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
@@ -575,54 +580,45 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 			log("Show notification 1");
-			mBuilderCompat
-			.setSmallIcon(R.drawable.ic_stat_notify)
-			.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-			.setAutoCancel(true).setTicker(notificationTitle)
-			.setContentTitle(notificationTitle).setContentText(size)
-			.setOngoing(false);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+				channel.setShowBadge(true);
+				channel.setSound(null, null);
+				mNotificationManager.createNotificationChannel(channel);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+				NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+				mBuilderCompatO
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setAutoCancel(true).setTicker(notificationTitle)
+						.setContentTitle(notificationTitle).setContentText(size)
+						.setOngoing(false);
+
+				mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+				mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 			}
+			else {
+				mBuilderCompat
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+						.setAutoCancel(true).setTicker(notificationTitle)
+						.setContentTitle(notificationTitle).setContentText(size)
+						.setOngoing(false);
 
-			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+				}
+
+				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+			}
 		}
 		else
 		{
 			try {
 				if (openFile) {
 					log("openFile true");
-					//				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-					//					log("Download success of zip file!");
-					//
-					//					if(pathFileToOpen!=null){
-					//						Intent intentZip;
-					//						intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
-					//						intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					//						intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-					//
-					//
-					//						if(intentZip!=null){
-					//							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					//							startActivity(intentZip);
-					//						}
-					//					}
-					//					else{
-					//						Intent intentZip = null;
-					//
-					//						intentZip = new Intent(this, ManagerActivityLollipop.class);
-					//						intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
-					//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					//						intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					//
-					//						startActivity(intentZip);
-					//					}
-					//
-					//					log("Lanzo intent al manager.....");
-					//				}
 					Boolean externalFile;
 					if (!currentFile.getAbsolutePath().contains(Environment.getExternalStorageDirectory().getPath())){
 						externalFile = true;
@@ -636,7 +632,37 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						fromMV = fromMediaViewers.get(handle);
 					}
 
-					if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+					if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+						log("Download success of zip file!");
+
+						if(pathFileToOpen!=null){
+							Intent intentZip;
+							intentZip = new Intent(this, ZipBrowserActivityLollipop.class);
+							intentZip.setAction(ZipBrowserActivityLollipop.ACTION_OPEN_ZIP_FILE);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivityLollipop.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+
+
+							if(intentZip!=null){
+								intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+								startActivity(intentZip);
+							}
+						}
+						else{
+							Intent intentZip = null;
+
+							intentZip = new Intent(this, ManagerActivityLollipop.class);
+							intentZip.setAction(Constants.ACTION_EXPLORE_ZIP);
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentZip.putExtra(Constants.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+
+							startActivity(intentZip);
+						}
+
+						log("Lanzo intent al manager.....");
+					}
+					else if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 						log("Pdf file");
 
 						if (!fromMV) {
@@ -657,14 +683,33 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						else {
 							log("Show notification 2");
-							mBuilderCompat
-									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-									.setAutoCancel(true).setTicker(notificationTitle)
-									.setContentTitle(notificationTitle).setContentText(size)
-									.setOngoing(false);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+								channel.setShowBadge(true);
+								channel.setSound(null, null);
+								mNotificationManager.createNotificationChannel(channel);
 
-							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+								mBuilderCompatO
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+							}
+							else {
+								mBuilderCompat
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							}
 						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
@@ -724,14 +769,33 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						else {
 							log("Show notification 2");
-							mBuilderCompat
-									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-									.setAutoCancel(true).setTicker(notificationTitle)
-									.setContentTitle(notificationTitle).setContentText(size)
-									.setOngoing(false);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+								channel.setShowBadge(true);
+								channel.setSound(null, null);
+								mNotificationManager.createNotificationChannel(channel);
 
-							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+								mBuilderCompatO
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+							}
+							else {
+								mBuilderCompat
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							}
 						}
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()) {
@@ -793,18 +857,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 						else {
 							log("Show notification 2");
-							mBuilderCompat
-									.setSmallIcon(R.drawable.ic_stat_notify)
-									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-									.setAutoCancel(true).setTicker(notificationTitle)
-									.setContentTitle(notificationTitle).setContentText(size)
-									.setOngoing(false);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+								NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+								channel.setShowBadge(true);
+								channel.setSound(null, null);
+								mNotificationManager.createNotificationChannel(channel);
 
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-								mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+								NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+								mBuilderCompatO
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
+
+								mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 							}
+							else {
+								mBuilderCompat
+										.setSmallIcon(R.drawable.ic_stat_notify)
+										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+										.setAutoCancel(true).setTicker(notificationTitle)
+										.setContentTitle(notificationTitle).setContentText(size)
+										.setOngoing(false);
 
-							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+									mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+								}
+
+								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							}
 						}
 
 					}
@@ -848,18 +933,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 									}
 									else{
 										log("No app to url file as text: show notification");
-										mBuilderCompat
-												.setSmallIcon(R.drawable.ic_stat_notify)
-												.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-												.setAutoCancel(true).setTicker(notificationTitle)
-												.setContentTitle(notificationTitle).setContentText(size)
-												.setOngoing(false);
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+											NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+											channel.setShowBadge(true);
+											channel.setSound(null, null);
+											mNotificationManager.createNotificationChannel(channel);
 
-										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-											mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+											NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+											mBuilderCompatO
+													.setSmallIcon(R.drawable.ic_stat_notify)
+													.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+													.setAutoCancel(true).setTicker(notificationTitle)
+													.setContentTitle(notificationTitle).setContentText(size)
+													.setOngoing(false);
+
+											mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+											mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 										}
+										else {
+											mBuilderCompat
+													.setSmallIcon(R.drawable.ic_stat_notify)
+													.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+													.setAutoCancel(true).setTicker(notificationTitle)
+													.setContentTitle(notificationTitle).setContentText(size)
+													.setOngoing(false);
 
-										mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+											if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+												mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+											}
+
+											mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+										}
 									}
 								}
 							}
@@ -878,18 +984,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							}
 							else{
 								log("Exception on processing url file: show notification");
-								mBuilderCompat
-										.setSmallIcon(R.drawable.ic_stat_notify)
-										.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-										.setAutoCancel(true).setTicker(notificationTitle)
-										.setContentTitle(notificationTitle).setContentText(size)
-										.setOngoing(false);
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+									NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+									channel.setShowBadge(true);
+									channel.setSound(null, null);
+									mNotificationManager.createNotificationChannel(channel);
 
-								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-									mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+									NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+									mBuilderCompatO
+											.setSmallIcon(R.drawable.ic_stat_notify)
+											.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+											.setAutoCancel(true).setTicker(notificationTitle)
+											.setContentTitle(notificationTitle).setContentText(size)
+											.setOngoing(false);
+
+									mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+									mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 								}
+								else {
+									mBuilderCompat
+											.setSmallIcon(R.drawable.ic_stat_notify)
+											.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+											.setAutoCancel(true).setTicker(notificationTitle)
+											.setContentTitle(notificationTitle).setContentText(size)
+											.setOngoing(false);
 
-								mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+										mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+									}
+
+									mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+								}
 							}
 
 						} finally {
@@ -929,18 +1056,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 
 						log("Show notification 2");
-						mBuilderCompat
-								.setSmallIcon(R.drawable.ic_stat_notify)
-								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-								.setAutoCancel(true).setTicker(notificationTitle)
-								.setContentTitle(notificationTitle).setContentText(size)
-								.setOngoing(false);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+							NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+							channel.setShowBadge(true);
+							channel.setSound(null, null);
+							mNotificationManager.createNotificationChannel(channel);
 
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-							mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+							NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+							mBuilderCompatO
+									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
+
+							mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 						}
+						else {
+							mBuilderCompat
+									.setSmallIcon(R.drawable.ic_stat_notify)
+									.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+									.setAutoCancel(true).setTicker(notificationTitle)
+									.setContentTitle(notificationTitle).setContentText(size)
+									.setOngoing(false);
 
-						mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+								mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+							}
+
+							mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+						}
 					}
 				} else {
 					openFile = true; //Set the openFile to the default
@@ -948,18 +1096,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 					log("Show notification 3");
-					mBuilderCompat
-							.setSmallIcon(R.drawable.ic_stat_notify)
-							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-							.setAutoCancel(true).setTicker(notificationTitle)
-							.setContentTitle(notificationTitle).setContentText(size)
-							.setOngoing(false);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+						NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+						channel.setShowBadge(true);
+						channel.setSound(null, null);
+						mNotificationManager.createNotificationChannel(channel);
 
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-						mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+						NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+						mBuilderCompatO
+								.setSmallIcon(R.drawable.ic_stat_notify)
+								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setAutoCancel(true).setTicker(notificationTitle)
+								.setContentTitle(notificationTitle).setContentText(size)
+								.setOngoing(false);
+
+						mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+						mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 					}
+					else {
+						mBuilderCompat
+								.setSmallIcon(R.drawable.ic_stat_notify)
+								.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+								.setAutoCancel(true).setTicker(notificationTitle)
+								.setContentTitle(notificationTitle).setContentText(size)
+								.setOngoing(false);
 
-					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+							mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+						}
+
+						mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+					}
 				}
 			}
 			catch (Exception e){
@@ -968,18 +1137,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
 
 				log("Show notification 4");
-				mBuilderCompat
-						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-						.setAutoCancel(true).setTicker(notificationTitle)
-						.setContentTitle(notificationTitle).setContentText(size)
-						.setOngoing(false);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+					NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+					channel.setShowBadge(true);
+					channel.setSound(null, null);
+					mNotificationManager.createNotificationChannel(channel);
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-					mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+					NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+					mBuilderCompatO
+							.setSmallIcon(R.drawable.ic_stat_notify)
+							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setAutoCancel(true).setTicker(notificationTitle)
+							.setContentTitle(notificationTitle).setContentText(size)
+							.setOngoing(false);
+
+					mBuilderCompatO.setColor(ContextCompat.getColor(this, R.color.mega));
+
+					mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
 				}
+				else {
+					mBuilderCompat
+							.setSmallIcon(R.drawable.ic_stat_notify)
+							.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+							.setAutoCancel(true).setTicker(notificationTitle)
+							.setContentTitle(notificationTitle).setContentText(size)
+							.setOngoing(false);
 
-				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+					}
+
+					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+				}
 			}
 		}
 	}
@@ -1051,7 +1241,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 
 			int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+				channel.setShowBadge(true);
+				channel.setSound(null, null);
+				mNotificationManager.createNotificationChannel(channel);
+
+				NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+				mBuilderCompat
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setColor(ContextCompat.getColor(this,R.color.mega))
+						.setProgress(100, progressPercent, false)
+						.setContentIntent(pendingIntent)
+						.setOngoing(true).setContentTitle(message).setSubText(info)
+						.setContentText(contentText)
+						.setOnlyAlertOnce(true);
+
+				notification = mBuilderCompat.build();
+			}
+			else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setColor(ContextCompat.getColor(this,R.color.mega))
@@ -1137,7 +1346,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setShowBadge(true);
+			channel.setSound(null, null);
+			mNotificationManager.createNotificationChannel(channel);
+
+			NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setColor(ContextCompat.getColor(this,R.color.mega))
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message).setSubText(info)
+					.setContentText(contentText)
+					.setOnlyAlertOnce(true);
+
+			notification = mBuilderCompat.build();
+		}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			mBuilder
 					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setColor(ContextCompat.getColor(this,R.color.mega))
@@ -1326,6 +1554,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						else{
 							saveOfflineChatFile(transfer);
 						}
+
+						refreshOfflineFragment();
 					}
 				}
 				else
@@ -2127,5 +2357,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 
+	}
+
+	private void refreshOfflineFragment(){
+		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }

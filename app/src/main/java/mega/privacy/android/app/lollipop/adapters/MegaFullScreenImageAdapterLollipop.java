@@ -562,7 +562,6 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 
 	public void setImageHolder (ViewHolderFullImage holder, MegaNode node) {
-
 		Bitmap thumb = null;
 		Bitmap preview = null;
 

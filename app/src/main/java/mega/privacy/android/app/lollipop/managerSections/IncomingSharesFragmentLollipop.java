@@ -41,7 +41,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -50,13 +52,15 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
@@ -83,8 +87,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+	CloudDriveAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
+	
+	FloatingItemDecoration floatingItemDecoration;
 
 	RelativeLayout transfersOverViewLayout;
 
@@ -107,6 +113,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 	String downloadLocationDefaultPath = Util.downloadDIR;
 
 	public ActionMode actionMode;
+	
+	private int placeholderCount;
 
 	public void activateActionMode(){
 		if (!adapter.isMultipleSelect()){
@@ -147,6 +155,59 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 		return null;
 	}
+    
+    public void addSectionTitle(List<MegaNode> nodes,int type) {
+        Map<Integer, String> sections = new HashMap<>();
+        int folderCount = 0;
+        int fileCount = 0;
+        for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            }
+            if (node.isFile()) {
+                fileCount++;
+            }
+        }
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            if(folderCount > 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(i,folderCount + " " + folderStr);
+                }
+            }
+            
+            if(fileCount > 0 ) {
+                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
+                }
+            }
+        } else {
+            placeholderCount = 0;
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
+        if (floatingItemDecoration == null) {
+            floatingItemDecoration = new FloatingItemDecoration(context);
+            recyclerView.addItemDecoration(floatingItemDecoration);
+        }
+        floatingItemDecoration.setType(type);
+        floatingItemDecoration.setKeys(sections);
+    }
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
@@ -242,6 +303,16 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}
 
 					((ManagerActivityLollipop) context).showConfirmationLeaveMultipleShares(handleList);
+					break;
+				}
+				case R.id.cab_menu_send_to_chat:{
+					log("Send files to chat");
+					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
+					NodeController nC = new NodeController(context);
+					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
+					clearSelections();
+					hideMultipleSelect();
+					break;
 				}
 			}
 			return false;
@@ -267,6 +338,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			List<MegaNode> selected = adapter.getSelectedNodes();
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
+			boolean showSendToChat = false;
+
 			if (selected.size() != 0) {
 
 				showCopy = true;
@@ -277,11 +350,11 @@ public class IncomingSharesFragmentLollipop extends Fragment{
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					unselect.setTitle(getString(R.string.action_unselect_all));
 					unselect.setVisible(true);
-          if(selected.size()==1){
-               showRename=true;
-          }else{
-                        showRename=false;
-                    }
+				  	if(selected.size()==1){
+				  		showRename=true;
+					}else{
+						showRename=false;
+					}
 					showMove = false;
 					showTrash=false;
 
@@ -300,7 +373,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					}else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 						showRename = false;
 					}
-				}else{
+
+ 				}else{
 
                     menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 					unselect.setTitle(getString(R.string.action_unselect_all));
@@ -328,6 +402,24 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 					menu.findItem(R.id.cab_menu_leave_multiple_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
+
+				boolean areFiles = true;
+				for (int i=0; i<selected.size(); i++) {
+					if (selected.get(i).isFolder()) {
+						areFiles = false;
+						break;
+					}
+				}
+
+				if(areFiles && Util.isChatEnabled()) {
+					showSendToChat = true;
+				}
+				else {
+					showSendToChat = false;
+				}
+
+				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
+				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 //				for(int i=0; i<selected.size();i++)	{
 //                    if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -419,7 +511,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -439,7 +531,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -453,7 +545,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				log("ParentHandle to find children: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				addSectionTitle(nodes,adapter.getAdapterType() );
+
 				adapter.setNodes(nodes);
 			}
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -520,7 +615,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				}
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.GONE);
 				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -540,7 +635,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			log("Grid View");
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
-			recyclerView = (CustomizedGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
 			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
@@ -556,10 +651,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleIncoming, recyclerView, null, Constants.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 //				adapterList.setNodes(nodes);
 			}
 			else{
@@ -575,7 +670,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 				log("ParentHandle: "+((ManagerActivityLollipop)context).parentHandleIncoming);
+
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				addSectionTitle(nodes,adapter.getAdapterType());
+
 				adapter.setNodes(nodes);
 			}
 
@@ -650,7 +748,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.GONE);
 				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
@@ -680,7 +778,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 			else {
 				parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
+
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				addSectionTitle(nodes,adapter.getAdapterType());
+
 				adapter.setNodes(nodes);
 			}
 		}
@@ -754,7 +855,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			}
 		}else{
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 			contentText.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -792,10 +893,10 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -810,6 +911,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				contentText.setText(MegaApiUtils.getInfoFolder(infoNode, context));
 
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
+				addSectionTitle(nodes,adapter.getAdapterType() );
+
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 				visibilityFastScroller();
@@ -872,7 +975,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				}
 				else{
 					recyclerView.setVisibility(View.VISIBLE);
-					contentTextLayout.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.GONE);
 					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
@@ -884,6 +987,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				//Is file
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+                    //Put flag to notify FullScreenImageViewerLollipop.
+                    intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 					intent.putExtra("isFolderLink", false);
@@ -894,7 +999,13 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
+						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					}
+					else{
+						intent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					}
+
 					intent.putExtra("fromShared", true);
 					intent.putExtra("screenPosition", screenPosition);
 					context.startActivity(intent);
@@ -929,7 +1040,14 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 					else{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
-					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+
+					if(((ManagerActivityLollipop)context).parentHandleIncoming==-1){
+						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderOthers);
+					}
+					else{
+						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
+					}
+
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("adapterType", Constants.INCOMING_SHARES_ADAPTER);
 
@@ -1169,7 +1287,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		if(((ManagerActivityLollipop)context).orderOthers == MegaApiJava.ORDER_DEFAULT_DESC){
 			sortByMailDescending();
 		}
-
+		addSectionTitle(nodes,adapter.getAdapterType() );
 		adapter.setNodes(nodes);
 
 		if (adapter.getItemCount() == 0){
@@ -1233,7 +1351,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		else{
 			log("adapter.getItemCount() != 0");
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 			contentText.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -1256,7 +1374,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleIncoming);
 			nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 		}
-
+		addSectionTitle(nodes,adapter.getAdapterType() );
 		adapter.setNodes(nodes);
 	}
 
@@ -1364,7 +1482,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			visibilityFastScroller();
 //				adapterList.setNodes(nodes);
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 			int lastVisiblePosition = 0;
 			if(!lastPositionStack.empty()){
 				lastVisiblePosition = lastPositionStack.pop();
@@ -1397,7 +1515,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
@@ -1407,6 +1525,8 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
+				addSectionTitle(nodes,adapter.getAdapterType() );
+
 				adapter.setNodes(nodes);
 				visibilityFastScroller();
 				int lastVisiblePosition = 0;
@@ -1434,7 +1554,7 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			log("ELSE deepTree");
 //			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 			recyclerView.setVisibility(View.VISIBLE);
-			contentTextLayout.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			((ManagerActivityLollipop)context).deepBrowserTreeIncoming=0;
@@ -1452,10 +1572,15 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 			adapter.notifyDataSetChanged();
 		}
 	}
-
-	public void setNodes(ArrayList<MegaNode> nodes){
+	
+	public void setNodes(ArrayList<MegaNode> nodes) {
 		log("setNodes");
 		this.nodes = nodes;
+		if (((ManagerActivityLollipop)context).isList) {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+		} else {
+			addSectionTitle(nodes,CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+		}
 		adapter.setNodes(nodes);
 	}
 	
@@ -1465,6 +1590,9 @@ public class IncomingSharesFragmentLollipop extends Fragment{
 		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
 
 		for (int i=0;i<nodes.size();i++){
+			if(nodes.get(i) == null) {
+				continue;
+			}
 			if (nodes.get(i).isFolder()){
 				folderNodes.add(nodes.get(i));
 			}

@@ -280,9 +280,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         log("updateScreenStatusInProgress");
         relativeVideo.getLayoutParams().height= RelativeLayout.LayoutParams.WRAP_CONTENT;
         relativeVideo.getLayoutParams().width= RelativeLayout.LayoutParams.WRAP_CONTENT;
-        flagMyAvatar = false;
+        flagMyAvatar = true;
         setProfileMyAvatar();
-        flagContactAvatar = true;
+        flagContactAvatar = false;
         setProfileContactAvatar();
 
         stopAudioSignals();
@@ -362,7 +362,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
             }
         }
     }
@@ -398,6 +403,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if (megaApi != null) {
             log("---------retryPendingConnections");
             megaApi.retryPendingConnections();
+        }
+
+        if (megaChatApi != null){
+            megaChatApi.retryPendingConnections(false, null);
         }
 
         if (megaChatApi == null) {
@@ -582,7 +591,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
 
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 

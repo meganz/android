@@ -195,9 +195,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private List<ShareInfo> filePreparedInfos;
     ArrayList<Long> handleListM = new ArrayList<Long>();
 
-    static int TYPE_UPLOAD = 0;
-    static int TYPE_DOWNLOAD = 1;
-
     private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
     private String path;
@@ -234,6 +231,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     boolean notChangePage = false;
     MegaNode currentDocument;
+
+    boolean sendToChat = false;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -336,7 +335,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
-        if (!isOffLine) {
+        if (!isOffLine && type != Constants.ZIP_ADAPTER) {
             app = (MegaApplication) getApplication();
             if (isFolderLink){
                 megaApi = app.getMegaApiFolder();
@@ -632,6 +631,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (type == Constants.OFFLINE_ADAPTER){
             OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
         }
+        else if (type == Constants.ZIP_ADAPTER) {
+            ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
+        }
     }
 
     @Override
@@ -664,6 +666,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (type == Constants.OFFLINE_ADAPTER){
                 isOffLine = true;
                 pathNavigation = intent.getStringExtra("pathNavigation");
+            }
+            else if (type == Constants.FILE_LINK_ADAPTER) {
+                String serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING);
+                if(serialize!=null) {
+                    currentDocument = MegaNode.unserialize(serialize);
+                    if (currentDocument != null) {
+                        log("currentDocument NOT NULL");
+                    }
+                    else {
+                        log("currentDocument is NULL");
+                    }
+                }
+                isOffLine = false;
+                fromChat = false;
             }
             else {
                 isOffLine = false;
@@ -698,7 +714,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             setContentView(R.layout.activity_pdfviewer);
 
-            if (!isOffLine){
+            if (!isOffLine && type != Constants.ZIP_ADAPTER){
                 app = (MegaApplication)getApplication();
                 if (isFolderLink){
                     megaApi = app.getMegaApiFolder();
@@ -1425,6 +1441,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             chatRemoveMenuItem.setVisible(false);
         }
         else {
+            if (nC == null) {
+                nC = new NodeController(this);
+            }
+            boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+
             if (type == Constants.OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
@@ -1441,7 +1462,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if(type == Constants.SEARCH_ADAPTER){
+            else if(type == Constants.SEARCH_ADAPTER && !fromIncoming){
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (isUrl){
@@ -1569,6 +1590,70 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
+            else if (type == Constants.ZIP_ADAPTER) {
+                propertiesMenuItem.setVisible(false);
+                chatMenuItem.setVisible(false);
+                shareMenuItem.setVisible(true);
+                downloadMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                renameMenuItem.setVisible(false);
+                moveMenuItem.setVisible(false);
+                copyMenuItem.setVisible(false);
+                moveToTrashMenuItem.setVisible(false);
+                removeMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+            }
+            else if (type == Constants.INCOMING_SHARES_ADAPTER ||  fromIncoming) {
+                propertiesMenuItem.setVisible(true);
+                if(Util.isChatEnabled()){
+                    chatMenuItem.setVisible(true);
+                }
+                else{
+                    chatMenuItem.setVisible(false);
+                }
+                copyMenuItem.setVisible(true);
+                removeMenuItem.setVisible(false);
+                importMenuItem.setVisible(false);
+                saveForOfflineMenuItem.setVisible(false);
+                chatRemoveMenuItem.setVisible(false);
+                getlinkMenuItem.setVisible(false);
+                removelinkMenuItem.setVisible(false);
+
+                if (isUrl){
+                    downloadMenuItem.setVisible(true);
+                    shareMenuItem.setVisible(false);
+                }
+                else {
+                    downloadMenuItem.setVisible(false);
+                    shareMenuItem.setVisible(true);
+                }
+
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                int accessLevel = megaApi.getAccess(node);
+
+                switch (accessLevel) {
+                    case MegaShare.ACCESS_FULL: {
+                        log("access FULL");
+                        renameMenuItem.setVisible(true);
+                        moveMenuItem.setVisible(true);
+                        moveToTrashMenuItem.setVisible(true);
+
+                        break;
+                    }
+                    case MegaShare.ACCESS_READ:
+                        log("access read");
+                    case MegaShare.ACCESS_READWRITE: {
+                        log("readwrite");
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
+                        break;
+                    }
+                }
+            }
             else {
                 shareMenuItem.setVisible(true);
                 boolean shareVisible = true;
@@ -1596,10 +1681,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         shareVisible = false;
                     }
                     else{
-                        if(fromShared){
-                            shareMenuItem.setVisible(false);
-                            shareVisible = false;
-                        }
                         if(isFolderLink){
                             shareMenuItem.setVisible(false);
                             shareVisible = false;
@@ -1617,122 +1698,91 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                             removelinkMenuItem.setVisible(false);
                         }
                         else{
-                            if(fromShared){
-                                removelinkMenuItem.setVisible(false);
+                            if(isFolderLink){
                                 getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
+
                             }
                             else{
-                                if(isFolderLink){
-                                    getlinkMenuItem.setVisible(false);
-                                    removelinkMenuItem.setVisible(false);
-
-                                }
-                                else{
-                                    getlinkMenuItem.setVisible(true);
-                                    removelinkMenuItem.setVisible(false);
-                                }
+                                getlinkMenuItem.setVisible(true);
+                                removelinkMenuItem.setVisible(false);
                             }
                         }
                     }
 
-                    if(fromShared){
+                    if(isFolderLink){
+                        propertiesMenuItem.setVisible(false);
+                        moveToTrashMenuItem.setVisible(false);
                         removeMenuItem.setVisible(false);
+                        renameMenuItem.setVisible(false);
+                        moveMenuItem.setVisible(false);
+                        copyMenuItem.setVisible(false);
                         chatMenuItem.setVisible(false);
-
-                        node = megaApi.getNodeByHandle(handle);
-                        int accessLevel = megaApi.getAccess(node);
-
-                        switch(accessLevel){
-                            case MegaShare.ACCESS_OWNER:
-                            case MegaShare.ACCESS_FULL:{
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
-                                moveToTrashMenuItem.setVisible(true);
-                                break;
-                            }
-                            case MegaShare.ACCESS_READWRITE:
-                            case MegaShare.ACCESS_READ:{
-                                renameMenuItem.setVisible(false);
-                                moveMenuItem.setVisible(false);
-                                moveToTrashMenuItem.setVisible(false);
-                                break;
-                            }
-                        }
                     }
                     else{
-                        if(isFolderLink){
-                            propertiesMenuItem.setVisible(false);
-                            moveToTrashMenuItem.setVisible(false);
-                            removeMenuItem.setVisible(false);
-                            renameMenuItem.setVisible(false);
-                            moveMenuItem.setVisible(false);
-                            copyMenuItem.setVisible(false);
-                            chatMenuItem.setVisible(false);
-                        }
-                        else{
-                            propertiesMenuItem.setVisible(true);
+                        propertiesMenuItem.setVisible(true);
 
-                            if(type==Constants.CONTACT_FILE_ADAPTER){
-                                removeMenuItem.setVisible(false);
-                                node = megaApi.getNodeByHandle(handle);
-                                int accessLevel = megaApi.getAccess(node);
-                                switch(accessLevel){
-                                    case MegaShare.ACCESS_OWNER:
-                                    case MegaShare.ACCESS_FULL:{
-                                        renameMenuItem.setVisible(true);
-                                        moveMenuItem.setVisible(true);
-                                        moveToTrashMenuItem.setVisible(true);
-                                        if(Util.isChatEnabled()){
-                                            chatMenuItem.setVisible(true);
-                                        }
-                                        else{
-                                            chatMenuItem.setVisible(false);
-                                        }
-                                        break;
+                        if(type==Constants.CONTACT_FILE_ADAPTER){
+                            removeMenuItem.setVisible(false);
+                            node = megaApi.getNodeByHandle(handle);
+                            int accessLevel = megaApi.getAccess(node);
+                            switch(accessLevel){
+                                case MegaShare.ACCESS_OWNER:
+                                case MegaShare.ACCESS_FULL:{
+                                    renameMenuItem.setVisible(true);
+                                    moveMenuItem.setVisible(true);
+                                    moveToTrashMenuItem.setVisible(true);
+                                    if(Util.isChatEnabled()){
+                                        chatMenuItem.setVisible(true);
                                     }
-                                    case MegaShare.ACCESS_READWRITE:
-                                    case MegaShare.ACCESS_READ:{
-                                        renameMenuItem.setVisible(false);
-                                        moveMenuItem.setVisible(false);
-                                        moveToTrashMenuItem.setVisible(false);
+                                    else{
                                         chatMenuItem.setVisible(false);
-                                        break;
                                     }
+                                    break;
+                                }
+                                case MegaShare.ACCESS_READWRITE:
+                                case MegaShare.ACCESS_READ:{
+                                    renameMenuItem.setVisible(false);
+                                    moveMenuItem.setVisible(false);
+                                    moveToTrashMenuItem.setVisible(false);
+                                    chatMenuItem.setVisible(false);
+                                    break;
                                 }
                             }
+                        }
+                        else{
+                            if(Util.isChatEnabled()){
+                                chatMenuItem.setVisible(true);
+                            }
                             else{
-                                if(Util.isChatEnabled()){
-                                    chatMenuItem.setVisible(true);
-                                }
-                                else{
-                                    chatMenuItem.setVisible(false);
-                                }
-                                renameMenuItem.setVisible(true);
-                                moveMenuItem.setVisible(true);
+                                chatMenuItem.setVisible(false);
+                            }
+                            renameMenuItem.setVisible(true);
+                            moveMenuItem.setVisible(true);
 
-                                node = megaApi.getNodeByHandle(handle);
+                            node = megaApi.getNodeByHandle(handle);
 
-                                final long handle = node.getHandle();
-                                MegaNode parent = megaApi.getNodeByHandle(handle);
+                            final long handle = node.getHandle();
+                            MegaNode parent = megaApi.getNodeByHandle(handle);
 
-                                while (megaApi.getParentNode(parent) != null){
-                                    parent = megaApi.getParentNode(parent);
-                                }
+                            while (megaApi.getParentNode(parent) != null){
+                                parent = megaApi.getParentNode(parent);
+                            }
 
-                                if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-                                    moveToTrashMenuItem.setVisible(true);
-                                    removeMenuItem.setVisible(false);
+                            if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+                                moveToTrashMenuItem.setVisible(true);
+                                removeMenuItem.setVisible(false);
 
-                                }
-                                else{
-                                    moveToTrashMenuItem.setVisible(false);
-                                    removeMenuItem.setVisible(true);
-                                    getlinkMenuItem.setVisible(false);
-                                    removelinkMenuItem.setVisible(false);
-                                }
+                            }
+                            else{
+                                moveToTrashMenuItem.setVisible(false);
+                                removeMenuItem.setVisible(true);
+                                getlinkMenuItem.setVisible(false);
+                                removelinkMenuItem.setVisible(false);
                             }
                         }
                     }
+
                     if (isUrl){
                         downloadMenuItem.setVisible(true);
                         shareMenuItem.setVisible(false);
@@ -1780,8 +1830,15 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(nC ==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-
-                nC.selectChatsToSendNodes(longArray);
+                if (type == Constants.INCOMING_SHARES_ADAPTER) {
+                    MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
+                    if (attachNode != null) {
+                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
+                    }
+                }
+                else {
+                    nC.selectChatsToSendNodes(longArray);
+                }
                 break;
             }
             case R.id.pdf_viewer_properties: {
@@ -2266,6 +2323,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             i.putExtra("handle", node.getHandle());
             i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
+            if (nC == null) {
+                nC = new NodeController(this);
+            }
+            boolean fromIncoming = nC.nodeComesFromIncoming(node);
+            if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
+                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                i.putExtra("firstLevel", false);
+            }
+            else if(type == Constants.INBOX_ADAPTER){
+                i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
+            }
         }
         startActivity(i);
         renamed = false;
@@ -2846,7 +2914,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             catch (Exception ex) {}
 
             if (e.getErrorCode() == MegaError.API_OK){
-                Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+                if (sendToChat && megaApi.getNodeByHandle(request.getParentHandle()).getName().equals(Constants.CHAT_FOLDER)
+                        && type == Constants.INCOMING_SHARES_ADAPTER) {
+                    log("Incoming node copied to Send to chat");
+                    MegaNode attachNode = megaApi.getNodeByHandle(request.getNodeHandle());
+                    if (attachNode != null) {
+                        nC.selectChatsToSendNode(attachNode);
+                    }
+                }
+                else {
+                    Snackbar.make(pdfviewerContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+                }
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
                 log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -2865,6 +2943,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             else{
                 Snackbar.make(pdfviewerContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
             }
+            sendToChat = false;
             log("copy nodes request finished");
         }
     }
@@ -2958,7 +3037,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         super.onResume();
         log("onResume");
         if (!isOffLine && !fromChat && !isFolderLink
-                && type != Constants.FILE_LINK_ADAPTER){
+                && type != Constants.FILE_LINK_ADAPTER
+                && type != Constants.ZIP_ADAPTER){
             if (megaApi.getNodeByHandle(handle) == null && inside && !fromDownload){
                 finish();
             }
@@ -3287,5 +3367,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         });
         downloadConfirmationDialog = builder.create();
         downloadConfirmationDialog.show();
+    }
+
+    public void setSendToChat (boolean sendToChat) {
+        this.sendToChat = sendToChat;
     }
 }

@@ -2,6 +2,7 @@ package mega.privacy.android.app;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -113,6 +114,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 	private int notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS;
 	private int notificationIdFinal = Constants.NOTIFICATION_CAMERA_UPLOADS_FINAL;
+	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
+	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
 
 	private static long lastRun = 0;
 
@@ -681,24 +684,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if (megaApi == null){
 			finish();
 			return START_NOT_STICKY;
-		}
-
-		String previousIP = app.getLocalIpAddress();
-		String currentIP = Util.getLocalIpAddress();
-		if (previousIP == null
-				|| (previousIP.length() == 0)
-				|| (previousIP.compareTo("127.0.0.1") == 0))
-		{
-			app.setLocalIpAddress(currentIP);
-		}
-		else if ((currentIP != null)
-				&& (currentIP.length() != 0)
-				&& (currentIP.compareTo("127.0.0.1") != 0)
-				&& (currentIP.compareTo(previousIP) != 0))
-		{
-			app.setLocalIpAddress(currentIP);
-			log("reconnect");
-			megaApi.reconnect();
 		}
 
 		int result = shouldRun();
@@ -1937,14 +1922,33 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
 		intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
 
-		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_camera_sync)
-				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(true).setTicker(contentText)
-				.setContentTitle(message).setContentText(contentText)
-				.setOngoing(false);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setShowBadge(true);
+			channel.setSound(null, null);
+			mNotificationManager.createNotificationChannel(channel);
 
-		mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
+			NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+			mBuilderCompatO
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(contentText)
+					.setContentTitle(message).setContentText(contentText)
+					.setOngoing(false);
+
+			mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
+		}
+		else {
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(contentText)
+					.setContentTitle(message).setContentText(contentText)
+					.setOngoing(false);
+
+			mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
+		}
 	}
 
 	public void retryLater(){
@@ -1984,15 +1988,33 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
 		intent.putExtra(Constants.EXTRA_OPEN_FOLDER, cameraUploadHandle);
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setShowBadge(true);
+			channel.setSound(null, null);
+			mNotificationManager.createNotificationChannel(channel);
 
-		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_camera_sync)
-				.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
-				.setAutoCancel(true).setTicker(title).setContentTitle(title)
-				.setContentText(message)
-				.setOngoing(false);
+			NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
 
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+			mBuilderCompatO
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
+					.setAutoCancel(true).setTicker(title).setContentTitle(title)
+					.setContentText(message)
+					.setOngoing(false);
+
+			mNotificationManager.notify(notificationIdFinal, mBuilderCompatO.build());
+		}
+		else {
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
+					.setAutoCancel(true).setTicker(title).setContentTitle(title)
+					.setContentText(message)
+					.setOngoing(false);
+
+			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		}
 	}
 
 	private void finish(){
@@ -2517,7 +2539,27 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		PendingIntent pendingIntent = PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0);
 		Notification notification = null;
 
-		if (currentapiVersion >= android.os.Build.VERSION_CODES.N) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			channel.setShowBadge(true);
+			channel.setSound(null, null);
+			mNotificationManager.createNotificationChannel(channel);
+
+			NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true)
+					.setContentTitle(message)
+					.setSubText(info)
+					.setContentText(getString(R.string.settings_camera_notif_title))
+					.setOnlyAlertOnce(true);
+
+			notification = mBuilderCompat.build();
+		}
+		else if (currentapiVersion >= android.os.Build.VERSION_CODES.N) {
 			mBuilder
 					.setSmallIcon(R.drawable.ic_stat_camera_sync)
 					.setProgress(100, progressPercent, false)
