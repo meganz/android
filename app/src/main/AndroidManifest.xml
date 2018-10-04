@@ -2,12 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="205"
-    android:versionName="3.3.8 (205)" >
-
-    <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="25" />
+    android:versionCode="207"
+    android:versionName="3.4.0 (207)" >
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
@@ -41,7 +37,7 @@
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
 
     <application
-        android:name="MegaApplication"
+        android:name="mega.privacy.android.app.MegaApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -156,6 +152,7 @@
 
        <activity 
             android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
+           android:launchMode="singleTask"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -183,7 +180,8 @@
         </activity>
 
         <activity android:name="mega.privacy.android.app.providers.FileProviderActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="locked">
             <intent-filter>
                 <action
                     android:name="android.intent.action.PICK"/>
@@ -447,6 +445,11 @@
         <!-- Used for Google Play Store Campaign Measurement-->
         <service
             android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+
+        <service
+            android:name=".jobservices.CameraUploadsService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
 
         <receiver
             android:name="mega.privacy.android.app.receivers.CustomInstallReferrerReceiver"

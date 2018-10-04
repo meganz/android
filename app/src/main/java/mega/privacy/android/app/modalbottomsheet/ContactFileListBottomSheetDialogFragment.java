@@ -40,40 +40,34 @@ import nz.mega.sdk.MegaShare;
 
 public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    private Context context;
-    private MegaNode node = null;
-    private NodeController nC;
-
-    private BottomSheetBehavior mBehavior;
-
-    private LinearLayout mainLinearLayout;
-    private ImageView nodeThumb;
-    private TextView nodeName;
-    private TextView nodeInfo;
-    private RelativeLayout nodeIconLayout;
-    private ImageView nodeIcon;
-    private LinearLayout optionDownload;
-    private LinearLayout optionInfo;
-    private TextView optionInfoText;
-    private ImageView optionInfoImage;
-    private LinearLayout optionLeave;
-    private LinearLayout optionCopy;
-    private LinearLayout optionMove;
-    private LinearLayout optionRename;
-    private LinearLayout optionRubbish;
-    private LinearLayout items_layout;
-
-    private DisplayMetrics outMetrics;
-
-    private Bitmap thumb = null;
-
-    private int height = -1;
-    private boolean heightseted = false;
-    private int heightReal = -1;
-    private int heightDisplay;
-
-    private MegaApiAndroid megaApi;
-    private DatabaseHandler dbH;
+    protected Context context;
+    protected MegaNode node = null;
+    protected NodeController nC;
+    protected BottomSheetBehavior mBehavior;
+    protected LinearLayout mainLinearLayout;
+    protected ImageView nodeThumb;
+    protected TextView nodeName;
+    protected TextView nodeInfo;
+    protected RelativeLayout nodeIconLayout;
+    protected ImageView nodeIcon;
+    protected LinearLayout optionDownload;
+    protected LinearLayout optionInfo;
+    protected TextView optionInfoText;
+    protected ImageView optionInfoImage;
+    protected LinearLayout optionLeave;
+    protected LinearLayout optionCopy;
+    protected LinearLayout optionMove;
+    protected LinearLayout optionRename;
+    protected LinearLayout optionRubbish;
+    protected LinearLayout items_layout;
+    protected DisplayMetrics outMetrics;
+    protected Bitmap thumb = null;
+    protected int height = -1;
+    protected boolean heightseted = false;
+    protected int heightReal = -1;
+    protected int heightDisplay;
+    protected MegaApiAndroid megaApi;
+    protected DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -461,7 +455,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 
-    private static void log(String log) {
+    protected static void log(String log) {
         Util.log("ContactFileListBottomSheetDialogFragment", log);
     }
 }

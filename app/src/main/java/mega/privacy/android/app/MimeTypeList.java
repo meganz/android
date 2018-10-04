@@ -112,6 +112,8 @@ public class MimeTypeList {
 			}
 			else if (extension.equals("url")) {
 				detectedType = "web/url";
+			}else if(extension.equals("webp")) {
+				detectedType = "image/webp";
 			}
 			else {
 				detectedType = "application/octet-stream";

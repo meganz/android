@@ -1441,6 +1441,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             chatRemoveMenuItem.setVisible(false);
         }
         else {
+            if (nC == null) {
+                nC = new NodeController(this);
+            }
+            boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+
             if (type == Constants.OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
@@ -1457,7 +1462,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if(type == Constants.SEARCH_ADAPTER){
+            else if(type == Constants.SEARCH_ADAPTER && !fromIncoming){
                 MegaNode node = megaApi.getNodeByHandle(handle);
 
                 if (isUrl){
@@ -1601,7 +1606,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 saveForOfflineMenuItem.setVisible(false);
                 chatRemoveMenuItem.setVisible(false);
             }
-            else if (type == Constants.INCOMING_SHARES_ADAPTER) {
+            else if (type == Constants.INCOMING_SHARES_ADAPTER ||  fromIncoming) {
                 propertiesMenuItem.setVisible(true);
                 if(Util.isChatEnabled()){
                     chatMenuItem.setVisible(true);
@@ -2318,7 +2323,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             i.putExtra("handle", node.getHandle());
             i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             i.putExtra("name", node.getName());
-            if (type == Constants.INCOMING_SHARES_ADAPTER) {
+            if (nC == null) {
+                nC = new NodeController(this);
+            }
+            boolean fromIncoming = nC.nodeComesFromIncoming(node);
+            if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);
             }

@@ -108,6 +108,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	public static int MAX_WIDTH_FILENAME_PORT=200;
 	public static int MAX_WIDTH_FILENAME_PORT_2=200;
+	
+	public static String NODE_HANDLE = "NODE_HANDLE";
 
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;
@@ -181,8 +183,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	RelativeLayout versionsLayout;
 	Button versionsButton;
 	View separatorVersions;
-
-//	ImageView publicLinkImage;
 	SwitchCompat offlineSwitch;
 
 	TextView sizeTextView;
@@ -197,11 +197,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	TextView addedTextView;
 	TextView modifiedTextView;
 	AppBarLayout appBarLayout;
-
-	//RelativeLayout permissionsLayout;
-	//TextView permissionLabel;
 	TextView permissionInfo;
-	//ImageView permissionsIcon;
 
 	boolean owner= true;
 	int typeExport = -1;
@@ -242,7 +238,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	ProgressDialog statusDialog;
 	boolean publicLink=false;
 
-	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 
 	private AlertDialog renameDialog;
@@ -253,8 +248,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-//	public static String DB_FILE = "0";
-//	public static String DB_FOLDER = "1";
 
 	Display display;
 	DisplayMetrics outMetrics;
@@ -278,6 +271,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
  	private File file;
  	private long fragmentHandle  = -1;
  	private String pathNavigation;
+ 	boolean isRemoveOffline;
+ 	long handle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -308,7 +303,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             scaleText = scaleW;
         }
 
-//		  dbH = new DatabaseHandler(getApplicationContext());
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
         adapterType = getIntent().getIntExtra("adapterType", 0);
@@ -355,34 +349,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         imageToolbarLayout.setVisibility(View.GONE);
 
         //Available Offline Layout
-
         availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
         availableOfflineLayout.setVisibility(View.VISIBLE);
-
         availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
-
         offlineSwitch = (SwitchCompat) findViewById(R.id.file_properties_switch);
 
         //Share with Layout
-
         sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
         sharedLayout.setOnClickListener(this);
-
         shareIcon = (ImageView) findViewById(R.id.file_properties_shared_image);
-
         usersSharedWithTextButton = (Button) findViewById(R.id.file_properties_shared_info_button);
         usersSharedWithTextButton.setOnClickListener(this);
-
-        dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
-
-        //Permissions Layout
-        //permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
-        //permissionsLayout.setVisibility(View.GONE);
-
-
-        //permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
-
-        //permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);
+        dividerSharedLayout = findViewById(R.id.divider_shared_layout);
         appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
 
         //Owner Layout
@@ -420,7 +398,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         //Info Layout
         infoTittle = (TextView) findViewById(R.id.file_properties_info_menu_info);
-
         infoIcon = (ImageView) findViewById(R.id.file_properties_info_image);
 
         //Size Layout
@@ -562,11 +539,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 String name = node.getName();
 
                 collapsingToolbar.setTitle(name);
-
-                MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
-                while (megaApi.getParentNode(parent) != null){
-                    parent = megaApi.getParentNode(parent);
+                if (nC == null) {
+                    nC = new NodeController(this);
                 }
+                MegaNode parent = nC.getParent(node);
                 if (from == FROM_INCOMING_SHARES){
                     fragmentHandle = -1;
                     if (megaApi.getParentNode(node) != null){
@@ -891,7 +867,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		int id = item.getItemId();
 		switch (id) {
 			case android.R.id.home: {
-				finish();
+                onBackPressed();
 				break;
 			}
 			case R.id.cab_menu_file_info_download: {
@@ -1272,15 +1248,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
-//					If I am the owner
+					//If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-
-//						permissionLabel.setVisibility(View.GONE);
-//						permissionInfo.setVisibility(View.GONE);
-						//permissionsLayout.setVisibility(View.GONE);
 						permissionInfo.setVisibility(View.GONE);
-						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
-
 					}
 					else{
 
@@ -1288,8 +1258,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 						//If I am not the owner
 						//permissionsLayout.setVisibility(View.VISIBLE);
 						permissionInfo.setVisibility(View.VISIBLE);
-//						permissionLabel.setVisibility(View.VISIBLE);
-//						permissionInfo.setVisibility(View.VISIBLE);
 
 						int accessLevel= megaApi.getAccess(node);
 						log("Node: "+node.getName());
@@ -1484,44 +1452,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		return (int)textSize;
 	}
 
-//	private boolean checkChildrenStatus(ArrayList<MegaNode> childrenList){
-//
-//		boolean children = true;
-//		ArrayList<MegaNode> childrenListRec;
-//
-//		if(childrenList.size()>0){
-//			for(int i=0;i<childrenList.size();i++){
-//
-//				if(!dbH.exists(childrenList.get(i).getHandle())){
-//					children=false;
-//					return children;
-//				}
-//				else{
-//					if(childrenList.get(i).isFolder()){
-//
-//						childrenListRec=megaApi.getChildren(childrenList.get(i));
-//
-//						if(childrenListRec.size()>0){
-//							boolean result=checkChildrenStatus(childrenListRec);
-//							if(!result){
-//								children=false;
-//								return children;
-//							}
-//						}
-//					}
-//					else{
-//
-//						if(!dbH.exists(childrenList.get(i).getHandle())){
-//							children=false;
-//							return children;
-//						}
-//
-//					}
-//				}
-//			}
-//		}
-//		return children;
-//	}
 	@Override
 	public void onClick(View v) {
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
@@ -1560,14 +1490,18 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					log("Owner: me");
 					if (!isChecked){
 						log("isChecked");
+                        isRemoveOffline = true;
+                        handle = node.getHandle();
 						availableOfflineBoolean = false;
 						offlineSwitch.setChecked(false);
-						mOffDelete = dbH.findByHandle(node.getHandle());
+						mOffDelete = dbH.findByHandle(handle);
 						removeOffline(mOffDelete);
 						supportInvalidateOptionsMenu();
 					}
 					else{
-						log("NOT Checked");
+                        log("NOT Checked");
+                        isRemoveOffline = false;
+                        handle = -1;
 						availableOfflineBoolean = true;
 						offlineSwitch.setChecked(true);
 
@@ -1771,105 +1705,104 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			startService(service);
 		}
 	}
-
-	public void removeOffline(MegaOffline mOffDelete){
-
-		if (mOffDelete == null){
-			return;
-		}
-
-		log("removeOffline - file(type): "+mOffDelete.getName()+"("+mOffDelete.getType()+")");
-		//mOffDelete = node;
-		MegaOffline parentNode = null;
-		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
-		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();
-
-		if(mOffDelete.getType().equals(MegaOffline.FOLDER)){
-			log("Finding children... ");
-			//Delete in DB
-			//Delete children
-			mOffListChildren=dbH.findByParentId(mOffDelete.getId());
-			if(mOffListChildren.size()>0){
-				log("Children: "+mOffListChildren.size());
-				//The node have childrens, delete
-				deleteChildrenDB(mOffListChildren);
-			}
-		}
-		else{
-			log("NOT children... ");
-		}
-
-		int parentId = mOffDelete.getParentId();
-		log("Finding parents... "+parentId);
-		//Delete parents
-		if(parentId!=-1){
-			mOffListParent=dbH.findByParentId(parentId);
-
-			if(mOffListParent.size()<1){
-				//No more node with the same parent, keep deleting
-				parentNode = dbH.findById(parentId);
-				if(parentNode != null){
-					removeOffline(mOffDelete);
-				}
-			}
-		}
-
-		//Remove the node physically
-		File destination = null;
-		log("Path: "+mOffDelete.getPath());
-		if(mOffDelete.getOrigin()==MegaOffline.INCOMING){
-			if (Environment.getExternalStorageDirectory() != null){
-				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffDelete.getHandleIncoming() +"/" + mOffDelete.getPath());
-			}
-			else{
-				destination = new File(getFilesDir(), mOffDelete.getHandle()+"");
-			}
-
-			log("Remove incoming: "+destination.getAbsolutePath());
-
-			try{
-				File offlineFile = new File(destination,  mOffDelete.getName());
-				Util.deleteFolderAndSubfolders(this, offlineFile);
-			}
-			catch(Exception e){
-				log("EXCEPTION: removeOffline - file");
-				log("EXCEPTION: "+e.toString());
-			};
-
-			dbH.removeById(mOffDelete.getId());
-		}
-		else
-		{
-			if(from==FROM_INBOX){
-				if (Environment.getExternalStorageDirectory() != null) {
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + mOffDelete.getPath());
-					log("offline File INCOMING: " + destination.getAbsolutePath());
-				} else {
-					destination = this.getFilesDir();
-				}
-			}
-			else{
-				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
-				}
-				else{
-					destination = new File(getFilesDir(), mOffDelete.getHandle()+"");
-				}
-			}
-
-			log("Remove node: "+destination.getAbsolutePath());
-
-			try{
-				File offlineFile = new File(destination, mOffDelete.getName());
-				Util.deleteFolderAndSubfolders(this, offlineFile);
-			}
-			catch(Exception e){
-				log("EXCEPTION: removeOffline - file");
-			};
-
-			dbH.removeById(mOffDelete.getId());
-		}
-	}
+    
+    private void updateParentOfflineStatus(int parentId) {
+        ArrayList<MegaOffline> offlineSiblings = dbH.findByParentId(parentId);
+        
+        if(offlineSiblings.size() > 0){
+            //have other offline file within same folder, so no need to do anything to the folder
+            return;
+        }
+        else{
+            //keep checking if there is any parent folder should display red arrow
+            MegaOffline parentNode = dbH.findById(parentId);
+            if (parentNode != null) {
+                int grandParentNodeId = parentNode.getParentId();
+                dbH.removeById(parentId);
+                updateParentOfflineStatus(grandParentNodeId);
+            }
+        }
+    }
+    
+    public void removeOffline(MegaOffline mOffDelete) {
+        
+        if (mOffDelete == null) {
+            return;
+        }
+        
+        log("removeOffline - file(type): " + mOffDelete.getName() + "(" + mOffDelete.getType() + ")");
+        ArrayList<MegaOffline> mOffListChildren;
+        
+        if (mOffDelete.getType().equals(MegaOffline.FOLDER)) {
+            log("Finding children... ");
+            
+            //Delete children in DB
+            mOffListChildren = dbH.findByParentId(mOffDelete.getId());
+            if (mOffListChildren.size() > 0) {
+                log("Children: " + mOffListChildren.size());
+                deleteChildrenDB(mOffListChildren);
+            }
+        } else {
+            log("NOT children... ");
+        }
+        
+        //remove red arrow from current item
+        int parentId = mOffDelete.getParentId();
+        dbH.removeById(mOffDelete.getId());
+        if (parentId != -1) {
+            updateParentOfflineStatus(parentId);
+        }
+        
+        //Remove the node physically
+        File destination;
+        log("Path: " + mOffDelete.getPath());
+        if (mOffDelete.getOrigin() == MegaOffline.INCOMING) {
+            if (Environment.getExternalStorageDirectory() != null) {
+                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffDelete.getHandleIncoming() + "/" + mOffDelete.getPath());
+            } else {
+                destination = new File(getFilesDir(),mOffDelete.getHandle() + "");
+            }
+            
+            log("Remove incoming: " + destination.getAbsolutePath());
+            
+            try {
+                File offlineFile = new File(destination,mOffDelete.getName());
+                Util.deleteFolderAndSubfolders(this,offlineFile);
+            } catch (Exception e) {
+                log("EXCEPTION: removeOffline - file " + e.toString());
+            }
+            ;
+            
+            dbH.removeById(mOffDelete.getId());
+        } else {
+            if (from == FROM_INBOX) {
+                if (Environment.getExternalStorageDirectory() != null) {
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + mOffDelete.getPath());
+                    log("offline File INCOMING: " + destination.getAbsolutePath());
+                } else {
+                    destination = this.getFilesDir();
+                }
+            } else {
+                if (Environment.getExternalStorageDirectory() != null) {
+                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
+                } else {
+                    destination = new File(getFilesDir(),mOffDelete.getHandle() + "");
+                }
+            }
+            
+            log("Remove node: " + destination.getAbsolutePath());
+            
+            try {
+                File offlineFile = new File(destination,mOffDelete.getName());
+                Util.deleteFolderAndSubfolders(this,offlineFile);
+            } catch (Exception e) {
+                log("EXCEPTION: removeOffline - file");
+            }
+            ;
+            
+            dbH.removeById(mOffDelete.getId());
+        }
+    }
 
 
 	private void deleteChildrenDB(ArrayList<MegaOffline> mOffList){
@@ -1975,10 +1908,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		final MegaNode rubbishNode = megaApi.getRubbishNode();
 
-		MegaNode parent = megaApi.getNodeByHandle(handle);
-		while (megaApi.getParentNode(parent) != null){
-			parent = megaApi.getParentNode(parent);
-		}
+		MegaNode parent = nC.getParent(node);
 
 		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
 			moveToRubbish = true;
@@ -2052,13 +1982,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
-//	    layout.setLayoutParams(params);
 
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
-//		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-//		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
@@ -2260,8 +2187,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 	@SuppressLint("NewApi")
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-//		node = megaApi.getNodeByHandle(request.getNodeHandle());
 
 		log("onRequestFinish: "+request.getType() + "__" + request.getRequestString());
 
@@ -2489,7 +2414,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 nC = new NodeController(this);
             }
             nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
-//			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
@@ -2751,7 +2675,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			else if(n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)){
 				if(thisNode){
 					if(nodeVersions!=null){
-//						node = nodeVersions.get(1);
 						long nodeHandle = nodeVersions.get(1).getHandle();
 						if(megaApi.getNodeByHandle(nodeHandle)!=null){
 							node = megaApi.getNodeByHandle(nodeHandle);
@@ -2852,25 +2775,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);
 
-//					If I am the owner
+					//If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-
-//						permissionLabel.setVisibility(View.GONE);
-//						permissionInfo.setVisibility(View.GONE);
-						//permissionsLayout.setVisibility(View.GONE);
 						permissionInfo.setVisibility(View.GONE);
-						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
-
 					}
 					else{
 
 						//If I am not the owner
 						owner = false;
-						//permissionsLayout.setVisibility(View.VISIBLE);
 						permissionInfo.setVisibility(View.VISIBLE);
-//						permissionLabel.setVisibility(View.VISIBLE);
-//						permissionInfo.setVisibility(View.VISIBLE);
-
 						int accessLevel= megaApi.getAccess(node);
 						log("Node: "+node.getName());
 
@@ -2996,7 +2909,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public void onBackPressed() {
-
+        if(isRemoveOffline){
+            Intent intent = new Intent();
+            intent.putExtra(NODE_HANDLE, handle);
+            setResult(RESULT_OK, intent);
+        }
 		super.onBackPressed();
 	}
 
@@ -3011,7 +2928,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     public void openAdvancedDevices (long handleToDownload){
         log("openAdvancedDevices");
-//		handleToDownload = handle;
         String externalPath = Util.getExternalCardPath();
 
         if(externalPath!=null){
@@ -3019,7 +2935,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
                 log("File: "+newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -3075,8 +2990,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         builder.setView(confirmationLayout);
 
-//				builder.setTitle(getString(R.string.confirmation_required));
-
         builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
         builder.setPositiveButton(getString(R.string.general_download),
                 new DialogInterface.OnClickListener() {
@@ -3124,7 +3037,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         builder.setView(confirmationLayout);
 
-//				builder.setTitle(getString(R.string.confirmation_required));
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
         builder.setPositiveButton(getString(R.string.general_download),
                 new DialogInterface.OnClickListener() {

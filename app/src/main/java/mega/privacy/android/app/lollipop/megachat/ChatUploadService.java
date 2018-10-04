@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -108,6 +109,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	MegaTransferListenerInterface megaTransferListener;
 
 	private int notificationId = Constants.NOTIFICATION_UPLOAD;
+	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_UPLOAD_ID;
+	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -503,7 +506,27 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			PendingIntent pendingIntent = PendingIntent.getActivity(ChatUploadService.this, 0, intent, 0);
 			Notification notification = null;
 			int currentapiVersion = Build.VERSION.SDK_INT;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+				channel.setShowBadge(true);
+				channel.setSound(null, null);
+				mNotificationManager.createNotificationChannel(channel);
+
+				NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+
+				mBuilderCompat
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setProgress(100, progressPercent, false)
+						.setContentIntent(pendingIntent)
+						.setOngoing(true).setContentTitle(message)
+						.setContentText(getString(R.string.chat_upload_title_notification))
+						.setOnlyAlertOnce(true)
+						.setColor(ContextCompat.getColor(this,R.color.mega));
+
+				notification = mBuilderCompat.build();
+			}
+			else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setProgress(100, progressPercent, false)

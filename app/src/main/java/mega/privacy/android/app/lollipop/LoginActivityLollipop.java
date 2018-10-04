@@ -485,10 +485,13 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //					dbH.setPinLockEnabled(false);
 //					dbH.setPinLockCode("");
 //					dbH.setCamSyncEnabled(false);
-        Intent stopIntent = null;
-        stopIntent = new Intent(this, CameraSyncService.class);
-        stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-        startService(stopIntent);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Intent stopIntent = null;
+            stopIntent = new Intent(this, CameraSyncService.class);
+            stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+            startService(stopIntent);
+        }
     }
 
     public void startCameraSyncService(boolean firstTimeCam, int time) {
@@ -506,7 +509,9 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 @Override
                 public void run() {
                     log("Now I start the service");
-                    startService(new Intent(getApplicationContext(), CameraSyncService.class));
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                        startService(new Intent(getApplicationContext(), CameraSyncService.class));
+                    }
                 }
             }, time);
         }
@@ -600,31 +605,33 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
                     log("ACTION_CANCEL_CAM_SYNC");
-                    Intent tempIntent = null;
-                    String title = null;
-                    String text = null;
-                    if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
-                        tempIntent = new Intent(this, CameraSyncService.class);
-                        tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-                        title = getString(R.string.cam_sync_syncing);
-                        text = getString(R.string.cam_sync_cancel_sync);
-                    }
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                        Intent tempIntent = null;
+                        String title = null;
+                        String text = null;
+                        if (intent.getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)) {
+                            tempIntent = new Intent(this, CameraSyncService.class);
+                            tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+                            title = getString(R.string.cam_sync_syncing);
+                            text = getString(R.string.cam_sync_cancel_sync);
+                        }
 
-                    final Intent cancelIntent = tempIntent;
-                    AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-                            title, text, null);
-                    builder.setPositiveButton(getString(R.string.cam_sync_stop),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    startService(cancelIntent);
-                                }
-                            });
-                    builder.setNegativeButton(getString(R.string.general_cancel), null);
-                    final AlertDialog dialog = builder.create();
-                    try {
-                        dialog.show();
-                    } catch (Exception ex) {
-                        startService(cancelIntent);
+                        final Intent cancelIntent = tempIntent;
+                        AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+                                title, text, null);
+                        builder.setPositiveButton(getString(R.string.cam_sync_stop),
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        startService(cancelIntent);
+                                    }
+                                });
+                        builder.setNegativeButton(getString(R.string.general_cancel), null);
+                        final AlertDialog dialog = builder.create();
+                        try {
+                            dialog.show();
+                        } catch (Exception ex) {
+                            startService(cancelIntent);
+                        }
                     }
                 }
                 else if (intent.getAction().equals(Constants.ACTION_CANCEL_DOWNLOAD)) {
