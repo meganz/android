@@ -3348,6 +3348,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             }
 
             ((ViewHolderMessageChat) holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
+            String link = androidMessage.getRichLinkMessage().getServer();
             ((ViewHolderMessageChat) holder).urlOwnMessageLink.setText(androidMessage.getRichLinkMessage().getServer());
 
             ((ViewHolderMessageChat) holder).urlOwnMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_launcher));
@@ -3382,12 +3383,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(androidMessage.getRichLinkMessage().getFolderContent());
                 }
             } else {
-                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.INVISIBLE);
-                ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.subtitle_mega_rich_link_no_key));
-                if (androidMessage.getRichLinkMessage().isFile()) {
-                    ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_generic_list);
-                } else {
-                    ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_folder_list);
+                if(androidMessage.getRichLinkMessage().isChat()){
+                    ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText("Chat title");
+                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText("Chat participants");
+
+                    if (androidMessage.getRichLinkMessage().isFile()) {
+                        ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_generic_list);
+                    } else {
+                        ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_folder_list);
+                    }
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.INVISIBLE);
+                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.subtitle_mega_rich_link_no_key));
+                    if (androidMessage.getRichLinkMessage().isFile()) {
+                        ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_generic_list);
+                    } else {
+                        ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_folder_list);
+                    }
                 }
             }
 
@@ -3671,12 +3686,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(androidMessage.getRichLinkMessage().getFolderContent());
                 }
             } else {
-                ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.INVISIBLE);
-                ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(context.getString(R.string.subtitle_mega_rich_link_no_key));
-                if (androidMessage.getRichLinkMessage().isFile()) {
-                    ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_generic_list);
-                } else {
-                    ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_folder_list);
+                if(androidMessage.getRichLinkMessage().isChat()){
+                    ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText("Chat title");
+                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setVisibility(View.VISIBLE);
+                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText("Chat participants");
+
+                    if (androidMessage.getRichLinkMessage().isFile()) {
+                        ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_generic_list);
+                    } else {
+                        ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_folder_list);
+                    }
+                }
+                else{
+                    ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.INVISIBLE);
+                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(context.getString(R.string.subtitle_mega_rich_link_no_key));
+                    if (androidMessage.getRichLinkMessage().isFile()) {
+                        ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_generic_list);
+                    } else {
+                        ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_folder_list);
+                    }
                 }
             }
 
@@ -3777,40 +3806,43 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 if (MegaChatApi.hasUrl(messageContent)) {
 
-                    if (MegaApplication.isShowRichLinkWarning()) {
-                        log("SDK - show link rich warning");
-                        if (((ChatActivityLollipop) context).showRichLinkWarning == Constants.RICH_WARNING_TRUE) {
-                            log("ANDROID - show link rich warning");
+                    if(((ChatActivityLollipop)context).checkMegaLink(message)==-1) {
+                        log("Is a link - not from MEGA");
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
-                            if(isMultipleSelect()){
-                                holder.forwardOwnRichLinks.setOnClickListener(null);
-                            }else{
-                                holder.forwardOwnRichLinks.setOnClickListener(this);
-                            }
+                        if (MegaApplication.isShowRichLinkWarning()) {
+                            log("SDK - show link rich warning");
+                            if (((ChatActivityLollipop) context).showRichLinkWarning == Constants.RICH_WARNING_TRUE) {
+                                log("ANDROID - show link rich warning");
+
+                                ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).forwardOwnRichLinks.setVisibility(View.VISIBLE);
+                                if(isMultipleSelect()){
+                                    holder.forwardOwnRichLinks.setOnClickListener(null);
+                                }else{
+                                    holder.forwardOwnRichLinks.setOnClickListener(this);
+                                }
 
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.title_enable_rich_links));
-                            ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.text_enable_rich_links));
+                                ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.title_enable_rich_links));
+                                ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.text_enable_rich_links));
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_rich_link));
+                                ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_rich_link));
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageIcon.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageIcon.setVisibility(View.GONE);
 
-                            ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setOnClickListener(this);
-                            ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setTag(holder);
+                                ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setOnClickListener(this);
+                                ((ViewHolderMessageChat) holder).alwaysAllowRichLinkButton.setTag(holder);
 
-                            ((ViewHolderMessageChat) holder).notNowRichLinkButton.setOnClickListener(this);
-                            ((ViewHolderMessageChat) holder).notNowRichLinkButton.setTag(holder);
+                                ((ViewHolderMessageChat) holder).notNowRichLinkButton.setOnClickListener(this);
+                                ((ViewHolderMessageChat) holder).notNowRichLinkButton.setTag(holder);
 
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
 
 //                            ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
@@ -3821,52 +3853,52 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //                            ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-                            holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
-                            holder.forwardOwnFile.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.GONE);
+                                holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                holder.forwardOwnFile.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).forwardOwnContact.setVisibility(View.GONE);
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.VISIBLE);
-                            ((ChatActivityLollipop) context).hideKeyboard();
-                            ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.VISIBLE);
+                                ((ChatActivityLollipop) context).hideKeyboard();
+                                ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
-                            int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
+                                int notNowCounter = MegaApplication.getCounterNotNowRichLinkWarning();
 
-                            if(notNowCounter>=3){
-                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.VISIBLE);
-                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(this);
-                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setTag(holder);
+                                if(notNowCounter>=3){
+                                    ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.VISIBLE);
+                                    ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(this);
+                                    ((ViewHolderMessageChat) holder).neverRichLinkButton.setTag(holder);
 
-                            } else {
-                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
-                                ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(null);
-                            }
+                                } else {
+                                    ((ViewHolderMessageChat) holder).neverRichLinkButton.setVisibility(View.GONE);
+                                    ((ViewHolderMessageChat) holder).neverRichLinkButton.setOnClickListener(null);
+                                }
 
-                            return;
-                        } else if (((ChatActivityLollipop) context).showRichLinkWarning == Constants.RICH_WARNING_CONFIRMATION) {
-                            log("ANDROID - show link disable rich link confirmation");
+                                return;
+                            } else if (((ChatActivityLollipop) context).showRichLinkWarning == Constants.RICH_WARNING_CONFIRMATION) {
+                                log("ANDROID - show link disable rich link confirmation");
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.title_confirmation_disable_rich_links));
-                            ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.text_confirmation_disable_rich_links));
+                                ((ViewHolderMessageChat) holder).urlOwnMessageLayout.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.title_confirmation_disable_rich_links));
+                                ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.text_confirmation_disable_rich_links));
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_rich_link));
+                                ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_rich_link));
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageIcon.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageIcon.setVisibility(View.GONE);
 
-                            ((ViewHolderMessageChat) holder).noDisableButton.setOnClickListener(this);
-                            ((ViewHolderMessageChat) holder).noDisableButton.setTag(holder);
+                                ((ViewHolderMessageChat) holder).noDisableButton.setOnClickListener(this);
+                                ((ViewHolderMessageChat) holder).noDisableButton.setTag(holder);
 
-                            ((ViewHolderMessageChat) holder).yesDisableButton.setOnClickListener(this);
-                            ((ViewHolderMessageChat) holder).yesDisableButton.setTag(holder);
+                                ((ViewHolderMessageChat) holder).yesDisableButton.setOnClickListener(this);
+                                ((ViewHolderMessageChat) holder).yesDisableButton.setTag(holder);
 
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).contentOwnMessageText.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).previewFrameLand.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).previewFramePort.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setVisibility(View.GONE);
 
 //                            ((ViewHolderMessageChat) holder).gradientOwnMessageThumbPort.setVisibility(View.GONE);
@@ -3877,12 +3909,16 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 //                            ((ViewHolderMessageChat) holder).videoIconOwnMessageThumbLand.setVisibility(View.GONE);
 //                            ((ViewHolderMessageChat) holder).videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
 
-                            ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).contentOwnMessageFileLayout.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).contentOwnMessageContactLayout.setVisibility(View.GONE);
 
-                            ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
-                            ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.VISIBLE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageWarningButtonsLayout.setVisibility(View.GONE);
+                                ((ViewHolderMessageChat) holder).urlOwnMessageDisableButtonsLayout.setVisibility(View.VISIBLE);
+                            }
                         }
+                    }
+                    else{
+                        log("It a MEGA link: wait for info update");
                     }
                 }
             }
