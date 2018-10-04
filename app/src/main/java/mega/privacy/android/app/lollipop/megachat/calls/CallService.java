@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -50,6 +51,9 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     private Notification.Builder mBuilder;
     private NotificationCompat.Builder mBuilderCompat;
     private NotificationManager mNotificationManager;
+
+    private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHATCALLS_ID;
+    private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHATCALLS_NAME;
 
     public void onCreate() {
         super.onCreate();
@@ -106,65 +110,127 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     public void showCallInProgressNotification(){
         log("showCallInProgressNotification");
 
-        mBuilderCompat = new NotificationCompat.Builder(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.createNotificationChannel(channel);
 
-        mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Intent intent = new Intent(this, ChatCallActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent intent = new Intent(this, ChatCallActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));
-        intent.putExtra("chatHandle", chatId);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            intent.putExtra("chatHandle", chatId);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(false)
-                .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), pendingIntent)
-                .setOngoing(false);
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
-        }
+            mBuilderCompatO
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(false)
+                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), pendingIntent)
+                    .setOngoing(false)
+                    .setColor(ContextCompat.getColor(this, R.color.mega));
 
-        String title = null;
-        String email = null;
-        long userHandle = -1;
-        MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-        if(chat!=null){
-            title = chat.getTitle();
+            String title = null;
+            String email = null;
+            long userHandle = -1;
+            MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+            if (chat != null) {
+                title = chat.getTitle();
 
-            if(chat.isGroup()){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                    Bitmap largeIcon = createDefaultAvatar(-1, title);
-                    if(largeIcon!=null){
-                        mBuilderCompat.setLargeIcon(largeIcon);
+                if(chat.isGroup()){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = createDefaultAvatar(-1, title);
+                        if(largeIcon!=null){
+                            mBuilderCompatO.setLargeIcon(largeIcon);
+                        }
                     }
                 }
-            }
-            else{
-                userHandle = chat.getPeerHandle(0);
-                email = chat.getPeerEmail(0);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                    Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
-                    if(largeIcon!=null){
-                        mBuilderCompat.setLargeIcon(largeIcon);
+                else{
+                    userHandle = chat.getPeerHandle(0);
+                    email = chat.getPeerEmail(0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                        if(largeIcon!=null){
+                            mBuilderCompatO.setLargeIcon(largeIcon);
+                        }
                     }
                 }
+
+                mBuilderCompatO.setContentTitle(title);
+                mBuilderCompatO.setContentText(getString(R.string.title_notification_call_in_progress));
+            } else {
+                mBuilderCompatO.setContentTitle(getString(R.string.title_notification_call_in_progress));
+                mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
             }
 
-            mBuilderCompat.setContentTitle(title);
-            mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
-        }
-        else{
-            mBuilderCompat.setContentTitle(getString(R.string.title_notification_call_in_progress));
-            mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
-        }
+            Notification notif = mBuilderCompatO.build();
 
-        Notification notif = mBuilderCompat.build();
+            startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
+        }
+        else {
+
+            mBuilderCompat = new NotificationCompat.Builder(this);
+
+            mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Intent intent = new Intent(this, ChatCallActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.setAction(Long.toString(System.currentTimeMillis()));
+            intent.putExtra("chatHandle", chatId);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(false)
+                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), pendingIntent)
+                    .setOngoing(false);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.mega));
+            }
+
+            String title = null;
+            String email = null;
+            long userHandle = -1;
+            MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+            if (chat != null) {
+                title = chat.getTitle();
+
+                if(chat.isGroup()){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = createDefaultAvatar(-1, title);
+                        if(largeIcon!=null){
+                            mBuilderCompat.setLargeIcon(largeIcon);
+                        }
+                    }
+                }
+                else{
+                    userHandle = chat.getPeerHandle(0);
+                    email = chat.getPeerEmail(0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                        Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                        if(largeIcon!=null){
+                            mBuilderCompat.setLargeIcon(largeIcon);
+                        }
+                    }
+                }
+
+                mBuilderCompat.setContentTitle(title);
+                mBuilderCompat.setContentText(getString(R.string.title_notification_call_in_progress));
+            } else {
+                mBuilderCompat.setContentTitle(getString(R.string.title_notification_call_in_progress));
+                mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
+            }
+
+            Notification notif = mBuilderCompat.build();
 //        mNotificationManager.notify(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
 
-        startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
+            startForeground(Constants.NOTIFICATION_CALL_IN_PROGRESS, notif);
+        }
     }
 
     public Bitmap setProfileContactAvatar(long userHandle,  String fullName, String email){

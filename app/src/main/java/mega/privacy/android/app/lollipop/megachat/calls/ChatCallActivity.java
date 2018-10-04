@@ -465,7 +465,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
             }
         }
     }
@@ -754,7 +759,12 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Start call Service");
                 Intent intentService = new Intent(this, CallService.class);
                 intentService.putExtra("chatHandle", callChat.getChatid());
-                this.startService(intentService);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.startForegroundService(intentService);
+                }
+                else{
+                    this.startService(intentService);
+                }
 
                 audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -2712,11 +2722,10 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 //First case:
                 if(!isManualMode){
                     if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                        log("updateUserSelected() - call IN PROGRESS - first case");
-                        position = peersOnCall.size()-2;
+                        position = 0;
                         peerSelected = peersOnCall.get(position);
                         if((adapter != null)&&(position !=-1)){
-                            adapter.addLayer(position, null);
+                            adapter.addLayer(position);
                         }
 
                         if(peerSelected.isVideoOn()){
@@ -2756,8 +2765,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             position = i;
                         }
                     }
+
                     if((adapter != null)&&(position !=-1)){
-                        adapter.addLayer(position, null);
+                        adapter.addLayer(position);
                     }
                     //Rest of cases:
                     if(peerSelected.isVideoOn()){

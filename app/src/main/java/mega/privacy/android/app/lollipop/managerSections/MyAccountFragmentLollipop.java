@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,12 +44,14 @@ import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -95,7 +98,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	LinearLayout typeLayout;
 	LinearLayout lastSessionLayout;
-	LinearLayout connectionsLayout;
+    RelativeLayout connectionsLayout;
+    private CustomizedGridRecyclerView lastContactsGridView;
 
 	LinearLayout achievementsLayout;
 	LinearLayout achievementsSeparator;
@@ -152,6 +156,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("My user handle string: "+megaApi.getMyUserHandle());
 
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.avatar_qr_background));
 		avatarLayout.setOnClickListener(this);
 
 		if (savedInstanceState != null) {
@@ -250,8 +255,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		lastSessionLayout.setOnClickListener(this);
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
-
+		connectionsLayout = (RelativeLayout) v.findViewById(R.id.my_account_connections_layout);
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
@@ -290,19 +294,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		this.updateAvatar(true);
 
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
-
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}		
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		updateContactsCount();
 
 		lastContacted = MegaApiUtils.getLastContactedUsers(context);
 		//Draw contact's connection component if lastContacted.size > 0
+        lastContactsGridView = (CustomizedGridRecyclerView)v.findViewById(R.id.last_contacts_gridview);
+        
+        lastContactsGridView.setColumnCount(LastContactsAdapter.MAX_COLUMN);
+        lastContactsGridView.setClipToPadding(false);
+        lastContactsGridView.setHasFixedSize(false);
+        
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
 
 		setAccountDetails();
 
@@ -311,6 +313,36 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
+	}
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Refresh
+		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+        updateView();
+    }
+    
+    /**
+     * Update last contacts list and refresh last contacts' avatar.
+     */
+    public void updateView() {
+        lastContacted = MegaApiUtils.getLastContactedUsers(context);
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+    }
+
+    public void updateContactsCount(){
+    	log("updateContactsCounts");
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
+
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}
+		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 	}
 
 	public void setMkButtonText(){
@@ -886,19 +918,27 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
 
 			String contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
-			Bitmap qrCodeBitmap = queryQR(contactLink);
-			qrAvatarSave = qrCodeBitmap;
-			avatarLayout.setBackground(new BitmapDrawable(qrCodeBitmap));
+			new QRBackgroundTask().execute(contactLink);
 		}
 		else {
 			log("Error request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE: " + e.getErrorString());
 		}
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+	class QRBackgroundTask extends AsyncTask<String, Void, Void> {
+
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			qrAvatarSave = queryQR(strings[0]);
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
+		}
 	}
 
 	@Override

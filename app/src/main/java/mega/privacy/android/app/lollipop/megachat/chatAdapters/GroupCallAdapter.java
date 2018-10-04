@@ -719,26 +719,29 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
     }
 
-    public void addLayer(int position, ViewHolderGroupCall holder){
-        log(" addLayer()");
-        //Remove green layer for the rest of users:
-        for(int i=0; i<peers.size();i++){
-            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
-            if(holder!=null){
-                InfoPeerGroupCall peer = getNodeAt(i);
-                if (peer == null){
-                    return;
-                }
-                if(i==position){
-                    holder.greenLayer.setVisibility(View.VISIBLE);
-                }else{
-                    if(holder.greenLayer.getVisibility()==View.VISIBLE){
-                        holder.greenLayer.setVisibility(View.GONE);
+    public void addLayer(int position){
+        log("addLayer() - position "+position);
+        if(peers!=null){
+            //Remove green layer for the rest of users:
+            for(int i=0; i<peers.size();i++){
+                ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
+                if(holder!=null){
+                    InfoPeerGroupCall peer = getNodeAt(i);
+                    if (peer == null){
+                        return;
                     }
-
+                    if(i==position){
+                        holder.greenLayer.setVisibility(View.VISIBLE);
+                    }else{
+                        if(holder.greenLayer.getVisibility()==View.VISIBLE){
+                            holder.greenLayer.setVisibility(View.GONE);
+                        }
+                    }
+                }else{
                 }
             }
         }
+
     }
 
 
