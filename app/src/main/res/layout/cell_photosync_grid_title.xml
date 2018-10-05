@@ -12,9 +12,10 @@
             android:id="@+id/cell_photosync_grid_title_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/mail_my_account"
-            android:layout_marginLeft="72dp"
-            android:textSize="14sp"
+            android:textColor="@color/name_my_account"
+            android:fontFamily="roboto"
+            android:layout_marginLeft="16dp"
+            android:textSize="12sp"
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
             />

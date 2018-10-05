@@ -28,6 +28,7 @@ import java.util.Locale;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.Constants;
@@ -195,10 +196,10 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		View v = inflater.inflate(R.layout.fragment_upgrade_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.scroll_view_upgrade);
-		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				if (v.canScrollVertically(-1)){
+				if (scrollView.canScrollVertically(-1)){
 					((ManagerActivityLollipop) context).changeActionBarElevation(true);
 				}
 				else {
