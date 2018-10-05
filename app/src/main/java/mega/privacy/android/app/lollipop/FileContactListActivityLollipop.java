@@ -511,17 +511,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_folder_contact_list, menu);
-	    
-//	    permissionButton = menu.findItem(R.id.action_file_contact_list_permissions);
-//	    deleteShareButton = menu.findItem(R.id.action_file_contact_list_delete);
-	    addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-	    	    
-//	    permissionButton.setVisible(false);
-//	    deleteShareButton.setVisible(false);
-	    addSharingContact.setVisible(true);
-		menu.findItem(R.id.action_folder_contacts_list_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
+	    inflater.inflate(R.menu.activity_folder_contact_list_without_share_action, menu);
 	    
 	    selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
@@ -541,20 +531,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		    	onBackPressed();
 		    	return true;
 		    }
-		    case R.id.action_folder_contacts_list_share_folder:{
-		    	//Option add new contact to share
-				removeShare = false;
-				changeShare = false;
-
-		    	Intent intent = new Intent();
-		    	intent.setClass(this, AddContactActivityLollipop.class);
-		    	intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
-				intent.putExtra("MULTISELECT", 0);
-		    	startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT);
-		    	
-	        	return true;
-	        }
 		    case R.id.action_select:{
 		    	
 		    	selectAll();
@@ -865,13 +841,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		});
 		permissionsDialog = dialogBuilder.create();
 		permissionsDialog.show();
-//				Resources resources = permissionsDialog.getContext().getResources();
-//				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-//				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-//		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-//				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-//				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-//				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 	}
 	
 	public void setPositionClicked(int positionClicked){
