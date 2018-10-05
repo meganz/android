@@ -67,10 +67,13 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.DividerItemDecoration;
+import mega.privacy.android.app.components.DividerItemDecorationV2;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
@@ -731,7 +734,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
 				scrollView = (ScrollView) v.findViewById(R.id.cam_sync_scroll_view);
-				scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+				new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
 					@Override
 					public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 						if (scrollView.canScrollVertically(-1)){
@@ -779,7 +782,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator());
-			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new DividerItemDecorationV2(context, outMetrics));
 
 			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			listView.setClipToPadding(false);

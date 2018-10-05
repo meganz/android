@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.utils.DBUtil;
@@ -106,10 +107,15 @@ public class MyStorageFragmentLollipop extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_my_storage, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.my_storage_complete_relative_layout);
-		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				checkScroll();
+				if (scrollView.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
 			}
 		});
 		

@@ -49,6 +49,7 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -162,10 +163,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
 
 		scrollView = (ScrollView) v.findViewById(R.id.my_account_complete_relative_layout);
-		scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				checkScroll();
+				if (scrollView.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
 			}
 		});
 		

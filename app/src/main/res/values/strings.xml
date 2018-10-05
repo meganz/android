@@ -520,7 +520,7 @@
     <!--
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
-    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
+    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">From file system</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -2135,5 +2135,8 @@
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
 
     <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
+
+    <string name="general_folders" context="General label for folders">Folders</string>
+    <string name="general_files" context="General label for files">Files</string>
 
 </resources>
