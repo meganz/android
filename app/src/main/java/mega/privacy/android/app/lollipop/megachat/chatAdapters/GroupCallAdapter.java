@@ -184,6 +184,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         if(numPeersOnCall < 7){
             RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holderGrid.microAvatar.getLayoutParams());
+            paramsMicroAvatar.height = Util.scaleWidthPx(24, outMetrics);
+            paramsMicroAvatar.width = Util.scaleWidthPx(24, outMetrics);
             paramsMicroAvatar.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, 0);
             paramsMicroAvatar.addRule(RelativeLayout.RIGHT_OF, R.id.avatar_rl);
             paramsMicroAvatar.addRule(RelativeLayout.ALIGN_TOP, R.id.avatar_rl);
@@ -197,6 +199,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
         }else{
             RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holderGrid.microAvatar.getLayoutParams());
+            paramsMicroAvatar.height = Util.scaleWidthPx(15, outMetrics);
+            paramsMicroAvatar.width = Util.scaleWidthPx(15, outMetrics);
             paramsMicroAvatar.setMargins(0, 0, 0, 0);
             paramsMicroAvatar.addRule(RelativeLayout.RIGHT_OF, R.id.avatar_rl);
             paramsMicroAvatar.addRule(RelativeLayout.ALIGN_TOP, R.id.avatar_rl);
@@ -348,15 +352,22 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
             //Update micro icon
             holder.microSurface.setImageResource(R.drawable.ic_mic_off_contact);
-            RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             if(numPeersOnCall < 7){
-                paramsMicroSurface.setMargins(0, 50, 50, 0);
+                RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams( Util.scaleWidthPx(24, outMetrics),Util.scaleWidthPx(24, outMetrics));
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                paramsMicroSurface.setMargins(0, Util.scaleWidthPx(50, outMetrics),  Util.scaleWidthPx(50, outMetrics), 0);
+                holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+
             }else{
-                paramsMicroSurface.setMargins(0, 4, 4, 0);
+                RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams( Util.scaleWidthPx(15, outMetrics),Util.scaleWidthPx(15, outMetrics));
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                paramsMicroSurface.setMargins(0,  Util.scaleWidthPx(7, outMetrics),  Util.scaleWidthPx(7, outMetrics), 0);
+                holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+
             }
-            holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
+
 
             if(peer.isAudioOn()){
                 holder.microSurface.setVisibility(View.GONE);
@@ -719,8 +730,8 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
     }
 
-    public void addLayer(int position){
-        log("addLayer() - position "+position);
+    public void addLayer(int p){
+        log("addLayer() - position "+p);
         if(peers!=null){
             //Remove green layer for the rest of users:
             for(int i=0; i<peers.size();i++){
@@ -730,7 +741,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                     if (peer == null){
                         return;
                     }
-                    if(i==position){
+                    if(i==p){
                         holder.greenLayer.setVisibility(View.VISIBLE);
                     }else{
                         if(holder.greenLayer.getVisibility()==View.VISIBLE){
