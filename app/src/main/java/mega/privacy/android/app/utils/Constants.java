@@ -35,6 +35,7 @@ public class Constants {
 	public static int ACTION_SEARCH_BY_DATE = 1024;
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
+	public static int REQUEST_CODE_FILE_INFO = 1027;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
@@ -206,7 +207,9 @@ public class Constants {
 	final public static int SEARCH_BY_ADAPTER = 2018;
 	final public static int FILE_LINK_ADAPTER = 2019;
 	final public static int FROM_CHAT = 2020;
+
     final public static int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
+    final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -240,6 +243,22 @@ public class Constants {
 	public static int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
+
+	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_ID = "UploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_UPLOAD_NAME = "MEGA Upload";
+	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID = "CameraUploadsServiceNotification";
+	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
+	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
+	public static String NOTIFICATION_CHANNEL_CHATCALLS_ID = "ChatCallNotification";
+	public static String NOTIFICATION_CHANNEL_CHATCALLS_NAME = "MEGA Chat Call";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
+	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_ID = "CloudDriveNotification";
+	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
+
 
 	public static String CHAT_FOLDER = "My chat files";
 

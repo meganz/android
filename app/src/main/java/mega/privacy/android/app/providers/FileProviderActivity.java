@@ -6,11 +6,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -24,11 +26,14 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,7 +68,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.MySwitch;
+import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
@@ -91,7 +96,7 @@ import nz.mega.sdk.MegaUser;
 
 
 @SuppressLint("NewApi") 
-public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface {
+public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 	
 //	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 //	
@@ -152,12 +157,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	EditText et_password;
 	TextView bRegisterLol;
 	TextView bLoginLol;
-	ImageView loginThreeDots;
-	TextView loginABC;
-	SwitchCompat loginSwitchLol;
-	MySwitch loginSwitch;
-	Button bRegister;
-	Button bLogin;
+
 	RelativeLayout relativeLayout;
 	
 	public static int CLOUD_TAB = 0;
@@ -202,6 +202,32 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	int progressTransfersFinish = 0;
 	ClipData clipDataTransfers;
 	ArrayList<Uri> contentUris = new ArrayList<>();
+
+	LinearLayout loginVerificationLayout;
+	InputMethodManager imm;
+	private EditTextPIN firstPin;
+	private EditTextPIN secondPin;
+	private EditTextPIN thirdPin;
+	private EditTextPIN fourthPin;
+	private EditTextPIN fifthPin;
+	private EditTextPIN sixthPin;
+	private StringBuilder sb = new StringBuilder();
+	private String pin = null;
+	private TextView pinError;
+	private RelativeLayout lostYourDeviceButton;
+	private ProgressBar verify2faProgressBar;
+
+	private boolean isFirstTime = true;
+	private boolean isErrorShown = false;
+	private boolean is2FAEnabled = false;
+	private boolean accountConfirmed = false;
+	private boolean pinLongClick = false;
+
+	private RelativeLayout loginEmailErrorLayout;
+	private RelativeLayout loginPasswordErrorLayout;
+
+	private ImageView toggleButton;
+	private boolean passwdVisibility;
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -237,6 +263,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		relativeLayout = (RelativeLayout) findViewById(R.id.provider_container);
 
+		is2FAEnabled = false;
+
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 			incParentHandle = savedInstanceState.getLong("incParentHandle", -1);
@@ -264,7 +292,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (credentials == null){
 			loginLogin.setVisibility(View.VISIBLE);
 			if(scrollView!=null){
-				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
+				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
@@ -482,7 +510,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 	}
 
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelectedLollipop");
@@ -496,34 +523,37 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	    return super.onOptionsItemSelected(item);
 	}
 
+	public void showHidePassword () {
+		if(!passwdVisibility){
+			et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+			et_password.setTypeface(Typeface.SANS_SERIF,Typeface.NORMAL);
+			et_password.setSelection(et_password.getText().length());
+		}else{
+			et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+			et_password.setSelection(et_password.getText().length());
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public void checkLogin(){
+
 		setContentView(R.layout.fragment_login);
-		
-		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
+
+		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);
 		
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
-		//Left margin
-		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
-		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
-		loginTitle.setLayoutParams(textParams);
-		
+
 		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
 		et_user = (EditText) findViewById(R.id.login_email_text);
-		android.view.ViewGroup.LayoutParams paramsb1 = et_user.getLayoutParams();		
-		paramsb1.width = Util.scaleWidthPx(280, outMetrics);		
-		et_user.setLayoutParams(paramsb1);
-		//Left margin
-		textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
-		et_user.setLayoutParams(textParams);		
-		
-		et_password = (EditText) findViewById(R.id.login_password_text);	
-		et_password.setLayoutParams(paramsb1);
-		et_password.setLayoutParams(textParams);	
-		
+
+		toggleButton = (ImageView) findViewById(R.id.toggle_button);
+		toggleButton.setOnClickListener(this);
+		passwdVisibility = false;
+
+		et_password = (EditText) findViewById(R.id.login_password_text);
+
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
 			
 			@Override
@@ -534,45 +564,27 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 				return false;
 			}
-		});			
-//		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
-//		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-//		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0);
-//		loginThreeDots.setLayoutParams(textThreeDots);
-//
-//		loginABC = (TextView) findViewById(R.id.ABC);
-//
-//		loginSwitchLol = (SwitchCompat) findViewById(R.id.switch_login);
-//		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitchLol.getLayoutParams();
-//		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0);
-//		loginSwitchLol.setLayoutParams(switchParams);
-//		loginSwitchLol.setChecked(false);
-//
-//		loginSwitchLol.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-//
-//			@Override
-//			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//				if(!isChecked){
-//						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//						et_password.setSelection(et_password.getText().length());
-//				}else{
-//						et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-//						et_password.setSelection(et_password.getText().length());
-//			    }
-//			}
-//		});
+		});
+
+		et_password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					toggleButton.setVisibility(View.VISIBLE);
+					toggleButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_b_shared_read));
+				}
+				else {
+					toggleButton.setVisibility(View.GONE);
+					passwdVisibility = false;
+					showHidePassword();
+				}
+			}
+		});
+
 		
 		bLoginLol = (TextView) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-//		android.view.ViewGroup.LayoutParams paramsbLogin = bLoginLol.getLayoutParams();		
-//		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
-//		bLoginLol.setLayoutParams(paramsbLogin);
-		//Margin
-		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLoginLol.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
-		bLoginLol.setLayoutParams(textParamsLogin);
-		
+
 		bLoginLol.setOnClickListener(this);
 		
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
@@ -580,23 +592,15 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		
 	    newToMega = (TextView) findViewById(R.id.text_newToMega);
 		//Margins (left, top, right, bottom)
-		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
-		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics)); 
-		newToMega.setLayoutParams(textnewToMega);	
-		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+//		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
+//		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics));
+//		newToMega.setLayoutParams(textnewToMega);
+//		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
 	    bRegisterLol = (TextView) findViewById(R.id.button_create_account_login);
 	    
 	    bRegisterLol.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-//		android.view.ViewGroup.LayoutParams paramsb2 = bRegisterLol.getLayoutParams();		
-//		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
-//		bRegisterLol.setLayoutParams(paramsb2);
-		//Margin
-		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegisterLol.getLayoutParams();
-		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
-		bRegisterLol.setLayoutParams(textParamsRegister);
-	    
+
 	    bRegisterLol.setOnClickListener(this);
 		
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
@@ -611,7 +615,492 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		serversBusyText = (TextView) findViewById(R.id.login_servers_busy_text);
 
+		loginEmailErrorLayout = (RelativeLayout) findViewById(R.id.login_email_text_error);
+		loginEmailErrorLayout.setVisibility(View.GONE);
+		loginPasswordErrorLayout = (RelativeLayout) findViewById(R.id.login_password_text_error);
+		loginPasswordErrorLayout.setVisibility(View.GONE);
+
+		tB  =(Toolbar) findViewById(R.id.toolbar);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		}
+		loginVerificationLayout = (LinearLayout) findViewById(R.id.login_2fa);
+		loginVerificationLayout.setVisibility(View.GONE);
+		lostYourDeviceButton = (RelativeLayout) findViewById(R.id.lost_authentication_device);
+		lostYourDeviceButton.setOnClickListener(this);
+		pinError = (TextView) findViewById(R.id.pin_2fa_error_login);
+		pinError.setVisibility(View.GONE);
+		verify2faProgressBar = (ProgressBar) findViewById(R.id.progressbar_verify_2fa);
+
+		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+		firstPin = (EditTextPIN) findViewById(R.id.pin_first_login);
+		firstPin.setOnLongClickListener(this);
+		firstPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(firstPin, InputMethodManager.SHOW_FORCED);
+		firstPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if(firstPin.length() != 0){
+					secondPin.requestFocus();
+					secondPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick){
+						secondPin.setText("");
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+					permitVerify();
+				}
+			}
+		});
+
+		secondPin = (EditTextPIN) findViewById(R.id.pin_second_login);
+		secondPin.setOnLongClickListener(this);
+		secondPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(secondPin, InputMethodManager.SHOW_FORCED);
+		secondPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (secondPin.length() != 0){
+					thirdPin.requestFocus();
+					thirdPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						thirdPin.setText("");
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+					permitVerify();
+				}
+			}
+		});
+
+		thirdPin = (EditTextPIN) findViewById(R.id.pin_third_login);
+		thirdPin.setOnLongClickListener(this);
+		thirdPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(thirdPin, InputMethodManager.SHOW_FORCED);
+		thirdPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (thirdPin.length()!= 0){
+					fourthPin.requestFocus();
+					fourthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						fourthPin.setText("");
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fourthPin = (EditTextPIN) findViewById(R.id.pin_fouth_login);
+		fourthPin.setOnLongClickListener(this);
+		fourthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
+		fourthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fourthPin.length()!=0){
+					fifthPin.requestFocus();
+					fifthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						fifthPin.setText("");
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		fifthPin = (EditTextPIN) findViewById(R.id.pin_fifth_login);
+		fifthPin.setOnLongClickListener(this);
+		fifthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(fifthPin, InputMethodManager.SHOW_FORCED);
+		fifthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (fifthPin.length()!=0){
+					sixthPin.requestFocus();
+					sixthPin.setCursorVisible(true);
+
+					if (isFirstTime && !pinLongClick) {
+						sixthPin.setText("");
+					}
+					else if (pinLongClick) {
+						pasteClipboard();
+					}
+					else  {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+
+		sixthPin = (EditTextPIN) findViewById(R.id.pin_sixth_login);
+		sixthPin.setOnLongClickListener(this);
+		sixthPin.setOnFocusChangeListener(this);
+		imm.showSoftInput(sixthPin, InputMethodManager.SHOW_FORCED);
+		sixthPin.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				if (sixthPin.length()!=0){
+					sixthPin.setCursorVisible(true);
+					hideKeyboard();
+
+					if (pinLongClick) {
+						pasteClipboard();
+					}
+					else {
+						permitVerify();
+					}
+				}
+				else {
+					if (isErrorShown){
+						verifyQuitError();
+					}
+				}
+			}
+		});
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb1.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb1.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		firstPin.setLayoutParams(paramsb1);
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		firstPin.setLayoutParams(textParams);
+
+		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb2.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb2.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		secondPin.setLayoutParams(paramsb2);
+		textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		secondPin.setLayoutParams(textParams);
+		secondPin.setEt(firstPin);
+
+		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb3.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb3.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		thirdPin.setLayoutParams(paramsb3);
+		textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(25, outMetrics), 0);
+		thirdPin.setLayoutParams(textParams);
+		thirdPin.setEt(secondPin);
+
+		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb4.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb4.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fourthPin.setLayoutParams(paramsb4);
+		textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fourthPin.setLayoutParams(textParams);
+		fourthPin.setEt(thirdPin);
+
+		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb5.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb5.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		fifthPin.setLayoutParams(paramsb5);
+		textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
+		textParams.setMargins(0, 0, Util.scaleWidthPx(8, outMetrics), 0);
+		fifthPin.setLayoutParams(textParams);
+		fifthPin.setEt(fourthPin);
+
+		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
+		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			paramsb6.width = Util.scaleWidthPx(42, outMetrics);
+		}
+		else {
+			paramsb6.width = Util.scaleWidthPx(25, outMetrics);
+		}
+		sixthPin.setLayoutParams(paramsb6);
+		textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
+		textParams.setMargins(0, 0, 0, 0);
+		sixthPin.setLayoutParams(textParams);
+		sixthPin.setEt(fifthPin);
 	}
+
+	void permitVerify(){
+		log("permitVerify");
+		if (firstPin.length() == 1 && secondPin.length() == 1 && thirdPin.length() == 1 && fourthPin.length() == 1 && fifthPin.length() == 1 && sixthPin.length() == 1){
+			hideKeyboard();
+			if (sb.length()>0) {
+				sb.delete(0, sb.length());
+			}
+			sb.append(firstPin.getText());
+			sb.append(secondPin.getText());
+			sb.append(thirdPin.getText());
+			sb.append(fourthPin.getText());
+			sb.append(fifthPin.getText());
+			sb.append(sixthPin.getText());
+			pin = sb.toString();
+			log("PIN: "+pin);
+			if (!isErrorShown && pin != null){
+				verify2faProgressBar.setVisibility(View.VISIBLE);
+				log("lastEmail: "+lastEmail+" lastPasswd: "+lastPassword);
+				megaApi.multiFactorAuthLogin(lastEmail, lastPassword, pin, this);
+			}
+		}
+	}
+
+	void hideKeyboard(){
+
+		View v = getCurrentFocus();
+		if (v != null){
+			imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+		}
+	}
+
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		switch (v.getId()) {
+			case R.id.pin_first_login:{
+				if (hasFocus) {
+					firstPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_second_login:{
+				if (hasFocus) {
+					secondPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_third_login:{
+				if (hasFocus) {
+					thirdPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fouth_login:{
+				if (hasFocus) {
+					fourthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_fifth_login:{
+				if (hasFocus) {
+					fifthPin.setText("");
+				}
+				break;
+			}
+			case R.id.pin_sixth_login:{
+				if (hasFocus) {
+					sixthPin.setText("");
+				}
+				break;
+			}
+		}
+	}
+
+	void pasteClipboard() {
+		log("pasteClipboard");
+		pinLongClick = false;
+		ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+		ClipData clipData = clipboard.getPrimaryClip();
+		if (clipData != null) {
+			String code = clipData.getItemAt(0).getText().toString();
+			log("code: "+code);
+			if (code != null && code.length() == 6) {
+				boolean areDigits = true;
+				for (int i=0; i<6; i++) {
+					if (!Character.isDigit(code.charAt(i))) {
+						areDigits = false;
+						break;
+					}
+				}
+				if (areDigits) {
+					firstPin.setText(""+code.charAt(0));
+					secondPin.setText(""+code.charAt(1));
+					thirdPin.setText(""+code.charAt(2));
+					fourthPin.setText(""+code.charAt(3));
+					fifthPin.setText(""+code.charAt(4));
+					sixthPin.setText(""+code.charAt(5));
+				}
+				else {
+					firstPin.setText("");
+					secondPin.setText("");
+					thirdPin.setText("");
+					fourthPin.setText("");
+					fifthPin.setText("");
+					sixthPin.setText("");
+				}
+			}
+		}
+	}
+
+	void verifyQuitError(){
+		isErrorShown = false;
+		pinError.setVisibility(View.GONE);
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()){
+			case R.id.pin_first_login:
+			case R.id.pin_second_login:
+			case R.id.pin_third_login:
+			case R.id.pin_fouth_login:
+			case R.id.pin_fifth_login:
+			case R.id.pin_sixth_login: {
+				pinLongClick = true;
+				v.requestFocus();
+			}
+		}
+		return false;
+	}
+
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
@@ -629,7 +1118,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 			searchView.setIconifiedByDefault(true);
 		}
-		
+		searchMenuItem.setVisible(false);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -642,6 +1131,24 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
 	{
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
+	}
+
+	public void downloadAndAttachAfterClick(long size, long [] hashes){
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+
+		progressTransfersFinish = 0;
+		clipDataTransfers = null;
+
+		downloadAndAttach(size, hashes);
 	}
 
 	public void downloadAndAttach(long size, long [] hashes){
@@ -766,6 +1273,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		bundle.putInt("deepBrowserTree", incomingDeepBrowserTree);
 		bundle.putLong("parentHandle", gParentHandle);
 		bundle.putLong("incParentHandle", incParentHandle);
+		bundle.putBoolean("is2FAEnabled", is2FAEnabled);
+		bundle.putString("lastEmail", lastEmail);
+		bundle.putString("lastPassword", lastPassword);
 		super.onSaveInstanceState(bundle);
 	}
 	
@@ -849,6 +1359,19 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
                 downloadAndAttach(selectedNodes.size(), hashes);
 				break;
 			}
+			case R.id.toggle_button: {
+				if (passwdVisibility) {
+					toggleButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_shared_read));
+					passwdVisibility = false;
+					showHidePassword();
+				}
+				else {
+					toggleButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_see));
+					passwdVisibility = true;
+					showHidePassword();
+				}
+				break;
+			}
 		}
 	}
 
@@ -919,7 +1442,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			return;
 		}
 		
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(et_user.getWindowToken(), 0);
 		
 		if(!Util.isOnline(this))
@@ -1055,6 +1578,35 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			}
 		}
 	}
+
+	public void showAB(Toolbar tB){
+		setSupportActionBar(tB);
+		aB = getSupportActionBar();
+
+		aB.show();
+		aB.setHomeButtonEnabled(true);
+		aB.setDisplayShowHomeEnabled(true);
+		aB.setDisplayHomeAsUpEnabled(true);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		}
+	}
+
+	public void hideAB(){
+		if (aB != null){
+			aB.hide();
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			Window window = getWindow();
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+		}
+	}
 	
 	public void setParentHandle (long parentHandle){
 		this.gParentHandle = parentHandle;
@@ -1137,41 +1689,78 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 					errorMessage = getString(R.string.error_server_expired_session);
 				}
+				else if (e.getErrorCode() == MegaError.API_EMFAREQUIRED){
+					is2FAEnabled = true;
+					showAB(tB);
+					loginLogin.setVisibility(View.GONE);
+					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
+					loginCreateAccount.setVisibility(View.GONE);
+					loginLoggingIn.setVisibility(View.GONE);
+					generatingKeysText.setVisibility(View.GONE);
+					loginProgressBar.setVisibility(View.GONE);
+					loginFetchNodesProgressBar.setVisibility(View.GONE);
+					queryingSignupLinkText.setVisibility(View.GONE);
+					confirmingAccountText.setVisibility(View.GONE);
+					fetchingNodesText.setVisibility(View.GONE);
+					prepareNodesText.setVisibility(View.GONE);
+					serversBusyText.setVisibility(View.GONE);
+					loginVerificationLayout.setVisibility(View.VISIBLE);
+					firstPin.requestFocus();
+					firstPin.setCursorVisible(true);
+					errorMessage = "";
+				}
 				else{
 
 					errorMessage = e.getErrorString();
 				}
-				loginLoggingIn.setVisibility(View.GONE);
-				loginLogin.setVisibility(View.VISIBLE);
-				if(scrollView!=null){
-					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
+
+				if (!is2FAEnabled) {
+					loginLoggingIn.setVisibility(View.GONE);
+					loginLogin.setVisibility(View.VISIBLE);
+					if(scrollView!=null){
+						scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
+					}
+					loginCreateAccount.setVisibility(View.INVISIBLE);
+					queryingSignupLinkText.setVisibility(View.GONE);
+					confirmingAccountText.setVisibility(View.GONE);
+					generatingKeysText.setVisibility(View.GONE);
+					loggingInText.setVisibility(View.GONE);
+					fetchingNodesText.setVisibility(View.GONE);
+					prepareNodesText.setVisibility(View.GONE);
+					if(serversBusyText!=null){
+						serversBusyText.setVisibility(View.GONE);
+					}
+
+					Util.showErrorAlertDialog(errorMessage, false, this);
 				}
-				loginCreateAccount.setVisibility(View.INVISIBLE);
-				queryingSignupLinkText.setVisibility(View.GONE);
-				confirmingAccountText.setVisibility(View.GONE);
-				generatingKeysText.setVisibility(View.GONE);
-				loggingInText.setVisibility(View.GONE);
-				fetchingNodesText.setVisibility(View.GONE);
-				prepareNodesText.setVisibility(View.GONE);
-				if(serversBusyText!=null){
-					serversBusyText.setVisibility(View.GONE);
-				}
-				
-				Util.showErrorAlertDialog(errorMessage, false, this);
 				
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-					Intent stopIntent = null;
-					stopIntent = new Intent(this, CameraSyncService.class);
-					stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-					startService(stopIntent);
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						Intent stopIntent = null;
+						stopIntent = new Intent(this, CameraSyncService.class);
+						stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+						startService(stopIntent);
+					}
 				}
 			}
 			else{
+				if (is2FAEnabled){
+					is2FAEnabled = false;
+					loginVerificationLayout.setVisibility(View.GONE);
+					hideAB();
+				}
+				loginLoggingIn.setVisibility(View.VISIBLE);
+				if(scrollView!=null){
+					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
+				}
+				generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
@@ -1291,16 +1880,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	}
 
 	public void afterFetchNodes(){
+		log("afterFetchNodes");
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_provider);
 
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tB.getLayoutParams();
 		params.setMargins(0, 0, 0, 0);
 
-		setSupportActionBar(tB);
-		aB = getSupportActionBar();
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setDisplayShowHomeEnabled(true);
+		showAB(tB);
 
 		Display display = getWindowManager().getDefaultDisplay();
 

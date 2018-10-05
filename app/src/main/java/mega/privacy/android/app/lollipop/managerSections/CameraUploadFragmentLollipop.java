@@ -112,7 +112,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	private RelativeLayout contentTextLayout;
+//	private RelativeLayout contentTextLayout;
 //	Button turnOnOff;
 	private RelativeLayout transfersOverViewLayout;
 
@@ -787,8 +787,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			relativeLayoutTurnOnOff.setOnClickListener(this);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
-			contentTextLayout.setVisibility(View.GONE);
+//			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
+//			contentTextLayout.setVisibility(View.GONE);
 
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.file_list_empty_text);
@@ -979,8 +979,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			relativeLayoutTurnOnOff.setOnClickListener(this);
 
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
-			contentTextLayout.setVisibility(View.GONE);
+//			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
+//			contentTextLayout.setVisibility(View.GONE);
 
 			fragmentContainer = (RelativeLayout) v.findViewById(R.id.fragment_container_file_browser_grid);
 			fragmentContainer.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
@@ -1389,8 +1389,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		else{
 			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 		}
-		
-		context.startService(new Intent(context, CameraSyncService.class));
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			context.startService(new Intent(context, CameraSyncService.class));
+		}
 		
 		((ManagerActivityLollipop)context).refreshCameraUpload();
 	}
@@ -1411,11 +1413,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (isEnabled){
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setCamSyncEnabled(false);
-			
-			Intent stopIntent = null;
-			stopIntent = new Intent(context, CameraSyncService.class);
-			stopIntent.setAction(CameraSyncService.ACTION_STOP);
-			context.startService(stopIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent stopIntent = null;
+				stopIntent = new Intent(context, CameraSyncService.class);
+				stopIntent.setAction(CameraSyncService.ACTION_STOP);
+				context.startService(stopIntent);
+			}
 			
 			((ManagerActivityLollipop)context).refreshCameraUpload();
 		}
@@ -1438,8 +1442,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 											
 																@Override
 																public void run() {
-																	log("Now I start the service");
-																	context.startService(new Intent(context, CameraSyncService.class));		
+																	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+																		log("Now I start the service");
+																		context.startService(new Intent(context, CameraSyncService.class));
+																	}
 																}
 															}, 5 * 1000);
 									

@@ -284,6 +284,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		adapterType = intent.getIntExtra("adapterType", 0);
 		offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 
+		if (nC == null) {
+			nC = new NodeController(this);
+		}
+		boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
+
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_get_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -344,7 +349,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			propertiesIcon.setVisible(false);
 			downloadIcon.setVisible(true);
 
-		}else if(adapterType == Constants.SEARCH_ADAPTER){
+		}else if(adapterType == Constants.SEARCH_ADAPTER && !fromIncoming){
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 
 			if(node.isExported()){
@@ -398,7 +403,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				removeIcon.setVisible(true);
 			}
 		}
-		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+		else if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
 			propertiesIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			if(Util.isChatEnabled()){
@@ -733,7 +738,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					i.putExtra("handle", node.getHandle());
 					i.putExtra("imageId", MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 					i.putExtra("name", node.getName());
-					if (adapterType == Constants.INCOMING_SHARES_ADAPTER) {
+					if (nC == null) {
+						nC = new NodeController(this);
+					}
+					boolean fromIncoming = nC.nodeComesFromIncoming(node);
+					if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
 						i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
 						i.putExtra("firstLevel", false);
 					}
@@ -882,7 +891,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
-		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+		//If inserted a placehoder in CloudDriveAdapter,here the position need to be remove the placeholder.
+        int placeholder = intent.getIntExtra("placeholder",0 );
+        positionG -= placeholder;
+        orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
 		isFileLink = intent.getBooleanExtra("isFileLink",false);
 
