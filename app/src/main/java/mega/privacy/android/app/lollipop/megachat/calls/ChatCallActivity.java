@@ -2723,9 +2723,9 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 if(!isManualMode){
                     if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
                         position = 0;
-                        peerSelected = peersOnCall.get(position);
+                        peerSelected = peersOnCall.get(1);
                         if((adapter != null)&&(position !=-1)){
-                            adapter.addLayer(position);
+                            adapter.addLayer(1);
                         }
 
                         if(peerSelected.isVideoOn()){

@@ -58,8 +58,8 @@
         <!--Micro Avatar-->
         <ImageView
             android:id="@+id/micro_avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_toRightOf="@+id/avatar_rl"
             android:layout_alignTop="@+id/avatar_rl"
             android:background="@android:color/transparent"

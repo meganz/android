@@ -62,8 +62,8 @@
                         <!--Micro Video-->
                         <ImageView
                             android:id="@+id/micro_fragment_big_camera_group_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_alignParentRight="true"
                             android:layout_alignParentTop="true"
                             android:layout_marginRight="8dp"
@@ -104,8 +104,8 @@
                         <!--Micro Avatar-->
                         <ImageView
                             android:id="@+id/micro_avatar_big_camera_group_call"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:layout_toRightOf="@+id/rl_avatar_big_camera_group_call"
                             android:layout_alignTop="@+id/rl_avatar_big_camera_group_call"
                             android:background="@android:color/transparent"
