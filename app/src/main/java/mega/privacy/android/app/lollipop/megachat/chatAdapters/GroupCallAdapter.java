@@ -249,6 +249,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
 
 
+
         if(peer.isVideoOn()) {
             log("Video ON - numPeersOnCall: "+numPeersOnCall);
             if(numPeersOnCall < 7){
@@ -321,7 +322,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
             }
 
-
             holder.avatarMicroLayout.setVisibility(GONE);
             holder.microAvatar.setVisibility(View.GONE);
 
@@ -365,7 +365,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
                 paramsMicroSurface.setMargins(0,  Util.scaleWidthPx(7, outMetrics),  Util.scaleWidthPx(7, outMetrics), 0);
                 holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
-
             }
 
 
@@ -379,6 +378,17 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
             }
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
+
+            //Green Layer
+            if(numPeersOnCall > 7){
+                if(peer.hasGreenLayer()){
+                    holder.greenLayer.setVisibility(View.VISIBLE);
+                }else{
+                    holder.greenLayer.setVisibility(View.GONE);
+                }
+            }else{
+                holder.greenLayer.setVisibility(View.GONE);
+            }
 
             //Create listener
             GroupCallListener listenerPeer = new GroupCallListener(context, holder);
@@ -488,6 +498,17 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 }
             }
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
+
+            //Green Layer
+            if(numPeersOnCall > 7){
+                if(peer.hasGreenLayer()){
+                    holder.greenLayer.setVisibility(View.VISIBLE);
+                }else{
+                    holder.greenLayer.setVisibility(View.GONE);
+                }
+            }else{
+                holder.greenLayer.setVisibility(View.GONE);
+            }
 
             //Remove listener
             if (peer.getHandle().equals(megaChatApi.getMyUserHandle())) {
@@ -730,30 +751,53 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         }
     }
 
-    public void addLayer(int p){
-        log("addLayer() - position "+p);
-        if(peers!=null){
-            //Remove green layer for the rest of users:
-            for(int i=0; i<peers.size();i++){
-                ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
-                if(holder!=null){
-                    InfoPeerGroupCall peer = getNodeAt(i);
-                    if (peer == null){
-                        return;
-                    }
-                    if(i==p){
-                        holder.greenLayer.setVisibility(View.VISIBLE);
-                    }else{
-                        if(holder.greenLayer.getVisibility()==View.VISIBLE){
-                            holder.greenLayer.setVisibility(View.GONE);
-                        }
-                    }
-                }else{
-                }
-            }
+    public void changesInGreenLayer(int position, ViewHolderGroupCall holder){
+        log("changesInGreenLayer");
+        if(holder == null){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
         }
-
+        if(holder!=null){
+            InfoPeerGroupCall peer = getNodeAt(position);
+            if (peer == null){
+                return;
+            }
+            if(peer.hasGreenLayer()){
+                log("Has Green layer");
+                holder.greenLayer.setVisibility(View.VISIBLE);
+            }else{
+                log("Has not Green layer");
+                holder.greenLayer.setVisibility(View.GONE);
+            }
+        }else{
+            notifyItemChanged(position);
+        }
     }
+
+
+//    public void addLayer(int p){
+//        log("addLayer() - position "+p);
+//        if(peers!=null){
+//            //Remove green layer for the rest of users:
+//            for(int i=0; i<peers.size();i++){
+//                ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
+//                if(holder!=null){
+//                    InfoPeerGroupCall peer = getNodeAt(i);
+//                    if (peer == null){
+//                        return;
+//                    }
+//                    if(i==p){
+//                        holder.greenLayer.setVisibility(View.VISIBLE);
+//                    }else{
+//                        if(holder.greenLayer.getVisibility()==View.VISIBLE){
+//                            holder.greenLayer.setVisibility(View.GONE);
+//                        }
+//                    }
+//                }else{
+//                }
+//            }
+//        }
+//
+//    }
 
 
     @Override
