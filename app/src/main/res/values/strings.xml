@@ -2134,6 +2134,7 @@
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
 
-    <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
+    <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
+    <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
 
 </resources>
