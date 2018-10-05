@@ -41,6 +41,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/pendingcontactrequest.cpp \
     sdk/src/treeproc.cpp \
     sdk/src/user.cpp \
+    sdk/src/useralerts.cpp \
     sdk/src/utils.cpp \
     sdk/src/waiterbase.cpp  \
     sdk/src/crypto/cryptopp.cpp  \
@@ -92,6 +93,7 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/treeproc.h \
 	    sdk/include/mega/types.h \
 	    sdk/include/mega/user.h \
+            sdk/include/mega/useralerts.h \
 	    sdk/include/mega/utils.h \
 	    sdk/include/mega/waiter.h \
 	    sdk/include/mega/crypto/cryptopp.h  \

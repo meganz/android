@@ -113,7 +113,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
+import nz.mega.sdk.MegaUserAlert;
 
 
 @SuppressLint("NewApi")
@@ -2912,7 +2912,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		log("onUsersUpdate");
 	}
 
-	@Override
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+        log("onUserAlertsUpdate");
+    }
+
+    @Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
 
