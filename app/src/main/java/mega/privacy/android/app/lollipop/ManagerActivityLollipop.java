@@ -13166,7 +13166,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		builder.setMessage(R.string.confirmation_close_sessions).setPositiveButton(R.string.general_close, dialogClickListener)
+		builder.setTitle(R.string.confirmation_close_sessions_title);
+
+		builder.setMessage(R.string.confirmation_close_sessions_text).setPositiveButton(R.string.contact_accept, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 	}
