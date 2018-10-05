@@ -1471,7 +1471,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         if(userHandle == megaChatApi.getMyUserHandle()){
             log("My own status update");
-            adapter.updateContactStatus(0, userHandle, status);
+            int position = participants.size()-1;
+            adapter.updateContactStatus(position, userHandle, status);
         }
         else{
             log("Status update for the user: "+userHandle);
