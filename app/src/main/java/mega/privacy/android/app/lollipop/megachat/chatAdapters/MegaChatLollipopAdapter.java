@@ -3383,11 +3383,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(androidMessage.getRichLinkMessage().getFolderContent());
                 }
             } else {
-                if(androidMessage.getRichLinkMessage().isChat()){
+                if(androidMessage.getRichLinkMessage()!=null && androidMessage.getRichLinkMessage().isChat()){
                     ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText("Chat title");
+                    ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(androidMessage.getRichLinkMessage().getTitle());
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText("Chat participants");
+                    long numParticipants = androidMessage.getRichLinkMessage().getNumParticipants();
+                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.number_of_participants, numParticipants));
 
                     if (androidMessage.getRichLinkMessage().isFile()) {
                         ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(R.drawable.ic_generic_list);
@@ -3638,11 +3639,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.forwardContactRichLinks.setOnClickListener(this);
             }
 
-
             ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
             holder.forwardContactContact.setVisibility(View.GONE);
-
 
             //MEGA link
 
@@ -3688,9 +3687,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 if(androidMessage.getRichLinkMessage().isChat()){
                     ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText("Chat title");
+
+                    ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText(androidMessage.getRichLinkMessage().getTitle());
                     ((ViewHolderMessageChat) holder).urlContactMessageDescription.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText("Chat participants");
+                    long numParticipants = androidMessage.getRichLinkMessage().getNumParticipants();
+                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(context.getString(R.string.number_of_participants, numParticipants));
 
                     if (androidMessage.getRichLinkMessage().isFile()) {
                         ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_generic_list);

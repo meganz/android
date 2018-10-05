@@ -13,12 +13,16 @@ import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatRequest;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-public class ChatLinkInfoListener implements MegaRequestListenerInterface {
+public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
     Context context;
     long msgId;
@@ -194,5 +198,37 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface {
 
     private static void log(String log) {
         Util.log("ChatLinkInfoListener", log);
+    }
+
+    @Override
+    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+
+    }
+
+    @Override
+    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        if (request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
+            if (e.getErrorCode() == MegaError.API_OK){
+
+                String link = request.getLink();
+
+                richLinkMessage = new AndroidMegaRichLinkMessage(link, request.getText(), request.getNumber());
+
+                ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+            }
+            else{
+                //Invalid link
+            }
+        }
+    }
+
+    @Override
+    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+
     }
 }

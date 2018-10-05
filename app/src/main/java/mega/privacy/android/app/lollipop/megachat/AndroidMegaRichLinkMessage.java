@@ -28,22 +28,19 @@ public class AndroidMegaRichLinkMessage {
         this.url = url;
 
         Uri uri = Uri.parse(url);
-
         this.server = uri.getAuthority();
     }
 
     public AndroidMegaRichLinkMessage (String url, String title, long participants){
 
         this.url = url;
+        this.title = title;
+        this.numParticipants = participants;
 
         Uri uri = Uri.parse(url);
-
         this.server = uri.getAuthority();
 
         this.isChat = true;
-
-        this.title = "New chat";
-        this.numParticipants = 5;
     }
 
     public String getUrl() {
@@ -120,7 +117,7 @@ public class AndroidMegaRichLinkMessage {
                 return url;
             }
             if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
-                log("folder link found");
+                log("chat link found");
                 return url;
             }
         }

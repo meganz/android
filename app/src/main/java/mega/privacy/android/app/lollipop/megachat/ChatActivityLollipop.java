@@ -4447,9 +4447,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(AndroidMegaRichLinkMessage.isChatLink(link)){
 
-                    AndroidMegaRichLinkMessage richLinkMessage = new AndroidMegaRichLinkMessage(link, "", 5);
-
-                    setRichLinkInfo(msg.getMsgId(), richLinkMessage);
+                    log("isChatLink");
+                    ChatLinkInfoListener listener = new ChatLinkInfoListener(this, msg.getMsgId(), megaApi);
+                    megaChatApi.checkChatLink(link, listener);
 
                     return MEGA_CHAT_LINK;
                 }
@@ -4633,13 +4633,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
-//DELETE AFTER CALLIN LISTENER
-                if(checkMegaLink(msg)==MEGA_CHAT_LINK){
-                    AndroidMegaRichLinkMessage richLinkMessage = new AndroidMegaRichLinkMessage("mega.nz/c/efxkhIBA#-fE3jeFzDnr6FhrWmepqrg", "", 5);
-
-                    androidMsg.setRichLinkMessage(richLinkMessage);
-                }
-///////////////////////
 
                 if (lastIdMsgSeen != -1) {
                     if(lastIdMsgSeen ==msg.getMsgId()){
