@@ -166,7 +166,6 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         name_background = userName.getBackground().mutate().getConstantState().newDrawable();
 
         userLastName.getBackground().clearColorFilter();
-        userLastName.requestFocus();
         userLastName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
