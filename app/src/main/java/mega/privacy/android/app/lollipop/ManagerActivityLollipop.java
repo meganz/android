@@ -8013,7 +8013,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
                         fragTransaction.detach(currentFragment);
                         fragTransaction.commitNowAllowingStateLoss();
-                        oFLol.floatingItemDecoration = null;
+                        oFLol.headerItemDecoration = null;
                         oFLol.setPathNavigation(pathNavigationOffline);
 
                         fragTransaction = getSupportFragmentManager().beginTransaction();
