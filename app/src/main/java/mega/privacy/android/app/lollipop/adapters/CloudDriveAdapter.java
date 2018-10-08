@@ -1459,7 +1459,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     
     
     private String getItemNode(int position) {
-        return nodes.get(position).getName();
+        if (nodes.get(position) != null) {
+            return nodes.get(position).getName();
+        }
+        return null;
     }
     
     
@@ -1487,7 +1490,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     
     @Override
     public String getSectionTitle(int position) {
-        return getItemNode(position).substring(0,1);
+        if (getItemNode(position) != null && !getItemNode(position).equals("")) {
+            return getItemNode(position).substring(0, 1);
+        }
+        return null;
     }
     
     @Override
