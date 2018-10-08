@@ -41,7 +41,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -50,14 +53,15 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.CustomizedGridRecyclerView;
+import mega.privacy.android.app.components.FloatingItemDecoration;
+import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaBrowserLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.CloudDriveAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -83,7 +87,7 @@ public class SearchFragmentLollipop extends Fragment{
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	MegaBrowserLollipopAdapter adapter;
+    CloudDriveAdapter adapter;
 	SearchFragmentLollipop searchFragment = this;
 	TextView contentText;
 	RelativeLayout contentTextLayout;
@@ -110,6 +114,10 @@ public class SearchFragmentLollipop extends Fragment{
 
 	boolean multiselectBoolean=false;
 
+    private int placeholderCount;
+
+    FloatingItemDecoration floatingItemDecoration;
+
 	public void activateActionMode(){
 		log("activateActionMode");
 		if (!adapter.isMultipleSelect()){
@@ -121,7 +129,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public void updateScrollPosition(int position) {
 		log("updateScrollPosition");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				mLayoutManager.scrollToPosition(position);
 			}
 			else if (gridLayoutManager != null) {
@@ -134,7 +142,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public ImageView getImageDrag(int position) {
 		log("getImageDrag");
 		if (adapter != null) {
-			if (adapter.getAdapterType() == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
+			if (adapter.getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_LIST && mLayoutManager != null) {
 				View v = mLayoutManager.findViewByPosition(position);
 				if (v != null) {
 					return (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -469,6 +477,82 @@ public class SearchFragmentLollipop extends Fragment{
 		lastPositionStack = new Stack<>();
 		super.onCreate(savedInstanceState);
 	}
+
+    public void addSectionTitle(List<MegaNode> nodes,int type) {
+	    //re-order the returned nodes, since SDK doesn't seprate the nodes by type.
+	    nodes.sort(new Comparator<MegaNode>() {
+
+            @Override
+            public int compare(MegaNode o1,MegaNode o2) {
+                if(o1 != null && o2 != null) {
+                    if(o1.isFolder() && o2.isFolder()) {
+                        return 0;
+                    }
+                    if(o1.isFile() && o2.isFile()) {
+                        return 0;
+                    }
+                    if(o1.isFolder() && o2.isFile()) {
+                        return -1;
+                    }
+                    if(o1.isFile() && o2.isFolder()) {
+                        return 1;
+                    }
+                }
+                return 0;
+            }
+        });
+        Map<Integer, String> sections = new HashMap<>();
+        int folderCount = 0;
+        int fileCount = 0;
+        for (MegaNode node : nodes) {
+            if(node == null) {
+                continue;
+            }
+            if (node.isFolder()) {
+                folderCount++;
+            }
+            if (node.isFile()) {
+                fileCount++;
+            }
+        }
+
+        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
+        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+        if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
+            int spanCount = 2;
+            if (recyclerView instanceof NewGridRecyclerView) {
+                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
+            }
+            if(folderCount > 0) {
+                for (int i = 0;i < spanCount;i++) {
+                    sections.put(i,folderCount + " " + folderStr);
+                }
+            }
+
+            if(fileCount > 0 ) {
+                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+                if (placeholderCount == 0) {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                    }
+                } else {
+                    for (int i = 0;i < spanCount;i++) {
+                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                    }
+                }
+            }
+        } else {
+            placeholderCount = 0;
+            sections.put(0,folderCount + " " + folderStr);
+            sections.put(folderCount,fileCount + " " + fileStr);
+        }
+        if (floatingItemDecoration == null) {
+            floatingItemDecoration = new FloatingItemDecoration(context);
+            recyclerView.addItemDecoration(floatingItemDecoration);
+        }
+        floatingItemDecoration.setType(type);
+        floatingItemDecoration.setKeys(sections);
+    }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -536,11 +620,12 @@ public class SearchFragmentLollipop extends Fragment{
 			transfersOverViewLayout.setVisibility(View.GONE);
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				adapter.setNodes(nodes);
+                adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
+                addSectionTitle(nodes,adapter.getAdapterType());
+                adapter.setNodes(nodes);
 			}
 
 			adapter.setMultipleSelect(false);
@@ -582,10 +667,11 @@ public class SearchFragmentLollipop extends Fragment{
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
 
 			if (adapter == null){
-				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new CloudDriveAdapter(context, this, nodes, ((ManagerActivityLollipop)context).parentHandleSearch, recyclerView, null, Constants.SEARCH_ADAPTER, CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
+                addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 			}
 			adapter.setMultipleSelect(false);
@@ -639,10 +725,10 @@ public class SearchFragmentLollipop extends Fragment{
 					lastFirstVisiblePosition = mLayoutManager.findFirstCompletelyVisibleItemPosition();
 				}
 				else{
-					lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
+					lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstCompletelyVisibleItemPosition();
 					if(lastFirstVisiblePosition==-1){
 						log("Completely -1 then find just visible position");
-						lastFirstVisiblePosition = ((CustomizedGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
+						lastFirstVisiblePosition = ((NewGridRecyclerView) recyclerView).findFirstVisibleItemPosition();
 					}
 				}
 
@@ -656,6 +742,7 @@ public class SearchFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(n, ((ManagerActivityLollipop)context).orderCloud);
+                addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 				recyclerView.scrollToPosition(0);
 
@@ -729,6 +816,8 @@ public class SearchFragmentLollipop extends Fragment{
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+                    //Put flag to notify FullScreenImageViewerLollipop.
+                    intent.putExtra("placeholder", placeholderCount);
 					intent.putExtra("position", position);
 					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).searchQuery);
 					intent.putExtra("adapterType", Constants.SEARCH_ADAPTER);
@@ -1125,6 +1214,7 @@ public class SearchFragmentLollipop extends Fragment{
 						emptyTextView.setVisibility(View.VISIBLE);
 					}
 				}
+                addSectionTitle(nodes,adapter.getAdapterType());
 				adapter.setNodes(nodes);
 
 				int lastVisiblePosition = 0;
@@ -1267,9 +1357,12 @@ public class SearchFragmentLollipop extends Fragment{
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		log("setNodes");
-
+        if(nodes == null) {
+            return;
+        }
 		this.nodes = nodes;
 		if (adapter != null){
+            addSectionTitle(nodes,adapter.getAdapterType());
 			adapter.setNodes(nodes);
 			visibilityFastScroller();
 
@@ -1336,11 +1429,11 @@ public class SearchFragmentLollipop extends Fragment{
 				}
 			}
 			else{
-				contentTextLayout.setVisibility(View.VISIBLE);
-				contentText.setText(MegaApiUtils.getInfoNode(nodes, context));
-				recyclerView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+//				contentTextLayout.setVisibility(View.GONE);
+//				contentText.setText(MegaApiUtils.getInfoNode(nodes, context));
+//				recyclerView.setVisibility(View.VISIBLE);
+//				emptyImageView.setVisibility(View.GONE);
+//				emptyTextView.setVisibility(View.GONE);
 			}			
 		}
 	}
