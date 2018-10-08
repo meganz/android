@@ -1548,8 +1548,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+
         if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {

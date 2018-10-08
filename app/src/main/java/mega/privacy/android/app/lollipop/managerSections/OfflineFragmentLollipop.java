@@ -57,6 +57,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -86,7 +87,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	CustomizedGridLayoutManager gridLayoutManager;
 
 	Stack<Integer> lastPositionStack;
-	public FloatingItemDecoration floatingItemDecoration;
+	public NewHeaderItemDecoration headerItemDecoration;
 	ImageView emptyImageView;
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
@@ -173,8 +174,7 @@ public class OfflineFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+
         if (getAdapterType() == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -182,7 +182,7 @@ public class OfflineFragmentLollipop extends Fragment{
             }
             if(folderCount > 0) {
                 for (int i = 0;i < spanCount;i++) {
-                    sections.put(i,folderCount + " " + folderStr);
+                    sections.put(i, getString(R.string.general_folders));
                 }
             }
             
@@ -190,25 +190,25 @@ public class OfflineFragmentLollipop extends Fragment{
                 placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
                 if (placeholderCount == 0) {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + i, getString(R.string.general_files));
                     }
                 } else {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
                     }
                 }
             }
         } else {
             placeholderCount = 0;
-            sections.put(0,folderCount + " " + folderStr);
-            sections.put(folderCount,fileCount + " " + fileStr);
+            sections.put(0, getString(R.string.general_folders));
+            sections.put(folderCount, getString(R.string.general_files));
         }
-        if (floatingItemDecoration == null) {
-            floatingItemDecoration = new FloatingItemDecoration(context);
-            recyclerView.addItemDecoration(floatingItemDecoration);
-        }
-        floatingItemDecoration.setType(getAdapterType());
-        floatingItemDecoration.setKeys(sections);
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+			recyclerView.addItemDecoration(headerItemDecoration);
+		}
+		headerItemDecoration.setType(getAdapterType());
+		headerItemDecoration.setKeys(sections);
     }
 
 	public ImageView getImageDrag(int position) {
@@ -520,8 +520,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			recyclerView = (RecyclerView) v.findViewById(R.id.offline_view_browser);
-            recyclerView.removeItemDecoration(floatingItemDecoration);
-            floatingItemDecoration = null;
+            recyclerView.removeItemDecoration(headerItemDecoration);
+            headerItemDecoration = null;
 //			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
@@ -599,8 +599,8 @@ public class OfflineFragmentLollipop extends Fragment{
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.offline_view_browser_grid);
-			recyclerView.removeItemDecoration(floatingItemDecoration);
-			floatingItemDecoration = null;
+			recyclerView.removeItemDecoration(headerItemDecoration);
+			headerItemDecoration = null;
 			recyclerView.setHasFixedSize(true);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
