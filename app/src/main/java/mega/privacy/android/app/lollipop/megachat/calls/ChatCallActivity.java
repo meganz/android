@@ -2128,9 +2128,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
                     microFAB.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_record_audio_w));
                     if (peersOnCall != null && !peersOnCall.isEmpty()) {
-                        InfoPeerGroupCall item = peersOnCall.get(peersOnCall.size()-1);
-                        if(!item.isAudioOn()){
-                            item.setAudioOn(true);
+                        if(!peersOnCall.get(peersOnCall.size()-1).isAudioOn()){
+                            peersOnCall.get(peersOnCall.size()-1).setAudioOn(true);
                             int position = peersOnCall.size() -1;
                             adapter.changesInAudio(position,null);
 
@@ -2141,9 +2140,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     microFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.disable_fab_chat_call)));
                     microFAB.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_mic_off));
                     if (peersOnCall != null && !peersOnCall.isEmpty()) {
-                        InfoPeerGroupCall item = peersOnCall.get(peersOnCall.size()-1);
-                        if(item.isAudioOn()){
-                            item.setAudioOn(false);
+                        if(peersOnCall.get(peersOnCall.size()-1).isAudioOn()){
+                            peersOnCall.get(peersOnCall.size()-1).setAudioOn(false);
                             int position = peersOnCall.size() -1;
                             adapter.changesInAudio(position,null);
                         }
@@ -2712,45 +2710,28 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void updateUserSelected(boolean flag){
-        log("**** updateUserSelected()");
+        log("updateUserSelected()");
         if(flag){
 
             //Call IN PROGRESS
             if(peerSelected == null){
-                log("**** updateUserSelected()- First case");
-
                 //First case:
                 if(!isManualMode){
-                    log("**** A");
-
                     if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                        log("**** A.1");
-
                         int position = peersOnCall.size()-2;
                         peerSelected = peersOnCall.get(position);
-                        log("**** A.2- position: "+position);
-
                         for(int i=0;i<peersOnCall.size();i++){
                             if(i==position){
-                                log("**** A.3- position("+position+") == i("+i+")");
-
-                                if(!peersOnCall.get(i).hasGreenLayer()){
-                                    log("**** A.3.1- setGreenLayer(true)");
-                                    peersOnCall.get(i).setGreenLayer(true);
+                                if(!peersOnCall.get(position).hasGreenLayer()){
+                                    peersOnCall.get(position).setGreenLayer(true);
                                     if(adapter!=null){
-                                        log("**** A.3.1- adapter.changesInGreenLayer()");
-                                        adapter.changesInGreenLayer(i,null);
+                                        adapter.changesInGreenLayer(position,null);
                                     }
                                 }
                             }else{
-                                log("**** A.4- position("+position+") != i("+i+")");
-
                                 if(peersOnCall.get(i).hasGreenLayer()){
-                                    log("**** A.4.1- setGreenLayer(false)");
-
                                     peersOnCall.get(i).setGreenLayer(false);
                                     if(adapter!=null){
-                                        log("**** A.4.1- adapter.changesInGreenLayer()");
                                         adapter.changesInGreenLayer(i,null);
                                     }
                                 }
@@ -2785,11 +2766,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     }
                 }
             }else{
-                log("**** updateUserSelected()- rest of cases");
-
+                //Rest of cases
                 if((peersOnCall!=null)&&(peersOnCall.size()!=0)){
-                    log("updateUserSelected() - call IN PROGRESS - rest of cases");
-
                     for(int i=0; i<peersOnCall.size(); i++){
                         if(peersOnCall.get(i).getHandle().equals(peerSelected.getHandle())){
                             if(!peersOnCall.get(i).hasGreenLayer()){
@@ -2798,7 +2776,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                     adapter.changesInGreenLayer(i,null);
                                 }
                             }
-
                         }else{
                             if(peersOnCall.get(i).hasGreenLayer()){
                                 peersOnCall.get(i).setGreenLayer(false);
@@ -2808,7 +2785,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                         }
                     }
-
                     //Rest of cases:
                     if(peerSelected.isVideoOn()){
                         //Video ON
@@ -2844,7 +2820,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             if((peerSelected == null)){
                 log("updateUserSelected() - call INCOMING");
-
                 //First time:
                 //Remove Camera element, because with incoming, avatar is the only showed
                 if (bigCameraGroupCallFragment != null) {
@@ -3013,6 +2988,4 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         avatarBigCameraGroupCallInitialLetter.setText(contactFirstLetter);
         avatarBigCameraGroupCallInitialLetter.setVisibility(View.VISIBLE);
     }
-
-
 }

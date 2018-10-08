@@ -162,7 +162,6 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
         holderGrid.rlGeneral = (RelativeLayout) v.findViewById(R.id.general);
 
         holderGrid.greenLayer = (RelativeLayout) v.findViewById(R.id.green_layer);
-        holderGrid.greenLayer.setVisibility(GONE);
 
         holderGrid.surfaceViewLayout = (RelativeLayout) v.findViewById(R.id.rl_surface);
         holderGrid.surfaceViewLayout.removeAllViewsInLayout();
@@ -224,7 +223,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
     }
 
     public void onBindViewHolderGrid (final ViewHolderGroupCallGrid holder, final int position){
-        log("onBindViewHolderGrid()");
+        log("onBindViewHolderGrid() - position: "+position);
 
         final InfoPeerGroupCall peer = getNodeAt(position);
         if (peer == null){
@@ -380,7 +379,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             holder.surfaceViewLayout.setVisibility(View.VISIBLE);
 
             //Green Layer
-            if(numPeersOnCall > 7){
+            if(numPeersOnCall >= 7){
                 if(peer.hasGreenLayer()){
                     holder.greenLayer.setVisibility(View.VISIBLE);
                 }else{
@@ -500,7 +499,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
             holder.avatarMicroLayout.setVisibility(View.VISIBLE);
 
             //Green Layer
-            if(numPeersOnCall > 7){
+            if(numPeersOnCall >= 7){
                 if(peer.hasGreenLayer()){
                     holder.greenLayer.setVisibility(View.VISIBLE);
                 }else{
@@ -724,81 +723,53 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
     public void changesInAudio(int position, ViewHolderGroupCall holder){
         log("changesInAudio");
-        if(holder == null){
-            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-        }
-        if(holder!=null){
-            InfoPeerGroupCall peer = getNodeAt(position);
-            if (peer == null){
-                return;
-            }
-            if(peer.isAudioOn()){
-                log("Audio ON");
-                holder.microAvatar.setVisibility(View.GONE);
-                holder.microSurface.setVisibility(View.GONE);
-            }else{
-                log("Audio OFF");
-                if(!peer.isVideoOn()){
-                    holder.microAvatar.setVisibility(View.VISIBLE);
-                    holder.microSurface.setVisibility(View.GONE);
-                }else{
-                    holder.microSurface.setVisibility(View.VISIBLE);
-                    holder.microAvatar.setVisibility(View.GONE);
-                }
-            }
-        }else{
-            notifyItemChanged(position);
-        }
+        notifyItemChanged(position);
+
+//        if(holder == null){
+//            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+//        }
+//        if(holder!=null){
+//            InfoPeerGroupCall peer = getNodeAt(position);
+//            if (peer == null){
+//                return;
+//            }
+//            if(peer.isAudioOn()){
+//                holder.microAvatar.setVisibility(View.GONE);
+//                holder.microSurface.setVisibility(View.GONE);
+//            }else{
+//                if(!peer.isVideoOn()){
+//                    holder.microAvatar.setVisibility(View.VISIBLE);
+//                    holder.microSurface.setVisibility(View.GONE);
+//                }else{
+//                    holder.microSurface.setVisibility(View.VISIBLE);
+//                    holder.microAvatar.setVisibility(View.GONE);
+//                }
+//            }
+//        }else{
+//            notifyItemChanged(position);
+//        }
     }
 
     public void changesInGreenLayer(int position, ViewHolderGroupCall holder){
-        log("changesInGreenLayer");
-        if(holder == null){
-            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-        }
-        if(holder!=null){
-            InfoPeerGroupCall peer = getNodeAt(position);
-            if (peer == null){
-                return;
-            }
-            if(peer.hasGreenLayer()){
-                log("Has Green layer");
-                holder.greenLayer.setVisibility(View.VISIBLE);
-            }else{
-                log("Has not Green layer");
-                holder.greenLayer.setVisibility(View.GONE);
-            }
-        }else{
-            notifyItemChanged(position);
-        }
-    }
-
-
-//    public void addLayer(int p){
-//        log("addLayer() - position "+p);
-//        if(peers!=null){
-//            //Remove green layer for the rest of users:
-//            for(int i=0; i<peers.size();i++){
-//                ViewHolderGroupCall holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(i);
-//                if(holder!=null){
-//                    InfoPeerGroupCall peer = getNodeAt(i);
-//                    if (peer == null){
-//                        return;
-//                    }
-//                    if(i==p){
-//                        holder.greenLayer.setVisibility(View.VISIBLE);
-//                    }else{
-//                        if(holder.greenLayer.getVisibility()==View.VISIBLE){
-//                            holder.greenLayer.setVisibility(View.GONE);
-//                        }
-//                    }
-//                }else{
-//                }
-//            }
+        log("changesInGreenLayer()");
+        notifyItemChanged(position);
+//        if(holder == null){
+//            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
 //        }
-//
-//    }
-
+//        if(holder!=null){
+//            InfoPeerGroupCall peer = getNodeAt(position);
+//            if (peer == null){
+//                return;
+//            }
+//            if(peer.hasGreenLayer()){
+//                holder.greenLayer.setVisibility(View.VISIBLE);
+//            }else{
+//                holder.greenLayer.setVisibility(View.GONE);
+//            }
+//        }else{
+//            notifyItemChanged(position);
+//        }
+    }
 
     @Override
     public void resetSize(Long userHandle) {
