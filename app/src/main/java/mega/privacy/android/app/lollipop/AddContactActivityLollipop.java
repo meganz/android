@@ -1605,12 +1605,16 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     addedContactsRecyclerView.setAdapter(adapterContacts);
 
                     if (phoneContacts != null && !phoneContacts.isEmpty()) {
-                        if (filteredContactsPhone == null || filteredContactsPhone.isEmpty()) {
+                        if (filteredContactsPhone == null && (addedContactsPhone == null || addedContactsPhone.isEmpty())) {
                             for (int i = 0; i < phoneContacts.size(); i++) {
                                 filteredContactsPhone.add(phoneContacts.get(i));
                             }
                         }
                         setPhoneAdapterContacts(filteredContactsPhone);
+                    }
+                    else if (addedContactsPhone != null && !addedContactsPhone.isEmpty()) {
+                        emptyImageView.setVisibility(View.VISIBLE);
+                        emptyTextView.setVisibility(View.VISIBLE);
                     }
                     else {
                         emptyImageView.setVisibility(View.VISIBLE);
