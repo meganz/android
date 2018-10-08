@@ -2489,15 +2489,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        log("Rejoin chat!: "+publicHandle);
+                    case DialogInterface.BUTTON_POSITIVE: {
+                        log("Rejoin chat!: " + publicHandle);
                         megaChatApi.rejoinChatLink(idChat, publicHandle, chatActivity);
                         break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
+                    }
+                    case DialogInterface.BUTTON_NEGATIVE: {
                         //No button clicked
-                        finish();
                         break;
+                    }
                 }
             }
         };
@@ -2526,12 +2526,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         String message="";
         if(isInvalidPreview){
             message= getResources().getString(R.string.alert_invalid_preview);
+            builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener);
         }
         else{
             message= getResources().getString(R.string.alert_already_participant_chat_link);
+            builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, null);
         }
-
-        builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener);
 
         chatAlertDialog = builder.create();
         chatAlertDialog.setCanceledOnTouchOutside(false);
@@ -6231,18 +6231,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else if(request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 idChat = request.getChatHandle();
+                MegaApplication.setOpenChatId(idChat);
                 showChat();
             }
             else {
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
-                if(e.getErrorCode()==MegaChatError.ERROR_EXIST){
+                if(e.getErrorCode()==MegaChatError.ERROR_EXIST) {
                     //ERROR_EXIST - If the user already participates in the chat.
-                    showAlertChatLink(false);
-                }
-                else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                    //ERROR_ACCESS If the user is trying to preview a public chat which he was part of -> rejoinChatLink
                     idChat = request.getChatHandle();
-                    showConfirmationRejoinChat(request.getUserHandle());
+                    MegaApplication.setOpenChatId(idChat);
+                    showChat();
+                    MegaChatRoom chatActive = megaChatApi.getChatRoom(idChat);
+                    if (chatActive.isActive()) {
+                        showAlertChatLink(false);
+                    } else {
+                        showConfirmationRejoinChat(request.getUserHandle());
+                    }
                 }
                 else{
 
@@ -6425,6 +6429,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     adapter.notifyDataSetChanged();
                     closeChat();
+                    MegaApplication.setOpenChatId(-1);
                     initAfterIntent(intent, null);
                 }
                 else{

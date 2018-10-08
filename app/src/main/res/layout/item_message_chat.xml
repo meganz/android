@@ -178,6 +178,35 @@
                             android:layout_marginTop="12dp"
                             android:layout_marginLeft="12dp" />
 
+                        <RelativeLayout
+                            android:id="@+id/url_chat_own_message_image"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginBottom="12dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_centerVertical="true">
+
+                            <mega.privacy.android.app.components.RoundedImageView
+                                android:id="@+id/content_url_chat_own_message_contact_thumb"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:layout_centerInParent="true"
+                                rounded:border_color="@color/white"
+                                rounded:border_width="2dp"
+                                rounded:corner_radius="20dp"/>
+
+                            <TextView
+                                android:id="@+id/content_url_chat_own_message_contact_initial_letter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:gravity="center_horizontal|center_vertical"
+                                android:paddingBottom="3dp"/>
+                        </RelativeLayout>
+
                         <LinearLayout
                             android:id="@+id/url_own_message_enable_layout_inside"
                             android:layout_width="wrap_content"
@@ -1119,6 +1148,35 @@
                             android:layout_gravity="center_vertical"
                             android:layout_marginTop="12dp"
                             android:layout_marginLeft="12dp" />
+
+                        <RelativeLayout
+                            android:id="@+id/url_chat_contact_message_image"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_marginBottom="12dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginLeft="16dp"
+                            android:layout_centerVertical="true">
+
+                            <mega.privacy.android.app.components.RoundedImageView
+                                android:id="@+id/content_url_chat_contact_message_contact_thumb"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:layout_centerInParent="true"
+                                rounded:border_color="@color/white"
+                                rounded:border_width="2dp"
+                                rounded:corner_radius="20dp"/>
+
+                            <TextView
+                                android:id="@+id/content_url_chat_contact_message_contact_initial_letter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:gravity="center_horizontal|center_vertical"
+                                android:paddingBottom="3dp"/>
+                        </RelativeLayout>
 
                         <LinearLayout
                             android:id="@+id/url_contact_message_enable_layout_inside"

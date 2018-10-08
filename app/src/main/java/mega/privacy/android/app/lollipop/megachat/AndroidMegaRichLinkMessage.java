@@ -4,6 +4,8 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.net.Uri;
 import android.util.Patterns;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -134,7 +136,28 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static boolean isChatLink(String url) {
-        if (url != null && (url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
+
+        if (url == null) {
+             return false;
+        }
+        try {
+            url = URLDecoder.decode(url, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {}
+        url.replace(' ', '+');
+        if(url.startsWith("mega://")){
+            url = url.replace("mega://", "https://mega.co.nz/");
+        }
+
+        if (url.startsWith("https://www.mega.co.nz")){
+            url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
+        }
+
+        if (url.startsWith("https://www.mega.nz")){
+            url = url.replace("https://www.mega.nz", "https://mega.nz");
+        }
+
+        if ((url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
             log("IS chat link found");
             return true;
         }

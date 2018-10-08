@@ -213,9 +213,8 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         if (request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
+            String link = request.getLink();
             if (e.getErrorCode() == MegaError.API_OK){
-
-                String link = request.getLink();
 
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, request.getText(), request.getNumber());
 
@@ -223,6 +222,9 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
             }
             else{
                 //Invalid link
+                richLinkMessage = new AndroidMegaRichLinkMessage(link, "", -1);
+                ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
+
             }
         }
     }
