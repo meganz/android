@@ -263,7 +263,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
 
-
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
@@ -646,6 +645,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     setProfileMyAvatar();
                     flagContactAvatar = true;
                     setProfileContactAvatar();
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -687,6 +687,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {}
 
     public void createDefaultAvatar(long userHandle,  String fullName) {
+        log("createDefaultAvatar");
+
         Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels, outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(defaultAvatar);
         Paint p = new Paint();
@@ -804,6 +806,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void createMyDefaultAvatar() {
+        log("createMyDefaultAvatar()");
         String myFullName = megaChatApi.getMyFullname();
         String myFirstLetter=myFullName.charAt(0) + "";
         myFirstLetter = myFirstLetter.toUpperCase(Locale.getDefault());
@@ -935,12 +938,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onPause(){
+        log("onPause()");
+
         mSensorManager.unregisterListener(this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        log("onResume()");
+
         this.width=0;
         this.height=0;
         super.onResume();
@@ -956,6 +963,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onDestroy(){
+        log("onDestroy()");
         if (megaChatApi != null) {
             megaChatApi.removeChatCallListener(this);
             megaChatApi.removeChatVideoListener(this);
@@ -1003,16 +1011,19 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
     @Override
     public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-        log("Type: "+request.getType());
+        log("onRequestStart()");
     }
 
     @Override
     public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
+        log("onRequestUpdate()");
 
     }
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
+        log("onRequestFinish()");
+
         if(request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL){
             MegaApplication.activityPaused();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1325,6 +1336,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         }
 
         if (this.width != width || this.height != height) {
+            log("onChatVideoData");
             this.width = width;
             this.height = height;
 
@@ -1365,7 +1377,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
         switch (v.getId()) {
             case R.id.video_fab:{
-
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
                     answerCallFAB.clearAnimation();
@@ -1656,7 +1667,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         int callStatus = callChat.getStatus();
 
         if (callChat.hasLocalVideo()) {
-
             log("Video local connected");
             if (myAvatarLayout.getVisibility() == View.VISIBLE) {
                 videoFAB.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.accentColor)));
@@ -1664,6 +1674,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 if(callStatus==MegaChatCall.CALL_STATUS_REQUEST_SENT){
                     if(localCameraFragmentFS == null){
+                        log("Create local camera fragment full screen");
                         localCameraFragmentFS = new LocalCameraCallFullScreenFragment();
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
@@ -1674,11 +1685,13 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     fragmentContainerLocalCameraFS.setVisibility(View.VISIBLE);
 
                 }else{
-                    localCameraFragment = new LocalCameraCallFragment();
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
-                    ft.commitNowAllowingStateLoss();
-
+                    if(localCameraFragment == null){
+                        log("Create local camera fragment");
+                        localCameraFragment = new LocalCameraCallFragment();
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.fragment_container_local_camera, localCameraFragment, "localCameraFragment");
+                        ft.commitNowAllowingStateLoss();
+                    }
                     myAvatarLayout.setVisibility(GONE);
                     parent.setVisibility(View.VISIBLE);
                     fragmentContainerLocalCamera.setVisibility(View.VISIBLE);
@@ -1694,11 +1707,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parentFS.setVisibility(View.GONE);
                 fragmentContainerLocalCameraFS.setVisibility(View.GONE);
                 if (localCameraFragmentFS != null) {
+                    log("Remove local camera fragment full screen");
                     localCameraFragmentFS.setVideoFrame(false);
                     FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                     ftFS.remove(localCameraFragmentFS);
                     localCameraFragmentFS = null;
-
                 }
                 contactAvatarLayout.setVisibility(View.VISIBLE);
 
@@ -1706,6 +1719,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 parent.setVisibility(View.GONE);
                 fragmentContainerLocalCamera.setVisibility(View.GONE);
                 if (localCameraFragment != null) {
+                    log("Create local camera fragment");
                     localCameraFragment.setVideoFrame(false);
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.remove(localCameraFragment);
