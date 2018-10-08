@@ -2007,10 +2007,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 if (isUrl){
                     shareMenuItem.setVisible(false);
-                    downloadMenuItem.setVisible(true);
                 }
                 else {
-                    downloadMenuItem.setVisible(false);
                     shareMenuItem.setVisible(true);
                 }
                 if(node.isExported()){
@@ -2022,6 +2020,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     getlinkMenuItem.setVisible(true);
                 }
 
+                downloadMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 renameMenuItem.setVisible(true);
                 moveMenuItem.setVisible(true);
@@ -2164,13 +2163,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 chatRemoveMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
 
                 if (isUrl){
-                    downloadMenuItem.setVisible(true);
                     shareMenuItem.setVisible(false);
                 }
                 else {
-                    downloadMenuItem.setVisible(false);
                     shareMenuItem.setVisible(true);
                 }
 
@@ -2328,15 +2326,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                     }
+
+                    downloadMenuItem.setVisible(true);
                     if (isUrl){
-                        downloadMenuItem.setVisible(true);
                         shareMenuItem.setVisible(false);
                     }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        if (shareVisible){
-                            shareMenuItem.setVisible(true);
-                        }
+                    else if (shareVisible){
+                        shareMenuItem.setVisible(true);
                     }
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
