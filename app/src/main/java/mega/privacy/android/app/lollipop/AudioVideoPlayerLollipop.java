@@ -673,6 +673,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             playList.setVisibility(View.GONE);
+            createPlayer();
         }
 
         if (savedInstanceState == null){
@@ -2176,7 +2177,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 int accessLevel = megaApi.getAccess(node);
-                
+
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL: {
                         log("access FULL");
@@ -2514,7 +2515,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                          isDeleteDialogShow = false;
                          finish();
                          break;
-            
+
                      case DialogInterface.BUTTON_NEGATIVE:
                          //No button clicked
                          isDeleteDialogShow = false;
@@ -3628,8 +3629,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         log("onResume");
         if (!isOffline && !fromChat && !isFolderLink
                 && adapterType != Constants.FILE_LINK_ADAPTER
-                && !isZip) {
-            if (megaApi.getNodeByHandle(handle) == null && !fromDownload) {
+                && !isZip && !fromDownload) {
+            if (megaApi.getNodeByHandle(handle) == null) {
                 finish();
             }
             updateFile();
