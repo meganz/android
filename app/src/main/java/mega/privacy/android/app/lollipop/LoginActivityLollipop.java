@@ -55,6 +55,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 
 public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
@@ -843,6 +844,11 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
+    }
+
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+        log("onUserAlertsUpdate");
     }
 
     @Override

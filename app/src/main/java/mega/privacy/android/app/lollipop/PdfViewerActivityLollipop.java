@@ -122,6 +122,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 
@@ -878,6 +879,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     @Override
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 
+    }
+
+    @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+        log("onUserAlertsUpdate");
     }
 
     @Override

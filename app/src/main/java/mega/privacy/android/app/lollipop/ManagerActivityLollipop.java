@@ -223,6 +223,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -13187,7 +13188,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		builder.setMessage(R.string.confirmation_close_sessions).setPositiveButton(R.string.general_close, dialogClickListener)
+		builder.setTitle(R.string.confirmation_close_sessions_title);
+
+		builder.setMessage(R.string.confirmation_close_sessions_text).setPositiveButton(R.string.contact_accept, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 	}
@@ -16603,6 +16606,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 
 		}
+	}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
 	}
 
 	@Override

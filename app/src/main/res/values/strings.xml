@@ -1269,7 +1269,8 @@
     </plurals>
 
     <string name="more_users_typing" context="text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing...">%1$s [A]and more are typing&#8230;[/A]</string>
-
+	<string name="label_more" context="button label more">More</string>
+	<string name="label_close" context="button label Close">Close</string>
     <string name="tab_my_account_general" context="Title of the general tab in My Account Section">General</string>
     <string name="tab_my_account_storage" context="Title of the storage tab in My Account Section">Storage</string>
 
@@ -2115,6 +2116,9 @@
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
 
+    <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Open camera?</string>
+    <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">If you open the camera, your video transmission will be paused in the current call.</string>
+
     <string name="notification_chat_undefined_title" context="Title of the notification when there is unknown activity on the Chat">Chat activity</string>
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">You may have new messages</string>
 
@@ -2130,7 +2134,6 @@
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable Rubbish bin cleaning scheduler or set a longer retention period you need to subscribe to a PRO plan.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
-
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Get chat link</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Manage chat link</string>
 
@@ -2142,6 +2145,9 @@
     <string name="action_delete_link" context="Title of the option to delete a chat link">Delete link</string>
 
     <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
+
+    <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
+    <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
 
     <string name="number_of_participants" context="Subtitle to show the number of participants of a chat">%d participants</string>
 
