@@ -751,23 +751,23 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
     public void changesInGreenLayer(int position, ViewHolderGroupCall holder){
         log("changesInGreenLayer()");
-        notifyItemChanged(position);
-//        if(holder == null){
-//            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-//        }
-//        if(holder!=null){
-//            InfoPeerGroupCall peer = getNodeAt(position);
-//            if (peer == null){
-//                return;
-//            }
-//            if(peer.hasGreenLayer()){
-//                holder.greenLayer.setVisibility(View.VISIBLE);
-//            }else{
-//                holder.greenLayer.setVisibility(View.GONE);
-//            }
-//        }else{
-//            notifyItemChanged(position);
-//        }
+//        notifyItemChanged(position);
+        if(holder == null){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+        }
+        if(holder!=null){
+            InfoPeerGroupCall peer = getNodeAt(position);
+            if (peer == null){
+                return;
+            }
+            if(peer.hasGreenLayer()){
+                holder.greenLayer.setVisibility(View.VISIBLE);
+            }else{
+                holder.greenLayer.setVisibility(View.GONE);
+            }
+        }else{
+            notifyItemChanged(position);
+        }
     }
 
     @Override
