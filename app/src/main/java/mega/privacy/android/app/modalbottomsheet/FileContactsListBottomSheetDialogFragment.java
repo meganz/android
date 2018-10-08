@@ -29,6 +29,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
+import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
@@ -87,18 +88,17 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
         }
         else{
             log("Bundle NULL");
-
             if(context instanceof FileContactListActivityLollipop){
                 share = ((FileContactListActivityLollipop) context).getSelectedShare();
-            }
-
-            if(context instanceof FileContactListActivityLollipop){
                 contact = ((FileContactListActivityLollipop) context).getSelectedContact();
-                if(contact==null){
-                    nonContactEmail = share.getUser();
-                }
+            }else if(context instanceof FileInfoActivityLollipop){
+                share = ((FileInfoActivityLollipop) context).getSelectedShare();
+                contact = ((FileInfoActivityLollipop) context).getSelectedContact();
             }
-
+            
+            if(contact==null){
+                nonContactEmail = share.getUser();
+            }
         }
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
@@ -322,12 +322,20 @@ public class FileContactsListBottomSheetDialogFragment extends BottomSheetDialog
 
             case R.id.file_contact_list_option_permissions_layout:{
                 log("permissions layout");
-                ((FileContactListActivityLollipop)context).changePermissions();
+                if(context instanceof FileContactListActivityLollipop){
+                    ((FileContactListActivityLollipop)context).changePermissions();
+                }else if(context instanceof FileInfoActivityLollipop){
+                    ((FileInfoActivityLollipop)context).changePermissions();
+                }
                 break;
             }
             case R.id.file_contact_list_option_delete_layout:{
                 log("optionSendFile");
-                ((FileContactListActivityLollipop)context).removeFileContactShare();
+                if(context instanceof FileContactListActivityLollipop){
+                    ((FileContactListActivityLollipop)context).removeFileContactShare();
+                }else if(context instanceof FileInfoActivityLollipop){
+                    ((FileInfoActivityLollipop)context).removeFileContactShare();
+                }
                 break;
             }
             case R.id.file_contact_list_option_info_layout:{

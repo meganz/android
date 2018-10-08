@@ -379,7 +379,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 				MegaNode n = nodes.get(position);
 				hashes = new long[1];
 				hashes[0] = n.getHandle();
-				((FileProviderActivity) context).downloadAndAttach(n.getSize(), hashes);
+				((FileProviderActivity) context).downloadAndAttachAfterClick(n.getSize(), hashes);
 			}
 		}
 	}
