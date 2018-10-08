@@ -93,6 +93,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 
 @SuppressLint("NewApi") 
@@ -1133,6 +1134,24 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
+	public void downloadAndAttachAfterClick(long size, long [] hashes){
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+
+		progressTransfersFinish = 0;
+		clipDataTransfers = null;
+
+		downloadAndAttach(size, hashes);
+	}
+
 	public void downloadAndAttach(long size, long [] hashes){
 		
 		log("downloadAndAttach");
@@ -1987,8 +2006,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		// TODO Auto-generated method stub
-		
+		log("onUsersUpdate");
+	}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
 	}
 
 	@Override

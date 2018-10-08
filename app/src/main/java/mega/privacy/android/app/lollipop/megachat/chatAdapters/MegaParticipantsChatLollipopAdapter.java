@@ -682,30 +682,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		log("updateContactStatus: "+position);
 
 		if(listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList){
-			holderList = (MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) listFragment.findViewHolderForAdapterPosition(position);
-			if(holderList!=null){
-
-				if(state == MegaChatApi.STATUS_ONLINE){
-					log("This user is connected");
-					holderList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_online));
-				}
-				else if(state == MegaChatApi.STATUS_AWAY){
-					log("This user is away");
-					holderList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_away));
-				}
-				else if(state == MegaChatApi.STATUS_BUSY){
-					log("This user is busy");
-					holderList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_busy));
-				}
-				else{
-					log("This user status is: "+state);
-					holderList.statusImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.circle_status_contact_offline));
-				}
-			}
-			else{
-				log("Holder is NULL");
-				notifyItemChanged(position);
-			}
+			notifyItemChanged(position);
 		}
 	}
 	

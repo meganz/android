@@ -207,6 +207,8 @@ public class Constants {
 	final public static int SEARCH_BY_ADAPTER = 2018;
 	final public static int FILE_LINK_ADAPTER = 2019;
 	final public static int FROM_CHAT = 2020;
+
+    final public static int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
     final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;

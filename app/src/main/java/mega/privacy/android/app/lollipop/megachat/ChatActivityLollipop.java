@@ -2306,6 +2306,49 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void showConfirmationOpenCamera(final MegaChatRoom c){
+        log("showConfirmationOpenCamera");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        log("Open camera and lost the camera in the call");
+                        //Remove the local video from the video call:
+                        MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                        if(callInProgress != null) {
+                            if (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                                megaChatApi.answerChatCall(idChat, true, null);
+                            } else {
+                                if (callInProgress.hasLocalVideo()) {
+                                    megaChatApi.disableVideo(idChat, null);
+                                } else {
+                                    megaChatApi.enableVideo(idChat, null);
+                                }
+                            }
+
+                            if ((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)) {
+                                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                            }
+                            openCameraApp();
+                        }
+
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        String message= getResources().getString(R.string.confirmation_open_camera_on_chat);
+        builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
+        builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
     public void showConfirmationClearChat(final MegaChatRoom c){
         log("showConfirmationClearChat");
 
@@ -2523,29 +2566,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                isTakePicture = true;
+                boolean inProgressCall = false;
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                    if (!hasStoragePermission) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                Constants.REQUEST_WRITE_STORAGE);
+                MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                if(callInProgress != null){
+                    if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                        inProgressCall = true;
+                    }else{
+                        inProgressCall = false;
                     }
-
-                    boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-                    if (!hasCameraPermission) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.CAMERA},
-                                Constants.REQUEST_CAMERA);
-                    }
-
-                    if (hasStoragePermission && hasCameraPermission){
-                        this.takePicture();
-                    }
+                }else{
+                    inProgressCall = false;
                 }
-                else{
-                    this.takePicture();
+
+                if(!inProgressCall){
+                    openCameraApp();
+                }else{
+                    showConfirmationOpenCamera(chatRoom);
                 }
 
                 break;
@@ -2703,6 +2740,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //ft.commitAllowingStateLoss();
     }
 
+
+
     public void attachFromCloud(){
         log("attachFromCloud");
         ChatController chatC = new ChatController(this);
@@ -2749,6 +2788,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(adapter!=null){
             adapter.notifyItemChanged(position);
+        }
+    }
+
+    public void openCameraApp(){
+        log("openCameraApp()");
+        isTakePicture = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+            }
+
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        Constants.REQUEST_CAMERA);
+            }
+
+            if (hasStoragePermission && hasCameraPermission){
+                this.takePicture();
+            }
+        }else{
+            this.takePicture();
         }
     }
 
