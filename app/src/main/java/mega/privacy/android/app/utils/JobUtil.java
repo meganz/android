@@ -42,7 +42,6 @@ public class JobUtil {
 
     public static int startJob(Context context) {
         if (isJobScheduled(context,PHOTOS_UPLOAD_JOB_ID)) {
-            TL.log(null,"start job but return!");
             return START_JOB_FAILED;
         }
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
@@ -53,7 +52,6 @@ public class JobUtil {
 
             int result = jobScheduler.schedule(jobInfoBuilder.build());
             logJobState(result,CameraUploadsService.class.getName());
-            TL.log(null,"start job!");
             return result;
         }
         return START_JOB_FAILED;
@@ -62,10 +60,7 @@ public class JobUtil {
     public static void cancelAllJobs(Context context) {
         JobScheduler js = context.getSystemService(JobScheduler.class);
         if (js != null) {
-            TL.log(null,"cancel job!");
             js.cancelAll();
-        } else {
-            TL.log(null,"cancel but js is null!");
         }
     }
 
