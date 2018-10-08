@@ -2136,4 +2136,5 @@
 
     <string name="confirmation_close_sessions" context="Text of the dialog to confirm after closing all other sessions">Do you want to close all other sessions? This will log you out on all other active sessions except the current one.</string>
 
+    <string name="call_started_messages" context="Message shown when a call starts.">Call started</string>
 </resources>
