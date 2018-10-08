@@ -355,7 +355,7 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
                 RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams( Util.scaleWidthPx(24, outMetrics),Util.scaleWidthPx(24, outMetrics));
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-                paramsMicroSurface.setMargins(0, Util.scaleWidthPx(50, outMetrics),  Util.scaleWidthPx(50, outMetrics), 0);
+                paramsMicroSurface.setMargins(0, Util.scaleWidthPx(15, outMetrics),  Util.scaleWidthPx(15, outMetrics), 0);
                 holder.surfaceViewLayout.addView(holder.microSurface,paramsMicroSurface);
 
             }else{
@@ -723,31 +723,30 @@ public GroupCallAdapter(Context context, RecyclerView recyclerView, ArrayList<In
 
     public void changesInAudio(int position, ViewHolderGroupCall holder){
         log("changesInAudio");
-        notifyItemChanged(position);
 
-//        if(holder == null){
-//            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
-//        }
-//        if(holder!=null){
-//            InfoPeerGroupCall peer = getNodeAt(position);
-//            if (peer == null){
-//                return;
-//            }
-//            if(peer.isAudioOn()){
-//                holder.microAvatar.setVisibility(View.GONE);
-//                holder.microSurface.setVisibility(View.GONE);
-//            }else{
-//                if(!peer.isVideoOn()){
-//                    holder.microAvatar.setVisibility(View.VISIBLE);
-//                    holder.microSurface.setVisibility(View.GONE);
-//                }else{
-//                    holder.microSurface.setVisibility(View.VISIBLE);
-//                    holder.microAvatar.setVisibility(View.GONE);
-//                }
-//            }
-//        }else{
-//            notifyItemChanged(position);
-//        }
+        if(holder == null){
+            holder = (ViewHolderGroupCall) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+        }
+        if(holder!=null){
+            InfoPeerGroupCall peer = getNodeAt(position);
+            if (peer == null){
+                return;
+            }
+            if(peer.isAudioOn()){
+                holder.microAvatar.setVisibility(View.GONE);
+                holder.microSurface.setVisibility(View.GONE);
+            }else{
+                if(!peer.isVideoOn()){
+                    holder.microAvatar.setVisibility(View.VISIBLE);
+                    holder.microSurface.setVisibility(View.GONE);
+                }else{
+                    holder.microSurface.setVisibility(View.VISIBLE);
+                    holder.microAvatar.setVisibility(View.GONE);
+                }
+            }
+        }else{
+            notifyItemChanged(position);
+        }
     }
 
     public void changesInGreenLayer(int position, ViewHolderGroupCall holder){
