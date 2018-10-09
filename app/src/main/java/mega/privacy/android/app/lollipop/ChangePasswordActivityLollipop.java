@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -110,6 +111,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	private String pin = null;
 	private TextView pinError;
 	private ProgressBar verify2faProgressBar;
+	private RelativeLayout lostYourDeviceButton;
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
@@ -361,6 +363,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
 		pinError.setVisibility(View.GONE);
 
+		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
+		lostYourDeviceButton.setOnClickListener(this);
 		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
 
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -852,6 +856,21 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 					toggleButtonNewPasswd2.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_see));
 					passwdVisibility = true;
 					showHidePassword(R.id.toggle_button_new_passwd2);
+				}
+				break;
+			}
+			case R.id.lost_authentication_device: {
+				try {
+					String url = "https://mega.nz/recovery";
+					Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					openTermsIntent.setData(Uri.parse(url));
+					startActivity(openTermsIntent);
+				}
+				catch (Exception e){
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+					startActivity(viewIntent);
 				}
 				break;
 			}
