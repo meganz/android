@@ -974,6 +974,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         log("onBindViewHolderList: "+position);
         
         MegaNode node = (MegaNode)getItem(position);
+        if(node == null) {
+            return;
+        }
         holder.document = node.getHandle();
         Bitmap thumb = null;
         
@@ -1517,10 +1520,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
         
         final MegaNode n = (MegaNode)getItem(currentPosition);
-//        //Reset the placeholder flag.
-//        if (n.isFolder()) {
-//            placeholderInserted = false;
-//        }
+        if(n == null) {
+            return;
+        }
         switch (v.getId()) {
             case R.id.file_list_three_dots_layout:
             case R.id.file_grid_three_dots: {
