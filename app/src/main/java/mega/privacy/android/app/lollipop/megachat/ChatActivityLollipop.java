@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -21,6 +23,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -354,6 +357,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private BroadcastReceiver dialogConnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            log("Network broadcast received on chatActivity!");
+
+            if (intent != null){
+                showConfirmationConnect();
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -548,6 +562,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         chatActivity = this;
         chatC = new ChatController(chatActivity);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -6082,6 +6098,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         megaChatApi.removeChatListener(this);
         megaChatApi.removeChatCallListener(this);
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
+
         super.onDestroy();
     }
 
@@ -7227,6 +7245,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
             }
         }
+    }
+
+    public void showConfirmationConnect(){
+        log("showConfirmationConnect");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        startConnection();
+                        finish();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        log("showConfirmationConnect: BUTTON_NEGATIVE");
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        try {
+            builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        }
+        catch (Exception e){}
+    }
+
+    public void startConnection() {
+        log("startConnection: Broadcast to ManagerActivity");
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+        intent.putExtra("actionType", Constants.START_RECONNECTION);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
     public int getDeviceDensity(){

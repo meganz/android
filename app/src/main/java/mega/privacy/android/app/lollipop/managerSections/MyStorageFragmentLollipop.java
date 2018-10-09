@@ -371,6 +371,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 
 	public void refreshVersionsInfo(){
+
+	    if(myAccountInfo==null){
+	        return;
+        }
+
 		if(myAccountInfo.getPreviousVersionsSize()>0){
 			previousVersionsText.setText(myAccountInfo.getFormattedPreviousVersionsSize());
 			previousVersionsLayout.setVisibility(View.VISIBLE);
