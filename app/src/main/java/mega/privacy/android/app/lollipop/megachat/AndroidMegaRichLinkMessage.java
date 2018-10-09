@@ -105,8 +105,29 @@ public class AndroidMegaRichLinkMessage {
         return links.toArray(new String[links.size()]);
     }
 
-    public static String extractMegaLink(String text) {
-        Matcher m = Patterns.WEB_URL.matcher(text);
+    public static String extractMegaLink(String urlIn) {
+
+        try {
+            urlIn = URLDecoder.decode(urlIn, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {}
+        urlIn.replace(' ', '+');
+        if(urlIn.startsWith("mega://")){
+            urlIn = urlIn.replace("mega://", "https://mega.co.nz/");
+        }
+        else  if(urlIn.startsWith("mega.")){
+            urlIn = urlIn.replace("mega.", "https://mega.");
+        }
+
+        if (urlIn.startsWith("https://www.mega.co.nz")){
+            urlIn = urlIn.replace("https://www.mega.co.nz", "https://mega.co.nz");
+        }
+
+        if (urlIn.startsWith("https://www.mega.nz")){
+            urlIn = urlIn.replace("https://www.mega.nz", "https://mega.nz");
+        }
+
+        Matcher m = Patterns.WEB_URL.matcher(urlIn);
         while (m.find()) {
             String url = m.group();
             log("URL extracted: " + url);
@@ -139,22 +160,6 @@ public class AndroidMegaRichLinkMessage {
 
         if (url == null) {
              return false;
-        }
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e) {}
-        url.replace(' ', '+');
-        if(url.startsWith("mega://")){
-            url = url.replace("mega://", "https://mega.co.nz/");
-        }
-
-        if (url.startsWith("https://www.mega.co.nz")){
-            url = url.replace("https://www.mega.co.nz", "https://mega.co.nz");
-        }
-
-        if (url.startsWith("https://www.mega.nz")){
-            url = url.replace("https://www.mega.nz", "https://mega.nz");
         }
 
         if ((url.matches("^https://mega\\.co\\.nz/c/.+$") || url.matches("^https://mega\\.nz/c/.+$"))) {
