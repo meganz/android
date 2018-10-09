@@ -327,8 +327,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
      * Update last contacts list and refresh last contacts' avatar.
      */
     public void updateView() {
-        lastContacted = MegaApiUtils.getLastContactedUsers(context);
-        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+
+        if(lastContactsGridView!=null){
+			lastContacted = MegaApiUtils.getLastContactedUsers(context);
+			lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+		}
     }
 
     public void updateContactsCount(){
