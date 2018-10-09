@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -1354,7 +1355,14 @@ public class SearchFragmentLollipop extends Fragment{
 	}
 
 	public ArrayList<MegaNode> getNodes(){
-		return nodes;
+	    //remove the null placeholder.
+        CopyOnWriteArraySet<MegaNode> safeSet = new CopyOnWriteArraySet(nodes);
+	    for(MegaNode node : safeSet) {
+	        if(node == null) {
+	            safeSet.remove(node);
+            }
+        }
+		return new ArrayList<>(safeSet);
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
