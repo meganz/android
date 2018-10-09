@@ -564,6 +564,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private String newMail = null;
 	private TextView pinError;
 	private ProgressBar verify2faProgressBar;
+	private RelativeLayout lostYourDeviceButton;
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
@@ -10469,7 +10470,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (type == Constants.DISABLE_2FA) {
 			titleDialog.setText(getString(R.string.disable_2fa_verification));
 		}
-
+		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
+		lostYourDeviceButton.setOnClickListener(this);
 		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
 
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
@@ -13115,6 +13117,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				isEnable2FADialogShown = false;
 				if (enable2FADialog != null) {
 					enable2FADialog.dismiss();
+				}
+				break;
+			}
+			case R.id.lost_authentication_device: {
+				try {
+					String url = "https://mega.nz/recovery";
+					Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					openTermsIntent.setData(Uri.parse(url));
+					startActivity(openTermsIntent);
+				}
+				catch (Exception e){
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+					startActivity(viewIntent);
 				}
 				break;
 			}
