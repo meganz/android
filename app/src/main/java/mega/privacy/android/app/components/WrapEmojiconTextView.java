@@ -9,12 +9,13 @@ import android.text.TextUtils;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.support.text.emoji.widget.EmojiAppCompatTextView;
 
 import io.github.rockerhieu.emojicon.EmojiconHandler;
 import mega.privacy.android.app.R;
 
 
-public class WrapEmojiconTextView extends AppCompatTextView {
+public class WrapEmojiconTextView extends EmojiAppCompatTextView {
 
     private int mEmojiconSize;
     private int mEmojiconAlignment;
