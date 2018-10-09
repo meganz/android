@@ -18142,9 +18142,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showEvaluatedAppDialog(){
-		if(megaChatApi.isSignalActivityRequired()){
-			megaChatApi.signalPresenceActivity();
-		}
 
 		LayoutInflater inflater = getLayoutInflater();
 		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
