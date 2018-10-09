@@ -22,7 +22,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.support.v7.widget.AppCompatTextView;
+import android.support.text.emoji.widget.EmojiAppCompatTextView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.DynamicDrawableSpan;
@@ -35,7 +35,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.Util;
 
 
-public class EmojiconTextView extends AppCompatTextView{
+public class EmojiconTextView extends EmojiAppCompatTextView{
     public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
     public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
     private int mEmojiconSize;
