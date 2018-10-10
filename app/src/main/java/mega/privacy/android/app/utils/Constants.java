@@ -262,6 +262,8 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME = "MEGA Incoming Calls";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_ID = "ContactSummaryNotification";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_NAME = "MEGA Contact Summary";
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_ID = "CloudDriveNotification";
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
 
