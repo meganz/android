@@ -39,6 +39,15 @@
                     rounded:border_width="0dp"
                     rounded:corner_radius="30dp" />
 
+                <ImageView
+                    android:id="@+id/contact_state"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_alignTop="@id/navigation_drawer_user_account_picture_profile"
+                    android:layout_alignRight="@id/navigation_drawer_user_account_picture_profile"
+                    android:background="@null"
+                    android:src="@drawable/ic_offline" />
+
                 <TextView
                     android:id="@+id/navigation_drawer_user_account_picture_profile_textview"
                     android:layout_width="match_parent"
