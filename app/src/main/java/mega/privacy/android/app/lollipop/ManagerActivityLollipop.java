@@ -586,6 +586,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean pinLongClick = false;
 
 	RelativeLayout myAccountHeader;
+	ImageView contactStatus;
 	RelativeLayout myAccountSection;
 	RelativeLayout inboxSection;
 	RelativeLayout contactsSection;
@@ -1881,6 +1882,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else {
 					resetNavigationViewLayout();
 				}
+				setContactStatus();
 			}
 
 			@Override
@@ -1891,6 +1893,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else {
 					resetNavigationViewLayout();
 				}
+				setContactStatus();
 			}
 
 			@Override
@@ -1907,6 +1910,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		myAccountHeader = (RelativeLayout) findViewById(R.id.navigation_drawer_account_section);
 		myAccountHeader.setOnClickListener(this);
+		contactStatus = (ImageView) findViewById(R.id.contact_state);
         myAccountSection = (RelativeLayout) findViewById(R.id.my_account_section);
         myAccountSection.setOnClickListener(this);
         inboxSection = (RelativeLayout) findViewById(R.id.inbox_section);
@@ -2014,7 +2018,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
-
         //TABS section Contacts
 		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
 		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
@@ -2811,7 +2814,61 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
+		if(savedInstanceState!=null){
+			updateAccountDetailsVisibleInfo();
+		}
 		log("END onCreate");
+	}
+
+	void setContactStatus() {
+    	log("setContactStatus");
+		if(Util.isChatEnabled()) {
+			log("setContactStatus chatEnabled");
+			if(megaChatApi == null) {
+				megaChatApi = app.getMegaChatApi();
+				megaChatApi.addChatListener(this);
+				megaChatApi.addChatCallListener(this);
+			}
+			int chatStatus = megaChatApi.getOnlineStatus();
+			if (contactStatus != null) {
+				switch (chatStatus) {
+					case MegaChatApi.STATUS_ONLINE: {
+						log("setContactStatus online");
+						contactStatus.setVisibility(View.VISIBLE);
+						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+						break;
+					}
+					case MegaChatApi.STATUS_AWAY: {
+						log("setContactStatus away");
+						contactStatus.setVisibility(View.VISIBLE);
+						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+						break;
+					}
+					case MegaChatApi.STATUS_BUSY: {
+						log("setContactStatus busy");
+						contactStatus.setVisibility(View.VISIBLE);
+						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+						break;
+					}
+					case MegaChatApi.STATUS_OFFLINE: {
+						log("setContactStatus offline");
+						contactStatus.setVisibility(View.VISIBLE);
+						contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+						break;
+					}
+					case MegaChatApi.STATUS_INVALID: {
+						log("setContactStatus invalid");
+						contactStatus.setVisibility(View.GONE);
+						break;
+					}
+					default: {
+						log("setContactStatus default");
+						contactStatus.setVisibility(View.GONE);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	public void showRememberPasswordDialog(boolean logout){
@@ -4484,9 +4541,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //							}
 //						}
 //					}
-
-					usedSpaceLayout.setVisibility(View.VISIBLE);
-
+					updateAccountDetailsVisibleInfo();
 				} else {
 					log("showOnlineMode - Root is NULL");
 					if (getApplicationContext() != null) {
@@ -12703,7 +12758,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(isFinishing()){
 			return;
 		}
-
+		if (((MegaApplication) getApplication()) == null || ((MegaApplication) getApplication()).getMyAccountInfo() == null) {
+			return;
+		}
 		if (usedSpaceLayout != null) {
 
 			String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
@@ -14419,7 +14476,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (contactsSection != null) {
 			contactsSection.setEnabled(false);
-			((TextView) contactsSection.findViewById(R.id.contacts_section_text)).setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+			if (contactsSectionText == null) {
+				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
+			}
+			String contactsText = contactsSectionText.getText().toString();
+			if (!contactsText.equals(getString(R.string.section_contacts))){
+				int start = contactsText.indexOf('(');
+				start++;
+				int end = contactsText.indexOf(')');
+				if (start>0 && end>0) {
+					int pendingRequest = Integer.parseInt(contactsText.substring(start, end));
+					setFormattedContactTitleSection(pendingRequest, false);
+				}
+			}
+
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
 		}
 
 		if (upgradeAccount != null) {
@@ -14494,7 +14565,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (contactsSection != null) {
 			contactsSection.setEnabled(true);
-			((TextView) contactsSection.findViewById(R.id.contacts_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			if (contactsSectionText == null) {
+				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
+			}
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			setContactTitleSection();
 		}
 
 		if (upgradeAccount != null) {
@@ -17893,6 +17968,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(Util.isChatEnabled()){
 				if(userHandle == megaChatApi.getMyUserHandle()){
 					log("My own status update");
+					setContactStatus();
 					if(drawerItem == DrawerItem.CHAT){
 							if(rChatFL!=null){
 								if(rChatFL.isAdded()){
@@ -18078,25 +18154,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					contactsSectionText.setText(getString(R.string.section_contacts));
 				}
 				else{
-					String textToShow = String.format(getString(R.string.section_contacts_with_notification), pendingRequest);
-					try {
-						textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-					}
-					catch(Exception e){
-						log("Formatted string: " + textToShow);
-					}
-
-					Spanned result = null;
-					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-						result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-					} else {
-						result = Html.fromHtml(textToShow);
-					}
-					contactsSectionText.setText(result);
+					setFormattedContactTitleSection(pendingRequest, true);
 				}
 			}
 		}
+	}
+
+	void setFormattedContactTitleSection (int pendingRequest, boolean enable) {
+		String textToShow = String.format(getString(R.string.section_contacts_with_notification), pendingRequest);
+		try {
+			if (enable) {
+				textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+			}
+			else {
+				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");
+			}
+			textToShow = textToShow.replace("[/A]", "</font>");
+		}
+		catch(Exception e){
+			log("Formatted string: " + textToShow);
+		}
+
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		contactsSectionText.setText(result);
 	}
 
 	@Override
@@ -18113,7 +18198,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else {
 				chatBadge.setVisibility(View.VISIBLE);
-				((TextView) chatBadge.findViewById(R.id.chat_badge_text)).setText("" + numberUnread);
+				if (numberUnread > 9) {
+					((TextView) chatBadge.findViewById(R.id.chat_badge_text)).setText("9+");
+				}
+				else {
+					((TextView) chatBadge.findViewById(R.id.chat_badge_text)).setText("" + numberUnread);
+				}
 			}
 		}
 		else {

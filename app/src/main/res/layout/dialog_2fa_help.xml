@@ -34,7 +34,7 @@
             android:text="@string/play_store_label"
             android:textSize="14sp"
             android:fontFamily="roboto"
-            android:textColor="@color/file_playlist_state"
+            android:textColor="@color/accentColor"
             android:gravity="right|center_vertical"
             android:layout_gravity="right"
             android:layout_marginTop="25dp"/>
@@ -47,7 +47,7 @@
             android:text="@string/general_cancel"
             android:textSize="14sp"
             android:fontFamily="roboto"
-            android:textColor="@color/file_playlist_state"
+            android:textColor="@color/accentColor"
             android:gravity="right|center_vertical"
             android:layout_gravity="right"
             android:layout_marginTop="12dp"/>
