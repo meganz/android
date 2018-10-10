@@ -254,6 +254,8 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
 	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
 	public static String NOTIFICATION_CHANNEL_CHATCALLS_ID = "ChatCallNotification";
 	public static String NOTIFICATION_CHANNEL_CHATCALLS_NAME = "MEGA Chat Call";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
