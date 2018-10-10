@@ -65,8 +65,10 @@ public final class ChatAdvancedNotificationBuilder {
     private String notificationChannelNameChatSimple = Constants.NOTIFICATION_CHANNEL_CHAT_NAME;
     private String notificationChannelIdChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID;
     private String notificationChannelNameChatSummary = Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME;
-    private String notificationChannelIdCall = Constants.NOTIFICATION_CHANNEL_CHATCALLS_ID;
-    private String notificationChannelNameCall = Constants.NOTIFICATION_CHANNEL_CHATCALLS_NAME;
+    private String notificationChannelIdInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
+    private String notificationChannelNameInProgressMissedCall = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
+    private String notificationChannelIdIncomingCall = Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_ID;
+    private String notificationChannelNameIncomingCall = Constants.NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME;
 
     public static ChatAdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi, MegaChatApiAndroid megaChatApi) {
         Context appContext = context.getApplicationContext();
@@ -881,14 +883,14 @@ public final class ChatAdvancedNotificationBuilder {
             long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                NotificationChannel channel = new NotificationChannel(notificationChannelIdCall, notificationChannelNameCall, NotificationManager.IMPORTANCE_HIGH);
+                NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
                 channel.setShowBadge(true);
                 if (notificationManager == null) {
                     notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 }
                 notificationManager.createNotificationChannel(channel);
 
-                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdCall);
+                NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
                 notificationBuilderO
                         .setSmallIcon(R.drawable.ic_stat_notify)
                         .setContentTitle(chatToAnswer.getPeerFullname(0))
@@ -1072,14 +1074,14 @@ public final class ChatAdvancedNotificationBuilder {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(notificationChannelIdCall, notificationChannelNameCall, NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel channel = new NotificationChannel(notificationChannelIdInProgressMissedCall, notificationChannelNameInProgressMissedCall, NotificationManager.IMPORTANCE_HIGH);
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdCall);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdInProgressMissedCall);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.missed_call_notification_title))
