@@ -1,65 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="24dp">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/name_my_account"
-        android:textSize="20sp"
-        android:fontFamily="roboto"
-        android:text="@string/no_authentication_apps_title"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/mail_my_account"
-        android:textSize="16sp"
-        android:fontFamily="roboto"
-        android:text="@string/intent_not_available_2fa"
-        android:layout_marginTop="14dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/mail_my_account"
-        android:textSize="16sp"
-        android:fontFamily="roboto"
-        android:text="@string/open_play_store_2fa"
-        android:layout_marginTop="35dp"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="right"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="-18dp"
-        android:layout_marginBottom="-18dp">
+        android:layout_height="match_parent"
+        android:padding="24dp">
 
-        <Button
-            android:id="@+id/cancel_button_no_app"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="?android:attr/borderlessButtonStyle"
-            android:text="@string/general_cancel"
-            android:textSize="14sp"
+            android:textColor="@color/name_my_account"
+            android:textSize="20sp"
             android:fontFamily="roboto"
-            android:textColor="@color/accentColor"
-            android:layout_marginRight="8dp"/>
+            android:text="@string/no_authentication_apps_title"/>
 
-        <Button
-            android:id="@+id/open_button_no_app"
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="?android:attr/borderlessButtonStyle"
-            android:text="@string/context_open_link"
-            android:textSize="14sp"
+            android:textColor="@color/mail_my_account"
+            android:textSize="16sp"
             android:fontFamily="roboto"
-            android:textColor="@color/accentColor"/>
+            android:text="@string/intent_not_available_2fa"
+            android:layout_marginTop="14dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/mail_my_account"
+            android:textSize="16sp"
+            android:fontFamily="roboto"
+            android:text="@string/open_play_store_2fa"
+            android:layout_marginTop="35dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="right"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="-18dp"
+            android:layout_marginBottom="-18dp">
+
+            <Button
+                android:id="@+id/cancel_button_no_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="@string/general_cancel"
+                android:textSize="14sp"
+                android:fontFamily="roboto"
+                android:textColor="@color/file_playlist_state"
+                android:layout_marginRight="8dp"/>
+
+            <Button
+                android:id="@+id/open_button_no_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:text="@string/context_open_link"
+                android:textSize="14sp"
+                android:fontFamily="roboto"
+                android:textColor="@color/file_playlist_state"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
