@@ -87,7 +87,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
-                android:layout_below="@+id/navigation_drawer_account_information">
+                android:layout_below="@+id/navigation_drawer_account_information"
+                android:visibility="gone">
 
                 <ProgressBar
                     android:id="@+id/manager_used_space_bar"
