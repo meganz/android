@@ -256,8 +256,10 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
 	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
-	public static String NOTIFICATION_CHANNEL_CHATCALLS_ID = "ChatCallNotification";
-	public static String NOTIFICATION_CHANNEL_CHATCALLS_NAME = "MEGA Chat Call";
+	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID = "InProgressMissedCallNotification";
+	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME = "MEGA In Progress and Missed Calls";
+	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_ID = "ChatIncomingCallNotification";
+	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME = "MEGA Incoming Calls";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_ID = "CloudDriveNotification";

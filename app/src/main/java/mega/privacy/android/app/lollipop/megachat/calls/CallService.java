@@ -52,8 +52,8 @@ public class CallService extends Service implements MegaChatCallListenerInterfac
     private NotificationCompat.Builder mBuilderCompat;
     private NotificationManager mNotificationManager;
 
-    private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHATCALLS_ID;
-    private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHATCALLS_NAME;
+    private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
+    private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
 
     public void onCreate() {
         super.onCreate();
