@@ -1222,8 +1222,13 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				ChatAdvancedNotificationBuilder notificationBuilder;
 				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
-				notificationBuilder.removeAllChatNotifications();
-				notificationBuilder.generateChatNotification(request);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+					notificationBuilder.generateChatNotification(request);
+				}
+				else{
+					notificationBuilder.removeAllChatNotifications();
+					notificationBuilder.generateChatNotification(request);
+				}
 			}
 			else{
 				log("Error TYPE_PUSH_RECEIVED: "+e.getErrorString());
