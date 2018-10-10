@@ -1875,7 +1875,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
 			@Override
 			public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-				if (!Util.isOnline(managerActivity)) {
+				if (!Util.isOnline(managerActivity) || megaApi==null || megaApi.getRootNode()==null) {
 					disableNavigationViewLayout();
 				}
 				else {
@@ -1885,7 +1885,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
-				if (!Util.isOnline(managerActivity)) {
+				if (!Util.isOnline(managerActivity) || megaApi==null || megaApi.getRootNode()==null) {
 					disableNavigationViewLayout();
 				}
 				else {
@@ -12704,28 +12704,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			return;
 		}
 
-		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
+		if (usedSpaceLayout != null) {
+
+			String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+			try{
+				textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
+				textToShow = textToShow.replace("[/A]", "</font>");
+				textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+				textToShow = textToShow.replace("[/B]", "</font>");
+			}
+			catch (Exception e){}
+			Spanned result = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				result = Html.fromHtml(textToShow);
+			}
+			spaceTV.setText(result);
+			usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
+			usedSpaceLayout.setVisibility(View.VISIBLE);
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		String textToShow = String.format(getResources().getString(R.string.used_space), ((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted(), ((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
-		try{
-			textToShow = textToShow.replace("[A]", "<font color=\'#00bfa5\'>");
-			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
-			textToShow = textToShow.replace("[/B]", "</font>");
-		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
-		spaceTV.setText(result);
 
-		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
-
-//				String usedSpaceString = getString(R.string.used_space, used, total);
+		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
 			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
@@ -14431,12 +14432,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	void resetNavigationViewMenu(Menu menu){
 		log("resetNavigationViewMenu()");
 
-		if(!Util.isOnline(this)){
-			disableNavigationViewMenu(menu);
-			return;
-		}
-
-		if(megaApi==null || megaApi.getRootNode()==null){
+		if(!Util.isOnline(this) || megaApi==null || megaApi.getRootNode()==null){
 			disableNavigationViewMenu(menu);
 			return;
 		}

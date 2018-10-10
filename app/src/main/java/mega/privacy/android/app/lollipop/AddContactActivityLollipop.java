@@ -1601,7 +1601,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     else {
                         containerAddedContactsRecyclerView.setVisibility(View.VISIBLE);
                     }
-
                     addedContactsRecyclerView.setAdapter(adapterContacts);
 
                     if (phoneContacts != null && !phoneContacts.isEmpty()) {
