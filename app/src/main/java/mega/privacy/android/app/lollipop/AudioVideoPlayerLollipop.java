@@ -1965,7 +1965,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (nC == null) {
             nC = new NodeController(this);
         }
-        boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+        boolean fromIncoming = false;
+        if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+            fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+        }
 
         if (loop){
             loopMenuItem.setChecked(true);

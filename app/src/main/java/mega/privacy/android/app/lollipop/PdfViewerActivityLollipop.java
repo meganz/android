@@ -1450,7 +1450,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+            boolean fromIncoming = false;
+            if (type != Constants.OFFLINE_ADAPTER && type != Constants.ZIP_ADAPTER) {
+                fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+            }
 
             if (type == Constants.OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
