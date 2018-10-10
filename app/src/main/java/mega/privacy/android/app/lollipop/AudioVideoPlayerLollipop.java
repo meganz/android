@@ -1612,38 +1612,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         handler.postDelayed(runnableActionStatusBar, 3000);
     }
 
-    public class FindSelected extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (isOffline){
-                for (int i=0; i<mediaOffList.size(); i++) {
-                    if (handle == Long.parseLong(mediaOffList.get(i).getHandle())) {
-                        currentWindowIndex = i;
-                        break;
-                    }
-                }
-            }
-            else if (isZip) {
-                for (int i = 0; i< zipMediaFiles.size(); i++) {
-                    if (fileName.equals(zipMediaFiles.get(i).getName())) {
-                        currentWindowIndex = i;
-                        break;
-                    }
-                }
-            }
-            else {
-                for (int i=0; i<mediaHandles.size(); i++) {
-                    if (handle == mediaHandles.get(i)) {
-                        currentWindowIndex = i;
-                        break;
-                    }
-                }
-            }
-            return null;
-        }
-    }
-
     public void sortByNameDescending(){
 
         ArrayList<String> foldersOrder = new ArrayList<String>();
@@ -1966,7 +1934,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (nC == null) {
             nC = new NodeController(this);
         }
-        boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+        boolean fromIncoming = false;
+        if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+            fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+        }
 
         if (loop){
             loopMenuItem.setChecked(true);
@@ -2592,8 +2563,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void releasePlaylist(){
-//        sortBySelected();
-//        findSelected();
         onPlaylist = false;
         if (player != null){
             playWhenReady = player.getPlayWhenReady();
@@ -4477,6 +4446,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                         }
                         if(mSource != null) {
+                            if (handle == Long.parseLong(mediaOffList.get(i).getHandle())) {
+                                currentWindowIndex = i;
+                            }
                             mediaSourcePlaylist.add(mSource);
                         }
                     }
@@ -4489,6 +4461,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             mediaUris.add(mediaUri);
                             mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                             if (mSource != null) {
+                                if (fileName.equals(zipMediaFiles.get(i).getName())) {
+                                    currentWindowIndex = i;
+                                }
                                 mediaSourcePlaylist.add(mSource);
                             }
                         }
@@ -4527,6 +4502,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         if (mSource != null) {
+                            if (handle == n.getHandle()) {
+                                currentWindowIndex = i;
+                            }
                             mediaSourcePlaylist.add(mSource);
                         }
                     }
@@ -4567,7 +4545,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 createPlaylistProgressBar.setVisibility(View.GONE);
             }
             else {
-                new FindSelected().execute();
                 createPlaylistProgressBar.setVisibility(View.GONE);
                 playListCreated = true;
                 enableNextButton();

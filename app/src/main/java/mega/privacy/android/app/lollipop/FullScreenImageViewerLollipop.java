@@ -288,7 +288,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		if (nC == null) {
 			nC = new NodeController(this);
 		}
-		boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
+		boolean fromIncoming = false;
+		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+			fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
+		}
 
 		if (adapterType == Constants.OFFLINE_ADAPTER){
 			getlinkIcon.setVisible(false);
@@ -1208,10 +1211,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else{
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
-
-
-
-//			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == Constants.SEARCH_ADAPTER){
 
