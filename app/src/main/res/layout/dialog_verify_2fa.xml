@@ -131,6 +131,25 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp"/>
 
+            <RelativeLayout
+                android:id="@+id/lost_authentication_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/six_pin_verify"
+                android:padding="10dp"
+                android:layout_marginTop="29dp"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lost_your_authenticator_device"
+                    android:textColor="@color/file_playlist_state"
+                    android:textSize="13sp"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
             <ProgressBar
                 android:id="@+id/progressbar_verify_2fa"
                 style="?android:attr/progressBarStyleLargeInverse"

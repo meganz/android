@@ -2767,7 +2767,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat)holder).urlOwnMessageTitle.setText(title);
+                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setMaxLines(1);
+
                 ((ViewHolderMessageChat)holder).urlOwnMessageDescription.setText(description);
+                ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setMaxLines(2);
+
                 ((ViewHolderMessageChat)holder).urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat)holder).urlOwnMessageLink.setText(urlString);
 
@@ -3337,6 +3341,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (node != null) {
                 ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(node.getName());
+                ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setMaxLines(1);
+                ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setMaxLines(2);
+
+
 
                 if (node.isFile()) {
                     Bitmap thumb = null;
@@ -3775,7 +3783,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
                             ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.title_enable_rich_links));
+                            ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setMaxLines(10);
+
                             ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.text_enable_rich_links));
+                            ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setMaxLines(30);
 
                             ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_rich_link));
@@ -3831,7 +3842,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setText(messageContent);
                             ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.title_confirmation_disable_rich_links));
+                            ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setMaxLines(10);
+
                             ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.text_confirmation_disable_rich_links));
+                            ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setMaxLines(30);
 
                             ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.VISIBLE);
                             ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_rich_link));
