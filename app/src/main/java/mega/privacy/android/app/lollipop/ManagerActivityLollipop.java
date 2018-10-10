@@ -2728,6 +2728,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
+		if (savedInstanceState != null) {
+			updateAccountDetailsVisibleInfo();
+		}
 		log("END onCreate");
 	}
 
@@ -4388,7 +4391,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						}
 //					}
 
-					usedSpaceLayout.setVisibility(View.VISIBLE);
+					updateAccountDetailsVisibleInfo();
 
 				} else {
 					log("showOnlineMode - Root is NULL");
@@ -12738,6 +12741,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void updateAccountDetailsVisibleInfo(){
 		log("updateAccountDetailsVisibleInfo");
 		if(isFinishing()){
+			return;
+		}
+		if (((MegaApplication) getApplication()) == null || ((MegaApplication) getApplication()).getMyAccountInfo() == null) {
 			return;
 		}
 
