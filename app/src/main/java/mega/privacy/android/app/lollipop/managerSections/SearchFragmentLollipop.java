@@ -56,7 +56,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -627,8 +626,6 @@ public class SearchFragmentLollipop extends Fragment{
 			}
 			else{
                 adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_LIST);
-                addSectionTitle(nodes,adapter.getAdapterType());
-                adapter.setNodes(nodes);
 			}
 
 			adapter.setMultipleSelect(false);
@@ -674,8 +671,6 @@ public class SearchFragmentLollipop extends Fragment{
 			}
 			else{
 				adapter.setAdapterType(CloudDriveAdapter.ITEM_VIEW_TYPE_GRID);
-                addSectionTitle(nodes,adapter.getAdapterType());
-				adapter.setNodes(nodes);
 			}
 			adapter.setMultipleSelect(false);
 
@@ -1256,7 +1251,6 @@ public class SearchFragmentLollipop extends Fragment{
 			log("searchQuery: "+((ManagerActivityLollipop)context).searchQuery);
 			((ManagerActivityLollipop)context).setParentHandleSearch(-1);
 			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
-			adapter.setNodes(nodes);
 			setNodes(nodes);
 			visibilityFastScroller();
 
