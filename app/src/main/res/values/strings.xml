@@ -2142,4 +2142,7 @@
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
 
+    <string name="title_upload_explorer" context="Title of cloud explorer to upload a file">Upload to MEGA</string>
+    <string name="choose_destionation" context="Label choose destination">Choose destination</string>
+
 </resources>
