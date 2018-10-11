@@ -2728,6 +2728,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
+		if (savedInstanceState != null) {
+			updateAccountDetailsVisibleInfo();
+		}
 		log("END onCreate");
 	}
 
@@ -4388,7 +4391,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						}
 //					}
 
-					usedSpaceLayout.setVisibility(View.VISIBLE);
+					updateAccountDetailsVisibleInfo();
 
 				} else {
 					log("showOnlineMode - Root is NULL");
@@ -12740,18 +12743,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(isFinishing()){
 			return;
 		}
+		if (((MegaApplication) getApplication()) == null || ((MegaApplication) getApplication()).getMyAccountInfo() == null) {
+			return;
+		}
 
-		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
-
-//				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
-		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
-
-		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
+		if (usedSpaceLayout != null) {
+			usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
-		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+			usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
+			totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+
+			usedSpaceLayout.setVisibility(View.VISIBLE);
+		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
 			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
