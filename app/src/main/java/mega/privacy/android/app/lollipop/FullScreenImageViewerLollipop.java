@@ -1273,10 +1273,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			else{
 				fileNameTextView.setMaxWidth(Util.scaleWidthPx(300, outMetrics));
 			}
-
-
-
-//			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+			fileNameTextView.setText(new File(paths.get(positionG)).getName());
 		}
 		else if(adapterType == Constants.SEARCH_ADAPTER){
 
