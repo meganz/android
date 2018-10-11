@@ -9736,7 +9736,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		mySnackbar.show();
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
 		log("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -9766,7 +9766,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if(dontShowAgain.isChecked()){
 							dbH.setAttrAskNoAppDownload("false");
 						}
-						nC.download(parentPathC, urlC, sizeC, hashesC);
+						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -9781,7 +9781,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
 		log("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -9812,7 +9812,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if(dontShowAgain.isChecked()){
 							dbH.setAttrAskSizeDownload("false");
 						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -13951,7 +13951,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("hashes size: "+hashes.length);
 
-			nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+			boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
+
+			nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
 //			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == Constants.REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
@@ -17650,7 +17652,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void openAdvancedDevices (long handleToDownload){
+	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
 		log("openAdvancedDevices");
 //		handleToDownload = handle;
 		String externalPath = Util.getExternalCardPath();
@@ -17675,6 +17677,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				intent.setType(mimeType);
 				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
 				intent.putExtra("handleToDownload", handleToDownload);
+				intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
+
 				try{
 					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
 				}

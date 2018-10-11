@@ -253,7 +253,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, false);
 					break;
 				}
 				case R.id.cab_menu_rename:{
