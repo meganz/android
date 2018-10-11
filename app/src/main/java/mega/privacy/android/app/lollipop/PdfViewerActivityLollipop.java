@@ -1450,7 +1450,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+            boolean fromIncoming = false;
+            if (type != Constants.OFFLINE_ADAPTER && type != Constants.ZIP_ADAPTER) {
+                fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+            }
 
             if (type == Constants.OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
@@ -1473,11 +1476,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
                 if (isUrl){
                     shareMenuItem.setVisible(false);
-                    downloadMenuItem.setVisible(true);
                 }
                 else {
                     shareMenuItem.setVisible(true);
-                    downloadMenuItem.setVisible(false);
                 }
                 if(node.isExported()){
                     removelinkMenuItem.setVisible(true);
@@ -1487,6 +1488,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     getlinkMenuItem.setVisible(true);
                 }
 
+                downloadMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 renameMenuItem.setVisible(true);
                 moveMenuItem.setVisible(true);
@@ -1627,13 +1629,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 chatRemoveMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
 
                 if (isUrl){
-                    downloadMenuItem.setVisible(true);
                     shareMenuItem.setVisible(false);
                 }
                 else {
-                    downloadMenuItem.setVisible(false);
                     shareMenuItem.setVisible(true);
                 }
 
@@ -1789,16 +1790,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         }
                     }
 
+                    downloadMenuItem.setVisible(true);
                     if (isUrl){
-                        downloadMenuItem.setVisible(true);
                         shareMenuItem.setVisible(false);
                     }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        if (shareVisible){
-                            shareMenuItem.setVisible(true);
-                        }
+                    else if (shareVisible){
+                        shareMenuItem.setVisible(true);
                     }
+
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
