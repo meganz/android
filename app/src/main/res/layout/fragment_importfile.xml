@@ -1,0 +1,145 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    tools:context=".FileExplorerListFragment">
+
+    <TextView
+        android:id="@+id/content_text"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginLeft="16dp"
+        android:textColor="@color/name_my_account"
+        android:textSize="14sp"
+        android:fontFamily="roboto"
+        android:gravity="left|center_vertical"
+        android:text="File"/>
+
+    <RelativeLayout
+        android:id="@+id/files_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginLeft="16dp"
+        android:layout_below="@+id/content_text">
+
+        <ImageView
+            android:id="@+id/thumbnail_file"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"/>
+        
+        <TextView
+            android:id="@+id/text_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/thumbnail_file"
+            android:layout_toLeftOf="@+id/edit_icon"
+            android:textSize="16sp"
+            android:textColor="@color/name_my_account"
+            android:gravity="left|center_vertical"
+            android:fontFamily="roboto"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:ellipsize="end"/>
+        
+        <ImageView
+            android:id="@+id/edit_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_rename"
+            android:alpha="0.5"
+            android:layout_marginRight="16dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/file_list_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:clipToPadding="false"-->
+            <!--android:choiceMode="multipleChoice"/>-->
+
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:background="@color/tour_bar_grey"
+        android:layout_width = "match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/files_layout"/>
+
+    <TextView
+        android:id="@+id/choose_destination"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginLeft="16dp"
+        android:textColor="@color/name_my_account"
+        android:textSize="14sp"
+        android:fontFamily="roboto"
+        android:layout_below="@+id/separator"
+        android:text="@string/choose_destionation"
+        android:gravity="left|center_vertical"
+        android:layout_marginTop="8dp"/>
+    
+    <RelativeLayout
+        android:id="@+id/cloud_drive_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_below="@+id/choose_destination">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accentColor"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:textSize="14sp"
+            android:text="@string/section_cloud_drive"
+            android:textAllCaps="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/cloud_incoming_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_below="@+id/cloud_drive_layout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accentColor"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:textSize="14sp"
+            android:text="@string/title_incoming_shares_explorer"
+            android:textAllCaps="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/cloud_chat_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_below="@+id/cloud_incoming_layout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accentColor"
+            android:layout_centerVertical="true"
+            android:gravity="left"
+            android:textSize="14sp"
+            android:text="@string/section_chat"
+            android:textAllCaps="true"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

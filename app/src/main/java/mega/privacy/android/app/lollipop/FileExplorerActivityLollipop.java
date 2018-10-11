@@ -181,6 +181,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
 	private ChatExplorerFragment chatExplorer;
+	private ImportFileFragment importFileFragment;
 
 	private AlertDialog newFolderDialog;
 	
@@ -204,6 +205,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	int deepBrowserTree = 0;
 
 	Intent intent = null;
+	boolean importFileF = false;
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -801,15 +803,28 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					else{
-						aB.setTitle(getString(R.string.title_cloud_explorer));
-						if (mTabsAdapterExplorer == null){
-							fileExplorerSectionLayout.setVisibility(View.VISIBLE);
-							viewPagerExplorer.setVisibility(View.VISIBLE);
-							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
-							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
-							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
+						aB.setTitle(getString(R.string.title_upload_explorer));
+						cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 
+						if(importFileFragment==null){
+							importFileFragment = new ImportFileFragment();
 						}
+
+						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+						ft.replace(R.id.cloudDriveFrameLayout, importFileFragment, "importFileFragment");
+						ft.commitNow();
+
+						cloudDriveFrameLayout.setVisibility(View.VISIBLE);
+
+						if(fileExplorerSectionLayout!=null){
+							fileExplorerSectionLayout.setVisibility(View.GONE);
+						}
+						else{
+							fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
+							fileExplorerSectionLayout.setVisibility(View.GONE);
+						}
+						importFileF = true;
+						tabShown=NO_TABS;
 					}
 				}
 
@@ -882,7 +897,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 				else{
 					//CLOUD TAB
-					if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)){
+					if(intent.getAction().equals(ACTION_MULTISELECT_FILE)||intent.getAction().equals(ACTION_SELECT_FILE)|| importFileF){
 						createFolderMenuItem.setVisible(false);
 					}
 					else{
