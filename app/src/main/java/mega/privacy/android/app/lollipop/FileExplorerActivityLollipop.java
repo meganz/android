@@ -46,6 +46,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -68,6 +69,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.PreviewUtils;
+import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -186,7 +188,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private AlertDialog newFolderDialog;
 	
 	ProgressDialog statusDialog;
-	
+
 	private List<ShareInfo> filePreparedInfos;
 
 	//Tabs in Cloud
@@ -259,8 +261,26 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
-			filePreparedInfos = info;			
-			onIntentProcessed();
+			filePreparedInfos = info;
+			if (importFileF) {
+				if(importFileFragment==null){
+					importFileFragment = new ImportFileFragment();
+				}
+
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.cloudDriveFrameLayout, importFileFragment, "importFileFragment");
+				ft.commitNow();
+
+				if (statusDialog != null) {
+					try {
+						statusDialog.dismiss();
+					}
+					catch(Exception ex){}
+				}
+			}
+			else {
+				onIntentProcessed();
+			}
 		}			
 	}
 	
@@ -804,15 +824,20 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 					else{
 						aB.setTitle(getString(R.string.title_upload_explorer));
+						importFileF = true;
 						cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
-
-						if(importFileFragment==null){
-							importFileFragment = new ImportFileFragment();
+						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+						ownFilePrepareTask.execute(getIntent());
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(this);
+							temp.setMessage(getString(R.string.upload_prepare));
+							temp.show();
 						}
-
-						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-						ft.replace(R.id.cloudDriveFrameLayout, importFileFragment, "importFileFragment");
-						ft.commitNow();
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
 
 						cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -823,7 +848,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
 							fileExplorerSectionLayout.setVisibility(View.GONE);
 						}
-						importFileF = true;
 						tabShown=NO_TABS;
 					}
 				}
@@ -1305,12 +1329,16 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if(tabShown==NO_TABS){
 			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
+			importFileFragment = (ImportFileFragment) getSupportFragmentManager().findFragmentByTag("importFileFragment");
 
 			if(cDriveExplorer!=null){
 				if (cDriveExplorer.onBackPressed() == 0){
 //					super.onBackPressed();
 					finishActivity();
 				}
+			}
+			else if (importFileFragment != null){
+				finishActivity();
 			}
 		}
 		else{
@@ -1454,11 +1482,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	public void onIntentProcessed() {
 		List<ShareInfo> infos = filePreparedInfos;
-		
+
 		if (statusDialog != null) {
-			try { 
-				statusDialog.dismiss(); 
-			} 
+			try {
+				statusDialog.dismiss();
+			}
 			catch(Exception ex){}
 		}
 		
@@ -2147,8 +2175,36 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		{	
 			megaApi.removeGlobalListener(this);
 		}
+
+		File childThumbDir = new File(ThumbnailUtils.getThumbFolder(this), ImportFileFragment.THUMB_FOLDER);
+		if (childThumbDir != null){
+			if (childThumbDir.exists()){
+				try {
+					deleteFile(childThumbDir);
+				} catch (IOException e) {}
+			}
+		}
 		
 		super.onDestroy();
+	}
+
+	public void deleteFile(File file) throws IOException {
+		if (file.isDirectory()) {
+			if (file.list().length == 0) {
+				file.delete();
+			} else {
+				String[] files = file.list();
+				for (String temp : files) {
+					File deleteFile = new File(file, temp);
+					deleteFile(deleteFile);
+				}
+				if (file.list().length == 0) {
+					file.delete();
+				}
+			}
+		} else {
+			file.delete();
+		}
 	}
 
 	@Override
@@ -2782,6 +2838,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	public void decreaseDeepBrowserTree() {
 		deepBrowserTree--;
+	}
+
+	public List<ShareInfo> getFilePreparedInfos() {
+		return filePreparedInfos;
 	}
 
 }
