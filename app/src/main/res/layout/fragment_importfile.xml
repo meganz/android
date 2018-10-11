@@ -20,48 +20,15 @@
     <RelativeLayout
         android:id="@+id/files_layout"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginLeft="16dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/content_text">
 
-        <ImageView
-            android:id="@+id/thumbnail_file"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_centerVertical="true"/>
-        
-        <TextView
-            android:id="@+id/text_file"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/file_list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/thumbnail_file"
-            android:layout_toLeftOf="@+id/edit_icon"
-            android:textSize="16sp"
-            android:textColor="@color/name_my_account"
-            android:gravity="left|center_vertical"
-            android:fontFamily="roboto"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:ellipsize="end"/>
-        
-        <ImageView
-            android:id="@+id/edit_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_rename"
-            android:alpha="0.5"
-            android:layout_marginRight="16dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"/>
-
-        <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/file_list_view"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:clipToPadding="false"-->
-            <!--android:choiceMode="multipleChoice"/>-->
-
+            android:clipToPadding="false"
+            android:choiceMode="multipleChoice"/>
 
     </RelativeLayout>
 
@@ -105,7 +72,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/cloud_incoming_layout"
+        android:id="@+id/incoming_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="16dp"
@@ -124,11 +91,11 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/cloud_chat_layout"
+        android:id="@+id/chat_layout"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginLeft="16dp"
-        android:layout_below="@+id/cloud_incoming_layout">
+        android:layout_below="@+id/incoming_layout">
 
         <TextView
             android:layout_width="match_parent"
