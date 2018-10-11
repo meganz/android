@@ -11,7 +11,9 @@ import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -19,6 +21,8 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.DBUtil;
+import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -26,7 +30,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 40;
+	private static final int DATABASE_VERSION = 41;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -41,6 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_PENDING_MSG = "pendingmsg";
 	private static final String TABLE_MSG_NODES = "msgnodes";
 	private static final String TABLE_NODE_ATTACHMENTS = "nodeattachments";
+	private static final String TABLE_CAMERA_UPLOADS = "camerauploads";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -147,6 +152,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_FILE_FINGERPRINT = "filefingerprint";
 	private static final String KEY_NODE_HANDLE = "nodehandle";
 
+	//columns for table camerauploads
+    private static final String KEY_SYNC_FILEPATH = "sync_filepath";
+    private static final String KEY_SYNC_TIMESTAMP = "sync_timestamp";
+    private static final String KEY_SYNC_STATE = "sync_state";
+    private static final String CREATE_CAMERA_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CAMERA_UPLOADS + "("
+            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER "+")";
+
 
     private static DatabaseHandler instance;
     
@@ -248,6 +260,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String CREATE_NODE_ATTACHMENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NODE_ATTACHMENTS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FILE_PATH + " TEXT, " + KEY_FILE_NAME + " TEXT, " + KEY_FILE_FINGERPRINT + " TEXT, " + KEY_NODE_HANDLE + " TEXT" + ")";
 		db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
+
+        db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
 	}
 
 	@Override
@@ -561,6 +575,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SMALL_GRID_CAMERA + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + " = '" + encrypt("false") + "';");
 		}
+        TL.log(null,"onupdate" );
+		if(oldVersion <= 40) {
+		    db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
+        }
 	}
 	
 //	public MegaOffline encrypt(MegaOffline off){
@@ -577,18 +595,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 	
 	public static String encrypt(String original) {
-		if (original == null) {
-			return null;
-		}
-		try {
-			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
-			return Base64.encodeToString(encrypted, Base64.DEFAULT);
-		} catch (Exception e) {
-			log("ee");
-			e.printStackTrace();
-			return null;
-		}
-//		return original;
+//		if (original == null) {
+//			return null;
+//		}
+//		try {
+//			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
+//			return Base64.encodeToString(encrypted, Base64.DEFAULT);
+//		} catch (Exception e) {
+//			log("ee");
+//			e.printStackTrace();
+//			return null;
+//		}
+		return original;
 	}
 	
 	private static byte[] getAesKey() {
@@ -608,6 +626,44 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			values.put(KEY_MY_HANDLE, encrypt(userCredentials.getMyHandle()+""));
 		}
         db.insert(TABLE_CREDENTIALS, null, values);
+    }
+
+    public void savePendingUploadRecords(List<SyncRecord> list) {
+        if (list != null) {
+            for (SyncRecord record : list) {
+                ContentValues values = new ContentValues();
+                if (record.getLocalPath() != null) {
+                    values.put(KEY_SYNC_FILEPATH,encrypt(record.getLocalPath()));
+                }
+                values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
+                values.put(KEY_SYNC_STATE,record.getStatus());
+                db.insert(TABLE_CAMERA_UPLOADS,null,values);
+            }
+        }
+    }
+
+    public List<SyncRecord> findUnsuccessfulUploads() {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " !='" + SyncRecord.STATUS_SUCCESS + "'";
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        List<SyncRecord> records = new ArrayList<>();
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                SyncRecord record = new SyncRecord();
+                record.setId(cursor.getInt(0));
+                record.setLocalPath(decrypt(cursor.getString(1)));
+                record.setTimestamp(Long.valueOf(decrypt(cursor.getString(2))));
+                record.setStatus(cursor.getInt(3));
+                records.add(record);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return records;
+    }
+
+    public void updateSyncRecord(SyncRecord record) {
+        String updateSql = "UPDATE " + TABLE_CAMERA_UPLOADS + " SET " + KEY_SYNC_STATE + "= " + record.getStatus() + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(record.getLocalPath()) + "' AND " + KEY_SYNC_TIMESTAMP + " ='" + encrypt(String.valueOf(record.getTimestamp())) +"'";
+        db.execSQL(updateSql);
     }
 
 	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
@@ -691,18 +747,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public static String decrypt(String encodedString) {
-		if (encodedString == null) {
-			return null;
-		}
-		try {
-			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
-			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
-			return new String(original);
-		} catch (Exception e) {
-			log("de");
-			return null;
-		}
-//		return encodedString;
+//		if (encodedString == null) {
+//			return null;
+//		}
+//		try {
+//			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
+//			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
+//			return new String(original);
+//		} catch (Exception e) {
+//			log("de");
+//			return null;
+//		}
+		return encodedString;
 	}
 	
 	public UserCredentials getCredentials(){
