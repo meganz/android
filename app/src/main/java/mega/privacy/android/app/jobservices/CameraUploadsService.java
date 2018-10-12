@@ -398,7 +398,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     continue;
                 }
             }
-            
             String fileName;
             if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
                 //Keep the file names as device
@@ -408,9 +407,12 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 do {
                     fileName = Util.getPhotoSyncNameWithIndex(file.media.timestamp,file.media.filePath,photoIndex);
                     photoIndex++;
-                } while (megaApi.getChildNode(cameraUploadNode,fileName) != null);
+                } while (megaApi.getChildNode(cameraUploadNode,fileName) != null || dbH.pendingUploadRecordNameExist(fileName));
             }
-        
+            SyncRecord record = SyncRecord.convert(file);
+            record.setFileName(fileName);
+            dbH.savePendingUploadRecord(record);
+
             if(file.copyOnly){
                 megaApi.copyNode(file.existingNode,file.parent,fileName,file.requestListener);
             }else{

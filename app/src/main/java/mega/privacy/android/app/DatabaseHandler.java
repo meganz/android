@@ -156,8 +156,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SYNC_FILEPATH = "sync_filepath";
     private static final String KEY_SYNC_TIMESTAMP = "sync_timestamp";
     private static final String KEY_SYNC_STATE = "sync_state";
+    private static final String KEY_SYNC_FILENAME = "sync_filename";
     private static final String CREATE_CAMERA_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CAMERA_UPLOADS + "("
-            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER "+")";
+            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER "+")";
 
 
     private static DatabaseHandler instance;
@@ -631,19 +632,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void savePendingUploadRecords(List<SyncRecord> list) {
         if (list != null) {
             for (SyncRecord record : list) {
-                ContentValues values = new ContentValues();
-                if (record.getLocalPath() != null) {
-                    values.put(KEY_SYNC_FILEPATH,encrypt(record.getLocalPath()));
-                }
-                values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
-                values.put(KEY_SYNC_STATE,record.getStatus());
-                db.insert(TABLE_CAMERA_UPLOADS,null,values);
+               savePendingUploadRecord(record);
             }
         }
     }
 
+    public void savePendingUploadRecord(SyncRecord record) {
+        ContentValues values = new ContentValues();
+        if (record.getLocalPath() != null) {
+            values.put(KEY_SYNC_FILEPATH,encrypt(record.getLocalPath()));
+        }
+        if (record.getFileName() != null) {
+            values.put(KEY_SYNC_FILENAME,encrypt(record.getFileName()));
+        }
+        values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
+        values.put(KEY_SYNC_STATE,record.getStatus());
+        db.insert(TABLE_CAMERA_UPLOADS,null,values);
+    }
+
+    public boolean pendingUploadRecordNameExist(String name) {
+        String selectQuery = "SELECT 1 FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILENAME + " ='" + name + "'";
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(selectQuery,null);
+            return (cursor != null && cursor.moveToFirst());
+        } finally {
+            cursor.close();
+        }
+    }
+
     public List<SyncRecord> findUnsuccessfulUploads() {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " !='" + SyncRecord.STATUS_SUCCESS + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " ='" + SyncRecord.STATUS_FAILED + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         List<SyncRecord> records = new ArrayList<>();
 
@@ -652,8 +671,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 SyncRecord record = new SyncRecord();
                 record.setId(cursor.getInt(0));
                 record.setLocalPath(decrypt(cursor.getString(1)));
-                record.setTimestamp(Long.valueOf(decrypt(cursor.getString(2))));
-                record.setStatus(cursor.getInt(3));
+                record.setFileName(decrypt(cursor.getString(2)));
+                record.setTimestamp(Long.valueOf(decrypt(cursor.getString(3))));
+                record.setStatus(cursor.getInt(4));
                 records.add(record);
             } while (cursor.moveToNext());
         }
@@ -661,7 +681,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return records;
     }
 
-    public void updateSyncRecord(SyncRecord record) {
+    public void updateSyncRecordState(SyncRecord record) {
         String updateSql = "UPDATE " + TABLE_CAMERA_UPLOADS + " SET " + KEY_SYNC_STATE + "= " + record.getStatus() + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(record.getLocalPath()) + "' AND " + KEY_SYNC_TIMESTAMP + " ='" + encrypt(String.valueOf(record.getTimestamp())) +"'";
         db.execSQL(updateSql);
     }

@@ -13,12 +13,22 @@ public class SyncRecord {
 
     private String localPath;
 
+    private String fileName;
+
     private long timestamp;
 
     private int status = STATUS_PENDING;
 
     public SyncRecord() {
 
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public int getId() {
@@ -78,6 +88,7 @@ public class SyncRecord {
         return "SyncRecord{" +
                 "id=" + id +
                 ", localPath='" + localPath + '\'' +
+                ", fileName='" + fileName + '\'' +
                 ", timestamp=" + timestamp +
                 ", status=" + status +
                 '}';
