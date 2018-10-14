@@ -62,33 +62,33 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 public class CameraUploadsService extends JobService implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface {
-
+    
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
     public static String SECONDARY_UPLOADS = "Media Uploads";
-
+    
     private NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
-
+    
     private int notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS;
     private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID;
     private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME;
-
+    
     Thread task;
-
+    
     static public boolean running = false;
     private Handler handler;
-
+    
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
-
+    
     private boolean isOverquota = false;
     private boolean canceled;
     private boolean isForeground;
     boolean newFileList = false;
-
+    
     DatabaseHandler dbH;
-
+    
     MegaPreferences prefs;
     String localPath = "";
     boolean isExternalSDCard = false;
@@ -98,45 +98,44 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     String localPathSecondary = "";
     long secondaryUploadHandle = -1;
     MegaNode secondaryUploadNode = null;
-
+    
     boolean isLoggingIn = false;
-
+    
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     MegaApplication app;
-
+    
     JobParameters globalParams;
-
+    
     int LOGIN_IN = 12;
-
+    
     static CameraUploadsService cameraUploadsService;
     static String gSession;
-
+    
     public class Media {
         public String filePath;
         public long timestamp;
     }
-
+    
     Queue<Media> cameraFiles = new LinkedList<>();
     ArrayList<PendingUpload> pendingUploadsList = new ArrayList<>();
     ArrayList<PendingUpload> pendingUploadsListSecondary = new ArrayList<>();
     Queue<Media> mediaFilesSecondary = new LinkedList<>();
     MegaNode cameraUploadNode = null;
     private int totalUploaded;
-    private long totalSizeToUpload;
     private int totalToUpload;
-    private long totalSizeUploaded;
-    private int successCount;
-
+    
     long currentTimeStamp = 0;
-
+    
+    Intent mIntent;
+    
     @Override
     public boolean onStartJob(JobParameters params) {
         log("onStartJob");
         cameraUploadsService = this;
         globalParams = params;
         handler = new Handler();
-
+        
         try {
             log("Start service here");
             initService();
@@ -154,18 +153,18 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     }
                 }
             };
-
+            
             task.start();
             return true;
         } catch (Exception e) {
             log("CameraUploadsService Exception: " + e.getMessage() + "_" + e.getStackTrace());
         }
-
+        
         return false;
     }
-
-    private void startCameraUploads() {
     
+    private void startCameraUploads() {
+        
         Intent intent;
         intent = new Intent(this,ManagerActivityLollipop.class);
         intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
@@ -178,7 +177,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
         }
-    
+        
         mBuilder = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
         mBuilder
                 .setSmallIcon(R.drawable.ic_stat_camera_sync)
@@ -188,7 +187,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 .setContentText(getString(R.string.settings_camera_notif_title))
                 .setOnlyAlertOnce(true);
         notification = mBuilder.build();
-    
+        
         isForeground = true;
         startForeground(notificationId,notification);
         
@@ -199,7 +198,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         }
     }
     
-    private void startUploads(){
+    private void startUploads() {
         log("startUploads()");
         if (!wl.isHeld()) {
             wl.acquire();
@@ -213,25 +212,25 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 MediaStore.MediaColumns.DATE_ADDED,
                 MediaStore.MediaColumns.DATE_MODIFIED
         };
-    
+        
         String selectionCamera = null;
         String selectionSecondary = null;
         String[] selectionArgs = null;
-    
+        
         prefs = dbH.getPreferences();
-    
+        
         //todo update query as per latest design
-        if (prefs != null){
+        if (prefs != null) {
             log("if (prefs != null)");
-            if (prefs.getCamSyncTimeStamp() != null){
+            if (prefs.getCamSyncTimeStamp() != null) {
                 log("if (prefs.getCamSyncTimeStamp() != null)");
                 long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
                 selectionCamera = "(" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
                 log("SELECTION: " + selectionCamera);
             }
-            if(secondaryEnabled){
+            if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
-                if (prefs.getSecSyncTimeStamp() != null){
+                if (prefs.getSecSyncTimeStamp() != null) {
                     log("if (prefs.getSecSyncTimeStamp() != null)");
                     long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
                     selectionSecondary = "(" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp;
@@ -241,7 +240,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         }
         
         String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC";
-    
+        
         ArrayList<Uri> uris = new ArrayList<>();
         if (prefs.getCamSyncFileUpload() == null) {
             log("if (prefs.getCamSyncFileUpload() == null)");
@@ -273,7 +272,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 }
             }
         }
-    
+        
         for (int i = 0;i < uris.size();i++) {
             log("for(int i=0; i<uris.size(); i++)");
             Cursor cursorCamera = app.getContentResolver().query(uris.get(i),projection,selectionCamera,selectionArgs,order);
@@ -288,16 +287,15 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) != 0)");
                     timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
                 }
-            
-                while (cursorCamera.moveToNext()) {
                 
+                while (cursorCamera.moveToNext()) {
+                    
                     Media media = new Media();
                     media.filePath = cursorCamera.getString(dataColumn);
-                    //log("Tipo de fichero:--------------------------: "+media.filePath);
                     media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
-                
+                    
                     log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + localPath);
-                
+                    
                     //Check files of the Camera Uploads
                     if (checkFile(media,localPath)) {
                         log("if (checkFile(media," + localPath + "))");
@@ -306,7 +304,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     }
                 }
             }
-        
+            
             //Secondary Media Folder
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
@@ -322,7 +320,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
                         }
                         while (cursorSecondary.moveToNext()) {
-                        
+                            
                             Media media = new Media();
                             media.filePath = cursorSecondary.getString(dataColumn);
                             media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;
@@ -339,36 +337,16 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 }
             }
         }
-    
+        
         cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
         if (cameraUploadNode == null) {
             log("ERROR: cameraUploadNode == null");
             finish();
             return;
         }
-    
-        totalToUpload = cameraFiles.size();
+        
         totalUploaded = 0;
-        totalSizeUploaded = 0;
-    
-        totalSizeToUpload = 0;
-        Iterator<Media> itCF = cameraFiles.iterator();
-        while (itCF.hasNext()) {
-            Media m = itCF.next();
-            File f = new File(m.filePath);
-            totalSizeToUpload = totalSizeToUpload + f.length();
-            log("m.filePath -> " + m.filePath);
-        }
-    
-        Iterator<Media> itmFS = mediaFilesSecondary.iterator();
-        while (itmFS.hasNext()) {
-            Media m = itmFS.next();
-            File f = new File(m.filePath);
-            totalSizeToUpload = totalSizeToUpload + f.length();
-            log("mS.filePath -> " + m.filePath);
-        }
-    
-        prepareUpload(cameraFiles, mediaFilesSecondary);
+        prepareUpload(cameraFiles,mediaFilesSecondary);
     }
     
     public void uploadNext() {
@@ -376,23 +354,27 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         log("uploadNext()");
     }
     
-    private void prepareUpload(Queue<Media> primaryList, Queue<Media> secondaryList) {
+    private void prepareUpload(Queue<Media> primaryList,Queue<Media> secondaryList) {
         log("uploadNext()");
         
         //todo start upload temp change
         pendingUploadsList = getPendingList(primaryList);
         pendingUploadsListSecondary = getPendingList(secondaryList);
-    
+        
+        
+        //todo need to maintain total size
+        totalToUpload = pendingUploadsList.size() + pendingUploadsListSecondary.size();
+        
         startParallelUpload(pendingUploadsList);
         startParallelUpload(pendingUploadsListSecondary);
     }
     
-    private void startParallelUpload(ArrayList<PendingUpload> list){
-        for(PendingUpload file : list){
-        
-            if(file.copyOnly){
+    private void startParallelUpload(ArrayList<PendingUpload> list) {
+        for (PendingUpload file : list) {
+            
+            if (file.copyOnly) {
                 //file exist in other location, service will copy internally
-            }else{
+            } else {
                 File f = new File(file.path);
                 if (!f.exists()) {
                     continue;
@@ -407,26 +389,26 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 do {
                     fileName = Util.getPhotoSyncNameWithIndex(file.media.timestamp,file.media.filePath,photoIndex);
                     photoIndex++;
-                } while (megaApi.getChildNode(cameraUploadNode,fileName) != null || dbH.pendingUploadRecordNameExist(fileName));
+                }
+                while (megaApi.getChildNode(cameraUploadNode,fileName) != null || dbH.pendingUploadRecordNameExist(fileName));
             }
             SyncRecord record = SyncRecord.convert(file);
             record.setFileName(fileName);
             dbH.savePendingUploadRecord(record);
-
-            if(file.copyOnly){
+            
+            if (file.copyOnly) {
                 megaApi.copyNode(file.existingNode,file.parent,fileName,file.requestListener);
-            }else{
-                megaApi.startUpload(file.path, file.parent,fileName, file.transferListener);
+            } else {
+                megaApi.startUpload(file.path,file.parent,fileName,file.transferListener);
             }
         }
     }
-
+    
     private void onQueueComplete(boolean success,int totalUploaded) {
         log("onQueueComplete");
         log("Stopping foreground!");
-        log("stopping service! success: " + successCount + " total: " + totalToUpload);
         megaApi.resetTotalUploads();
-
+        
         if ((lock != null) && (lock.isHeld()))
             try {
                 lock.release();
@@ -439,13 +421,13 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
+        
         if (totalUploaded == 0) {
             log("TotalUploaded == 0");
         } else {
             log("stopping service!");
         }
-
+        
         log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
         isForeground = false;
         finish();
@@ -457,7 +439,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     }
     
     private ArrayList<PendingUpload> getPendingList(Queue<Media> mediaList) {
-    
+        
         ArrayList<PendingUpload> pendingList = new ArrayList<>();
         
         if (cameraUploadNode == null) {
@@ -559,7 +541,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         //Keep the file names as device
                         currentTimeStamp = media.timestamp;
                         //megaApi.startUpload(file.getAbsolutePath(),cameraUploadNode,file.getName(),this);
-                        pendingList.add(new PendingUpload(file.getAbsolutePath(),cameraUploadNode,file.getName(),this, media));
+                        pendingList.add(new PendingUpload(file.getAbsolutePath(),cameraUploadNode,file.getName(),this,media));
                         log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
                     } else {
                         int photoIndex = 0;
@@ -571,7 +553,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         
                         log("photoFinalName: " + photoFinalName + "______" + photoIndex);
                         currentTimeStamp = media.timestamp;
-                        pendingList.add(new PendingUpload(file.getAbsolutePath(),cameraUploadNode,photoFinalName,this, media));
+                        pendingList.add(new PendingUpload(file.getAbsolutePath(),cameraUploadNode,photoFinalName,this,media));
                         //megaApi.startUpload(file.getAbsolutePath(),cameraUploadNode,photoFinalName,this);
                         log("CHANGEEEEEEE: filePath: " + file.getAbsolutePath() + " Change finalName: " + photoFinalName);
                     }
@@ -579,8 +561,8 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("if (photoAlreadyExists)");
                     currentTimeStamp = media.timestamp;
                     dbH.setCamSyncTimeStamp(currentTimeStamp);
-                    File f = new File(media.filePath);
-                    totalSizeUploaded += f.length();
+                    //File f = new File(media.filePath);
+                    //totalSizeUploaded += f.length();
                     //uploadNext();
                 }
             } else {
@@ -627,19 +609,19 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         }
         return pendingList;
     }
-
+    
     private class LookForRenameTask {
         Media media;
         String photoFinalName;
         MegaNode uploadNode;
-
+        
         public LookForRenameTask(Media media,MegaNode uploadNode) {
             this.media = media;
             this.uploadNode = uploadNode;
         }
-
+        
         protected Boolean rename(MegaNode nodeExists) {
-
+            
             File file = new File(media.filePath);
             log("RENOMBRAR EL FICHERO: " + media.filePath);
             Calendar cal = Calendar.getInstance();
@@ -652,7 +634,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     photoAlreadyExists = true;
                 }
             }
-
+            
             if (!photoAlreadyExists) {
                 int photoIndex = 0;
                 this.photoFinalName = null;
@@ -660,13 +642,13 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp,media.filePath,photoIndex);
                     photoIndex++;
                 } while (megaApi.getChildNode(uploadNode,photoFinalName) != null);
-
+                
                 log("photoFinalName: " + photoFinalName + "______" + photoIndex);
                 currentTimeStamp = media.timestamp;
-
+                
                 megaApi.renameNode(nodeExists,photoFinalName,cameraUploadsService);
                 log("RENAMED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
-
+                
                 return true;
             } else {
                 currentTimeStamp = media.timestamp;
@@ -677,20 +659,20 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("renameTask: Update Camera Sync TimeStamp, parentHandle= " + uploadNode.getHandle() + " cameraHandle: " + cameraUploadHandle);
                     dbH.setCamSyncTimeStamp(currentTimeStamp);
                 }
-
+                
                 log("Upoad NODE: " + uploadNode.getName());
-
+                
                 File f = new File(media.filePath);
-                totalSizeUploaded += f.length();
-
+               // totalSizeUploaded += f.length();
+                
                 uploadNext();
                 return false;
             }
         }
     }
-
+    
     private boolean checkFile(Media media,String path) {
-
+        
         if (media.filePath != null) {
             if (path != null) {
                 if (path.compareTo("") != 0) {
@@ -700,19 +682,19 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 }
             }
         }
-
+        
         return false;
     }
-
+    
     private int shouldRun() {
         log("shouldRun()");
-
+        
         if (!Util.isOnline(this)) {
             log("Not online");
             finish();
             return 1;
         }
-
+        
         prefs = dbH.getPreferences();
         if (prefs == null) {
             log("Not defined, so not enabled");
@@ -729,10 +711,10 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     finish();
                     return 4;
                 } else {
-                    if(prefs.getCameraFolderExternalSDCard() != null && Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())){
+                    if (prefs.getCameraFolderExternalSDCard() != null && Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard())) {
                         Uri uri = Uri.parse(prefs.getUriExternalSDCard());
                         localPath = FileUtil.getFullPathFromTreeUri(uri,this);
-                    }else{
+                    } else {
                         localPath = prefs.getCamSyncLocalPath();
                     }
                     
@@ -745,12 +727,12 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             log("Not defined, so not enabled");
                             finish();
                             return 6;
-
+                            
                         } else {
                             log("Localpath: " + localPath);
                         }
                     }
-
+                    
                     boolean isWifi = Util.isOnWifi(this);
                     if (prefs.getCamSyncWifi() == null) {
                         if (!isWifi) {
@@ -767,7 +749,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             }
                         }
                     }
-
+                    
                     boolean isCharging = Util.isCharging(this);
                     if (prefs.getCamSyncCharging() == null) {
                         if (!isCharging) {
@@ -784,46 +766,46 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             }
                         }
                     }
-
+                    
                     UserCredentials credentials = dbH.getCredentials();
                     if (credentials == null) {
                         log("There are not user credentials");
                         finish();
                         return 11;
                     }
-
+                    
                     gSession = credentials.getSession();
-
+                    
                     if (megaApi.getRootNode() == null) {
                         log("RootNode = null");
-
+                        
                         running = true;
-
+                        
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 if (megaApi.getRootNode() == null) {
                                     isLoggingIn = MegaApplication.isLoggingIn();
                                     if (!isLoggingIn) {
-
+                                        
                                         isLoggingIn = true;
                                         MegaApplication.setLoggingIn(isLoggingIn);
-
+                                        
                                         if (Util.isChatEnabled()) {
                                             log("shouldRun: Chat is ENABLED");
                                             if (megaChatApi == null) {
                                                 megaChatApi = ((MegaApplication)getApplication()).getMegaChatApi();
                                             }
-
+                                            
                                             int ret = megaChatApi.getInitState();
-
+                                            
                                             if (ret == 0 || ret == MegaChatApi.INIT_ERROR) {
                                                 ret = megaChatApi.init(gSession);
                                                 log("shouldRun: result of init ---> " + ret);
                                                 chatSettings = dbH.getChatSettings();
                                                 if (ret == MegaChatApi.INIT_NO_CACHE) {
                                                     log("shouldRun: condition ret == MegaChatApi.INIT_NO_CACHE");
-
+                                                    
                                                 } else if (ret == MegaChatApi.INIT_ERROR) {
                                                     log("shouldRun: condition ret == MegaChatApi.INIT_ERROR");
                                                     if (chatSettings == null) {
@@ -841,14 +823,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                                 }
                                             }
                                         }
-
+                                        
                                         megaApi.fastLogin(gSession,cameraUploadsService);
                                     } else {
                                         log("Another login is processing");
                                     }
                                 } else {
                                     log("postDelayed RootNode != null");
-
+                                    
                                     int r = runLoggedIn();
                                     log("shouldRunAfterLoginDelayed -> " + r);
                                     if (r == 0) {
@@ -857,10 +839,10 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                 }
                             }
                         },30000);
-
+                        
                         return LOGIN_IN;
                     }
-
+                    
                     log("RootNode != null");
                     int r = runLoggedIn();
                     return r;
@@ -868,9 +850,9 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             }
         }
     }
-
+    
     private int runLoggedIn() {
-
+        
         if (prefs.getCamSyncHandle() == null) {
             log("if (prefs.getCamSyncHandle() == null)");
             cameraUploadHandle = -1;
@@ -878,7 +860,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             log("if (prefs.getCamSyncHandle() != null)");
             cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
         }
-
+        
         if (prefs.getSecondaryMediaFolderEnabled() == null) {
             log("if (prefs.getSecondaryMediaFolderEnabled() == null)");
             dbH.setSecondaryUploadEnabled(false);
@@ -894,7 +876,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 localPathSecondary = prefs.getLocalPathSecondaryFolder();
             }
         }
-
+        
         ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
         if (cameraUploadHandle == -1) {
             log("Find the Camera Uploads folder of the old PhotoSync");
@@ -908,7 +890,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     megaApi.renameNode(nl.get(i),CAMERA_UPLOADS,this);
                 }
             }
-
+            
             log("If not Camera Uploads nor Photosync");
             if (cameraUploadHandle == -1) {
                 log("must create the folder");
@@ -930,7 +912,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         megaApi.renameNode(nl.get(i),CAMERA_UPLOADS,this);
                     }
                 }
-
+                
                 if (cameraUploadHandle == -1) {
                     log("If not Camera Uploads nor Photosync--- must create the folder");
                     megaApi.createFolder(CAMERA_UPLOADS,megaApi.getRootNode(),this);
@@ -940,7 +922,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 log("Sync Folder " + cameraUploadHandle + " Node: " + n.getName());
             }
         }
-
+        
         if (secondaryEnabled) {
             log("the secondary uploads are enabled");
             String temp = prefs.getMegaHandleSecondaryFolder();
@@ -954,7 +936,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                 dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                             }
                         }
-
+                        
                         //If not "Media Uploads"
                         if (secondaryUploadHandle == -1) {
                             log("must create the secondary folder");
@@ -974,7 +956,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                     dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                                 }
                             }
-
+                            
                             //If not "Media Uploads"
                             if (secondaryUploadHandle == -1) {
                                 log("must create the folder");
@@ -995,7 +977,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                         }
                     }
-
+                    
                     //If not "Media Uploads"
                     if (secondaryUploadHandle == -1) {
                         log("must create the folder");
@@ -1010,7 +992,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         dbH.setSecondaryFolderHandle(secondaryUploadHandle);
                     }
                 }
-
+                
                 //If not "Media Uploads"
                 if (secondaryUploadHandle == -1) {
                     log("must create the folder");
@@ -1021,53 +1003,49 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         } else {
             log("Secondary NOT Enabled");
         }
-
+        
         return 0;
     }
-
+    
     private void initService() {
         log("initService()");
-
-        totalUploaded = -1;
-        totalSizeToUpload = 0;
+        
+        totalUploaded = 0;
         totalToUpload = 0;
-        totalSizeUploaded = 0;
-        successCount = 0;
-
         canceled = false;
         isOverquota = false;
         newFileList = false;
-
+        
         try {
             app = (MegaApplication)getApplication();
         } catch (Exception ex) {
             finish();
         }
-
+        
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
-
+        
         if (megaApi == null) {
             finish();
             return;
         }
-
+        
         megaApi.addGlobalListener(this);
-
+        
         int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
         }
-
+        
         WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
         PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MegaDownloadServicePowerLock:");
-
+        
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-
+        
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
+        
         String previousIP = app.getLocalIpAddress();
         String currentIP = Util.getLocalIpAddress();
         if (previousIP == null || (previousIP.length() == 0) || (previousIP.compareTo("127.0.0.1") == 0)) {
@@ -1077,18 +1055,22 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             log("reconnect");
             megaApi.reconnect();
         }
+    
+    
+        mIntent = new Intent(this,ManagerActivityLollipop.class);
+        mIntent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
     }
-
+    
     private void finish() {
         log("finish CameraUploadsService");
-
+        
         if (running) {
             handler.removeCallbacksAndMessages(null);
             running = false;
         }
         cancel();
     }
-
+    
     private void cancel() {
         if ((lock != null) && (lock.isHeld()))
             try {
@@ -1100,11 +1082,11 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 wl.release();
             } catch (Exception ex) {
             }
-
+        
         if (isOverquota) {
             showStorageOverQuotaNotification();
         }
-
+        
         canceled = true;
         isForeground = false;
         running = false;
@@ -1115,44 +1097,43 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         jobFinished(globalParams,true);
     }
     
-    private void showStorageOverQuotaNotification(){
+    private void showStorageOverQuotaNotification() {
         log("showStorageOverQuotaNotification");
         
         String contentText = getString(R.string.download_show_info);
         String message = getString(R.string.overquota_alert_title);
         
-        Intent intent = new Intent(this, ManagerActivityLollipop.class);
+        Intent intent = new Intent(this,ManagerActivityLollipop.class);
         intent.setAction(Constants.ACTION_OVERQUOTA_STORAGE);
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
-            channel.setSound(null, null);
+            channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
             
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
             
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentText(contentText)
                     .setOngoing(false);
             
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
-        }
-        else {
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilderCompatO.build());
+        } else {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentText(contentText)
                     .setOngoing(false);
             
-            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, mBuilder.build());
+            mNotificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA,mBuilder.build());
         }
     }
-
+    
     @Override
     public boolean onStopJob(JobParameters params) {
         log("onStopJob");
@@ -1163,75 +1144,80 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         }
         return false;
     }
-
+    
     public static void log(String message) {
         Util.log("CameraUploadsService",message);
     }
-
+    
     @Override
     public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
-
+    
     }
-
+    
     @Override
     public void onNodesUpdate(MegaApiJava api,ArrayList<MegaNode> nodeList) {
-
+    
     }
-
+    
     @Override
     public void onReloadNeeded(MegaApiJava api) {
-
+    
     }
-
+    
     @Override
     public void onAccountUpdate(MegaApiJava api) {
-
+    
     }
-
+    
     @Override
     public void onContactRequestsUpdate(MegaApiJava api,ArrayList<MegaContactRequest> requests) {
-
+    
     }
-
+    
     @Override
     public void onEvent(MegaApiJava api,MegaEvent event) {
-
+    
     }
-
+    
     @Override
     public void onRequestStart(MegaChatApiJava api,MegaChatRequest request) {
-
+    
     }
-
+    
     @Override
     public void onRequestUpdate(MegaChatApiJava api,MegaChatRequest request) {
-
+    
     }
-
+    
     @Override
     public void onRequestFinish(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
-
+    
     }
-
+    
     @Override
     public void onRequestTemporaryError(MegaChatApiJava api,MegaChatRequest request,MegaChatError e) {
-
+    
     }
-
+    
     @Override
     public void onRequestStart(MegaApiJava api,MegaRequest request) {
         log("onRequestStart: " + request.getRequestString());
     }
-
+    
     @Override
     public void onRequestUpdate(MegaApiJava api,MegaRequest request) {
         log("onRequestUpdate: " + request.getRequestString());
     }
-
+    
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         log("onRequestFinish: " + request.getRequestString());
-
+        requestFinished(api,request,e);
+        
+    }
+    
+    private synchronized void requestFinished(MegaApiJava api,MegaRequest request,MegaError e) {
+        
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Fast login OK");
@@ -1253,7 +1239,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         megaChatApi.connectInBackground(this);
                         isLoggingIn = false;
                         MegaApplication.setLoggingIn(isLoggingIn);
-
+                        
                         int r = runLoggedIn();
                         log("shouldRunAfterLogin -> " + r);
                         if (r == 0) {
@@ -1263,7 +1249,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         log("Chat NOT enabled - readyToManager");
                         isLoggingIn = false;
                         MegaApplication.setLoggingIn(isLoggingIn);
-
+                        
                         int r = runLoggedIn();
                         log("shouldRunAfterLogin -> " + r);
                         if (r == 0) {
@@ -1274,7 +1260,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("chatSettings NULL - readyToManager");
                     isLoggingIn = false;
                     MegaApplication.setLoggingIn(isLoggingIn);
-
+                    
                     int r = runLoggedIn();
                     log("shouldRunAfterLogin -> " + r);
                     if (r == 0) {
@@ -1299,7 +1285,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("Secondary Folder UPDATED DB");
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());
                 }
-
+                
                 startCameraUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_RENAME || request.getType() == MegaRequest.TYPE_COPY) {
@@ -1319,37 +1305,35 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                             dbH.setCamSyncTimeStamp(currentTimeStamp);
                         }
                     }
-
-//                    totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
-//                    if (cameraFilesExternalSDCardQueue != null) {
-//                        if (cameraFilesExternalSDCardQueue.size() > 0) {
-//                            //uploadNextSDCard();
-//                        } else {
-//                            //uploadNext();
-//                        }
-//                    } else {
-//                        //uploadNext();
-//                    }
+                    updateProgressNotification();
+                    totalUploaded++;
+                    if (totalToUpload == totalUploaded) {
+                        onQueueComplete(true,totalToUpload);
+                    }
                 }
             }
         }
     }
-
+    
     @Override
     public void onRequestTemporaryError(MegaApiJava api,MegaRequest request,MegaError e) {
         log("onRequestTemporaryError: " + request.getRequestString());
     }
-
+    
     @Override
     public void onTransferStart(MegaApiJava api,MegaTransfer transfer) {
         log("onTransferStart: " + transfer.getFileName());
     }
-
+    
     @Override
     public void onTransferUpdate(MegaApiJava api,MegaTransfer transfer) {
+        transferUpdated(api,transfer);
+    }
+    
+    private synchronized void transferUpdated(MegaApiJava api,MegaTransfer transfer) {
         if (canceled) {
             log("Transfer cancel: " + transfer.getFileName());
-
+            
             if ((lock != null) && (lock.isHeld()))
                 try {
                     lock.release();
@@ -1360,32 +1344,35 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     wl.release();
                 } catch (Exception ex) {
                 }
-
+            
             megaApi.cancelTransfer(transfer);
             cancel();
             return;
         }
-
+        
         if (isOverquota) {
             return;
         }
-
-        final long bytes = transfer.getTransferredBytes();
-//		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
-        updateProgressNotification(totalSizeUploaded + bytes);
+        
+        updateProgressNotification();
     }
-
+    
     @Override
     public void onTransferTemporaryError(MegaApiJava api,MegaTransfer transfer,MegaError e) {
         log("onTransferTemporaryError: " + transfer.getFileName());
     }
-
+    
     @Override
     public void onTransferFinish(MegaApiJava api,MegaTransfer transfer,MegaError e) {
         log("Image sync finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
         log("transfer.getPath:" + transfer.getPath());
         log("transfer.getNodeHandle:" + transfer.getNodeHandle());
-
+        
+        transferFinished(api,transfer,e);
+    }
+    
+    private synchronized void transferFinished(MegaApiJava api,MegaTransfer transfer,MegaError e) {
+        
         if (canceled) {
             log("Image sync cancelled: " + transfer.getFileName());
             if ((lock != null) && (lock.isHeld()))
@@ -1398,28 +1385,18 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     wl.release();
                 } catch (Exception ex) {
                 }
-
-            if (isExternalSDCard) {
-                File fileToDelete = new File(transfer.getPath());
-                if (fileToDelete != null) {
-                    if (fileToDelete.exists()) {
-                        fileToDelete.delete();
-                    }
-                }
-            }
-
+            
             cancel();
         } else {
-
+            
             if (isOverquota) {
                 return;
             }
-
+            
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Image Sync OK: " + transfer.getFileName());
-                totalSizeUploaded += transfer.getTransferredBytes();
                 log("IMAGESYNCFILE: " + transfer.getPath());
-
+                
                 String tempPath = transfer.getPath();
                 if (!isExternalSDCard) {
                     if (tempPath.startsWith(localPath)) {
@@ -1430,11 +1407,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                         dbH.setSecSyncTimeStamp(currentTimeStamp);
                     }
                 }
-
-                if (isExternalSDCard) {
-                    dbH.setCamSyncTimeStamp(currentTimeStamp);
-                }
-
+                
                 if (Util.isVideoFile(transfer.getPath())) {
                     log("Is video!!!");
                     File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -1443,42 +1416,42 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     megaApi.createThumbnail(transfer.getPath(),thumb.getAbsolutePath());
                     megaApi.createPreview(transfer.getPath(),preview.getAbsolutePath());
-
+                    
                     MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if (node != null) {
                         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                         retriever.setDataSource(transfer.getPath());
-
+                        
                         String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
                         if (location != null) {
                             log("Location: " + location);
-
+                            
                             boolean secondTry = false;
                             try {
                                 final int mid = location.length() / 2; //get the middle of the String
                                 String[] parts = {location.substring(0,mid),location.substring(mid)};
-
+                                
                                 Double lat = Double.parseDouble(parts[0]);
                                 Double lon = Double.parseDouble(parts[1]);
                                 log("Lat: " + lat); //first part
                                 log("Long: " + lon); //second part
-
+                                
                                 megaApi.setNodeCoordinates(node,lat,lon,null);
                             } catch (Exception exc) {
                                 secondTry = true;
                                 log("Exception, second try to set GPS coordinates");
                             }
-
+                            
                             if (secondTry) {
                                 try {
                                     String latString = location.substring(0,7);
                                     String lonString = location.substring(8,17);
-
+                                    
                                     Double lat = Double.parseDouble(latString);
                                     Double lon = Double.parseDouble(lonString);
                                     log("Lat2: " + lat); //first part
                                     log("Long2: " + lon); //second part
-
+                                    
                                     megaApi.setNodeCoordinates(node,lat,lon,null);
                                 } catch (Exception ex) {
                                     log("Exception again, no chance to set coordinates of video");
@@ -1490,14 +1463,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     }
                 } else if (MimeTypeList.typeForName(transfer.getPath()).isImage()) {
                     log("Is image!!!");
-
+                    
                     File previewDir = PreviewUtils.getPreviewFolder(this);
                     File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     megaApi.createThumbnail(transfer.getPath(),thumb.getAbsolutePath());
                     megaApi.createPreview(transfer.getPath(),preview.getAbsolutePath());
-
+                    
                     MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if (node != null) {
                         try {
@@ -1507,7 +1480,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                                 log("Latitude: " + latLong[0] + " Longitude: " + latLong[1]);
                                 megaApi.setNodeCoordinates(node,latLong[0],latLong[1],null);
                             }
-
+                            
                         } catch (Exception exception) {
                             log("Couldn't read exif info: " + transfer.getPath());
                         }
@@ -1515,91 +1488,70 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 } else {
                     log("NOT video or image!");
                 }
-//TODO UNCOMMENT
-//                if (isExternalSDCard) {
-//                    File fileToDelete = new File(transfer.getPath());
-//                    if (fileToDelete != null) {
-//                        if (fileToDelete.exists()) {
-//                            fileToDelete.delete();
-//                        }
-//                    }
-//                }
-
-//                if (cameraFilesExternalSDCardQueue != null) {
-//                    if (cameraFilesExternalSDCardQueue.size() > 0) {
-//                        uploadNextSDCard();
-//                    } else {
-//                        uploadNext();
-//                    }
-//                } else {
-//                    uploadNext();
-//                }
+    
+                totalUploaded++;
+                if (totalToUpload == totalUploaded) {
+                    onQueueComplete(true,totalToUpload);
+                }
             } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
                 log("OVERQUOTA ERROR: " + e.getErrorCode());
-
                 isOverquota = true;
-
                 cancel();
-
             } else {
                 log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
                 cancel();
             }
         }
-
-        Log.d("Yuan", transfer.getPath());
+        
+        Log.d("Yuan",transfer.getPath() + " and error is " + e.getErrorString());
     }
-
+    
     @Override
     public boolean onTransferData(MegaApiJava api,MegaTransfer transfer,byte[] buffer) {
         return true;
     }
-
+    
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
-    private void updateProgressNotification(final long progress) {
-        int progressPercent = (int)Math.round((double)progress / totalSizeToUpload
-                * 100);
-        log(progressPercent + " " + progress + " " + totalSizeToUpload);
-        int left = totalToUpload - totalUploaded;
-        int current = totalToUpload - left;
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-
-        String message = current + " ";
-        if (totalToUpload == 1) {
-            message += getResources().getQuantityString(
-                    R.plurals.general_num_files,1);
-        } else {
-            message += getString(R.string.general_x_of_x)
-                    + " "
-                    + totalToUpload;
-
-            if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                message += " "
-                        + getResources().getQuantityString(
-                        R.plurals.general_num_files,totalToUpload);
-            }
+    private synchronized void updateProgressNotification() {
+        int pendingTransfers = megaApi.getNumPendingUploads();
+        int totalTransfers = megaApi.getTotalUploads();
+    
+        long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
+        long totalSizeTransferred = megaApi.getTotalUploadedBytes();
+    
+        int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
+        log("updateProgressNotification: "+progressPercent);
+    
+        String message;
+        if (totalTransfers == 0){
+            message = getString(R.string.download_preparing_files);
         }
-
-        Intent intent = null;
-
-        intent = new Intent(this,ManagerActivityLollipop.class);
-        intent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
-
-        String info = Util.getProgressSize(this,progress,totalSizeToUpload);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+        else{
+            int inProgress;
+            if(pendingTransfers==0){
+                inProgress = totalTransfers - pendingTransfers;
+            }
+            else{
+                inProgress = totalTransfers - pendingTransfers + 1;
+            }
+            message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
+        }
+        
+        String info = Util.getProgressSize(this,totalSizeTransferred,totalSizePendingTransfer);
+        
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
         Notification notification = null;
-
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
-
+            
             NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
-
+            
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100,progressPercent,false)
@@ -1609,9 +1561,9 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setSubText(info)
                     .setContentText(getString(R.string.settings_camera_notif_title))
                     .setOnlyAlertOnce(true);
-
+            
             notification = mBuilderCompat.build();
-        } else if (currentapiVersion >= android.os.Build.VERSION_CODES.N) {
+        } else if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
                     .setProgress(100,progressPercent,false)
@@ -1623,11 +1575,11 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     .setOnlyAlertOnce(true);
             notification = mBuilder.getNotification();
         }
-
+        
         mNotificationManager.notify(notificationId,notification);
     }
     
-    public class PendingUpload{
+    public class PendingUpload {
         
         String path, name;
         MegaNode parent, existingNode;
@@ -1636,15 +1588,15 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         boolean copyOnly;
         Media media;
         
-        PendingUpload(String localPath, MegaNode parent, String fileName, MegaTransferListenerInterface listener, Media media){
+        PendingUpload(String localPath,MegaNode parent,String fileName,MegaTransferListenerInterface listener,Media media) {
             this.path = localPath;
             this.parent = parent;
             this.name = fileName;
             this.transferListener = listener;
             this.media = media;
         }
-    
-        PendingUpload(MegaNode exist, MegaNode parent, String fileName, MegaRequestListenerInterface listener, boolean copyOnly, Media media){
+        
+        PendingUpload(MegaNode exist,MegaNode parent,String fileName,MegaRequestListenerInterface listener,boolean copyOnly,Media media) {
             this.existingNode = exist;
             this.parent = parent;
             this.name = fileName;
