@@ -676,9 +676,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 record.setStatus(cursor.getInt(4));
                 records.add(record);
             } while (cursor.moveToNext());
+            cursor.close();
         }
-        cursor.close();
         return records;
+    }
+
+    public SyncRecord findRecordByPath(String filePath) {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + filePath + "'";
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            SyncRecord record = new SyncRecord();
+            record.setId(cursor.getInt(0));
+            record.setLocalPath(decrypt(cursor.getString(1)));
+            record.setFileName(decrypt(cursor.getString(2)));
+            record.setTimestamp(Long.valueOf(decrypt(cursor.getString(3))));
+            record.setStatus(cursor.getInt(4));
+
+            cursor.close();
+            return record;
+        }
+        return null;
     }
 
     public void updateSyncRecordState(SyncRecord record) {
