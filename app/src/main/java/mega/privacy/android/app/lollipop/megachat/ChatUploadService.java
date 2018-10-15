@@ -274,7 +274,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							numberVideosPending--;
 							totalVideos--;
 							pendingMessages.add(newMessage);
-							megaApi.startUpload(filePath, parentNode);
+							megaApi.startUploadWithTopPriority(filePath, parentNode, "", false);
 						}
 						else{
 							newMessage.setVideoDownSampled(outFile.getAbsolutePath());
@@ -288,13 +288,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					} catch (Throwable throwable) {
 						pendingMessages.add(newMessage);
-						megaApi.startUpload(filePath, parentNode);
+						megaApi.startUploadWithTopPriority(filePath, parentNode, "", false);
 						log("EXCEPTION: Video cannot be downsampled");
 					}
 				}
 				else{
 					pendingMessages.add(newMessage);
-					megaApi.startUpload(filePath, parentNode);
+					megaApi.startUploadWithTopPriority(filePath, parentNode, "", false);
 				}
 
 			}
@@ -453,7 +453,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		if(downFile!=null){
-			megaApi.startUpload(downFile.getPath(), parentNode);
+			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, "", false);
 		}
 	}
 

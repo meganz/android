@@ -895,7 +895,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
                 ArrayList<Long> handleList = new ArrayList<Long>();
                 handleList.add(node.getHandle());
-                nC.prepareForDownload(handleList);
+                nC.prepareForDownload(handleList, false);
                 break;
             }
             case R.id.option_properties_layout:{

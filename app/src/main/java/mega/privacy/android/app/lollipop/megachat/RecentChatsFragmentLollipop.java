@@ -1364,7 +1364,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID:{
-                        if(!Util.isOnline(context)){
+                        if(!Util.isOnline(context) || megaApi == null || megaApi.getRootNode()==null){
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
                         else{
@@ -1374,7 +1374,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                     }
                     default:{
 
-                        if(!Util.isOnline(context)){
+                        if(!Util.isOnline(context) || megaApi == null || megaApi.getRootNode()==null){
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
                         else{
