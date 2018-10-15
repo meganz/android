@@ -157,8 +157,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SYNC_TIMESTAMP = "sync_timestamp";
     private static final String KEY_SYNC_STATE = "sync_state";
     private static final String KEY_SYNC_FILENAME = "sync_filename";
+    private static final String KEY_SYNC_HANDLE = "sync_handle";
+    private static final String KEY_SYNC_COPYONLY = "sync_copyonly";
     private static final String CREATE_CAMERA_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CAMERA_UPLOADS + "("
-            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER "+")";
+            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER, " + KEY_SYNC_HANDLE + " TEXT," + KEY_SYNC_COPYONLY + " BOOLEAN" + ")";
 
 
     private static DatabaseHandler instance;
@@ -644,7 +646,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (record.getFileName() != null) {
             values.put(KEY_SYNC_FILENAME,encrypt(record.getFileName()));
         }
-        values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
+        if(record.getNodeHandle() != null) {
+            values.put(KEY_SYNC_HANDLE,encrypt(String.valueOf(record.getNodeHandle())));
+        }
+        if(record.getTimestamp() != null) {
+            values.put(KEY_SYNC_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
+        }
+        if(record.isCopyOnly() != null) {
+            values.put(KEY_SYNC_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
+        }
         values.put(KEY_SYNC_STATE,record.getStatus());
         db.insert(TABLE_CAMERA_UPLOADS,null,values);
     }
@@ -672,18 +682,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public List<SyncRecord> findUnsuccessfulUploads() {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " ='" + SyncRecord.STATUS_FAILED + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " =" + SyncRecord.STATUS_FAILED;
         Cursor cursor = db.rawQuery(selectQuery,null);
         List<SyncRecord> records = new ArrayList<>();
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                SyncRecord record = new SyncRecord();
-                record.setId(cursor.getInt(0));
-                record.setLocalPath(decrypt(cursor.getString(1)));
-                record.setFileName(decrypt(cursor.getString(2)));
-                record.setTimestamp(Long.valueOf(decrypt(cursor.getString(3))));
-                record.setStatus(cursor.getInt(4));
+                SyncRecord record = extract(cursor);
                 records.add(record);
             } while (cursor.moveToNext());
             cursor.close();
@@ -691,17 +696,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return records;
     }
 
+    private SyncRecord extract(Cursor cursor) {
+        SyncRecord record = new SyncRecord();
+        record.setId(cursor.getInt(0));
+        record.setLocalPath(decrypt(cursor.getString(1)));
+        record.setFileName(decrypt(cursor.getString(2)));
+        String timestamp = decrypt(cursor.getString(3));
+        if (timestamp == null) {
+            record.setTimestamp(null);
+        } else {
+            record.setTimestamp(Long.valueOf(timestamp));
+        }
+
+        record.setStatus(cursor.getInt(4));
+        String nodeHandle = decrypt(cursor.getString(5));
+        if (nodeHandle == null) {
+            record.setNodeHandle(null);
+        } else {
+            record.setNodeHandle(Long.valueOf(nodeHandle));
+        }
+        record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(6))));
+        return record;
+    }
+
     public SyncRecord findRecordByPath(String filePath) {
         String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filePath) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
-            SyncRecord record = new SyncRecord();
-            record.setId(cursor.getInt(0));
-            record.setLocalPath(decrypt(cursor.getString(1)));
-            record.setFileName(decrypt(cursor.getString(2)));
-            record.setTimestamp(Long.valueOf(decrypt(cursor.getString(3))));
-            record.setStatus(cursor.getInt(4));
-
+            SyncRecord record = extract(cursor);
             cursor.close();
             return record;
         }

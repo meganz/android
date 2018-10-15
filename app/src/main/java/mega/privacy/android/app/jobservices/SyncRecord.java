@@ -15,12 +15,38 @@ public class SyncRecord {
 
     private String fileName;
 
-    private long timestamp;
+    private Long timestamp;
+
+    private Long nodeHandle;
+
+    private Boolean copyOnly = false;
 
     private int status = STATUS_PENDING;
 
     public SyncRecord() {
 
+    }
+
+    public SyncRecord(String localPath,String fileName,Long timestamp) {
+        this.localPath = localPath;
+        this.fileName = fileName;
+        this.timestamp = timestamp;
+    }
+
+    public SyncRecord(Long handle,String name,boolean copyOnly,String filePath,Long timestamp) {
+        this.copyOnly = copyOnly;
+        this.nodeHandle = handle;
+        this.fileName = name;
+        this.localPath = filePath;
+        this.timestamp = timestamp;
+    }
+
+    public Boolean isCopyOnly() {
+        return copyOnly;
+    }
+
+    public void setCopyOnly(Boolean copyOnly) {
+        this.copyOnly = copyOnly;
     }
 
     public String getFileName() {
@@ -47,11 +73,19 @@ public class SyncRecord {
         this.localPath = localPath;
     }
 
-    public long getTimestamp() {
+    public Long getNodeHandle() {
+        return nodeHandle;
+    }
+
+    public void setNodeHandle(Long nodeHandle) {
+        this.nodeHandle = nodeHandle;
+    }
+
+    public Long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -63,34 +97,23 @@ public class SyncRecord {
         this.status = status;
     }
 
-    public SyncRecord(String localPath,long timestamp) {
+    public SyncRecord(String localPath,Long timestamp) {
         this.localPath = localPath;
         this.timestamp = timestamp;
     }
 
-    public static List<SyncRecord> convert(List<CameraUploadsService.PendingUpload> pending) {
-        if (pending == null || pending.size() == 0) {
-            return null;
-        }
-        List<SyncRecord> list = new ArrayList<>(pending.size());
-        for (CameraUploadsService.PendingUpload p : pending) {
-            list.add(convert(p));
-        }
-        return list;
-    }
-
-    public static SyncRecord convert(CameraUploadsService.PendingUpload pending) {
-        return new SyncRecord(pending.media.filePath,pending.media.timestamp);
-    }
-
-    @Override
-    public String toString() {
-        return "SyncRecord{" +
-                "id=" + id +
-                ", localPath='" + localPath + '\'' +
-                ", fileName='" + fileName + '\'' +
-                ", timestamp=" + timestamp +
-                ", status=" + status +
-                '}';
-    }
+//    public static List<SyncRecord> convert(List<CameraUploadsService.PendingUpload> pending) {
+//        if (pending == null || pending.size() == 0) {
+//            return null;
+//        }
+//        List<SyncRecord> list = new ArrayList<>(pending.size());
+//        for (CameraUploadsService.PendingUpload p : pending) {
+//            list.add(convert(p));
+//        }
+//        return list;
+//    }
+//
+//    public static SyncRecord convert(CameraUploadsService.PendingUpload pending) {
+//        return new SyncRecord(pending.media.filePath,pending.media.timestamp);
+//    }
 }
