@@ -76,16 +76,38 @@
                         android:layout_marginLeft="3dp"/>
 
                 </RelativeLayout>
-
                 <EditText
                     android:id="@+id/create_account_last_name_text"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="left"
                     android:hint="@string/lastname_text"
-                    android:textSize="16sp"
                     android:imeOptions="actionNext"
-                    android:inputType="text|textCapWords" />
+                    android:inputType="text|textCapWords"
+                    android:textSize="16sp"/>
+                <RelativeLayout
+                    android:id="@+id/create_account_last_name_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/create_account_last_name_error_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="2dp"
+                        android:src="@drawable/ic_input_warning"
+                        android:tint="@color/login_warning"
+                    />
+                    <TextView
+                        android:id="@+id/create_account_last_name_error_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="3dp"
+                        android:layout_toLeftOf="@id/create_account_last_name_error_icon"
+                        android:textColor="@color/login_warning"/>
+                </RelativeLayout>
 
                 <EditText
                     android:id="@+id/create_account_email_text"

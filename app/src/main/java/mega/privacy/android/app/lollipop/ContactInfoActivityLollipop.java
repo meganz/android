@@ -98,6 +98,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_COPY_FOLDER;
 import static mega.privacy.android.app.lollipop.ContactFileListActivityLollipop.REQUEST_CODE_SELECT_MOVE_FOLDER;
@@ -1855,7 +1856,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if(nC==null){
             nC = new NodeController(this);
         }
-        nC.prepareForDownload(handleList);
+        nC.prepareForDownload(handleList, true);
     }
     
     public void showConfirmationLeaveIncomingShare (final MegaNode n){
@@ -2243,7 +2244,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         mySnackbar.show();
     }
     
-    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         log("askSizeConfirmationBeforeDownload");
         
         final String parentPathC = parentPath;
@@ -2275,7 +2276,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                         if(nC==null){
                             nC = new NodeController(ContactInfoActivityLollipop.this);
                         }
-                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -2290,7 +2291,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         downloadConfirmationDialog.show();
     }
     
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         log("askConfirmationNoAppInstaledBeforeDownload");
         
         final String parentPathC = parentPath;
@@ -2322,7 +2323,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                         if(nC==null){
                             nC = new NodeController(ContactInfoActivityLollipop.this);
                         }
-                        nC.download(parentPathC, urlC, sizeC, hashesC);
+                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -2341,6 +2342,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
     
     }
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
+	}
     
     @Override
     public void onNodesUpdate(MegaApiJava api,ArrayList<MegaNode> nodeList) {

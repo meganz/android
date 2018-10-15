@@ -294,7 +294,7 @@
 				</LinearLayout>
 				<mega.privacy.android.app.components.CustomizedGridRecyclerView
 					android:id="@+id/last_contacts_gridview"
-					android:layout_width="wrap_content"
+					android:layout_width="70dp"
 					android:layout_height="52dp"
 					android:layout_centerVertical="true"
 					android:paddingTop="2dp"

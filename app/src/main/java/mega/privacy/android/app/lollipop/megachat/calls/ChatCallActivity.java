@@ -286,6 +286,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         log("onOptionsItemSelected");
+
         ((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
         int id = item.getItemId();
@@ -849,8 +850,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }else if(callStatus==MegaChatCall.CALL_STATUS_IN_PROGRESS){
                     log("InProgress");
                     updateScreenStatusInProgress();
-
                 }else{
+
                     int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                     if (volume == 0) {
                         toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, 100);
@@ -1159,7 +1160,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onPause(){
         log("onPause");
-
         mSensorManager.unregisterListener(this);
         super.onPause();
     }
@@ -1195,8 +1195,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
             }
         }
-
-
         super.onResume();
 //        adapter.notifyDataSetChanged();
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -1271,8 +1269,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     @Override
     public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
         log("onRequestUpdate: "+request.getType());
-
-
     }
 
     @Override
@@ -1713,7 +1709,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             case R.id.video_fab:{
                 log("onClick video FAB");
-
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
                     answerCallFAB.clearAnimation();
@@ -2009,7 +2004,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     public void updateLocalVideoStatus(){
         log("updateLocalVideoStatus");
         int callStatus = callChat.getStatus();
-
         if(chat.isGroup()){
             log("is group");
             if(callChat !=null){
@@ -2056,6 +2050,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     if(localCameraFragmentFS == null){
                         log("CREATE localCameraFragmentFS");
                         localCameraFragmentFS = LocalCameraCallFullScreenFragment.newInstance(chatId);
+
                         FragmentTransaction ftFS = getSupportFragmentManager().beginTransaction();
                         ftFS.replace(R.id.fragment_container_local_cameraFS, localCameraFragmentFS, "localCameraFragmentFS");
                         ftFS.commitNowAllowingStateLoss();
@@ -2111,6 +2106,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                     parentLocal.setVisibility(View.GONE);
                     fragmentContainerLocalCamera.setVisibility(View.GONE);
                     myAvatarLayout.setVisibility(View.VISIBLE);
+
                 }
             }
         }
