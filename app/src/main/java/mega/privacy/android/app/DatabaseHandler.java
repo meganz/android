@@ -731,7 +731,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     if(o1.equals(o2)) {
                         return 0;
                     }
-                    return (o1 > o2) ? 1 : -1;
+                    return (o1 > o2) ? -1 : 1;
                 }
             });
             cursor.close();
