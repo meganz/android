@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -22,6 +23,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.lollipop.ImportFileFragment;
 import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.ViewHolderImportFiles>  {
@@ -59,7 +61,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
         holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail_file);
         holder.name = (TextView) v.findViewById(R.id.text_file);
-        holder.editButton = (ImageView) v.findViewById(R.id.edit_icon);
+        holder.editButton = (RelativeLayout) v.findViewById(R.id.edit_icon_layout);
 
         v.setTag(holder);
         return holder;
@@ -117,7 +119,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
         ImageView thumbnail;
         TextView name;
-        ImageView editButton;
+        RelativeLayout editButton;
         int currentPosition;
 
         public ViewHolderImportFiles(View itemView) {
@@ -138,5 +140,9 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
         this.mItemClickListener = mItemClickListener;
+    }
+
+    private static void log(String log) {
+        Util.log("ImportFilesAdapter", log);
     }
 }

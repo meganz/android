@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,9 +55,6 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
         super.onCreate(savedInstanceState);
 
         filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
-        if (filePreparedInfos != null) {
-            new GetNamesAsyncTask().execute();
-        }
     }
 
     @Override
@@ -64,6 +62,13 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
+
+        if (filePreparedInfos != null) {
+            nameFiles = ((FileExplorerActivityLollipop) context).getNameFiles();
+            if (nameFiles == null || nameFiles.size() <= 0) {
+                new GetNamesAsyncTask().execute();
+            }
+        }
 
         View v = inflater.inflate(R.layout.fragment_importfile, container, false);
 
@@ -107,19 +112,39 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
     public void itemClick(View view, int position) {
         log("itemClick");
         ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
+        if (view.getId() == R.id.edit_icon_layout) {
+            if (adapter != null) {
+                ShareInfo info = (ShareInfo) adapter.getItem(position);
+                if (info != null) {
+                    File file =  new File(info.getFileAbsolutePath());
+                    if (file != null) {
+                        ((FileExplorerActivityLollipop) context).showRenameDialog(file, info.getTitle());
+                    }
+                }
+            }
+        }
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.cloud_drive_layout: {
+                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CLOUD_FRAGMENT);
                 break;
             }
             case R.id.incoming_layout: {
+                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.INCOMING_FRAGMENT);
                 break;
             }
             case R.id.chat_layout: {
+                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CHAT_FRAGMENT);
                 break;
             }
         }
