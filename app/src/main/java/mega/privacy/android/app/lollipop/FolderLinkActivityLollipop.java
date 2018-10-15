@@ -1910,7 +1910,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(FolderLinkActivityLollipop.this);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, false);
 					}
 					overridePendingTransition(0,0);
 				}

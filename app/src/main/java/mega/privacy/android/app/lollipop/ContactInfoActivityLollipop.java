@@ -1849,7 +1849,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if(nC==null){
             nC = new NodeController(this);
         }
-        nC.prepareForDownload(handleList);
+        nC.prepareForDownload(handleList, true);
     }
     
     public void showConfirmationLeaveIncomingShare (final MegaNode n){
@@ -2237,7 +2237,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         mySnackbar.show();
     }
     
-    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         log("askSizeConfirmationBeforeDownload");
         
         final String parentPathC = parentPath;
@@ -2269,7 +2269,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                         if(nC==null){
                             nC = new NodeController(ContactInfoActivityLollipop.this);
                         }
-                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -2284,7 +2284,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         downloadConfirmationDialog.show();
     }
     
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         log("askConfirmationNoAppInstaledBeforeDownload");
         
         final String parentPathC = parentPath;
@@ -2316,7 +2316,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
                         if(nC==null){
                             nC = new NodeController(ContactInfoActivityLollipop.this);
                         }
-                        nC.download(parentPathC, urlC, sizeC, hashesC);
+                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
