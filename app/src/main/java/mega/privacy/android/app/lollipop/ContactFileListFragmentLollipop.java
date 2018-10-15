@@ -20,9 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -660,7 +658,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(contactNodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, true);
 					}
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -717,7 +715,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 										ArrayList<Long> handleList = new ArrayList<Long>();
 										handleList.add(contactNodes.get(position).getHandle());
 										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList);
+										nC.prepareForDownload(handleList, true);
 									}
 								}
 							}
@@ -738,7 +736,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 								ArrayList<Long> handleList = new ArrayList<Long>();
 								handleList.add(contactNodes.get(position).getHandle());
 								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList);
+								nC.prepareForDownload(handleList, true);
 							}
 
 						} finally {

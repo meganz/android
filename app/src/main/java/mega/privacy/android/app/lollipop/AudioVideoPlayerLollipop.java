@@ -3089,7 +3089,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if(nC==null){
                 nC = new NodeController(this, isFolderLink);
             }
-            nC.prepareForDownload(handleList);
+            nC.prepareForDownload(handleList, false);
         }
     }
 
@@ -3423,7 +3423,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+                nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
@@ -4014,7 +4014,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
 
-    public void openAdvancedDevices (long handleToDownload){
+    public void openAdvancedDevices (long handleToDownload, boolean highPriority){
         log("openAdvancedDevices");
 //		handleToDownload = handle;
         String externalPath = mega.privacy.android.app.utils.Util.getExternalCardPath();
@@ -4039,6 +4039,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 intent.setType(mimeType);
                 intent.putExtra(Intent.EXTRA_TITLE, node.getName());
                 intent.putExtra("handleToDownload", handleToDownload);
+                intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
                 try{
                     startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
                 }
@@ -4065,7 +4066,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         mySnackbar.show();
     }
 
-    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         log("askSizeConfirmationBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -4099,7 +4100,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if(nC==null){
                             nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
                         }
-                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -4114,7 +4115,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         downloadConfirmationDialog.show();
     }
 
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         log("askConfirmationNoAppInstaledBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -4147,7 +4148,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         if(nC==null){
                             nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
                         }
-                        nC.download(parentPathC, urlC, sizeC, hashesC);
+                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
