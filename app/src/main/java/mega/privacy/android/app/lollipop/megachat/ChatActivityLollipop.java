@@ -1711,7 +1711,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home: {
-                finish();
+                log("home");
+                onBackPressed();
+                //finish();
                 break;
             }
             case R.id.cab_menu_call_chat:{
@@ -2423,7 +2425,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onBackPressed() {
-        log("onBackPressedLollipop");
+        log("onBackPressed");
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();

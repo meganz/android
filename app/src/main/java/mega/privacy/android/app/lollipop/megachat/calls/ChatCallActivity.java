@@ -292,7 +292,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home: {
-                log("Hang call");
+                log("home");
                 onBackPressed();
                 break;
             }
