@@ -264,7 +264,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 					clearSelections();
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, false);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -1826,7 +1826,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 									ArrayList<Long> handleList = new ArrayList<Long>();
 									handleList.add(psHMegaNode.getHandle());
 									NodeController nC = new NodeController(context);
-									nC.prepareForDownload(handleList);
+									nC.prepareForDownload(handleList, true);
 								}
 							}
 							((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -1837,7 +1837,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(psHMegaNode.getHandle());
 							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList);
+							nC.prepareForDownload(handleList, true);
 						}
 					}
 				}

@@ -32,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -154,7 +153,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                     clearSelections();
                     NodeController nC = new NodeController(context);
-                    nC.prepareForDownload(handleList);
+                    nC.prepareForDownload(handleList, false);
                     break;
                 }
                 case R.id.cab_menu_copy:{
@@ -1222,7 +1221,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                                 ArrayList<Long> handleList = new ArrayList<Long>();
                                 handleList.add(n.getHandle());
                                 NodeController nC = new NodeController(context);
-                                nC.prepareForDownload(handleList);
+                                nC.prepareForDownload(handleList, true);
                             }
                         }
                         ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -1232,7 +1231,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         ArrayList<Long> handleList = new ArrayList<Long>();
                         handleList.add(n.getHandle());
                         NodeController nC = new NodeController(context);
-                        nC.prepareForDownload(handleList);
+                        nC.prepareForDownload(handleList, true);
                     }
                     notifyDataSetChanged();
                 }
