@@ -1530,7 +1530,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     case MegaChatMessage.END_CALL_REASON_ENDED:{
 
                         ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
-
                         int minutes = (message.getDuration() % 3600) / 60;
                         int seconds = message.getDuration() % 60;
 
