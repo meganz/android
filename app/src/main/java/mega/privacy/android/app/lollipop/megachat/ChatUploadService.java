@@ -108,9 +108,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	MegaRequestListenerInterface megaRequestListener;
 	MegaTransferListenerInterface megaTransferListener;
 
-	private int notificationId = Constants.NOTIFICATION_UPLOAD;
-	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_UPLOAD_ID;
-	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME;
+	private int notificationId = Constants.NOTIFICATION_CHAT_UPLOAD;
+	private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID;
+	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME;
 
 	@SuppressLint("NewApi")
 	@Override
