@@ -1461,6 +1461,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             case MegaChatMessage.TYPE_CHAT_TITLE:
             case MegaChatMessage.TYPE_TRUNCATE:
             case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT:
+            case MegaChatMessage.TYPE_CALL_STARTED:
             case MegaChatMessage.TYPE_CALL_ENDED:{
                 return true;
             }
@@ -1521,7 +1522,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String textToShow = "";
 
             if(message.getType()==MegaChatMessage.TYPE_CALL_STARTED){
-                ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
+                ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
                 textToShow = context.getResources().getString(R.string.call_started_messages);
             }
             else{
