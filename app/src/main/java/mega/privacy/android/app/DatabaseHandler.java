@@ -735,6 +735,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(updateSql);
     }
 
+    public void deleteSyncRecordByPath(String filepath) {
+        String sql = "DELETE FROM " + TABLE_CAMERA_UPLOADS + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(filepath) + "'";
+        db.execSQL(sql);
+    }
+
     public Long findMaxTimestamp() {
         String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_CAMERA_UPLOADS;
         Cursor cursor = db.rawQuery(selectQuery,null);
