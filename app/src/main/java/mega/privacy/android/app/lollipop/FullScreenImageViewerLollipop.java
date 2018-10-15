@@ -858,7 +858,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if(nC==null){
 						nC = new NodeController(this, isFolderLink);
 					}
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, false);
 
 					break;
 				}
@@ -2071,7 +2071,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (adapterType == Constants.FILE_LINK_ADAPTER) {
 						downloadNode();
 					}else{
-						nC.prepareForDownload(handleListM);
+						nC.prepareForDownload(handleListM, false);
 					}
 				}
 	        	break;
@@ -2642,7 +2642,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
 
-	public void openAdvancedDevices (long handleToDownload){
+	public void openAdvancedDevices (long handleToDownload, boolean highPriority){
 		log("openAdvancedDevices");
 //		handleToDownload = handle;
 		String externalPath = Util.getExternalCardPath();
@@ -2667,6 +2667,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				intent.setType(mimeType);
 				intent.putExtra(Intent.EXTRA_TITLE, node.getName());
 				intent.putExtra("handleToDownload", handleToDownload);
+				intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
 				try{
 					startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
 				}
@@ -2705,12 +2706,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 				long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 				long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
+				boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
 				log("URL: " + url + "___SIZE: " + size);
 
 				if(nC==null){
 					nC = new NodeController(this, isFolderLink);
 				}
-				nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+				nC.checkSizeBeforeDownload(parentPath, url, size, hashes, highPriority);
 			}
 		}
 		else if (requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -2727,6 +2729,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			Uri treeUri = intent.getData();
 			log("--------------Create the node : "+treeUri);
 			long handleToDownload = intent.getLongExtra("handleToDownload", -1);
+			boolean highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false);
 			log("The recovered handle is: "+handleToDownload);
 			//Now, call to the DownloadService
 
@@ -2741,6 +2744,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 				service.putExtra(DownloadService.EXTRA_PATH, path);
 				service.putExtra("fromMV", true);
+				service.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
 				startService(service);
 			}
 		}
@@ -2873,7 +2877,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		mySnackbar.show();
 	}
 
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
 		log("askSizeConfirmationBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -2907,7 +2911,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						if(nC==null){
 							nC = new NodeController(fullScreenImageViewer, isFolderLink);
 						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -2922,7 +2926,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		downloadConfirmationDialog.show();
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
 		log("askConfirmationNoAppInstaledBeforeDownload");
 
 		final String parentPathC = parentPath;
@@ -2955,7 +2959,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						if(nC==null){
 							nC = new NodeController(fullScreenImageViewer, isFolderLink);
 						}
-						nC.download(parentPathC, urlC, sizeC, hashesC);
+						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {

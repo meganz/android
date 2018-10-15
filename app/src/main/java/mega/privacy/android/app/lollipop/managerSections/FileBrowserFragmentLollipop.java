@@ -190,7 +190,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, false);
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -1028,7 +1028,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(nodes.get(position).getHandle());
 							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList);
+							nC.prepareForDownload(handleList, true);
 						}
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -1086,7 +1086,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 										ArrayList<Long> handleList = new ArrayList<Long>();
 										handleList.add(nodes.get(position).getHandle());
 										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList);
+										nC.prepareForDownload(handleList, true);
 									}
 								}
 							}
@@ -1107,7 +1107,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 								ArrayList<Long> handleList = new ArrayList<Long>();
 								handleList.add(nodes.get(position).getHandle());
 								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList);
+								nC.prepareForDownload(handleList, true);
 							}
 
 						} finally {
@@ -1123,7 +1123,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, true);
 					}
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isPdf()){
@@ -1187,7 +1187,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, true);
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -1196,7 +1196,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, true);
 				}
 			}
 		}
