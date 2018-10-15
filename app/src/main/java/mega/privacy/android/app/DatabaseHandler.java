@@ -682,7 +682,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public List<SyncRecord> findUnsuccessfulUploads() {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " =" + SyncRecord.STATUS_FAILED;
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " !=" + SyncRecord.STATUS_SUCCESS;
         Cursor cursor = db.rawQuery(selectQuery,null);
         List<SyncRecord> records = new ArrayList<>();
 
@@ -741,8 +741,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()) {
             List<Long> timestamps = new ArrayList<>(cursor.getCount());
             do {
-                timestamps.add(Long.valueOf(decrypt(cursor.getString(0))));
+                String timestamp = decrypt(cursor.getString(0));
+                if(timestamp == null) {
+                    timestamps.add(0L);
+                }else{
+                    timestamps.add(Long.valueOf(timestamp));
+                }
             } while (cursor.moveToNext());
+            cursor.close();
+
             if(timestamps.isEmpty()) {
                 return null;
             }
@@ -756,7 +763,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     return (o1 > o2) ? -1 : 1;
                 }
             });
-            cursor.close();
             return timestamps.get(0);
         }
         return null;
