@@ -11,6 +11,7 @@ import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.jobservices.SyncRecord;
@@ -649,11 +650,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public boolean pendingUploadRecordNameExist(String name) {
-        String selectQuery = "SELECT 1 FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILENAME + " ='" + name + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "'";
         Cursor cursor = null;
         try {
             cursor = db.rawQuery(selectQuery,null);
-            return (cursor != null && cursor.moveToFirst());
+            return cursor != null && cursor.getCount() == 1;
+        } finally {
+            cursor.close();
+        }
+    }
+
+    public boolean pendingUploadRecordPathExist(String filepath) {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filepath) + "'";
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(selectQuery,null);
+            return cursor != null && cursor.getCount() == 1;
         } finally {
             cursor.close();
         }
@@ -680,7 +692,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public SyncRecord findRecordByPath(String filePath) {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + filePath + "'";
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filePath) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
             SyncRecord record = new SyncRecord();
@@ -696,9 +708,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
 
-    public void updateSyncRecordState(SyncRecord record) {
-        String updateSql = "UPDATE " + TABLE_CAMERA_UPLOADS + " SET " + KEY_SYNC_STATE + "= " + record.getStatus() + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(record.getLocalPath()) + "' AND " + KEY_SYNC_TIMESTAMP + " ='" + encrypt(String.valueOf(record.getTimestamp())) +"'";
+    public void updateSyncRecordState(int state,String filepath) {
+        String updateSql = "UPDATE " + TABLE_CAMERA_UPLOADS + " SET " + KEY_SYNC_STATE + "= " + state + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(filepath) + "'";
         db.execSQL(updateSql);
+    }
+
+    public Long findMaxTimestamp() {
+        String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_CAMERA_UPLOADS;
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            List<Long> timestamps = new ArrayList<>(cursor.getCount());
+            do {
+                timestamps.add(Long.valueOf(decrypt(cursor.getString(0))));
+            } while (cursor.moveToNext());
+            if(timestamps.isEmpty()) {
+                return null;
+            }
+            timestamps.sort(new Comparator<Long>() {
+
+                @Override
+                public int compare(Long o1,Long o2) {
+                    if(o1.equals(o2)) {
+                        return 0;
+                    }
+                    return (o1 > o2) ? 1 : -1;
+                }
+            });
+            cursor.close();
+            return timestamps.get(0);
+        }
+        return null;
     }
 
 	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
