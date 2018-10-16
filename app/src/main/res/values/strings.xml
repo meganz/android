@@ -2149,4 +2149,9 @@
     <string name="general_files" context="General label for files">Files</string>
     <string name="general_save_to_device" context="Item menu option upon right click on one or multiple files">Save to device</string>
 
+    <string name="title_upload_explorer" context="Title of cloud explorer to upload a file">Upload to MEGA</string>
+    <string name="choose_destionation" context="Label choose destination">Choose destination</string>
+    <string name="general_show_more" context="Label that indicates show more items">Show more</string>
+    <string name="general_show_less" context="Label that indicates show less items">Show less</string>
+
 </resources>
