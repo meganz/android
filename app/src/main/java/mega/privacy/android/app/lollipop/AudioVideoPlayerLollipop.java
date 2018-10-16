@@ -1935,7 +1935,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             nC = new NodeController(this);
         }
         boolean fromIncoming = false;
-        if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+        if (adapterType == Constants.SEARCH_ADAPTER || adapterType == Constants.INCOMING_SHARES_ADAPTER) {
             fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
         }
 
