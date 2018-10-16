@@ -790,10 +790,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		return listView;
 	}
 
-	public int getDeepBrowserTree() {
-		return ((FileExplorerActivityLollipop)context).deepBrowserTree;
-	}
-
 	public void activateButton(boolean show){
 		optionButton.setEnabled(show);
 		if(show){
