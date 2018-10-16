@@ -81,12 +81,20 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
             childThumbDir.mkdirs();
         }
         File thumb = new File(childThumbDir, file.getTitle() + ".jpg");
-        boolean thumbnailCreated = false;
-        thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
-        if (thumbnailCreated) {
+        if (thumb != null && thumb.exists()) {
             Uri uri = Uri.parse(thumb.getAbsolutePath());
             if (uri != null) {
                 holder.thumbnail.setImageURI(uri);
+            }
+        }
+        else {
+            boolean thumbnailCreated = false;
+            thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
+            if (thumbnailCreated) {
+                Uri uri = Uri.parse(thumb.getAbsolutePath());
+                if (uri != null) {
+                    holder.thumbnail.setImageURI(uri);
+                }
             }
         }
 

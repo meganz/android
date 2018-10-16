@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -12,10 +13,12 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,10 +28,14 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 
 public class ImportFileFragment extends Fragment implements View.OnClickListener {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
+
+    MegaApiAndroid megaApi;
 
     Context context;
 
@@ -40,6 +47,11 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
     RelativeLayout cloudDriveButton;
     RelativeLayout incomingButton;
     RelativeLayout chatButton;
+    RelativeLayout showMoreLayout;
+    TextView showMoreText;
+    ImageView showMoreIcon;
+
+    boolean showMore = true;
 
     private List<ShareInfo> filePreparedInfos;
     HashMap<String, String> nameFiles = new HashMap<>();
@@ -53,6 +65,10 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (megaApi == null){
+            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+        }
 
         filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
     }
@@ -81,10 +97,35 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
         cloudDriveButton.setOnClickListener(this);
         incomingButton = (RelativeLayout) v.findViewById(R.id.incoming_layout);
         incomingButton.setOnClickListener(this);
+        ArrayList<MegaNode> inShares = megaApi.getInShares();
+        if (inShares != null) {
+            if (inShares.size() <= 0) {
+                incomingButton.setVisibility(View.GONE);
+            }
+            else {
+                incomingButton.setVisibility(View.VISIBLE);
+            }
+        }
+        else {
+            incomingButton.setVisibility(View.GONE);
+        }
+
         chatButton = (RelativeLayout) v.findViewById(R.id.chat_layout);
         chatButton.setOnClickListener(this);
+        showMoreLayout = (RelativeLayout) v.findViewById(R.id.show_more_layout);
+        showMoreLayout.setOnClickListener(this);
+        showMoreText  = (TextView) v.findViewById(R.id.show_more_text);
+        showMoreIcon = (ImageView) v.findViewById(R.id.show_more_image);
 
         if (filePreparedInfos != null) {
+
+            if (filePreparedInfos.size() <= 4) {
+                showMoreLayout.setVisibility(View.GONE);
+            }
+            else {
+                showMoreLayout.setVisibility(View.VISIBLE);
+            }
+
             if (filePreparedInfos.size() == 1) {
                 contentText.setText("File");
             }
@@ -118,7 +159,7 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
                 if (info != null) {
                     File file =  new File(info.getFileAbsolutePath());
                     if (file != null) {
-                        ((FileExplorerActivityLollipop) context).showRenameDialog(file, info.getTitle());
+                        ((FileExplorerActivityLollipop) context).showRenameDialog(file, nameFiles.get(info.getTitle()));
                     }
                 }
             }
@@ -145,6 +186,19 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
             }
             case R.id.chat_layout: {
                 ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CHAT_FRAGMENT);
+                break;
+            }
+            case R.id.show_more_layout: {
+                if (showMore) {
+                    showMore = false;
+                    showMoreText.setText(getString(R.string.general_show_less));
+                    showMoreIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
+                }
+                else {
+                    showMore = true;
+                    showMoreText.setText(getString(R.string.general_show_more));
+                    showMoreIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
+                }
                 break;
             }
         }
