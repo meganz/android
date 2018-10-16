@@ -1935,7 +1935,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             nC = new NodeController(this);
         }
         boolean fromIncoming = false;
-        if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+        if (adapterType == Constants.SEARCH_ADAPTER) {
             fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
         }
 
@@ -3031,7 +3031,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            boolean fromIncoming = nC.nodeComesFromIncoming(node);
+            boolean fromIncoming = false;
+            if (adapterType == Constants.SEARCH_ADAPTER) {
+                fromIncoming = nC.nodeComesFromIncoming(node);
+            }
             if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);

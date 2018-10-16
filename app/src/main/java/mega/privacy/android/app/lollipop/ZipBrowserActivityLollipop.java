@@ -318,23 +318,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-		try {
-			myZipFile = new ZipFile(pathZip);			
-	
-			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-			while (zipEntries.hasMoreElements()) {
-				
-				ZipEntry element = zipEntries.nextElement();	
-				
-				log(element.getName());
-			}
-				
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		} 
-
 			
 		String[] parts = pathZip.split("/");
 		if(parts.length>0){
