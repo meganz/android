@@ -1451,7 +1451,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 nC = new NodeController(this);
             }
             boolean fromIncoming = false;
-            if (type == Constants.SEARCH_ADAPTER || type == Constants.INCOMING_SHARES_ADAPTER) {
+            if (type == Constants.SEARCH_ADAPTER) {
                 fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
             }
 
@@ -2331,7 +2331,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            boolean fromIncoming = nC.nodeComesFromIncoming(node);
+            boolean fromIncoming = false;
+            if (type == Constants.SEARCH_ADAPTER) {
+                fromIncoming = nC.nodeComesFromIncoming(node);
+            }
             if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);
