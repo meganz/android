@@ -1083,33 +1083,35 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
-		if(transfer.isStreamingTransfer()){
-			return;
-		}
-
-		if (!transfer.isFolderTransfer()){
-			if (canceled) {
-				log("Transfer cancel: " + transfer.getFileName());
-	
-				if((lock != null) && (lock.isHeld()))
-					try{ lock.release(); } catch(Exception ex) {}
-				if((wl != null) && (wl.isHeld()))
-					try{ wl.release(); } catch(Exception ex) {}
-				
-				megaApi.cancelTransfer(transfer);
-				ChatUploadService.this.cancel();
-				log("after cancel");
+		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			if(transfer.isStreamingTransfer()){
 				return;
 			}
 
-			if(isOverquota!=0){
-				log("after overquota alert");
-				return;
+			if (!transfer.isFolderTransfer()){
+				if (canceled) {
+					log("Transfer cancel: " + transfer.getFileName());
+
+					if((lock != null) && (lock.isHeld()))
+						try{ lock.release(); } catch(Exception ex) {}
+					if((wl != null) && (wl.isHeld()))
+						try{ wl.release(); } catch(Exception ex) {}
+
+					megaApi.cancelTransfer(transfer);
+					ChatUploadService.this.cancel();
+					log("after cancel");
+					return;
+				}
+
+				if(isOverquota!=0){
+					log("after overquota alert");
+					return;
+				}
+
+				mapProgressTransfers.put(transfer.getTag(), transfer);
+
+				updateProgressNotification();
 			}
-
-			mapProgressTransfers.put(transfer.getTag(), transfer);
-
-			updateProgressNotification();
 		}
 	}
 
