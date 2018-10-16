@@ -2147,5 +2147,6 @@
 
     <string name="general_folders" context="General label for folders">Folders</string>
     <string name="general_files" context="General label for files">Files</string>
+    <string name="general_save_to_device" context="Item menu option upon right click on one or multiple files">Save to device</string>
 
 </resources>

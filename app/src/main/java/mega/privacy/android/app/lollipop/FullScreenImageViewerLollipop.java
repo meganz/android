@@ -304,7 +304,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			nC = new NodeController(this);
 		}
 		boolean fromIncoming = false;
-		if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+		if (adapterType == Constants.SEARCH_ADAPTER || adapterType == Constants.INCOMING_SHARES_ADAPTER) {
 			fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(imageHandles.get(positionG)));
 		}
 

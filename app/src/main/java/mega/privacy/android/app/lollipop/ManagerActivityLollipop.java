@@ -8080,7 +8080,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 						rubbishBinFLol = new RubbishBinFragmentLollipop().newInstance();
 
-						rubbishBinFLol.floatingItemDecoration = null;
+						rubbishBinFLol.headerItemDecoration = null;
 
 						FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 						ft.replace(R.id.fragment_container, rubbishBinFLol, "rubbishBinFLol");
@@ -17254,18 +17254,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 
-				if (fbFLol != null && fbFLol.isAdded()) {
-					fbFLol.setOverviewLayout();
-					fbFLol.refresh(transfer.getNodeHandle());
-				}
-
-				if(inSFLol != null && inSFLol.isAdded()){
-                    inSFLol.refresh();
-                }
-
-                if(outSFLol != null && outSFLol.isAdded()){
-                    outSFLol.refresh();
-                }
+                onNodesCloudDriveUpdate();
+				onNodesInboxUpdate();
+				onNodesSearchUpdate();
+				onNodesSharedUpdate();
 
 				String tFTag = getFragmentTag(R.id.transfers_tabs_pager, 0);
 				tFLol = (TransfersFragmentLollipop) getSupportFragmentManager().findFragmentByTag(tFTag);

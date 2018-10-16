@@ -478,6 +478,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			this.getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
+		}
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
