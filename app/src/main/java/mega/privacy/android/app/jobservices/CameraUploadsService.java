@@ -220,20 +220,19 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         
         prefs = dbH.getPreferences();
         
-        //todo update query as per latest design
         if (prefs != null) {
             log("if (prefs != null)");
             if (prefs.getCamSyncTimeStamp() != null) {
                 log("if (prefs.getCamSyncTimeStamp() != null)");
-                long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-                selectionCamera = "(" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
+                currentTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
+                selectionCamera = "(" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + currentTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + currentTimeStamp;
                 log("SELECTION: " + selectionCamera);
             }
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
                 if (prefs.getSecSyncTimeStamp() != null) {
                     log("if (prefs.getSecSyncTimeStamp() != null)");
-                    long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
+                    secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
                     selectionSecondary = "(" + MediaStore.MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaStore.MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp;
                     log("SELECTION SECONDARY: " + selectionSecondary);
                 }
@@ -352,33 +351,42 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     
     private void prepareUpload(Queue<Media> primaryList,Queue<Media> secondaryList) {
         log("uploadNext()");
+        //todo this method can be improved
         
         //todo start upload temp change
-        pendingUploadsList = getPendingList(primaryList);
-        pendingUploadsListSecondary = getPendingList(secondaryList);
-        
-        //todo update time stamp separately
-        Long timeStamp = dbH.findMaxTimestamp();
-        if(timeStamp != null && timeStamp > currentTimeStamp){
-            updateCurrentTimeStamp(dbH.findMaxTimestamp());
-            updateSecondaryTimeStamp(dbH.findMaxTimestamp());
+        pendingUploadsList = getPendingList(primaryList, false);
+        ArrayList<SyncRecord> pendingTransferPrimaryFromLastSync = (ArrayList<SyncRecord>)dbH.findUnsuccessfulUploads(false);
+    
+        ArrayList<SyncRecord> pendingTransferSecondaryFromLastSync = new ArrayList<>();
+        if(secondaryEnabled){
+            pendingUploadsListSecondary = getPendingList(secondaryList, true);
+            pendingTransferSecondaryFromLastSync = (ArrayList<SyncRecord>)dbH.findUnsuccessfulUploads(true);
         }
         
-        //todo need to maintain total size
-        totalToUpload = pendingUploadsList.size() + pendingUploadsListSecondary.size();
+        totalToUpload = pendingUploadsList.size() + pendingUploadsListSecondary.size() + pendingTransferPrimaryFromLastSync.size() + pendingTransferSecondaryFromLastSync.size();
+        if(totalToUpload == 0){
+            Log.d("yuan", "nothing to upload");
+            finish();
+            return;
+        }
         
-        startParallelUpload(pendingUploadsList);
-        startParallelUpload(pendingUploadsListSecondary);
+        //todo combine to one single list?
+        startParallelUpload(pendingTransferPrimaryFromLastSync, false);
+        startParallelUpload(pendingUploadsList, true);
+        startParallelUpload(pendingTransferSecondaryFromLastSync, false);
+        startParallelUpload(pendingUploadsListSecondary, true);
+        updateTimeStamp();
     }
     
-    private void startParallelUpload(ArrayList<SyncRecord> list) {
+    private void startParallelUpload(ArrayList<SyncRecord> list, boolean shouldSaveToDB) {
         for (SyncRecord file : list) {
             
             if (file.isCopyOnly()) {
-                //file exist in other location, service will copy internally
+                //file exist in other location, server will copy internally
             } else {
                 File f = new File(file.getLocalPath());
                 if (!f.exists()) {
+                    dbH.deleteSyncRecordByPath(file.getLocalPath());
                     continue;
                 }
             }
@@ -392,10 +400,13 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     fileName = Util.getPhotoSyncNameWithIndex(file.getTimestamp(),file.getLocalPath(),photoIndex);
                     photoIndex++;
                 }
-                while (megaApi.getChildNode(cameraUploadNode,fileName) != null || dbH.pendingUploadRecordNameExist(fileName));
+                while ((megaApi.getChildNode(cameraUploadNode,fileName) != null || dbH.pendingUploadRecordNameExist(fileName)) && shouldSaveToDB);
             }
             file.setFileName(fileName);
-            dbH.savePendingUploadRecord(file);
+            
+            if(shouldSaveToDB){
+                dbH.savePendingUploadRecord(file);
+            }
             
             if (file.isCopyOnly()) {
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),cameraUploadNode,fileName,this);
@@ -439,10 +450,9 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         jobFinished(globalParams,true);
     }
     
-    private ArrayList<SyncRecord> getPendingList(Queue<Media> mediaList) {
-        
+    private ArrayList<SyncRecord> getPendingList(Queue<Media> mediaList, boolean isSecondary) {
+    
         ArrayList<SyncRecord> pendingList = new ArrayList<>();
-        
         if (cameraUploadNode == null) {
             log("if (cameraUploadNode == null)");
             cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
@@ -540,42 +550,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 
                 if (!photoAlreadyExists) {
                     log("if (!photoAlreadyExists)");
-                    
-                    if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
-                        //Keep the file names as device
-                        pendingList.add(new SyncRecord(file.getAbsolutePath(),file.getName(),media.timestamp));
-                        log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-                    } else {
-                        int photoIndex = 0;
-                        String photoFinalName = null;
-                        do {
-                            photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp,media.filePath,photoIndex);
-                            photoIndex++;
-                        } while (megaApi.getChildNode(cameraUploadNode,photoFinalName) != null);
-                        
-                        log("photoFinalName: " + photoFinalName + " : " + photoIndex);
-                        pendingList.add(new SyncRecord(file.getAbsolutePath(),photoFinalName,media.timestamp));
-                    }
+                    pendingList.add(new SyncRecord(file.getAbsolutePath(),file.getName(),media.timestamp,isSecondary));
+                    log("MediaFinalName: " + file.getName());
                 }
             } else {
                 log("NODE EXISTS: " + megaApi.getParentNode(nodeExists).getName() + " : " + nodeExists.getName());
                 if (megaApi.getParentNode(nodeExists).getHandle() != cameraUploadHandle) {
-                    
-                    if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
-                        //Keep the file names as device
-                        pendingList.add(new SyncRecord(nodeExists.getHandle(),file.getName(),true,media.filePath,media.timestamp));
-                        log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-                    } else {
-                        int photoIndex = 0;
-                        String photoFinalName = null;
-                        do {
-                            photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp,media.filePath,photoIndex);
-                            photoIndex++;
-                        } while (megaApi.getChildNode(cameraUploadNode,photoFinalName) != null);
-                        
-                        log("photoFinalName: " + photoFinalName + " : " + photoIndex);
-                        pendingList.add(new SyncRecord(nodeExists.getHandle(),file.getName(),true,media.filePath,media.timestamp));
-                    }
+                    pendingList.add(new SyncRecord(nodeExists.getHandle(),file.getName(),true,media.filePath,media.timestamp,isSecondary));
+                    log("MediaFinalName: " + file.getName());
                 } else {
                     if (!(Boolean.parseBoolean(prefs.getKeepFileNames()))) {
                         //Change the file names as device
@@ -1055,8 +1037,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             showStorageOverQuotaNotification();
         }
         
-        //todo update DB, all unfinished job will be marked as failed
-        
         canceled = true;
         isForeground = false;
         running = false;
@@ -1260,24 +1240,13 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             }
         } else if (request.getType() == MegaRequest.TYPE_RENAME || request.getType() == MegaRequest.TYPE_COPY) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                if (megaApi.getNodeByHandle(request.getNodeHandle()).getName().compareTo(CAMERA_UPLOADS) == 0) {
+                String nodeName = megaApi.getNodeByHandle(request.getNodeHandle()).getName();
+                if (nodeName.compareTo(CAMERA_UPLOADS) == 0) {
                     log("Folder renamed to CAMERA_UPLOADS");
                     startCameraUploads();
                 } else {
-//                    MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-//                    if (megaApi.getParentNode(node) != null) {
-//                        long parentHandle = megaApi.getParentNode(node).getHandle();
-//                        if (parentHandle == secondaryUploadHandle) {
-//                            log("Update SECONDARY Sync TimeStamp");
-//                            dbH.setSecSyncTimeStamp(currentTimeStamp);
-//                        } else {
-//                            log("Update Camera Sync TimeStamp");
-//                            dbH.setCamSyncTimeStamp(currentTimeStamp);
-//                        }
-//                    }
-//
-                    //todo copy have not path, use handle?
-                    //dbH.updateSyncRecordState(createRecord(node.getpa, true));
+                    //todo copy have not path, use name?
+                    dbH.deleteSyncRecordByFileName(nodeName); //todo need to verify real name too
                     updateProgressNotification();
                     totalUploaded++;
                     if (totalToUpload == totalUploaded) {
@@ -1374,7 +1343,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Image Sync OK: " + transfer.getFileName());
                 log("IMAGESYNCFILE: " + transfer.getPath());
-                
+                dbH.deleteSyncRecordByPath(transfer.getPath());
                 if (Util.isVideoFile(transfer.getPath())) {
                     log("Is video!!!");
                     File previewDir = PreviewUtils.getPreviewFolder(this);
@@ -1469,11 +1438,7 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD,this);
                 cancel();
             }
-    
-            dbH.updateSyncRecordState(SyncRecord.STATUS_SUCCESS, transfer.getPath());
         }
-        
-        Log.d("Yuan",transfer.getPath() + " and error is " + e.getErrorString());
     }
     
     @Override
@@ -1548,32 +1513,19 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         mNotificationManager.notify(notificationId,notification);
     }
     
-//    public class PendingUpload {
-//
-//        String path, name;
-//        MegaNode parent, existingNode;
-//        MegaTransferListenerInterface transferListener;
-//        MegaRequestListenerInterface requestListener;
-//        boolean copyOnly;
-//        Media media;
-//
-//        PendingUpload(String localPath,MegaNode parent,String fileName,MegaTransferListenerInterface listener,Media media) {
-//            this.path = localPath;
-//            this.parent = parent;
-//            this.name = fileName;
-//            this.transferListener = listener;
-//            this.media = media;
-//        }
-//
-//        PendingUpload(MegaNode exist,MegaNode parent,String fileName,MegaRequestListenerInterface listener,boolean copyOnly,Media media) {
-//            this.existingNode = exist;
-//            this.parent = parent;
-//            this.name = fileName;
-//            this.requestListener = listener;
-//            this.copyOnly = copyOnly;
-//            this.media = media;
-//        }
-//    }
+    private void updateTimeStamp(){
+        Long timeStampPrimary = dbH.findMaxTimestamp(false);
+        if(timeStampPrimary != null && timeStampPrimary > currentTimeStamp){
+            updateCurrentTimeStamp(dbH.findMaxTimestamp(false));
+        }
+    
+        if(secondaryEnabled){
+            Long timeStampSecondary = dbH.findMaxTimestamp(true);
+            if(timeStampSecondary != null && timeStampSecondary > secondaryTimeStamp){
+                updateSecondaryTimeStamp(dbH.findMaxTimestamp(true));
+            }
+        }
+    }
     
     private void updateCurrentTimeStamp(long timeStamp){
         currentTimeStamp = timeStamp;

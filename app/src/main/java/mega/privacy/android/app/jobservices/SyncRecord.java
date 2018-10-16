@@ -18,27 +18,31 @@ public class SyncRecord {
     private Long timestamp;
 
     private Long nodeHandle;
+    
+    private Boolean isSecondary = false;
 
     private Boolean copyOnly = false;
-
+    
     private int status = STATUS_PENDING;
 
     public SyncRecord() {
 
     }
 
-    public SyncRecord(String localPath,String fileName,Long timestamp) {
+    public SyncRecord(String localPath,String fileName,Long timestamp, Boolean isSecondary) {
         this.localPath = localPath;
         this.fileName = fileName;
         this.timestamp = timestamp;
+        this.isSecondary = isSecondary;
     }
 
-    public SyncRecord(Long handle,String name,boolean copyOnly,String filePath,Long timestamp) {
+    public SyncRecord(Long handle,String name,boolean copyOnly,String filePath,Long timestamp, Boolean isSecondary) {
         this.copyOnly = copyOnly;
         this.nodeHandle = handle;
         this.fileName = name;
         this.localPath = filePath;
         this.timestamp = timestamp;
+        this.isSecondary = isSecondary;
     }
 
     public Boolean isCopyOnly() {
@@ -48,7 +52,15 @@ public class SyncRecord {
     public void setCopyOnly(Boolean copyOnly) {
         this.copyOnly = copyOnly;
     }
-
+    
+    public Boolean getSecondary() {
+        return isSecondary;
+    }
+    
+    public void setSecondary(Boolean secondary) {
+        isSecondary = secondary;
+    }
+    
     public String getFileName() {
         return fileName;
     }

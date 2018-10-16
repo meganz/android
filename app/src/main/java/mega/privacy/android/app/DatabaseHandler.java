@@ -159,8 +159,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SYNC_FILENAME = "sync_filename";
     private static final String KEY_SYNC_HANDLE = "sync_handle";
     private static final String KEY_SYNC_COPYONLY = "sync_copyonly";
+    private static final String KEY_SYNC_SECONDARY = "sync_secondary";
     private static final String CREATE_CAMERA_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CAMERA_UPLOADS + "("
-            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER, " + KEY_SYNC_HANDLE + " TEXT," + KEY_SYNC_COPYONLY + " BOOLEAN" + ")";
+            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER, " + KEY_SYNC_HANDLE + " TEXT," + KEY_SYNC_COPYONLY + " BOOLEAN," + KEY_SYNC_SECONDARY + " BOOLEAN"+ ")";
 
 
     private static DatabaseHandler instance;
@@ -655,6 +656,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(record.isCopyOnly() != null) {
             values.put(KEY_SYNC_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
         }
+        if(record.getSecondary() != null) {
+            values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.getSecondary())));
+        }
         values.put(KEY_SYNC_STATE,record.getStatus());
         db.insert(TABLE_CAMERA_UPLOADS,null,values);
     }
@@ -681,8 +685,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public List<SyncRecord> findUnsuccessfulUploads() {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " !=" + SyncRecord.STATUS_SUCCESS;
+    public List<SyncRecord> findUnsuccessfulUploads(Boolean isSecondary) {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " !=" + SyncRecord.STATUS_SUCCESS + " AND " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         List<SyncRecord> records = new ArrayList<>();
 
@@ -694,6 +698,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
         }
         return records;
+    }
+    
+    public void deleteAllSyncRecords(){
+        String sql = "DELETE FROM " + TABLE_CAMERA_UPLOADS;
+        db.execSQL(sql);
     }
 
     private SyncRecord extract(Cursor cursor) {
@@ -716,6 +725,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             record.setNodeHandle(Long.valueOf(nodeHandle));
         }
         record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(6))));
+        record.setSecondary(Boolean.valueOf(decrypt(cursor.getString(7))));
         return record;
     }
 
@@ -730,18 +740,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
 
-    public void updateSyncRecordState(int state,String filepath) {
-        String updateSql = "UPDATE " + TABLE_CAMERA_UPLOADS + " SET " + KEY_SYNC_STATE + "= " + state + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(filepath) + "'";
-        db.execSQL(updateSql);
-    }
-
     public void deleteSyncRecordByPath(String filepath) {
         String sql = "DELETE FROM " + TABLE_CAMERA_UPLOADS + "  WHERE " + KEY_SYNC_FILEPATH + " = '" + encrypt(filepath) + "'";
         db.execSQL(sql);
     }
+    
+    public void deleteSyncRecordByFileName(String fileName) {
+        String sql = "DELETE FROM " + TABLE_CAMERA_UPLOADS + "  WHERE " + KEY_SYNC_FILENAME + " = '" + encrypt(fileName) + "'" + " OR " + KEY_SYNC_FILEPATH +  " LIKE '%" + encrypt(fileName) + "'";
+        db.execSQL(sql);
+    }
 
-    public Long findMaxTimestamp() {
-        String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_CAMERA_UPLOADS;
+    public Long findMaxTimestamp(Boolean isSecondary) {
+        String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_CAMERA_UPLOADS + "  WHERE " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
             List<Long> timestamps = new ArrayList<>(cursor.getCount());
@@ -772,7 +782,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return null;
     }
-
+    
 	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
 		ContentValues values = new ContentValues();
 		if (ephemeralCredentials.getEmail() != null){
