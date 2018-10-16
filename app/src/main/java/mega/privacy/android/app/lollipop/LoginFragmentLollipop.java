@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,7 +42,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 
 import java.util.Locale;
 
@@ -2414,7 +2414,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
-                if (error.getErrorCode() == MegaError.API_ENOENT){
+                if (error.getErrorCode() == MegaError.API_ENOENT || error.getErrorCode() == MegaError.API_EKEY){
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
                 }
                 else{
