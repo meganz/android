@@ -245,6 +245,7 @@ public class Constants {
 	public static int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
 //	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
+	public static int NOTIFICATION_CHAT_UPLOAD = 15;
 
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_ID = "DownloadServiceNotification";
 	public static String NOTIFICATION_CHANNEL_DOWNLOAD_NAME = "MEGA Download";
@@ -254,12 +255,20 @@ public class Constants {
 	public static String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
 	public static String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
 	public static String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
-	public static String NOTIFICATION_CHANNEL_CHATCALLS_ID = "ChatCallNotification";
-	public static String NOTIFICATION_CHANNEL_CHATCALLS_NAME = "MEGA Chat Call";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
+	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID = "InProgressMissedCallNotification";
+	public static String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME = "MEGA In Progress and Missed Calls";
+	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_ID = "ChatIncomingCallNotification";
+	public static String NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME = "MEGA Incoming Calls";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
 	public static String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_ID = "ContactSummaryNotification";
+	public static String NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_NAME = "MEGA Contact Summary";
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_ID = "CloudDriveNotification";
 	public static String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
+	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
+	public static String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
 
 
 	public static String CHAT_FOLDER = "My chat files";
