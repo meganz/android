@@ -1281,6 +1281,28 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			if (parentNodeHandle == -1){
 				String query = intent.getStringExtra("searchQuery");
 				nodes = megaApi.search(query);
+                //re-order the returned nodes, since SDK doesn't seprate the nodes by type.
+                nodes.sort(new Comparator<MegaNode>() {
+
+                    @Override
+                    public int compare(MegaNode o1,MegaNode o2) {
+                        if(o1 != null && o2 != null) {
+                            if(o1.isFolder() && o2.isFolder()) {
+                                return 0;
+                            }
+                            if(o1.isFile() && o2.isFile()) {
+                                return 0;
+                            }
+                            if(o1.isFolder() && o2.isFile()) {
+                                return -1;
+                            }
+                            if(o1.isFile() && o2.isFolder()) {
+                                return 1;
+                            }
+                        }
+                        return 0;
+                    }
+                });
 			}
 			else{
 				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
