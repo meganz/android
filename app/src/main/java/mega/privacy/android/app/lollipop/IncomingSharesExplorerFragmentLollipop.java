@@ -533,6 +533,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				}		
 			}
 		}
+		((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 	}	
 
 	public int onBackPressed(){
@@ -598,7 +599,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyTextViewFirst.setText(result);
 
 			}
-
+			((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 			return 3;
 		}
 		else if (((FileExplorerActivityLollipop)context).deepBrowserTree>0){
@@ -674,6 +675,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 					emptyTextView.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
 				}
+				((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 				return 2;
 			}
 
@@ -695,6 +697,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 			((FileExplorerActivityLollipop)context).deepBrowserTree=0;
+			((FileExplorerActivityLollipop) context).supportInvalidateOptionsMenu();
 			return 0;
 		}
 	}
