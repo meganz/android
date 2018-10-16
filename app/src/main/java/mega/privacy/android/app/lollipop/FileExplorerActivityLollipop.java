@@ -3003,7 +3003,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
     }
 
-    public void showRenameDialog(final File document, String text){
+    public void showRenameDialog(final File document, final String text){
         log("showRenameDialog");
 
         LinearLayout layout = new LinearLayout(this);
@@ -3029,7 +3029,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
                         input.setSelection(0, input.getText().length());
                     }
                     else{
-                        String [] s = document.getName().split("\\.");
+                        String [] s = text.split("\\.");
                         if (s != null){
 
                             int numParts = s.length;
