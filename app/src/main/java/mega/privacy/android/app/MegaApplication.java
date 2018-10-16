@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -1000,6 +1001,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 				notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
 
+
+				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+					//API 25 = Android 7.1
+					notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+				} else {
+					notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+				}
+
 				NotificationManager notificationManager =
 						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -1222,13 +1231,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				ChatAdvancedNotificationBuilder notificationBuilder;
 				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-					notificationBuilder.generateChatNotification(request);
-				}
-				else{
-					notificationBuilder.removeAllChatNotifications();
-					notificationBuilder.generateChatNotification(request);
-				}
+				notificationBuilder.generateChatNotification(request);
 			}
 			else{
 				log("Error TYPE_PUSH_RECEIVED: "+e.getErrorString());
