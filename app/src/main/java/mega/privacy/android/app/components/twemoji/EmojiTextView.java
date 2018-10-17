@@ -106,15 +106,6 @@ public class EmojiTextView extends AppCompatTextView {
     }
   }
 
-  // sets the emoji size in pixels with the provided resource and automatically invalidates the text and renders it with the new size
-  public final void setEmojiSizeRes(int res) {
-    setEmojiSizeRes(res, true);
-  }
-
-  // sets the emoji size in pixels with the provided resource and invalidates the text and renders it with the new size when {@code shouldInvalidate} is true
-  public final void setEmojiSizeRes(int res, boolean shouldInvalidate) {
-    setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
-  }
 }
 
 
