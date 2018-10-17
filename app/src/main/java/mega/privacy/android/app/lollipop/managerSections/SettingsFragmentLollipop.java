@@ -1383,6 +1383,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadWhat.setSummary(fileUpload);
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords();
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -1765,7 +1766,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 
-			dbH.setCamSyncTimeStamp(0);			
+			dbH.setCamSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords();
 			cameraUpload = !cameraUpload;			
 			
 			if (cameraUpload){
@@ -2404,6 +2406,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords();
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -2461,6 +2464,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords();
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -2570,6 +2574,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
+                dbH.deleteAllSyncRecords();
 
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					Intent photosVideosIntent = null;

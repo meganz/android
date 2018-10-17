@@ -1420,6 +1420,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (isEnabled){
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setCamSyncEnabled(false);
+			dbH.deleteAllSyncRecords();
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent stopIntent = null;
@@ -1445,6 +1446,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 									if (prefs.getCamSyncWifi().compareTo("") != 0){
 										dbH.setCamSyncTimeStamp(0);
 										dbH.setCamSyncEnabled(true);
+                                        dbH.deleteAllSyncRecords();
 
                                         Handler handler = new Handler();
                                         handler.postDelayed(new Runnable() {
@@ -1485,6 +1487,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					log("onClick AlertDialog");
 					dbH.setCamSyncTimeStamp(0);
 					dbH.setCamSyncEnabled(true);
+                    dbH.deleteAllSyncRecords();
 					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 					File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 					String localPath = localFile.getAbsolutePath();

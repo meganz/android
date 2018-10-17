@@ -676,9 +676,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return cursor != null && cursor.getCount() == 1;
         }
     }
+    
+    public boolean pendingUploadRecordExist(String filepath, boolean isSecondary) {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filepath) + "'" + " AND " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";;
+        try (Cursor cursor = db.rawQuery(selectQuery,null)) {
+            return cursor != null && cursor.getCount() == 1;
+        }
+    }
 
-    public List<SyncRecord> findUnsuccessfulUploads(Boolean isSecondary) {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_STATE + " !=" + SyncRecord.STATUS_SUCCESS + " AND " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
+    public List<SyncRecord> findUnsuccessfulUploads() {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS;
         Cursor cursor = db.rawQuery(selectQuery,null);
         List<SyncRecord> records = new ArrayList<>();
 
