@@ -292,4 +292,6 @@ public class Constants {
 	public static int MAX_BUFFER_32MB = 33554432; // 32 MB
 
 	public static String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
+
+	public static String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
 }
