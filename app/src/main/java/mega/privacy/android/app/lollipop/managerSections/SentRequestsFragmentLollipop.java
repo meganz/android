@@ -56,8 +56,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	LinearLayoutManager mLayoutManager;
 	MegaContactRequest selectedRequest = null;
 	
@@ -273,10 +271,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				adapterList.setContacts(contacts);
 			}
 
-			if (contacts.size() > 0) {
-				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
-			}
-
 			adapterList.setPositionClicked(-1);
 
 			if (adapterList.getItemCount() == 0) {
@@ -303,13 +297,11 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				emptyTextViewFirst.setText(result);
 
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			} else {
 				log("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -374,19 +366,12 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.empty_text_contacts_requests);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.empty_text_contacts_requests_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_requests_list_content_text_layout);
-
-			contentText = (TextView) v.findViewById(R.id.contact_requests_list_content_text);
 
 			if (adapterList == null){
 				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, listView, Constants.OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
-			}
-
-			if (contacts.size() > 0) {
-				contentText.setText(contacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, contacts.size()));
 			}
 		
 			adapterList.setPositionClicked(-1);
@@ -396,7 +381,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 				log("adapterList.getItemCount() == 0");
 
 				listView.setVisibility(View.GONE);
-				contentTextLayout.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 
@@ -424,7 +408,6 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			}else{
 				log("adapterList.getItemCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
