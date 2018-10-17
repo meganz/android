@@ -49,7 +49,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,7 +192,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
 	private ChatExplorerFragment chatExplorer;
-	private ImportFileFragment importFileFragment;
+	private ImportFilesFragment importFileFragment;
 
 	private AlertDialog newFolderDialog;
 	
@@ -922,7 +924,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if (fragment == IMPORT_FRAGMENT){
 			if(importFileFragment==null){
-				importFileFragment = new ImportFileFragment();
+				importFileFragment = new ImportFilesFragment();
 			}
 
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -1096,7 +1098,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						case INCOMING_FRAGMENT:{
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 							if(iSharesExplorer != null && iSharesExplorer.isAdded()){
-								if (iSharesExplorer.getDeepBrowserTree() > 0) {
+								if (deepBrowserTree > 0) {
 									//Check the folder's permissions
 									long parentH = iSharesExplorer.getParentHandle();
 									MegaNode n = megaApi.getNodeByHandle(parentH);
@@ -1230,7 +1232,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
 
 							if(iSharesExplorer!=null && iSharesExplorer.isAdded()){
-								if(iSharesExplorer.getDeepBrowserTree()==0){
+								if(deepBrowserTree==0){
 									setRootTitle();
 								}
 								else{
@@ -1505,7 +1507,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		else if(tabShown==NO_TABS){
 			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cDriveExplorer");
-			importFileFragment = (ImportFileFragment) getSupportFragmentManager().findFragmentByTag("importFileFragment");
+			importFileFragment = (ImportFilesFragment) getSupportFragmentManager().findFragmentByTag("importFileFragment");
 
 			if (importFileF) {
 				switch (importFragmentSelected) {
@@ -1724,6 +1726,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					if (nameFiles != null && nameFiles.get(info.getTitle()) != null && !nameFiles.get(info.getTitle()).equals(info.getTitle())) {
+						intent.putExtra(UploadService.EXTRA_NAME_EDITED, nameFiles.get(info.getTitle()));
+					}
 					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
 					startService(intent);
@@ -2022,7 +2027,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 		}
 		else if (tabShown == NO_TABS){
-			if (cDriveExplorer != null){
+			if (importFileF && importFragmentSelected != -1) {
+				switch (importFragmentSelected) {
+					case CLOUD_FRAGMENT: {
+						if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
+							parentHandle = cDriveExplorer.getParentHandle();
+						}
+						break;
+					}
+					case INCOMING_FRAGMENT: {
+						if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
+							parentHandle = iSharesExplorer.getParentHandle();
+						}
+						break;
+					}
+				}
+			}
+			else if (cDriveExplorer != null){
 				parentHandle = cDriveExplorer.getParentHandle();
 				log("1)cDriveExplorer != null: " + parentHandle);
 			}
@@ -2162,7 +2183,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}						
 				}
 				else if (tabShown == NO_TABS){
-					if (cDriveExplorer != null){
+					if (importFileF && importFragmentSelected != -1) {
+						switch (importFragmentSelected) {
+							case CLOUD_FRAGMENT: {
+								if (cDriveExplorer != null && cDriveExplorer.isAdded()) {
+									cDriveExplorer.navigateToFolder(request.getNodeHandle());
+								}
+								break;
+							}
+							case INCOMING_FRAGMENT: {
+								if (iSharesExplorer != null && iSharesExplorer.isAdded()) {
+									iSharesExplorer.navigateToFolder(request.getNodeHandle());
+								}
+								break;
+							}
+						}
+					}
+					else if (cDriveExplorer != null){
 						cDriveExplorer.navigateToFolder(request.getNodeHandle());
 						parentHandleCloud = request.getNodeHandle();
 					}
@@ -2387,7 +2424,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			megaApi.removeGlobalListener(this);
 		}
 
-		File childThumbDir = new File(ThumbnailUtils.getThumbFolder(this), ImportFileFragment.THUMB_FOLDER);
+		File childThumbDir = new File(ThumbnailUtils.getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER);
 		if (childThumbDir != null){
 			if (childThumbDir.exists()){
 				try {
@@ -2994,13 +3031,45 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	public void changeName (String name, String rename) {
-		if (importFileFragment != null && importFileFragment.isAdded()) {
-			importFileFragment.getNames().replace(name, rename);
+		String[] params = {name, rename};
+		new ChangeNameTask().execute(params);
+    }
+
+    public class ChangeNameTask extends AsyncTask<String, Void, Void> {
+
+		HashMap<String, String> temp = new HashMap<>();
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			String name = strings[0];
+			String rename = strings[1];
+
+			if (importFileFragment != null && importFileFragment.isAdded()) {
+				HashMap<String, String> names = importFileFragment.getNameFiles();
+				Iterator it = names.entrySet().iterator();
+
+				while (it.hasNext()) {
+					Map.Entry entry = (Map.Entry) it.next();
+					if (entry.getKey().equals(name)) {
+						temp.put((String)entry.getKey(), rename);
+					}
+					else {
+						temp.put((String)entry.getKey(), (String)entry.getValue());
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			nameFiles = temp;
+			importFileFragment.setNameFiles(temp);
 			if (importFileFragment.adapter != null) {
-				importFileFragment.adapter.setImportNameFiles(importFileFragment.getNames());
+				importFileFragment.adapter.setImportNameFiles(temp);
 			}
 		}
-    }
+	}
 
     public void showRenameDialog(final File document, final String text){
         log("showRenameDialog");

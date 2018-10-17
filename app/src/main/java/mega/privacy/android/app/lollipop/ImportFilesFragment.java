@@ -31,7 +31,7 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
-public class ImportFileFragment extends Fragment implements View.OnClickListener {
+public class ImportFilesFragment extends Fragment implements View.OnClickListener {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
 
@@ -51,14 +51,14 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
     TextView showMoreText;
     ImageView showMoreIcon;
 
-    boolean showMore = true;
+    boolean itemsVisibles = false;
 
     private List<ShareInfo> filePreparedInfos;
     HashMap<String, String> nameFiles = new HashMap<>();
 
-    public static ImportFileFragment newInstance() {
+    public static ImportFilesFragment newInstance() {
         log("newInstance");
-        ImportFileFragment fragment = new ImportFileFragment();
+        ImportFilesFragment fragment = new ImportFilesFragment();
         return fragment;
     }
 
@@ -144,6 +144,14 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
                 });
             }
             adapter.setImportNameFiles(nameFiles);
+            if (incomingButton.getVisibility() == View.VISIBLE) {
+                itemsVisibles = false;
+                adapter.setItemsVisibility(itemsVisibles);
+            }
+            else {
+                itemsVisibles = true;
+                adapter.setItemsVisibility(itemsVisibles);
+            }
             recyclerView.setAdapter(adapter);
         }
 
@@ -189,13 +197,19 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
                 break;
             }
             case R.id.show_more_layout: {
-                if (showMore) {
-                    showMore = false;
+                if (!itemsVisibles) {
+                    itemsVisibles = true;
+                    if (adapter != null) {
+                        adapter.setItemsVisibility(itemsVisibles);
+                    }
                     showMoreText.setText(getString(R.string.general_show_less));
                     showMoreIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
                 }
                 else {
-                    showMore = true;
+                    itemsVisibles = false;
+                    if (adapter != null) {
+                        adapter.setItemsVisibility(itemsVisibles);
+                    }
                     showMoreText.setText(getString(R.string.general_show_more));
                     showMoreIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
                 }
@@ -210,7 +224,11 @@ public class ImportFileFragment extends Fragment implements View.OnClickListener
         context = activity;
     }
 
-    public HashMap<String, String> getNames () {
+    public void setNameFiles (HashMap<String, String> nameFiles) {
+        this.nameFiles = nameFiles;
+    }
+
+    public HashMap<String, String> getNameFiles() {
         return nameFiles;
     }
 
