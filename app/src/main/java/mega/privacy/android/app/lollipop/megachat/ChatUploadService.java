@@ -351,12 +351,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			showStorageOverquotaNotification();
 		}
 
-
 		log("Reset figures of chatUploadService");
 		numberVideosPending=0;
 		totalVideos=0;
 		totalUploads = 0;
 		totalUploadsCompleted = 0;
+
+		if(megaApi.getNumPendingUploads()<=0){
+			megaApi.resetTotalUploads();
+		}
 
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
@@ -475,8 +478,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 				for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
 					MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
-					total = total + currentTransfer.getTotalBytes();
-					inProgress = inProgress + currentTransfer.getTransferredBytes();
+					if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
+						total = total + currentTransfer.getTotalBytes();
+						inProgress = inProgress + currentTransfer.getTotalBytes();
+					}
+					else{
+						total = total + currentTransfer.getTotalBytes();
+						inProgress = inProgress + currentTransfer.getTransferredBytes();
+					}
 				}
 				inProgress = inProgress *100;
 				progressPercent = inProgress/total;
