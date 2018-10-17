@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.twemoji.EmojiManager;
+import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
@@ -503,6 +505,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest);
 			EmojiCompat.init(configDF);
 		}
+		EmojiManager.install(new TwitterEmojiProvider());
 
 
 //		initializeGA();

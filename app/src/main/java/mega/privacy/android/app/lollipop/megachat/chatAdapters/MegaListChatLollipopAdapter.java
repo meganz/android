@@ -43,6 +43,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EmojiconTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -134,8 +135,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 		RoundedImageView imageView;
 		TextView contactInitialLetter;
-		TextView textViewContactName;
-		EmojiconTextView textViewContent;
+		EmojiTextView textViewContactName;
+		EmojiTextView textViewContent;
 		TextView textViewDate;
 		String textFastScroller = "";
 		ImageButton imageButtonThreeDots;
@@ -480,7 +481,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 			((ViewHolderNormalChatList)holder).contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
-			((ViewHolderNormalChatList)holder).textViewContactName = (TextView) v.findViewById(R.id.recent_chat_list_name);
+			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
+			((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleHeightPx(16, outMetrics));
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
@@ -490,7 +492,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContactName.setMaxWidth(Util.scaleWidthPx(190, outMetrics));
 			}
 
-			((ViewHolderNormalChatList)holder).textViewContent = (EmojiconTextView) v.findViewById(R.id.recent_chat_list_content);
+			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
+			((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleHeightPx(14, outMetrics));
+
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
 				((ViewHolderNormalChatList)holder).textViewContent.setMaxWidth(Util.scaleWidthPx(260, outMetrics));

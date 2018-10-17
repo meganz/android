@@ -37,7 +37,33 @@
                 app:titleTextAppearance="@style/ToolbarTitle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                tools:context=".lollipop.megachat.ChatActivityLollipop" />
+                tools:context=".lollipop.megachat.ChatActivityLollipop" >
+
+                <LinearLayout
+                    android:id="@+id/toolbar_elements"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/title_toolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:maxLines="1"
+                        android:layout_marginRight="20dp"
+                        android:ellipsize="end"/>
+
+                    <TextView
+                        android:id="@+id/subtitle_toolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:layout_marginRight="8dp"/>
+                </LinearLayout>
+            </android.support.v7.widget.Toolbar>
+
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
@@ -77,7 +103,26 @@
                             android:tint="@color/accentColor"
                             android:src="@drawable/ic_send_black"/>
 
-                        <mega.privacy.android.app.components.emojicon.EmojiconEditText
+                        <!--<mega.privacy.android.app.components.emojicon.EmojiconEditText-->
+                            <!--android:id="@id/edit_text_chat"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:background="@android:color/transparent"-->
+                            <!--android:layout_marginTop="6dp"-->
+                            <!--android:layout_marginBottom="12dp"-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:layout_centerVertical="true"-->
+                            <!--android:textSize="14sp"-->
+                            <!--android:layout_toLeftOf="@+id/send_message_icon_chat"-->
+                            <!--android:inputType="textMultiLine|textCapSentences"-->
+                            <!--emojicon:emojiconSize="16sp"-->
+                            <!--android:minLines="1"-->
+                            <!--android:maxLines="1"-->
+                            <!--android:ellipsize="end"-->
+                            <!--android:textColor="@color/black"/>-->
+
+                        <mega.privacy.android.app.components.twemoji.EmojiEditText
                             android:id="@id/edit_text_chat"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -88,9 +133,9 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:textSize="14sp"
+                            android:imeOptions="actionSend"
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
-                            emojicon:emojiconSize="16sp"
                             android:minLines="1"
                             android:maxLines="1"
                             android:ellipsize="end"

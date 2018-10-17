@@ -85,6 +85,7 @@ import mega.privacy.android.app.components.emojicon.EmojiconEditText;
 import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
 import mega.privacy.android.app.components.emojicon.EmojiconsFragment;
 import mega.privacy.android.app.components.emojicon.emoji.Emojicon;
+import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -220,6 +221,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     ActionBar aB;
     Toolbar tB;
+    LinearLayout toolbarElements;
+    TextView titleToolbar;
+    TextView subtitleToobar;
 
     float scaleH, scaleW;
     float density;
@@ -259,7 +263,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     RelativeLayout callInProgressLayout;
 
-    EmojiconEditText textChat;
+//    EmojiconEditText textChat;
+    EmojiEditText textChat;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
 
@@ -582,6 +587,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
 
+        aB.setTitle(null);
+        aB.setSubtitle(null);
+
         tB.setOnClickListener(this);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
@@ -590,6 +598,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
+
+        toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
+        titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
+        titleToolbar.setText(" ");
+        subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
 
         emptyLayout = (LinearLayout) findViewById(R.id.empty_messages_layout);
         emptyTextView = (TextView) findViewById(R.id.empty_text_chat_recent);
@@ -621,8 +634,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickFileStorageButton = (ImageButton) findViewById(R.id.pick_file_storage_icon_chat);
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
-        textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
-
+//        textChat = (EmojiconEditText) findViewById(R.id.edit_text_chat);
+        textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
+        textChat.setEmojiSize(Util.scaleHeightPx(14, outMetrics));
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
 
@@ -1061,7 +1075,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         log("Result of open chat: " + result);
 
-                        aB.setTitle(chatRoom.getTitle());
+//                        aB.setTitle(chatRoom.getTitle());
+                        titleToolbar.setText(chatRoom.getTitle());
                         setChatSubtitle();
 
                         if (intentAction.equals(Constants.ACTION_NEW_CHAT)) {
@@ -1195,7 +1210,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("setChatSubtitle");
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED||megaChatApi.getChatConnectionState(idChat)!=MegaChatApi.CHAT_CONNECTION_ONLINE){
             log("Chat not connected");
-            aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+            subtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
             tB.setOnClickListener(null);
         }
         else{
@@ -1220,10 +1235,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.isArchived()){
                         log("Chat is archived");
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.archived_chat)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
+
                     }
                     else{
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
                     }
                 }
                 else if(permission==MegaChatRoom.PRIV_RM) {
@@ -1238,14 +1254,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.isArchived()){
                         log("Chat is archived");
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.archived_chat)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                     }
                     else{
                         if(!chatRoom.isActive()){
-                            aB.setSubtitle(adjustForLargeFont(getString(R.string.inactive_chat)));
+                            subtitleToobar.setText(adjustForLargeFont(getString(R.string.inactive_chat)));
                         }
                         else{
-                            aB.setSubtitle(null);
+                            subtitleToobar.setText(null);
                         }
                     }
                 }
@@ -1261,10 +1277,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.isArchived()){
                         log("Chat is archived");
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.archived_chat)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                     }
                     else{
-                        aB.setSubtitle(null);
+                        subtitleToobar.setText(null);
                     }
                 }
             }
@@ -1306,10 +1322,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.isArchived()){
                         log("Chat is archived");
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.archived_chat)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                     }
                     else{
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.observer_permission_label_participants_panel)));
                     }
                 }
                 else if(permission==MegaChatRoom.PRIV_RM) {
@@ -1326,14 +1342,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.isArchived()){
                         log("Chat is archived");
-                        aB.setSubtitle(adjustForLargeFont(getString(R.string.archived_chat)));
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
                     }
                     else{
                         if(!chatRoom.isActive()){
-                            aB.setSubtitle(adjustForLargeFont(getString(R.string.inactive_chat)));
+                            subtitleToobar.setText(adjustForLargeFont(getString(R.string.inactive_chat)));
                         }
                         else{
-                            aB.setSubtitle(null);
+                            subtitleToobar.setText(null);
                         }
                     }
                 }
@@ -1358,40 +1374,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void setStatus(long userHandle){
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
-            aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+            subtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
         }
         else{
 
             if(chatRoom.isArchived()){
                 log("Chat is archived");
-                aB.setSubtitle(adjustForLargeFont(getString(R.string.archived_chat)));
+                subtitleToobar.setText(adjustForLargeFont(getString(R.string.archived_chat)));
             }
             else{
                 int state = megaChatApi.getUserOnlineStatus(userHandle);
 
                 if(state == MegaChatApi.STATUS_ONLINE){
                     log("This user is connected");
-                    aB.setSubtitle(adjustForLargeFont(getString(R.string.online_status)));
+                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.online_status)));
                 }
                 else if(state == MegaChatApi.STATUS_AWAY){
                     log("This user is away");
-                    aB.setSubtitle(adjustForLargeFont(getString(R.string.away_status)));
+                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
                 }
                 else if(state == MegaChatApi.STATUS_BUSY){
                     log("This user is busy");
-                    aB.setSubtitle(adjustForLargeFont(getString(R.string.busy_status)));
+                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
                 }
                 else if(state == MegaChatApi.STATUS_OFFLINE){
                     log("This user is offline");
-                    aB.setSubtitle(adjustForLargeFont(getString(R.string.offline_status)));
+                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
                 }
                 else if(state == MegaChatApi.STATUS_INVALID){
                     log("INVALID status: "+state);
-                    aB.setSubtitle(null);
+                    subtitleToobar.setText(null);
                 }
                 else{
                     log("This user status is: "+state);
-                    aB.setSubtitle(null);
+                    subtitleToobar.setText(null);
                 }
             }
         }
@@ -4760,7 +4776,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Change of chat title");
             String newTitle = msg.getContent();
             if(newTitle!=null){
-                aB.setTitle(newTitle);
+//                aB.setTitle(newTitle);
+                titleToolbar.setText(newTitle);
+
             }
         }
         else if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
@@ -6733,7 +6751,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     
        if(aB != null && aB.getTitle() != null){
-           aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
+//           aB.setTitle(adjustForLargeFont(aB.getTitle().toString()));
+           titleToolbar.setText(adjustForLargeFont(aB.getTitle().toString()));
+
        }
     }
 

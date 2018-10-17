@@ -61,6 +61,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.WrapEmojiconTextView;
+import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.listeners.ChatAttachmentAvatarListener;
 import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
@@ -504,13 +505,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         //        TextView meText;
         TextView timeOwnText;
         RelativeLayout contentOwnMessageLayout;
-        WrapEmojiconTextView contentOwnMessageText;
+        EmojiTextView contentOwnMessageText;
 
         //Own rich links
         RelativeLayout urlOwnMessageLayout;
         RelativeLayout forwardOwnRichLinks;
 
-        WrapEmojiconTextView urlOwnMessageText;
+        EmojiTextView urlOwnMessageText;
         LinearLayout urlOwnMessageWarningButtonsLayout;
         Button neverRichLinkButton;
         Button alwaysAllowRichLinkButton;
@@ -530,7 +531,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         //Contact's rich links
         RelativeLayout urlContactMessageLayout;
-        WrapEmojiconTextView urlContactMessageText;
+        EmojiTextView urlContactMessageText;
         TextView urlContactMessageTitle;
         TextView urlContactMessageDescription;
         RelativeLayout forwardContactRichLinks;
@@ -597,7 +598,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         TextView contactInitialLetter;
 
         RelativeLayout contentContactMessageLayout;
-        WrapEmojiconTextView contentContactMessageText;
+        EmojiTextView contentContactMessageText;
 
         RoundedImageView contentContactMessageThumbLand;
         RelativeLayout gradientContactMessageThumbLand;
@@ -737,7 +738,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.previewFrameLand = (RelativeLayout) v.findViewById(R.id.preview_frame_landscape);
 
             holder.contentOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.content_own_message_layout);
-            holder.contentOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_own_message_text);
+            holder.contentOwnMessageText = (EmojiTextView) v.findViewById(R.id.content_own_message_text);
 
             //Own rich links message
             holder.urlOwnMessageLayout = (RelativeLayout) v.findViewById(R.id.url_own_message_layout);
@@ -756,7 +757,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardOwnRichLinks.setTag(holder);
             holder.forwardOwnRichLinks.setVisibility(View.GONE);
 
-            holder.urlOwnMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_own_message_text);
+            holder.urlOwnMessageText = (EmojiTextView) v.findViewById(R.id.url_own_message_text);
             holder.urlOwnMessageText.setTag(holder);
             holder.urlOwnMessageText.setOnClickListener(this);
             holder.urlOwnMessageText.setOnLongClickListener(this);
@@ -902,7 +903,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.nameContactText = (TextView) v.findViewById(R.id.contact_message_chat_name_text);
 
             holder.contentContactMessageLayout = (RelativeLayout) v.findViewById(R.id.content_contact_message_layout);
-            holder.contentContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.content_contact_message_text);
+            holder.contentContactMessageText = (EmojiTextView) v.findViewById(R.id.content_contact_message_text);
 
             RelativeLayout.LayoutParams paramsContactMessage = (RelativeLayout.LayoutParams) holder.contentContactMessageText.getLayoutParams();
             if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -944,7 +945,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.forwardContactRichLinks = (RelativeLayout) v.findViewById(R.id.forward_contact_rich_links);
             holder.forwardContactRichLinks.setTag(holder);
             holder.forwardContactRichLinks.setVisibility(View.GONE);
-            holder.urlContactMessageText = (WrapEmojiconTextView) v.findViewById(R.id.url_contact_message_text);
+            holder.urlContactMessageText = (EmojiTextView) v.findViewById(R.id.url_contact_message_text);
 
             holder.urlContactMessageTitle = (TextView) v.findViewById(R.id.url_contact_message_title);
             holder.urlContactMessageDescription = (TextView) v.findViewById(R.id.url_contact_message_description);
@@ -2731,22 +2732,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: "+size);
                     switch (size){
                         case 1:{
-                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat)holder).urlOwnMessageText.setLineSpacing(1,1.2f);
                             break;
                         }
                         case 2:{
-                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat)holder).urlOwnMessageText.setLineSpacing(1,1.2f);
                             break;
                         }
                         case 3:{
-                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat)holder).urlOwnMessageText.setLineSpacing(1,1.2f);
                             break;
                         }
                         default:{
-                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat)holder).urlOwnMessageText.setLineSpacing(1,1.2f);
                             break;
                         }
@@ -2755,7 +2756,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 else{
                     log("IS NOT only emoji");
                     ((ViewHolderMessageChat)holder).urlOwnMessageText.setLineSpacing(1,1.0f);
-                    ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat)holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
 //                            ((ViewHolderMessageChat)holder).contentOwnMessageText.setText(messageContent);
                 if(ssb!=null){
@@ -2965,22 +2966,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: " + size);
                     switch (size) {
                         case 1: {
-                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 2: {
-                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 3: {
-                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         default: {
-                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
@@ -2989,7 +2990,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("IS NOT only emoji!!!");
                     ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.0f);
-                    ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
 
                 //Color always status SENT
@@ -3224,22 +3225,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: " + size);
                     switch (size) {
                         case 1: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 2: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 3: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         default: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
@@ -3247,7 +3248,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("IS NOT only emoji");
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.0f);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
             } else {
 
@@ -3297,22 +3298,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: " + size);
                     switch (size) {
                         case 1: {
-                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 2: {
-                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 3: {
-                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         default: {
-                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat) holder).urlOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
@@ -3320,7 +3321,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("IS NOT only emoji");
                     ((ViewHolderMessageChat) holder).urlOwnMessageText.setLineSpacing(1, 1.0f);
-                    ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat) holder).urlOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
 
 
@@ -3569,22 +3570,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 log("size of emojis: " + size);
                 switch (size) {
                     case 1: {
-                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(35);
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                         ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                         break;
                     }
                     case 2: {
-                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(30);
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                         ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                         break;
                     }
                     case 3: {
-                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(25);
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                         ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                         break;
                     }
                     default: {
-                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(20);
+                        ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                         ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.2f);
                         break;
                     }
@@ -3593,7 +3594,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             } else {
                 log("IS NOT only emoji!!!");
                 ((ViewHolderMessageChat) holder).urlContactMessageText.setLineSpacing(1, 1.0f);
-                ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiconSizeSp(20);
+                ((ViewHolderMessageChat) holder).urlContactMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
             }
 
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
@@ -3964,22 +3965,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: " + size);
                     switch (size) {
                         case 1: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 2: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 3: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         default: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
@@ -3987,7 +3988,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("IS NOT only emoji");
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.0f);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
 
 //                ((ViewHolderMessageChat)holder).contentOwnMessageLayout.setVisibility(View.VISIBLE);
@@ -4132,22 +4133,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: " + size);
                     switch (size) {
                         case 1: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 2: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 3: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         default: {
-                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
@@ -4155,7 +4156,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("IS NOT only emoji");
                     ((ViewHolderMessageChat) holder).contentOwnMessageText.setLineSpacing(1, 1.0f);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
 
 
@@ -4480,22 +4481,22 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     log("size of emojis: " + size);
                     switch (size) {
                         case 1: {
-                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiconSizeSp(35);
+                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiSize(Util.scaleHeightPx(35, outMetrics));
                             ((ViewHolderMessageChat) holder).contentContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 2: {
-                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiconSizeSp(30);
+                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiSize(Util.scaleHeightPx(25, outMetrics));
                             ((ViewHolderMessageChat) holder).contentContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         case 3: {
-                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiconSizeSp(25);
+                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiSize(Util.scaleHeightPx(20, outMetrics));
                             ((ViewHolderMessageChat) holder).contentContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
                         default: {
-                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiconSizeSp(20);
+                            ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                             ((ViewHolderMessageChat) holder).contentContactMessageText.setLineSpacing(1, 1.2f);
                             break;
                         }
@@ -4504,7 +4505,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 } else {
                     log("IS NOT only emoji!!!");
                     ((ViewHolderMessageChat) holder).contentContactMessageText.setLineSpacing(1, 1.0f);
-                    ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiconSizeSp(20);
+                    ((ViewHolderMessageChat) holder).contentContactMessageText.setEmojiSize(Util.scaleHeightPx(15, outMetrics));
                 }
 
                 //Color always status SENT
