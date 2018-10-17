@@ -663,25 +663,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_CAMERA_UPLOADS,null,values);
     }
 
-    public boolean pendingUploadRecordNameExist(String name) {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "'";
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery(selectQuery,null);
+    public boolean pendingUploadRecordNameExist(String name,boolean isSecondary) {
+        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "'"+ " AND " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
+        try (Cursor cursor = db.rawQuery(selectQuery,null)) {
             return cursor != null && cursor.getCount() == 1;
-        } finally {
-            cursor.close();
         }
     }
 
     public boolean pendingUploadRecordPathExist(String filepath) {
         String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filepath) + "'";
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery(selectQuery,null);
+        try (Cursor cursor = db.rawQuery(selectQuery,null)) {
             return cursor != null && cursor.getCount() == 1;
-        } finally {
-            cursor.close();
         }
     }
 
