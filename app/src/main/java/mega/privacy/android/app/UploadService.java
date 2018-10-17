@@ -538,6 +538,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			String appData = transfer.getAppData();
+
+			if(appData!=null){
+				return;
+			}
+
 			transfersCount++;
 			if (!transfer.isFolderTransfer()){
 				updateProgressNotification();
@@ -550,6 +556,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+
+			String appData = transfer.getAppData();
+
+			if(appData!=null){
+				return;
+			}
 
 			transfersCount--;
 
@@ -784,6 +796,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
+			String appData = transfer.getAppData();
+
+			if(appData!=null){
+				return;
+			}
+
 			if (!transfer.isFolderTransfer()){
 				if (canceled) {
 					log("Transfer cancel: " + transfer.getFileName());
