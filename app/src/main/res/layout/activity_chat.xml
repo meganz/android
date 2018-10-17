@@ -16,16 +16,15 @@
         android:background="@android:color/transparent"
         android:id="@+id/activity_chat_content_layout">
 
-        <FrameLayout
-            android:id="@+id/chat_emoji_keyboard"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_alignParentBottom="true" />
+        <!--<FrameLayout-->
+            <!--android:id="@+id/chat_emoji_keyboard"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_alignParentBottom="true" />-->
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/chat_emoji_keyboard">
+            android:layout_height="match_parent">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
@@ -41,18 +40,23 @@
 
                 <LinearLayout
                     android:id="@+id/toolbar_elements"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_width="wrap_content"
                     android:orientation="vertical">
-                    <TextView
+                    <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/title_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
+                        android:gravity="center_vertical"
+                        android:layout_gravity="center_vertical"
                         android:textSize="20sp"
                         android:maxLines="1"
+                        android:singleLine="true"
+                        android:fontFamily="sans-serif-light"
+                        android:textStyle="bold"
                         android:layout_marginRight="20dp"
-                        android:ellipsize="end"/>
+                        android:lineSpacingMultiplier="1.20"/>
 
                     <TextView
                         android:id="@+id/subtitle_toolbar"
@@ -60,7 +64,8 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:layout_marginRight="8dp"/>
+                        android:layout_marginRight="8dp"
+                        android:visibility="gone"/>
                 </LinearLayout>
             </android.support.v7.widget.Toolbar>
 
@@ -103,25 +108,6 @@
                             android:tint="@color/accentColor"
                             android:src="@drawable/ic_send_black"/>
 
-                        <!--<mega.privacy.android.app.components.emojicon.EmojiconEditText-->
-                            <!--android:id="@id/edit_text_chat"-->
-                            <!--android:layout_width="match_parent"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:background="@android:color/transparent"-->
-                            <!--android:layout_marginTop="6dp"-->
-                            <!--android:layout_marginBottom="12dp"-->
-                            <!--android:layout_marginLeft="10dp"-->
-                            <!--android:layout_marginRight="10dp"-->
-                            <!--android:layout_centerVertical="true"-->
-                            <!--android:textSize="14sp"-->
-                            <!--android:layout_toLeftOf="@+id/send_message_icon_chat"-->
-                            <!--android:inputType="textMultiLine|textCapSentences"-->
-                            <!--emojicon:emojiconSize="16sp"-->
-                            <!--android:minLines="1"-->
-                            <!--android:maxLines="1"-->
-                            <!--android:ellipsize="end"-->
-                            <!--android:textColor="@color/black"/>-->
-
                         <mega.privacy.android.app.components.twemoji.EmojiEditText
                             android:id="@id/edit_text_chat"
                             android:layout_width="match_parent"
@@ -151,18 +137,19 @@
                     </RelativeLayout>
 
                     <LinearLayout
+                        android:id="@+id/linear_layout_twemoji"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:orientation="horizontal"
                         android:layout_alignBottom="@+id/edit_text_chat">
 
                         <RelativeLayout
-                            android:id="@+id/rl_keyboard_icon_chat"
+                            android:id="@+id/rl_keyboard_twemoji_chat"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_weight="1">
                             <ImageButton
-                                android:id="@+id/keyboard_icon_chat"
+                                android:id="@+id/keyboard_twemoji_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:background="@null"
