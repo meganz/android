@@ -281,7 +281,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							numberVideosPending--;
 							totalVideos--;
 							pendingMessages.add(newMessage);
-							megaApi.startUploadWithTopPriority(filePath, parentNode, "", false);
+							megaApi.startUploadWithTopPriority(filePath, parentNode, Constants.UPLOAD_APP_DATA_CHAT, false);
 						}
 						else{
 							newMessage.setVideoDownSampled(outFile.getAbsolutePath());
@@ -295,13 +295,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					} catch (Throwable throwable) {
 						pendingMessages.add(newMessage);
-						megaApi.startUploadWithTopPriority(filePath, parentNode, "", false);
+						megaApi.startUploadWithTopPriority(filePath, parentNode, Constants.UPLOAD_APP_DATA_CHAT, false);
 						log("EXCEPTION: Video cannot be downsampled");
 					}
 				}
 				else{
 					pendingMessages.add(newMessage);
-					megaApi.startUploadWithTopPriority(filePath, parentNode, "", false);
+					megaApi.startUploadWithTopPriority(filePath, parentNode, Constants.UPLOAD_APP_DATA_CHAT, false);
 				}
 
 			}
@@ -352,12 +352,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			showStorageOverquotaNotification();
 		}
 
-
 		log("Reset figures of chatUploadService");
 		numberVideosPending=0;
 		totalVideos=0;
 		totalUploads = 0;
 		totalUploadsCompleted = 0;
+
+		if(megaApi.getNumPendingUploads()<=0){
+			megaApi.resetTotalUploads();
+		}
 
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
@@ -457,7 +460,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		if(downFile!=null){
-			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, "", false);
+			megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, Constants.UPLOAD_APP_DATA_CHAT, false);
 		}
 	}
 
@@ -476,8 +479,14 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 				for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
 					MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
-					total = total + currentTransfer.getTotalBytes();
-					inProgress = inProgress + currentTransfer.getTransferredBytes();
+					if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
+						total = total + currentTransfer.getTotalBytes();
+						inProgress = inProgress + currentTransfer.getTotalBytes();
+					}
+					else{
+						total = total + currentTransfer.getTotalBytes();
+						inProgress = inProgress + currentTransfer.getTransferredBytes();
+					}
 				}
 				inProgress = inProgress *100;
 				progressPercent = inProgress/total;
@@ -643,8 +652,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
+			String appData = transfer.getAppData();
 
-			if(transfer.getParentHandle()==parentNode.getHandle()){
+			if(appData!=null && appData.contains(Constants.UPLOAD_APP_DATA_CHAT)){
 				log("This is a chat upload");
 				transfersCount++;
 				if(transfer.isStreamingTransfer()){
@@ -666,230 +676,259 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
-			if(transfer.isStreamingTransfer()){
-				return;
-			}
+			String appData = transfer.getAppData();
 
-			transfersCount--;
-			totalUploadsCompleted++;
+			if(appData!=null && appData.contains(Constants.UPLOAD_APP_DATA_CHAT)){
+				if(transfer.isStreamingTransfer()){
+					return;
+				}
 
-			mapProgressTransfers.put(transfer.getTag(), transfer);
+				transfersCount--;
+				totalUploadsCompleted++;
 
-			if (canceled) {
+				mapProgressTransfers.put(transfer.getTag(), transfer);
 
-				log("Upload cancelled: " + transfer.getFileName());
+				if (canceled) {
 
-				if((lock != null) && (lock.isHeld()))
-					try{ lock.release(); } catch(Exception ex) {}
-				if((wl != null) && (wl.isHeld()))
-					try{ wl.release(); } catch(Exception ex) {}
+					log("Upload cancelled: " + transfer.getFileName());
 
-				ChatUploadService.this.cancel();
-				log("after cancel");
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-				File f = new File(pathSelfie);
-				//Delete recursively all files and folder
-				if (f.exists()) {
-					if (f.isDirectory()) {
-						if(f.list().length<=0){
-							f.delete();
+					if((lock != null) && (lock.isHeld()))
+						try{ lock.release(); } catch(Exception ex) {}
+					if((wl != null) && (wl.isHeld()))
+						try{ wl.release(); } catch(Exception ex) {}
+
+					ChatUploadService.this.cancel();
+					log("after cancel");
+					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+					File f = new File(pathSelfie);
+					//Delete recursively all files and folder
+					if (f.exists()) {
+						if (f.isDirectory()) {
+							if(f.list().length<=0){
+								f.delete();
+							}
 						}
 					}
+					f.delete();
 				}
-				f.delete();
-			}
-			else{
-				if (error.getErrorCode() == MegaError.API_OK) {
-					log("Upload OK: " + transfer.getFileName());
+				else{
+					if (error.getErrorCode() == MegaError.API_OK) {
+						log("Upload OK: " + transfer.getFileName());
 
-					if(Util.isVideoFile(transfer.getPath())){
-						log("Is video!!!");
+						if(Util.isVideoFile(transfer.getPath())){
+							log("Is video!!!");
 
-						File previewDir = PreviewUtils.getPreviewFolder(this);
-						File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						File thumbDir = ThumbnailUtils.getThumbFolder(this);
-						File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-						megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-						megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+							File previewDir = PreviewUtils.getPreviewFolder(this);
+							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							File thumbDir = ThumbnailUtils.getThumbFolder(this);
+							File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+							megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+							megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 
-						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-						if(node!=null){
+							MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+							if(node!=null){
 
-							MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-							retriever.setDataSource(transfer.getPath());
+								MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+								retriever.setDataSource(transfer.getPath());
 
-							String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-							if(location!=null){
-								log("Location: "+location);
+								String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+								if(location!=null){
+									log("Location: "+location);
 
-								boolean secondTry = false;
-								try{
-									final int mid = location.length() / 2; //get the middle of the String
-									String[] parts = {location.substring(0, mid),location.substring(mid)};
-
-									Double lat = Double.parseDouble(parts[0]);
-									Double lon = Double.parseDouble(parts[1]);
-									log("Lat: "+lat); //first part
-									log("Long: "+lon); //second part
-
-									megaApi.setNodeCoordinates(node, lat, lon, null);
-								}
-								catch (Exception e){
-									secondTry = true;
-									log("Exception, second try to set GPS coordinates");
-								}
-
-								if(secondTry){
+									boolean secondTry = false;
 									try{
-										String latString = location.substring(0,7);
-										String lonString = location.substring(8,17);
+										final int mid = location.length() / 2; //get the middle of the String
+										String[] parts = {location.substring(0, mid),location.substring(mid)};
 
-										Double lat = Double.parseDouble(latString);
-										Double lon = Double.parseDouble(lonString);
-										log("Lat2: "+lat); //first part
-										log("Long2: "+lon); //second part
+										Double lat = Double.parseDouble(parts[0]);
+										Double lon = Double.parseDouble(parts[1]);
+										log("Lat: "+lat); //first part
+										log("Long: "+lon); //second part
 
 										megaApi.setNodeCoordinates(node, lat, lon, null);
 									}
 									catch (Exception e){
-										log("Exception again, no chance to set coordinates of video");
+										secondTry = true;
+										log("Exception, second try to set GPS coordinates");
+									}
+
+									if(secondTry){
+										try{
+											String latString = location.substring(0,7);
+											String lonString = location.substring(8,17);
+
+											Double lat = Double.parseDouble(latString);
+											Double lon = Double.parseDouble(lonString);
+											log("Lat2: "+lat); //first part
+											log("Long2: "+lon); //second part
+
+											megaApi.setNodeCoordinates(node, lat, lon, null);
+										}
+										catch (Exception e){
+											log("Exception again, no chance to set coordinates of video");
+										}
 									}
 								}
-							}
-							else{
-								log("No location info");
-							}
-						}
-						attachNodes(transfer);
-					}
-					else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
-						log("Is image!!!");
-
-						MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-						if(node!=null){
-
-							File previewDir = PreviewUtils.getPreviewFolder(this);
-							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-							megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
-
-							File thumbDir = ThumbnailUtils.getThumbFolder(this);
-							File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-							megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
-
-							try {
-								final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
-								float[] latLong = new float[2];
-								if (exifInterface.getLatLong(latLong)) {
-									log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
-									megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+								else{
+									log("No location info");
 								}
-
-							} catch (Exception exception) {
-								log("Couldn't read exif info: " + transfer.getPath());
 							}
-						}
-						attachNodes(transfer);
-					}
-					else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
-						log("Is pdf!!!");
-
-						try{
-							ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
-						}
-						catch(Exception e){
-							log("Pdf thumbnail could not be created");
-						}
-
-						int pageNumber = 0;
-						FileOutputStream out = null;
-
-						try {
-
-							PdfiumCore pdfiumCore = new PdfiumCore(this);
-							MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
-
-							if (pdfNode == null){
-								log("pdf is NULL");
-								return;
-							}
-
-							File previewDir = PreviewUtils.getPreviewFolder(this);
-							File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-							File file = new File(transfer.getPath());
-
-							PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
-							pdfiumCore.openPage(pdfDocument, pageNumber);
-							int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
-							int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
-							Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-							pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
-							Bitmap resizedBitmap = PreviewUtils.resizeBitmapUpload(bmp, width, height);
-							out = new FileOutputStream(preview);
-							boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-							if(result){
-								log("Compress OK!");
-								File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
-								if (oldPreview.exists()){
-									oldPreview.delete();
-								}
-								//Attach node one the request finish
-								requestSent++;
-								megaApi.setPreview(pdfNode, preview.getAbsolutePath(), this);
-							}
-							else{
-								log("Not Compress");
-							}
-							pdfiumCore.closeDocument(pdfDocument);
-
-							updatePdfAttachStatus(transfer);
-
-						} catch(Exception e) {
-							log("Pdf preview could not be created");
 							attachNodes(transfer);
-						} finally {
+						}
+						else if (MimeTypeList.typeForName(transfer.getPath()).isImage()){
+							log("Is image!!!");
+
+							MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+							if(node!=null){
+
+								File previewDir = PreviewUtils.getPreviewFolder(this);
+								File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+								megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
+
+								File thumbDir = ThumbnailUtils.getThumbFolder(this);
+								File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+								megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+
+								try {
+									final ExifInterface exifInterface = new ExifInterface(transfer.getPath());
+									float[] latLong = new float[2];
+									if (exifInterface.getLatLong(latLong)) {
+										log("Latitude: "+latLong[0]+" Longitude: " +latLong[1]);
+										megaApi.setNodeCoordinates(node, latLong[0], latLong[1], null);
+									}
+
+								} catch (Exception exception) {
+									log("Couldn't read exif info: " + transfer.getPath());
+								}
+							}
+							attachNodes(transfer);
+						}
+						else if (MimeTypeList.typeForName(transfer.getPath()).isPdf()) {
+							log("Is pdf!!!");
+
+							try{
+								ThumbnailUtilsLollipop.createThumbnailPdf(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+							}
+							catch(Exception e){
+								log("Pdf thumbnail could not be created");
+							}
+
+							int pageNumber = 0;
+							FileOutputStream out = null;
+
 							try {
-								if (out != null)
-									out.close();
-							} catch (Exception e) {
-								//todo with exception
+
+								PdfiumCore pdfiumCore = new PdfiumCore(this);
+								MegaNode pdfNode = megaApi.getNodeByHandle(transfer.getNodeHandle());
+
+								if (pdfNode == null){
+									log("pdf is NULL");
+									return;
+								}
+
+								File previewDir = PreviewUtils.getPreviewFolder(this);
+								File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
+								File file = new File(transfer.getPath());
+
+								PdfDocument pdfDocument = pdfiumCore.newDocument(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
+								pdfiumCore.openPage(pdfDocument, pageNumber);
+								int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber);
+								int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber);
+								Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+								pdfiumCore.renderPageBitmap(pdfDocument, bmp, pageNumber, 0, 0, width, height);
+								Bitmap resizedBitmap = PreviewUtils.resizeBitmapUpload(bmp, width, height);
+								out = new FileOutputStream(preview);
+								boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+								if(result){
+									log("Compress OK!");
+									File oldPreview = new File(previewDir, transfer.getFileName()+".jpg");
+									if (oldPreview.exists()){
+										oldPreview.delete();
+									}
+									//Attach node one the request finish
+									requestSent++;
+									megaApi.setPreview(pdfNode, preview.getAbsolutePath(), this);
+								}
+								else{
+									log("Not Compress");
+								}
+								pdfiumCore.closeDocument(pdfDocument);
+
+								updatePdfAttachStatus(transfer);
+
+							} catch(Exception e) {
+								log("Pdf preview could not be created");
+								attachNodes(transfer);
+							} finally {
+								try {
+									if (out != null)
+										out.close();
+								} catch (Exception e) {
+									//todo with exception
+								}
 							}
 						}
-					}
-					else{
-						log("NOT video, image or pdf!");
-						attachNodes(transfer);
-					}
+						else{
+							log("NOT video, image or pdf!");
+							attachNodes(transfer);
+						}
 
 //					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-				}
-				else{
-					log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
-
-					if(error.getErrorCode() == MegaError.API_EEXIST){
-						log("Transfer API_EEXIST: "+transfer.getNodeHandle());
 					}
 					else{
+						log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-						if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-							isOverquota = 1;
+						if(error.getErrorCode() == MegaError.API_EEXIST){
+							log("Transfer API_EEXIST: "+transfer.getNodeHandle());
 						}
-						else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-							isOverquota = 2;
-						}
+						else{
 
-						//Find the pending message
-						for(int i=0; i<pendingMessages.size();i++){
-							PendingMessage pendMsg = pendingMessages.get(i);
+							if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
+								isOverquota = 1;
+							}
+							else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+								isOverquota = 2;
+							}
 
-							PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
+							//Find the pending message
+							for(int i=0; i<pendingMessages.size();i++){
+								PendingMessage pendMsg = pendingMessages.get(i);
 
-							String transferPath = transfer.getPath();
-							String nodeAttachement = nodeAttachment.getFilePath();
+								PendingNodeAttachment nodeAttachment = pendMsg.getNodeAttachment();
 
-							if(Util.isVideoFile(transferPath)){
-								if(pendMsg.getVideoDownSampled()!=null){
-									String pathToCompare = pendMsg.getVideoDownSampled();
-									if(pathToCompare.equals(transferPath)){
+								String transferPath = transfer.getPath();
+								String nodeAttachement = nodeAttachment.getFilePath();
+
+								if(Util.isVideoFile(transferPath)){
+									if(pendMsg.getVideoDownSampled()!=null){
+										String pathToCompare = pendMsg.getVideoDownSampled();
+										if(pathToCompare.equals(transferPath)){
+
+											dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
+											launchErrorToChat(pendMsg);
+
+											if (totalUploadsCompleted==totalUploads && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
+												onQueueComplete();
+											}
+											return;
+										}
+									}
+									else {
+										if (nodeAttachment.getFilePath().equals(transferPath)) {
+
+											dbH.updatePendingMessage(pendMsg.getId(), -1 + "", PendingMessage.STATE_ERROR);
+											launchErrorToChat(pendMsg);
+
+											if (totalUploadsCompleted==totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
+												onQueueComplete();
+											}
+											return;
+										}
+									}
+								}
+								else{
+
+									if(nodeAttachment.getFilePath().equals(transferPath)){
 
 										dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
 										launchErrorToChat(pendMsg);
@@ -900,35 +939,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 										return;
 									}
 								}
-								else {
-									if (nodeAttachment.getFilePath().equals(transferPath)) {
 
-										dbH.updatePendingMessage(pendMsg.getId(), -1 + "", PendingMessage.STATE_ERROR);
-										launchErrorToChat(pendMsg);
 
-										if (totalUploadsCompleted==totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
-											onQueueComplete();
-										}
-										return;
-									}
-								}
 							}
-							else{
-
-								if(nodeAttachment.getFilePath().equals(transferPath)){
-
-									dbH.updatePendingMessage(pendMsg.getId(), -1+"", PendingMessage.STATE_ERROR);
-									launchErrorToChat(pendMsg);
-
-									if (totalUploadsCompleted==totalUploads && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
-										onQueueComplete();
-									}
-									return;
-								}
-							}
-
-
-						}
 
 //						//Find the pending message
 //						for(int i=0; i<pendingMessages.size();i++){
@@ -944,31 +957,33 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 //								break;
 //							}
 //						}
+						}
+					}
+
+					if (isOverquota!=0) {
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+					}
+
+					log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
+					String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
+					if (transfer.getPath() != null) {
+						if (transfer.getPath().startsWith(pathSelfie)) {
+							File f = new File(transfer.getPath());
+							f.delete();
+						}
+					} else {
+						log("transfer.getPath() is NULL");
 					}
 				}
 
-				if (isOverquota!=0) {
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				if (totalUploadsCompleted==totalUploads && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
+					onQueueComplete();
 				}
-
-				log("IN Finish: "+transfer.getFileName()+" path: "+transfer.getPath());
-				String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.temporalPicDIR;
-				if (transfer.getPath() != null) {
-					if (transfer.getPath().startsWith(pathSelfie)) {
-						File f = new File(transfer.getPath());
-						f.delete();
-					}
-				} else {
-					log("transfer.getPath() is NULL");
+				else{
+					updateProgressNotification();
 				}
 			}
 
-			if (totalUploadsCompleted==totalUploads && transfersCount==0 && numberVideosPending<=0 && requestSent<=0){
-				onQueueComplete();
-			}
-			else{
-				updateProgressNotification();
-			}
 		}
 
 	}
@@ -1085,33 +1100,38 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-			if(transfer.isStreamingTransfer()){
-				return;
-			}
 
-			if (!transfer.isFolderTransfer()){
-				if (canceled) {
-					log("Transfer cancel: " + transfer.getFileName());
+			String appData = transfer.getAppData();
 
-					if((lock != null) && (lock.isHeld()))
-						try{ lock.release(); } catch(Exception ex) {}
-					if((wl != null) && (wl.isHeld()))
-						try{ wl.release(); } catch(Exception ex) {}
-
-					megaApi.cancelTransfer(transfer);
-					ChatUploadService.this.cancel();
-					log("after cancel");
+			if(appData!=null && appData.contains(Constants.UPLOAD_APP_DATA_CHAT)){
+				if(transfer.isStreamingTransfer()){
 					return;
 				}
 
-				if(isOverquota!=0){
-					log("after overquota alert");
-					return;
+				if (!transfer.isFolderTransfer()){
+					if (canceled) {
+						log("Transfer cancel: " + transfer.getFileName());
+
+						if((lock != null) && (lock.isHeld()))
+							try{ lock.release(); } catch(Exception ex) {}
+						if((wl != null) && (wl.isHeld()))
+							try{ wl.release(); } catch(Exception ex) {}
+
+						megaApi.cancelTransfer(transfer);
+						ChatUploadService.this.cancel();
+						log("after cancel");
+						return;
+					}
+
+					if(isOverquota!=0){
+						log("after overquota alert");
+						return;
+					}
+
+					mapProgressTransfers.put(transfer.getTag(), transfer);
+
+					updateProgressNotification();
 				}
-
-				mapProgressTransfers.put(transfer.getTag(), transfer);
-
-				updateProgressNotification();
 			}
 		}
 	}

@@ -499,19 +499,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
 
-		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads() + megaApiFolder.getNumPendingUploads();
+		int total = megaApi.getNumPendingDownloads() + megaApiFolder.getNumPendingDownloads();
 		log("onQueueComplete: total of files before reset " + total);
 		if(total <= 0){
-			log("onQueueComplete: reset total uploads/downloads");
-			megaApi.resetTotalUploads();
+			log("onQueueComplete: reset total downloads");
 			megaApi.resetTotalDownloads();
 			megaApiFolder.resetTotalDownloads();
-			megaApiFolder.resetTotalUploads();
 			errorCount = 0;
 			alreadyDownloaded = 0;
 		}
 	}
-
 
 	private File getDir(MegaNode document, Intent intent) {
 		log("getDir");
