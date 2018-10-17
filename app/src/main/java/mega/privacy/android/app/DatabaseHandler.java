@@ -11,6 +11,7 @@ import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -767,7 +768,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if(timestamps.isEmpty()) {
                 return null;
             }
-            timestamps.sort(new Comparator<Long>() {
+            Collections.sort(timestamps,new Comparator<Long>() {
 
                 @Override
                 public int compare(Long o1,Long o2) {
