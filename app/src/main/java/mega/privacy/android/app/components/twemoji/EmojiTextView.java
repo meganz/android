@@ -1,26 +1,38 @@
 package mega.privacy.android.app.components.twemoji;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
-import android.support.annotation.CallSuper;
-import android.support.annotation.DimenRes;
-import android.support.annotation.Px;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.util.AttributeSet;
-
+import android.util.DisplayMetrics;
+import android.view.Display;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.Util;
 
-@SuppressWarnings("CPD-START") public class EmojiTextView extends AppCompatTextView {
+public class EmojiTextView extends AppCompatTextView {
+
   private float emojiSize;
 
-  public EmojiTextView(final Context context) {
-    this(context, null);
+  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
+  public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
+  private Context mContext;
+  private DisplayMetrics mOutMetrics;
+  private int textViewMaxWidth;
+
+  public EmojiTextView(Context context) {
+    super(context);
+    mContext = context;
   }
 
-  public EmojiTextView(final Context context, final AttributeSet attrs) {
+  public EmojiTextView(Context context, AttributeSet attrs) {
     super(context, attrs);
+    mContext = context;
 
     if (!isInEditMode()) {
       EmojiManager.getInstance().verifyInstalled();
@@ -32,7 +44,7 @@ import mega.privacy.android.app.R;
     if (attrs == null) {
       emojiSize = defaultEmojiSize;
     } else {
-      final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiTextView);
+      TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiTextView);
 
       try {
         emojiSize = a.getDimension(R.styleable.EmojiTextView_emojiSize, defaultEmojiSize);
@@ -41,25 +53,52 @@ import mega.privacy.android.app.R;
       }
     }
 
+    if (mContext instanceof ManagerActivityLollipop) {
+      Display display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
+      mOutMetrics = new DisplayMetrics ();
+      display.getMetrics(mOutMetrics);
+      if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+      }else{
+        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      }
+    }else if (mContext instanceof ChatActivityLollipop) {
+      Display display = ((ChatActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
+      mOutMetrics = new DisplayMetrics();
+      display.getMetrics(mOutMetrics);
+      if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+      } else {
+        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+      }
+    }
+
     setText(getText());
   }
 
-  @Override @CallSuper public void setText(final CharSequence rawText, final BufferType type) {
-    final CharSequence text = rawText == null ? "" : rawText;
-    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-    final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-    final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+  @Override public void setText(CharSequence rawText, BufferType type) {
+    CharSequence text = rawText == null ? "" : rawText;
+    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+    Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+    float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
     EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
-    super.setText(spannableStringBuilder, type);
+
+    if (mContext instanceof ManagerActivityLollipop) {
+      //format text if too long
+      CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+      super.setText(textF, type);
+    }else{
+      super.setText(spannableStringBuilder, type);
+    }
   }
 
-  /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size */
-  public final void setEmojiSize(@Px final int pixels) {
+  //sets the emoji size in pixels and automatically invalidates the text and renders it with the new size
+  public final void setEmojiSize(int pixels) {
     setEmojiSize(pixels, true);
   }
 
-  /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size when {@code shouldInvalidate} is true */
-  public final void setEmojiSize(@Px final int pixels, final boolean shouldInvalidate) {
+  // sets the emoji size in pixels and automatically invalidates the text and renders it with the new size when {@code shouldInvalidate} is true
+  public final void setEmojiSize(int pixels, boolean shouldInvalidate) {
     emojiSize = pixels;
 
     if (shouldInvalidate) {
@@ -67,13 +106,15 @@ import mega.privacy.android.app.R;
     }
   }
 
-  /** sets the emoji size in pixels with the provided resource and automatically invalidates the text and renders it with the new size */
-  public final void setEmojiSizeRes(@DimenRes final int res) {
+  // sets the emoji size in pixels with the provided resource and automatically invalidates the text and renders it with the new size
+  public final void setEmojiSizeRes(int res) {
     setEmojiSizeRes(res, true);
   }
 
-  /** sets the emoji size in pixels with the provided resource and invalidates the text and renders it with the new size when {@code shouldInvalidate} is true */
-  public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
+  // sets the emoji size in pixels with the provided resource and invalidates the text and renders it with the new size when {@code shouldInvalidate} is true
+  public final void setEmojiSizeRes(int res, boolean shouldInvalidate) {
     setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
   }
 }
+
+

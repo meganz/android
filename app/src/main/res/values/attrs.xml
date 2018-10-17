@@ -121,4 +121,18 @@
         <attr name="emojiSize"/>
     </declare-styleable>
 
+    <declare-styleable name="Emojicon">
+        <attr format="dimension" name="emojiconSize"/>
+        <attr format="enum" name="emojiconAlignment">
+            <enum name="bottom" value="0"/>
+            <enum name="baseline" value="1"/>
+        </attr>
+        <attr format="integer" name="emojiconTextStart"/>
+        <attr format="integer" name="emojiconTextLength"/>
+        <attr format="boolean" name="emojiconUseSystemDefault"/>
+    </declare-styleable>
+    <declare-styleable name="EmojiconStyle">
+        <attr format="reference" name="emojiconGridViewStyle"/>
+    </declare-styleable>
+
 </resources>
