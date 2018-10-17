@@ -137,20 +137,26 @@
                     android:id="@+id/button_login_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_marginTop="40dp"
+                    android:background="@drawable/background_accent_button"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
                     android:layout_marginLeft="3dp"
-                    android:layout_marginBottom="44dp"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="34dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"/>
 
                 <TextView
                     android:id="@+id/button_forgot_pass"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
                     android:layout_marginLeft="3dp"
                     android:layout_marginBottom="94dp"
                     android:textColor="@color/accentColor"
@@ -181,7 +187,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
                     android:layout_marginBottom="24dp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
                     android:textColor="@color/accentColor"
                     android:textSize="14sp" />
 
