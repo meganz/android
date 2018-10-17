@@ -71,6 +71,8 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
+
 public class SearchFragmentLollipop extends Fragment{
 
 	private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
@@ -479,28 +481,6 @@ public class SearchFragmentLollipop extends Fragment{
 	}
 
     public void addSectionTitle(List<MegaNode> nodes,int type) {
-	    //re-order the returned nodes, since SDK doesn't seprate the nodes by type.
-	    nodes.sort(new Comparator<MegaNode>() {
-
-            @Override
-            public int compare(MegaNode o1,MegaNode o2) {
-                if(o1 != null && o2 != null) {
-                    if(o1.isFolder() && o2.isFolder()) {
-                        return 0;
-                    }
-                    if(o1.isFile() && o2.isFile()) {
-                        return 0;
-                    }
-                    if(o1.isFolder() && o2.isFile()) {
-                        return -1;
-                    }
-                    if(o1.isFile() && o2.isFolder()) {
-                        return 1;
-                    }
-                }
-                return 0;
-            }
-        });
         Map<Integer, String> sections = new HashMap<>();
         int folderCount = 0;
         int fileCount = 0;
@@ -577,7 +557,7 @@ public class SearchFragmentLollipop extends Fragment{
 			if(((ManagerActivityLollipop)context).searchQuery!=null){
 				if(!((ManagerActivityLollipop)context).searchQuery.isEmpty()){
 					log("SEARCH NODES: " + ((ManagerActivityLollipop)context).searchQuery);
-					nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+					nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
 					log("Nodes found = " + nodes.size());
 
 				}
@@ -1250,7 +1230,7 @@ public class SearchFragmentLollipop extends Fragment{
 			log("levels searchQuery: "+((ManagerActivityLollipop)context).levelsSearch);
 			log("searchQuery: "+((ManagerActivityLollipop)context).searchQuery);
 			((ManagerActivityLollipop)context).setParentHandleSearch(-1);
-			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
 			setNodes(nodes);
 			visibilityFastScroller();
 
@@ -1302,7 +1282,7 @@ public class SearchFragmentLollipop extends Fragment{
 	public void refresh(){
 		log("refresh ");
 		if(((ManagerActivityLollipop)context).parentHandleSearch==-1){
-			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+			nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
 		}else{
 			MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).parentHandleSearch);
 			if(parentNode!=null){
@@ -1310,7 +1290,7 @@ public class SearchFragmentLollipop extends Fragment{
 				nodes = megaApi.getChildren(parentNode, ((ManagerActivityLollipop)context).orderCloud);
 				contentText.setText(MegaApiUtils.getInfoFolder(parentNode, context));
 			}else{
-				nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery);
+				nodes = megaApi.search(((ManagerActivityLollipop)context).searchQuery,ORDER_DEFAULT_ASC);
 			}
 		}
 		setNodes(nodes);
