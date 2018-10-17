@@ -61,7 +61,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
-public class CameraUploadsService extends JobService implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface {
+public class CameraUploadsService extends JobService implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaTransferListenerInterface {
 
     public static String PHOTO_SYNC = "PhotoSync";
     public static String CAMERA_UPLOADS = "Camera Uploads";
@@ -193,14 +193,14 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
         startForeground(notificationId,notification);
         Log.d("Yuan", "notification created");
         try {
-            startUploads();
+            getFilesFromMediaStore();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void startUploads() {
-        log("startUploads()");
+    private void getFilesFromMediaStore() {
+        log("getFilesFromMediaStore()");
         if (!wl.isHeld()) {
             wl.acquire();
         }
@@ -1003,8 +1003,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
             return;
         }
 
-        megaApi.addGlobalListener(this);
-
         int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
             wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
@@ -1125,36 +1123,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     }
 
     @Override
-    public void onUsersUpdate(MegaApiJava api,ArrayList<MegaUser> users) {
-
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api,ArrayList<MegaNode> nodeList) {
-
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api,ArrayList<MegaContactRequest> requests) {
-
-    }
-
-    @Override
-    public void onEvent(MegaApiJava api,MegaEvent event) {
-
-    }
-
-    @Override
     public void onRequestStart(MegaChatApiJava api,MegaChatRequest request) {
 
     }
@@ -1192,63 +1160,8 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     }
 
     private synchronized void requestFinished(MegaApiJava api,MegaRequest request,MegaError e) {
-
-        if (request.getType() == MegaRequest.TYPE_LOGIN) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                log("Fast login OK");
-                log("Calling fetchNodes from CameraUploadsService");
-                megaApi.fetchNodes(this);
-            } else {
-                log("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                finish();
-            }
-        } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                chatSettings = dbH.getChatSettings();
-                if (chatSettings != null) {
-                    boolean chatEnabled = Boolean.parseBoolean(chatSettings.getEnabled());
-                    if (chatEnabled) {
-                        log("Chat enabled-->connect");
-                        megaChatApi.connectInBackground(this);
-                        isLoggingIn = false;
-                        MegaApplication.setLoggingIn(isLoggingIn);
-
-                        int r = runLoggedIn();
-                        log("shouldRunAfterLogin -> " + r);
-                        if (r == 0) {
-                            startCameraUploads();
-                        }
-                    } else {
-                        log("Chat NOT enabled - readyToManager");
-                        isLoggingIn = false;
-                        MegaApplication.setLoggingIn(isLoggingIn);
-
-                        int r = runLoggedIn();
-                        log("shouldRunAfterLogin -> " + r);
-                        if (r == 0) {
-                            startCameraUploads();
-                        }
-                    }
-                } else {
-                    log("chatSettings NULL - readyToManager");
-                    isLoggingIn = false;
-                    MegaApplication.setLoggingIn(isLoggingIn);
-
-                    int r = runLoggedIn();
-                    log("shouldRunAfterLogin -> " + r);
-                    if (r == 0) {
-                        startCameraUploads();
-                    }
-                }
-            } else {
-                log("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                finish();
-            }
-        } else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
+    
+        if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Folder created: " + request.getName());
                 String name = request.getName();
@@ -1260,24 +1173,18 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                     log("Secondary Folder UPDATED DB");
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());
                 }
-
-                startCameraUploads();
             }
         } else if (request.getType() == MegaRequest.TYPE_RENAME || request.getType() == MegaRequest.TYPE_COPY) {
+            String nodeName = megaApi.getNodeByHandle(request.getNodeHandle()).getName();
             if (e.getErrorCode() == MegaError.API_OK) {
-                String nodeName = megaApi.getNodeByHandle(request.getNodeHandle()).getName();
-                if (nodeName.compareTo(CAMERA_UPLOADS) == 0) {
-                    log("Folder renamed to CAMERA_UPLOADS");
-                    startCameraUploads();
-                } else {
-                    //todo copy have not path, use name?
-                    dbH.deleteSyncRecordByFileName(nodeName); //todo need to verify real name too
-                    updateProgressNotification();
-                    totalUploaded++;
-                    if (totalToUpload == totalUploaded) {
-                        onQueueComplete(true,totalToUpload);
-                    }
-                }
+                //todo copy have not path, use name?
+                dbH.deleteSyncRecordByFileName(nodeName); //todo need to verify real name too
+            }
+            
+            updateProgressNotification();
+            totalUploaded++;
+            if (totalToUpload == totalUploaded) {
+                onQueueComplete(true,totalToUpload);
             }
         }
     }
