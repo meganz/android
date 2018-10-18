@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -1543,12 +1545,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     imageView = (ImageView)v.findViewById(R.id.file_grid_thumbnail);
                 }
                 imageView.getLocationOnScreen(screenPosition);
+
                 int[] dimens = new int[4];
                 dimens[0] = screenPosition[0];
                 dimens[1] = screenPosition[1];
                 dimens[2] = imageView.getWidth();
                 dimens[3] = imageView.getHeight();
-                
+                Log.e("@#@",Arrays.toString(dimens));
                 if (type == Constants.RUBBISH_BIN_ADAPTER) {
                     ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
                 } else if (type == Constants.INBOX_ADAPTER) {
