@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -128,6 +130,22 @@ public class ChatExplorerFragment extends Fragment{
         emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_chat_recent_invite);
         emptyTextViewInvite.setWidth(Util.scaleWidthPx(236, outMetrics));
         emptyTextView = (TextView) v.findViewById(R.id.empty_text_chat_recent);
+
+        String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+        try{
+            textToShow = textToShow.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[/B]", "</font>");
+        }
+        catch (Exception e){}
+        Spanned resultB = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            resultB = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            resultB = Html.fromHtml(textToShow);
+        }
+        emptyTextView.setText(resultB);
 
         LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
         emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(50, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));

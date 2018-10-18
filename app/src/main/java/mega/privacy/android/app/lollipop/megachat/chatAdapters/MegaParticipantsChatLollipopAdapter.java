@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,9 +30,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatParticipantAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
@@ -168,10 +164,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 //			v = LayoutInflater.from(context).inflate(R.layout.item_add_participant_chat_list, null);
 			holderAddParticipant = new ViewHolderAddParticipant(v);
 			holderAddParticipant.itemLayout = (RelativeLayout) v.findViewById(R.id.add_participant_list_item_layout);
-			//Right margin
-			RecyclerView.LayoutParams itemLayoutParams = (RecyclerView.LayoutParams) holderList.itemLayout.getLayoutParams();
-			itemLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(8, outMetrics));
-			holderList.itemLayout.setLayoutParams(itemLayoutParams);
 
 			holderAddParticipant.imageView = (ImageView) v.findViewById(R.id.add_participant_list_icon);
 			holderAddParticipant.textViewContactName = (TextView) v.findViewById(R.id.add_participant_list_text);
@@ -447,7 +439,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
     public int getItemCount() {
 		log("getItemCount");
-		int permission = participants.get(0).getPrivilege();
+		int size = participants.size();
+
+		int permission = participants.get(size-1).getPrivilege();
 
 		if (permission == MegaChatRoom.PRIV_MODERATOR) {
 			log("getItemCount: moderator type");
@@ -462,11 +456,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 	@Override
 	public int getItemViewType(int position) {
 		log("getItemViewType: position"+position);
-		int permission = participants.get(0).getPrivilege();
+		int size = participants.size();
+
+		int permission = participants.get(size-1).getPrivilege();
 
 		if (permission == MegaChatRoom.PRIV_MODERATOR) {
 			log("getItemViewType: moderator type");
-			if (position<participants.size()) {
+			if (position>0) {
 				return ITEM_VIEW_TYPE_NORMAL;
 			} else {
 				log("Type ADD_PARTICIPANT");
@@ -479,8 +475,16 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
 	public Object getItem(int position) {
 		log("getItem: "+position);
-		log("participants size: "+participants.size());
-		return participants.get(position);
+		int size = participants.size();
+		log("participants size: "+size);
+		int permission = participants.get(size-1).getPrivilege();
+
+		if (permission == MegaChatRoom.PRIV_MODERATOR) {
+			log("getItemViewType: moderator type");
+			return participants.get(position-1);
+		} else {
+			return participants.get(position);
+		}
 	}
 
 	@Override

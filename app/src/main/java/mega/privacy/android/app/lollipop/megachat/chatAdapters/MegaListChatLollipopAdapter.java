@@ -145,6 +145,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		RelativeLayout layoutPendingMessages;
 		ImageView muteIcon;
 		ImageView contactStateIcon;
+		ImageView callInProgressIcon;
 		String contactMail;
 		String fullName = "";
 
@@ -174,8 +175,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	@Override
 	public void onBindViewHolder(ViewHolderChatList holder, int position) {
-		log("---------------onBindViewHolder---------------- position:"+position);
-
+		log("onBindViewHolder- position:"+position);
 		final int itemType = getItemViewType(position);
 		log("itemType: "+itemType);
 
@@ -184,7 +184,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).contactInitialLetter.setText("");
 
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
-			//log("ChatRoom handle: "+chat.getChatId() +"****"+ MegaApiAndroid.userHandleToBase64(chat.getChatId())+ " title "+chat.getTitle());
 
 			setTitle(position, holder);
 
@@ -201,7 +200,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 					setUserAvatar(holder, userHandleEncoded);
 				} else {
 					log("Multiselect ON");
@@ -217,7 +215,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						log("NOT selected");
 						((ViewHolderNormalChatList)holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
 						holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 						setUserAvatar(holder, userHandleEncoded);
 					}
 				}
@@ -336,6 +333,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnClickListener(this);
 				holder.itemLayout.setOnLongClickListener(this);
 			}
+
+			if(chat.isCallInProgress()){
+				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.VISIBLE);
+			}
+			else{
+				((ViewHolderNormalChatList)holder).callInProgressIcon.setVisibility(View.GONE);
+			}
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
 			((ViewHolderArchivedChatList)holder).textViewArchived.setOnClickListener(this);
@@ -354,20 +358,28 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
-	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
-		log("setUserAvatar");
 
+	public void setUserAvatar(ViewHolderChatList holder, String userHandle){
+		log("setUserAvatar ");
 		createDefaultAvatar(holder, userHandle);
 
 		ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder, this);
-
 		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderNormalChatList)holder).contactMail + ".jpg");
+
+		if(((ViewHolderNormalChatList)holder).contactMail == null){
+			if (context.getExternalCacheDir() != null) {
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), userHandle + ".jpg");
+			}else {
+				avatar = new File(context.getCacheDir().getAbsolutePath(), userHandle + ".jpg");
+			}
+		}else{
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), ((ViewHolderNormalChatList)holder).contactMail + ".jpg");
+			}else{
+				avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderNormalChatList)holder).contactMail + ".jpg");
+			}
 		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), ((ViewHolderNormalChatList)holder).contactMail + ".jpg");
-		}
+
 		Bitmap bitmap = null;
 		if (avatar.exists()){
 			if (avatar.length() > 0){
@@ -389,13 +401,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					else{
 						megaApi.getUserAvatar(((ViewHolderNormalChatList)holder).contactMail, context.getCacheDir().getAbsolutePath() + "/" + ((ViewHolderNormalChatList)holder).contactMail + ".jpg", listener);
 					}
-				}
-				else{
+				}else{
 					((ViewHolderNormalChatList)holder).contactInitialLetter.setVisibility(View.GONE);
 					((ViewHolderNormalChatList)holder).imageView.setImageBitmap(bitmap);
 				}
-			}
-			else{
+			}else{
+
 				if(megaApi==null){
 					log("setUserAvatar: megaApi is Null in Offline mode");
 					return;
@@ -403,13 +414,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if (context.getExternalCacheDir() != null){
 					megaApi.getUserAvatar(((ViewHolderNormalChatList)holder).contactMail, context.getExternalCacheDir().getAbsolutePath() + "/" + ((ViewHolderNormalChatList)holder).contactMail + ".jpg", listener);
-				}
-				else{
+				}else{
 					megaApi.getUserAvatar(((ViewHolderNormalChatList)holder).contactMail, context.getCacheDir().getAbsolutePath() + "/" + ((ViewHolderNormalChatList)holder).contactMail + ".jpg", listener);
 				}
 			}
-		}
-		else{
+		}else{
+
 			if(megaApi==null){
 				log("setUserAvatar: megaApi is Null in Offline mode");
 				return;
@@ -505,6 +515,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).numberPendingMessages = (TextView) v.findViewById(R.id.recent_chat_list_unread_number);
 
 			((ViewHolderNormalChatList)holder).contactStateIcon = (ImageView) v.findViewById(R.id.recent_chat_list_contact_state);
+			((ViewHolderNormalChatList)holder).callInProgressIcon = (ImageView) v.findViewById(R.id.recent_chat_list_call_in_progress);
 		}
 		else if(viewType == ITEM_VIEW_TYPE_ARCHIVED_CHATS){
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_archived_chat_option_list, parent, false);
@@ -2015,13 +2026,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 					log("getLastMessageSender: the last message is mine: "+lastMsgSender);
-					Spannable me = new SpannableString("Me: ");
+					Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
 					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);
 						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
+						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 						((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 					}
 				}
