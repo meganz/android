@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly"
-    android:versionCode="205"
-    android:versionName="3.3.8 (205)" >
+    android:versionCode="211"
+    android:versionName="3.4.0 (211)" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -52,7 +52,6 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.LoginActivityLollipop"
-            android:theme="@style/no_title_activity"
             android:label="@string/login_text"
             android:screenOrientation="locked"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -71,24 +70,14 @@
         </activity>
 
         <activity
-            android:name="LauncherActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity
             android:name="mega.privacy.android.app.lollipop.ManagerActivityLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <meta-data android:name="android.app.searchable"
@@ -194,7 +183,8 @@
         </activity>
 
         <activity android:name="mega.privacy.android.app.providers.FileProviderActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="locked">
             <intent-filter>
                 <action
                     android:name="android.intent.action.PICK"/>
@@ -305,7 +295,8 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.AddContactActivityLollipop"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Add.Contacts">
         </activity>
 
         <activity
@@ -383,6 +374,12 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"
             android:label="@string/app_name">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar.General">
         </activity>
 
         <activity

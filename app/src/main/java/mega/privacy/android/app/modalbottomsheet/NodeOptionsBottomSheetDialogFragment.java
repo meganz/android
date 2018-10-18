@@ -272,8 +272,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     } else {
                         nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     }
-
-                    optionSendChat.setVisibility(View.VISIBLE);
+                    if (Util.isChatEnabled()) {
+                        optionSendChat.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        optionSendChat.setVisibility(View.GONE);
+                    }
                 }
             }
 
@@ -436,8 +440,15 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         if (node.isFolder()) {
                             optionInfoText.setText(R.string.general_folder_info);
+                            optionSendChat.setVisibility(View.GONE);
                         } else {
                             optionInfoText.setText(R.string.general_file_info);
+                            if (Util.isChatEnabled()) {
+                                optionSendChat.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                optionSendChat.setVisibility(View.GONE);
+                            }
                         }
 
                         nodeIconLayout.setVisibility(View.VISIBLE);
@@ -449,7 +460,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionInfo.setVisibility(View.VISIBLE);
                         optionRemove.setVisibility(View.GONE);
                         optionShare.setVisibility(View.GONE);
-                        optionSendChat.setVisibility(View.GONE);
 
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
                         log("DeepTree value:" + dBT);
@@ -888,8 +898,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-
-                nC.selectChatsToSendNode(node);
+                drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+                if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
+                    if(((ManagerActivityLollipop) context).getTabItemShares()==0) {
+                        nC.checkIfNodeIsMineAndSelectChatsToSendNode(node);
+                    }
+                    else {
+                        nC.selectChatsToSendNode(node);
+                    }
+                }
+                else {
+                    nC.selectChatsToSendNode(node);
+                }
 
                 dismissAllowingStateLoss();
                 break;

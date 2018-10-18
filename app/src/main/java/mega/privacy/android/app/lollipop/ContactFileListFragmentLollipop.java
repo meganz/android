@@ -36,7 +36,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -833,6 +838,98 @@ public class ContactFileListFragmentLollipop extends Fragment{
 						nC.prepareForDownload(handleList);
 					}
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
+				}
+				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isURL()){
+					log("Is URL file");
+					MegaNode file = contactNodes.get(position);
+
+					boolean isOnMegaDownloads = false;
+					String localPath = Util.getLocalFile(context, file.getName(), file.getSize(), downloadLocationDefaultPath);
+					File f = new File(downloadLocationDefaultPath, file.getName());
+					if(f.exists() && (f.length() == file.getSize())){
+						isOnMegaDownloads = true;
+					}
+					log("isOnMegaDownloads: "+isOnMegaDownloads);
+					if (localPath != null && (isOnMegaDownloads || (megaApi.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApi.getFingerprint(localPath))))){
+						File mediaFile = new File(localPath);
+						InputStream instream = null;
+
+						try {
+							// open the file for reading
+							instream = new FileInputStream(f.getAbsolutePath());
+
+							// if file the available for reading
+							if (instream != null) {
+								// prepare the file for reading
+								InputStreamReader inputreader = new InputStreamReader(instream);
+								BufferedReader buffreader = new BufferedReader(inputreader);
+
+								String line1 = buffreader.readLine();
+								if(line1!=null){
+									String line2= buffreader.readLine();
+
+									String url = line2.replace("URL=","");
+
+									log("Is URL - launch browser intent");
+									Intent i = new Intent(Intent.ACTION_VIEW);
+									i.setData(Uri.parse(url));
+									startActivity(i);
+								}
+								else{
+									log("Not expected format: Exception on processing url file");
+									Intent intent = new Intent(Intent.ACTION_VIEW);
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+									} else {
+										intent.setDataAndType(Uri.fromFile(f), "text/plain");
+									}
+									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+									if (MegaApiUtils.isIntentAvailable(context, intent)){
+										startActivity(intent);
+									}
+									else{
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(contactNodes.get(position).getHandle());
+										NodeController nC = new NodeController(context);
+										nC.prepareForDownload(handleList);
+									}
+								}
+							}
+						} catch (Exception ex) {
+
+							Intent intent = new Intent(Intent.ACTION_VIEW);
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", f), "text/plain");
+							} else {
+								intent.setDataAndType(Uri.fromFile(f), "text/plain");
+							}
+							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+							if (MegaApiUtils.isIntentAvailable(context, intent)){
+								startActivity(intent);
+							}
+							else{
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(contactNodes.get(position).getHandle());
+								NodeController nC = new NodeController(context);
+								nC.prepareForDownload(handleList);
+							}
+
+						} finally {
+							// close the file.
+							try {
+								instream.close();
+							} catch (IOException e) {
+								log("EXCEPTION closing InputStream");
+							}
+						}
+					}
+					else {
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(contactNodes.get(position).getHandle());
+						((ContactFileListActivityLollipop)context).onFileClick(handleList);
+					}
 				}
 				else {
 					adapter.notifyDataSetChanged();

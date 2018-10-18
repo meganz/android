@@ -20,9 +20,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -124,7 +127,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     protected void onDestroy() {
         log("onDestroy");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateMyAccountReceiver);
-        megaApi.removeGlobalListener(this);
+        if (megaApi != null) {
+            megaApi.removeGlobalListener(this);
+            megaApi.removeRequestListener(this);
+        }
         super.onDestroy();
     }
 
@@ -142,9 +148,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         density = getResources().getDisplayMetrics().density;
 
         aB = getSupportActionBar();
-        if (aB != null) {
-            aB.hide();
-        }
+        hideAB();
 
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
@@ -195,6 +199,26 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         LocalBroadcastManager.getInstance(this).registerReceiver(updateMyAccountReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
         showFragment(visibleFragment);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case android.R.id.home: {
+                if (loginFragment != null) {
+                    loginFragment.returnToLogin();
+                }
+                break;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void showSnackbar(String message) {
@@ -338,6 +362,10 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                 break;
             }
         }
+
+        if( ((MegaApplication) getApplication()).isEsid()){
+            showAlertLoggedOut();
+        }
     }
 
     public void showAlertIncorrectRK() {
@@ -358,6 +386,28 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 
         android.support.v7.app.AlertDialog alert = dialogBuilder.create();
         alert.show();
+    }
+
+    public void showAlertLoggedOut() {
+        log("showAlertLoggedOut");
+        ((MegaApplication) getApplication()).setEsid(false);
+        if(!isFinishing()){
+            final android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(this);
+
+            dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
+            dialogBuilder.setMessage(getString(R.string.error_server_expired_session));
+
+            dialogBuilder.setPositiveButton(getString(R.string.cam_sync_ok), new android.content.DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            android.support.v7.app.AlertDialog alert = dialogBuilder.create();
+            alert.show();
+        }
     }
 
     public void showTransferOverquotaDialog() {
@@ -543,7 +593,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     public void onResume() {
         log("onResume");
         super.onResume();
-
+        Util.setAppFontSize(this);
         Intent intent = getIntent();
 
         if (intent != null) {
@@ -842,13 +892,14 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
         log("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
         if(request.getType() == MegaRequest.TYPE_LOGOUT){
+
             if(accountBlocked!=null){
                 showSnackbar(accountBlocked);
             }
             accountBlocked=null;
-        }
 
-        if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
+        }
+        else if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
             try {
                 if (request.getParamType() == 1) {
                     if (e.getErrorCode() == MegaError.API_OK) {
@@ -897,5 +948,34 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
     protected void onPause() {
         log("onPause");
         super.onPause();
+    }
+
+    public void showAB(Toolbar tB){
+        setSupportActionBar(tB);
+        if (aB == null){
+            aB = getSupportActionBar();
+        }
+        aB.show();
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+        }
+    }
+
+    public void hideAB(){
+        if (aB != null){
+            aB.hide();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
+        }
     }
 }

@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatRoom;
 
 public class ArchivedChatsActivity extends PinActivityLollipop implements View.OnClickListener, MegaChatRequestListenerInterface, MegaChatListenerInterface {
 
@@ -45,6 +46,8 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
 
     MenuItem createFolderMenuItem;
     MenuItem newChatMenuItem;
+
+    private BadgeDrawerArrowDrawable badgeDrawable;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -115,6 +118,9 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
             log("aB is null");
         }
 
+        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+
+        updateNavigationToolbarIcon();
 
         if(archivedChatsFragment ==null){
             archivedChatsFragment = new RecentChatsFragmentLollipop().newInstance();
@@ -138,6 +144,10 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
             if(archivedChatsFragment.isAdded()){
                 archivedChatsFragment.listItemUpdate(item);
             }
+        }
+
+        if(item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
+            updateNavigationToolbarIcon();
         }
     }
 
@@ -182,6 +192,32 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
         }
     }
 
+    public void updateNavigationToolbarIcon(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int numberUnread = megaChatApi.getUnreadChats();
+
+            if(numberUnread==0){
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            }
+            else{
+
+                badgeDrawable.setProgress(1.0f);
+
+                if(numberUnread>9){
+                    badgeDrawable.setText("9+");
+                }
+                else{
+                    badgeDrawable.setText(numberUnread+"");
+                }
+
+                aB.setHomeAsUpIndicator(badgeDrawable);
+            }
+        }
+        else{
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        }
+    }
 
     public static void log(String log) {
         Util.log("ArchivedChatsActivity", log);
@@ -217,25 +253,39 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
 
         if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
             long chatHandle = request.getChatHandle();
-            MegaChatListItem chatItem = megaChatApi.getChatListItem(chatHandle);
+            MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+
+            String chatTitle = chat.getTitle();
+
+            if(chatTitle==null){
+                chatTitle = "";
+            }
+            else if(!chatTitle.isEmpty() && chatTitle.length()>60){
+                chatTitle = chatTitle.substring(0,59)+"...";
+            }
+
+            if(!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()){
+                chatTitle = "\""+chatTitle+"\"";
+            }
+
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 if(request.getFlag()){
                     log("Chat archived");
-                    showSnackbar(getString(R.string.success_archive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.success_archive_chat, chatTitle));
                 }
                 else{
                     log("Chat unarchived");
-                    showSnackbar(getString(R.string.success_unarchive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
                 }
             }
             else{
                 if(request.getFlag()){
                     log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
-                    showSnackbar(getString(R.string.error_archive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.error_archive_chat, chatTitle));
                 }
                 else{
                     log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
-                    showSnackbar(getString(R.string.error_unarchive_chat, chatItem.getTitle()));
+                    showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
                 }
             }
         }

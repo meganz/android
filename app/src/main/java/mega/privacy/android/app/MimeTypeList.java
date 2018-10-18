@@ -110,6 +110,9 @@ public class MimeTypeList {
 			else if (extension.equals("heic")) {
 				detectedType = "image/heic";
 			}
+			else if (extension.equals("url")) {
+				detectedType = "web/url";
+			}
 			else {
 				detectedType = "application/octet-stream";
 			}
@@ -144,6 +147,10 @@ public class MimeTypeList {
 	 */
 	public boolean isImage() {
 		return type.startsWith("image/");
+	}
+
+	public boolean isURL() {
+		return type.startsWith("web/url");
 	}
 	
 	public boolean isPdf(){

@@ -4,114 +4,213 @@
 	android:id="@+id/relative_container_add_contact"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:fitsSystemWindows="true">
+	android:fitsSystemWindows="true"
+	android:background="@color/white"
+	android:focusable="true"
+	android:focusableInTouchMode="true">
 
 	<LinearLayout
 		android:id="@+id/container_linear_layout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:background="#acbdbb"
-		android:elevation="4dp">
+		android:background="@color/white">
 
-		<android.support.v7.widget.Toolbar
-			android:id="@+id/add_contact_toolbar"
+		<LinearLayout
+			android:id="@+id/container_toolbar"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:background="#acbdbb"
-			app:titleTextAppearance="@style/ToolbarTitle"
-			app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-			app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+			android:orientation="vertical"
+			android:background="@color/white"
+			android:layout_marginBottom="4dp"
+			android:elevation="4dp">
 
-			<LinearLayout
+			<android.support.v7.widget.Toolbar
+				android:id="@+id/add_contact_toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:layout_marginRight="10dp">
+				android:background="@color/camera_uploads_list_view"
+				app:titleTextColor="@color/mail_my_account"
+				app:subtitleTextColor="@color/mail_my_account"
+				app:titleTextAppearance="@style/ToolbarTitle"
+				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-				<EditText
-					android:id="@+id/addcontact_edittext"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:hint="@string/type_contact"
-					android:textSize="15sp"
-					android:inputType="textEmailAddress"
-					android:textCursorDrawable="@drawable/cursor_color"
-					android:backgroundTint="@color/grey_achievements_invite_friends_sub"
-					android:textColorHint="@color/white"/>
-
-				<RelativeLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:id="@+id/add_contact_email_error">
-
-					<ImageView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:id="@+id/login_email_text_error_icon"
-						android:layout_alignParentRight="true"
-						android:src="@drawable/ic_input_warning"
-						android:tint="@color/login_warning"
-						android:layout_marginRight="4dp"/>
-
-					<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:id="@+id/login_email_text_error_text"
-						android:textColor="@color/login_warning"
-						android:layout_toLeftOf="@id/login_email_text_error_icon"
-						android:layout_alignParentLeft="true"
-						android:layout_marginLeft="4dp"
-						android:text="@string/invalid_email_to_invite"
-						android:layout_centerInParent="true"/>
-
-				</RelativeLayout>
-
-				<RelativeLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:id="@+id/not_permited_add_contact_error">
-
-					<ImageView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:id="@+id/not_permited_add_contact_error_icon"
-						android:layout_alignParentRight="true"
-						android:src="@drawable/ic_input_warning"
-						android:tint="@color/login_warning"
-						android:layout_marginRight="4dp"/>
-
-					<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:id="@+id/not_permited_add_contact_text"
-						android:textColor="@color/login_warning"
-						android:layout_toLeftOf="@id/not_permited_add_contact_error_icon"
-						android:layout_alignParentLeft="true"
-						android:layout_marginLeft="4dp"
-						android:text="@string/not_permited_add_email_to_invite"
-						android:layout_centerInParent="true"/>
-
-				</RelativeLayout>
-
-			</LinearLayout>
-
-
-		</android.support.v7.widget.Toolbar>
+		</LinearLayout>
 
 		<RelativeLayout
-			android:id="@+id/recycler_layout_add_contacts"
+			android:id="@+id/layout_type_mail"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/add_contact_toolbar"
-			android:layout_marginRight="10dp"
-			android:layout_marginLeft="14dp">
+			android:layout_height="60dp"
+			android:background="@color/white">
+
+			<EditText
+				android:id="@+id/type_mail_edittext"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:maxLines="1"
+				android:hint="@string/type_mail"
+				android:textColorHint="@color/mail_my_account"
+				android:textSize="14sp"
+				android:textColor="@color/text_login"
+				android:layout_marginLeft="18dp"
+				android:layout_marginRight="18dp"
+				android:layout_centerVertical="true"
+				android:inputType="textEmailAddress"
+				android:textCursorDrawable="@drawable/cursor_color"
+				android:backgroundTint="@color/white"/>
+
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginRight="18dp"
+				android:layout_marginLeft="22dp"
+				android:layout_marginTop="-10dp"
+				android:id="@+id/add_contact_email_error"
+				android:layout_below="@id/type_mail_edittext">
+
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/login_email_text_error_icon"
+					android:layout_alignParentRight="true"
+					android:src="@drawable/ic_input_warning"
+					android:tint="@color/login_warning"/>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/login_email_text_error_text"
+					android:textColor="@color/login_warning"
+					android:layout_toLeftOf="@id/login_email_text_error_icon"
+					android:layout_alignParentLeft="true"
+					android:text="@string/invalid_email_to_invite"
+					android:layout_centerInParent="true"/>
+
+			</RelativeLayout>
+
+			<LinearLayout
+				android:id="@+id/separator_type"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:background="@color/sliding_panel_separator"
+				android:orientation="vertical"
+				android:layout_alignParentBottom="true"/>
+
+		</RelativeLayout>
+
+		<RelativeLayout
+			android:id="@+id/layout_scan_qr"
+			android:layout_width="match_parent"
+			android:layout_height="56dp"
+			android:background="@color/white">
+
+			<Button
+				android:id="@+id/scan_qr_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/menu_item_scan_code"
+				android:textSize="14sp"
+				android:textColor="@color/file_playlist_state"
+				android:paddingLeft="24dp"
+				android:layout_centerVertical="true"
+				style="?android:attr/borderlessButtonStyle"/>
+
+		</RelativeLayout>
+
+		<RelativeLayout
+			android:id="@+id/layout_invite_contact"
+			android:layout_width="match_parent"
+			android:layout_height="56dp"
+			android:background="@color/white">
+
+			<Button
+				android:id="@+id/invite_contact_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/invite_contacts"
+				android:textColor="@color/file_playlist_state"
+				android:textSize="14sp"
+				android:paddingLeft="24dp"
+				android:layout_centerVertical="true"
+				style="?android:attr/borderlessButtonStyle"/>
+
+			<LinearLayout
+				android:id="@+id/separator_invite_contact"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:background="@color/sliding_panel_separator"
+				android:orientation="vertical"
+				android:layout_alignParentBottom="true"/>
+
+		</RelativeLayout>
+
+		<RelativeLayout
+			android:id="@+id/layout_group_chat"
+			android:layout_width="match_parent"
+			android:layout_height="56dp"
+			android:background="@color/white">
+
+			<Button
+				android:id="@+id/group_chat_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/new_group_chat_label"
+				android:textColor="@color/file_playlist_state"
+				android:textSize="14sp"
+				android:paddingLeft="24dp"
+				android:layout_centerVertical="true"
+				style="?android:attr/borderlessButtonStyle"/>
+
+		</RelativeLayout>
+
+		<LinearLayout
+			android:id="@+id/separator_up"
+			android:layout_below="@+id/container_linear_layout"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@color/sliding_panel_separator"
+			android:orientation="vertical"/>
+
+		<RelativeLayout
+			android:id="@+id/contacts_adds_container"
+			android:layout_width="match_parent"
+			android:layout_height="90dp"
+			android:background="@color/white"
+			android:layout_below="@id/add_contact_toolbar">
 
 			<android.support.v7.widget.RecyclerView
 				android:id="@+id/contact_adds_recycler_view"
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:orientation="horizontal"
+				android:layout_centerHorizontal="true"/>
+
+			<android.support.design.widget.FloatingActionButton
+				android:id="@+id/image_group_floating_button"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:elevation="@dimen/elevation_low"
+				android:layout_marginLeft="16sp"
+				android:layout_marginRight="16dp"
+				android:layout_centerVertical="true"
+				android:src="@drawable/ic_w_take_photo"/>
+
+			<EditText
+				android:id="@+id/name_group_edittext"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:choiceMode="multipleChoice"/>
+				android:maxLines="1"
+				android:background="@android:color/transparent"
+				android:layout_centerVertical="true"
+				android:layout_toRightOf="@+id/image_group_floating_button"
+				android:layout_marginRight="16dp"
+				android:hint="@string/hint_type_group"
+				android:textSize="16sp"
+				android:textColorHint="@color/mail_my_account"
+				android:textColor="@color/name_my_account"
+				android:fontFamily="roboto"
+				android:visibility="gone"/>
 
 		</RelativeLayout>
 
@@ -124,168 +223,82 @@
 		android:layout_below="@id/container_linear_layout"
 		android:background="@color/white">
 
-		<ImageView
-			android:id="@+id/add_contact_list_empty_image"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_centerHorizontal="true"
-			android:layout_marginTop="25dp"
-			android:gravity="center_horizontal" />
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical"
+			android:layout_centerInParent="true">
 
-        <LinearLayout
-            android:id="@+id/contact_list_empty_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@id/add_contact_list_empty_image"
-            android:layout_centerHorizontal="true">
+			<ImageView
+				android:id="@+id/add_contact_list_empty_image"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"/>
 
             <TextView
                 android:id="@+id/add_contact_list_empty_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:gravity="center_horizontal"
+                android:gravity="center"
+				android:layout_gravity="center_horizontal"
                 android:textColor="@color/text_secondary"
-                android:textSize="18sp" />
+                android:textSize="18sp"/>
+
+			<ProgressBar
+				android:id="@+id/add_contact_progress_bar"
+				style="?android:attr/progressBarStyleLargeInverse"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:visibility="gone"
+				android:layout_marginTop="10dp" />
         </LinearLayout>
 
-		<ProgressBar
-			android:id="@+id/add_contact_progress_bar"
-			style="?android:attr/progressBarStyleLargeInverse"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
-			android:layout_below="@id/contact_list_empty_text"
-			android:layout_centerHorizontal="true"
-			android:visibility="gone"
-			android:layout_marginTop="10dp" />
-
-		<ScrollView
+		<RelativeLayout
+			android:id="@+id/container_list_contacts"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content">
 
 			<RelativeLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
-
-				<RelativeLayout
-					android:id="@+id/header_list_mega"
-					android:layout_width="match_parent"
-					android:background="@color/camera_uploads_list_view"
-					android:layout_height="48dp">
-
-					<TextView
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_centerVertical="true"
-						android:text="@string/contacts_mega"
-						android:textColor="@color/mail_my_account"
-						android:textSize="14sp"
-						android:layout_marginLeft="16dp"/>
-
-				</RelativeLayout>
-
-				<android.support.v7.widget.RecyclerView
-					android:id="@+id/add_contact_list_mega"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:choiceMode="multipleChoice"
-					android:layout_below="@+id/header_list_mega"/>
-
-				<RelativeLayout
-					android:id="@+id/header_list_phone"
-					android:layout_width="match_parent"
-					android:background="@color/camera_uploads_list_view"
-					android:layout_height="48dp"
-					android:layout_below="@+id/add_contact_list_mega">
-
-					<TextView
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:layout_centerVertical="true"
-						android:text="@string/contacts_phone"
-						android:textColor="@color/mail_my_account"
-						android:textSize="14sp"
-						android:layout_marginLeft="16dp"/>
-
-				</RelativeLayout>
-
-				<android.support.v7.widget.RecyclerView
-					android:id="@+id/add_contact_list_phone"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:choiceMode="multipleChoice"
-					android:layout_below="@+id/header_list_phone"/>
-
-			</RelativeLayout>
-
-		</ScrollView>
-
-		<!--<RelativeLayout
-			android:id="@+id/container_list_mega"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentTop="true">
-
-			<RelativeLayout
-				android:id="@+id/header_list_mega"
+				android:id="@+id/header_list"
 				android:layout_width="match_parent"
 				android:background="@color/camera_uploads_list_view"
 				android:layout_height="48dp">
 
 				<TextView
+					android:id="@+id/text_header_list"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_centerVertical="true"
-					android:text="@string/contacts_mega"
 					android:textColor="@color/mail_my_account"
 					android:textSize="14sp"
 					android:layout_marginLeft="16dp"/>
 
 			</RelativeLayout>
 
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/add_contact_list_mega"
+			<FrameLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:choiceMode="multipleChoice"
-				android:layout_below="@+id/header_list_mega"/>
+				android:layout_below="@+id/header_list">
+
+				<android.support.v7.widget.RecyclerView
+					android:id="@+id/add_contact_list"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:choiceMode="multipleChoice"
+					android:orientation="vertical"/>
+
+			</FrameLayout>
+
+			<mega.privacy.android.app.components.scrollBar.FastScroller
+				android:id="@+id/fastscroll"
+				android:orientation="vertical"
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:layout_alignParentRight="true"
+				android:layout_below="@+id/header_list"/>
 
 		</RelativeLayout>
-
-		<RelativeLayout
-			android:id="@+id/container_list_phone"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_below="@+id/container_list_mega"
-			android:layout_alignParentBottom="true">
-
-			<RelativeLayout
-				android:id="@+id/header_list_phone"
-				android:layout_width="match_parent"
-				android:background="@color/camera_uploads_list_view"
-				android:layout_height="48dp">
-
-				<TextView
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_centerVertical="true"
-					android:text="@string/contacts_phone"
-					android:textColor="@color/mail_my_account"
-					android:textSize="14sp"
-					android:layout_marginLeft="16dp"/>
-
-			</RelativeLayout>
-
-			<android.support.v7.widget.RecyclerView
-				android:id="@+id/add_contact_list_phone"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:choiceMode="multipleChoice"
-				android:layout_below="@+id/header_list_phone"/>
-
-		</RelativeLayout>-->
 
 	</RelativeLayout>
 </RelativeLayout>

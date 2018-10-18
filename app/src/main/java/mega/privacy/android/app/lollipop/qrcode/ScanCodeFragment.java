@@ -80,6 +80,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     private TextView initialLetter;
     private TextView contactName;
     private TextView contactMail;
+    private TextView invalidCode;
 
     private TextView dialogTitle;
     private TextView dialogText;
@@ -156,6 +157,9 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
         View view = inflater.inflate(R.layout.fragment_scan_code, container, false);
 
+        invalidCode = (TextView) view.findViewById(R.id.invalid_code_text);
+        invalidCode.setVisibility(View.GONE);
+
         codeScannerView = (CodeScannerView) view.findViewById(R.id.scanner_view);
         codeScanner = new CodeScanner(context, codeScannerView);
         codeScanner.setDecodeCallback(new DecodeCallback() {
@@ -173,6 +177,9 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             @Override
             public void onClick(View v) {
                 codeScanner.startPreview();
+                if (invalidCode.getVisibility() == View.VISIBLE) {
+                    invalidCode.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -265,7 +272,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
 
     public void showAlertDialog (int title, int text, final boolean success) {
 //        scannerView.stopCamera();
-        codeScanner.releaseResources();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_invite, null);
@@ -301,6 +307,9 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                     codeScanner.releaseResources();
                     getActivity().finish();
                 }
+                else {
+                    codeScanner.startPreview();
+                }
             }
         });
         dialogshown = true;
@@ -313,11 +322,15 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         String contactLink = rawResult.getText();
         String[] s = contactLink.split("C!");
 
+        codeScanner.startPreview();
         if (s.length<=1){
-            codeScanner.releaseResources();
-            codeScanner.startPreview();
+            invalidCode.setVisibility(View.VISIBLE);
+        }
+        else if (!s[0].equals("https://mega.nz/")) {
+            invalidCode.setVisibility(View.VISIBLE);
         }
         else{
+            invalidCode.setVisibility(View.GONE);
             handle = MegaApiAndroid.base64ToHandle(s[1].trim());
             log("Contact link: "+contactLink+ " s[1]: "+s[1]+" handle: "+handle);
             if (megaApi == null){
@@ -352,7 +365,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             });
 
 //        scannerView.stopCamera();
-            codeScanner.releaseResources();
         }
     }
 
@@ -659,7 +671,6 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             contactName.setText(contactNameContent);
 //            setAvatar();
         }
-        codeScanner.releaseResources();
         inviteAlertDialog.show();
         inviteShown = true;
     }

@@ -1,5 +1,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scroll_view_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -185,6 +186,167 @@
                     android:textSize="14sp" />
 
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/login_2fa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                app:title="@string/login_verification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:background="@color/lollipop_primary_color"
+                android:elevation="4dp"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:titleTextAppearance="@style/ToolbarTitle"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                tools:context=".lollipop.twofa.LoginActivityLollipop" />
+
+            <RelativeLayout
+                android:id="@+id/container_confirm_2fa_login"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/toolbar">
+
+                <TextView
+                    android:id="@+id/explain_confirm_2fa_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/explain_confirm_2fa"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:fontFamily="roboto"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_centerHorizontal="true"/>
+
+                <LinearLayout
+                    android:id="@+id/six_pin_login_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/explain_confirm_2fa_login"
+                    android:layout_marginTop="36dp"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal">
+
+                    <mega.privacy.android.app.components.EditTextPIN
+                        android:id="@+id/pin_first_login"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="left"
+                        android:textSize="32sp"
+                        android:textColor="@color/name_my_account"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="1" />
+
+                    <mega.privacy.android.app.components.EditTextPIN
+                        android:id="@+id/pin_second_login"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="left"
+                        android:textSize="32sp"
+                        android:textColor="@color/name_my_account"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="1" />
+
+                    <mega.privacy.android.app.components.EditTextPIN
+                        android:id="@+id/pin_third_login"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="left"
+                        android:textSize="32sp"
+                        android:textColor="@color/name_my_account"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="1" />
+
+                    <mega.privacy.android.app.components.EditTextPIN
+                        android:id="@+id/pin_fouth_login"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="left"
+                        android:textSize="32sp"
+                        android:textColor="@color/name_my_account"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="1" />
+
+                    <mega.privacy.android.app.components.EditTextPIN
+                        android:id="@+id/pin_fifth_login"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="left"
+                        android:textSize="32sp"
+                        android:textColor="@color/name_my_account"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="1" />
+
+                    <mega.privacy.android.app.components.EditTextPIN
+                        android:id="@+id/pin_sixth_login"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:layout_gravity="left"
+                        android:textSize="32sp"
+                        android:textColor="@color/name_my_account"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="1" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/pin_2fa_error_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="40dp"
+                    android:text="@string/pin_error_2fa"
+                    android:textColor="@color/login_warning"
+                    android:fontFamily="roboto"
+                    android:layout_below="@+id/six_pin_login_layout"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="10dp"/>
+
+                <RelativeLayout
+                    android:id="@+id/lost_authentication_device"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/six_pin_login_layout"
+                    android:padding="10dp"
+                    android:layout_marginTop="29dp"
+                    android:layout_centerHorizontal="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lost_your_authenticator_device"
+                        android:textColor="@color/file_playlist_state"
+                        android:textSize="13sp"
+                        android:layout_centerHorizontal="true"/>
+
+                </RelativeLayout>
+
+                <ProgressBar
+                    android:id="@+id/progressbar_verify_2fa"
+                    style="?android:attr/progressBarStyleLargeInverse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
+
         </LinearLayout>
 
         <LinearLayout
