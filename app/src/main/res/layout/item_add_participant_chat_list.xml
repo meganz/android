@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/add_participant_list_item_layout"
     android:layout_width="fill_parent"
-    android:layout_height="72dp"
+    android:layout_height="56dp"
     android:descendantFocusability="blocksDescendants" >
 
     <RelativeLayout
@@ -15,7 +15,7 @@
             android:id="@+id/add_participant_list_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_add_contact_chat_item"
+            android:src="@drawable/ic_g_add_contact"
             android:gravity="center_horizontal|center_vertical"/>
     </RelativeLayout>
 

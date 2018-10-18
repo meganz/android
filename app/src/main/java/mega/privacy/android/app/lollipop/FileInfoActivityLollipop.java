@@ -960,6 +960,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				Intent intent = new Intent();
 				intent.setClass(this, AddContactActivityLollipop.class);
 				intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH);
+                intent.putExtra("MULTISELECT", 0);
 				intent.putExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 				startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 				break;

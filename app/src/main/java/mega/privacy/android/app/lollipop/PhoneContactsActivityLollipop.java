@@ -253,7 +253,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
-		final PhoneContactInfo contact = (PhoneContactInfo) adapter.getDocumentAt(position);
+		final PhoneContactInfo contact = (PhoneContactInfo) adapter.getItem(position);
 		if(contact == null)
 		{
 			return;
