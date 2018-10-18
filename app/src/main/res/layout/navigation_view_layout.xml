@@ -205,6 +205,31 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/notifications_section"
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
+
+            <TextView
+                android:id="@+id/notification_section_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:layout_centerVertical="true"
+                android:textSize="14sp"
+                android:fontFamily="roboto"
+                android:textColor="@color/name_my_account"
+                android:text="@string/title_properties_chat_contact_notifications"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/divider_upgrade_account"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/settings_section"
             android:layout_width="match_parent"
             android:layout_height="56dp">

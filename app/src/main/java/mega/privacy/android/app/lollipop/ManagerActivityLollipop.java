@@ -162,6 +162,7 @@ import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.MonthlyAnnualyFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
@@ -343,7 +344,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     int orientationSaved;
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS, MEDIA_UPLOADS, CHAT, RUBBISH_BIN, NOTIFICATIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -363,6 +364,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case MEDIA_UPLOADS: return context.getString(R.string.section_secondary_media_uploads);
 				case CHAT: return context.getString(R.string.section_chat);
 				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
+				case NOTIFICATIONS: return context.getString(R.string.title_properties_chat_contact_notifications);
 			}
 			return null;
 		}
@@ -492,6 +494,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	private RecentChatsFragmentLollipop rChatFL;
 
+	private NotificationsFragmentLollipop notificFragment;
+
 	private TurnOnNotificationsFragment tonF;
 	private ExportRecoveryKeyFragment eRKeyF;
 
@@ -590,6 +594,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	RelativeLayout myAccountSection;
 	RelativeLayout inboxSection;
 	RelativeLayout contactsSection;
+	RelativeLayout notificationsSection;
 	RelativeLayout settingsSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
@@ -1917,6 +1922,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         inboxSection.setOnClickListener(this);
         contactsSection = (RelativeLayout) findViewById(R.id.contacts_section);
         contactsSection.setOnClickListener(this);
+		notificationsSection = (RelativeLayout) findViewById(R.id.notifications_section);
+		notificationsSection.setOnClickListener(this);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
@@ -4341,6 +4348,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				firstNavigationLevel = true;
 				break;
 			}
+			case NOTIFICATIONS:{
+				aB.setSubtitle(null);
+				aB.setTitle(getString(R.string.title_properties_chat_contact_notifications).toUpperCase());
+				firstNavigationLevel = true;
+				break;
+			}
 			case CHAT:{
 				tB.setVisibility(View.VISIBLE);
 				aB.setTitle(getString(R.string.section_chat).toUpperCase());
@@ -4720,40 +4733,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 					break;
 				}
-				case MEDIA_UPLOADS:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
-				case INBOX:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
 				case SHARED_ITEMS:{
 					setBottomNavigationMenuItemChecked(SHARED_BNV);
 					break;
 				}
-				case CONTACTS:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
-				case SETTINGS:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
-				case SEARCH:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
-				case ACCOUNT:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
-				case TRANSFERS:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					break;
-				}
 				case CHAT:{
 					setBottomNavigationMenuItemChecked(CHAT_BNV);
+					break;
+				}
+				case CONTACTS:
+				case SETTINGS:
+				case SEARCH:
+				case ACCOUNT:
+				case TRANSFERS:
+				case MEDIA_UPLOADS:
+				case NOTIFICATIONS:
+				case INBOX:{
+					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					break;
 				}
 			}
@@ -5108,6 +5104,48 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				break;
 			}
 		}
+	}
+
+	public void selectDrawerItemNotifications(){
+		log("selectDrawerItemNotifications");
+
+		tB.setVisibility(View.VISIBLE);
+
+		drawerItem = DrawerItem.NOTIFICATIONS;
+
+		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+
+		tabLayoutContacts.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
+		tabLayoutShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		tabLayoutMyAccount.setVisibility(View.GONE);
+		viewPagerMyAccount.setVisibility(View.GONE);
+		tabLayoutTransfers.setVisibility(View.GONE);
+		viewPagerTransfers.setVisibility(View.GONE);
+
+		fragmentContainer.setVisibility(View.VISIBLE);
+
+		if (notificFragment == null){
+			log("New NotificationsFragment");
+			notificFragment = new NotificationsFragmentLollipop();
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
+			ft.commitNowAllowingStateLoss();
+		}
+		else{
+			log("NotificationsFragment is not null");
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
+			ft.commitNow();
+			notificFragment.setNotifications();
+		}
+
+		setToolbarTitle();
+
+		showFabButton();
+
+		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
 	public void selectDrawerItemTransfers(){
@@ -5556,6 +5594,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showFabButton();
     			break;
     		}
+			case NOTIFICATIONS:{
+				showHideBottomNavigationView(true);
+				selectDrawerItemNotifications();
+				supportInvalidateOptionsMenu();
+				showFabButton();
+				break;
+			}
     		case SETTINGS:{
 				showHideBottomNavigationView(true);
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null && ((MegaApplication) getApplication()).getMyAccountInfo().getNumVersions() == -1){
@@ -13144,6 +13189,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case R.id.contacts_section: {
 				drawerItem = DrawerItem.CONTACTS;
+				selectDrawerItemLollipop(drawerItem);
+				break;
+			}
+			case R.id.notifications_section: {
+				drawerItem = DrawerItem.NOTIFICATIONS;
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
