@@ -1051,11 +1051,36 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
             if (managerActivity != null){
             	log("ORIGINAL JSON3:" + purchase.getOriginalJson() + ":::");
-            	megaApi.submitPurchaseReceipt(purchase.getOriginalJson(), managerActivity);
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(managerActivity);
+				}
+
+				MegaAttributes attributes = dbH.getAttributes();
+
+				long lastPublicHandle = Util.getLastPublicHandle(attributes);
+				if (lastPublicHandle == -1){
+					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), managerActivity);
+				}
+				else{
+					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle, managerActivity);
+				}
             }
             else{
             	log("ORIGINAL JSON4:" + purchase.getOriginalJson() + ":::");
-            	megaApi.submitPurchaseReceipt(purchase.getOriginalJson());
+				if (dbH != null){
+					MegaAttributes attributes = dbH.getAttributes();
+
+					long lastPublicHandle = Util.getLastPublicHandle(attributes);
+					if (lastPublicHandle == -1){
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson());
+					}
+					else{
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson(), lastPublicHandle);
+					}
+				}
+				else{
+					megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, purchase.getOriginalJson());
+				}
             }
         }
     };
@@ -1218,7 +1243,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory() > ((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails()){
 					if (maxP != null){
 						log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
-						megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
+						if (dbH == null){
+							dbH = DatabaseHandler.getDbHandler(managerActivity);
+						}
+
+						MegaAttributes attributes = dbH.getAttributes();
+
+						long lastPublicHandle = Util.getLastPublicHandle(attributes);
+						if (lastPublicHandle == -1){
+							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), managerActivity);
+						}
+						else{
+							megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, managerActivity);
+						}
 					}
 				}
 			}
@@ -12761,7 +12798,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
 				if (maxP != null){
 					log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
-					megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
+
+					if (dbH == null){
+						dbH = DatabaseHandler.getDbHandler(this);
+					}
+
+					MegaAttributes attributes = dbH.getAttributes();
+
+					long lastPublicHandle = Util.getLastPublicHandle(attributes);
+					if (lastPublicHandle == -1){
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), this);
+					}
+					else{
+						megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, maxP.getOriginalJson(), lastPublicHandle, this);
+					}
 				}
 			}
 		}
