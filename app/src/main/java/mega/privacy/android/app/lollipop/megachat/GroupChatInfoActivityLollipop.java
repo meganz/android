@@ -8,9 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -130,17 +127,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     TextView notificationsTitle;
     TextView notificationSelectedText;
 
-    RelativeLayout messageSoundLayout;
-    TextView messageSoundText;
-    View dividerMessageSoundLayout;
-
-    RelativeLayout ringtoneLayout;
-    TextView ringtoneText;
-    View dividerRingtoneLayout;
-
     RelativeLayout clearChatLayout;
     View dividerClearLayout;
     RelativeLayout leaveChatLayout;
+    View dividerLeaveLayout;
+
+    RelativeLayout archiveChatLayout;
+    TextView archiveChatTitle;
+    ImageView archiveChatIcon;
 
     TextView participantsTitle;
     long participantsCount;
@@ -277,74 +271,44 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             notificationsLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_notifications_layout);
             notificationsLayout.setVisibility(View.VISIBLE);
-            LinearLayout.LayoutParams paramsNotifications = (LinearLayout.LayoutParams) notificationsLayout.getLayoutParams();
-            paramsNotifications.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            notificationsLayout.setLayoutParams(paramsNotifications);
 
             notificationsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_title);
 //            notificationSelectedText = (TextView) findViewById(R.id.chat_group_contact_properties_notifications_option);
 
             notificationsSwitch = (SwitchCompat) findViewById(R.id.chat_group_contact_properties_switch);
             notificationsSwitch.setOnClickListener(this);
-            LinearLayout.LayoutParams paramsSwitch = (LinearLayout.LayoutParams) notificationsSwitch.getLayoutParams();
-            paramsSwitch.rightMargin = Util.scaleWidthPx(16, outMetrics);
-            notificationsSwitch.setLayoutParams(paramsSwitch);
-
-            //Chat message sound Layout
-
-            messageSoundLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_messages_sound_layout);
-            messageSoundLayout.setOnClickListener(this);
-            LinearLayout.LayoutParams paramsSound = (LinearLayout.LayoutParams) messageSoundLayout.getLayoutParams();
-            paramsSound.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            messageSoundLayout.setLayoutParams(paramsSound);
-
-            messageSoundText = (TextView) findViewById(R.id.chat_group_contact_properties_messages_sound);
-
-            dividerMessageSoundLayout = (View) findViewById(R.id.divider_message_sound_layout);
-            LinearLayout.LayoutParams paramsDividerSound = (LinearLayout.LayoutParams) dividerMessageSoundLayout.getLayoutParams();
-            paramsDividerSound.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            dividerMessageSoundLayout.setLayoutParams(paramsDividerSound);
-
-            //Call ringtone Layout
-
-            ringtoneLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_ringtone_layout);
-            ringtoneLayout.setOnClickListener(this);
-            LinearLayout.LayoutParams paramsRingtone = (LinearLayout.LayoutParams) ringtoneLayout.getLayoutParams();
-            paramsRingtone.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            ringtoneLayout.setLayoutParams(paramsRingtone);
-
-            ringtoneText = (TextView) findViewById(R.id.chat_group_contact_properties_ringtone);
-
-            dividerRingtoneLayout = (View) findViewById(R.id.divider_ringtone_layout);
-            LinearLayout.LayoutParams paramsRingtoneDivider = (LinearLayout.LayoutParams) dividerRingtoneLayout.getLayoutParams();
-            paramsRingtoneDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            dividerRingtoneLayout.setLayoutParams(paramsRingtoneDivider);
 
             //Clear chat Layout
             clearChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_clear_layout);
             clearChatLayout.setOnClickListener(this);
-            LinearLayout.LayoutParams paramsClearChat = (LinearLayout.LayoutParams) clearChatLayout.getLayoutParams();
-            paramsClearChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            clearChatLayout.setLayoutParams(paramsClearChat);
 
             dividerClearLayout = (View) findViewById(R.id.divider_clear_layout);
-            LinearLayout.LayoutParams paramsClearDivider = (LinearLayout.LayoutParams) dividerClearLayout.getLayoutParams();
-            paramsClearDivider.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            dividerClearLayout.setLayoutParams(paramsClearDivider);
+
+            //Archive chat Layout
+            archiveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_archive_layout);
+            archiveChatLayout.setOnClickListener(this);
+
+            archiveChatTitle = (TextView) findViewById(R.id.chat_group_contact_properties_archive);
+            archiveChatIcon = (ImageView) findViewById(R.id.chat_group_contact_properties_archive_icon);
+
+            if(chat.isArchived()){
+                archiveChatTitle.setText(getString(R.string.general_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_unarchive));
+            }
+            else{
+                archiveChatTitle.setText(getString(R.string.general_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_b_archive));
+            }
 
             //Leave chat Layout
             leaveChatLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_leave_layout);
             leaveChatLayout.setOnClickListener(this);
-            LinearLayout.LayoutParams paramsLeaveChat = (LinearLayout.LayoutParams) leaveChatLayout.getLayoutParams();
-            paramsLeaveChat.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            leaveChatLayout.setLayoutParams(paramsLeaveChat);
+
+            dividerLeaveLayout = (View) findViewById(R.id.divider_leave_layout);
 
             setChatPermissions();
 
             participantsTitle = (TextView) findViewById(R.id.chat_group_contact_properties_title_text);
-            RelativeLayout.LayoutParams paramsPartTitle = (RelativeLayout.LayoutParams) participantsTitle.getLayoutParams();
-            paramsPartTitle.leftMargin = Util.scaleWidthPx(72, outMetrics);
-            participantsTitle.setLayoutParams(paramsPartTitle);
 
             recyclerView = (RecyclerView) findViewById(R.id.chat_group_contact_properties_list);
 //            recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
@@ -375,15 +339,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     setUpIndividualChatNotifications();
                 } else {
                     log("General notifications OFF");
-                    boolean notificationsEnabled = false;
-                    notificationsSwitch.setChecked(notificationsEnabled);
-
-                    if (!notificationsEnabled) {
-                        ringtoneLayout.setVisibility(View.GONE);
-                        dividerRingtoneLayout.setVisibility(View.GONE);
-                        messageSoundLayout.setVisibility(View.GONE);
-                        dividerMessageSoundLayout.setVisibility(View.GONE);
-                    }
+                    notificationsSwitch.setChecked(false);
                 }
             }
 
@@ -409,142 +365,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             notificationsSwitch.setChecked(notificationsEnabled);
 
-            if(!notificationsEnabled){
-//                    ringtoneText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
-//                    messageSoundText.setTextColor(ContextCompat.getColor(this, R.color.accentColorTransparent));
-                ringtoneLayout.setVisibility(View.GONE);
-                dividerRingtoneLayout.setVisibility(View.GONE);
-                messageSoundLayout.setVisibility(View.GONE);
-                dividerMessageSoundLayout.setVisibility(View.GONE);
-            }
-
-            String ringtoneString = chatPrefs.getRingtone();
-            if(ringtoneString.isEmpty()){
-                log("Empty ringtone");
-                Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-                Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
-                ringtoneText.setText(defaultRingtone.getTitle(this));
-            }
-            else if(ringtoneString.equals("-1")){
-                ringtoneText.setText(getString(R.string.settings_chat_silent_sound_not));
-            }
-            else{
-                Ringtone ringtone = RingtoneManager.getRingtone(this, Uri.parse(ringtoneString));
-                String title = ringtone.getTitle(this);
-                ringtoneText.setText(title);
-            }
-
-            String soundString = chatPrefs.getNotificationsSound();
-            if (soundString == null){
-                log("NULL sound");
-                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-                Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-                messageSoundText.setText(defaultSound.getTitle(this));
-            }
-            else if(soundString.equals("-1")){
-                log("Notification sound -1");
-                messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-            }
-            else if(soundString.isEmpty()){
-                log("Empty sound");
-                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-                Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-                messageSoundText.setText(defaultSound.getTitle(this));
-            }
-            else{
-                log("Sound stored in DB: "+soundString);
-                Uri uri = Uri.parse(soundString);
-                log("Uri: "+uri);
-
-                if(soundString.equals("true")){
-
-                    Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    Ringtone defaultSound2 = RingtoneManager.getRingtone(this, defaultSoundUri2);
-                    messageSoundText.setText(defaultSound2.getTitle(this));
-                    log("---Notification sound: "+defaultSound2.getTitle(this));
-                }
-                else{
-                    Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
-                    if(sound==null){
-                        log("Sound is null");
-                        messageSoundText.setText("None");
-                    }
-                    else{
-                        String titleSound = sound.getTitle(this);
-                        log("Notification sound: "+titleSound);
-                        messageSoundText.setText(titleSound);
-                    }
-                }
-            }
         }
         else{
             log("NO individual chat preferences");
             notificationsSwitch.setChecked(true);
-
-            if(chatSettings==null){
-                log("Chat settings is NULL");
-                Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-                Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
-                ringtoneText.setText(defaultRingtone.getTitle(this));
-
-                Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-                Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-                messageSoundText.setText(defaultSound.getTitle(this));
-            }
-            else{
-                log("There is chat settings");
-
-                if (chatSettings.getNotificationsSound() == null){
-                    log("Notification sound is NULL");
-                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
-                    Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-                    messageSoundText.setText(defaultSound.getTitle(this));
-                }
-                else if(chatSettings.getNotificationsSound().equals("-1")){
-                    log("Notification sound -1");
-                    messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-
-                }
-                else{
-                    if(chatSettings.getNotificationsSound().equals("")){
-                        log("Notification sound is EMPTY");
-                        Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION);
-                        Ringtone defaultSound = RingtoneManager.getRingtone(this, defaultSoundUri);
-                        messageSoundText.setText(defaultSound.getTitle(this));
-                    }
-                    else{
-                        String soundString = chatSettings.getNotificationsSound();
-                        log("Sound stored in DB: "+soundString);
-                        Uri uri = Uri.parse(soundString);
-                        log("Uri: "+uri);
-
-                        if(soundString.equals("true")){
-
-                            Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                            Ringtone defaultSound2 = RingtoneManager.getRingtone(this, defaultSoundUri2);
-                            messageSoundText.setText(defaultSound2.getTitle(this));
-                            log("---Notification sound: "+defaultSound2.getTitle(this));
-                        }
-                        else{
-                            Ringtone sound = RingtoneManager.getRingtone(this, Uri.parse(soundString));
-                            if(sound==null){
-                                log("Sound is null");
-                                messageSoundText.setText("None");
-                            }
-                            else{
-                                String titleSound = sound.getTitle(this);
-                                log("Notification sound: "+titleSound);
-                                messageSoundText.setText(titleSound);
-                            }
-                        }
-
-                    }
-                }
-
-                Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-                Ringtone defaultRingtone = RingtoneManager.getRingtone(this, defaultRingtoneUri);
-                ringtoneText.setText(defaultRingtone.getTitle(this));
-            }
         }
     }
 
@@ -554,14 +378,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             editImageView.setVisibility(View.VISIBLE);
             dividerClearLayout.setVisibility(View.VISIBLE);
             clearChatLayout.setVisibility(View.VISIBLE);
+            dividerLeaveLayout.setVisibility(View.VISIBLE);
         }
         else{
-            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_RM){
-                leaveChatLayout.setVisibility(View.GONE);
-            }
             editImageView.setVisibility(View.GONE);
             dividerClearLayout.setVisibility(View.GONE);
             clearChatLayout.setVisibility(View.GONE);
+        }
+
+        if(chat.getOwnPrivilege()<MegaChatRoom.PRIV_RO){
+            leaveChatLayout.setVisibility(View.GONE);
+            dividerLeaveLayout.setVisibility(View.GONE);
         }
     }
 
@@ -581,20 +408,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         log("Participants count: "+participantsCount);
         long participantsLabel = participantsCount+1; //Add one to include me
         infoNumParticipantsText.setText(participantsLabel+ " "+ getString(R.string.participants_chat_label));
-
-        String myFullName =  megaChatApi.getMyFullname();
-        if(myFullName!=null){
-            if(myFullName.trim().isEmpty()){
-                myFullName =  megaChatApi.getMyEmail();
-            }
-        }
-        else{
-            myFullName =  megaChatApi.getMyEmail();
-        }
-
-        MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
-
-        participants.add(me);
 
         for(int i=0;i<participantsCount;i++){
             int peerPrivilege = chat.getPeerPrivilege(i);
@@ -617,13 +430,26 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             participants.add(participant);
         }
 
-        log("number of participants: "+participants.size());
+        String myFullName =  megaChatApi.getMyFullname();
+        if(myFullName!=null){
+            if(myFullName.trim().isEmpty()){
+                myFullName =  megaChatApi.getMyEmail();
+            }
+        }
+        else{
+            myFullName =  megaChatApi.getMyEmail();
+        }
+
+        MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
+
+        participants.add(me);
+
+        log("number of participants with me: "+participants.size());
         if (adapter == null){
             adapter = new MegaParticipantsChatLollipopAdapter(this, participants, recyclerView);
             adapter.setHasStableIds(true);
             adapter.setPositionClicked(-1);
             recyclerView.setAdapter(adapter);
-
         }
         else{
             adapter.setParticipants(participants);
@@ -731,6 +557,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     in.putExtra("contactType", Constants.CONTACT_TYPE_MEGA);
                     in.putExtra("chat", true);
                     in.putExtra("chatId", chatHandle);
+                    in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
                     startActivityForResult(in, Constants.REQUEST_ADD_PARTICIPANTS);
                 }
             }
@@ -815,26 +642,53 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.change_permissions_dialog, null);
 
+        final LinearLayout administratorLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator_layout);
         final CheckedTextView administratorCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_administrator);
-        administratorCheck.setText(getString(R.string.administrator_permission_label_participants_panel));
-        administratorCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         administratorCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
-        administratorMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        administratorMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
 
+        final TextView administratorTitle = (TextView) dialoglayout.findViewById(R.id.administrator_title);
+        administratorTitle.setText(getString(R.string.administrator_permission_label_participants_panel));
+        administratorTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
+        final TextView administratorSubtitle = (TextView) dialoglayout.findViewById(R.id.administrator_subtitle);
+        administratorSubtitle.setText(getString(R.string.file_properties_shared_folder_full_access));
+        administratorSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
+        final LinearLayout administratorTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.administrator_text_layout);
+        ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
+        administratorSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+
+        final LinearLayout memberLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_member_layout);
         final CheckedTextView memberCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_member);
-        memberCheck.setText(getString(R.string.standard_permission_label_participants_panel));
-        memberCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         memberCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
-        memberMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        memberMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
 
+        final TextView memberTitle = (TextView) dialoglayout.findViewById(R.id.member_title);
+        memberTitle.setText(getString(R.string.standard_permission_label_participants_panel));
+        memberTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
+        final TextView memberSubtitle = (TextView) dialoglayout.findViewById(R.id.member_subtitle);
+        memberSubtitle.setText(getString(R.string.file_properties_shared_folder_read_write));
+        memberSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
+        final LinearLayout memberTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.member_text_layout);
+        ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
+        memberSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
+
+        final LinearLayout observerLayout = (LinearLayout) dialoglayout.findViewById(R.id.change_permissions_dialog_observer_layout);
         final CheckedTextView observerCheck = (CheckedTextView) dialoglayout.findViewById(R.id.change_permissions_dialog_observer);
-        observerCheck.setText(getString(R.string.observer_permission_label_participants_panel));
-        observerCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
         observerCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
-        observerMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        observerMLP.setMargins(Util.scaleWidthPx(17, outMetrics), 0, 0, 0);
+
+        final TextView observerTitle = (TextView) dialoglayout.findViewById(R.id.observer_title);
+        observerTitle.setText(getString(R.string.observer_permission_label_participants_panel));
+        observerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
+        final TextView observerSubtitle = (TextView) dialoglayout.findViewById(R.id.observer_subtitle);
+        observerSubtitle.setText(getString(R.string.subtitle_read_only_permissions));
+        observerSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
+        final LinearLayout observerTextLayout = (LinearLayout) dialoglayout.findViewById(R.id.observer_text_layout);
+        ViewGroup.MarginLayoutParams observerSubtitleMLP = (ViewGroup.MarginLayoutParams) observerTextLayout.getLayoutParams();
+        observerSubtitleMLP.setMargins(Util.scaleHeightPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(15, outMetrics));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         builder.setView(dialoglayout);
@@ -863,38 +717,32 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         final AlertDialog dialog = permissionsDialog;
-        administratorCheck.setOnClickListener(new View.OnClickListener() {
 
+        View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_MODERATOR);
+                switch (v.getId()) {
+                    case R.id.change_permissions_dialog_administrator_layout: {
+                        changePermissions(MegaChatRoom.PRIV_MODERATOR);
+                        break;
+                    }
+                    case R.id.change_permissions_dialog_member_layout: {
+                        changePermissions(MegaChatRoom.PRIV_STANDARD);
+                        break;
+                    }
+                    case R.id.change_permissions_dialog_observer_layout: {
+                        changePermissions(MegaChatRoom.PRIV_RO);
+                        break;
+                    }
+                }
                 if (dialog != null){
                     dialog.dismiss();
                 }
             }
-        });
-
-        memberCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_STANDARD);
-                if (dialog != null){
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        observerCheck.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                changePermissions(MegaChatRoom.PRIV_RO);
-                if (dialog != null){
-                    dialog.dismiss();
-                }
-            }
-        });
+        };
+        administratorLayout.setOnClickListener(clickListener);
+        memberLayout.setOnClickListener(clickListener);
+        observerLayout.setOnClickListener(clickListener);
 
         log("Change permissions");
     }
@@ -1022,69 +870,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 showConfirmationClearChat();
                 break;
             }
-            case R.id.chat_group_contact_properties_ringtone_layout: {
-                log("Ringtone option");
-
-                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.call_ringtone_title));
-
-                if(chatPrefs!=null){
-                    String ringtoneString = chatPrefs.getRingtone();
-                    if(ringtoneString.isEmpty()){
-                        log("Empty ringtone");
-                        Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultRingtoneUri);
-                    }
-                    else if(ringtoneString.equals("-1")){
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri)null);
-                    }
-                    else{
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(ringtoneString));
-                    }
-                }
-                else{
-                    Uri defaultRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_RINGTONE);
-                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultRingtoneUri);
-                }
-
-                this.startActivityForResult(intent, Constants.SELECT_RINGTONE);
-
-                break;
-            }
-            case R.id.chat_group_contact_properties_messages_sound_layout: {
-                log("Message sound option");
-
-                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.notification_sound_title));
-
-                if(chatPrefs!=null){
-                    String soundString = chatPrefs.getNotificationsSound();
-                    if (soundString == null){
-                        log("NULL sound");
-                        Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
-                    }
-                    else if(soundString.equals("-1")){
-                        log("Notification sound -1");
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
-                    }
-                    else if(soundString.isEmpty()){
-                        log("Empty sound");
-                        Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
-                    }
-                    else{
-                        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(soundString));
-                    }
-                }
-                else{
-                    Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(getApplicationContext(), RingtoneManager.TYPE_NOTIFICATION);
-                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, defaultSoundUri);
-                }
-
-                this.startActivityForResult(intent, Constants.SELECT_NOTIFICATION_SOUND);
+            case R.id.chat_group_contact_properties_archive_layout:{
+                ChatController chatC = new ChatController(this);
+                chatC.archiveChat(chat);
                 break;
             }
             case R.id.chat_group_contact_properties_switch:{
@@ -1095,19 +883,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
                 else{
                     boolean enabled = notificationsSwitch.isChecked();
-
-                    if(!enabled){
-                        ringtoneLayout.setVisibility(View.GONE);
-                        dividerRingtoneLayout.setVisibility(View.GONE);
-                        messageSoundLayout.setVisibility(View.GONE);
-                        dividerMessageSoundLayout.setVisibility(View.GONE);
-                    }
-                    else{
-                        ringtoneLayout.setVisibility(View.VISIBLE);
-                        dividerRingtoneLayout.setVisibility(View.VISIBLE);
-                        messageSoundLayout.setVisibility(View.VISIBLE);
-                        dividerMessageSoundLayout.setVisibility(View.VISIBLE);
-                    }
 
                     ChatController chatC = new ChatController(this);
                     if(enabled){
@@ -1130,72 +905,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         log("onActivityResult, resultCode: "+resultCode);
 
-        if (resultCode == RESULT_OK && requestCode == Constants.SELECT_RINGTONE)
-        {
-            log("Selected ringtone OK");
-
-            Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-
-            String chosenRingtone = "-1";
-            if(uri!=null){
-
-                Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-                String title = ringtone.getTitle(this);
-
-                if(title!=null){
-                    log("Title ringtone: "+title);
-                    ringtoneText.setText(title);
-                }
-
-                chosenRingtone = uri.toString();
-            }
-            else{
-                ringtoneText.setText(getString(R.string.settings_chat_silent_sound_not));
-            }
-
-            if(chatPrefs==null){
-                chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), chosenRingtone, "");
-                dbH.setChatItemPreferences(chatPrefs);
-            }
-            else{
-                chatPrefs.setRingtone(chosenRingtone);
-                dbH.setRingtoneChatItem(chosenRingtone, Long.toString(chatHandle));
-            }
-
-        }
-        else if (resultCode == RESULT_OK && requestCode == Constants.SELECT_NOTIFICATION_SOUND)
-        {
-            log("Selected notification sound OK");
-
-            Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-                String chosenSound = "-1";
-                if(uri!=null){
-
-                    Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-                    String title = ringtone.getTitle(this);
-
-                    if(title!=null){
-                        log("Title ringtone: "+title);
-                        messageSoundText.setText(title);
-                    }
-
-                    chosenSound = uri.toString();
-                }
-                else{
-                    messageSoundText.setText(getString(R.string.settings_chat_silent_sound_not));
-                }
-
-                if(chatPrefs==null){
-
-                    chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "", chosenSound);
-                    dbH.setChatItemPreferences(chatPrefs);
-                }
-                else{
-                    chatPrefs.setNotificationsSound(chosenSound);
-                    dbH.setNotificationSoundChatItem(chosenSound, Long.toString(chatHandle));
-                }
-        }
-        else if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
+       if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             log("onActivityResult REQUEST_ADD_PARTICIPANTS OK");
 
             if (intent == null) {
@@ -1446,6 +1156,52 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
         }
+        else if(request.getType() == MegaChatRequest.TYPE_ARCHIVE_CHATROOM){
+            long chatHandle = request.getChatHandle();
+            MegaChatRoom chat = megaChatApi.getChatRoom(chatHandle);
+            String chatTitle = chat.getTitle();
+
+            if(chatTitle==null){
+                chatTitle = "";
+            }
+            else if(!chatTitle.isEmpty() && chatTitle.length()>60){
+                chatTitle = chatTitle.substring(0,59)+"...";
+            }
+
+            if(!chatTitle.isEmpty() && chat.isGroup() && !chat.hasCustomTitle()){
+                chatTitle = "\""+chatTitle+"\"";
+            }
+
+            if(e.getErrorCode()==MegaChatError.ERROR_OK){
+                if(request.getFlag()){
+                    log("Chat archived");
+                    showSnackbar(getString(R.string.success_archive_chat, chatTitle));
+                }
+                else{
+                    log("Chat unarchived");
+                    showSnackbar(getString(R.string.success_unarchive_chat, chatTitle));
+                }
+            }
+            else{
+                if(request.getFlag()){
+                    log("EEEERRRRROR WHEN ARCHIVING CHAT " + e.getErrorString());
+                    showSnackbar(getString(R.string.error_archive_chat, chatTitle));
+                }
+                else{
+                    log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
+                    showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
+                }
+            }
+
+            if(chat.isArchived()){
+                archiveChatTitle.setText(getString(R.string.general_unarchive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_unarchive));
+            }
+            else{
+                archiveChatTitle.setText(getString(R.string.general_archive));
+                archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.ic_b_archive));
+            }
+        }
         else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
             log("Remove participant: "+request.getUserHandle());
             log("My user handle: "+megaChatApi.getMyUserHandle());
@@ -1616,6 +1372,10 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     if(e.getErrorCode()==MegaError.API_EEXIST)
                     {
                         showSnackbar(getString(R.string.context_contact_already_invited, request.getEmail()));
+                    }
+                    else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
+                    {
+                        showSnackbar(getString(R.string.error_own_email_as_contact));
                     }
                     else{
                         showSnackbar(getString(R.string.general_error));

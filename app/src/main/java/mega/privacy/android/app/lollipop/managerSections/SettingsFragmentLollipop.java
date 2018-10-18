@@ -54,20 +54,15 @@ import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatPresenceConfig;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static nz.mega.sdk.MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION;
 
 
 //import android.support.v4.preference.PreferenceFragment;
@@ -96,9 +91,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 	public static String CATEGORY_QR_CODE = "settings_qrcode";
 	public static String CATEGORY_SECURITY = "settings_security";
+	public static String CATEGORY_2FA = "settings_2fa";
 	public static String CATEGORY_FILE_MANAGEMENT = "settings_file_management";
 
 	public static String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";
+	public static String KEY_2FA = "settings_2fa_activated";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -166,6 +163,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory qrCodeCategory;
 	SwitchPreference qrCodeAutoAcceptSwitch;
 	TwoLineCheckPreference qrCodeAutoAcceptCheck;
+
+	PreferenceCategory twoFACategory;
+	SwitchPreference twoFASwitch;
+	TwoLineCheckPreference twoFACheck;
 
 	PreferenceScreen preferenceScreen;
 
@@ -314,6 +315,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		persistenceChatCategory = (PreferenceCategory) findPreference(CATEGORY_PERSISTENCE_CHAT);
 		qrCodeCategory = (PreferenceCategory) findPreference(CATEGORY_QR_CODE);
 		securityCategory = (PreferenceCategory) findPreference(CATEGORY_SECURITY);
+		twoFACategory = (PreferenceCategory) findPreference(CATEGORY_2FA);
 		fileManagementCategory = (PreferenceCategory) findPreference(CATEGORY_FILE_MANAGEMENT);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -331,6 +333,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			qrCodeAutoAcceptSwitch = (SwitchPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
 			qrCodeAutoAcceptSwitch.setOnPreferenceClickListener(this);
+
+			twoFASwitch = (SwitchPreference) findPreference(KEY_2FA);
+			twoFASwitch.setOnPreferenceClickListener(this);
 		}
 		else{
 			pinLockEnableCheck = (TwoLineCheckPreference) findPreference(KEY_PIN_LOCK_ENABLE);
@@ -347,6 +352,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 			qrCodeAutoAcceptCheck = (TwoLineCheckPreference) findPreference(KEY_QR_CODE_AUTO_ACCEPT);
 			qrCodeAutoAcceptCheck.setOnPreferenceClickListener(this);
+
+			twoFACheck = (TwoLineCheckPreference) findPreference(KEY_2FA);
+			twoFACheck.setOnPreferenceClickListener(this);
 		}
 
 		chatAttachmentsChatListPreference = (ListPreference) findPreference("settings_chat_send_originals");
@@ -1112,6 +1120,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		setAutoaccept = false;
 		autoAccept = true;
+		if (megaApi.multiFactorAuthAvailable()) {
+			preferenceScreen.addPreference(twoFACategory);
+			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+		}
+		else {
+			preferenceScreen.removePreference(twoFACategory);
+		}
 		megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 		megaApi.getFileVersionsOption((ManagerActivityLollipop)context);
 	}
@@ -2169,6 +2184,34 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
 			startActivity(intent);
 		}
+		else if (preference.getKey().compareTo(KEY_2FA) == 0){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if (((ManagerActivityLollipop) context).is2FAEnabled()){
+					log("2FA is Checked");
+					twoFASwitch.setChecked(true);
+					((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.DISABLE_2FA);
+				}
+				else {
+					log("2FA is NOT Checked");
+					twoFASwitch.setChecked(false);
+					Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
+					startActivity(intent);
+				}
+			}
+			else{
+				if (((ManagerActivityLollipop) context).is2FAEnabled()){
+					log("2FA is Checked");
+					twoFACheck.setChecked(true);
+					((ManagerActivityLollipop) context).showVerifyPin2FA(Constants.DISABLE_2FA);
+				}
+				else {
+					log("2FA is NOT Checked");
+					twoFACheck.setChecked(false);
+					Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
+					startActivity(intent);
+				}
+			}
+		}
 		
 		return true;
 	}
@@ -2409,7 +2452,39 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		super.onResume();
 	}
-	
+
+	public void update2FAPreference(boolean enabled) {
+		log("update2FAPreference");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			twoFASwitch.setChecked(enabled);
+		}
+		else{
+			twoFACheck.setChecked(enabled);
+		}
+	}
+
+	public void update2FAVisibility(){
+		log("update2FAVisbility");
+		if (megaApi == null){
+			if (context != null){
+				if (((Activity)context).getApplication() != null){
+					megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+				}
+			}
+		}
+
+		if (megaApi != null) {
+			if (megaApi.multiFactorAuthAvailable()) {
+				log("update2FAVisbility true");
+				preferenceScreen.addPreference(twoFACategory);
+				megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+			} else {
+				log("update2FAVisbility false");
+				preferenceScreen.removePreference(twoFACategory);
+			}
+		}
+	}
+
 	public void afterSetPinLock(){
 		log("afterSetPinLock");
 
