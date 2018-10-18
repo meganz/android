@@ -16,8 +16,10 @@ public class MegaAttributes {
 	String useHttpsOnly = "false";
 	String showCopyright = "true";
 	String showNotifOff = "true";
+	String lastPublicHandle = "";
+	String lastPublicHandleTimeStamp = "";
 	
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String showCopyright, String showNotifOff, String lastPublicHandle, String lastPublicHandleTimeStamp) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -32,9 +34,11 @@ public class MegaAttributes {
 		this.useHttpsOnly = "false";
 		this.showCopyright = showCopyright;
 		this.showNotifOff = showNotifOff;
+		this.lastPublicHandle = lastPublicHandle;
+		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
 	}
 
-	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff) {
+	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger, String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp, String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String lastPublicHandle, String lastPublicHandleTimeStamp) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -49,6 +53,8 @@ public class MegaAttributes {
 		this.useHttpsOnly = useHttpsOnly;
 		this.showCopyright = showCopyright;
 		this.showNotifOff = showNotifOff;
+		this.lastPublicHandle = lastPublicHandle;
+		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
 	}
 	
 	public String getOnline(){
@@ -161,5 +167,21 @@ public class MegaAttributes {
 
 	public void setShowNotifOff(String showNotifOff) {
 		this.showNotifOff = showNotifOff;
+	}
+
+	public String getLastPublicHandle(){
+		return lastPublicHandle;
+	}
+
+	public void setLastPublicHandle(String lastPublicHandle){
+		this.lastPublicHandle = lastPublicHandle;
+	}
+
+	public String getLastPublicHandleTimeStamp(){
+		return lastPublicHandleTimeStamp;
+	}
+
+	public void setLastPublicHandleTimeStamp(String lastPublicHandleTimeStamp){
+		this.lastPublicHandleTimeStamp = lastPublicHandleTimeStamp;
 	}
 }
