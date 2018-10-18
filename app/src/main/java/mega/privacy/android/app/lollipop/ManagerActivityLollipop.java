@@ -1879,6 +1879,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
+		if (!Util.isOnline(this)){
+			usedSpaceLayout.setVisibility(View.GONE);
+		}
+		else{
+			usedSpaceLayout.setVisibility(View.VISIBLE);
+		}
 
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
@@ -2571,6 +2577,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						indexContacts = 0;
 						selectDrawerItemLollipop(drawerItem);
 					}
+					else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
+						update2FASetting();
+					}
 				}
 	        }
 
@@ -3248,6 +3257,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ac.copyMK(false);
 					}
 				}
+				else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
+					update2FASetting();
+				}
 
     			intent.setAction(null);
 				setIntent(null);
@@ -3533,8 +3545,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						radius = imBitmap.getHeight() / 2;
 
 					c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
-					nVPictureProfile.setImageBitmap(circleBitmap);
-					nVPictureProfileTextView.setVisibility(View.GONE);
+					if (nVPictureProfile != null){
+						nVPictureProfile.setImageBitmap(circleBitmap);
+					}
+					if (nVPictureProfileTextView != null){
+						nVPictureProfileTextView.setVisibility(View.GONE);
+					}
 					return;
 				}
 			}
@@ -3572,16 +3588,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			radius = defaultAvatar.getHeight()/2;
 
 		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		nVPictureProfile.setImageBitmap(defaultAvatar);
+		if (nVPictureProfile != null){
+			nVPictureProfile.setImageBitmap(defaultAvatar);
+		}
 
 		int avatarTextSize = Util.getAvatarTextSize(density);
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 
-		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(32);
-		nVPictureProfileTextView.setTextColor(Color.WHITE);
-		nVPictureProfileTextView.setVisibility(View.VISIBLE);
-
+		if (nVPictureProfileTextView != null) {
+			nVPictureProfileTextView.setText(firstLetter);
+			nVPictureProfileTextView.setTextSize(32);
+			nVPictureProfileTextView.setTextColor(Color.WHITE);
+			nVPictureProfileTextView.setVisibility(View.VISIBLE);
+		}
 	}
 
 	public void showDialogChangeUserAttribute(){
@@ -4489,13 +4508,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("megaApi is Null in Offline mode");
 			}
 
-			usedSpaceLayout.setVisibility(View.GONE);
+			if (usedSpaceLayout != null) {
+				usedSpaceLayout.setVisibility(View.GONE);
+			}
 
 			UserCredentials credentials = dbH.getCredentials();
 			if (credentials != null) {
 				String emailCredentials = credentials.getEmail();
 				if (emailCredentials != null) {
-					nVEmail.setText(emailCredentials);
+					if (nVEmail != null) {
+						nVEmail.setText(emailCredentials);
+					}
 				}
 
 				String myHandleCredentials = credentials.getMyHandle();
@@ -4532,7 +4555,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("Full name set by default: " + fullName);
 				}
 
-				nVDisplayName.setText(fullName);
+				if (nVDisplayName != null) {
+					nVDisplayName.setText(fullName);
+				}
 
 				String firstLetter = fullName.charAt(0) + "";
 				firstLetter = firstLetter.toUpperCase(Locale.getDefault());
@@ -5490,6 +5515,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
 				showFabButton();
+
+				if (sttFLol != null){
+					sttFLol.update2FAVisibility();
+				}
 				break;
     		}
     		case SEARCH:{
@@ -13474,6 +13503,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
+	public void update2FASetting(){
+		log("update2FAVisibility");
+		if (sttFLol != null) {
+			try {
+				sttFLol.update2FAVisibility();
+			}catch (Exception e){}
+		}
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		log("-------------------onActivityResult "+requestCode + "____" + resultCode);
@@ -14041,24 +14079,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 			}
-//			else if (drawerItem == DrawerItem.RUBBISH_BIN){
-//				parentHandleRubbish = intent.getLongExtra("PARENT_HANDLE", -1);
-//				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
-//				if (parentNode != null){
-//					if (rubbishBinFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//						rubbishBinFLol.setNodes(nodes);
-//						rubbishBinFLol.getListView().invalidateViews();
-//					}
-//				}
-//				else{
-//					if (rubbishBinFLol != null){
-//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-//						rubbishBinFLol.setNodes(nodes);
-//						rubbishBinFLol.getListView().invalidateViews();
-//					}
-//				}
-//			}
 			else if (drawerItem == DrawerItem.SHARED_ITEMS){
 				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
@@ -14078,6 +14098,62 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						inSFLol.getRecyclerView().invalidate();
 					}
 				}
+			}
+		}
+		else if (requestCode == Constants.REQUEST_CODE_REFRESH_STAGING && resultCode == RESULT_OK) {
+			log("Resfresh DONE onActivityResult");
+
+			if (intent == null) {
+				log("Return.....");
+				return;
+			}
+
+			((MegaApplication) getApplication()).askForFullAccountInfo();
+			((MegaApplication) getApplication()).askForExtendedAccountDetails();
+
+			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+				if (parentNode != null){
+					if (fbFLol != null && fbFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderCloud);
+						fbFLol.setNodes(nodes);
+						fbFLol.getRecyclerView().invalidate();
+					}
+				}
+				else{
+					if (fbFLol != null && fbFLol.isAdded()){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderCloud);
+						fbFLol.setNodes(nodes);
+						fbFLol.getRecyclerView().invalidate();
+					}
+				}
+			}
+			else if (drawerItem == DrawerItem.SHARED_ITEMS){
+				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
+				if (parentNode != null){
+					if (inSFLol != null && inSFLol.isAdded()){
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+						//TODO: ojo con los hijos
+//							inSFLol.setNodes(nodes);
+						inSFLol.getRecyclerView().invalidate();
+					}
+				}
+				else{
+					if (inSFLol != null && inSFLol.isAdded()){
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+						//TODO: ojo con los hijos
+//							inSFLol.setNodes(nodes);
+						inSFLol.getRecyclerView().invalidate();
+					}
+				}
+			}
+
+			if (sttFLol != null) {
+				try {
+					sttFLol.update2FAVisibility();
+				}catch (Exception e){}
 			}
 		}
 		else if (requestCode == Constants.TAKE_PHOTO_CODE){
