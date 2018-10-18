@@ -5490,7 +5490,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
     			}
 
     			if (sttFLol != null && sttFLol.isAdded()){
@@ -5508,7 +5508,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
-    			ft.commit();
+    			ft.commitNowAllowingStateLoss();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
