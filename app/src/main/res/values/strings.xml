@@ -1675,7 +1675,7 @@
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
-    <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
+    <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully deleted</string>
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
@@ -2141,5 +2141,7 @@
 
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
+
+    <string name="save_qr_cloud_drive" context="Label shown to indicate the QR is saving in Cloud Drive">Saving %s in Cloud Drive&#8230;</string>
 
 </resources>
