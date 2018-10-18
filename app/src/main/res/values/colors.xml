@@ -169,4 +169,7 @@
     <color name="white_15_opacity">#26FFFFFF</color>
     <color name="black_15_opacity">#26000000</color>
     <color name="accent_color_30_opacity">#4D00BFA5</color>
+
+    <color name="yellow_notif_shares">#FFFFA500</color>
+    <color name="green_notif_contacts">#FF00897B</color>
 </resources>
