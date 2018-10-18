@@ -2154,8 +2154,8 @@
     <string name="general_show_more" context="Label that indicates show more items">Show more</string>
     <string name="general_show_less" context="Label that indicates show less items">Show less</string>
 
-    <string name="notification_new_contact_request" context="Label that indicates show less items">%s send you a contact request.</string>
-    <string name="notification_new_contact" context="Label that indicates show less items">%s is now a contact.</string>
-    <string name="notification_new_shared_folder" context="Label that indicates show less items">New shared folder from %s</string>
+    <string name="notification_new_contact_request" context="Text of the historic notification for a new contact request">%s send you a contact request.</string>
+    <string name="notification_new_contact" context="Text of the historic notification for a new contact">%s is now a contact.</string>
+    <string name="notification_new_shared_folder" context="Text of the historic notification for a new shared folder">New shared folder from %s</string>
 
 </resources>
