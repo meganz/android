@@ -128,6 +128,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	int mTopDelta;
 	float mWidthScale;
 	float mHeightScale;
+	int placeholderCount;
 
 	private DisplayMetrics outMetrics;
 
@@ -962,8 +963,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
 		//If inserted a placehoder in CloudDriveAdapter,here the position need to be remove the placeholder.
-        int placeholder = intent.getIntExtra("placeholder",0 );
-        positionG -= placeholder;
+        placeholderCount = intent.getIntExtra("placeholder",0 );
+        positionG -= placeholderCount;
         orderGetChildren = intent.getIntExtra("orderGetChildren", ORDER_DEFAULT_ASC);
 		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
 		isFileLink = intent.getBooleanExtra("isFileLink",false);
@@ -1692,7 +1693,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void updateCurrentImage(){
-
+        positionG += placeholderCount;
 	    if (adapterType == Constants.OFFLINE_ADAPTER){
 	        String name = mOffListImages.get(positionG).getName();
             for (int i=0; i<mOffList.size(); i++){
