@@ -1,13 +1,10 @@
 package mega.privacy.android.app;
 
-//import com.google.android.gms.analytics.GoogleAnalytics;
-//import com.google.android.gms.analytics.Logger.LogLevel;
-//import com.google.android.gms.analytics.Tracker;
-
 import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -23,12 +20,8 @@ import org.webrtc.ContextUtils;
 import org.webrtc.SurfaceTextureHelper;
 import org.webrtc.VideoCapturer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
@@ -38,7 +31,9 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -56,20 +51,19 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
+import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaHandleList;
-import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 
-public class MegaApplication extends Application implements MegaListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface {
+public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -80,6 +74,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
 	MyAccountInfo myAccountInfo;
+	boolean esid = false;
 
 	private static boolean activityVisible = false;
 	private static boolean isLoggingIn = false;
@@ -109,6 +104,24 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	private static boolean registeredChatListeners = false;
 
 	MegaChatApiAndroid megaChatApi = null;
+
+	private NetworkStateReceiver networkStateReceiver;
+
+	@Override
+	public void networkAvailable() {
+		log("Net available: Broadcast to ManagerActivity");
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+		intent.putExtra("actionType", Constants.GO_ONLINE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
+
+	@Override
+	public void networkUnavailable() {
+		log("Net unavailable: Broadcast to ManagerActivity");
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+		intent.putExtra("actionType", Constants.GO_OFFLINE);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
 
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -145,11 +158,22 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			log("BackgroundRequestListener:onRequestFinish: " + request.getRequestString() + "____" + e.getErrorCode() + "___" + request.getParamType());
-			if (e.getErrorCode() == MegaError.API_ESID){
-				if (request.getType() == MegaRequest.TYPE_LOGOUT){
-					log("type_logout");
+
+			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+				if (e.getErrorCode() == MegaError.API_ESID){
+					log("TYPE_LOGOUT:API_ESID");
 					myAccountInfo = new MyAccountInfo(getApplicationContext());
-					AccountController.logout(getApplicationContext(), getMegaApi());
+
+					esid = true;
+
+					if(!Util.isChatEnabled()){
+						log("Chat is not enable - proceed to show login");
+						if(activityVisible){
+							launchExternalLogout();
+						}
+					}
+
+					AccountController.localLogoutApp(getApplicationContext());
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_LOGIN){
@@ -256,13 +280,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 							log("getMegaAccountSESSION not Null");
 							dbH.setExtendedAccountDetailsTimestamp();
 							long mostRecentSession = megaAccountSession.getMostRecentUsage();
-							log("The last session: "+mostRecentSession);
-							java.text.DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.SHORT, Locale.getDefault());
-							Date date = new Date(mostRecentSession * 1000);
-							Calendar cal = Calendar.getInstance();
-							TimeZone tz = cal.getTimeZone();
-							df.setTimeZone(tz);
-							myAccountInfo.setLastSessionFormattedDate(df.format(date));
+
+							String date = TimeChatUtils.formatDateAndTime(mostRecentSession, TimeChatUtils.DATE_LONG_FORMAT);
+
+							myAccountInfo.setLastSessionFormattedDate(date);
 							myAccountInfo.setCreateSessionTimeStamp(megaAccountSession.getCreationTimestamp());
 						}
 
@@ -282,6 +303,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			log("BackgroundRequestListener: onRequestTemporaryError: " + request.getRequestString());
 		}
 		
+	}
+
+	public void launchExternalLogout(){
+		log("launchExternalLogout");
+		Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
+		loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		startActivity(loginIntent);
 	}
 
 	private final int interval = 3000;
@@ -333,20 +361,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		keepAliveHandler.postAtTime(keepAliveRunnable, System.currentTimeMillis()+interval);
 		keepAliveHandler.postDelayed(keepAliveRunnable, interval);
 
-		MegaApiAndroid.addLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		megaApi = getMegaApi();
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
 
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger());
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
-
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
+		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
@@ -359,9 +382,24 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				} else {
 					fileLoggerSDK = false;
 				}
-			} else {
-				fileLoggerSDK = false;
+
+				if (attrs.getStaging() != null){
+					try{
+						staging = Boolean.parseBoolean(attrs.getStaging());
+					} catch (Exception e){ staging = false;}
+				}
 			}
+			else {
+				fileLoggerSDK = false;
+				staging = false;
+			}
+		}
+
+		if (staging){
+			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+		}
+		else{
+			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 		}
 
 		if (Util.DEBUG){
@@ -406,6 +444,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			}
 		}
 
+		//init logger only when pre-request are all ready
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, Util.getFileLoggerKarere()));
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+
 		boolean useHttpsOnly = false;
 		if (dbH != null) {
 			useHttpsOnly = Boolean.parseBoolean(dbH.getUseHttpsOnly());
@@ -418,6 +463,10 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
 		}
+
+		networkStateReceiver = new NetworkStateReceiver();
+		networkStateReceiver.addListener(this);
+		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
@@ -632,7 +681,8 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 			requestListener = new BackgroundRequestListener();
 			log("ADD REQUESTLISTENER");
 			megaApi.addRequestListener(requestListener);
-			megaApi.addListener(this);
+
+			megaApi.addGlobalListener(this);
 
 //			DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 //			if (dbH.getCredentials() != null){
@@ -783,37 +833,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	}
 
 	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_LOGOUT){
-			log("type_logout: " + e.getErrorCode() + "__" + request.getParamType());
-			myAccountInfo = new MyAccountInfo(this);
-			if (e.getErrorCode() == MegaError.API_ESID){
-				log("calling ManagerActivity.logout");
-				AccountController.logout(getApplicationContext(), getMegaApi());
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");
 	}
@@ -828,42 +847,15 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		// TODO Auto-generated method stub
-	}
-	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
-			byte[] buffer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		log("onAccountUpdate");
 
-		megaApi.getPaymentMethods(this);
-		megaApi.getAccountDetails(this);
-		megaApi.getPricing(this);
-		megaApi.creditCardQuerySubscriptions(this);
+		megaApi.getPaymentMethods(null);
+		megaApi.getAccountDetails(null);
+		megaApi.getPricing(null);
+		megaApi.creditCardQuerySubscriptions(null);
 		dbH.resetExtendedAccountDetailsTimestamp();
 	}
 
@@ -912,17 +904,16 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-		log("onRequestStart: " + request.getRequestString());
+		log("onRequestStart (CHAT): " + request.getRequestString());
 	}
 
 	@Override
 	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-		log("onRequestUpdate: Chat");
 	}
 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestFinish: Chat " + request.getRequestString());
+		log("onRequestFinish (CHAT): " + request.getRequestString() + "_"+e.getErrorCode());
 		if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS){
 			log("SET_BACKGROUND_STATUS: " + request.getFlag());
 		}
@@ -967,7 +958,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 							startActivity(confirmIntent);
 						}
 						else{
-							log("Launch intent to tour screen");
+							log("Launch intent to login activity");
 							Intent tourIntent = new Intent(this, LoginActivityLollipop.class);
 							tourIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 							this.startActivity(tourIntent);
@@ -1025,7 +1016,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		log("onRequestTemporaryError: Chat");
+		log("onRequestTemporaryError (CHAT): "+e.getErrorString());
 	}
 
 	@Override
@@ -1312,6 +1303,14 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		else{
 			MegaApplication.disableFileVersions = 0;
 		}
+	}
+
+	public boolean isEsid() {
+		return esid;
+	}
+
+	public void setEsid(boolean esid) {
+		this.esid = esid;
 	}
 
 	public static boolean isClosedChat() {

@@ -683,24 +683,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 
-		String previousIP = app.getLocalIpAddress();
-		String currentIP = Util.getLocalIpAddress();
-		if (previousIP == null
-				|| (previousIP.length() == 0)
-				|| (previousIP.compareTo("127.0.0.1") == 0))
-		{
-			app.setLocalIpAddress(currentIP);
-		}
-		else if ((currentIP != null)
-				&& (currentIP.length() != 0)
-				&& (currentIP.compareTo("127.0.0.1") != 0)
-				&& (currentIP.compareTo(previousIP) != 0))
-		{
-			app.setLocalIpAddress(currentIP);
-			log("reconnect");
-			megaApi.reconnect();
-		}
-
 		int result = shouldRun();
 		if (result != 0){
 			return result;

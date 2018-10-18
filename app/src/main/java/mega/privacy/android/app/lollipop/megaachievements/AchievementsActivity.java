@@ -35,6 +35,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -291,6 +292,10 @@ public class AchievementsActivity extends PinActivityLollipop implements MegaReq
                 if(e.getErrorCode()==MegaError.API_EEXIST)
                 {
                     showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+                }
+                else if(request.getNumber()== MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
+                {
+                    showSnackbar(getString(R.string.error_own_email_as_contact));
                 }
                 else{
                     showSnackbar(getString(R.string.general_error));

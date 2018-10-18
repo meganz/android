@@ -18,35 +18,46 @@
  */
 package mega.privacy.android.app.components;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.Display;
 
 import io.github.rockerhieu.emojicon.EmojiconHandler;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
+
 
 public class EmojiconTextView extends AppCompatTextView{
-
+    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
+    public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
     private int mEmojiconSize;
     private int mEmojiconAlignment;
     private int mEmojiconTextSize;
     private int mTextStart = 0;
     private int mTextLength = -1;
     private boolean mUseSystemDefault = false;
+    private Context mContext;
+    private DisplayMetrics mOutMetrics;
+    private int textViewMaxWidth;
 
     public EmojiconTextView(Context context) {
         super(context);
+        mContext = context;
         init(null);
     }
 
 
     public EmojiconTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         init(attrs);
     }
 
@@ -70,6 +81,19 @@ public class EmojiconTextView extends AppCompatTextView{
             mUseSystemDefault = a.getBoolean(R.styleable.Emojicon_emojiconUseSystemDefault, false);
             a.recycle();
         }
+    
+        //get screen metrics
+        Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
+        mOutMetrics = new DisplayMetrics ();
+        display.getMetrics(mOutMetrics);
+        
+        //get max width of the text view
+        if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+        }else{
+            textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+        }
+        
         setText(getText());
     }
 
@@ -78,14 +102,15 @@ public class EmojiconTextView extends AppCompatTextView{
         if (!TextUtils.isEmpty(text)) {
             SpannableStringBuilder builder = new SpannableStringBuilder(text);
             EmojiconHandler.addEmojis(getContext(), builder, mEmojiconSize, mEmojiconAlignment, mEmojiconTextSize, mTextStart, mTextLength, mUseSystemDefault);
-            text = builder;
+    
+            //format text if too long
+            text = TextUtils.ellipsize(builder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
         }
         super.setText(text, type);
     }
 
 
     //Set the size of emojicon in pixels.
-
     public void setEmojiconSize(int pixels) {
         mEmojiconSize = pixels;
         super.setText(getText());
