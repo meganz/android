@@ -72,8 +72,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private boolean isForeground = false;
 	private boolean canceled;
 
-	private boolean isQRFile = false;
-
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
@@ -196,7 +194,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onHandleIntent");
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
-		isQRFile = intent.getBooleanExtra("qrfile", false);
+
 		if(file!=null){
 			log("File to manage: "+file.getAbsolutePath());
 		}
@@ -789,15 +787,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (getApplicationContext().getExternalCacheDir() != null && !isQRFile) {
+				String qrFileName = megaApi.getMyEmail() + "QRcode.jpg";
+
+				if (getApplicationContext().getExternalCacheDir() != null) {
 					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
-					if (localFile.exists()) {
+					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}
-				} else if (!isQRFile){
+				} else {
 					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
-					if (localFile.exists()) {
+					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}

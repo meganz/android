@@ -562,19 +562,10 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             else{
                 qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
             }
-            if (reset && qrCodeFile!= null && qrCodeFile.exists()){
-                qrCodeFile.delete();
-                qrCodeFile = null;
-                if (context.getExternalCacheDir() != null){
-                    qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
-                else{
-                    qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
-                }
-            }
-            if (qrCodeFile != null && !qrCodeFile.exists()) {
+
+            if (qrCodeFile != null) {
                 try {
-                    FileOutputStream out = new FileOutputStream(qrCodeFile);
+                    FileOutputStream out = new FileOutputStream(qrCodeFile, false);
                     qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
