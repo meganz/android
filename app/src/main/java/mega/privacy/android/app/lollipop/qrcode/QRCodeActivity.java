@@ -77,13 +77,21 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     MegaApiAndroid megaApi;
 
     private boolean contacts = false;
+    private boolean inviteContacts = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         log("onCreate");
 
-        contacts = getIntent().getBooleanExtra("contacts", false);
+        if (savedInstanceState != null) {
+            contacts = savedInstanceState.getBoolean("contacts", false);
+            inviteContacts = savedInstanceState.getBoolean("inviteContacts", false);
+        }
+        else {
+            contacts = getIntent().getBooleanExtra("contacts", false);
+            inviteContacts = getIntent().getBooleanExtra("inviteContacts", false);
+        }
 
         setContentView(R.layout.activity_qr_code);
 
@@ -164,7 +172,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
         viewPagerQRCode.setAdapter(qrCodePageAdapter);
         tabLayoutQRCode.setupWithViewPager(viewPagerQRCode);
-        if (contacts){
+        if (contacts || inviteContacts){
             viewPagerQRCode.setCurrentItem(1);
         }
         else {
@@ -175,6 +183,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putBoolean("contacts", contacts);
+        outState.putBoolean("inviteContacts", inviteContacts);
     }
 
     @Override
@@ -434,17 +444,30 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
                     scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
                 }
+                else if (e.getErrorCode() == MegaError.API_EARGS){
+                    scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
+                    scanCodeFragment.dialogTextContent = R.string.error_own_email_as_contact;
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                }
             }
         }
         //        megaApi.contactLinkQuery(request.getNodeHandle(), this);
         else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){
-            if (scanCodeFragment == null) {
-                log("ScanCodeFragment is NULL");
-                scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+            if (inviteContacts) {
+                Intent intent = new Intent();
+                intent.putExtra("mail", request.getEmail());
+                setResult(RESULT_OK, intent);
+                finish();
             }
-            if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
-                scanCodeFragment.myEmail = request.getEmail();
-                scanCodeFragment.initDialogInvite(request, e);
+            else {
+                if (scanCodeFragment == null) {
+                    log("ScanCodeFragment is NULL");
+                    scanCodeFragment = (ScanCodeFragment) qrCodePageAdapter.instantiateItem(viewPagerQRCode, 1);
+                }
+                if (scanCodeFragment != null && scanCodeFragment.isAdded()) {
+                    scanCodeFragment.myEmail = request.getEmail();
+                    scanCodeFragment.initDialogInvite(request, e);
+                }
             }
         }
         else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {

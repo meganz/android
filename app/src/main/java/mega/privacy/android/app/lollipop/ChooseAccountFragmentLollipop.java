@@ -648,6 +648,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("firstTimeCam", true);
         intent.putExtra("upgradeAccount", false);
+        intent.putExtra("newAccount", true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -660,6 +661,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", Constants.PRO_I);
+        intent.putExtra("newAccount", true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -672,6 +674,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", Constants.PRO_II);
+        intent.putExtra("newAccount", true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -684,6 +687,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", Constants.PRO_III);
+        intent.putExtra("newAccount", true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }
@@ -696,6 +700,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         intent = new Intent(context,ManagerActivityLollipop.class);
         intent.putExtra("upgradeAccount", true);
         intent.putExtra("accountType", Constants.PRO_LITE);
+        intent.putExtra("newAccount", true);
         startActivity(intent);
         ((LoginActivityLollipop)context).finish();
     }

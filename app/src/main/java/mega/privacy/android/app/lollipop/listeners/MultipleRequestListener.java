@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
@@ -251,7 +252,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             message = context.getString(R.string.number_correctly_shared, max_items-error) + context.getString(R.string.number_no_shared, error);
                         }
                         else{
-                            message = context.getString(R.string.number_correctly_shared, max_items);
+                            message = context.getString(R.string.context_correctly_shared);
                         }
                     }
                     else{
@@ -291,6 +292,9 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
             }
             else if(context instanceof AchievementsActivity){
                 ((AchievementsActivity) context).showInviteConfirmationDialog();
+            }
+            else if(context instanceof AddContactActivityLollipop){
+                ((AddContactActivityLollipop) context).showSnackbar(message);
             }
         }
     }

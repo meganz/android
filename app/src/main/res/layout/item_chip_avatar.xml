@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_layout_chip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/chip_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:layout_marginLeft="22dp"
+        android:layout_marginRight="22dp"
+        android:layout_marginBottom="8dp">
+        
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/rounded_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <ImageView
+            android:id="@+id/delete_icon_chip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignRight="@+id/rounded_avatar"
+            android:layout_alignBottom="@+id/rounded_avatar"
+            android:paddingLeft="24dp"
+            android:paddingTop="24dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginBottom="-3dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_b_remove_avatar" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/name_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="12sp"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="middle"
+        android:maxWidth="60dp"
+        android:gravity="center"
+        android:textColor="@color/mail_my_account"
+        android:fontFamily="roboto"
+        android:layout_below="@+id/chip_layout"/>
+
+</RelativeLayout>

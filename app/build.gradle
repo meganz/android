@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 205
-        versionName "3.3.8 (205)"
+        versionCode 211
+        versionName "3.4.0 (211)"
     }
 
     sourceSets.main {
@@ -72,8 +72,8 @@ dependencies {
     compile 'com.budiyev.android:code-scanner:1.8.3'
     compile "com.squareup.picasso:picasso:2.4.0"
     compile 'me.leolin:ShortcutBadger:1.1.21@aar'
+    compile 'com.brandongogetap:stickyheaders:0.5.1'
     compile 'com.github.bumptech.glide:glide:3.8.0'
-    compile 'com.android.support:support-v4:19.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
