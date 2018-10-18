@@ -76,7 +76,8 @@
                     android:text="User Name"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:fontFamily="roboto"/>
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_email"
@@ -112,9 +113,9 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/manager_used_space_bar"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="roboto"
-                    android:textSize="13sp"
-                    tools:fontFamily="roboto"/>
+                    android:fontFamily="sans-serif-light"
+                    android:textStyle="bold"
+                    android:textSize="13sp"/>
             </RelativeLayout>
 
             <View
@@ -138,7 +139,8 @@
                 android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
-                android:fontFamily="roboto"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/section_account"/>
 
@@ -164,7 +166,8 @@
                 android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
-                android:fontFamily="roboto"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/section_contacts"/>
 
@@ -190,7 +193,8 @@
                 android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
-                android:fontFamily="roboto"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/section_inbox"/>
 
@@ -216,7 +220,8 @@
                 android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
-                android:fontFamily="roboto"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/title_properties_chat_contact_notifications"/>
 
@@ -241,7 +246,8 @@
                 android:gravity="left|center_vertical"
                 android:layout_centerVertical="true"
                 android:textSize="14sp"
-                android:fontFamily="roboto"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
                 android:textColor="@color/name_my_account"
                 android:text="@string/action_settings"/>
 
@@ -263,8 +269,10 @@
             android:elevation="6dp"
             android:background="@drawable/background_button_white"
             android:textColor="@color/accentColor"
-            android:fontFamily="roboto"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="bold"
             android:layout_marginBottom="40dp"
+            android:layout_marginLeft="1dp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:paddingLeft="16dp"
