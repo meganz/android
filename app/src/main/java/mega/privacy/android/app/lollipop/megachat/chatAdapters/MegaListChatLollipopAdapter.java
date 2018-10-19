@@ -482,7 +482,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			((ViewHolderNormalChatList)holder).imageView = (RoundedImageView) v.findViewById(R.id.recent_chat_list_thumbnail);
 			((ViewHolderNormalChatList)holder).contactInitialLetter = (TextView) v.findViewById(R.id.recent_chat_list_initial_letter);
 			((ViewHolderNormalChatList)holder).textViewContactName = (EmojiTextView) v.findViewById(R.id.recent_chat_list_name);
-			((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(Util.scaleHeightPx(16, outMetrics));
+			((ViewHolderNormalChatList)holder).textViewContactName.setEmojiSize(40);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
@@ -493,7 +493,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			}
 
 			((ViewHolderNormalChatList)holder).textViewContent = (EmojiTextView) v.findViewById(R.id.recent_chat_list_content);
-			((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(Util.scaleHeightPx(14, outMetrics));
+			((ViewHolderNormalChatList)holder).textViewContent.setEmojiSize(30);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape");
