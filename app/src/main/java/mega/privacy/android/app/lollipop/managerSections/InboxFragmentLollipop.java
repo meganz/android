@@ -690,7 +690,7 @@ public class InboxFragmentLollipop extends Fragment{
 					mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					mediaIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER);
 					mediaIntent.putExtra("screenPosition", screenPosition);
-
+                    mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 					mediaIntent.putExtra("adapterType", Constants.INBOX_ADAPTER);

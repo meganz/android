@@ -165,12 +165,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     float mHeightScale;
     int screenWidth;
     int screenHeight;
+    int placeholderCount;
 
     private final String offLineDIR = mega.privacy.android.app.utils.Util.offlineDIR;
     private final String oldMKFile = mega.privacy.android.app.utils.Util.oldMKFile;
 
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
-    
+
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
@@ -216,7 +217,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MenuItem chatRemoveMenuItem;
 
     private RelativeLayout playerLayout;
-    
+
     private RelativeLayout audioContainer;
     private long handle = -1;
     int countChat = 0;
@@ -237,7 +238,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private boolean isUrl;
 
     ArrayList<Long> handleListM = new ArrayList<Long>();
-    
+
     private int currentPosition = 0;
     private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
     private long parentNodeHandle = -1;
@@ -371,6 +372,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             playWhenReady = savedInstanceState.getBoolean("playWhenReady", true);
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
             isAbHide = savedInstanceState.getBoolean("isAbHide", false);
+            placeholderCount = savedInstanceState.getInt("placeholder", 0);
         }
         else {
             isDeleteDialogShow = false;
@@ -380,6 +382,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             handle = getIntent().getLongExtra("HANDLE", -1);
             fileName = getIntent().getStringExtra("FILENAME");
             currentPosition = intent.getIntExtra("position", 0);
+            placeholderCount = intent.getIntExtra("placeholder", 0);
             playWhenReady = true;
         }
         if (!renamed) {
@@ -1380,6 +1383,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         intent.putExtra("position", i);
         intent.putExtra("actionType", Constants.UPDATE_IMAGE_DRAG);
         intent.putExtra("adapterType", adapterType);
+        intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -1427,6 +1431,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         intent.putExtra("actionType", Constants.SCROLL_TO_POSITION);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
+        intent.putExtra("placeholder",placeholderCount);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -1722,6 +1727,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         outState.putLong("currentTime", currentTime);
         outState.putInt("currentPosition", currentPosition);
+        outState.putInt("placeholder",placeholderCount );
         outState.putLong("handle", handle);
         outState.putString("fileName", fileName);
         outState.putString("uri", uri.toString());

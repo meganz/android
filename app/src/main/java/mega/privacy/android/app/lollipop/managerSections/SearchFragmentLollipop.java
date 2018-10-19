@@ -834,6 +834,7 @@ public class SearchFragmentLollipop extends Fragment{
 						internalIntent = true;
 						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 					}
+                    mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("position", position);
 					mediaIntent.putExtra("searchQuery", ((ManagerActivityLollipop)context).searchQuery);
 					mediaIntent.putExtra("adapterType", Constants.SEARCH_ADAPTER);

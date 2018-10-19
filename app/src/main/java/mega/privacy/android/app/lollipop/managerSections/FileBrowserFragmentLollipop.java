@@ -926,6 +926,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						internalIntent=true;
 					}
 					mediaIntent.putExtra("position", position);
+                    mediaIntent.putExtra("placeholder", placeholderCount);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 					}

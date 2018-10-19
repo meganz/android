@@ -32,7 +32,7 @@
 				android:layout_width="110dp"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:layout_marginRight="8dp"
+				android:layout_marginRight="16dp"
 				android:layout_toRightOf="@+id/file_grid_icon"
 				android:ellipsize="middle"
 				android:singleLine="true"
