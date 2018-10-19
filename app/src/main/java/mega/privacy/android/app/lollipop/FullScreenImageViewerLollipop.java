@@ -119,6 +119,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
 
@@ -127,6 +128,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	int mTopDelta;
 	float mWidthScale;
 	float mHeightScale;
+	int placeholderCount;
 
 	private DisplayMetrics outMetrics;
 
@@ -209,7 +211,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	private android.support.v7.app.AlertDialog renameDialog;
 
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren = ORDER_DEFAULT_ASC;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -961,15 +963,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
 		//If inserted a placehoder in CloudDriveAdapter,here the position need to be remove the placeholder.
-        int placeholder = intent.getIntExtra("placeholder",0 );
-        positionG -= placeholder;
-        orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
-		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
-		isFileLink = intent.getBooleanExtra("isFileLink",false);
+        placeholderCount = intent.getIntExtra("placeholder",0 );
+        orderGetChildren = intent.getIntExtra("orderGetChildren", ORDER_DEFAULT_ASC);
+        isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+        isFileLink = intent.getBooleanExtra("isFileLink",false);
 
-		adapterType = intent.getIntExtra("adapterType", 0);
-
-		MegaApplication app = (MegaApplication)getApplication();
+        adapterType = intent.getIntExtra("adapterType", 0);
+        if(adapterType == Constants.RUBBISH_BIN_ADAPTER
+                || adapterType == Constants.INBOX_ADAPTER || adapterType == Constants.INCOMING_SHARES_ADAPTER||
+                adapterType == Constants.OUTGOING_SHARES_ADAPTER || adapterType == Constants.SEARCH_ADAPTER ||
+                adapterType == Constants.SEARCH_ADAPTER || adapterType == Constants.FILE_BROWSER_ADAPTER ||
+                adapterType == Constants.PHOTO_SYNC_ADAPTER || adapterType == Constants.SEARCH_BY_ADAPTER) {
+            positionG -= placeholderCount;
+        }
+        MegaApplication app = (MegaApplication)getApplication();
 		if (isFolderLink ){
 			megaApi = app.getMegaApiFolder();
 		}else{
@@ -1045,7 +1052,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			//OFFLINE
 			mOffList = new ArrayList<MegaOffline>();
 			String pathNavigation = intent.getStringExtra("pathNavigation");
-			int orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+			int orderGetChildren = intent.getIntExtra("orderGetChildren", ORDER_DEFAULT_ASC);
 			log("PATHNAVIGATION: " + pathNavigation);
 			mOffList=dbH.findByPath(pathNavigation);
 			log ("mOffList.size() = " + mOffList.size());
@@ -1283,29 +1290,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			ArrayList<MegaNode> nodes = null;
 			if (parentNodeHandle == -1){
 				String query = intent.getStringExtra("searchQuery");
-				nodes = megaApi.search(query);
-                //re-order the returned nodes, since SDK doesn't seprate the nodes by type.
-                nodes.sort(new Comparator<MegaNode>() {
-
-                    @Override
-                    public int compare(MegaNode o1,MegaNode o2) {
-                        if(o1 != null && o2 != null) {
-                            if(o1.isFolder() && o2.isFolder()) {
-                                return 0;
-                            }
-                            if(o1.isFile() && o2.isFile()) {
-                                return 0;
-                            }
-                            if(o1.isFolder() && o2.isFile()) {
-                                return -1;
-                            }
-                            if(o1.isFile() && o2.isFolder()) {
-                                return 1;
-                            }
-                        }
-                        return 0;
-                    }
-                });
+				nodes = megaApi.search(query,ORDER_DEFAULT_ASC);
 			}
 			else{
 				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
@@ -1713,7 +1698,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	public void updateCurrentImage(){
-
 	    if (adapterType == Constants.OFFLINE_ADAPTER){
 	        String name = mOffListImages.get(positionG).getName();
             for (int i=0; i<mOffList.size(); i++){
@@ -1765,10 +1749,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	};
 
 	public void getImageView (int i, long handle) {
-		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
 		intent.putExtra("actionType", Constants.UPDATE_IMAGE_DRAG);
 		intent.putExtra("adapterType", adapterType);
+        intent.putExtra("placeholder",placeholderCount);
 		intent.putExtra("handle", handle);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
@@ -1823,6 +1808,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		intent.putExtra("actionType", Constants.SCROLL_TO_POSITION);
 		intent.putExtra("adapterType", adapterType);
 		intent.putExtra("handle", handle);
+        intent.putExtra("placeholder",placeholderCount );
 		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 
