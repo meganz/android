@@ -76,15 +76,18 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     private RelativeLayout email_error_layout;
     private RelativeLayout password_confirm_error_layout;
     private RelativeLayout name_error_layout;
+    private RelativeLayout last_name_error_layout;
     private RelativeLayout password_error_layout;
     private TextView email_error_text;
     private TextView password_confirm_error_text;
     private TextView name_error_text;
+    private TextView last_name_error_text;
     private TextView password_error_text;
 
     private Drawable email_background;
     private Drawable password_confirm_background;
     private Drawable name_background;
+    private Drawable lastname_background;
     private Drawable password_background;
 
     private ImageView toggleButtonPasswd;
@@ -163,6 +166,23 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         name_background = userName.getBackground().mutate().getConstantState().newDrawable();
 
         userLastName.getBackground().clearColorFilter();
+        userLastName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                quitError(userLastName);
+            }
+        });
+        lastname_background = userLastName.getBackground().mutate().getConstantState().newDrawable();
 
         userEmail.getBackground().clearColorFilter();
         userEmail.addTextChangedListener(new TextWatcher() {
@@ -275,6 +295,9 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         name_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_name_error);
         name_error_layout.setVisibility(View.GONE);
         name_error_text = (TextView) v.findViewById(R.id.create_account_name_error_text);
+        last_name_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_last_name_error);
+        last_name_error_layout.setVisibility(View.GONE);
+        last_name_error_text = (TextView) v.findViewById(R.id.create_account_last_name_error_text);
         password_error_layout = (RelativeLayout) v.findViewById(R.id.create_account_password_error);
         password_error_layout.setVisibility(View.GONE);
         password_error_text = (TextView) v.findViewById(R.id.create_account_password_error_text);
@@ -589,10 +612,12 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         String emailError = getEmailError();
         String passwordError = getPasswordError();
         String usernameError = getUsernameError();
+        String userLastnameError = getUserLastnameError();
         String passwordConfirmError = getPasswordConfirmError();
 
         // Set or remove errors
         setError(userName, usernameError);
+        setError(userLastName, userLastnameError);
         setError(userEmail, emailError);
         setError(userPassword, passwordError);
         setError(userPasswordConfirm, passwordConfirmError);
@@ -601,7 +626,10 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         if (usernameError != null) {
             userName.requestFocus();
             return false;
-        } else if (emailError != null) {
+        } else if(userLastnameError != null){
+            userLastName.requestFocus();
+            return false;
+        }else if (emailError != null) {
             userEmail.requestFocus();
             return false;
         } else if (passwordError != null) {
@@ -632,6 +660,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
         String value = userName.getText().toString();
         if (value.length() == 0) {
             return getString(R.string.error_enter_username);
+        }
+        return null;
+    }
+
+    private String getUserLastnameError() {
+        String value = userLastName.getText().toString();
+        if (value.length() == 0) {
+            return getString(R.string.error_enter_userlastname);
         }
         return null;
     }
@@ -718,6 +754,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             else{
                 ((LoginActivityLollipop)context).setEmailTemp(userEmail.getText().toString().toLowerCase(Locale.ENGLISH).trim());
                 ((LoginActivityLollipop)context).setFirstNameTemp(userName.getText().toString());
+                ((LoginActivityLollipop)context).setLastNameTemp(userLastName.getText().toString());
                 ((LoginActivityLollipop)context).setPasswdTemp(userPassword.getText().toString());
                 ((LoginActivityLollipop)context).setWaitingForConfirmAccount(true);
 
@@ -829,6 +866,22 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                 userName.setLayoutParams(textParamsEditText);
             }
             break;
+            case R.id.create_account_last_name_text:{
+                last_name_error_layout.setVisibility(View.VISIBLE);
+                last_name_error_text.setText(error);
+                PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                Drawable background = lastname_background.mutate().getConstantState().newDrawable();
+                background.setColorFilter(porterDuffColorFilter);
+                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    userLastName.setBackgroundDrawable(background);
+                } else{
+                    userLastName.setBackground(background);
+                }
+                LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams) userLastName.getLayoutParams();
+                textParamsEditText.bottomMargin = Util.scaleWidthPx(3, outMetrics);
+                userLastName.setLayoutParams(textParamsEditText);
+            }
+            break;
             case R.id.create_account_password_text:{
                 password_error_layout.setVisibility(View.VISIBLE);
                 password_error_text.setText(error);
@@ -893,6 +946,20 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
                     LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userName.getLayoutParams();
                     textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
                     userName.setLayoutParams(textParamsEditText);
+                }
+            }
+            break;
+            case R.id.create_account_last_name_text:{
+                if(last_name_error_layout.getVisibility() != View.GONE){
+                    last_name_error_layout.setVisibility(View.GONE);
+                    if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                        userLastName.setBackgroundDrawable(lastname_background);
+                    } else{
+                        userLastName.setBackground(lastname_background);
+                    }
+                    LinearLayout.LayoutParams textParamsEditText = (LinearLayout.LayoutParams)userLastName.getLayoutParams();
+                    textParamsEditText.bottomMargin = Util.scaleWidthPx(10, outMetrics);
+                    userLastName.setLayoutParams(textParamsEditText);
                 }
             }
             break;

@@ -1273,7 +1273,18 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			lv.setPadding(0, 0, 0, 0);
 		}
 
-		setOnlineOptions(Util.isOnline(context));
+		if(Util.isOnline(context)){
+			if(megaApi==null || megaApi.getRootNode()==null){
+				setOnlineOptions(false);
+			}
+			else{
+				setOnlineOptions(true);
+			}
+		}
+		else{
+			log("Offline");
+			setOnlineOptions(false);
+		}
 
 		return v;
 	}

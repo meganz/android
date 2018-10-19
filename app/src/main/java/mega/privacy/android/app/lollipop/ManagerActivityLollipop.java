@@ -224,6 +224,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -564,6 +565,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private String newMail = null;
 	private TextView pinError;
 	private ProgressBar verify2faProgressBar;
+	private RelativeLayout lostYourDeviceButton;
 
 	private boolean isFirstTime = true;
 	private boolean isErrorShown = false;
@@ -669,6 +671,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(actionType == Constants.GO_ONLINE){
 					showOnlineMode();
+				}
+				else if(actionType == Constants.START_RECONNECTION){
+					startConnection();
 				}
 			}
 		}
@@ -2734,6 +2739,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (verify2FADialogIsShown){
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
+		if (savedInstanceState != null) {
+			updateAccountDetailsVisibleInfo();
+		}
 		log("END onCreate");
 	}
 
@@ -3247,6 +3255,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	}
 
     	if (nV != null){
+            Menu nVMenu = nV.getMenu();
+            resetNavigationViewMenu(nVMenu);
+			selectNavigationItem(drawerItem);
+
     		switch(drawerItem){
 	    		case CLOUD_DRIVE:{
 	    			log("onPostResume: case CLOUD DRIVE");
@@ -3299,13 +3311,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					break;
 				}
 				case CHAT:{
-					if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						resetNavigationViewMenu(nVMenu);
-						MenuItem menuItem = nVMenu.findItem(R.id.navigation_item_chat);
-						menuItem.setChecked(true);
-						menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat_red));
-					}
 
 					if (rChatFL != null){
 						if(rChatFL.isAdded()){
@@ -4413,23 +4418,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 
 					supportInvalidateOptionsMenu();
+
+//					if (rChatFL != null) {
+//						if (rChatFL.isAdded()) {
+//							log("ONLINE: Update screen RecentChats");
+//							if (!Util.isChatEnabled()) {
+//								rChatFL.showDisableChatScreen();
+//							}
+//						}
+//					}
+
+					updateAccountDetailsVisibleInfo();
+
 				} else {
 					log("showOnlineMode - Root is NULL");
 					if (getApplicationContext() != null) {
-						showConfirmationConnect();
-					}
-				}
-
-				if (rChatFL != null) {
-					if (rChatFL.isAdded()) {
-						log("ONLINE: Update screen RecentChats");
-						if (!Util.isChatEnabled()) {
-							rChatFL.showDisableChatScreen();
+						if(((MegaApplication) getApplication()).getOpenChatId()!=-1){
+							Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG);
+							LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+						}
+						else{
+							showConfirmationConnect();
 						}
 					}
 				}
-
-				usedSpaceLayout.setVisibility(View.VISIBLE);
 			}
 		}catch (Exception e){}
 	}
@@ -4442,15 +4454,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivity(intent);
-						finish();
+						startConnection();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
-
+                        log("showConfirmationConnect: BUTTON_NEGATIVE");
 						break;
 				}
 			}
@@ -4462,6 +4470,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					.setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
 		}
 		catch (Exception e){}
+	}
+
+	public void startConnection(){
+		log("startConnection");
+		Intent intent = new Intent(this, LoginActivityLollipop.class);
+		intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+		finish();
 	}
 
 	public void showOfflineMode() {
@@ -7898,9 +7915,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //	        	return true;
 //	        }
 	        case R.id.action_menu_clear_rubbish_bin:{
-	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		showClearRubbishBinDialog();
-	        	}
+	        	showClearRubbishBinDialog();
 	        	return true;
 	        }
 	        case R.id.action_menu_refresh:{
@@ -9269,8 +9284,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
-					return;
 				}
+                return;
 			}
 			super.onBackPressed();
 		}
@@ -9608,115 +9623,143 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			firstTimeCam = false;
 			dbH.setCamSyncEnabled(false);
 		}
+
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			resetNavigationViewMenu(nVMenu);
+		}
+
 		switch (menuItem.getItemId()){
 			case R.id.navigation_item_cloud_drive:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CLOUD_DRIVE;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_saved_for_offline:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_camera_uploads:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CAMERA_UPLOADS;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_inbox:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.INBOX;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_shared_items:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SHARED_ITEMS;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.shared_items_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_chat:{
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CHAT;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_contacts:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CONTACTS;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.contacts_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.navigation_item_settings:{
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				lastDrawerItem = drawerItem;
 				drawerItem = DrawerItem.SETTINGS;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					resetNavigationViewMenu(nVMenu);
-				}
-				menuItem.setChecked(true);
-				menuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 		}
+
+		selectNavigationItem(drawerItem);
+		selectDrawerItemLollipop(drawerItem);
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 
 		return true;
 	}
+
+	public void selectNavigationItem(DrawerItem drawerItem){
+
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+
+			switch(drawerItem){
+				case CLOUD_DRIVE:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
+					}
+					break;
+				}
+				case SHARED_ITEMS:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_shared_items);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.shared_items_red));
+					}
+					break;
+				}
+				case SETTINGS:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_settings);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.settings_red));
+					}
+					break;
+				}
+				case CONTACTS:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_contacts);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.contacts_red));
+					}
+					break;
+				}
+				case CHAT:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_chat);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_menu_chat_red));
+					}
+					break;
+				}
+				case INBOX:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_inbox);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.inbox_red));
+					}
+					break;
+				}
+				case CAMERA_UPLOADS:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.camera_uploads_red));
+					}
+					break;
+				}
+				case SAVED_FOR_OFFLINE:{
+					MenuItem mi = nVMenu.findItem(R.id.navigation_item_saved_for_offline);
+					if (mi != null){
+						mi.setChecked(true);
+						mi.setIcon(ContextCompat.getDrawable(this, R.drawable.saved_for_offline_red));
+					}
+					break;
+				}
+			}
+		}
+    }
 
 	public void showSnackbar(String s){
 		log("showSnackbar");
@@ -10467,7 +10510,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		else if (type == Constants.DISABLE_2FA) {
 			titleDialog.setText(getString(R.string.disable_2fa_verification));
 		}
-
+		lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
+		lostYourDeviceButton.setOnClickListener(this);
 		verify2faProgressBar = (ProgressBar) v.findViewById(R.id.progressbar_verify_2fa);
 
 		pinError = (TextView) v.findViewById(R.id.pin_2fa_error_verify);
@@ -12736,18 +12780,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if(isFinishing()){
 			return;
 		}
+		if (((MegaApplication) getApplication()) == null || ((MegaApplication) getApplication()).getMyAccountInfo() == null) {
+			return;
+		}
 
-		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
-
-//				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
-		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
-
-		usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
+		if (usedSpaceLayout != null) {
+			usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
 
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-		usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
-		totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+			usedSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getUsedFormatted());
+			totalSpaceTV.setText(((MegaApplication) getApplication()).getMyAccountInfo().getTotalFormatted());
+
+			usedSpaceLayout.setVisibility(View.VISIBLE);
+		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
 			if (((MegaApplication) getApplication()).getMyAccountInfo().getLevelAccountDetails() < ((MegaApplication) getApplication()).getMyAccountInfo().getLevelInventory()){
@@ -13046,7 +13091,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			case R.id.navigation_drawer_account_view:{
 //				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
-				if (Util.isOnline(this)){
+				if (Util.isOnline(this) && megaApi.getRootNode()!=null){
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment=Constants.MY_ACCOUNT_FRAGMENT;
 					if (nV != null){
@@ -13113,6 +13158,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				isEnable2FADialogShown = false;
 				if (enable2FADialog != null) {
 					enable2FADialog.dismiss();
+				}
+				break;
+			}
+			case R.id.lost_authentication_device: {
+				try {
+					String url = "https://mega.nz/recovery";
+					Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					openTermsIntent.setData(Uri.parse(url));
+					startActivity(openTermsIntent);
+				}
+				catch (Exception e){
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+					startActivity(viewIntent);
 				}
 				break;
 			}
@@ -13205,7 +13265,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-		builder.setMessage(R.string.confirmation_close_sessions).setPositiveButton(R.string.general_close, dialogClickListener)
+		builder.setTitle(R.string.confirmation_close_sessions_title);
+
+		builder.setMessage(R.string.confirmation_close_sessions_text).setPositiveButton(R.string.contact_accept, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 
 	}
@@ -14427,6 +14489,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("resetNavigationViewMenu()");
 
 		if(!Util.isOnline(this)){
+			disableNavigationViewMenu(menu);
+			return;
+		}
+
+		if(megaApi==null || megaApi.getRootNode()==null){
 			disableNavigationViewMenu(menu);
 			return;
 		}
@@ -16623,6 +16690,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
+	}
+
+	@Override
 	public void onEvent(MegaApiJava api, MegaEvent event) {
 
 	}
@@ -18111,9 +18183,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showEvaluatedAppDialog(){
-		if(megaChatApi.isSignalActivityRequired()){
-			megaChatApi.signalPresenceActivity();
-		}
 
 		LayoutInflater inflater = getLayoutInflater();
 		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);

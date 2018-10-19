@@ -440,18 +440,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				e.printStackTrace();
 			} 	
 		}
-		Collections.sort(zipNodes, new Comparator<ZipEntry>(){
-
-			public int compare(ZipEntry z1, ZipEntry z2) {
-				String name1 = z1.getName();
-				String name2 = z2.getName();
-				int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
-				if (res == 0) {
-					res = name1.compareTo(name2);
-				}
-				return res;
-			}
-		});
+		orderZips();
 		if (adapterList == null){
 			adapterList = new ZipListAdapterLollipop(this, recyclerView, aB, zipNodes, currentFolder);
 		}
@@ -464,6 +453,21 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+	}
+
+	void orderZips () {
+		Collections.sort(zipNodes, new Comparator<ZipEntry>(){
+
+			public int compare(ZipEntry z1, ZipEntry z2) {
+				String name1 = z1.getName();
+				String name2 = z2.getName();
+				int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+				if (res == 0) {
+					res = name1.compareTo(name2);
+				}
+				return res;
+			}
+		});
 	}
 	
 	@Override
@@ -549,8 +553,9 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 			}
 
-//			mediaIntent.putExtra("HANDLE", Long.parseLong(currentNode.getHandle()));
-			mediaIntent.putExtra("FILENAME", currentNode.getName());
+			int index = currentNode.getName().lastIndexOf('/');
+			String name = currentNode.getName().substring(index+1);
+			mediaIntent.putExtra("FILENAME", name);
 			mediaIntent.putExtra("path", currentFile.getAbsolutePath());
 			mediaIntent.putExtra("adapterType", Constants.ZIP_ADAPTER);
 			mediaIntent.putExtra("position", position);
@@ -739,6 +744,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop implements O
 			depth=depth+1;
 			listDirectory(currentPath);
 			this.setFolder(currentPath);
+			orderZips();
 			adapterList.setNodes(zipNodes);
 		}
 		else{

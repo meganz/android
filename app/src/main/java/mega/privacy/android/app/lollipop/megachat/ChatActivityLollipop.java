@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -21,6 +23,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -354,6 +357,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private BroadcastReceiver dialogConnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            log("Network broadcast received on chatActivity!");
+
+            if (intent != null){
+                showConfirmationConnect();
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -548,6 +562,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         chatActivity = this;
         chatC = new ChatController(chatActivity);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(dialogConnectReceiver, new IntentFilter(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = this.getWindow();
@@ -1007,7 +1023,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     if(!result){
                         log("----Error on openChatRoom");
                         if(errorOpenChatDialog==null){
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                            android.support.v7.app.AlertDialog.Builder builder;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                                builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                            }
+                            else{
+                                builder = new AlertDialog.Builder(this);
+                            }
                             builder.setTitle(getString(R.string.chat_error_open_title));
                             builder.setMessage(getString(R.string.chat_error_open_message));
 
@@ -2297,6 +2319,49 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void showConfirmationOpenCamera(final MegaChatRoom c){
+        log("showConfirmationOpenCamera");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        log("Open camera and lost the camera in the call");
+                        //Remove the local video from the video call:
+                        MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                        if(callInProgress != null) {
+                            if (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
+                                megaChatApi.answerChatCall(idChat, true, null);
+                            } else {
+                                if (callInProgress.hasLocalVideo()) {
+                                    megaChatApi.disableVideo(idChat, null);
+                                } else {
+                                    megaChatApi.enableVideo(idChat, null);
+                                }
+                            }
+
+                            if ((callInProgress.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) || (callInProgress.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT)) {
+                                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                            }
+                            openCameraApp();
+                        }
+
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        String message= getResources().getString(R.string.confirmation_open_camera_on_chat);
+        builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
+        builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
+
     public void showConfirmationClearChat(final MegaChatRoom c){
         log("showConfirmationClearChat");
 
@@ -2318,7 +2383,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        android.support.v7.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        }
+        else{
+            builder = new AlertDialog.Builder(this);
+        }
         String message= getResources().getString(R.string.confirmation_clear_group_chat);
         builder.setTitle(R.string.title_confirmation_clear_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -2344,7 +2415,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        android.support.v7.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        }
+        else{
+            builder = new AlertDialog.Builder(this);
+        }
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message= getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -2502,29 +2579,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                 }
 
-                isTakePicture = true;
+                boolean inProgressCall = false;
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                    if (!hasStoragePermission) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                Constants.REQUEST_WRITE_STORAGE);
+                MegaChatCall callInProgress = megaChatApi.getChatCall(idChat);
+                if(callInProgress != null){
+                    if((callInProgress.getStatus() >= MegaChatCall.CALL_STATUS_REQUEST_SENT) && (callInProgress.getStatus() <= MegaChatCall.CALL_STATUS_IN_PROGRESS)){
+                        inProgressCall = true;
+                    }else{
+                        inProgressCall = false;
                     }
-
-                    boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-                    if (!hasCameraPermission) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.CAMERA},
-                                Constants.REQUEST_CAMERA);
-                    }
-
-                    if (hasStoragePermission && hasCameraPermission){
-                        this.takePicture();
-                    }
+                }else{
+                    inProgressCall = false;
                 }
-                else{
-                    this.takePicture();
+
+                if(!inProgressCall){
+                    openCameraApp();
+                }else{
+                    showConfirmationOpenCamera(chatRoom);
                 }
 
                 break;
@@ -2682,6 +2753,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         //ft.commitAllowingStateLoss();
     }
 
+
+
     public void attachFromCloud(){
         log("attachFromCloud");
         ChatController chatC = new ChatController(this);
@@ -2728,6 +2801,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(adapter!=null){
             adapter.notifyItemChanged(position);
+        }
+    }
+
+    public void openCameraApp(){
+        log("openCameraApp()");
+        isTakePicture = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        Constants.REQUEST_WRITE_STORAGE);
+            }
+
+            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        Constants.REQUEST_CAMERA);
+            }
+
+            if (hasStoragePermission && hasCameraPermission){
+                this.takePicture();
+            }
+        }else{
+            this.takePicture();
         }
     }
 
@@ -5999,6 +6098,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         megaChatApi.removeChatListener(this);
         megaChatApi.removeChatCallListener(this);
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(dialogConnectReceiver);
+
         super.onDestroy();
     }
 
@@ -6246,7 +6347,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         final long sizeC = size;
         final ChatController chatC = new ChatController(this);
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        android.support.v7.app.AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        }
+        else{
+            builder = new AlertDialog.Builder(this);
+        }
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -7138,6 +7245,40 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
             }
         }
+    }
+
+    public void showConfirmationConnect(){
+        log("showConfirmationConnect");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        startConnection();
+                        finish();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        log("showConfirmationConnect: BUTTON_NEGATIVE");
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        try {
+            builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.cam_sync_ok, dialogClickListener)
+                    .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        }
+        catch (Exception e){}
+    }
+
+    public void startConnection() {
+        log("startConnection: Broadcast to ManagerActivity");
+        Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
+        intent.putExtra("actionType", Constants.START_RECONNECTION);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
     public int getDeviceDensity(){

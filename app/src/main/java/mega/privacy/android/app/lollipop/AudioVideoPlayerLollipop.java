@@ -150,6 +150,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
@@ -672,6 +673,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
         else {
             playList.setVisibility(View.GONE);
+            createPlayer();
         }
 
         if (savedInstanceState == null){
@@ -1610,38 +1612,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         handler.postDelayed(runnableActionStatusBar, 3000);
     }
 
-    public class FindSelected extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (isOffline){
-                for (int i=0; i<mediaOffList.size(); i++) {
-                    if (handle == Long.parseLong(mediaOffList.get(i).getHandle())) {
-                        currentWindowIndex = i;
-                        break;
-                    }
-                }
-            }
-            else if (isZip) {
-                for (int i = 0; i< zipMediaFiles.size(); i++) {
-                    if (fileName.equals(zipMediaFiles.get(i).getName())) {
-                        currentWindowIndex = i;
-                        break;
-                    }
-                }
-            }
-            else {
-                for (int i=0; i<mediaHandles.size(); i++) {
-                    if (handle == mediaHandles.get(i)) {
-                        currentWindowIndex = i;
-                        break;
-                    }
-                }
-            }
-            return null;
-        }
-    }
-
     public void sortByNameDescending(){
 
         ArrayList<String> foldersOrder = new ArrayList<String>();
@@ -1964,7 +1934,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (nC == null) {
             nC = new NodeController(this);
         }
-        boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+        boolean fromIncoming = false;
+        if (adapterType != Constants.OFFLINE_ADAPTER && adapterType != Constants.ZIP_ADAPTER) {
+            fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+        }
 
         if (loop){
             loopMenuItem.setChecked(true);
@@ -2006,10 +1979,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 if (isUrl){
                     shareMenuItem.setVisible(false);
-                    downloadMenuItem.setVisible(true);
                 }
                 else {
-                    downloadMenuItem.setVisible(false);
                     shareMenuItem.setVisible(true);
                 }
                 if(node.isExported()){
@@ -2021,6 +1992,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     getlinkMenuItem.setVisible(true);
                 }
 
+                downloadMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 renameMenuItem.setVisible(true);
                 moveMenuItem.setVisible(true);
@@ -2163,19 +2135,18 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 chatRemoveMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
 
                 if (isUrl){
-                    downloadMenuItem.setVisible(true);
                     shareMenuItem.setVisible(false);
                 }
                 else {
-                    downloadMenuItem.setVisible(false);
                     shareMenuItem.setVisible(true);
                 }
 
                 MegaNode node = megaApi.getNodeByHandle(handle);
                 int accessLevel = megaApi.getAccess(node);
-                
+
                 switch (accessLevel) {
                     case MegaShare.ACCESS_FULL: {
                         log("access FULL");
@@ -2327,15 +2298,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                     }
+
+                    downloadMenuItem.setVisible(true);
                     if (isUrl){
-                        downloadMenuItem.setVisible(true);
                         shareMenuItem.setVisible(false);
                     }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        if (shareVisible){
-                            shareMenuItem.setVisible(true);
-                        }
+                    else if (shareVisible){
+                        shareMenuItem.setVisible(true);
                     }
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
@@ -2513,7 +2482,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                          isDeleteDialogShow = false;
                          finish();
                          break;
-            
+
                      case DialogInterface.BUTTON_NEGATIVE:
                          //No button clicked
                          isDeleteDialogShow = false;
@@ -2590,8 +2559,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     void releasePlaylist(){
-//        sortBySelected();
-//        findSelected();
         onPlaylist = false;
         if (player != null){
             playWhenReady = player.getPlayWhenReady();
@@ -3627,8 +3594,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         log("onResume");
         if (!isOffline && !fromChat && !isFolderLink
                 && adapterType != Constants.FILE_LINK_ADAPTER
-                && !isZip) {
-            if (megaApi.getNodeByHandle(handle) == null && !fromDownload) {
+                && !isZip && !fromDownload) {
+            if (megaApi.getNodeByHandle(handle) == null) {
                 finish();
             }
             updateFile();
@@ -4320,6 +4287,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     @Override
+    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+        log("onUserAlertsUpdate");
+    }
+
+    @Override
     public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
         log("onNodesUpdate");
         if (megaApi.getNodeByHandle(handle) == null){
@@ -4470,6 +4442,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                         }
                         if(mSource != null) {
+                            if (handle == Long.parseLong(mediaOffList.get(i).getHandle())) {
+                                currentWindowIndex = i;
+                            }
                             mediaSourcePlaylist.add(mSource);
                         }
                     }
@@ -4482,6 +4457,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             mediaUris.add(mediaUri);
                             mSource = new ExtractorMediaSource(mediaUri, dataSourceFactory, extractorsFactory, null, null);
                             if (mSource != null) {
+                                if (fileName.equals(zipMediaFiles.get(i).getName())) {
+                                    currentWindowIndex = i;
+                                }
                                 mediaSourcePlaylist.add(mSource);
                             }
                         }
@@ -4520,6 +4498,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         }
                         if (mSource != null) {
+                            if (handle == n.getHandle()) {
+                                currentWindowIndex = i;
+                            }
                             mediaSourcePlaylist.add(mSource);
                         }
                     }
@@ -4560,7 +4541,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 createPlaylistProgressBar.setVisibility(View.GONE);
             }
             else {
-                new FindSelected().execute();
                 createPlaylistProgressBar.setVisibility(View.GONE);
                 playListCreated = true;
                 enableNextButton();
