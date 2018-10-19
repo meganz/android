@@ -223,7 +223,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			else if (gridLayoutManager != null){
 				View v = gridLayoutManager.findViewByPosition(position);
 				if (v != null) {
-					return (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
 				}
 			}
 		}
