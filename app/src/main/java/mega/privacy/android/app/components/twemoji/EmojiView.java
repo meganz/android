@@ -40,7 +40,7 @@ import mega.privacy.android.app.components.twemoji.listeners.RepeatListener;
 
   private int emojiTabLastSelectedIndex = -1;
 
-  @SuppressWarnings("PMD.CyclomaticComplexity") public EmojiView(final Context context, final OnEmojiClickListener onEmojiClickListener,
+  public EmojiView(final Context context, final OnEmojiClickListener onEmojiClickListener,
                                                                  final OnEmojiLongClickListener onEmojiLongClickListener, @NonNull final RecentEmoji recentEmoji,
                                                                  @NonNull final VariantEmoji variantManager, @ColorInt final int backgroundColor,
                                                                  @ColorInt final int iconColor, @ColorInt final int dividerColor) {

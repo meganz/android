@@ -48,7 +48,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
   }
 
   @Override @CallSuper protected void onTextChanged(final CharSequence text, final int start, final int lengthBefore, final int lengthAfter) {
-    log("onTextChanged()-text: "+text);
+    log("**** onTextChanged()-text: "+text);
 
     final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
 
