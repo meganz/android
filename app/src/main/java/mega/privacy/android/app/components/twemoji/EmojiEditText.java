@@ -12,9 +12,10 @@ import android.view.KeyEvent;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.utils.Util;
 
 /** Reference implementation for an EditText with emoji support. */
-@SuppressWarnings("CPD-START") public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
+public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
   private float emojiSize;
 
   public EmojiEditText(final Context context) {
@@ -47,9 +48,13 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
   }
 
   @Override @CallSuper protected void onTextChanged(final CharSequence text, final int start, final int lengthBefore, final int lengthAfter) {
+    log("onTextChanged()-text: "+text);
+
     final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+
     final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
     EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
+
   }
 
   @Override public float getEmojiSize() {
@@ -62,9 +67,14 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
   }
 
   @Override @CallSuper public void input(final Emoji emoji) {
+    log("input() --> emoji: "+emoji);
+
     if (emoji != null) {
+      log("emoji != null");
+
       final int start = getSelectionStart();
       final int end = getSelectionEnd();
+      log("start: "+start+", end: "+end);
 
       if (start < 0) {
         append(emoji.getUnicode());
@@ -92,5 +102,9 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
   @Override public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
     setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
+  }
+
+  public static void log(String message) {
+    Util.log("EmojiEditText", message);
   }
 }

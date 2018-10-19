@@ -13,14 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
+import mega.privacy.android.app.utils.Util;
 
-import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
+import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
+
 
 /* EmojiManager where an EmojiProvider can be installed for further usage.*/
-@SuppressWarnings("PMD.ForLoopCanBeForeach") public final class EmojiManager {
+public final class EmojiManager {
   private static final EmojiManager INSTANCE = new EmojiManager();
   private static final int GUESSED_UNICODE_AMOUNT = 3000;
   private static final int GUESSED_TOTAL_PATTERN_LENGTH = GUESSED_UNICODE_AMOUNT * 4;
@@ -36,27 +37,33 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
 
   private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = new EmojiReplacer() {
     @Override public void replaceWithImages(final Context context, final Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback) {
+      log("replaceWithImages()- text: "+text+", emojiSize: "+emojiSize+", defaultEmojiSize: "+defaultEmojiSize);
+
       final EmojiManager emojiManager = EmojiManager.getInstance();
+
       final EmojiSpan[] existingSpans = text.getSpans(0, text.length(), EmojiSpan.class);
       final List<Integer> existingSpanPositions = new ArrayList<>(existingSpans.length);
 
       final int size = existingSpans.length;
+
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0; i < size; i++) {
         existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
       }
-
       final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
+      log("replaceWithImages() - findAllEmojis.size: "+findAllEmojis.size());
 
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0; i < findAllEmojis.size(); i++) {
         final EmojiRange location = findAllEmojis.get(i);
 
         if (!existingSpanPositions.contains(location.start)) {
-          text.setSpan(new EmojiSpan(context, location.emoji, emojiSize),
-                  location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+          text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+          log("replaceWithImages() - text.setSpan(EmojiSpan(context, location.emoji("+location.emoji+"), emojiSize("+emojiSize+")), location.start("+location.start+"), location.end("+location.end+"), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);)");
+
         }
       }
+
     }
   };
 
@@ -82,6 +89,7 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
    * @param provider the provider that should be installed.
    */
   public static void install(@NonNull final EmojiProvider provider) {
+
     INSTANCE.categories = checkNotNull(provider.getCategories(), "categories == null");
     INSTANCE.emojiMap.clear();
     INSTANCE.emojiReplacer = provider instanceof EmojiReplacer ? (EmojiReplacer) provider : DEFAULT_EMOJI_REPLACER;
@@ -94,6 +102,7 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
       final Emoji[] emojis = checkNotNull(INSTANCE.categories[i].getEmojis(), "emojies == null");
 
       final int emojisSize = emojis.length;
+
       //noinspection ForLoopReplaceableByForEach
       for (int j = 0; j < emojisSize; j++) {
         final Emoji emoji = emojis[j];
@@ -166,6 +175,8 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
   }
 
   public void replaceWithImages(final Context context, final Spannable text, final float emojiSize, final float defaultEmojiSize) {
+    log("replaceWithImages() text: "+text+", emojiSize: "+emojiSize+", defaultEmojiSize: "+defaultEmojiSize);
+
     verifyInstalled();
 
     emojiReplacer.replaceWithImages(context, text, emojiSize, defaultEmojiSize, DEFAULT_EMOJI_REPLACER);
@@ -173,7 +184,7 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
 
   EmojiCategory[] getCategories() {
     verifyInstalled();
-    return categories; // NOPMD
+    return categories;
   }
 
   Pattern getEmojiRepetitivePattern() {
@@ -181,6 +192,8 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
   }
 
   @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
+    log("findAllEmojis() - text: "+text);
+
     verifyInstalled();
 
     final List<EmojiRange> result = new ArrayList<>();
@@ -190,9 +203,11 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
 
       while (matcher.find()) {
         final Emoji found = findEmoji(text.subSequence(matcher.start(), matcher.end()));
-
+        log("emoji founded");
         if (found != null) {
           result.add(new EmojiRange(matcher.start(), matcher.end(), found));
+        }else{
+
         }
       }
     }
@@ -201,6 +216,8 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
   }
 
   @Nullable Emoji findEmoji(@NonNull final CharSequence candidate) {
+    log("findEmoji() - --  candidate: "+candidate);
+
     verifyInstalled();
 
     // We need to call toString on the candidate, since the emojiMap may not find the requested entry otherwise, because
@@ -213,4 +230,9 @@ import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
       throw new IllegalStateException("Please install an EmojiProvider through the EmojiManager.install() method first.");
     }
   }
+
+  public static void log(String message) {
+    Util.log("EmojiManager", message);
+  }
+
 }

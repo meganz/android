@@ -77,6 +77,7 @@ public class EmojiTextView extends AppCompatTextView {
   }
 
   @Override public void setText(CharSequence rawText, BufferType type) {
+
     CharSequence text = rawText == null ? "" : rawText;
     SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
     Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
@@ -105,7 +106,9 @@ public class EmojiTextView extends AppCompatTextView {
       setText(getText());
     }
   }
-
+  public static void log(String message) {
+    Util.log("EmojiTextView", message);
+  }
 }
 
 

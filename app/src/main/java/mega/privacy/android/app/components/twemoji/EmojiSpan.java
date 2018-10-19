@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.text.style.DynamicDrawableSpan;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
+import mega.privacy.android.app.utils.Util;
 
 final class EmojiSpan extends DynamicDrawableSpan {
   private final float size;
@@ -28,8 +29,8 @@ final class EmojiSpan extends DynamicDrawableSpan {
     return deferredDrawable;
   }
 
-  @Override public int getSize(final Paint paint, final CharSequence text, final int start,
-                               final int end, final Paint.FontMetricsInt fontMetrics) {
+  @Override public int getSize(final Paint paint, final CharSequence text, final int start, final int end, final Paint.FontMetricsInt fontMetrics) {
+
     if (fontMetrics != null) {
       final Paint.FontMetrics paintFontMetrics = paint.getFontMetrics();
       final float fontHeight = paintFontMetrics.descent - paintFontMetrics.ascent;
@@ -58,4 +59,5 @@ final class EmojiSpan extends DynamicDrawableSpan {
     drawable.draw(canvas);
     canvas.restore();
   }
+
 }
