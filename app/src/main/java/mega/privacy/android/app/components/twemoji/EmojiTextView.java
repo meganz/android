@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
+import android.support.text.emoji.widget.EmojiAppCompatTextView;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -15,7 +16,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
-public class EmojiTextView extends AppCompatTextView {
+public class EmojiTextView extends EmojiAppCompatTextView {
 
   private float emojiSize;
 

@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
 import android.support.annotation.Px;
+import android.support.text.emoji.widget.EmojiAppCompatEditText;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -15,7 +16,7 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.utils.Util;
 
 /** Reference implementation for an EditText with emoji support. */
-public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
+public class EmojiEditText extends EmojiAppCompatEditText implements EmojiEditTextInterface {
   private float emojiSize;
 
   public EmojiEditText(final Context context) {
@@ -48,7 +49,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
   }
 
   @Override @CallSuper protected void onTextChanged(final CharSequence text, final int start, final int lengthBefore, final int lengthAfter) {
-    log("**** onTextChanged()-text: "+text);
+    log("onTextChanged()-text: "+text);
 
     final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
 
@@ -67,14 +68,11 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
   }
 
   @Override @CallSuper public void input(final Emoji emoji) {
-    log("input() --> emoji: "+emoji);
 
     if (emoji != null) {
-      log("emoji != null");
 
       final int start = getSelectionStart();
       final int end = getSelectionEnd();
-      log("start: "+start+", end: "+end);
 
       if (start < 0) {
         append(emoji.getUnicode());

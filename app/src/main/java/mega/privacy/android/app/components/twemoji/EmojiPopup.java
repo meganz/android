@@ -15,8 +15,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
 
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiBackspaceClickListener;
 import mega.privacy.android.app.components.twemoji.listeners.OnEmojiClickListener;
@@ -30,10 +32,11 @@ import mega.privacy.android.app.utils.Util;
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
 
 public final class EmojiPopup {
-  static final int MIN_KEYBOARD_HEIGHT = 100;
+  static final int MIN_KEYBOARD_HEIGHT_PORTRAIT = 100;
 
   final View rootView;
   final Activity context;
+  final ImageButton emojiIcon;
 
   @NonNull final RecentEmoji recentEmoji;
   @NonNull final VariantEmoji variantEmoji;
@@ -56,17 +59,18 @@ public final class EmojiPopup {
 
   final ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
     @Override public void onGlobalLayout() {
-      final Rect rect = Utils.windowVisibleDisplayFrame(context);
-      final int heightDifference = Utils.screenHeight(context) - rect.bottom;
 
-      if (heightDifference > Utils.dpToPx(context, MIN_KEYBOARD_HEIGHT)) {
+      final Rect rect = Utils.windowVisibleDisplayFrame(context);
+      final int heightDifference = Utils.screenHeight(context) - (rect.bottom);
+
+      if (heightDifference > Utils.dpToPx(context, MIN_KEYBOARD_HEIGHT_PORTRAIT)) {
+
         popupWindow.setHeight(heightDifference);
         popupWindow.setWidth(rect.right);
 
         if (!isKeyboardOpen && onSoftKeyboardOpenListener != null) {
           onSoftKeyboardOpenListener.onKeyboardOpen(heightDifference);
         }
-        log("ViewTreeObserver()- isKeyboardOpen = true;");
         isKeyboardOpen = true;
 
         if (isPendingOpen) {
@@ -75,14 +79,11 @@ public final class EmojiPopup {
         }
       } else {
         if (isKeyboardOpen) {
-          log("ViewTreeObserver()- isKeyboardOpen = false && hideBothKeyboards()");
-
           isKeyboardOpen = false;
 
           if (onSoftKeyboardCloseListener != null) {
             onSoftKeyboardCloseListener.onKeyboardClose();
           }
-
           hideBothKeyboards();
           Utils.removeOnGlobalLayoutListener(context.getWindow().getDecorView(), onGlobalLayoutListener);
         }
@@ -90,11 +91,12 @@ public final class EmojiPopup {
     }
   };
 
-  EmojiPopup(@NonNull final View rootView, @NonNull final EmojiEditTextInterface editInterface, @Nullable final RecentEmoji recent, @Nullable final VariantEmoji variant, @ColorInt final int backgroundColor, @ColorInt final int iconColor, @ColorInt final int dividerColor) {
+  EmojiPopup(@NonNull final View rootView, @NonNull final EmojiEditTextInterface editInterface, @Nullable final RecentEmoji recent, @Nullable final VariantEmoji variant, @ColorInt final int backgroundColor, @ColorInt final int iconColor, @ColorInt final int dividerColor, @Nullable final ImageButton emojiIcon) {
 
     this.context = Utils.asActivity(rootView.getContext());
     this.rootView = rootView.getRootView();
     this.editInterface = editInterface;
+    this.emojiIcon = emojiIcon;
     this.recentEmoji = recent != null ? recent : new RecentEmojiManager(context);
     this.variantEmoji = variant != null ? variant : new VariantEmojiManager(context);
 
@@ -149,20 +151,18 @@ public final class EmojiPopup {
 
   public void openLetterKeyboard(){
     log("openLetterKeyboard()");
-    if (isKeyboardOpen) {
-      log("openKeyboard() - LetterKeyboard is visible -> do nothing");
-
-    }else if (editInterface instanceof View) {
-      log("openKeyboard() - LetterKeyboard is hide -> show LetterKeyboard");
+    if ((!isKeyboardOpen)&&(editInterface instanceof View)){
       final View view = (View) editInterface;
       view.setFocusableInTouchMode(true);
       view.requestFocus();
+
       //Show keyboard
       InputMethodManager imm = (InputMethodManager)  context.getSystemService(Context.INPUT_METHOD_SERVICE);
-      if( context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+      imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+      if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        log("LANDSCAPE");
       }else{
-        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        log("PORTRAIT");
       }
 
     } else {
@@ -172,12 +172,13 @@ public final class EmojiPopup {
   }
 
   public void hideBothKeyboards(){
+    log("hideBothKeyboards");
+    emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
     if(isKeyboardOpen){
       hideLetterKeyboard();
     }
     if(popupWindow.isShowing()){
       hideEmojiKeyboard();
-
     }
   }
 
@@ -192,15 +193,13 @@ public final class EmojiPopup {
   public void hideLetterKeyboard(){
 
   if (editInterface instanceof View) {
-      //the Letterkeyboard is visible
+    log("hideLetterKeyboard() ");
+
+    //the Letterkeyboard is visible
       final View view = (View) editInterface;
       //Hide keyboard
       InputMethodManager imm = (InputMethodManager)  context.getSystemService(Context.INPUT_METHOD_SERVICE);
-      if( context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-      }else{
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-      }
+      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
     } else {
       throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
@@ -208,8 +207,8 @@ public final class EmojiPopup {
   }
 
   public void changeKeyboard() {
+    log("changeKeyboard() ");
     if (!popupWindow.isShowing()) {
-      //If Emojikeyboard is not showing open emojiKeyboard
       // Remove any previous listeners to avoid duplicates.
       Utils.removeOnGlobalLayoutListener(context.getWindow().getDecorView(), onGlobalLayoutListener);
       context.getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
@@ -225,17 +224,17 @@ public final class EmojiPopup {
 
         //Show keyboard
         InputMethodManager imm = (InputMethodManager)  context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        if( context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-          imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+          log("LANDSCAPE");
         }else{
-          imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+          log("PORTRAIT");
         }
+
       } else {
         throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
       }
     } else {
-      //If Emojikeyboard is showing -> dismissEmojiKeyboard and the LetterKeyboard is showing
-      log("changeKeyboard() - EmojiKeyboard is visible -> hideEmojiKeyboard()");
       hideEmojiKeyboard();
     }
 
@@ -364,11 +363,11 @@ public final class EmojiPopup {
       return this;
     }
 
-    @CheckResult public EmojiPopup build(@NonNull final EmojiEditTextInterface editInterface) {
+    @CheckResult public EmojiPopup build(@NonNull final EmojiEditTextInterface editInterface, final ImageButton emojiIcon) {
       EmojiManager.getInstance().verifyInstalled();
       checkNotNull(editInterface, "EditText can't be null");
 
-      final EmojiPopup emojiPopup = new EmojiPopup(rootView, editInterface, recentEmoji, variantEmoji, backgroundColor, iconColor, dividerColor);
+      final EmojiPopup emojiPopup = new EmojiPopup(rootView, editInterface, recentEmoji, variantEmoji, backgroundColor, iconColor, dividerColor, emojiIcon);
       emojiPopup.onSoftKeyboardCloseListener = onSoftKeyboardCloseListener;
       emojiPopup.onEmojiClickListener = onEmojiClickListener;
       emojiPopup.onSoftKeyboardOpenListener = onSoftKeyboardOpenListener;
@@ -382,5 +381,9 @@ public final class EmojiPopup {
   public static void log(String message) {
     Util.log("EmojiPopup", message);
   }
+  public void modifyKeyboardHeight(int heightDifference){
+
+  }
+
 
 }

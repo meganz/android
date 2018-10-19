@@ -119,7 +119,7 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:textSize="14sp"
-                            android:imeOptions="actionSend"
+                            android:imeOptions="flagNoExtractUi"
                             android:layout_toLeftOf="@+id/send_message_icon_chat"
                             android:inputType="textMultiLine|textCapSentences"
                             android:minLines="1"
