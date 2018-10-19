@@ -81,10 +81,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
-import mega.privacy.android.app.components.emojicon.EmojiconEditText;
-import mega.privacy.android.app.components.emojicon.EmojiconGridFragment;
-import mega.privacy.android.app.components.emojicon.EmojiconsFragment;
-import mega.privacy.android.app.components.emojicon.emoji.Emojicon;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiPopup;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -147,7 +143,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -327,14 +323,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private ActionMode actionMode;
 
-    public void onEmojiconClicked(Emojicon emojicon) {
-        EmojiconsFragment.input(textChat, emojicon);
-    }
-
-    @Override
-    public void onEmojiconBackspaceClicked(View v) {
-        EmojiconsFragment.backspace(textChat);
-    }
 
     private class UserTyping {
         MegaChatParticipant participantTyping;
@@ -635,7 +623,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
-        textChat.setEmojiSize(Util.scaleWidthPx(25, outMetrics));
+        textChat.setEmojiSize(40);
         emojiPopup = EmojiPopup.Builder.fromRootView(linearLayoutTwemoji).build(textChat);
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
@@ -709,6 +697,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
                             if(chatRoom.hasCustomTitle()){
+
                                 textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
                             }
                             else{

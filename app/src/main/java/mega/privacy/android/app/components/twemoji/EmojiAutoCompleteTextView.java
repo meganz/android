@@ -15,7 +15,7 @@ import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
 
 /** Reference implementation for an EmojiAutoCompleteTextView with emoji support. */
-@SuppressWarnings("CPD-START") public class EmojiAutoCompleteTextView extends AppCompatAutoCompleteTextView implements EmojiEditTextInterface {
+public class EmojiAutoCompleteTextView extends AppCompatAutoCompleteTextView implements EmojiEditTextInterface {
   private float emojiSize;
 
   public EmojiAutoCompleteTextView(final Context context) {
