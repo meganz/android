@@ -828,7 +828,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 ArrayList<MegaNode> nodes = null;
                 if (parentNodeHandle == -1){
-                    nodes = megaApi.search(query);
+                    nodes = megaApi.search(query, MegaApiJava.ORDER_DEFAULT_ASC);
                 }
                 else{
                     parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
