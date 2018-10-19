@@ -2158,4 +2158,6 @@
     <string name="notification_new_contact" context="Text of the historic notification for a new contact">%s is now a contact.</string>
     <string name="notification_new_shared_folder" context="Text of the historic notification for a new shared folder">New shared folder from %s</string>
 
+    <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+
 </resources>

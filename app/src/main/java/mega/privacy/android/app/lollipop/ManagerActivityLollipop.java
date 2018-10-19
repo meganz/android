@@ -598,6 +598,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	RelativeLayout settingsSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
+	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 
@@ -1924,6 +1925,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         contactsSection.setOnClickListener(this);
 		notificationsSection = (RelativeLayout) findViewById(R.id.notifications_section);
 		notificationsSection.setOnClickListener(this);
+		notificationsSectionText = (TextView) findViewById(R.id.notification_section_text);
         contactsSectionText = (TextView) findViewById(R.id.contacts_section_text);
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
@@ -2652,6 +2654,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("onCreate - Check if there any INCOMING pendingRequest contacts");
 			setContactTitleSection();
+
+			setNotificationsTitleSection();
 
 			if (drawerItem == null) {
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -4459,7 +4463,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				if(numberUnread==0){
 					if(isFirstNavigationLevel()){
-						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 								|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
 							aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 						}
@@ -4473,7 +4477,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					if(isFirstNavigationLevel()){
-						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 								|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
 							badgeDrawable.setProgress(1.0f);
 						}
@@ -4497,7 +4501,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				if(isFirstNavigationLevel()){
-					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 							|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
 						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 					}
@@ -4512,7 +4516,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		} else {
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
 						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
@@ -7278,6 +7282,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					pauseTransfersMenuIcon.setVisible(false);
 				}
 			}
+			else if(drawerItem == DrawerItem.NOTIFICATIONS){
+				//Hide all
+				newChatMenuItem.setVisible(false);
+				selectMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
+				selectMenuItem.setVisible(false);
+				setStatusMenuItem.setVisible(false);
+				searchByDate.setVisible(false);
+				addContactMenuItem.setVisible(false);
+				searchMenuItem.setVisible(false);
+				createFolderMenuItem.setVisible(false);
+				addMenuItem.setVisible(false);
+				sortByMenuItem.setVisible(false);
+				unSelectMenuItem.setVisible(false);
+				thumbViewMenuItem.setVisible(false);
+				addMenuItem.setEnabled(false);
+				rubbishBinMenuItem.setVisible(false);
+				clearRubbishBinMenuitem.setVisible(false);
+				importLinkMenuItem.setVisible(false);
+				takePicture.setVisible(false);
+				refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				upgradeAccountMenuItem.setVisible(false);
+				changePass.setVisible(false);
+				cancelSubscription.setVisible(false);
+				killAllSessions.setVisible(false);
+				logoutMenuItem.setVisible(false);
+				cancelAllTransfersMenuItem.setVisible(false);
+				clearCompletedTransfers.setVisible(false);
+				forgotPassMenuItem.setVisible(false);
+				playTransfersMenuIcon.setVisible(false);
+				pauseTransfersMenuIcon.setVisible(false);
+			}
 		}
 		else{
 			log("Offline options shown");
@@ -7420,7 +7457,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case android.R.id.home:{
 				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX
-							|| drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.MEDIA_UPLOADS) {
+							|| drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.MEDIA_UPLOADS) {
 						if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
 							backToDrawerItem(CLOUD_DRIVE_BNV);
 						}
@@ -9560,6 +9597,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 			}
+		}
+		else if (drawerItem == DrawerItem.NOTIFICATIONS){
+			backToDrawerItem(bottomNavigationCurrentItem);
+			return;
 		}
 		else if (drawerItem == DrawerItem.SETTINGS){
 
@@ -14547,6 +14588,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
 		}
 
+		if (notificationsSection != null) {
+			notificationsSection.setEnabled(false);
+			if (notificationsSectionText == null) {
+				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.contacts_section_text);
+			}
+
+			int unread = megaApi.getNumUnreadUserAlerts();
+
+			if(unread == 0){
+				notificationsSectionText.setText(getString(R.string.title_properties_chat_contact_notifications));
+			}
+			else{
+				setFormattedNotificationsTitleSection(unread, false);
+			}
+
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.black_15_opacity));
+		}
+
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(false);
 			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_disable));
@@ -14624,6 +14683,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
 			setContactTitleSection();
+		}
+
+		if (notificationsSection != null) {
+			notificationsSection.setEnabled(true);
+			if (notificationsSectionText == null) {
+				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
+			}
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			setNotificationsTitleSection();
 		}
 
 		if (upgradeAccount != null) {
@@ -16748,6 +16816,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
 		log("onUserAlertsUpdate");
+		setNotificationsTitleSection();
+
+		if(notificFragment!=null && notificFragment.isAdded()){
+			ListIterator<MegaUserAlert> itrReplace = userAlerts.listIterator();
+			while (itrReplace.hasNext()) {
+				MegaUserAlert alert = itrReplace.next();
+				if (alert != null) {
+					if (alert.getSeen()==false) {
+						//Add the new notification
+						notificFragment.addNotification(alert);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -18230,6 +18312,41 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			result = Html.fromHtml(textToShow);
 		}
 		contactsSectionText.setText(result);
+	}
+
+	public void setNotificationsTitleSection(){
+		int unread = megaApi.getNumUnreadUserAlerts();
+
+		if(unread == 0){
+			notificationsSectionText.setText(getString(R.string.title_properties_chat_contact_notifications));
+		}
+		else{
+			setFormattedNotificationsTitleSection(unread, true);
+		}
+	}
+
+	void setFormattedNotificationsTitleSection (int unread, boolean enable) {
+		String textToShow = String.format(getString(R.string.section_notification_with_unread), unread);
+		try {
+			if (enable) {
+				textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+			}
+			else {
+				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");
+			}
+			textToShow = textToShow.replace("[/A]", "</font>");
+		}
+		catch(Exception e){
+			log("Formatted string: " + textToShow);
+		}
+
+		Spanned result = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+		} else {
+			result = Html.fromHtml(textToShow);
+		}
+		notificationsSectionText.setText(result);
 	}
 
 	@Override
