@@ -3,56 +3,27 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 
@@ -91,14 +62,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		LinearLayout itemLayout;
 
-		ImageView titleIcon;
-    	TextView titleText;
+		ImageView sectionIcon;
+    	TextView sectionText;
 
-    	ImageView firstLineIcon;
-    	TextView firstLineText;
+    	ImageView titleIcon;
+    	TextView titleText;
     	TextView newText;
 
-    	TextView secondLineText;
+    	TextView descriptionText;
     	TextView dateText;
     }
 
@@ -118,22 +89,22 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		holder.itemLayout = (LinearLayout) v.findViewById(R.id.notification_list_item_layout);
 
-		holder.titleIcon = (ImageView) v.findViewById(R.id.notification_title_icon);
-		holder.titleText = (TextView) v.findViewById(R.id.notification_title_text);
+		holder.sectionIcon = (ImageView) v.findViewById(R.id.notification_title_icon);
+		holder.sectionText = (TextView) v.findViewById(R.id.notification_title_text);
 
-		holder.firstLineIcon = (ImageView) v.findViewById(R.id.notification_first_line_icon);
-		holder.firstLineText = (TextView) v.findViewById(R.id.notification_first_line_text);
+		holder.titleIcon = (ImageView) v.findViewById(R.id.notification_first_line_icon);
+		holder.titleText = (TextView) v.findViewById(R.id.notification_first_line_text);
 		holder.newText = (TextView) v.findViewById(R.id.notification_new_label);
 
-		holder.secondLineText = (TextView) v.findViewById(R.id.notifications_text);
+		holder.descriptionText = (TextView) v.findViewById(R.id.notifications_text);
 		holder.dateText = (TextView) v.findViewById(R.id.notifications_date);
 
 		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			log("onCreate: Landscape configuration");
-			holder.firstLineText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+			holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 		}
 		else{
-			holder.firstLineText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+			holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 		}
 
 		holder.itemLayout.setTag(holder);
@@ -152,146 +123,150 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		int alertType = alert.getType();
 
-		String title = alert.getHeading();
-		log(alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + alert.getString(0));
+		String section = alert.getHeading();
+		log("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
+		log("****"+ alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
 
-		String text = alert.getTitle();
+		String description = alert.getTitle();
 
 		switch (alertType){
 
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 
-				holder.firstLineText.setText(context.getString(R.string.title_contact_request_notification));
+				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
 				String email = alert.getEmail();
-				text = context.getString(R.string.notification_new_contact_request, email);
+				description = context.getString(R.string.notification_new_contact_request, email);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
-				holder.firstLineText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
+				holder.titleText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
 
 				String email = alert.getEmail();
-				text = context.getString(R.string.notification_new_contact, email);
+				description = context.getString(R.string.notification_new_contact, email);
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:{
+				//android100@yopmail.com
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setText(alert.getEmail());
+
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:{
-				title = context.getString(R.string.section_contacts).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.firstLineIcon.setVisibility(View.GONE);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHARE:{
-				title = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
-				long handle = alert.getNodeHandle();
-				MegaNode node = megaApi.getNodeByHandle(handle);
-				if(node!=null){
-					if(node.isInShare()){
-						holder.titleIcon.setVisibility(View.VISIBLE);
-						holder.firstLineIcon.setVisibility(View.VISIBLE);
-						holder.firstLineText.setText(node.getName());
-					}
-				}
-				else{
-					log("Node path: "+alert.getPath());
-				}
+				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
+				holder.sectionIcon.setVisibility(View.VISIBLE);
+				holder.titleIcon.setVisibility(View.VISIBLE);
+				holder.titleText.setText("Folder name");
 
 				String email = alert.getEmail();
-				text = context.getString(R.string.notification_new_shared_folder, email);
+				description = context.getString(R.string.notification_new_shared_folder, email);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_DELETEDSHARE:{
-				title = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
+				holder.sectionIcon.setVisibility(View.VISIBLE);
 				holder.titleIcon.setVisibility(View.VISIBLE);
-				holder.firstLineIcon.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHAREDNODES:{
-				title = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
+				holder.sectionIcon.setVisibility(View.VISIBLE);
 				holder.titleIcon.setVisibility(View.VISIBLE);
-				holder.firstLineIcon.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:{
-				title = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
+				holder.sectionIcon.setVisibility(View.VISIBLE);
 				holder.titleIcon.setVisibility(View.VISIBLE);
-				holder.firstLineIcon.setVisibility(View.VISIBLE);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_PAYMENT_SUCCEEDED:{
-				title = alert.getHeading();
+				section = alert.getHeading();
 
 				break;
 			}
@@ -312,19 +287,18 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 			}
 		}
 
-		holder.titleText.setText(title);
-		holder.secondLineText.setText(text);
+		holder.sectionText.setText(section);
+		holder.descriptionText.setText(description);
 
 		String date = TimeChatUtils.formatDateAndTime(alert.getTimestamp(0), TimeChatUtils.DATE_LONG_FORMAT);
 		holder.dateText.setText(date);
 
 		if(alert.getSeen()==false){
-			holder.newText.setVisibility(View.GONE);
-		}
-		else{
 			holder.newText.setVisibility(View.VISIBLE);
 		}
-
+		else{
+			holder.newText.setVisibility(View.GONE);
+		}
 
 //		holder.imageButtonThreeDots.setTag(holder);
 //		holder.imageButtonThreeDots.setOnClickListener(this);

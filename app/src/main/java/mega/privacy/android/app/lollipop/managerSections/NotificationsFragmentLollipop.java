@@ -2,16 +2,13 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,47 +17,24 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.ChatDividerItemDecoration;
-import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
-import mega.privacy.android.app.lollipop.listeners.ChatNonContactNameListener;
-import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
-import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUserAlert;
-
-import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
 public class NotificationsFragmentLollipop extends Fragment implements View.OnClickListener {
 
@@ -77,7 +51,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     RecyclerView listView;
     LinearLayoutManager mLayoutManager;
-    FastScroller fastScroller;
 
     ArrayList<MegaUserAlert> notifications;
 
@@ -131,11 +104,9 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         View v = inflater.inflate(R.layout.notifications_fragment, container, false);
 
         listView = (RecyclerView) v.findViewById(R.id.notifications_list_view);
-        fastScroller = (FastScroller) v.findViewById(R.id.fastscroll_notifications);
 
         listView.setClipToPadding(false);
-        mLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true);
-        listView.setLayoutManager(mLayoutManager);
+        mLayoutManager = new LinearLayoutManager(context);
         listView.setHasFixedSize(true);
         listView.setItemAnimator(new DefaultItemAnimator());
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -148,6 +119,8 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             }
         });
 //        listView.setClipToPadding(false);
+
+        listView.setLayoutManager(mLayoutManager);
 
         emptyLayout = (LinearLayout) v.findViewById(R.id.linear_empty_layout_notifications);
         emptyTextViewInvite = (TextView) v.findViewById(R.id.empty_text_notifications_invite);
@@ -173,20 +146,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
         mainRelativeLayout = (RelativeLayout) v.findViewById(R.id.main_relative_layout_notifications);
 
-        notifications = megaApi.getUserAlerts();
-
-        if (adapterList == null){
-            log("adapterList is NULL");
-            adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);
-        }
-        else{
-            adapterList.setNotifications(notifications);
-        }
-
-        listView.setAdapter(adapterList);
-
-        setNotifications();
-
         return v;
     }
 
@@ -202,13 +161,18 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         if(isAdded()) {
             notifications = megaApi.getUserAlerts();
 
+            Collections.reverse(notifications);
+
             if (adapterList == null){
                 log("adapterList is NULL");
                 adapterList = new MegaNotificationsAdapter(context, this, notifications, listView);
+
             }
             else{
                 adapterList.setNotifications(notifications);
             }
+
+            listView.setAdapter(adapterList);
 
             if (notifications == null || notifications.isEmpty()) {
                 String textToShow = String.format(context.getString(R.string.context_empty_chat_recent));
@@ -238,6 +202,21 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 emptyLayout.setVisibility(View.GONE);
             }
         }
+    }
+
+    public void addNotification(MegaUserAlert newAlert){
+        log("addNotification");
+        //Check scroll position
+
+        notifications.add(0, newAlert);
+        if(adapterList!=null){
+            adapterList.notifyItemInserted(0);
+        }
+
+        //Before scrolling be sure it was on the first
+        listView.smoothScrollToPosition(0);
+
+        megaApi.acknowledgeUserAlerts();
     }
 
     @Override
@@ -310,12 +289,16 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     @Override
     public void onResume() {
         log("onResume: lastFirstVisiblePosition " +lastFirstVisiblePosition);
+        setNotifications();
+
         if(lastFirstVisiblePosition>0){
             (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
         }else{
             (listView.getLayoutManager()).scrollToPosition(0);
         }
         lastFirstVisiblePosition=0;
+
+        megaApi.acknowledgeUserAlerts();
 
         super.onResume();
     }
