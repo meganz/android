@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -16,6 +18,8 @@ import mega.privacy.android.app.components.twemoji.emoji.CacheKey;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.utils.Util;
 
+import static android.graphics.Color.WHITE;
+
 public class TwitterEmoji extends Emoji {
 
   private static final Object LOCK = new Object();
@@ -25,6 +29,8 @@ public class TwitterEmoji extends Emoji {
   private static final LruCache<CacheKey, Bitmap> BITMAP_CACHE = new LruCache<>(CACHE_SIZE);
   private static final int SPRITE_SIZE = 65;
   private static final int SPRITE_SIZE_INC_BORDER = 66;
+  private static final int WIDTH = 75;
+
 
   static {
     for (int i = 0; i < NUM_STRIPS; i++) {
@@ -69,8 +75,18 @@ public class TwitterEmoji extends Emoji {
     }
     final Bitmap strip = loadStrip(context);
     final Bitmap cut = Bitmap.createBitmap(strip, 1, y * SPRITE_SIZE_INC_BORDER + 1, SPRITE_SIZE, SPRITE_SIZE);
-    BITMAP_CACHE.put(key, cut);
-    return new BitmapDrawable(context.getResources(), cut);
+
+    Bitmap finalEmoji = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
+    int width = SPRITE_SIZE;
+    Canvas c = new Canvas(finalEmoji);
+    Paint paint = new Paint();
+    paint.setAntiAlias(true);
+    paint.setColor(WHITE);
+    int pos = (c.getWidth()/2) - (width/2);
+    c.drawBitmap(cut, 3f, 3f, null);
+
+    BITMAP_CACHE.put(key, finalEmoji);
+    return new BitmapDrawable(context.getResources(), finalEmoji);
   }
 
   private Bitmap loadStrip(final Context context) {

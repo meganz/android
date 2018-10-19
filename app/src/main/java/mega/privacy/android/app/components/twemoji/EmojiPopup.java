@@ -251,13 +251,6 @@ public final class EmojiPopup {
     return isKeyboardOpen;
   }
 
-//  public void dismiss() {
-//    popupWindow.dismiss();
-//    variantPopup.dismiss();
-//    recentEmoji.persist();
-//    variantEmoji.persist();
-//  }
-
   void showAtBottom() {
     final Point desiredLocation = new Point(0, Utils.screenHeight(context) - popupWindow.getHeight());
 

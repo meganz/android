@@ -635,7 +635,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
-        textChat.setEmojiSize(Util.scaleWidthPx(14, outMetrics));
+        textChat.setEmojiSize(Util.scaleWidthPx(25, outMetrics));
         emojiPopup = EmojiPopup.Builder.fromRootView(linearLayoutTwemoji).build(textChat);
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
@@ -2715,8 +2715,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             case R.id.pick_file_storage_icon_chat:
             case R.id.rl_pick_file_storage_icon_chat:{
-                emojiPopup.hideBothKeyboards();
-                keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                emojiPopup.hideBothKeyboards();
+
 
                 if(fileStorageLayout.isShown()){
                     if(fileStorageF != null){
@@ -2725,8 +2725,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }else{
+                    InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+                    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    }else{
+                        imm.hideSoftInputFromWindow(textChat.getWindowToken(), 0);
+                    }
+                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
 
-                    fileStorageLayout.setVisibility(View.VISIBLE);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -2767,6 +2773,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     .commitNowAllowingStateLoss();
             isFirstTimeStorage = false;
         }
+        fileStorageLayout.setVisibility(View.VISIBLE);
+
 //        fileStorageF = ChatFileStorageFragment.newInstance();
 //        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 //        ft.replace(R.id.fragment_container_file_storage, fileStorageF, "fileStorageF");

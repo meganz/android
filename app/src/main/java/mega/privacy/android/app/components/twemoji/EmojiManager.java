@@ -81,13 +81,10 @@ public final class EmojiManager {
     return INSTANCE;
   }
 
-  /**
-   * Installs the given EmojiProvider.
-   *
-   * NOTE: That only one can be present at any time.
-   *
-   * @param provider the provider that should be installed.
-   */
+  //Installs the given EmojiProvider.
+  // NOTE: That only one can be present at any time.
+  //param provider the provider that should be installed.
+
   public static void install(@NonNull final EmojiProvider provider) {
 
     INSTANCE.categories = checkNotNull(provider.getCategories(), "categories == null");
@@ -142,13 +139,6 @@ public final class EmojiManager {
     INSTANCE.emojiRepetitivePattern = Pattern.compile('(' + regex + ")+");
   }
 
-  /**
-   * Destroys the EmojiManager. This means that all internal data structures are released as well as
-   * all data associated with installed {@link Emoji}s. For the existing {@link EmojiProvider}s this
-   * means the memory-heavy emoji sheet.
-   *
-   * @see #destroy()
-   */
   public static void destroy() {
     release();
 
@@ -159,15 +149,6 @@ public final class EmojiManager {
     INSTANCE.emojiReplacer = null;
   }
 
-  /**
-   * Releases all data associated with installed {@link Emoji}s. For the existing {@link EmojiProvider}s this
-   * means the memory-heavy emoji sheet.
-   *
-   * In contrast to {@link #destroy()}, this does <b>not</b> destroy the internal
-   * data structures and thus, you do not need to {@link #install(EmojiProvider)} again before using the EmojiManager.
-   *
-   * @see #destroy()
-   */
   public static void release() {
     for (final Emoji emoji : INSTANCE.emojiMap.values()) {
       emoji.destroy();
@@ -203,11 +184,8 @@ public final class EmojiManager {
 
       while (matcher.find()) {
         final Emoji found = findEmoji(text.subSequence(matcher.start(), matcher.end()));
-        log("emoji founded");
         if (found != null) {
           result.add(new EmojiRange(matcher.start(), matcher.end(), found));
-        }else{
-
         }
       }
     }
