@@ -4458,48 +4458,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("updateNavigationToolbarIcon");
 		//Just working on 4.4.+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			if(Util.isChatEnabled() && megaChatApi != null){
-				int numberUnread = megaChatApi.getUnreadChats();
 
-				if(numberUnread==0){
-					if(isFirstNavigationLevel()){
-						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
-								|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
-							aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
-						}
-						else {
-							aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_menu_white, R.color.black));
-						}
-					}
-					else{
-						aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
-					}
-				}
-				else{
-					if(isFirstNavigationLevel()){
-						if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
-								|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
-							badgeDrawable.setProgress(1.0f);
-						}
-						else {
-							badgeDrawable.setProgress(0.0f);
-						}
-					}
-					else{
-						badgeDrawable.setProgress(1.0f);
-					}
-
-					if(numberUnread>9){
-						badgeDrawable.setText("9+");
-					}
-					else{
-						badgeDrawable.setText(numberUnread+"");
-					}
-
-					aB.setHomeAsUpIndicator(badgeDrawable);
-				}
+			int totalHistoric = megaApi.getNumUnreadUserAlerts();
+			int totalIpc = 0;
+			ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
+			if(requests!=null) {
+				totalIpc = requests.size();
 			}
-			else{
+
+			int chatUnread = 0;
+			if(Util.isChatEnabled() && megaChatApi != null) {
+				chatUnread = megaChatApi.getUnreadChats();
+			}
+
+			int totalNotifications = totalHistoric + totalIpc + chatUnread;
+
+			if(totalNotifications==0){
 				if(isFirstNavigationLevel()){
 					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
 							|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
@@ -4512,6 +4486,29 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 				}
+			}
+			else{
+				if(isFirstNavigationLevel()){
+					if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.ACCOUNT || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+							|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.MEDIA_UPLOADS){
+						badgeDrawable.setProgress(1.0f);
+					}
+					else {
+						badgeDrawable.setProgress(0.0f);
+					}
+				}
+				else{
+					badgeDrawable.setProgress(1.0f);
+				}
+
+				if(totalNotifications>9){
+					badgeDrawable.setText("9+");
+				}
+				else{
+					badgeDrawable.setText(totalNotifications+"");
+				}
+
+				aB.setHomeAsUpIndicator(badgeDrawable);
 			}
 
 		} else {
@@ -16808,8 +16805,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					continue;
 				}
 			}
-
-
 		}
 	}
 
@@ -16830,6 +16825,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+
+		updateNavigationToolbarIcon();
 	}
 
 	@Override
@@ -17139,6 +17136,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+
+		updateNavigationToolbarIcon();
 	}
 
 	////TRANSFERS/////
@@ -17972,7 +17971,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setSelectedOfflineNode(MegaOffline selectedOfflineNode) {
 		this.selectedOfflineNode = selectedOfflineNode;
 	}
-
 
 	public int getSelectedPaymentMethod() {
 		return selectedPaymentMethod;

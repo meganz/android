@@ -38,6 +38,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 	private RecyclerView listFragment;
 	private MegaApiAndroid megaApi;
 
+	DisplayMetrics outMetrics;
+
 	private NotificationsFragmentLollipop fragment;
 
 	public MegaNotificationsAdapter(Context _context, NotificationsFragmentLollipop _fragment, ArrayList<MegaUserAlert> _notifications, RecyclerView _listView) {
@@ -50,6 +52,10 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+		display.getMetrics(outMetrics);
 
 		listFragment = _listView;
 	}
@@ -71,6 +77,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
     	TextView descriptionText;
     	TextView dateText;
+
+    	LinearLayout separator;
     }
 
 	ViewHolderNotifications holder = null;
@@ -78,10 +86,6 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 	@Override
 	public ViewHolderNotifications onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
-
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
 
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification_list, parent, false);
 
@@ -106,6 +110,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		else{
 			holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 		}
+
+		holder.separator = (LinearLayout) v.findViewById(R.id.notifications_separator);
 
 		holder.itemLayout.setTag(holder);
 		holder.itemLayout.setOnClickListener(this);
@@ -295,10 +301,37 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		if(alert.getSeen()==false){
 			holder.newText.setVisibility(View.VISIBLE);
+			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+
+			if(position<(notifications.size()-1)){
+				MegaUserAlert nextAlert = (MegaUserAlert) getItem(position+1);
+				if(nextAlert.getSeen()==false){
+					LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
+					textParams.setMargins(Util.scaleWidthPx(16, outMetrics), 0, Util.scaleWidthPx(16, outMetrics), 0);
+					holder.separator.setLayoutParams(textParams);
+				}
+				else{
+					LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
+					textParams.setMargins(0, 0, 0, 0);
+					holder.separator.setLayoutParams(textParams);
+				}
+			}
+			else{
+				log("Last element of the notifications");
+				LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
+				textParams.setMargins(0, 0, 0, 0);
+				holder.separator.setLayoutParams(textParams);
+			}
 		}
 		else{
 			holder.newText.setVisibility(View.GONE);
+			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_background_new_messages));
+
+			LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
+			textParams.setMargins(Util.scaleWidthPx(16, outMetrics), 0, Util.scaleWidthPx(16, outMetrics), 0);
+			holder.separator.setLayoutParams(textParams);
 		}
+
 
 //		holder.imageButtonThreeDots.setTag(holder);
 //		holder.imageButtonThreeDots.setOnClickListener(this);
