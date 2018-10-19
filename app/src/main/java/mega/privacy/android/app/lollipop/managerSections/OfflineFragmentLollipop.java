@@ -223,7 +223,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			else if (gridLayoutManager != null){
 				View v = gridLayoutManager.findViewByPosition(position);
 				if (v != null) {
-					return (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+					return (ImageView) v.findViewById(R.id.file_grid_thumbnail);
 				}
 			}
 		}
@@ -1049,7 +1049,6 @@ public class OfflineFragmentLollipop extends Fragment{
 		}
 		else{
 			MegaOffline currentNode = mOffList.get(position);
-			
 			File currentFile=null;
 			
 			if(currentNode.getHandle().equals("0")){
@@ -1202,6 +1201,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					}
 					else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+                        intent.putExtra("placeholder", placeholderCount);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
 						intent.putExtra("parentNodeHandle", -1L);
@@ -1237,6 +1237,7 @@ public class OfflineFragmentLollipop extends Fragment{
 						mediaIntent.putExtra("FILENAME", currentNode.getName());
 						mediaIntent.putExtra("path", currentFile.getAbsolutePath());
 						mediaIntent.putExtra("adapterType", Constants.OFFLINE_ADAPTER);
+                        mediaIntent.putExtra("placeholder", placeholderCount);
 						mediaIntent.putExtra("position", position);
 						mediaIntent.putExtra("parentNodeHandle", -1L);
 						mediaIntent.putExtra("offlinePathDirectory", currentFile.getParent());
