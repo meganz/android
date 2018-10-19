@@ -320,4 +320,9 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements View.O
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 
     }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+    }
 }

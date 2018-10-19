@@ -2946,6 +2946,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     }
 
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+    }
+
     private void setError(final EditText editText, String error){
         if(error == null || error.equals("")){
             return;

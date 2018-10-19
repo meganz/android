@@ -6895,6 +6895,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         setChatSubtitle();
     }
 
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+        log("onChatPresenceLastGreen");
+    }
+
     public void takePicture(){
         log("takePicture");
 
