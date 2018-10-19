@@ -207,6 +207,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     public void addNotification(MegaUserAlert newAlert){
         log("addNotification");
         //Check scroll position
+        boolean shouldScroll = false;
+        if (!listView.canScrollVertically(-1)){
+            shouldScroll = true;
+        }
 
         notifications.add(0, newAlert);
         if(adapterList!=null){
@@ -214,7 +218,9 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         }
 
         //Before scrolling be sure it was on the first
-        listView.smoothScrollToPosition(0);
+        if(shouldScroll){
+            listView.smoothScrollToPosition(0);
+        }
 
         megaApi.acknowledgeUserAlerts();
     }
