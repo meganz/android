@@ -11,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -28,7 +27,6 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -61,24 +59,24 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnClickListener, View.OnLongClickListener {
-    
+
     public static final int ITEM_VIEW_TYPE_LIST = 0;
     public static final int ITEM_VIEW_TYPE_GRID = 1;
-    
+
     Context context;
     MegaApiAndroid megaApi;
-    
+
     //	int positionClicked;
     ArrayList<MegaNode> nodes;
-    
+
     Object fragment;
     long parentHandle = -1;
     DisplayMetrics outMetrics;
-    
+
     private int placeholderCount;
-    
+
     private SparseBooleanArray selectedItems;
-    
+
     RecyclerView listFragment;
     //	ImageView emptyImageViewFragment;
 //	TextView emptyTextViewFragment;
@@ -88,20 +86,20 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     boolean multipleSelect;
     int type = Constants.FILE_BROWSER_ADAPTER;
     int adapterType;
-    
+
     public static class ViewHolderBrowserList extends MegaBrowserLollipopAdapter.ViewHolderBrowserList {
-        
+
         public ViewHolderBrowserList(View v) {
             super(v);
         }
     }
-    
+
     public static class ViewHolderBrowserGrid extends MegaBrowserLollipopAdapter.ViewHolderBrowserGrid {
-        
+
         public ViewHolderBrowserGrid(View v) {
             super(v);
         }
-        
+
         public View folderLayout;
         public View fileLayout;
         public RelativeLayout thumbLayoutForFile;
@@ -110,24 +108,24 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         public TextView textViewFileNameForFile;
         public ImageView fileGridSelected;
     }
-    
+
     public int getPlaceholderCount() {
         return placeholderCount;
     }
-    
+
     public void toggleAllSelection(int pos) {
         log("toggleAllSelection: " + pos);
         final int positionToflip = pos;
-        
+
         if (selectedItems.get(pos,false)) {
             log("delete pos: " + pos);
             selectedItems.delete(pos);
-            
+
         } else {
             log("PUT pos: " + pos);
             selectedItems.put(pos,true);
         }
-        
+
         if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
             log("adapter type is LIST");
             CloudDriveAdapter.ViewHolderBrowserList view = (CloudDriveAdapter.ViewHolderBrowserList)listFragment.findViewHolderForLayoutPosition(pos);
@@ -137,9 +135,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-                    
+
                     }
-                    
+
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         log("onAnimationEnd: " + selectedItems.size());
@@ -166,10 +164,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         log("toggleAllSelection: notified item changed");
                         notifyItemChanged(positionToflip);
                     }
-                    
+
                     @Override
                     public void onAnimationRepeat(Animation animation) {
-                    
+
                     }
                 });
                 view.imageView.startAnimation(flipAnimation);
@@ -201,10 +199,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             notifyItemChanged(positionToflip);
         }
     }
-    
+
     public void toggleSelection(int pos) {
         log("toggleSelection: " + pos);
-        
+
         if (selectedItems.get(pos,false)) {
             log("delete pos: " + pos);
             selectedItems.delete(pos);
@@ -222,9 +220,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
                     public void onAnimationStart(Animation animation) {
-                    
+
                     }
-                    
+
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         if (selectedItems.size() <= 0) {
@@ -247,15 +245,15 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                             }
                         }
                     }
-                    
+
                     @Override
                     public void onAnimationRepeat(Animation animation) {
-                    
+
                     }
                 });
-                
+
                 view.imageView.startAnimation(flipAnimation);
-                
+
             } else {
                 log("view is null - not animation");
                 if (selectedItems.size() <= 0) {
@@ -289,9 +287,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     flipAnimation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {
-                        
+
                         }
-                        
+
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             if (selectedItems.size() <= 0) {
@@ -314,10 +312,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                                 }
                             }
                         }
-                        
+
                         @Override
                         public void onAnimationRepeat(Animation animation) {
-                        
+
                         }
                     });
                     view.imageViewIcon.startAnimation(flipAnimation);
@@ -346,7 +344,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
             //---------------------------------------
             if (selectedItems.size() <= 0) {
-                
+
                 if (type == Constants.RUBBISH_BIN_ADAPTER) {
                     ((RubbishBinFragmentLollipop)fragment).hideMultipleSelect();
                 } else if (type == Constants.INBOX_ADAPTER) {
@@ -367,7 +365,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
         }
     }
-    
+
     public void selectAll() {
         for (int i = 0;i < nodes.size();i++) {
             if (!isItemChecked(i)) {
@@ -378,7 +376,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
         }
     }
-    
+
     public void clearSelections() {
         log("clearSelections");
         for (int i = 0;i < nodes.size();i++) {
@@ -390,7 +388,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
         }
     }
-    
+
     //	public void clearSelections() {
 //		if(selectedItems!=null){
 //			selectedItems.clear();
@@ -406,11 +404,11 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
     private boolean isItemChecked(int position) {
         return selectedItems.get(position);
     }
-    
+
     public int getSelectedItemCount() {
         return selectedItems.size();
     }
-    
+
     public List<Integer> getSelectedItems() {
         List<Integer> items = new ArrayList<Integer>(selectedItems.size());
         for (int i = 0;i < selectedItems.size();i++) {
@@ -418,13 +416,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
         return items;
     }
-    
+
     /*
      * Get list of all selected nodes
      */
     public List<MegaNode> getSelectedNodes() {
         ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
-        
+
         for (int i = 0;i < selectedItems.size();i++) {
             if (selectedItems.valueAt(i) == true) {
                 MegaNode document = getNodeAt(selectedItems.keyAt(i));
@@ -435,10 +433,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
         return nodes;
     }
-    
+
     public ArrayList<MegaNode> getArrayListSelectedNodes() {
         ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
-        
+
         for (int i = 0;i < selectedItems.size();i++) {
             if (selectedItems.valueAt(i) == true) {
                 MegaNode document = getNodeAt(selectedItems.keyAt(i));
@@ -449,7 +447,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
         return nodes;
     }
-    
+
     /**
      * In grid view.
      * For folder count is odd. Insert null element as placeholder.
@@ -471,7 +469,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         if (listFragment instanceof NewGridRecyclerView) {
             spanCount = ((NewGridRecyclerView)listFragment).getSpanCount();
         }
-        int placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
+        int placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
 
         if (folderCount > 0 && placeholderCount != 0 && adapterType == ITEM_VIEW_TYPE_GRID) {
             //Add placeholder at folders' end.
@@ -481,7 +479,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
         return nodes;
     }
-    
+
     public CloudDriveAdapter(Context _context,Object fragment,ArrayList<MegaNode> _nodes,long _parentHandle,RecyclerView recyclerView,ActionBar aB,int type,int adapterType) {
         super(_context,fragment,_nodes,_parentHandle,recyclerView,aB,type,adapterType);
         this.context = _context;
@@ -490,9 +488,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         this.type = type;
         this.adapterType = adapterType;
         this.fragment = fragment;
-        
+
         dbH = DatabaseHandler.getDbHandler(context);
-        
+
         switch (type) {
             case Constants.FILE_BROWSER_ADAPTER: {
 //				((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
@@ -534,78 +532,78 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 break;
             }
         }
-        
+
         this.listFragment = recyclerView;
 //		this.emptyImageViewFragment = emptyImageView;
 //		this.emptyTextViewFragment = emptyTextView;
         this.type = type;
-        
+
         if (megaApi == null) {
             megaApi = ((MegaApplication)((Activity)context).getApplication())
                     .getMegaApi();
         }
     }
-    
+
     public void setNodes(ArrayList<MegaNode> nodes) {
         log("setNodes");
         this.nodes = insertPlaceHolderNode(nodes);
 //		contentTextFragment.setText(getInfoFolder(node));
         notifyDataSetChanged();
     }
-    
+
     public void setAdapterType(int adapterType) {
         this.adapterType = adapterType;
     }
-    
+
     public int getAdapterType() {
         return adapterType;
     }
-    
+
     public MegaBrowserLollipopAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent,int viewType) {
         log("onCreateViewHolder");
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        
+
         if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
             log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_LIST");
-            
+
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list,parent,false);
             ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
             holderList.itemLayout = (RelativeLayout)v.findViewById(R.id.file_list_item_layout);
             holderList.imageView = (ImageView)v.findViewById(R.id.file_list_thumbnail);
             holderList.savedOffline = (ImageView)v.findViewById(R.id.file_list_saved_offline);
-            
+
             holderList.publicLinkImage = (ImageView)v.findViewById(R.id.file_list_public_link);
             holderList.permissionsIcon = (ImageView)v.findViewById(R.id.file_list_incoming_permissions);
-            
+
             holderList.textViewFileName = (TextView)v.findViewById(R.id.file_list_filename);
-            
+
             holderList.textViewFileSize = (TextView)v.findViewById(R.id.file_list_filesize);
-            
+
             holderList.threeDotsLayout = (RelativeLayout)v.findViewById(R.id.file_list_three_dots_layout);
-            
+
             holderList.savedOffline.setVisibility(View.INVISIBLE);
-            
+
             holderList.publicLinkImage.setVisibility(View.INVISIBLE);
-            
+
             holderList.textViewFileSize.setVisibility(View.VISIBLE);
-            
+
             holderList.itemLayout.setTag(holderList);
             holderList.itemLayout.setOnClickListener(this);
             holderList.itemLayout.setOnLongClickListener(this);
-            
+
             holderList.threeDotsLayout.setTag(holderList);
             holderList.threeDotsLayout.setOnClickListener(this);
-            
+
             v.setTag(holderList);
             return holderList;
         } else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID) {
             log("onCreateViewHolder -> type: ITEM_VIEW_TYPE_GRID");
-            
+
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid_new,parent,false);
             CloudDriveAdapter.ViewHolderBrowserGrid holderGrid = new CloudDriveAdapter.ViewHolderBrowserGrid(v);
-            
+
             holderGrid.folderLayout = v.findViewById(R.id.item_file_grid_folder);
             holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);
             holderGrid.itemLayout = (RelativeLayout)v.findViewById(R.id.file_grid_item_layout);
@@ -626,7 +624,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holderGrid.videoDuration = (TextView)v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = (RelativeLayout)v.findViewById(R.id.item_file_videoinfo_layout);
             holderGrid.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
-            
+
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderGrid.textViewFileSize.setMaxWidth(Util.scaleWidthPx(70,outMetrics));
             } else {
@@ -637,29 +635,29 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             } else {
                 log("textViewFileSize is NULL");
             }
-            
+
             holderGrid.savedOffline.setVisibility(View.INVISIBLE);
             holderGrid.publicLinkImage.setVisibility(View.GONE);
-            
+
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);
             holderGrid.itemLayout.setOnLongClickListener(this);
-            
+
             holderGrid.imageButtonThreeDots.setTag(holderGrid);
             holderGrid.imageButtonThreeDots.setOnClickListener(this);
             holderGrid.imageButtonThreeDotsForFile.setTag(holderGrid);
             holderGrid.imageButtonThreeDotsForFile.setOnClickListener(this);
             v.setTag(holderGrid);
-            
+
             return holderGrid;
         } else {
             return null;
         }
     }
-    
+
     public void onBindViewHolder(MegaBrowserLollipopAdapter.ViewHolderBrowser holder,int position) {
         log("onBindViewHolder");
-        
+
         if (adapterType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST) {
             CloudDriveAdapter.ViewHolderBrowserList holderList = (CloudDriveAdapter.ViewHolderBrowserList)holder;
             onBindViewHolderList(holderList,position);
@@ -668,7 +666,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             onBindViewHolderGrid(holderGrid,position);
         }
     }
-    
+
     public void onBindViewHolderGrid(ViewHolderBrowserGrid holder,int position) {
         log("onBindViewHolderGrid");
         MegaNode node = (MegaNode)getItem(position);
@@ -679,12 +677,12 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holder.itemLayout.setVisibility(View.INVISIBLE);
             return;
         }
-        
+
         holder.document = node.getHandle();
         Bitmap thumb = null;
-        
+
         log("Node : " + position + " " + node.getName());
-        
+
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
         holder.videoInfoLayout.setVisibility(View.GONE);
@@ -701,7 +699,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 //                holder.separator.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
 //            }
 //        }
-        
+
         if (node.isExported()) {
             //Node has public link
             holder.publicLinkImage.setVisibility(View.VISIBLE);
@@ -711,13 +709,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         } else {
             holder.publicLinkImage.setVisibility(View.INVISIBLE);
         }
-        
+
         if (node.isFolder()) {
             holder.itemLayout.setVisibility(View.VISIBLE);
             holder.folderLayout.setVisibility(View.VISIBLE);
             holder.fileLayout.setVisibility(View.GONE);
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            
+
             if (type == Constants.FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context,megaApi));
                 setFolderSelected(holder,position,R.drawable.ic_folder_list);
@@ -727,7 +725,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holder.imageViewIcon.setVisibility(View.VISIBLE);
             holder.imageViewThumb.setVisibility(View.GONE);
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
-            
+
             if (type == Constants.INCOMING_SHARES_ADAPTER) {
                 setFolderSelected(holder,position,R.drawable.ic_folder_incoming);
                 //Show the owner of the shared folder
@@ -792,15 +790,15 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.textViewFileName.setVisibility(View.VISIBLE);
             holder.textViewFileSize.setVisibility(View.GONE);
-            
+
             holder.textViewFileNameForFile.setText(node.getName());
             long nodeSize = node.getSize();
             holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-            
+
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
             holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
-            
+
             if (multipleSelect && isItemChecked(position)) {
 //                    holder.itemLayout.setForeground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
@@ -810,7 +808,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
                 holder.fileGridSelected.setVisibility(View.GONE);
             }
-            
+
             if (Util.isVideoFile(node.getName())) {
                 holder.videoInfoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setVisibility(View.GONE);
@@ -820,21 +818,21 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     int hours = duration / 3600;
                     int minutes = (duration % 3600) / 60;
                     int seconds = duration % 60;
-                    
+
                     String timeString;
                     if (hours > 0) {
                         timeString = String.format("%d:%d:%02d",hours,minutes,seconds);
                     } else {
                         timeString = String.format("%d:%02d",minutes,seconds);
                     }
-                    
+
                     log("The duration is: " + hours + " " + minutes + " " + seconds);
-                    
+
                     holder.videoDuration.setText(timeString);
                     holder.videoDuration.setVisibility(View.VISIBLE);
                 }
             }
-            
+
             if (node.hasThumbnail()) {
 
 //				DisplayMetrics dm = new DisplayMetrics();
@@ -844,33 +842,33 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 //				params.width = ViewGroup.LayoutParams.MATCH_PARENT;
 //				params.height = ViewGroup.LayoutParams.MATCH_PARENT;
 //				holder.imageView.setLayoutParams(params);
-                
+
                 Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
-                
+
                 if (temp != null) {
                     thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
                     holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
-                    
+
                 } else {
                     temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
-                    
+
                     if (temp != null) {
                         thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
                         holder.fileGridIconForFile.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
                         holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
-                        
+
                     } else {
                         try {
                             temp = ThumbnailUtilsLollipop.getThumbnailFromMegaGrid(node,context,holder,megaApi,this);
-                            
+
                         } catch (Exception e) {
                         } // Too many AsyncTasks
-                        
+
                         if (temp != null) {
                             thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
                             holder.imageViewIcon.setVisibility(View.GONE);
@@ -892,7 +890,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
                 } else {
                     temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
-                    
+
                     if (temp != null) {
                         thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
                         holder.fileGridIconForFile.setVisibility(View.GONE);
@@ -908,7 +906,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 }
             }
         }
-        
+
         //Check if is an offline file to show the red arrow
         File offlineFile = null;
         //Find in the database
@@ -924,7 +922,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 } else {
                     offlineFile = context.getFilesDir();
                 }
-                
+
             } else if (inbox) {
                 String pathMega = megaApi.getNodePath(node);
                 pathMega = pathMega.replace("/in","");
@@ -944,7 +942,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         } else {
             log("Node NOT found OFFLINE: " + node.getName());
         }
-        
+
         if (offlineFile != null) {
             if (offlineFile.exists()) {
                 log("File EXISTS!!!");
@@ -957,7 +955,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holder.savedOffline.setVisibility(View.INVISIBLE);
         }
     }
-    
+
     private void setFolderSelected(ViewHolderBrowserGrid holder,int position,int folderDrawableResId) {
         if (multipleSelect && isItemChecked(position)) {
             RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageViewIcon.getLayoutParams();
@@ -971,23 +969,23 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             holder.imageViewIcon.setImageResource(folderDrawableResId);
         }
     }
-    
+
     public void onBindViewHolderList(ViewHolderBrowserList holder,int position) {
-        log("onBindViewHolderList: "+position);
-        
+        log("onBindViewHolderList: " + position);
+
         MegaNode node = (MegaNode)getItem(position);
-        if(node == null) {
+        if (node == null) {
             return;
         }
         holder.document = node.getHandle();
         Bitmap thumb = null;
-        
+
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
-        
+
         holder.publicLinkImage.setVisibility(View.INVISIBLE);
         holder.permissionsIcon.setVisibility(View.GONE);
-        
+
         if (node.isExported()) {
             //Node has public link
             holder.publicLinkImage.setVisibility(View.VISIBLE);
@@ -997,9 +995,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         } else {
             holder.publicLinkImage.setVisibility(View.INVISIBLE);
         }
-        
+
         if (node.isFolder()) {
-            
+
             log("Node is folder");
             holder.itemLayout.setBackgroundColor(Color.WHITE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1007,18 +1005,18 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             params.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
             params.setMargins(0,0,0,0);
             holder.imageView.setLayoutParams(params);
-            
+
             holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
             holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context));
-            
+
             if (type == Constants.FOLDER_LINK_ADAPTER) {
                 holder.textViewFileSize.setText(MegaApiUtils.getInfoFolder(node,context,megaApi));
                 if (!multipleSelect) {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
                     holder.imageView.setImageResource(R.drawable.ic_folder_list);
                 } else {
-                    
+
                     if (this.isItemChecked(position)) {
                         RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                         paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
@@ -1037,7 +1035,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
                     holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
                 } else {
-                    
+
                     if (this.isItemChecked(position)) {
                         holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                         RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1051,12 +1049,12 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
                     }
                 }
-                
+
                 boolean firstLevel = ((ContactFileListFragmentLollipop)fragment).isEmptyParentHandleStack();
-                
+
                 if (firstLevel) {
                     int accessLevel = megaApi.getAccess(node);
-                    
+
                     if (accessLevel == MegaShare.ACCESS_FULL) {
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                     } else if (accessLevel == MegaShare.ACCESS_READWRITE) {
@@ -1074,7 +1072,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
                     holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
                 } else {
-                    
+
                     if (this.isItemChecked(position)) {
                         holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                         RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1088,7 +1086,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         holder.imageView.setImageResource(R.drawable.ic_folder_incoming_list);
                     }
                 }
-                
+
                 //Show the owner of the shared folder
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
                 for (int j = 0;j < sharesIncoming.size();j++) {
@@ -1112,12 +1110,12 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         }
                     }
                 }
-                
+
                 int dBT = ((IncomingSharesFragmentLollipop)fragment).getDeepBrowserTree();
-                
+
                 if (dBT == 0) {
                     int accessLevel = megaApi.getAccess(node);
-                    
+
                     if (accessLevel == MegaShare.ACCESS_FULL) {
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess);
                     } else if (accessLevel == MegaShare.ACCESS_READWRITE) {
@@ -1129,13 +1127,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 } else {
                     holder.permissionsIcon.setVisibility(View.GONE);
                 }
-                
+
             } else if (type == Constants.OUTGOING_SHARES_ADAPTER) {
                 if (!multipleSelect) {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
                     holder.imageView.setImageResource(R.drawable.ic_folder_outgoing_list);
                 } else {
-                    
+
                     if (this.isItemChecked(position)) {
                         holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                         RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1157,7 +1155,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     }
                 }
             } else if (type == Constants.FILE_BROWSER_ADAPTER) {
-                
+
                 if (!multipleSelect) {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
                     if (node.isOutShare() || megaApi.isPendingShare(node)) {
@@ -1172,7 +1170,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         }
                     }
                 } else {
-                    
+
                     if (this.isItemChecked(position)) {
                         holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                         RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1196,7 +1194,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         }
                     }
                 }
-                
+
             } else {
                 if (!multipleSelect) {
                     holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -1208,7 +1206,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         holder.imageView.setImageResource(R.drawable.ic_folder_list);
                     }
                 } else {
-                    
+
                     if (this.isItemChecked(position)) {
                         holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                         RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1234,20 +1232,20 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 //			holder.propertiesText.setText(R.string.general_file_info);
             long nodeSize = node.getSize();
             holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-            
+
             if (!multipleSelect) {
                 log("Not multiselect");
                 holder.itemLayout.setBackgroundColor(Color.WHITE);
                 holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                
+
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                 params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
                 params.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
                 params.setMargins(0,0,0,0);
                 holder.imageView.setLayoutParams(params);
-                
+
                 log("Check the thumb");
-                
+
                 if (node.hasThumbnail()) {
                     log("Node has thumbnail");
                     RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1255,26 +1253,26 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                     int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
                     params1.setMargins(left,0,0,0);
-                    
+
                     holder.imageView.setLayoutParams(params1);
-                    
+
                     thumb = ThumbnailUtils.getThumbnailFromCache(node);
                     if (thumb != null) {
-                        
+
                         holder.imageView.setImageBitmap(thumb);
-                        
+
                     } else {
                         thumb = ThumbnailUtils
                                 .getThumbnailFromFolder(node,context);
                         if (thumb != null) {
                             holder.imageView.setImageBitmap(thumb);
-                            
+
                         } else {
                             try {
                                 thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node,context,holder,megaApi,this);
                             } catch (Exception e) {
                             } // Too many AsyncTasks
-                            
+
                             if (thumb != null) {
                                 holder.imageView.setImageBitmap(thumb);
                             }
@@ -1289,11 +1287,11 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                         int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
                         params1.setMargins(left,0,0,0);
-                        
+
                         holder.imageView.setLayoutParams(params1);
                         holder.imageView.setImageBitmap(thumb);
-                        
-                        
+
+
                     } else {
                         thumb = ThumbnailUtils.getThumbnailFromFolder(node,context);
                         if (thumb != null) {
@@ -1302,10 +1300,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                             params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                             int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
                             params1.setMargins(left,0,0,0);
-                            
+
                             holder.imageView.setLayoutParams(params1);
                             holder.imageView.setImageBitmap(thumb);
-                            
+
                         } else {
                             try {
                                 ThumbnailUtilsLollipop.createThumbnailList(context,node,holder,megaApi,this);
@@ -1326,9 +1324,9 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     holder.imageView.setImageResource(R.drawable.ic_select_folder);
                 } else {
                     holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.white));
-                    
+
                     log("Check the thumb");
-                    
+
                     if (node.hasThumbnail()) {
                         log("Node has thumbnail");
                         RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1336,26 +1334,26 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                         int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
                         params1.setMargins(left,0,0,0);
-                        
+
                         holder.imageView.setLayoutParams(params1);
-                        
+
                         thumb = ThumbnailUtils.getThumbnailFromCache(node);
                         if (thumb != null) {
-                            
+
                             holder.imageView.setImageBitmap(thumb);
-                            
+
                         } else {
                             thumb = ThumbnailUtils
                                     .getThumbnailFromFolder(node,context);
                             if (thumb != null) {
                                 holder.imageView.setImageBitmap(thumb);
-                                
+
                             } else {
                                 try {
                                     thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node,context,holder,megaApi,this);
                                 } catch (Exception e) {
                                 } // Too many AsyncTasks
-                                
+
                                 if (thumb != null) {
                                     holder.imageView.setImageBitmap(thumb);
                                 }
@@ -1363,7 +1361,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         }
                     } else {
                         log("Node NOT thumbnail");
-                        
+
                         thumb = ThumbnailUtils.getThumbnailFromCache(node);
                         if (thumb != null) {
                             RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -1371,11 +1369,11 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                             params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                             int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
                             params1.setMargins(left,0,0,0);
-                            
+
                             holder.imageView.setLayoutParams(params1);
                             holder.imageView.setImageBitmap(thumb);
-                            
-                            
+
+
                         } else {
                             thumb = ThumbnailUtils.getThumbnailFromFolder(node,context);
                             if (thumb != null) {
@@ -1384,10 +1382,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                                 params1.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
                                 int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
                                 params1.setMargins(left,0,0,0);
-                                
+
                                 holder.imageView.setLayoutParams(params1);
                                 holder.imageView.setImageBitmap(thumb);
-                                
+
                             } else {
                                 log("NOT thumbnail");
                                 holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -1401,7 +1399,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 }
             }
         }
-        
+
         //Check if is an offline file to show the red arrow
         File offlineFile = null;
         //Find in the database
@@ -1417,7 +1415,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 } else {
                     offlineFile = context.getFilesDir();
                 }
-                
+
             } else if (inbox) {
                 log("In Inbox");
                 String pathMega = megaApi.getNodePath(node);
@@ -1440,7 +1438,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         } else {
             log("Not found: " + node.getHandle() + " " + node.getName());
         }
-        
+
         if (offlineFile != null) {
             if (offlineFile.exists()) {
                 holder.savedOffline.setVisibility(View.VISIBLE);
@@ -1461,16 +1459,16 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 //		// }
 //		return super.isEnabled(position);
 //	}
-    
-    
+
+
     private String getItemNode(int position) {
         if (nodes.get(position) != null) {
             return nodes.get(position).getName();
         }
         return null;
     }
-    
-    
+
+
     @Override
     public int getItemCount() {
         if (nodes != null) {
@@ -1479,50 +1477,50 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             return 0;
         }
     }
-    
+
     @Override
     public int getItemViewType(int position) {
         return adapterType;
     }
-    
+
     public Object getItem(int position) {
         if (nodes != null) {
             return nodes.get(position);
         }
-        
+
         return null;
     }
-    
+
     @Override
     public String getSectionTitle(int position) {
         if (getItemNode(position) != null && !getItemNode(position).equals("")) {
-            return getItemNode(position).substring(0, 1);
+            return getItemNode(position).substring(0,1);
         }
         return null;
     }
-    
+
     @Override
     public long getItemId(int position) {
         return position;
     }
-    
+
     @Override
     public void onClick(View v) {
         log("onClick");
         ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
-        
+
         ViewHolderBrowser holder = (ViewHolderBrowser)v.getTag();
         int currentPosition = holder.getAdapterPosition();
-        
+
         log("onClick -> Current position: " + currentPosition);
-        
+
         if (currentPosition < 0) {
             log("Current position error - not valid value");
             return;
         }
-        
+
         final MegaNode n = (MegaNode)getItem(currentPosition);
-        if(n == null) {
+        if (n == null) {
             return;
         }
         switch (v.getId()) {
@@ -1551,7 +1549,6 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 dimens[1] = screenPosition[1];
                 dimens[2] = imageView.getWidth();
                 dimens[3] = imageView.getHeight();
-                Log.e("@#@",Arrays.toString(dimens));
                 if (type == Constants.RUBBISH_BIN_ADAPTER) {
                     ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,dimens,imageView);
                 } else if (type == Constants.INBOX_ADAPTER) {
@@ -1576,8 +1573,8 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
         }
     }
-    
-    
+
+
     private void threeDotsClicked(int currentPosition,MegaNode n) {
         log("onClick: file_list_three_dots: " + currentPosition);
         if (!Util.isOnline(context)) {
@@ -1590,7 +1587,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
             return;
         }
-        
+
         if (multipleSelect) {
             if (type == Constants.RUBBISH_BIN_ADAPTER) {
                 ((RubbishBinFragmentLollipop)fragment).itemClick(currentPosition,null,null);
@@ -1622,12 +1619,12 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             }
         }
     }
-    
+
     @Override
     public boolean onLongClick(View view) {
         log("OnLongCLick");
         ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
-        
+
         ViewHolderBrowser holder = (ViewHolderBrowser)view.getTag();
         int currentPosition = holder.getAdapterPosition();
 //        Toast.makeText(context,"pos:" + currentPosition ,Toast.LENGTH_SHORT ).show();
@@ -1662,10 +1659,10 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             ((FileBrowserFragmentLollipop)fragment).activateActionMode();
             ((FileBrowserFragmentLollipop)fragment).itemClick(currentPosition,null,null);
         }
-        
+
         return true;
     }
-    
+
     /*
      * Get document at specified position
      */
@@ -1678,20 +1675,20 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         }
         return null;
     }
-    
-    
+
+
     public long getParentHandle() {
         return parentHandle;
     }
-    
+
     public void setParentHandle(long parentHandle) {
         this.parentHandle = parentHandle;
     }
-    
+
     public boolean isMultipleSelect() {
         return multipleSelect;
     }
-    
+
     public void setMultipleSelect(boolean multipleSelect) {
         log("setMultipleSelect: " + multipleSelect);
         if (this.multipleSelect != multipleSelect) {
@@ -1701,12 +1698,12 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
             selectedItems = new SparseBooleanArray();
         }
     }
-    
+
     private static void log(String log) {
         Util.log("CloudDriveAdapter",log);
     }
-    
+
     public void allowMultiselect() {
-    
+
     }
 }
