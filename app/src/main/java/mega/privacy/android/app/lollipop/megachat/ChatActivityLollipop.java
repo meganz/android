@@ -2634,15 +2634,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             case R.id.pick_file_storage_icon_chat:
             case R.id.rl_pick_file_storage_icon_chat:{
-//
+                log("file storage icon ");
                 if(fileStorageLayout.isShown()){
                     if(fileStorageF != null){
+
                         fileStorageF.clearSelections();
                         fileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }else{
-                    emojiPopup.hideBothKeyboards();
+                    emojiPopup.isShowSoftKeyboard(textChat,false);
+                    emojiPopup.hideEmojiKeyboard();
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -2657,7 +2659,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         this.attachFromFileStorage();
                     }
                 }
-
                 break;
             }
             case R.id.toolbar_chat:{
