@@ -25,6 +25,7 @@ public final class EmojiManager {
   private static final EmojiManager INSTANCE = new EmojiManager();
   private static final int GUESSED_UNICODE_AMOUNT = 3000;
   private static final int GUESSED_TOTAL_PATTERN_LENGTH = GUESSED_UNICODE_AMOUNT * 4;
+  private static final Pattern SPACE_REMOVAL = Pattern.compile("[\\s]");
 
   private static final Comparator<String> STRING_LENGTH_COMPARATOR = new Comparator<String>() {
     @Override public int compare(final String first, final String second) {
@@ -170,6 +171,29 @@ public final class EmojiManager {
 
   Pattern getEmojiRepetitivePattern() {
     return emojiRepetitivePattern;
+  }
+
+
+  /** returns true when the string contains only emojis. Note that whitespace will be filtered out. */
+  public boolean isOnlyEmojis(@Nullable final String text) {
+
+    if (!TextUtils.isEmpty(text)) {
+
+      final String inputWithoutSpaces = SPACE_REMOVAL.matcher(text).replaceAll(Matcher.quoteReplacement(""));
+      return EmojiManager.getInstance()
+              .getEmojiRepetitivePattern()
+              .matcher(inputWithoutSpaces)
+              .matches();
+//      return EmojiManager.getInstance().getEmojiRepetitivePattern().matcher(text).matches();
+    }else{
+
+    }
+    return false;
+  }
+  public int getNumEmojis(@Nullable final CharSequence text){
+    List<EmojiRange> emojis =findAllEmojis(text);
+    int num = emojis.size();
+    return num;
   }
 
   @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
