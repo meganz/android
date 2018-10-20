@@ -244,7 +244,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     TextView userTypingText;
     boolean sendIsTyping=true;
     long userTypingTimeStamp = -1;
-//    TextView inviteText;
     ImageButton keyboardTwemojiButton;
     ImageButton mediaButton;
     ImageButton sendContactButton ;
@@ -284,17 +283,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     String intentAction;
     MegaChatLollipopAdapter adapter;
-
     int stateHistory;
 
     DatabaseHandler dbH = null;
 
-    int keyboardSize = -1;
-    int firstSize = -1;
-
     FrameLayout fragmentContainerFileStorage;
     RelativeLayout fileStorageLayout;
-//    private ArrayList<String> images;
     private ChatFileStorageFragment fileStorageF;
 
     ArrayList<AndroidMegaChatMessage> messages;
