@@ -14,7 +14,7 @@ public final class EmojiUtils {
   private static final Pattern SPACE_REMOVAL = Pattern.compile("[\\s]");
 
   /** returns true when the string contains only emojis. Note that whitespace will be filtered out. */
-  public static boolean isOnlyEmojis(@Nullable final String text) {
+  public boolean isOnlyEmojis(@Nullable final String text) {
 
     if (!TextUtils.isEmpty(text)) {
 
@@ -44,7 +44,7 @@ public final class EmojiUtils {
 //  }
 
   /** returns a class that contains all of the emoji information that was found in the given text */
-  @NonNull public static EmojiInformation emojiInformation(@Nullable final String text) {
+  @NonNull public EmojiInformation emojiInformation(@Nullable final String text) {
 
     final List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(text);
 

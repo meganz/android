@@ -582,6 +582,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
         titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            titleToolbar.setEmojiSize(Util.scaleWidthPx(12, outMetrics));
+        }else{
+            titleToolbar.setEmojiSize(Util.scaleWidthPx(25, outMetrics));
+        }
         titleToolbar.setText(" ");
         subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
 
@@ -617,7 +622,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickCloudDriveButton = (ImageButton) findViewById(R.id.pick_cloud_drive_icon_chat);
 
         textChat = (EmojiEditText) findViewById(R.id.edit_text_chat);
-        textChat.setEmojiSize(40);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            textChat.setEmojiSize(Util.scaleWidthPx(10, outMetrics));
+        }else{
+            textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
+        }
         emojiPopup = EmojiPopup.Builder.fromRootView(linearLayoutTwemoji).build(textChat, keyboardTwemojiButton);
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
