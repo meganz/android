@@ -142,6 +142,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
+import static mega.privacy.android.app.utils.Util.context;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener{
 
@@ -627,6 +628,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
         }
+
         emojiPopup = EmojiPopup.Builder.fromRootView(linearLayoutTwemoji).build(textChat, keyboardTwemojiButton);
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
@@ -700,11 +702,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
 
                             if(chatRoom.hasCustomTitle()){
-
                                 textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-                            }
-                            else{
-                                textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
+                            }else{
+                               textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                             }
 
                             textChat.setMinLines(1);
@@ -719,8 +719,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         if(chatRoom.hasCustomTitle()){
                             textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-                        }
-                        else{
+                        }else{
                             textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                         }
 
@@ -736,8 +735,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.hasCustomTitle()){
                         textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-                    }
-                    else{
+                    }else{
                         textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                     }
 
@@ -1008,8 +1006,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if(chatRoom.hasCustomTitle()){
                         textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-                    }
-                    else{
+                    }else{
                         textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
                     }
 
@@ -6608,8 +6605,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatRoom.hasCustomTitle()){
             textChat.setHint(getString(R.string.type_message_hint_with_customized_title, chatRoom.getTitle()));
-        }
-        else{
+        }else{
             textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
         }
 
