@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.support.annotation.DimenRes;
 import android.support.annotation.Px;
+import android.widget.TextView;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
@@ -11,6 +12,7 @@ public interface EmojiEditTextInterface {
 
   void input(Emoji emoji);
 
+  /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size */
   float getEmojiSize();
 
   /** sets the emoji size in pixels and automatically invalidates the text and renders it with the new size */

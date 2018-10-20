@@ -81,7 +81,8 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     setText(getText());
   }
 
-  @Override public void setText(CharSequence rawText, BufferType type) {
+
+    @Override public void setText(CharSequence rawText, BufferType type) {
 
     CharSequence text = rawText == null ? "" : rawText;
     SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
