@@ -15,8 +15,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.utils.Util;
 
-/** Reference implementation for an EditText with emoji support. */
-public class EmojiEditText extends EmojiAppCompatEditText implements EmojiEditTextInterface {
+//Reference implementation for an EditText with emoji support
+public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
   private float emojiSize;
 
   public EmojiEditText(final Context context) {

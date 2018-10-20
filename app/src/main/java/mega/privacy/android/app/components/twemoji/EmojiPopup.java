@@ -14,6 +14,8 @@ import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
@@ -61,10 +63,8 @@ public final class EmojiPopup {
     @Override public void onGlobalLayout() {
 
       final Rect rect = Utils.windowVisibleDisplayFrame(context);
-      final int heightDifference = Utils.screenHeight(context) - (rect.bottom);
-
+      int heightDifference = Utils.screenHeight(context) - (rect.bottom);
       if (heightDifference > Utils.dpToPx(context, MIN_KEYBOARD_HEIGHT_PORTRAIT)) {
-
         popupWindow.setHeight(heightDifference);
         popupWindow.setWidth(rect.right);
 
@@ -78,15 +78,15 @@ public final class EmojiPopup {
           isPendingOpen = false;
         }
       } else {
-        if (isKeyboardOpen) {
-          isKeyboardOpen = false;
+          if (isKeyboardOpen) {
+            isKeyboardOpen = false;
 
-          if (onSoftKeyboardCloseListener != null) {
-            onSoftKeyboardCloseListener.onKeyboardClose();
+            if (onSoftKeyboardCloseListener != null) {
+              onSoftKeyboardCloseListener.onKeyboardClose();
+            }
+            hideBothKeyboards();
+            Utils.removeOnGlobalLayoutListener(context.getWindow().getDecorView(), onGlobalLayoutListener);
           }
-          hideBothKeyboards();
-          Utils.removeOnGlobalLayoutListener(context.getWindow().getDecorView(), onGlobalLayoutListener);
-        }
       }
     }
   };
@@ -155,16 +155,7 @@ public final class EmojiPopup {
       final View view = (View) editInterface;
       view.setFocusableInTouchMode(true);
       view.requestFocus();
-
-      //Show keyboard
-      InputMethodManager imm = (InputMethodManager)  context.getSystemService(Context.INPUT_METHOD_SERVICE);
-      imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-      if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-        log("LANDSCAPE");
-      }else{
-        log("PORTRAIT");
-      }
-
+      isShowSoftKeyboard(view, true);
     } else {
       throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
     }
@@ -191,19 +182,30 @@ public final class EmojiPopup {
 
   }
   public void hideLetterKeyboard(){
-
   if (editInterface instanceof View) {
     log("hideLetterKeyboard() ");
-
-    //the Letterkeyboard is visible
-      final View view = (View) editInterface;
-      //Hide keyboard
-      InputMethodManager imm = (InputMethodManager)  context.getSystemService(Context.INPUT_METHOD_SERVICE);
-      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
+     final View view = (View) editInterface;
+      isShowSoftKeyboard(view, false);
     } else {
       throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
     }
+  }
+
+  public void isShowSoftKeyboard(final View view, final boolean show) {
+    final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+    if (imm == null)
+      return;
+
+    if (show) {
+      view.post(new Runnable() {
+
+        @Override
+        public void run() {
+          imm.showSoftInput(view, 0, null);
+        }// run()
+      });
+    } else
+      imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
   }
 
   public void changeKeyboard() {
@@ -221,23 +223,13 @@ public final class EmojiPopup {
         view.setFocusableInTouchMode(true);
         view.requestFocus();
         showAtBottomPending();
-
-        //Show keyboard
-        InputMethodManager imm = (InputMethodManager)  context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-          log("LANDSCAPE");
-        }else{
-          log("PORTRAIT");
-        }
-
+        isShowSoftKeyboard(view, true);
       } else {
         throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
       }
     } else {
       hideEmojiKeyboard();
     }
-
     // Manually dispatch the event. In some cases this does not work out of the box reliably.
     context.getWindow().getDecorView().getViewTreeObserver().dispatchOnGlobalLayout();
   }
@@ -381,9 +373,5 @@ public final class EmojiPopup {
   public static void log(String message) {
     Util.log("EmojiPopup", message);
   }
-  public void modifyKeyboardHeight(int heightDifference){
-
-  }
-
 
 }
