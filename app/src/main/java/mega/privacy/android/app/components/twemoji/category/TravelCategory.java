@@ -7,7 +7,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 
 
-@SuppressWarnings("PMD.MethodReturnsInternalArray") public final class TravelCategory implements EmojiCategory {
+public final class TravelCategory implements EmojiCategory {
   private static final Emoji[] DATA = new Emoji[] {
     new Emoji(0x1f697, R.drawable.emoji_twitter_1f697),
     new Emoji(0x1f695, R.drawable.emoji_twitter_1f695),
