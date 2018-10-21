@@ -1,6 +1,11 @@
 package mega.privacy.android.app.components.twemoji.emoji;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -11,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import mega.privacy.android.app.utils.Util;
+
+import static android.graphics.Color.WHITE;
 import static java.util.Arrays.asList;
 
 public class Emoji implements Serializable {
@@ -23,19 +31,26 @@ public class Emoji implements Serializable {
 
   public Emoji(@NonNull final int[] codePoints, @DrawableRes final int resource) {
     this(codePoints, resource, new Emoji[0]);
+    log("***** Emoji 1");
+
   }
 
   public Emoji(final int codePoint, @DrawableRes final int resource) {
     this(codePoint, resource, new Emoji[0]);
+    log("***** Emoji 2");
   }
 
   public Emoji(final int codePoint, @DrawableRes final int resource, final Emoji... variants) {
     this(new int[]{codePoint}, resource, variants);
+    log("***** Emoji 3");
+
   }
 
   public Emoji(@NonNull final int[] codePoints, @DrawableRes final int resource, final Emoji... variants) {
     this.unicode = new String(codePoints, 0, codePoints.length);
     this.resource = resource;
+    log("***** Emoji 4");
+
     // asList seems to always allocate a new object, even for empty lists.
     this.variants = variants.length == 0 ? Collections.<Emoji>emptyList() : asList(variants);
     for (final Emoji variant : variants) {
@@ -53,7 +68,18 @@ public class Emoji implements Serializable {
   }
 
   @NonNull public Drawable getDrawable(final Context context) {
-    return AppCompatResources.getDrawable(context, resource);
+//    Drawable drawableInitial = AppCompatResources.getDrawable(context, resource);
+
+    Bitmap bitmapInitial = BitmapFactory.decodeResource(context.getResources(), resource);
+    Bitmap bitmapFinal = Bitmap.createBitmap(80, 80, Bitmap.Config.ARGB_8888);
+    Canvas c = new Canvas(bitmapFinal);
+    Paint paint = new Paint();
+    paint.setAntiAlias(true);
+    paint.setColor(WHITE);
+    c.drawBitmap(bitmapInitial, 3f, 3f, null);
+
+    Drawable drawableFinal = new BitmapDrawable(context.getResources(), bitmapFinal);
+    return drawableFinal;
   }
 
   @NonNull public List<Emoji> getVariants() {
@@ -103,5 +129,9 @@ public class Emoji implements Serializable {
     result = 31 * result + resource;
     result = 31 * result + variants.hashCode();
     return result;
+  }
+
+  public static void log(String message) {
+    Util.log("Emoji", message);
   }
 }
