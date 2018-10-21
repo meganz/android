@@ -31,25 +31,21 @@ public class Emoji implements Serializable {
 
   public Emoji(@NonNull final int[] codePoints, @DrawableRes final int resource) {
     this(codePoints, resource, new Emoji[0]);
-    log("***** Emoji 1");
 
   }
 
   public Emoji(final int codePoint, @DrawableRes final int resource) {
     this(codePoint, resource, new Emoji[0]);
-    log("***** Emoji 2");
   }
 
   public Emoji(final int codePoint, @DrawableRes final int resource, final Emoji... variants) {
     this(new int[]{codePoint}, resource, variants);
-    log("***** Emoji 3");
 
   }
 
   public Emoji(@NonNull final int[] codePoints, @DrawableRes final int resource, final Emoji... variants) {
     this.unicode = new String(codePoints, 0, codePoints.length);
     this.resource = resource;
-    log("***** Emoji 4");
 
     // asList seems to always allocate a new object, even for empty lists.
     this.variants = variants.length == 0 ? Collections.<Emoji>emptyList() : asList(variants);
