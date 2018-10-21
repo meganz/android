@@ -6,7 +6,7 @@ import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 
-@SuppressWarnings("PMD.MethodReturnsInternalArray") public final class NatureCategory implements EmojiCategory {
+public final class NatureCategory implements EmojiCategory {
   private static final Emoji[] DATA = new Emoji[] {
     new Emoji(0x1f436, R.drawable.emoji_twitter_1f436),
     new Emoji(0x1f431, R.drawable.emoji_twitter_1f431),
@@ -59,6 +59,14 @@ import android.support.annotation.NonNull;
     new Emoji(0x1f991, R.drawable.emoji_twitter_1f991),
     new Emoji(0x1f419, R.drawable.emoji_twitter_1f419),
     new Emoji(0x1f990, R.drawable.emoji_twitter_1f990),
+    new Emoji(0x1f992, R.drawable.emoji_twitter_1f992),
+    new Emoji(0x1f993, R.drawable.emoji_twitter_1f993),
+    new Emoji(0x1f994, R.drawable.emoji_twitter_1f994),
+    new Emoji(0x1f995, R.drawable.emoji_twitter_1f995),
+    new Emoji(0x1f996, R.drawable.emoji_twitter_1f996),
+    new Emoji(0x1f999, R.drawable.emoji_twitter_1f999),
+    new Emoji(0x1f997, R.drawable.emoji_twitter_1f997),
+    new Emoji(0x1f998, R.drawable.emoji_twitter_1f998),
     new Emoji(0x1f420, R.drawable.emoji_twitter_1f420),
     new Emoji(0x1f41f, R.drawable.emoji_twitter_1f41f),
     new Emoji(0x1f421, R.drawable.emoji_twitter_1f421),
@@ -93,6 +101,15 @@ import android.support.annotation.NonNull;
     new Emoji(0x1f401, R.drawable.emoji_twitter_1f401),
     new Emoji(0x1f400, R.drawable.emoji_twitter_1f400),
     new Emoji(0x1f43f, R.drawable.emoji_twitter_1f43f),
+    new Emoji(0x1f9a0, R.drawable.emoji_twitter_1f9a0),
+    new Emoji(0x1f9a1, R.drawable.emoji_twitter_1f9a1),
+    new Emoji(0x1f9a2, R.drawable.emoji_twitter_1f9a2),
+    new Emoji(0x1f99a, R.drawable.emoji_twitter_1f99a),
+    new Emoji(0x1f99b, R.drawable.emoji_twitter_1f99b),
+    new Emoji(0x1f99c, R.drawable.emoji_twitter_1f99c),
+    new Emoji(0x1f99d, R.drawable.emoji_twitter_1f99d),
+    new Emoji(0x1f99e, R.drawable.emoji_twitter_1f99e),
+    new Emoji(0x1f99f, R.drawable.emoji_twitter_1f99f),
     new Emoji(0x1f43e, R.drawable.emoji_twitter_1f43e),
     new Emoji(0x1f409, R.drawable.emoji_twitter_1f409),
     new Emoji(0x1f432, R.drawable.emoji_twitter_1f432),
