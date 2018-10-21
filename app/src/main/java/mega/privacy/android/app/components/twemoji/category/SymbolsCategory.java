@@ -11,6 +11,7 @@ public final class SymbolsCategory implements EmojiCategory {
   private static final Emoji[] DATA = new Emoji[] {
     new Emoji(0x2764, R.drawable.emoji_twitter_2764),
     new Emoji(0x1f49b, R.drawable.emoji_twitter_1f49b),
+    new Emoji(0x1f9e1, R.drawable.emoji_twitter_1f9e1),
     new Emoji(0x1f49a, R.drawable.emoji_twitter_1f49a),
     new Emoji(0x1f499, R.drawable.emoji_twitter_1f499),
     new Emoji(0x1f49c, R.drawable.emoji_twitter_1f49c),
