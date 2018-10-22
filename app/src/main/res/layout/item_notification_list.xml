@@ -128,8 +128,10 @@
 		android:maxLines="1"/>
 
 	<LinearLayout
+		android:id="@+id/notifications_separator"
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
-		android:background="@color/grid_item_separator"/>
+		android:background="@color/grid_item_separator"
+		android:orientation="horizontal" />
 </LinearLayout>
 
