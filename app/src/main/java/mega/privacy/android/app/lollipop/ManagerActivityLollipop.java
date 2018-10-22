@@ -4253,6 +4253,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case CHAT:{
 				tB.setVisibility(View.VISIBLE);
 				aB.setTitle(getString(R.string.section_chat));
+				if(rChatFL!=null && rChatFL.isAdded()){
+					rChatFL.setStatus();
+				}
 				firstNavigationLevel = true;
 				break;
 			}
@@ -4478,6 +4481,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					case DialogInterface.BUTTON_NEGATIVE:
                         log("showConfirmationConnect: BUTTON_NEGATIVE");
+                        setToolbarTitle();
 						break;
 				}
 			}
@@ -9439,15 +9443,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showOfflineMode();
 			}
 			else{
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				if (nV != null){
-					Menu nVMenu = nV.getMenu();
-					MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-					resetNavigationViewMenu(nVMenu);
-					cloudDrive.setChecked(true);
-					cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
+				if(megaApi!=null && megaApi.getRootNode()!=null){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					if (nV != null){
+						Menu nVMenu = nV.getMenu();
+						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+						resetNavigationViewMenu(nVMenu);
+						cloudDrive.setChecked(true);
+						cloudDrive.setIcon(ContextCompat.getDrawable(this, R.drawable.cloud_drive_red));
+					}
+					selectDrawerItemLollipop(drawerItem);
 				}
-				selectDrawerItemLollipop(drawerItem);
+				else{
+					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+					selectDrawerItemLollipop(DrawerItem.SAVED_FOR_OFFLINE);
+				}
 			}
 		}
 		else if (drawerItem == DrawerItem.CONTACTS){
