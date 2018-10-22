@@ -5508,7 +5508,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
-    			ft.commitNowAllowingStateLoss();
+    			ft.commitAllowingStateLoss();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
