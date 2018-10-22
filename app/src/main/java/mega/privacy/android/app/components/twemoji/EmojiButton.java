@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 
 import mega.privacy.android.app.R;
 
-@SuppressWarnings("CPD-START") public class EmojiButton extends AppCompatButton {
+public class EmojiButton extends AppCompatButton {
   private float emojiSize;
 
   public EmojiButton(final Context context) {
