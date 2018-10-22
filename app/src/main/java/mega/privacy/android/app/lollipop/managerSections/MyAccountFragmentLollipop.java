@@ -829,7 +829,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("DENSITY: " + density + ":::: " + avatarTextSize);
 
 		initialLetter.setText(myAccountInfo.getFirstLetter());
-		initialLetter.setTextSize(30);
+		initialLetter.setTextSize(25);
 		initialLetter.setTextColor(Color.WHITE);
 		initialLetter.setVisibility(View.VISIBLE);
 	}

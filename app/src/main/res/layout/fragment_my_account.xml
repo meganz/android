@@ -92,8 +92,8 @@
 
 								<mega.privacy.android.app.components.RoundedImageView
 									android:id="@+id/my_account_thumbnail"
-									android:layout_width="fill_parent"
-									android:layout_height="fill_parent"
+									android:layout_width="match_parent"
+									android:layout_height="match_parent"
 									android:scaleType="fitCenter"
 									android:layout_centerInParent="true"
 									rounded:border_color="@color/border_file_properties"
@@ -102,11 +102,11 @@
 
 								<TextView
 									android:id="@+id/my_account_initial_letter"
-									android:layout_width="fill_parent"
-									android:layout_height="fill_parent"
+									android:layout_width="match_parent"
+									android:layout_height="match_parent"
 									android:layout_centerInParent="true"
 									android:gravity="center_horizontal|center_vertical"
-									android:paddingBottom="3dp" />
+									android:paddingBottom="2.5dp" />
 
 							</RelativeLayout>
 						</RelativeLayout>
