@@ -54,7 +54,7 @@ public class EmojiEditText extends EmojiAppCompatEditText implements EmojiEditTe
     final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
 
     final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-    EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
+    EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize);
 
   }
 
