@@ -5,32 +5,30 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.style.DynamicDrawableSpan;
+import android.text.style.ImageSpan;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.utils.Util;
 
-final class EmojiSpan extends DynamicDrawableSpan {
+final class EmojiSpan extends ImageSpan {
   private final float size;
-  private final Context context;
-  private final Emoji emoji;
-  private Drawable deferredDrawable;
 
-  EmojiSpan(final Context context, final Emoji emoji, final float size) {
-    this.context = context;
-    this.emoji = emoji;
+  EmojiSpan(final Context context, final int drawableRes, final float size) {
+    super(context, drawableRes);
+
     this.size = size;
   }
 
   @Override public Drawable getDrawable() {
-    if (deferredDrawable == null) {
-      deferredDrawable = emoji.getDrawable(context);
-      deferredDrawable.setBounds(0, 0, (int) size, (int) size);
-    }
-    return deferredDrawable;
+    final Drawable result = super.getDrawable();
+
+    result.setBounds(0, 0, (int) size, (int) size);
+
+    return result;
   }
 
-  @Override public int getSize(final Paint paint, final CharSequence text, final int start, final int end, final Paint.FontMetricsInt fontMetrics) {
-
+  @Override public int getSize(final Paint paint, final CharSequence text, final int start,
+                               final int end, final Paint.FontMetricsInt fontMetrics) {
     if (fontMetrics != null) {
       final Paint.FontMetrics paintFontMetrics = paint.getFontMetrics();
       final float fontHeight = paintFontMetrics.descent - paintFontMetrics.ascent;
@@ -59,5 +57,4 @@ final class EmojiSpan extends DynamicDrawableSpan {
     drawable.draw(canvas);
     canvas.restore();
   }
-
 }
