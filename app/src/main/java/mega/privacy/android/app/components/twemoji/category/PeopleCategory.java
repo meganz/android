@@ -587,7 +587,9 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f468, 0x1f3fe, 0x200d, 0x1f3a4 }, R.drawable.emoji_twitter_1f468_1f3fe_200d_1f3a4),
       new Emoji(new int[] { 0x1f468, 0x1f3ff, 0x200d, 0x1f3a4 }, R.drawable.emoji_twitter_1f468_1f3ff_200d_1f3a4)
     ),
-    new Emoji(new int[] { 0x1f469, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_200d_1f3eb,
+          new Emoji(0x1f9df, R.drawable.emoji_twitter_1f9df),
+
+          new Emoji(new int[] { 0x1f469, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_200d_1f3eb,
       new Emoji(new int[] { 0x1f469, 0x1f3fb, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_1f3fb_200d_1f3eb),
       new Emoji(new int[] { 0x1f469, 0x1f3fc, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_1f3fc_200d_1f3eb),
       new Emoji(new int[] { 0x1f469, 0x1f3fd, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_1f3fd_200d_1f3eb),
