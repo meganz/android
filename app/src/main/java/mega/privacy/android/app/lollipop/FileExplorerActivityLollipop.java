@@ -2474,13 +2474,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 						if (sharedText != null) {
-							body.append("\n");
+							if(body.length()>0){
+								body.append("\n");
+							}
 							body.append(getString(R.string.new_file_content_when_uploading) + ": ");
 							body.append(sharedText);
 						}
 						String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
 						if (sharedText3 != null) {
-							body.append("\n");
+							if(body.length()>0){
+								body.append("\n");
+							}
 							body.append(getString(R.string.new_file_email_when_uploading) + ": ");
 							body.append(sharedText3);
 						}
