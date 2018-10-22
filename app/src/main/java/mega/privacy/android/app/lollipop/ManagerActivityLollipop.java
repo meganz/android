@@ -383,7 +383,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView nVDisplayName;
 	TextView nVEmail;
 	RoundedImageView nVPictureProfile;
-	TextView nVPictureProfileTextView;
 	TextView spaceTV;
 	ProgressBar usedSpacePB;
 
@@ -1978,12 +1977,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		setChatBadge();
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
-		if (!Util.isOnline(this)){
-			usedSpaceLayout.setVisibility(View.GONE);
-		}
-		else{
-			usedSpaceLayout.setVisibility(View.VISIBLE);
-		}
 
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
@@ -2065,7 +2058,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         nVDisplayName = (TextView) findViewById(R.id.navigation_drawer_account_information_display_name);
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
-        nVPictureProfileTextView = (TextView) findViewById(R.id.navigation_drawer_user_account_picture_profile_textview);
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
@@ -3601,7 +3593,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
 					nVPictureProfile.setImageBitmap(circleBitmap);
-					nVPictureProfileTextView.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -3626,42 +3617,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void setDefaultAvatar(){
 		log("setDefaultAvatar");
 
-		float density  = getResources().getDisplayMetrics().density;
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			log("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
-
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		nVPictureProfile.setImageBitmap(defaultAvatar);
-
-		int avatarTextSize = Util.getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
-
 		String firstLetter = " ";
 		if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
 			firstLetter = ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter();
 		}
-
-		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(30);
-		nVPictureProfileTextView.setTextColor(Color.WHITE);
-		nVPictureProfileTextView.setVisibility(View.VISIBLE);
+		if (firstLetter == null) {
+			firstLetter = " ";
+		}
+		nVPictureProfile.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 	}
 
 	public void setOfflineAvatar(String email, long myHandle, String firstLetter){
@@ -3706,19 +3670,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (nVPictureProfile != null){
 						nVPictureProfile.setImageBitmap(circleBitmap);
 					}
-					if (nVPictureProfileTextView != null){
-						nVPictureProfileTextView.setVisibility(View.GONE);
-					}
 					return;
 				}
 			}
 		}
-
-		float density  = getResources().getDisplayMetrics().density;
-		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
 
 		String myHandleEncoded = "";
 		if(megaApi.getMyUser()!=null){
@@ -3730,34 +3685,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 
 		String color = megaApi.getUserAvatarColor(myHandleEncoded);
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			log("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
-		}
 
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(defaultAvatar);
-		}
-
-		int avatarTextSize = Util.getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		if (nVPictureProfileTextView != null) {
-			nVPictureProfileTextView.setText(firstLetter);
-			nVPictureProfileTextView.setTextSize(32);
-			nVPictureProfileTextView.setTextColor(Color.WHITE);
-			nVPictureProfileTextView.setVisibility(View.VISIBLE);
+			nVPictureProfile.setImageBitmap(Util.createDefaultAvatar(color, firstLetter));
 		}
 	}
 
@@ -17760,9 +17690,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		nVDisplayName.setText(fullName);
 
-		nVPictureProfileTextView.setText(firstLetter);
-		nVPictureProfileTextView.setTextSize(32);
-		nVPictureProfileTextView.setTextColor(Color.WHITE);
+		nVPictureProfile.setImageBitmap(Util.createDefaultAvatar(megaApi.getUserAvatarColor(megaApi.getMyUser()), firstLetter));
 	}
 
 	public void updateMailNavigationView(String email){

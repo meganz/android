@@ -24,6 +24,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
@@ -2105,6 +2106,55 @@ public class Util {
 			log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
 			return false;
 		}
+	}
+
+	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
+		log("createDefaultAvatar color: '"+color+"' firstLetter: '"+firstLetter+"'");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint paintText = new Paint();
+		Paint paintCircle = new Paint();
+
+		paintText.setColor(Color.WHITE);
+		paintText.setTextSize(150);
+		paintText.setAntiAlias(true);
+		paintText.setTextAlign(Paint.Align.CENTER);
+		Typeface face = Typeface.SANS_SERIF;
+		paintText.setTypeface(face);
+		paintText.setAntiAlias(true);
+		paintText.setSubpixelText(true);
+		paintText.setStyle(Paint.Style.FILL);
+
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			paintCircle.setColor(Color.parseColor(color));
+			paintCircle.setAntiAlias(true);
+		}
+		else{
+			log("Default color to the avatar");
+			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+			paintCircle.setAntiAlias(true);
+		}
+
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
+
+		log("Draw letter: "+firstLetter);
+		Rect bounds = new Rect();
+
+		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
+		int xPos = (c.getWidth()/2);
+		int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
+		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+
+		return defaultAvatar;
 	}
 
 	private static void log(String message) {

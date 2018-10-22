@@ -48,14 +48,6 @@
                     android:background="@null"
                     android:src="@drawable/ic_offline" />
 
-                <TextView
-                    android:id="@+id/navigation_drawer_user_account_picture_profile_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingBottom="3dp"
-                    android:layout_centerInParent="true"
-                    android:gravity="center_horizontal|center_vertical"/>
-
             </RelativeLayout>
 
             <LinearLayout
