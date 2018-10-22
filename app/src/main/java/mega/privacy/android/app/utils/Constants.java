@@ -36,8 +36,10 @@ public class Constants {
 	public static int REQUEST_CODE_SELECT_CHAT = 1025;
 	public static int REQUEST_CODE_GET_CONTACTS = 1026;
 	public static int REQUEST_CODE_FILE_INFO = 1027;
+	public static int REQUEST_CODE_REFRESH_STAGING = 1028;
 
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
+	public static String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
 	public static String ACTION_ENABLE_CHAT = "ACTION_ENABLE_CHAT";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";

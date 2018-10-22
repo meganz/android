@@ -1318,7 +1318,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment{
 					else{
 						mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop)context).orderCloud);
 					}
-
+                    mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("screenPosition", screenPosition);
 
 					mediaIntent.putExtra("HANDLE", file.getHandle());

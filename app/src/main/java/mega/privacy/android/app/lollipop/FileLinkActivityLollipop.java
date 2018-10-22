@@ -458,7 +458,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			
 			if (e.getErrorCode() == MegaError.API_OK) {
 				document = request.getPublicMegaNode();
-				
+
 				if (document == null){
 					log("documment==null --> Intent to ManagerActivityLollipop");
 					boolean closedChat = MegaApplication.isClosedChat();
@@ -470,6 +470,14 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	    			finish();
 					return;
 				}
+
+				log("DOCUMENTNODEHANDLEPUBLIC: " + document.getHandle());
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+
+				dbH.setLastPublicHandle(document.getHandle());
+				dbH.setLastPublicHandleTimeStamp();
 
 //				nameView.setText(document.getName());
 				collapsingToolbar.setTitle(document.getName());
