@@ -500,14 +500,18 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-		if(Util.isChatEnabled()){
-			FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
-			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest);
+//		if(Util.isChatEnabled()){
+		EmojiManager.install(new TwitterEmojiProvider());
+
+		FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
+			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest)
+					.setReplaceAll(false)
+					.setEmojiSpanIndicatorEnabled(true)
+					.setUseEmojiAsDefaultStyle(true);
 
 			EmojiCompat.init(configDF);
-		}
+//		}
 
-		EmojiManager.install(new TwitterEmojiProvider());
 
 
 //		initializeGA();

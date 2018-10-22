@@ -23,7 +23,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
-public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface{
+public class EmojiTextView extends EmojiAppCompatTextView implements EmojiTexViewInterface{
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
