@@ -684,20 +684,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			int position;
 			int adapterType;
 			int actionType;
+			int placeholderCount;
 			ImageView imageDrag = null;
 
 			if (intent != null){
 				actionType = intent.getIntExtra("actionType", -1);
-
-
 				position = intent.getIntExtra("position", -1);
+				placeholderCount = intent.getIntExtra("placeholder", 0);
 				adapterType = intent.getIntExtra("adapterType", 0);
 
 				if (position != -1){
 					if (adapterType == Constants.RUBBISH_BIN_ADAPTER){
 						if (rubbishBinFLol != null && rubbishBinFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
-								imageDrag = rubbishBinFLol.getImageDrag(position);
+								imageDrag = rubbishBinFLol.getImageDrag(position + placeholderCount);
 								if (rubbishBinFLol.imageDrag != null){
 									rubbishBinFLol.imageDrag.setVisibility(View.VISIBLE);
 								}
@@ -707,14 +707,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else if (actionType == Constants.SCROLL_TO_POSITION) {
-								rubbishBinFLol.updateScrollPosition(position);
+								rubbishBinFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
 					else if (adapterType == Constants.INBOX_ADAPTER){
 						if (iFLol != null && iFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
-								imageDrag = iFLol.getImageDrag(position);
+								imageDrag = iFLol.getImageDrag(position  + placeholderCount);
 								if (iFLol.imageDrag != null){
 									iFLol.imageDrag.setVisibility(View.VISIBLE);
 								}
@@ -724,14 +724,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else if (actionType == Constants.SCROLL_TO_POSITION) {
-								iFLol.updateScrollPosition(position);
+								iFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
 					else if (adapterType == Constants.INCOMING_SHARES_ADAPTER){
 						if (inSFLol != null && inSFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
-								imageDrag = inSFLol.getImageDrag(position);
+								imageDrag = inSFLol.getImageDrag(position  + placeholderCount);
 								if (inSFLol.imageDrag != null){
 									inSFLol.imageDrag.setVisibility(View.VISIBLE);
 								}
@@ -741,14 +741,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else if (actionType == Constants.SCROLL_TO_POSITION) {
-								inSFLol.updateScrollPosition(position);
+								inSFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
 					else if (adapterType == Constants.OUTGOING_SHARES_ADAPTER){
 						if (outSFLol != null && outSFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
-								imageDrag = outSFLol.getImageDrag(position);
+								imageDrag = outSFLol.getImageDrag(position + placeholderCount);
 								if (outSFLol.imageDrag != null){
 									outSFLol.imageDrag.setVisibility(View.VISIBLE);
 								}
@@ -758,7 +758,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else if (actionType == Constants.SCROLL_TO_POSITION) {
-								outSFLol.updateScrollPosition(position);
+								outSFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
@@ -768,7 +768,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							ArrayList<MegaNode> listNodes = sFLol.getNodes();
 							for (int i=0; i<listNodes.size(); i++){
 								if (listNodes.get(i).getHandle() == handle){
-									position = i;
+									position = i + placeholderCount;
 									break;
 								}
 							}
@@ -791,7 +791,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else if (adapterType == Constants.FILE_BROWSER_ADAPTER){
 						if (fbFLol != null && fbFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
-								imageDrag = fbFLol.getImageDrag(position);
+								imageDrag = fbFLol.getImageDrag(position + placeholderCount);
 								if (fbFLol.imageDrag != null){
 									fbFLol.imageDrag.setVisibility(View.VISIBLE);
 								}
@@ -801,7 +801,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else if (actionType == Constants.SCROLL_TO_POSITION) {
-								fbFLol.updateScrollPosition(position);
+								fbFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
@@ -813,7 +813,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = cuFL.getNodesArray();
 								for (int i=0; i<listNodes.size(); i++){
 									if (listNodes.get(i).getHandle() == handle){
-										position = i;
+										position = i + placeholderCount;
 										break;
 									}
 								}
@@ -830,7 +830,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 										String h1 = handles.get(j).toString();
 										String h2 = handle.toString();
 										if (h1.equals(h2)){
-											position = count;
+											position = count + placeholderCount;
 											found = true;
 											break;
 										}
@@ -862,7 +862,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder> listNodes = muFLol.getNodesArray();
 								for (int i=0; i<listNodes.size(); i++){
 									if (listNodes.get(i).getHandle() == handle){
-										position = i;
+										position = i + placeholderCount;
 										break;
 									}
 								}
@@ -879,7 +879,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 										String h1 = handles.get(j).toString();
 										String h2 = String.valueOf(handle);
 										if (h1.equals(h2)){
-											position = count;
+											position = count + placeholderCount;
 											found = true;
 											break;
 										}
@@ -909,7 +909,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else if (adapterType == Constants.OFFLINE_ADAPTER){
 						if (oFLol != null && oFLol.isAdded()){
 							if (actionType == Constants.UPDATE_IMAGE_DRAG) {
-								imageDrag = oFLol.getImageDrag(position);
+								imageDrag = oFLol.getImageDrag(position + placeholderCount);
 								if (oFLol.imageDrag != null){
 									oFLol.imageDrag.setVisibility(View.VISIBLE);
 								}
@@ -919,7 +919,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 							else if (actionType == Constants.SCROLL_TO_POSITION) {
-								oFLol.updateScrollPosition(position);
+								oFLol.updateScrollPosition(position + placeholderCount);
 							}
 						}
 					}
@@ -16913,6 +16913,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onNodesSearchUpdate");
 		if (sFLol != null){
 			if(sFLol.isAdded()){
+			    //stop from query for empty string.
+                textSubmitted = true;
 				sFLol.refresh();
 			}
 		}
