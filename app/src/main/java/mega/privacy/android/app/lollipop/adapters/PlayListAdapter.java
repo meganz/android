@@ -489,15 +489,23 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     }
 
     public void setItemChecked (int position){
-        this.itemChecked = position;
-        if (adapterType == Constants.OFFLINE_ADAPTER){
-            offNodeChecked = offNodes.get(position);
-        }
-        else if (adapterType == Constants.ZIP_ADAPTER){
-            zipChecked = zipFiles.get(position);
-        }
-        else{
-            nodeChecked = nodes.get(position);
+        if (position >=0) {
+            this.itemChecked = position;
+            if (adapterType == Constants.OFFLINE_ADAPTER) {
+                if (offNodes != null && position < offNodes.size()) {
+                    offNodeChecked = offNodes.get(position);
+                }
+            }
+            else if (adapterType == Constants.ZIP_ADAPTER) {
+                if (zipFiles != null && position < zipFiles.size()) {
+                    zipChecked = zipFiles.get(position);
+                }
+            }
+            else {
+                if (nodes != null && position < nodes.size()) {
+                    nodeChecked = nodes.get(position);
+                }
+            }
         }
     }
 
