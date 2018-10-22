@@ -1162,6 +1162,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		setAutoaccept = false;
 		autoAccept = true;
 		if (megaApi.multiFactorAuthAvailable()) {
+			preferenceScreen.addPreference(twoFACategory);
 			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 		}
 		else {
@@ -2657,7 +2658,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			twoFACheck.setChecked(enabled);
 		}
 	}
-	
+
+	public void update2FAVisibility(){
+		log("update2FAVisbility");
+		if (megaApi == null){
+			if (context != null){
+				if (((Activity)context).getApplication() != null){
+					megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+				}
+			}
+		}
+
+		if (megaApi != null) {
+			if (megaApi.multiFactorAuthAvailable()) {
+				log("update2FAVisbility true");
+				preferenceScreen.addPreference(twoFACategory);
+				megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+			} else {
+				log("update2FAVisbility false");
+				preferenceScreen.removePreference(twoFACategory);
+			}
+		}
+	}
+
 	public void afterSetPinLock(){
 		log("afterSetPinLock");
 

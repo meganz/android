@@ -88,7 +88,7 @@ import android.support.v4.provider.FontRequest;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.4.0_207";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -417,6 +417,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
+		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
@@ -429,13 +430,28 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				} else {
 					fileLoggerSDK = false;
 				}
-			} else {
+
+				if (attrs.getStaging() != null){
+					try{
+						staging = Boolean.parseBoolean(attrs.getStaging());
+					} catch (Exception e){ staging = false;}
+				}
+			}
+			else {
 				fileLoggerSDK = false;
+				staging = false;
 			}
 		}
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		if (staging){
+			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+		}
+		else{
+			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+		}
 
 		if (Util.DEBUG){
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
