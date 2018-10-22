@@ -359,6 +359,7 @@ public final class PeopleCategory implements EmojiCategory {
     new Emoji(0x1f5e3, R.drawable.emoji_twitter_1f5e3),
     new Emoji(0x1f464, R.drawable.emoji_twitter_1f464),
     new Emoji(0x1f465, R.drawable.emoji_twitter_1f465),
+
     new Emoji(0x1f476, R.drawable.emoji_twitter_1f476,
       new Emoji(new int[] { 0x1f476, 0x1f3fb }, R.drawable.emoji_twitter_1f476_1f3fb),
       new Emoji(new int[] { 0x1f476, 0x1f3fc }, R.drawable.emoji_twitter_1f476_1f3fc),
@@ -366,6 +367,15 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f476, 0x1f3fe }, R.drawable.emoji_twitter_1f476_1f3fe),
       new Emoji(new int[] { 0x1f476, 0x1f3ff }, R.drawable.emoji_twitter_1f476_1f3ff)
     ),
+
+    new Emoji(0x1f9d2, R.drawable.emoji_twitter_1f9d2,
+            new Emoji(new int[] { 0x1f9d2, 0x1f3fb }, R.drawable.emoji_twitter_1f9d2_1f3fb),
+            new Emoji(new int[] { 0x1f9d2, 0x1f3fc }, R.drawable.emoji_twitter_1f9d2_1f3fc),
+            new Emoji(new int[] { 0x1f9d2, 0x1f3fd }, R.drawable.emoji_twitter_1f9d2_1f3fd),
+            new Emoji(new int[] { 0x1f9d2, 0x1f3fe }, R.drawable.emoji_twitter_1f9d2_1f3fe),
+            new Emoji(new int[] { 0x1f9d2, 0x1f3ff }, R.drawable.emoji_twitter_1f9d2_1f3ff)
+    ),
+
     new Emoji(0x1f466, R.drawable.emoji_twitter_1f466,
       new Emoji(new int[] { 0x1f466, 0x1f3fb }, R.drawable.emoji_twitter_1f466_1f3fb),
       new Emoji(new int[] { 0x1f466, 0x1f3fc }, R.drawable.emoji_twitter_1f466_1f3fc),
@@ -407,6 +417,14 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f471, 0x1f3fd }, R.drawable.emoji_twitter_1f471_1f3fd),
       new Emoji(new int[] { 0x1f471, 0x1f3fe }, R.drawable.emoji_twitter_1f471_1f3fe),
       new Emoji(new int[] { 0x1f471, 0x1f3ff }, R.drawable.emoji_twitter_1f471_1f3ff)
+    ),
+
+    new Emoji(0x1f9d3, R.drawable.emoji_twitter_1f9d3,
+            new Emoji(new int[] { 0x1f9d3, 0x1f3fb }, R.drawable.emoji_twitter_1f9d3_1f3fb),
+            new Emoji(new int[] { 0x1f9d3, 0x1f3fc }, R.drawable.emoji_twitter_1f9d3_1f3fc),
+            new Emoji(new int[] { 0x1f9d3, 0x1f3fd }, R.drawable.emoji_twitter_1f9d3_1f3fd),
+            new Emoji(new int[] { 0x1f9d3, 0x1f3fe }, R.drawable.emoji_twitter_1f9d3_1f3fe),
+            new Emoji(new int[] { 0x1f9d3, 0x1f3ff }, R.drawable.emoji_twitter_1f9d3_1f3ff)
     ),
     new Emoji(0x1f474, R.drawable.emoji_twitter_1f474,
       new Emoji(new int[] { 0x1f474, 0x1f3fb }, R.drawable.emoji_twitter_1f474_1f3fb),

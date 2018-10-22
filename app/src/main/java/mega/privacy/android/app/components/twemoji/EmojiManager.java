@@ -59,10 +59,14 @@ public final class EmojiManager {
         final EmojiRange location = findAllEmojis.get(i);
 
         if (!existingSpanPositions.contains(location.start)) {
-          text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-          log("replaceWithImages() - text.setSpan(EmojiSpan(context, location.emoji("+location.emoji+"), emojiSize("+emojiSize+")), location.start("+location.start+"), location.end("+location.end+"), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);)");
-
+          text.setSpan(new EmojiSpan(context, location.emoji.getResource(), emojiSize),
+                  location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+//        if (!existingSpanPositions.contains(location.start)) {
+//          text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//          log("replaceWithImages() - text.setSpan(EmojiSpan(context, location.emoji("+location.emoji+"), emojiSize("+emojiSize+")), location.start("+location.start+"), location.end("+location.end+"), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);)");
+//
+//        }
       }
 
     }
