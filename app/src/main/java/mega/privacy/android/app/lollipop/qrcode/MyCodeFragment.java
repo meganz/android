@@ -72,8 +72,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     final int RELATIVE_WIDTH = 280;
     final int WIDTH = 500;
     final int AVATAR_LEFT = 177;
-    final int AVATAR_RIGTH = 323;
-    final int AVATAR_WIDTH = 145;
+    final int AVATAR_RIGTH = 312;
+    final int AVATAR_WIDTH = 135;
 
     MegaUser myUser;
     String myEmail;
@@ -235,7 +235,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(WHITE);
-        int pos = (c.getWidth()/2) - (width/2);
+//        int pos = (c.getWidth()/2) - (width/2);
 //        int border = getDP(4);
 //        float radius = getDP(40);
 
@@ -246,7 +246,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
                 AVATAR_RIGTH,
                 AVATAR_RIGTH, paint);
 //        c.drawCircle(pos+radius-border, pos+radius-border, radius, paint);
-        c.drawBitmap(avatar, pos, pos, null);
+        c.drawBitmap(avatar, AVATAR_LEFT, AVATAR_LEFT, null);
 
         return qrCode;
     }
