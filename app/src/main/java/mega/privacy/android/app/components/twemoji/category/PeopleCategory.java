@@ -289,6 +289,36 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f44b, 0x1f3fe }, R.drawable.emoji_twitter_1f44b_1f3fe),
       new Emoji(new int[] { 0x1f44b, 0x1f3ff }, R.drawable.emoji_twitter_1f44b_1f3ff)
     ),
+    new Emoji(0x1f9b5, R.drawable.emoji_twitter_1f9b5,
+            new Emoji(new int[] { 0x1f9b5, 0x1f3fb }, R.drawable.emoji_twitter_1f9b5_1f3fb),
+            new Emoji(new int[] { 0x1f9b5, 0x1f3fc }, R.drawable.emoji_twitter_1f9b5_1f3fc),
+            new Emoji(new int[] { 0x1f9b5, 0x1f3fd }, R.drawable.emoji_twitter_1f9b5_1f3fd),
+            new Emoji(new int[] { 0x1f9b5, 0x1f3fe }, R.drawable.emoji_twitter_1f9b5_1f3fe),
+            new Emoji(new int[] { 0x1f9b5, 0x1f3ff }, R.drawable.emoji_twitter_1f9b5_1f3ff)
+    ),
+    new Emoji(0x1f9b6, R.drawable.emoji_twitter_1f9b6,
+            new Emoji(new int[] { 0x1f9b6, 0x1f3fb }, R.drawable.emoji_twitter_1f9b6_1f3fb),
+            new Emoji(new int[] { 0x1f9b6, 0x1f3fc }, R.drawable.emoji_twitter_1f9b6_1f3fc),
+            new Emoji(new int[] { 0x1f9b6, 0x1f3fd }, R.drawable.emoji_twitter_1f9b6_1f3fd),
+            new Emoji(new int[] { 0x1f9b6, 0x1f3fe }, R.drawable.emoji_twitter_1f9b6_1f3fe),
+            new Emoji(new int[] { 0x1f9b6, 0x1f3ff }, R.drawable.emoji_twitter_1f9b6_1f3ff)
+    ),
+
+    new Emoji(0x1f91f, R.drawable.emoji_twitter_1f91f,
+            new Emoji(new int[] { 0x1f91f, 0x1f3fb }, R.drawable.emoji_twitter_1f91f_1f3fb),
+            new Emoji(new int[] { 0x1f91f, 0x1f3fc }, R.drawable.emoji_twitter_1f91f_1f3fc),
+            new Emoji(new int[] { 0x1f91f, 0x1f3fd }, R.drawable.emoji_twitter_1f91f_1f3fd),
+            new Emoji(new int[] { 0x1f91f, 0x1f3fe }, R.drawable.emoji_twitter_1f91f_1f3fe),
+            new Emoji(new int[] { 0x1f91f, 0x1f3ff }, R.drawable.emoji_twitter_1f91f_1f3ff)
+    ),
+
+    new Emoji(0x1f932, R.drawable.emoji_twitter_1f932,
+            new Emoji(new int[] { 0x1f932, 0x1f3fb }, R.drawable.emoji_twitter_1f932_1f3fb),
+            new Emoji(new int[] { 0x1f932, 0x1f3fc }, R.drawable.emoji_twitter_1f932_1f3fc),
+            new Emoji(new int[] { 0x1f932, 0x1f3fd }, R.drawable.emoji_twitter_1f932_1f3fd),
+            new Emoji(new int[] { 0x1f932, 0x1f3fe }, R.drawable.emoji_twitter_1f932_1f3fe),
+            new Emoji(new int[] { 0x1f932, 0x1f3ff }, R.drawable.emoji_twitter_1f932_1f3ff)
+    ),
     new Emoji(0x1f919, R.drawable.emoji_twitter_1f919,
       new Emoji(new int[] { 0x1f919, 0x1f3fb }, R.drawable.emoji_twitter_1f919_1f3fb),
       new Emoji(new int[] { 0x1f919, 0x1f3fc }, R.drawable.emoji_twitter_1f919_1f3fc),
@@ -447,6 +477,88 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f472, 0x1f3fe }, R.drawable.emoji_twitter_1f472_1f3fe),
       new Emoji(new int[] { 0x1f472, 0x1f3ff }, R.drawable.emoji_twitter_1f472_1f3ff)
     ),
+          new Emoji(0x1f9db, R.drawable.emoji_twitter_1f9db,
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fb }, R.drawable.emoji_twitter_1f9db_1f3fb),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fc }, R.drawable.emoji_twitter_1f9db_1f3fc),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fd }, R.drawable.emoji_twitter_1f9db_1f3fd),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fe }, R.drawable.emoji_twitter_1f9db_1f3fe),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3ff }, R.drawable.emoji_twitter_1f9db_1f3ff)
+          ),
+
+          new Emoji(new int[] { 0x1f9db, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9db_200d_2640_fe0f,
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fb, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9db_1f3fb_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fc, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9db_1f3fc_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fd, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9db_1f3fd_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3fe, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9db_1f3fe_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9db, 0x1f3ff, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9db_1f3ff_200d_2640_fe0f)
+          ),
+
+          new Emoji(0x1f9dd, R.drawable.emoji_twitter_1f9dd,
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fb }, R.drawable.emoji_twitter_1f9dd_1f3fb),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fc }, R.drawable.emoji_twitter_1f9dd_1f3fc),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fd }, R.drawable.emoji_twitter_1f9dd_1f3fd),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fe }, R.drawable.emoji_twitter_1f9dd_1f3fe),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3ff }, R.drawable.emoji_twitter_1f9dd_1f3ff)
+          ),
+
+          new Emoji(new int[] { 0x1f9dd, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9dd_200d_2640_fe0f,
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fb, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9dd_1f3fb_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fc, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9dd_1f3fc_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fd, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9dd_1f3fd_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3fe, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9dd_1f3fe_200d_2640_fe0f),
+                  new Emoji(new int[] { 0x1f9dd, 0x1f3ff, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9dd_1f3ff_200d_2640_fe0f)
+          ),
+
+
+
+  new Emoji(0x1f9d9, R.drawable.emoji_twitter_1f9d9,
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fb }, R.drawable.emoji_twitter_1f9d9_1f3fb),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fc }, R.drawable.emoji_twitter_1f9d9_1f3fc),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fd }, R.drawable.emoji_twitter_1f9d9_1f3fd),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fe }, R.drawable.emoji_twitter_1f9d9_1f3fe),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3ff }, R.drawable.emoji_twitter_1f9d9_1f3ff)
+  ),
+
+  new Emoji(new int[] { 0x1f9d9, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9d9_200d_2640_fe0f,
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fb, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9d9_1f3fb_200d_2640_fe0f),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fc, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9d9_1f3fc_200d_2640_fe0f),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fd, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9d9_1f3fd_200d_2640_fe0f),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3fe, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9d9_1f3fe_200d_2640_fe0f),
+          new Emoji(new int[] { 0x1f9d9, 0x1f3ff, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9d9_1f3ff_200d_2640_fe0f)
+  ),
+
+          new Emoji(0x1f9da, R.drawable.emoji_twitter_1f9da,
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fb }, R.drawable.emoji_twitter_1f9da_1f3fb),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fc }, R.drawable.emoji_twitter_1f9da_1f3fc),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fd }, R.drawable.emoji_twitter_1f9da_1f3fd),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fe }, R.drawable.emoji_twitter_1f9da_1f3fe),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3ff }, R.drawable.emoji_twitter_1f9da_1f3ff)
+          ),
+
+          new Emoji(new int[] { 0x1f9da, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9da_200d_2642_fe0f,
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fb, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9da_1f3fb_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fc, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9da_1f3fc_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fd, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9da_1f3fd_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3fe, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9da_1f3fe_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9da, 0x1f3ff, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9da_1f3ff_200d_2642_fe0f)
+          ),
+
+          new Emoji(0x1f9dc, R.drawable.emoji_twitter_1f9dc,
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fb }, R.drawable.emoji_twitter_1f9dc_1f3fb),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fc }, R.drawable.emoji_twitter_1f9dc_1f3fc),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fd }, R.drawable.emoji_twitter_1f9dc_1f3fd),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fe }, R.drawable.emoji_twitter_1f9dc_1f3fe),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3ff }, R.drawable.emoji_twitter_1f9dc_1f3ff)
+          ),
+
+          new Emoji(new int[] { 0x1f9dc, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9dc_200d_2642_fe0f,
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fb, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9dc_1f3fb_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fc, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9dc_1f3fc_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fd, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9dc_1f3fd_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3fe, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9dc_1f3fe_200d_2642_fe0f),
+                  new Emoji(new int[] { 0x1f9dc, 0x1f3ff, 0x200d, 0x2642, 0xfe0f }, R.drawable.emoji_twitter_1f9dc_1f3ff_200d_2642_fe0f)
+          ),
+
     new Emoji(new int[] { 0x1f473, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f473_200d_2640_fe0f,
       new Emoji(new int[] { 0x1f473, 0x1f3fb, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f473_1f3fb_200d_2640_fe0f),
       new Emoji(new int[] { 0x1f473, 0x1f3fc, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f473_1f3fc_200d_2640_fe0f),
@@ -587,9 +699,12 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f468, 0x1f3fe, 0x200d, 0x1f3a4 }, R.drawable.emoji_twitter_1f468_1f3fe_200d_1f3a4),
       new Emoji(new int[] { 0x1f468, 0x1f3ff, 0x200d, 0x1f3a4 }, R.drawable.emoji_twitter_1f468_1f3ff_200d_1f3a4)
     ),
-          new Emoji(0x1f9df, R.drawable.emoji_twitter_1f9df),
+    new Emoji(0x1f9df, R.drawable.emoji_twitter_1f9df),
+    new Emoji(new int[] { 0x1f9df, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9df_200d_2640_fe0f),
+    new Emoji(0x1f9de, R.drawable.emoji_twitter_1f9de),
+    new Emoji(new int[] { 0x1f9de, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f9de_200d_2640_fe0f),
 
-          new Emoji(new int[] { 0x1f469, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_200d_1f3eb,
+     new Emoji(new int[] { 0x1f469, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_200d_1f3eb,
       new Emoji(new int[] { 0x1f469, 0x1f3fb, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_1f3fb_200d_1f3eb),
       new Emoji(new int[] { 0x1f469, 0x1f3fc, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_1f3fc_200d_1f3eb),
       new Emoji(new int[] { 0x1f469, 0x1f3fd, 0x200d, 0x1f3eb }, R.drawable.emoji_twitter_1f469_1f3fd_200d_1f3eb),

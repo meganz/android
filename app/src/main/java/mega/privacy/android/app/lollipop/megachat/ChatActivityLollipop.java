@@ -81,8 +81,8 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
-import mega.privacy.android.app.components.twemoji.EmojiPopup;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.components.twemoji.EmojiUniversal;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -251,7 +251,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ImageButton pickCloudDriveButton;
     ImageButton pickFileStorageButton;
 
-    EmojiPopup emojiPopup;
+//    EmojiPopup emojiPopup;
     LinearLayout linearLayoutTwemoji;
 
     RelativeLayout rLKeyboardTwemojiButton;
@@ -264,6 +264,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     RelativeLayout callInProgressLayout;
 
     EmojiEditText textChat;
+    EmojiUniversal emojiUniversal;
     ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
 
@@ -628,7 +629,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             textChat.setEmojiSize(Util.scaleWidthPx(20, outMetrics));
         }
 
-        emojiPopup = EmojiPopup.Builder.fromRootView(linearLayoutTwemoji).build(textChat, keyboardTwemojiButton);
+//        emojiPopup = EmojiPopup.Builder.fromRootView(linearLayoutTwemoji).build(textChat, keyboardTwemojiButton);
+        emojiUniversal = (EmojiUniversal)findViewById(R.id.emojiView);
+
+        emojiUniversal.init(textChat, this);
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
@@ -785,22 +789,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
-                //Keyboard
-                if(emojiPopup.isEmojiKeyboardShowing()){
-                    emojiPopup.hideEmojiKeyboard();
-                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                    textChat.requestFocus();
-
-                }else{
-                    if(emojiPopup.isLetterKeyboardOpen()){
-                        textChat.requestFocus();
-
-                    }else{
-                        emojiPopup.openLetterKeyboard();
-                        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                        textChat.requestFocus();
-                    }
-                }
+//                //Keyboard
+//                if(emojiPopup.isEmojiKeyboardShowing()){
+//                    emojiPopup.hideEmojiKeyboard();
+//                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                    textChat.requestFocus();
+//
+//                }else{
+//                    if(emojiPopup.isLetterKeyboardOpen()){
+//                        textChat.requestFocus();
+//
+//                    }else{
+//                        emojiPopup.openLetterKeyboard();
+//                        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                        textChat.requestFocus();
+//                    }
+//                }
 
                 return false;
             }
@@ -819,22 +823,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     fileStorageLayout.setVisibility(View.GONE);
                 }
 
-                //Keyboard
-                if(emojiPopup.isEmojiKeyboardShowing()){
-                    emojiPopup.hideEmojiKeyboard();
-                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                    textChat.requestFocus();
-
-                }else{
-                    if(emojiPopup.isLetterKeyboardOpen()){
-                        textChat.requestFocus();
-
-                    }else{
-                        emojiPopup.openLetterKeyboard();
-                        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                        textChat.requestFocus();
-                    }
-                }
+//                //Keyboard
+//                if(emojiPopup.isEmojiKeyboardShowing()){
+//                    emojiPopup.hideEmojiKeyboard();
+//                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                    textChat.requestFocus();
+//
+//                }else{
+//                    if(emojiPopup.isLetterKeyboardOpen()){
+//                        textChat.requestFocus();
+//
+//                    }else{
+//                        emojiPopup.openLetterKeyboard();
+//                        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                        textChat.requestFocus();
+//                    }
+//                }
 
 
                 return false;
@@ -855,22 +859,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         fileStorageLayout.setVisibility(View.GONE);
                     }
 
-                    //Keyboard
-                    if(emojiPopup.isEmojiKeyboardShowing()){
-                        emojiPopup.hideEmojiKeyboard();
-                        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                        textChat.requestFocus();
-
-                    }else{
-                        if(emojiPopup.isLetterKeyboardOpen()){
-                            textChat.requestFocus();
-
-                        }else{
-                            emojiPopup.openLetterKeyboard();
-                            keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                            textChat.requestFocus();
-                        }
-                    }
+//                    //Keyboard
+//                    if(emojiPopup.isEmojiKeyboardShowing()){
+//                        emojiPopup.hideEmojiKeyboard();
+//                        keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                        textChat.requestFocus();
+//
+//                    }else{
+//                        if(emojiPopup.isLetterKeyboardOpen()){
+//                            textChat.requestFocus();
+//
+//                        }else{
+//                            emojiPopup.openLetterKeyboard();
+//                            keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                            textChat.requestFocus();
+//                        }
+//                    }
                 }
                 return false;
             }
@@ -2463,7 +2467,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             megaChatApi.signalPresenceActivity();
         }
 
-        emojiPopup.hideBothKeyboards();
+//        emojiPopup.hideBothKeyboards();
 
         if(fileStorageLayout.isShown()){
             if(fileStorageF != null){
@@ -2545,15 +2549,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     fileStorageLayout.setVisibility(View.GONE);
                 }
 
-                //keyboard
-                if(emojiPopup.isEmojiKeyboardShowing()){
-                    textChat.requestFocus();
-                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
-                    emojiPopup.changeKeyboard();
-                }else {
-                    keyboardTwemojiButton.setImageResource(R.drawable.ic_keyboard_white);
-                    emojiPopup.changeKeyboard();
-                }
+                emojiUniversal.toggle();
+
+//                //keyboard
+//                if(emojiPopup.isEmojiKeyboardShowing()){
+//                    textChat.requestFocus();
+//                    keyboardTwemojiButton.setImageResource(R.drawable.ic_emoticon_white);
+//                    emojiPopup.changeKeyboard();
+//                }else {
+//                    keyboardTwemojiButton.setImageResource(R.drawable.ic_keyboard_white);
+//                    emojiPopup.changeKeyboard();
+//                }
                 break;
             }
 
@@ -2567,7 +2573,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
-                emojiPopup.hideBothKeyboards();
+//                emojiPopup.hideBothKeyboards();
 
                 boolean inProgressCall = false;
 
@@ -2599,7 +2605,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
-                emojiPopup.hideBothKeyboards();
+//                emojiPopup.hideBothKeyboards();
 
                 attachContact();
                 break;
@@ -2615,7 +2621,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     fileStorageLayout.setVisibility(View.GONE);
                 }
 
-                emojiPopup.hideBothKeyboards();
+//                emojiPopup.hideBothKeyboards();
 
                 attachPhotoVideo();
                 break;
@@ -2631,7 +2637,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     fileStorageLayout.setVisibility(View.GONE);
                 }
 
-                emojiPopup.hideBothKeyboards();
+//                emojiPopup.hideBothKeyboards();
 
                 attachFromCloud();
                 break;
@@ -2648,8 +2654,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }else{
-                    emojiPopup.isShowSoftKeyboard(textChat,false);
-                    emojiPopup.hideEmojiKeyboard();
+//                    emojiPopup.isShowSoftKeyboard(textChat,false);
+//                    emojiPopup.hideEmojiKeyboard();
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -4723,7 +4729,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
-            if((emojiPopup.isLetterKeyboardOpen() || emojiPopup.isEmojiKeyboardShowing())&&(messages.size()==1)){
+//            if((emojiPopup.isLetterKeyboardOpen() || emojiPopup.isEmojiKeyboardShowing())&&(messages.size()==1)){
+            if((messages.size()==1)){
                 mLayoutManager.scrollToPosition(messages.size());
             }
 
@@ -6038,7 +6045,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     protected void onDestroy(){
-        emojiPopup.hideBothKeyboards();
+//        emojiPopup.hideBothKeyboards();
 
         megaChatApi.closeChatRoom(idChat, this);
         MegaApplication.setClosedChat(true);
@@ -6608,7 +6615,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
         }
 
-       emojiPopup.hideBothKeyboards();
+//       emojiPopup.hideBothKeyboards();
 
         //Update last seen position if different and there is unread messages
        //If the chat is being opened do not update, onLoad will do that
@@ -7179,7 +7186,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             fileStorageLayout.setVisibility(View.GONE);
         }
-        emojiPopup.hideBothKeyboards();
+//        emojiPopup.hideBothKeyboards();
 
     }
 
