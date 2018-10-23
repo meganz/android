@@ -88,7 +88,7 @@ import android.support.v4.provider.FontRequest;
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.1_212";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
