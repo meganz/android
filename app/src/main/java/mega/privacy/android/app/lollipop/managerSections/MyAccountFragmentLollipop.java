@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -42,7 +44,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -117,7 +121,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private Bitmap qrAvatarSave;
 
 	int numOfClicksLastSession = 0;
-	boolean stagingApiUrl = false;
+	boolean staging = false;
+
+	DatabaseHandler dbH;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -125,6 +131,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		dbH = DatabaseHandler.getDbHandler(context);
 
 		super.onCreate(savedInstanceState);
 	}
@@ -327,8 +335,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
      * Update last contacts list and refresh last contacts' avatar.
      */
     public void updateView() {
-        lastContacted = MegaApiUtils.getLastContactedUsers(context);
-        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+
+        if(lastContactsGridView!=null){
+			lastContacted = MegaApiUtils.getLastContactedUsers(context);
+			lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+		}
     }
 
     public void updateContactsCount(){
@@ -606,21 +617,63 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				numOfClicksLastSession++;
 				if (numOfClicksLastSession == 5){
 					numOfClicksLastSession = 0;
-					if (!stagingApiUrl) {
-						stagingApiUrl = true;
-						megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-						Intent intent = new Intent(context, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setAction(Constants.ACTION_REFRESH);
-						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					staging = false;
+					if (dbH != null){
+						MegaAttributes attrs = dbH.getAttributes();
+						if (attrs != null) {
+							if (attrs.getStaging() != null){
+								try{
+									staging = Boolean.parseBoolean(attrs.getStaging());
+								} catch (Exception e){ staging = false;}
+							}
+						}
+					}
+
+					if (!staging) {
+						DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which){
+									case DialogInterface.BUTTON_POSITIVE:
+										staging = true;
+										megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+										if (dbH != null){
+											dbH.setStaging(true);
+										}
+
+										Intent intent = new Intent(context, LoginActivityLollipop.class);
+										intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+										intent.setAction(Constants.ACTION_REFRESH_STAGING);
+
+										startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH_STAGING);
+										break;
+
+									case DialogInterface.BUTTON_NEGATIVE:
+										//No button clicked
+										break;
+								}
+							}
+						};
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setTitle(getResources().getString(R.string.staging_api_url_title));
+						builder.setMessage(getResources().getString(R.string.staging_api_url_text));
+
+						builder.setPositiveButton(R.string.general_yes, dialogClickListener);
+						builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+						builder.show();
 					}
 					else{
-						stagingApiUrl = false;
+						staging = false;
 						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+						if (dbH != null){
+							dbH.setStaging(false);
+						}
 						Intent intent = new Intent(context, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setAction(Constants.ACTION_REFRESH);
-						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+						intent.setAction(Constants.ACTION_REFRESH_STAGING);
+
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH_STAGING);
 					}
 				}
 				break;

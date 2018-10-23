@@ -1028,7 +1028,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if(nC==null){
                 nC = new NodeController(this, isFolderLink);
             }
-            nC.prepareForDownload(handleList);
+            nC.prepareForDownload(handleList, false);
         }
     }
 
@@ -1450,7 +1450,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            boolean fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+            boolean fromIncoming = false;
+            if (type == Constants.SEARCH_ADAPTER) {
+                fromIncoming = nC.nodeComesFromIncoming(megaApi.getNodeByHandle(handle));
+            }
 
             if (type == Constants.OFFLINE_ADAPTER){
                 getlinkMenuItem.setVisible(false);
@@ -1473,11 +1476,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
                 if (isUrl){
                     shareMenuItem.setVisible(false);
-                    downloadMenuItem.setVisible(true);
                 }
                 else {
                     shareMenuItem.setVisible(true);
-                    downloadMenuItem.setVisible(false);
                 }
                 if(node.isExported()){
                     removelinkMenuItem.setVisible(true);
@@ -1487,6 +1488,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     getlinkMenuItem.setVisible(true);
                 }
 
+                downloadMenuItem.setVisible(true);
                 propertiesMenuItem.setVisible(true);
                 renameMenuItem.setVisible(true);
                 moveMenuItem.setVisible(true);
@@ -1627,13 +1629,12 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 chatRemoveMenuItem.setVisible(false);
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
 
                 if (isUrl){
-                    downloadMenuItem.setVisible(true);
                     shareMenuItem.setVisible(false);
                 }
                 else {
-                    downloadMenuItem.setVisible(false);
                     shareMenuItem.setVisible(true);
                 }
 
@@ -1789,16 +1790,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         }
                     }
 
+                    downloadMenuItem.setVisible(true);
                     if (isUrl){
-                        downloadMenuItem.setVisible(true);
                         shareMenuItem.setVisible(false);
                     }
-                    else {
-                        downloadMenuItem.setVisible(false);
-                        if (shareVisible){
-                            shareMenuItem.setVisible(true);
-                        }
+                    else if (shareVisible){
+                        shareMenuItem.setVisible(true);
                     }
+
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
                     chatRemoveMenuItem.setVisible(false);
@@ -2332,7 +2331,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             if (nC == null) {
                 nC = new NodeController(this);
             }
-            boolean fromIncoming = nC.nodeComesFromIncoming(node);
+            boolean fromIncoming = false;
+            if (type == Constants.SEARCH_ADAPTER) {
+                fromIncoming = nC.nodeComesFromIncoming(node);
+            }
             if (type == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
                 i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
                 i.putExtra("firstLevel", false);
@@ -2574,7 +2576,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if(nC==null){
                     nC = new NodeController(this, isFolderLink);
                 }
-                nC.checkSizeBeforeDownload(parentPath, url, size, hashes);
+                nC.checkSizeBeforeDownload(parentPath, url, size, hashes, false);
             }
         }
         else if (requestCode == Constants.REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
@@ -3184,7 +3186,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         snackbar.show();
     }
 
-    public void openAdvancedDevices (long handleToDownload){
+    public void openAdvancedDevices (long handleToDownload, boolean highPriority){
         log("openAdvancedDevices");
 //		handleToDownload = handle;
         String externalPath = Util.getExternalCardPath();
@@ -3209,6 +3211,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 intent.setType(mimeType);
                 intent.putExtra(Intent.EXTRA_TITLE, node.getName());
                 intent.putExtra("handleToDownload", handleToDownload);
+                intent.putExtra(Constants.HIGH_PRIORITY_TRANSFER, highPriority);
                 try{
                     startActivityForResult(intent, Constants.WRITE_SD_CARD_REQUEST_CODE);
                 }
@@ -3279,7 +3282,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         downloadConfirmationDialog.show();
     }
 
-    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes){
+    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         log("askSizeConfirmationBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -3313,7 +3316,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         if(nC==null){
                             nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
                         }
-                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC);
+                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
@@ -3328,7 +3331,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         downloadConfirmationDialog.show();
     }
 
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload){
+    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         log("askConfirmationNoAppInstaledBeforeDownload");
 
         final String parentPathC = parentPath;
@@ -3361,7 +3364,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         if(nC==null){
                             nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
                         }
-                        nC.download(parentPathC, urlC, sizeC, hashesC);
+                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
                     }
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {

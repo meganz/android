@@ -119,7 +119,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 					clearSelections();
 					hideMultipleSelect();
 					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList);
+					nC.prepareForDownload(handleList, false);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -565,14 +565,14 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				  			ArrayList<Long> handleList = new ArrayList<Long>();
 							handleList.add(n.getHandle());
 							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList);
+							nC.prepareForDownload(handleList, true);
 				  		}						
 					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(n.getHandle());
 						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, true);
 					}	
 					notifyDataSetChanged();
 				}
