@@ -35,7 +35,7 @@ public final class EmojiUtils {
 
   /** returns the emojis that were found in the given text */
   @NonNull public static List<EmojiRange> emojis(@Nullable final String text) {
-    return EmojiManager.getInstance().findAllEmojis(text);
+    return EmojiManager.getInstance().findAllEmojis(text, false);
   }
 
 //  /** returns the number of all emojis that were found in the given text */
@@ -46,7 +46,7 @@ public final class EmojiUtils {
   /** returns a class that contains all of the emoji information that was found in the given text */
   @NonNull public EmojiInformation emojiInformation(@Nullable final String text) {
 
-    final List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(text);
+    final List<EmojiRange> emojis = EmojiManager.getInstance().findAllEmojis(text, false);
 
     final boolean isOnlyEmojis = isOnlyEmojis(text);
 
