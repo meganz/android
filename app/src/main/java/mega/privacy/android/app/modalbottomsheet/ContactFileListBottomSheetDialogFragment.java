@@ -31,6 +31,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -380,7 +381,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 }
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
-                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                i.putExtra("from", Constants.FROM_INCOMING_SHARES);
                 boolean firstLevel = ((ContactFileListActivityLollipop) context).isEmptyParentHandleStack();
                 log("onClick File Info: First LEVEL is: "+firstLevel);
                 i.putExtra("firstLevel", firstLevel);

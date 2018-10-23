@@ -2867,6 +2867,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (savedInstanceState != null) {
 			updateAccountDetailsVisibleInfo();
 		}
+		setContactStatus();
 		log("END onCreate");
 	}
 

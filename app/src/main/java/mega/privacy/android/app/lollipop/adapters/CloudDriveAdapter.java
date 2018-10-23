@@ -50,6 +50,7 @@ import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -910,13 +911,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         //Check if is an offline file to show the red arrow
         boolean availableOffline = false;
         if (incoming) {
-            availableOffline = Util.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
+            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
         }
         else if (inbox){
-            availableOffline = Util.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
+            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
         }
         else {
-            availableOffline = Util.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
+            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
         }
         if (availableOffline) {
             holder.savedOffline.setVisibility(View.VISIBLE);
@@ -1373,13 +1374,13 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
         //Check if is an offline file to show the red arrow
         boolean availableOffline = false;
         if (incoming) {
-            availableOffline = Util.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
+            availableOffline = OfflineUtils.availableOffline(Constants.INCOMING_SHARES_ADAPTER, node, context, megaApi);
         }
         else if (inbox){
-            availableOffline = Util.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
+            availableOffline = OfflineUtils.availableOffline(Constants.INBOX_ADAPTER, node, context, megaApi);
         }
         else {
-            availableOffline = Util.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
+            availableOffline = OfflineUtils.availableOffline(Constants.GENERAL_OTHERS_ADAPTER, node, context, megaApi);
         }
         if (availableOffline) {
             holder.savedOffline.setVisibility(View.VISIBLE);

@@ -519,21 +519,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}
 
 		dbH = DatabaseHandler.getDbHandler(context);
-
-		prefs = dbH.getPreferences();
-		if (prefs != null){
-			log("prefs != null");
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					log("askMe==false");
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
+		downloadLocationDefaultPath = Util.getDownloadLocation(context);
 		lastPositionStack = new Stack<>();
 
 		super.onCreate(savedInstanceState);

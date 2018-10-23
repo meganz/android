@@ -93,6 +93,7 @@ import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
@@ -2041,73 +2042,6 @@ public class Util {
 		}
 	}
 
-	public static boolean availableOffline (int from, MegaNode node, Context context, MegaApiAndroid megaApi) {
-		File offlineFile = null;
-
-		if(dbH.exists(node.getHandle())) {
-			log("Exists OFFLINE in the DB!!!");
-
-			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
-			if (offlineNode != null) {
-				log("YESS FOUND: " + node.getName());
-				if (from == Constants.INCOMING_SHARES_ADAPTER) {
-					log("FROM_INCOMING_SHARES");
-					//Find in the filesystem
-					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming() + offlineNode.getPath()+ "/" + node.getName());
-						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
-					}
-					else {
-						offlineFile = context.getFilesDir();
-					}
-				}
-				else if(from==Constants.INBOX_ADAPTER){
-
-					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + offlineNode.getPath()+ "/" + node.getName());
-						log("offline File INCOMING: " + offlineFile.getAbsolutePath());
-					}
-					else {
-						offlineFile = context.getFilesDir();
-					}
-				}
-				else {
-					log("NOT INCOMING NEITHER INBOX");
-					//Find in the filesystem
-					if (Environment.getExternalStorageDirectory() != null) {
-						offlineFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + megaApi.getNodePath(node));
-						log("offline File: " + offlineFile.getAbsolutePath());
-					}
-					else {
-						offlineFile = context.getFilesDir();
-					}
-				}
-				if (offlineFile != null) {
-					if (offlineFile.exists()) {
-						log("FOUND!!!: " + node.getHandle() + " " + node.getName());
-						return true;
-					}
-					else {
-						log("Not found: " + node.getHandle() + " " + node.getName());
-						return false;
-					}
-				}
-				else {
-					log("Not found offLineFile is NULL");
-					return false;
-				}
-			}
-			else{
-				log("offLineNode is NULL");
-				return false;
-			}
-		}
-		else{
-			log("NOT Exists in DB OFFLINE: setChecket FALSE: "+node.getHandle());
-			return false;
-		}
-	}
-
 	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
 		log("createDefaultAvatar color: '"+color+"' firstLetter: '"+firstLetter+"'");
 
@@ -2156,6 +2090,26 @@ public class Util {
 
 		return defaultAvatar;
 	}
+
+	public static String getDownloadLocation (Context context) {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        MegaPreferences prefs = dbH.getPreferences();
+
+        if (prefs != null){
+            log("prefs != null");
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    log("askMe==false");
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            return prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
+        return Util.downloadDIR;
+    }
 
 	private static void log(String message) {
 		log("Util", message);
