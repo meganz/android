@@ -76,8 +76,10 @@ dependencies {
     implementation 'com.brandongogetap:stickyheaders:0.5.1'
     implementation 'com.github.bumptech.glide:glide:3.8.0'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation "com.android.support:support-emoji:27.1.1"
     implementation 'com.android.support:support-emoji-appcompat:27.1.1'
+    implementation 'com.android.support:support-emoji-bundled:27.1.1'
+
+
 }
 
 apply plugin: 'com.google.gms.google-services'

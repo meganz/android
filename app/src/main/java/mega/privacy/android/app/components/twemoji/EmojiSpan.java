@@ -6,24 +6,27 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
+import android.text.style.ReplacementSpan;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.utils.Util;
 
-final class EmojiSpan extends DynamicDrawableSpan {
+final class EmojiSpan extends ReplacementSpan {
   private final float size;
   private final Context context;
   private final Emoji emoji;
   private Drawable deferredDrawable;
+
   EmojiSpan(final Context context, final Emoji emoji, final float size) {
     this.context = context;
     this.emoji = emoji;
     this.size = size;
   }
-  @Override public Drawable getDrawable() {
-    if (deferredDrawable == null) {
-      deferredDrawable = emoji.getDrawable(context);
-      deferredDrawable.setBounds(0, 0, (int) size, (int) size);
+
+   public Drawable getDrawable() {
+     if (deferredDrawable == null) {
+       deferredDrawable = emoji.getDrawable(context);
+       deferredDrawable.setBounds(0, 0, (int) size, (int) size);
     }
     return deferredDrawable;
   }
@@ -51,5 +54,8 @@ final class EmojiSpan extends DynamicDrawableSpan {
     canvas.translate(x, transitionY);
     drawable.draw(canvas);
     canvas.restore();
+  }
+  public static void log(String message) {
+    Util.log("EmojiSpan", message);
   }
 }

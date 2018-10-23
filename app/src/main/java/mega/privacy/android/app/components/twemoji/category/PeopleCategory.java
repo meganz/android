@@ -9,10 +9,10 @@ import android.support.annotation.NonNull;
 
 public final class PeopleCategory implements EmojiCategory {
   private static final Emoji[] DATA = new Emoji[] {
-    new Emoji(0x1f600, R.drawable.emoji_twitter_1f600),
-    new Emoji(0x1f603, R.drawable.emoji_twitter_1f603),
-    new Emoji(0x1f604, R.drawable.emoji_twitter_1f604),
-    new Emoji(0x1f601, R.drawable.emoji_twitter_1f601),
+    new Emoji(0x1F600, R.drawable.emoji_twitter_1f600),
+    new Emoji(0x1F603, R.drawable.emoji_twitter_1f603),
+    new Emoji(0x1F604, R.drawable.emoji_twitter_1f604),
+    new Emoji(0x1F601, R.drawable.emoji_twitter_1f601),
     new Emoji(0x1f606, R.drawable.emoji_twitter_1f606),
     new Emoji(0x1f605, R.drawable.emoji_twitter_1f605),
     new Emoji(0x1f602, R.drawable.emoji_twitter_1f602),
@@ -59,7 +59,7 @@ public final class PeopleCategory implements EmojiCategory {
     new Emoji(0x1f92e, R.drawable.emoji_twitter_1f92e),
     new Emoji(0x1f92f, R.drawable.emoji_twitter_1f92f),
     new Emoji(0x1f928, R.drawable.emoji_twitter_1f928),
-    new Emoji(0x1f929, R.drawable.emoji_twitter_1f929),
+    new Emoji(0x1F929, R.drawable.emoji_twitter_1f929),
     new Emoji(0x1f97a, R.drawable.emoji_twitter_1f97a),
     new Emoji(0x1f970, R.drawable.emoji_twitter_1f970),
     new Emoji(0x1f973, R.drawable.emoji_twitter_1f973),
