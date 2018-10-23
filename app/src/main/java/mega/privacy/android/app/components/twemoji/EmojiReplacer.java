@@ -7,5 +7,5 @@ import android.text.Spannable;
  //For instance, the GooogleCompatEmojiProvider calls the corresponding AppCompat Emoji
  // Support library replace method directly for emoji in the default size
 public interface EmojiReplacer {
-  void replaceWithImages(Context context, Spannable text, float emojiSize, float defaultEmojiSize, EmojiReplacer fallback);
+  void replaceWithImages(Context context, Spannable text, float emojiSize, float defaultEmojiSize, EmojiReplacer fallback, boolean isTV);
 }
