@@ -48,7 +48,6 @@ public final class EmojiPopup {
   final EmojiEditTextInterface editInterface;
 
   boolean isPendingOpen;
-
   boolean isKeyboardOpen;
 
   @Nullable OnEmojiPopupShownListener onEmojiPopupShownListener;
@@ -243,9 +242,10 @@ public final class EmojiPopup {
   }
 
   void showAtBottom() {
+    log("showAtBottom()");
     final Point desiredLocation = new Point(0, Utils.screenHeight(context) - popupWindow.getHeight());
 
-    popupWindow.showAtLocation(rootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
+    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, desiredLocation.x, desiredLocation.y);
     Utils.fixPopupLocation(popupWindow, desiredLocation);
 
     if (onEmojiPopupShownListener != null) {
