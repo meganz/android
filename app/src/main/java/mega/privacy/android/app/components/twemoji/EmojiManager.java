@@ -3,6 +3,7 @@ package mega.privacy.android.app.components.twemoji;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.text.emoji.widget.EmojiTextViewHelper;
 import android.text.Spannable;
 import android.text.TextUtils;
 import java.util.ArrayList;
@@ -16,11 +17,14 @@ import java.util.regex.Pattern;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.components.twemoji.emoji.EmojiCategory;
 import mega.privacy.android.app.utils.Util;
+import android.support.text.emoji.EmojiCompat;
+
 
 import static mega.privacy.android.app.components.twemoji.Utils.checkNotNull;
 
 /* EmojiManager where an EmojiProvider can be installed for further usage.*/
 public final class EmojiManager {
+
   private static final EmojiManager INSTANCE = new EmojiManager();
   private static final int GUESSED_UNICODE_AMOUNT = 3000;
   private static final int GUESSED_TOTAL_PATTERN_LENGTH = GUESSED_UNICODE_AMOUNT * 4;
@@ -33,26 +37,36 @@ public final class EmojiManager {
     }
   };
   private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = new EmojiReplacer() {
-    @Override public void replaceWithImages(final Context context, final Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback) {
-      log("replaceWithImages()- text: "+text+", emojiSize: "+emojiSize+", defaultEmojiSize: "+defaultEmojiSize);
+    @Override public void replaceWithImages(final Context context, Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback) {
       final EmojiManager emojiManager = EmojiManager.getInstance();
       final EmojiSpan[] existingSpans = text.getSpans(0, text.length(), EmojiSpan.class);
       final List<Integer> existingSpanPositions = new ArrayList<>(existingSpans.length);
       final int size = existingSpans.length;
+
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0; i < size; i++) {
         existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
+        log("***** replaceWithImages()- existingSpanPositions.add("+text.getSpanStart(existingSpans[i]));
+
       }
       final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
-      log("replaceWithImages() - findAllEmojis.size: "+findAllEmojis.size());
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0; i < findAllEmojis.size(); i++) {
-        final EmojiRange location = findAllEmojis.get(i);
-        if (!existingSpanPositions.contains(location.start)) {
-          text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-          log("replaceWithImages() - text.setSpan(EmojiSpan(context, location.emoji("+location.emoji+"), emojiSize("+emojiSize+")), location.start("+location.start+"), location.end("+location.end+"), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);)");
+      if(findAllEmojis.size() == 0){
+          log("###### NOTTT EMOJISSSS FOUNDED");
+//          text.
+//        text = (Spannable) EmojiCompat.get().process("\uD83D\uDE10",0,0,0);
+
+
+      }else{
+          log("###### YEEEESSS "+findAllEmojis.size()+" EMOJISSSS FOUNDED");
+        for (int i = 0; i < findAllEmojis.size(); i++) {
+          final EmojiRange location = findAllEmojis.get(i);
+          if (!existingSpanPositions.contains(location.start)) {
+            text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+          }
         }
       }
+
+
     }
   };
   private final Map<String, Emoji> emojiMap = new LinkedHashMap<>(GUESSED_UNICODE_AMOUNT);
@@ -75,23 +89,30 @@ public final class EmojiManager {
     INSTANCE.emojiReplacer = provider instanceof EmojiReplacer ? (EmojiReplacer) provider : DEFAULT_EMOJI_REPLACER;
     final List<String> unicodesForPattern = new ArrayList<>(GUESSED_UNICODE_AMOUNT);
     final int categoriesSize = INSTANCE.categories.length;
+
     //noinspection ForLoopReplaceableByForEach
     for (int i = 0; i < categoriesSize; i++) {
-      final Emoji[] emojis = checkNotNull(INSTANCE.categories[i].getEmojis(), "emojies == null");
+
+      final Emoji[] emojis = checkNotNull(INSTANCE.categories[i].getEmojis(), "emojis == null");
+
       final int emojisSize = emojis.length;
+
       //noinspection ForLoopReplaceableByForEach
       for (int j = 0; j < emojisSize; j++) {
         final Emoji emoji = emojis[j];
+
         final String unicode = emoji.getUnicode();
         final List<Emoji> variants = emoji.getVariants();
         INSTANCE.emojiMap.put(unicode, emoji);
         unicodesForPattern.add(unicode);
+
         //noinspection ForLoopReplaceableByForEach
         for (int k = 0; k < variants.size(); k++) {
           final Emoji variant = variants.get(k);
           final String variantUnicode = variant.getUnicode();
           INSTANCE.emojiMap.put(variantUnicode, variant);
           unicodesForPattern.add(variantUnicode);
+
         }
       }
     }
@@ -147,13 +168,14 @@ public final class EmojiManager {
     }
     return false;
   }
+
   public int getNumEmojis(@Nullable final CharSequence text){
     List<EmojiRange> emojis =findAllEmojis(text);
     int num = emojis.size();
     return num;
   }
   @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
-    log("findAllEmojis() - text: "+text);
+    log("#### findAllEmojis() - text: "+text);
     verifyInstalled();
     final List<EmojiRange> result = new ArrayList<>();
     if (!TextUtils.isEmpty(text)) {
@@ -168,16 +190,20 @@ public final class EmojiManager {
     return result;
   }
   @Nullable Emoji findEmoji(@NonNull final CharSequence candidate) {
-    log("findEmoji() - --  candidate: "+candidate);
     verifyInstalled();
     // We need to call toString on the candidate, since the emojiMap may not find the requested entry otherwise, because
     // the type is different.
-    return emojiMap.get(candidate.toString());
+      Emoji emojiFounded = emojiMap.get(candidate.toString());
+    return emojiFounded;
   }
   void verifyInstalled() {
     if (categories == null) {
       throw new IllegalStateException("Please install an EmojiProvider through the EmojiManager.install() method first.");
     }
+  }
+
+  public void activateEmojiAppCompat(){
+
   }
   public static void log(String message) {
     Util.log("EmojiManager", message);

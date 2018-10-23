@@ -6,10 +6,12 @@ import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.text.emoji.widget.EmojiAppCompatTextView;
+import android.support.text.emoji.widget.EmojiTextViewHelper;
 import android.support.v7.widget.AppCompatTextView;
-import android.text.Spannable;
+import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -23,20 +25,34 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
-public class EmojiTextView extends EmojiAppCompatTextView implements EmojiTexViewInterface{
+public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface{
+
+//  private EmojiTextViewHelper mEmojiTextViewHelper = null;
+
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE = 260;
   private Context mContext;
   private DisplayMetrics mOutMetrics;
   private int textViewMaxWidth;
+
+
   public EmojiTextView(final Context context) {
     this(context, null);
     mContext = context;
+
   }
-  public EmojiTextView(final Context context, final AttributeSet attrs) {
-    super(context, attrs);
+
+  public EmojiTextView(Context context, @Nullable AttributeSet attrs) {
+    this(context, attrs, 0);
     mContext = context;
+
+  }
+
+  public EmojiTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    mContext = context;
+
     if (!isInEditMode()) {
       EmojiManager.getInstance().verifyInstalled();
     }
@@ -61,30 +77,94 @@ public class EmojiTextView extends EmojiAppCompatTextView implements EmojiTexVie
       }else{
         textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
       }
-    }else if (mContext instanceof ChatActivityLollipop) {
-      Display display = ((ChatActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
-      mOutMetrics = new DisplayMetrics();
-      display.getMetrics(mOutMetrics);
-      if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
-      } else {
-        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
-      }
     }
     setText(getText());
+
   }
+
+//
+//  @Override
+//  public void setFilters(InputFilter[] filters) {
+//    super.setFilters(getEmojiTextViewHelper().getFilters(filters));
+//  }
+//
+//  @Override
+//  public void setAllCaps(boolean allCaps) {
+//    super.setAllCaps(allCaps);
+//    getEmojiTextViewHelper().setAllCaps(allCaps);
+//  }
+//
+//  /**
+//   * Returns the EmojiTextViewHelper for this TextView. This method can be called from super constructors through { #setFilters(InputFilter[])} or {#setAllCaps(boolean)}.   */
+//  private EmojiTextViewHelper getEmojiTextViewHelper() {
+//    if (mEmojiTextViewHelper == null) {
+//      mEmojiTextViewHelper = new EmojiTextViewHelper(this);
+//    }
+//    return mEmojiTextViewHelper;
+//  }
+
+
+
+//  public EmojiTextView(final Context context, final AttributeSet attrs) {
+//    super(context, attrs);
+//    mContext = context;
+//    if (!isInEditMode()) {
+//      EmojiManager.getInstance().verifyInstalled();
+//    }
+//    final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+//    final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+//    if (attrs == null) {
+//      emojiSize = defaultEmojiSize;
+//    } else {
+//      final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EmojiTextView);
+//      try {
+//        emojiSize = a.getDimension(R.styleable.EmojiTextView_emojiSize, defaultEmojiSize);
+//      } finally {
+//        a.recycle();
+//      }
+//    }
+//    if (mContext instanceof ManagerActivityLollipop) {
+//      Display display = ((ManagerActivityLollipop)mContext).getWindowManager().getDefaultDisplay();
+//      mOutMetrics = new DisplayMetrics ();
+//      display.getMetrics(mOutMetrics);
+//      if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+//      }else{
+//        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+//      }
+//    }
+//    else if (mContext instanceof ChatActivityLollipop) {
+//      Display display = ((ChatActivityLollipop) mContext).getWindowManager().getDefaultDisplay();
+//      mOutMetrics = new DisplayMetrics();
+//      display.getMetrics(mOutMetrics);
+//      if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_LANDSCAPE, mOutMetrics);
+//      } else {
+//        textViewMaxWidth = Util.scaleWidthPx(LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT, mOutMetrics);
+//      }
+//    }
+//    setText(getText());
+//  }
   @Override public void setText(CharSequence rawText, BufferType type) {
+    log("setText()-  rawText: "+rawText);
     CharSequence text = rawText == null ? "" : rawText;
     SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+
     Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
     float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+//    log("###  setText()-  replaceWithImages : spannableStringBuilder"+spannableStringBuilder);
     EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
     if (mContext instanceof ManagerActivityLollipop) {
       //format text if too long
       CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
       super.setText(textF, type);
+
     }else{
+
+      log("setText()-("+rawText+")  getEmojiTextViewHelper().updateTransformationMethod");
+//      getEmojiTextViewHelper().updateTransformationMethod();
       super.setText(spannableStringBuilder, type);
+
     }
   }
   @Override @CallSuper public void backspace() {
