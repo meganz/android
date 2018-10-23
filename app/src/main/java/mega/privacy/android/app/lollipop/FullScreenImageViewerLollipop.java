@@ -814,11 +814,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						fromIncoming = nC.nodeComesFromIncoming(node);
 					}
 					if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
-						i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+						i.putExtra("from", Constants.FROM_INCOMING_SHARES);
 						i.putExtra("firstLevel", false);
 					}
 					else if(adapterType == Constants.INBOX_ADAPTER){
-						i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
+						i.putExtra("from", Constants.FROM_INBOX);
 					}
 					startActivity(i);
 					break;

@@ -296,4 +296,8 @@ public class Constants {
 	public static String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
 	public static String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+
+
+	public static int FROM_INCOMING_SHARES= 140;
+	public static int FROM_INBOX= 150;
 }

@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
+import mega.privacy.android.app.utils.OfflineUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -367,7 +368,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     optionDownload.setVisibility(View.VISIBLE);
                     comesFrom = Constants.GENERAL_OTHERS_ADAPTER;
-                    availableOffline = Util.availableOffline(comesFrom, node, context, megaApi);
+                    availableOffline = OfflineUtils.availableOffline(comesFrom, node, context, megaApi);
                     if (availableOffline) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
                     }
@@ -475,7 +476,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                     optionDownload.setVisibility(View.VISIBLE);
                     comesFrom = Constants.INBOX_ADAPTER;
-                    availableOffline = Util.availableOffline(comesFrom, node, context, megaApi);
+                    availableOffline = OfflineUtils.availableOffline(comesFrom, node, context, megaApi);
                     if (availableOffline) {
                         optionOfflineText.setText(getString(R.string.context_delete_offline));
                     }
@@ -535,7 +536,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                         optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.VISIBLE);
                         comesFrom = Constants.INCOMING_SHARES_ADAPTER;
-                        availableOffline = Util.availableOffline(comesFrom, node, context, megaApi);
+                        availableOffline = OfflineUtils.availableOffline(comesFrom, node, context, megaApi);
                         if (availableOffline) {
                             optionOfflineText.setText(getString(R.string.context_delete_offline));
                         }
@@ -699,7 +700,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         optionDownload.setVisibility(View.VISIBLE);
                         comesFrom = Constants.GENERAL_OTHERS_ADAPTER;
-                        availableOffline = Util.availableOffline(comesFrom, node, context, megaApi);
+                        availableOffline = OfflineUtils.availableOffline(comesFrom, node, context, megaApi);
                         if (availableOffline) {
                             optionOfflineText.setText(getString(R.string.context_delete_offline));
                         }
@@ -761,7 +762,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 //                        optionOpenFolder.setVisibility(View.GONE);
                         optionDownload.setVisibility(View.VISIBLE);
                         comesFrom = Constants.INCOMING_SHARES_ADAPTER;
-                        availableOffline = Util.availableOffline(comesFrom, node, context, megaApi);
+                        availableOffline = OfflineUtils.availableOffline(comesFrom, node, context, megaApi);
                         if (availableOffline) {
                             optionOfflineText.setText(getString(R.string.context_delete_offline));
                         }
@@ -907,7 +908,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 
                         optionDownload.setVisibility(View.VISIBLE);
                         comesFrom = Constants.GENERAL_OTHERS_ADAPTER;
-                        availableOffline = Util.availableOffline(comesFrom, node, context, megaApi);
+                        availableOffline = OfflineUtils.availableOffline(comesFrom, node, context, megaApi);
                         if (availableOffline) {
                             optionOfflineText.setText(getString(R.string.context_delete_offline));
                         }
@@ -1107,7 +1108,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
                 if(drawerItem== ManagerActivityLollipop.DrawerItem.SHARED_ITEMS){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
-                        i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                        i.putExtra("from", Constants.FROM_INCOMING_SHARES);
                         int dBT = ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming();
                         if(dBT<=0){
                             log("First LEVEL is true: "+dBT);
@@ -1121,12 +1122,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 }
                 else if(drawerItem== ManagerActivityLollipop.DrawerItem.INBOX){
                     if(((ManagerActivityLollipop) context).getTabItemShares()==0){
-                        i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
+                        i.putExtra("from", Constants.FROM_INBOX);
                     }
                 }
                 else if (drawerItem == ManagerActivityLollipop.DrawerItem.SEARCH) {
                     if (nC.nodeComesFromIncoming(node)){
-                        i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                        i.putExtra("from", Constants.FROM_INCOMING_SHARES);
                         int dBT = nC.getIncomingLevel(node);
                         if(dBT<=0){
                             i.putExtra("firstLevel", true);
@@ -1310,7 +1311,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                     log("The selected node is NULL");
                     return;
                 }
-                openWith();
+                UtilsModalBottomSheet.openWith(megaApi, context, node);
                 break;
             }
             case R.id.option_restore_layout:{
@@ -1328,80 +1329,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
 //        dismiss();
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
         mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-    }
-
-    public long findIncomingParentHandle(MegaNode nodeToFind){
-        log("findIncomingParentHandle");
-
-        MegaNode parentNode = megaApi.getParentNode(nodeToFind);
-        long result=-1;
-        if(parentNode==null){
-            log("findIncomingParentHandle A: "+nodeToFind.getHandle());
-            return nodeToFind.getHandle();
-        }
-        else{
-            result=findIncomingParentHandle(parentNode);
-            while(result==-1){
-                result=findIncomingParentHandle(parentNode);
-            }
-            log("findIncomingParentHandle B: "+nodeToFind.getHandle());
-            return result;
-        }
-    }
-
-    private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-
-        if (megaApi.getRootNode() == null)
-            return;
-
-        folder.mkdir();
-        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
-        for(int i=0; i<nodeList.size(); i++){
-            MegaNode document = nodeList.get(i);
-            if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subfolder = new File(folder, new String(document.getName()));
-                getDlList(dlFiles, document, subfolder);
-            }
-            else {
-                dlFiles.put(document, folder.getAbsolutePath());
-            }
-        }
-    }
-
-    private void deleteChildrenDB(ArrayList<MegaOffline> mOffList){
-
-        log("deleteChildenDB");
-        MegaOffline mOffDelete=null;
-
-        for(int i=0; i< mOffList.size(); i++){
-
-            mOffDelete=mOffList.get(i);
-            ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
-            if(mOffList.size()>0){
-                //The node have children, delete
-                deleteChildrenDB(mOffListChildren2);
-
-            }
-            dbH.removeById(mOffDelete.getId());
-        }
-    }
-
-    private void updateParentOfflineStatus(int parentId) {
-        ArrayList<MegaOffline> offlineSiblings = dbH.findByParentId(parentId);
-
-        if(offlineSiblings.size() > 0){
-            //have other offline file within same folder, so no need to do anything to the folder
-            return;
-        }
-        else{
-            //keep checking if there is any parent folder should display red arrow
-            MegaOffline parentNode = dbH.findById(parentId);
-            if (parentNode != null) {
-                int grandParentNodeId = parentNode.getParentId();
-                dbH.removeById(parentId);
-                updateParentOfflineStatus(grandParentNodeId);
-            }
-        }
     }
 
     void refreshView () {
@@ -1427,85 +1354,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
     }
 
     void removeFromOffline (MegaOffline mOffDelete) {
-        if (mOffDelete == null) {
-            return;
-        }
-
-        log("removeOffline - file(type): " + mOffDelete.getName() + "(" + mOffDelete.getType() + ")");
-        ArrayList<MegaOffline> mOffListChildren;
-
-        if (mOffDelete.getType().equals(MegaOffline.FOLDER)) {
-            log("Finding children... ");
-
-            //Delete children in DB
-            mOffListChildren = dbH.findByParentId(mOffDelete.getId());
-            if (mOffListChildren.size() > 0) {
-                log("Children: " + mOffListChildren.size());
-                deleteChildrenDB(mOffListChildren);
-            }
-        }
-        else {
-            log("NOT children... ");
-        }
-
-        //remove red arrow from current item
-        int parentId = mOffDelete.getParentId();
-        dbH.removeById(mOffDelete.getId());
-        if (parentId != -1) {
-            updateParentOfflineStatus(parentId);
-        }
-
-        //Remove the node physically
-        File destination;
-        log("Path: " + mOffDelete.getPath());
-        if (mOffDelete.getOrigin() == MegaOffline.INCOMING) {
-            if (Environment.getExternalStorageDirectory() != null) {
-                destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffDelete.getHandleIncoming() + "/" + mOffDelete.getPath());
-            }
-            else {
-                destination = new File(context.getFilesDir(),mOffDelete.getHandle() + "");
-            }
-
-            log("Remove incoming: " + destination.getAbsolutePath());
-
-            try {
-                File offlineFile = new File(destination,mOffDelete.getName());
-                Util.deleteFolderAndSubfolders(context,offlineFile);
-            } catch (Exception e) {
-                log("EXCEPTION: removeOffline - file " + e.toString());
-            }
-
-            dbH.removeById(mOffDelete.getId());
-        }
-        else {
-            if (comesFrom == Constants.INBOX_ADAPTER) {
-                if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/in/" + mOffDelete.getPath());
-                    log("offline File INCOMING: " + destination.getAbsolutePath());
-                }
-                else {
-                    destination = context.getFilesDir();
-                }
-            }
-            else {
-                if (Environment.getExternalStorageDirectory() != null) {
-                    destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
-                }
-                else {
-                    destination = new File(context.getFilesDir(),mOffDelete.getHandle() + "");
-                }
-            }
-
-            log("Remove node: " + destination.getAbsolutePath());
-
-            try {
-                File offlineFile = new File(destination,mOffDelete.getName());
-                Util.deleteFolderAndSubfolders(context,offlineFile);
-            } catch (Exception e) {
-                log("EXCEPTION: removeOffline - file");
-            }
-            dbH.removeById(mOffDelete.getId());
-        }
+        OfflineUtils.removeOffline(mOffDelete, dbH, context, comesFrom);
         refreshView ();
     }
 
@@ -1517,7 +1366,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
                 log("FROM_INCOMING_SHARES");
                 //Find in the filesystem
                 if (Environment.getExternalStorageDirectory() != null) {
-                    long handleIncoming = findIncomingParentHandle(node);
+                    long handleIncoming = OfflineUtils.findIncomingParentHandle(node, megaApi);
                     destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + Long.toString(handleIncoming) + "/" + MegaApiUtils.createStringTree(node, context));
                     log("offline File INCOMING: " + destination.getAbsolutePath());
                 } else {
@@ -1557,7 +1406,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
         }
         else{
             long result = -1;
-            result=findIncomingParentHandle(node);
+            result=OfflineUtils.findIncomingParentHandle(node, megaApi);
             log("IncomingParentHandle: "+result);
             if(result!=-1){
                 MegaNode megaNode = megaApi.getNodeByHandle(result);
@@ -1587,103 +1436,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
         }
 
-        log("Handle to save for offline : "+node.getHandle());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        Constants.REQUEST_WRITE_STORAGE);
-            }
-        }
-
-        destination.mkdirs();
-
-        log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
-
-        double availableFreeSpace = Double.MAX_VALUE;
-        try{
-            StatFs stat = new StatFs(destination.getAbsolutePath());
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-        }
-        catch(Exception ex){}
-
-        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-        if (node.getType() == MegaNode.TYPE_FOLDER) {
-            log("saveOffline:isFolder");
-            getDlList(dlFiles, node, new File(destination, new String(node.getName())));
-        } else {
-            log("saveOffline:isFile");
-            dlFiles.put(node, destination.getAbsolutePath());
-        }
-
-        for (MegaNode document : dlFiles.keySet()) {
-            String path = dlFiles.get(document);
-
-            if(availableFreeSpace <document.getSize()){
-                Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, (ManagerActivityLollipop) context);
-                continue;
-            }
-
-            String url = null;
-            Intent service = new Intent(context, DownloadService.class);
-            service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-            service.putExtra(DownloadService.EXTRA_URL, url);
-            service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-            service.putExtra(DownloadService.EXTRA_PATH, path);
-            context.startService(service);
-        }
+        OfflineUtils.saveOffline(destination, node, context, (ManagerActivityLollipop) context, megaApi);
     }
-
-    public void openWith () {
-        log("openWith");
-
-        if (megaApi.httpServerIsRunning() == 0) {
-            megaApi.httpServerStart();
-        }
-
-        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        activityManager.getMemoryInfo(mi);
-
-        if(mi.totalMem> Constants.BUFFER_COMP){
-            log("Total mem: "+mi.totalMem+" allocate 32 MB");
-            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
-        }
-        else{
-            log("Total mem: "+mi.totalMem+" allocate 16 MB");
-            megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
-        }
-
-        String url = megaApi.httpServerGetLocalLink(node);
-        String mimeType = MimeTypeList.typeForName(node.getName()).getType();
-        log("FILENAME: " + node.getName());
-
-        Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-        mediaIntent.putExtra("HANDLE", node.getHandle());
-        mediaIntent.putExtra("FILENAME", node.getName());
-        String localPath = Util.getLocalFile(context, node.getName(), node.getSize(), Util.downloadDIR);
-        if (localPath != null){
-            File mediaFile = new File(localPath);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(node.getName()).getType());
-            }
-            else{
-                mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(node.getName()).getType());
-            }
-            mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }
-        else {
-            mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-        }
-        if (MegaApiUtils.isIntentAvailable(context, mediaIntent)){
-            startActivity(mediaIntent);
-        }
-        else{
-            Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-        }
-    }
-
 
     @Override
     public void onAttach(Activity activity) {
