@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -79,11 +80,15 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import android.support.text.emoji.EmojiCompat;
+import android.support.text.emoji.FontRequestEmojiCompatConfig;
+import android.support.v4.provider.FontRequest;
+
 
 public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.4.0_207";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -412,6 +417,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
+		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
@@ -424,13 +430,28 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				} else {
 					fileLoggerSDK = false;
 				}
-			} else {
+
+				if (attrs.getStaging() != null){
+					try{
+						staging = Boolean.parseBoolean(attrs.getStaging());
+					} catch (Exception e){ staging = false;}
+				}
+			}
+			else {
 				fileLoggerSDK = false;
+				staging = false;
 			}
 		}
 
 		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
 		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		if (staging){
+			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+		}
+		else{
+			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+		}
 
 		if (Util.DEBUG){
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
@@ -493,6 +514,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+
+		if(Util.isChatEnabled()){
+			FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
+			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest);
+			EmojiCompat.init(configDF);
+		}
+
+
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
@@ -988,6 +1017,14 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 				notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
 
+
+				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+					//API 25 = Android 7.1
+					notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+				} else {
+					notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+				}
+
 				NotificationManager notificationManager =
 						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -1210,7 +1247,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 				ChatAdvancedNotificationBuilder notificationBuilder;
 				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
-				notificationBuilder.removeAllChatNotifications();
 				notificationBuilder.generateChatNotification(request);
 			}
 			else{

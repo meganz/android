@@ -907,8 +907,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 					if(iSharesExplorer != null){
-						log("Level deepBrowserTree: "+iSharesExplorer.getDeepBrowserTree());
-						if (iSharesExplorer.getDeepBrowserTree()==0){
+						log("Level deepBrowserTree: "+deepBrowserTree);
+						if (deepBrowserTree==0){
 							createFolderMenuItem.setVisible(false);
 						}
 						else{
@@ -943,8 +943,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 2);
 					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 					if(iSharesExplorer != null){
-						log("Level deepBrowserTree: "+iSharesExplorer.getDeepBrowserTree());
-						if (iSharesExplorer.getDeepBrowserTree()==0){
+						log("Level deepBrowserTree: "+deepBrowserTree);
+						if (deepBrowserTree==0){
 							createFolderMenuItem.setVisible(false);
 						}
 						else{
@@ -1112,7 +1112,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							tabShown=INCOMING_TAB;
 						}
 
-						if(((IncomingSharesExplorerFragmentLollipop)f).getDeepBrowserTree()==0){
+						if(deepBrowserTree==0){
 							setRootTitle();
 						}
 						else{
@@ -1164,7 +1164,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							tabShown=INCOMING_TAB;
 						}
 
-						if(((IncomingSharesExplorerFragmentLollipop)f).getDeepBrowserTree()==0){
+						if(deepBrowserTree==0){
 							setRootTitle();
 						}
 						else{
@@ -1176,6 +1176,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 		}
+		supportInvalidateOptionsMenu();
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
@@ -1215,11 +1216,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 		if(iSharesExplorer!=null){
 			parentHandleIncoming = iSharesExplorer.getParentHandle();
-			deepBrowserTree = iSharesExplorer.getDeepBrowserTree();
 		}
 		else{
 			parentHandleIncoming = -1;
-			deepBrowserTree = 0;
 		}
 		bundle.putLong("parentHandleIncoming", parentHandleIncoming);
 		bundle.putInt("deepBrowserTree", deepBrowserTree);
@@ -1496,7 +1495,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 
 		if (tabShown == INCOMING_TAB){
-			if (iSharesExplorer.getDeepBrowserTree()==0){
+			if (deepBrowserTree==0){
 				Intent intent = new Intent();
 				setResult(RESULT_FIRST_USER, intent);
 				finishActivity();
@@ -2475,13 +2474,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 						if (sharedText != null) {
-							body.append("\n");
+							if(body.length()>0){
+								body.append("\n");
+							}
 							body.append(getString(R.string.new_file_content_when_uploading) + ": ");
 							body.append(sharedText);
 						}
 						String sharedText3 = intent.getStringExtra(Intent.EXTRA_EMAIL);
 						if (sharedText3 != null) {
-							body.append("\n");
+							if(body.length()>0){
+								body.append("\n");
+							}
 							body.append(getString(R.string.new_file_email_when_uploading) + ": ");
 							body.append(sharedText3);
 						}

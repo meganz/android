@@ -65,6 +65,9 @@ public class MegaApiUtils {
 
         for (int i=0;i<nodes.size();i++){
             MegaNode n = nodes.get(i);
+            if(n == null) {
+                continue;
+            }
             if (n.isFolder()){
                 numFolders++;
             }

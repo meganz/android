@@ -8,8 +8,8 @@ android {
         applicationId "mega.privacy.android.app"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 207
-        versionName "3.4.0 (207)"
+        versionCode 211
+        versionName "3.4.0 (211)"
         multiDexEnabled true
     }
 
@@ -76,6 +76,8 @@ dependencies {
     implementation 'com.brandongogetap:stickyheaders:0.5.1'
     implementation 'com.github.bumptech.glide:glide:3.8.0'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation "com.android.support:support-emoji:27.1.1"
+    implementation 'com.android.support:support-emoji-appcompat:27.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

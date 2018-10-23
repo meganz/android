@@ -1353,6 +1353,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (e.getErrorCode() == MegaError.API_OK) {
+				log("DOCUMENTNODEHANDLEPUBLIC: " + request.getNodeHandle());
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+
+				dbH.setLastPublicHandle(request.getNodeHandle());
+				dbH.setLastPublicHandleTimeStamp();
+
 				MegaNode rootNode = megaApiFolder.getRootNode();
 				if (rootNode != null){
 
@@ -1905,7 +1913,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(nodes.get(position).getHandle());
 						NodeController nC = new NodeController(FolderLinkActivityLollipop.this);
-						nC.prepareForDownload(handleList);
+						nC.prepareForDownload(handleList, false);
 					}
 					overridePendingTransition(0,0);
 				}

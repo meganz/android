@@ -29,7 +29,9 @@ import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
@@ -97,6 +99,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME;
 
 	private HashMap<String, String> transfersCopy;
+	HashMap<Integer, MegaTransfer> mapProgressTransfers;
+	int totalUploadsCompleted = 0;
+	int totalUploads = 0;
 
 	//0 - not overquota, not pre-overquota
 	//1 - overquota
@@ -114,6 +119,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		megaChatApi = app.getMegaChatApi();
 
 		transfersCopy = new HashMap<String, String>();
+		mapProgressTransfers = new HashMap();
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -140,7 +146,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onDestroy(){
-		log("onDestroy");
+		log("****onDestroy");
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))
@@ -154,6 +160,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         if (megaChatApi != null){
             megaChatApi.saveCurrentState();
         }
+
+        totalUploads = 0;
+		totalUploadsCompleted = 0;
 
 		super.onDestroy();
 	}
@@ -195,6 +204,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
 
 		if (file.isDirectory()) {
+			totalUploads++;
+
 			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 			if (nameInMEGA != null){
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
@@ -214,6 +225,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					if(!lock.isHeld()){
 						lock.acquire();
 					}
+
+					totalUploads++;
 
 					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 					if (nameInMEGA != null){
@@ -240,6 +253,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					if(!lock.isHeld()){
 						lock.acquire();
 					}
+
+					totalUploads++;
 
 					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 					if (nameInMEGA != null){
@@ -314,7 +329,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * No more intents in the queue
 	 */
 	private void onQueueComplete() {
-		log("onQueueComplete");
+		log("****onQueueComplete");
 
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
@@ -328,15 +343,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			showCompleteNotification();
 		}
 
-		int total = megaApi.getNumPendingUploads() + megaApi.getNumPendingDownloads();
-		log("onQueueComplete: total of files before reset " + total);
-		if(total <= 0){
-			log("onQueueComplete: reset total uploads/downloads");
+		if(megaApi.getNumPendingUploads() <= 0){
+			log("onQueueComplete: reset total uploads");
 			megaApi.resetTotalUploads();
-			megaApi.resetTotalDownloads();
-			errorCount = 0;
-			copiedCount = 0;
 		}
+
+		errorCount = 0;
+		copiedCount = 0;
+
+		totalUploads = 0;
+
+		totalUploadsCompleted = 0;
 
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
@@ -360,13 +377,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * Show complete success notification
 	 */
 	private void showCompleteNotification() {
-		log("showCompleteNotification");
+		log("****showCompleteNotification");
 
 		if(isOverquota==0){
 			String notificationTitle, size;
 
-			int totalUploads = megaApi.getTotalUploads();
-			notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploads, totalUploads);
+			notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification, totalUploadsCompleted, totalUploadsCompleted);
 
 			if(copiedCount>0 && errorCount>0){
 				String copiedString = getResources().getQuantityString(R.plurals.copied_service_upload, copiedCount, copiedCount);;
@@ -380,7 +396,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
 			}
 			else{
-				String totalBytes = Formatter.formatFileSize(UploadService.this, megaApi.getTotalUploadedBytes());
+				Collection<MegaTransfer> transfers= mapProgressTransfers.values();
+				long transferredBytes = 0;
+				for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
+					MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
+					transferredBytes = transferredBytes + currentTransfer.getTransferredBytes();
+				}
+
+				String totalBytes = Formatter.formatFileSize(UploadService.this, transferredBytes);
 				size = getString(R.string.general_total_size, totalBytes);
 			}
 
@@ -421,33 +444,39 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void updateProgressNotification() {
 
 		if(isOverquota==0){
-			int pendingTransfers = megaApi.getNumPendingUploads();
-			int totalTransfers = megaApi.getTotalUploads();
+			long progressPercent = 0;
 
-			long totalSizePendingTransfer = megaApi.getTotalUploadBytes();
-			long totalSizeTransferred = megaApi.getTotalUploadedBytes();
+			Collection<MegaTransfer> transfers= mapProgressTransfers.values();
 
-			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
-			log("updateProgressNotification: "+progressPercent);
+			long total = 0;
+			long inProgress = 0;
+
+			for (Iterator iterator = transfers.iterator(); iterator.hasNext();) {
+				MegaTransfer currentTransfer = (MegaTransfer) iterator.next();
+				if(currentTransfer.getState()==MegaTransfer.STATE_COMPLETED){
+					total = total + currentTransfer.getTotalBytes();
+					inProgress = inProgress + currentTransfer.getTotalBytes();
+				}
+				else{
+					total = total + currentTransfer.getTotalBytes();
+					inProgress = inProgress + currentTransfer.getTransferredBytes();
+				}
+			}
+			long inProgressTemp = inProgress *100;
+			progressPercent = inProgressTemp/total;
 
 			String message = "";
-			if (totalTransfers == 0){
+			if (inProgress == 0){
 				message = getString(R.string.download_preparing_files);
 			}
 			else{
-				int inProgress = 0;
-				if(pendingTransfers==0){
-					inProgress = totalTransfers - pendingTransfers;
-				}
-				else{
-					inProgress = totalTransfers - pendingTransfers + 1;
-				}
-				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalTransfers, inProgress, totalTransfers);
+				int filesProgress = totalUploadsCompleted+1;
+				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, filesProgress, totalUploads);
 			}
 
-			log("updateProgressNotification: "+message);
+			log("****updateProgressNotification: "+ progressPercent+" "+message);
 
-			String info = Util.getProgressSize(UploadService.this, totalSizeTransferred, totalSizePendingTransfer);
+			String info = Util.getProgressSize(UploadService.this, inProgress, total);
 
 			Intent intent;
 			intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
@@ -467,7 +496,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				mBuilderCompat
 						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setColor(ContextCompat.getColor(this, R.color.mega))
-						.setProgress(100, progressPercent, false)
+						.setProgress(100, (int)progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
 						.setContentText(getString(R.string.download_touch_to_show))
@@ -479,7 +508,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
 						.setColor(ContextCompat.getColor(this, R.color.mega))
-						.setProgress(100, progressPercent, false)
+						.setProgress(100, (int)progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setSubText(info)
 						.setContentText(getString(R.string.download_touch_to_show))
@@ -490,7 +519,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 				mBuilder
 						.setSmallIcon(R.drawable.ic_stat_notify)
-						.setProgress(100, progressPercent, false)
+						.setProgress(100, (int)progressPercent, false)
 						.setContentIntent(pendingIntent)
 						.setOngoing(true).setContentTitle(message).setContentInfo(info)
 						.setContentText(getString(R.string.download_touch_to_show))
@@ -511,7 +540,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
 				notification.contentView.setTextViewText(R.id.status_text, message);
 				notification.contentView.setTextViewText(R.id.progress_text, info);
-				notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+				notification.contentView.setProgressBar(R.id.status_progress, 100, (int)progressPercent, false);
 			}
 
 			if (!isForeground) {
@@ -536,9 +565,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
+		log("Upload start: " + transfer.getFileName());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			String appData = transfer.getAppData();
+
+			if(appData!=null){
+				return;
+			}
+
 			transfersCount++;
+			mapProgressTransfers.put(transfer.getTag(), transfer);
 			if (!transfer.isFolderTransfer()){
 				updateProgressNotification();
 			}
@@ -547,11 +583,20 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		log("onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
+		log("****onTransferFinish: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 
+			String appData = transfer.getAppData();
+
+			if(appData!=null){
+				return;
+			}
+
 			transfersCount--;
+			totalUploadsCompleted++;
+
+			mapProgressTransfers.put(transfer.getTag(), transfer);
 
 			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
 				isOverquota = 1;
@@ -567,7 +612,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer.getFileName(), transfer.getType(), transfer.getState(), size, transfer.getNodeHandle() + "");
 					dbH.setCompletedTransfer(completedTransfer);
 				}
-				updateProgressNotification();
 			}
 
 			if (canceled) {
@@ -774,8 +818,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					log("transfer.getPath() is NULL");
 				}
 
-				if (megaApi.getNumPendingUploads() == 0 && transfersCount == 0) {
+				int total = totalUploadsCompleted + copiedCount;
+				if (total==totalUploads && transfersCount == 0) {
 					onQueueComplete();
+				}
+				else{
+					updateProgressNotification();
 				}
 			}
 		}
@@ -783,7 +831,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		log("****onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
+			String appData = transfer.getAppData();
+
+			if(appData!=null){
+				return;
+			}
+
 			if (!transfer.isFolderTransfer()){
 				if (canceled) {
 					log("Transfer cancel: " + transfer.getFileName());
@@ -803,6 +858,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					log("after overquota alert");
 					return;
 				}
+
+				mapProgressTransfers.put(transfer.getTag(), transfer);
 
 				updateProgressNotification();
 			}
@@ -885,8 +942,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						}
 					}
 					transfersCopy.remove(megaFingerPrint);
-
-					if (megaApi.getNumPendingUploads() == 0){
+					int total = totalUploadsCompleted + copiedCount;
+					if (total==totalUploads){
 						onQueueComplete();
 					}
 				}
