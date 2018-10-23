@@ -964,6 +964,13 @@ public final class PeopleCategory implements EmojiCategory {
       new Emoji(new int[] { 0x1f930, 0x1f3fe }, R.drawable.emoji_twitter_1f930_1f3fe),
       new Emoji(new int[] { 0x1f930, 0x1f3ff }, R.drawable.emoji_twitter_1f930_1f3ff)
     ),
+    new Emoji(0x1f931, R.drawable.emoji_twitter_1f931,
+            new Emoji(new int[] { 0x1f931, 0x1f3fb }, R.drawable.emoji_twitter_1f931_1f3fb),
+            new Emoji(new int[] { 0x1f931, 0x1f3fc }, R.drawable.emoji_twitter_1f931_1f3fc),
+            new Emoji(new int[] { 0x1f931, 0x1f3fd }, R.drawable.emoji_twitter_1f931_1f3fd),
+            new Emoji(new int[] { 0x1f931, 0x1f3fe }, R.drawable.emoji_twitter_1f931_1f3fe),
+            new Emoji(new int[] { 0x1f931, 0x1f3ff }, R.drawable.emoji_twitter_1f931_1f3ff)
+    ),
     new Emoji(new int[] { 0x1f647, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f647_200d_2640_fe0f,
       new Emoji(new int[] { 0x1f647, 0x1f3fb, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f647_1f3fb_200d_2640_fe0f),
       new Emoji(new int[] { 0x1f647, 0x1f3fc, 0x200d, 0x2640, 0xfe0f }, R.drawable.emoji_twitter_1f647_1f3fc_200d_2640_fe0f),
