@@ -913,7 +913,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if(adapterPhone!=null){
             if (adapterPhone.getItemCount() == 0){
                 headerContacts.setVisibility(View.GONE);
-                recyclerViewList.setVisibility(View.GONE);
                 if (contactType == Constants.CONTACT_TYPE_BOTH) {
                     if (adapterMEGA != null) {
                         if (adapterMEGA.getItemCount() == 0) {
@@ -933,7 +932,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             else{
                 headerContacts.setVisibility(View.VISIBLE);
-                recyclerViewList.setVisibility(View.VISIBLE);
                 emptyImageView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.GONE);
             }
@@ -968,13 +966,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
             emptyTextView.setText(result);
             headerContacts.setVisibility(View.GONE);
-            recyclerViewList.setVisibility(View.GONE);
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
         }
         else {
             headerContacts.setVisibility(View.VISIBLE);
-            recyclerViewList.setVisibility(View.VISIBLE);
             emptyImageView.setVisibility(View.GONE);
             emptyTextView.setVisibility(View.GONE);
         }
@@ -1839,7 +1835,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (adapterMEGA != null){
             if (adapterMEGA.getItemCount() == 1){
                 headerContacts.setVisibility(View.GONE);
-                recyclerViewList.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1903,7 +1898,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if(adapterPhone!=null){
             if (adapterPhone.getItemCount() == 0){
                 headerContacts.setVisibility(View.GONE);
-                recyclerViewList.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
@@ -2060,7 +2054,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     }
                     if (adapterMEGA.getItemCount() != 0) {
                         headerContacts.setVisibility(View.VISIBLE);
-                        recyclerViewList.setVisibility(View.VISIBLE);
                         emptyImageView.setVisibility(View.GONE);
                         emptyTextView.setVisibility(View.GONE);
                     }
@@ -2125,7 +2118,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 if(adapterPhone!=null){
                     if (adapterPhone.getItemCount() != 0){
                         headerContacts.setVisibility(View.VISIBLE);
-                        recyclerViewList.setVisibility(View.VISIBLE);
                         emptyImageView.setVisibility(View.GONE);
                         emptyTextView.setVisibility(View.GONE);
                     }
@@ -2785,10 +2777,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             aB.setSubtitle(null);
             inviteContactButton.setVisibility(View.VISIBLE);
             newGroupChatButton.setVisibility(View.VISIBLE);
-            for (int i=0; i<addedContactsMEGA.size(); i++){
-                addMEGAFilteredContact(addedContactsMEGA.get(i));
-            }
+            filteredContactMEGA.clear();
+            filteredContactMEGA.addAll(visibleContactsMEGA);
+            setMegaAdapterContacts(filteredContactMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
             addedContactsMEGA.clear();
+            setRecyclersVisibility();
             setSendInvitationVisibility();
             setSeparatorVisibility();
             containerAddedContactsRecyclerView.setVisibility(View.GONE);
@@ -2882,6 +2875,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         setSendInvitationVisibility();
         setMegaAdapterContacts(addedContactsMEGA, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_GROUP_CHAT);
         visibilityFastScroller();
+        setRecyclersVisibility();
         if (isConfirmDeleteShown) {
             for (int i=0; i<addedContactsMEGA.size(); i++) {
                 if (getMegaContactMail(addedContactsMEGA.get(i)).equals(confirmDeleteMail)) {
@@ -3042,7 +3036,12 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 containerContacts.setVisibility(View.VISIBLE);
             }
             else {
-                containerContacts.setVisibility(View.GONE);
+                if (onNewGroup) {
+                    containerContacts.setVisibility(View.VISIBLE);
+                }
+                else {
+                    containerContacts.setVisibility(View.GONE);
+                }
             }
         }
         else if (contactType ==  Constants.CONTACT_TYPE_DEVICE) {
