@@ -217,7 +217,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
-			holderList.declineLayout.setVisibility(View.GONE);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
@@ -255,6 +254,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
 			holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 			holderList.declineLayout = (RelativeLayout) v.findViewById(R.id.contact_list_decline);
+			holderList.declineLayout.setVisibility(View.VISIBLE);
 
 			if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				holderList.textViewContactName.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
