@@ -37,6 +37,7 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Spannable;
@@ -1999,5 +2000,16 @@ public class Util {
         }
     
         Log.d("Yuan", label + " SCHEDULED " + (result == JobScheduler.RESULT_SUCCESS));
+    }
+    
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

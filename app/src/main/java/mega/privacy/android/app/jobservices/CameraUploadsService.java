@@ -723,22 +723,22 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                         }
                     }
 
-                    boolean isCharging = Util.isCharging(this);
-                    if (prefs.getCamSyncCharging() == null) {
-                        if (!isCharging) {
-                            log("not charging...");
-                            finish();
-                            return 9;
-                        }
-                    } else {
-                        if (Boolean.parseBoolean(prefs.getCamSyncCharging())) {
-                            if (!isCharging) {
-                                log("not charging...");
-                                finish();
-                                return 10;
-                            }
-                        }
-                    }
+//                    boolean isCharging = Util.isCharging(this);
+//                    if (prefs.getCamSyncCharging() == null) {
+//                        if (!isCharging) {
+//                            log("not charging...");
+//                            finish();
+//                            return 9;
+//                        }
+//                    } else {
+//                        if (Boolean.parseBoolean(prefs.getCamSyncCharging())) {
+//                            if (!isCharging) {
+//                                log("not charging...");
+//                                finish();
+//                                return 10;
+//                            }
+//                        }
+//                    }
 
                     UserCredentials credentials = dbH.getCredentials();
                     if (credentials == null) {

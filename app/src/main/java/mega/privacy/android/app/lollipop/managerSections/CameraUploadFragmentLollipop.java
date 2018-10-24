@@ -1537,49 +1537,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	@Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-	        switch(requestCode){
-//		        case ManagerActivityLollipop.REQUEST_CAMERA:{
-//		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//		        		boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-//		        		if (hasStoragePermission){
-//		        			if (firstTimeCam){ 
-//		        				this.cameraOnOffFirstTime();
-//		        			}
-//		        			else{		        			
-//		        				this.cameraOnOff();
-//		        			}
-//		        		}
-//		        		else{
-//		        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-//					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//					                ManagerActivityLollipop.REQUEST_WRITE_STORAGE);
-//		        		}
-//		        	}
-//		        	break;
-//	        	}	
-		        case Constants.REQUEST_WRITE_STORAGE:{
-		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//		        		boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-//		        		if (hasCameraPermission){
-		        			if (((ManagerActivityLollipop) context).getFirstTimeCam()){
-		        				this.cameraOnOffFirstTime();
-		        			}
-		        			else{		        			
-		        				this.cameraOnOff();
-		        			}
-//		        		}
-//		        		else{
-//		        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-//					                new String[]{Manifest.permission.CAMERA},
-//					                ManagerActivityLollipop.REQUEST_CAMERA);
-//		        		}
-		        	}
-		        	break;
-	        	}
-	        }
+    public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+        switch (requestCode) {
+            case Constants.REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (((ManagerActivityLollipop)context).getFirstTimeCam()) {
+                        this.cameraOnOffFirstTime();
+                    } else {
+                        this.cameraOnOff();
+                    }
+                }
+                break;
+            }
         }
+    }
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -1627,13 +1599,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 								Constants.REQUEST_WRITE_STORAGE);
 					}
-					
-					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-	        		if (!hasCameraPermission){
-	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-				                new String[]{Manifest.permission.CAMERA},
-								Constants.REQUEST_CAMERA);
-	        		}
 
 					if (hasStoragePermission){
 						cameraOnOffFirstTime();

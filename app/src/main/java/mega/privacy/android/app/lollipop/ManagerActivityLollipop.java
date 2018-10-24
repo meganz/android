@@ -1387,16 +1387,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 					onGetReadWritePermission();
 				}
+				break;
 			}
 	        case Constants.REQUEST_WRITE_STORAGE:{
 				log("REQUEST_WRITE_STORAGE PERMISSIONS");
 	        	if (firstTimeCam){
 					log("The first time");
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-//						if (firstTimeCam){
-//							firstTimeCam = false;
-//						}
 
 						if (fromTakePicture==Constants.TAKE_PICTURE_OPTION){
 							log("TAKE_PICTURE_OPTION");
@@ -1463,20 +1460,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 	        	break;
 	        }
+	        
+            case Constants.REQUEST_CAMERA_UPLOAD:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(sttFLol != null && sttFLol.isAdded()){
+                        sttFLol.enableCameraUpload();
+                    }
+                }
+                
+                break;
+            }
         }
-//        switch (requestCode)
-//        {
-//            case REQUEST_WRITE_STORAGE: {
-//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//                {
-//                    //reload my activity with permission granted or use the features what required the permission
-//                } else
-//                {
-//                    Toast.makeText(this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        }
-
     }
 
 	@Override
@@ -5465,21 +5459,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
-    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+    				//getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNow();
+                    getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
     			}
-
-    			if (sttFLol != null && sttFLol.isAdded()){
-					if (openSettingsStorage){
-						sttFLol.goToCategoryStorage();
-					}
-					else if (openSettingsQR){
-						log ("goToCategoryQR");
-						sttFLol.goToCategoryQR();
-					}
-				}
-				else {
-					sttFLol = new SettingsFragmentLollipop();
-				}
+            
+                sttFLol = new SettingsFragmentLollipop();
+                if (openSettingsStorage){
+                    sttFLol.goToCategoryStorage();
+                }
+                else if (openSettingsQR){
+                    log ("goToCategoryQR");
+                    sttFLol.goToCategoryQR();
+                }
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
