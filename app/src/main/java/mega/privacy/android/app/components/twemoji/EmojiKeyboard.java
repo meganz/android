@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -37,8 +38,7 @@ public class EmojiKeyboard extends LinearLayout {
     private EmojiVariantPopup variantPopup;
     private View rootView;
     private ImageButton emojiIcon;
-
-    private int keyboardHeight = 500;
+    private int keyboardHeight;
     private OnEmojiClickListener onEmojiClickListener;
     private OnEmojiBackspaceClickListener onEmojiBackspaceClickListener;
 
@@ -120,11 +120,11 @@ public class EmojiKeyboard extends LinearLayout {
         this.editInterface = editText;
         this.emojiIcon = emojiIcon;
         this.context = context;
+
         DisplayMetrics displayMetrics = new DisplayMetrics();
         context.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         keyboardHeight = displayMetrics.heightPixels / 2 - getActionBarHeight();
         requestLayout();
-
     }
 
     public void setOnEmojiClickListener(OnEmojiClickListener onEmojiClickListener) {
@@ -166,10 +166,8 @@ public class EmojiKeyboard extends LinearLayout {
         if (activity == null) return;
         log("changeKeyboard()");
         if(isLetterKeyboardShown){
-            hideLetterKeyboard();
             showEmojiKeyboard();
         }else if(isEmojiKeyboardShown){
-            hideEmojiKeyboard();
             showLetterKeyboard();
         }else{
             showEmojiKeyboard();
@@ -192,30 +190,35 @@ public class EmojiKeyboard extends LinearLayout {
                     @Override
                     public void run() {
                         imm.showSoftInput(view, 0, null);
-                    }// run()
+                        isLetterKeyboardShown = true;
+                        emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
+                    }
                 });
             } else {
                 throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
             }
-            isLetterKeyboardShown = true;
-            emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
         }
     }
 
     public void showEmojiKeyboard(){
         if(!isEmojiKeyboardShown){
             log("showEmojiKeyboard() ");
-            hideLetterKeyboard();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setVisibility(VISIBLE);
-                }
-            },200);
-            isEmojiKeyboardShown = true;
-            emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
-
-        }
+            if(isLetterKeyboardShown){
+                hideLetterKeyboard();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        setVisibility(VISIBLE);
+                        isEmojiKeyboardShown = true;
+                        emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+                    }
+                },250);
+            }else{
+                setVisibility(VISIBLE);
+                isEmojiKeyboardShown = true;
+                emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+            }
+         }
     }
 
     public void hideLetterKeyboard() {
@@ -228,10 +231,10 @@ public class EmojiKeyboard extends LinearLayout {
                 final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm == null) return;
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0, null);
+                isLetterKeyboardShown = false;
             } else {
                 throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
             }
-            isLetterKeyboardShown = false;
         }
     }
 
