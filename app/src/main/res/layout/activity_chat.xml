@@ -235,12 +235,12 @@
                         </RelativeLayout>
                     </LinearLayout>
 
-                    <mega.privacy.android.app.components.twemoji.EmojiUniversal
-                        android:id="@+id/emojiView"
-                        android:animateLayoutChanges="true"
-                        android:visibility="visible"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                    <!--<mega.privacy.android.app.components.twemoji.EmojiUniversal-->
+                        <!--android:id="@+id/emojiView"-->
+                        <!--android:animateLayoutChanges="true"-->
+                        <!--android:visibility="visible"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content" />-->
 
                     <RelativeLayout
                         android:id="@+id/relative_layout_file_storage"
