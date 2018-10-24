@@ -19,7 +19,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -36,6 +35,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.CameraSyncService;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.EphemeralCredentials;
@@ -58,7 +58,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 
-public class LoginActivityLollipop extends AppCompatActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
+public class LoginActivityLollipop extends BaseActivity implements MegaGlobalListenerInterface, MegaRequestListenerInterface {
 
     float scaleH, scaleW;
     float density;

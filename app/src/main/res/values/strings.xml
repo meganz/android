@@ -42,6 +42,9 @@
 
     <string name="general_export" context="button">Export</string>
 
+    <string name="general_retry" context="Button to try retry some action">Retry</string>
+    <string name="general_open_browser" context="Button to open the default web browser">Open browser</string>
+
     <!--
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     -->
@@ -2141,5 +2144,8 @@
 
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
+
+    <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL certificate error</string>
+    <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA is unable to connect securely through SSL. You might be on public WiFi with additional requirements.</string>
 
 </resources>
