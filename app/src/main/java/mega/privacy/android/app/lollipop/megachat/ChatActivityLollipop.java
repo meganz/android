@@ -2445,7 +2445,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.call_in_progress_layout:{
                 log("onClick:call_in_progress_layout");
-
                 Intent intent = new Intent(this, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        intent.setAction(Long.toString(System.currentTimeMillis()));
@@ -2495,7 +2494,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     fileStorageLayout.setVisibility(View.GONE);
                 }
                 emojiKeyboard.changeKeyboard(this);
-
                 break;
             }
 
@@ -2580,27 +2578,63 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_file_storage_icon_chat:
             case R.id.rl_pick_file_storage_icon_chat:{
                 log("file storage icon ");
+
                 if(fileStorageLayout.isShown()){
                     if(fileStorageF != null){
                         fileStorageF.clearSelections();
                         fileStorageF.hideMultipleSelect();
                     }
                     fileStorageLayout.setVisibility(View.GONE);
+
                 }else{
-                    emojiKeyboard.hideBothKeyboard(this);
+                    if(emojiKeyboard.getLetterKeyboardShown()){
+                        emojiKeyboard.hideBothKeyboard(this);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                                    if (!hasStoragePermission) {
+                                        ActivityCompat.requestPermissions(chatActivity,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                        if (!hasStoragePermission) {
-                            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+                                    }else{
+                                        chatActivity.attachFromFileStorage();
+                                    }
+                                }
+                                else{
+                                    chatActivity.attachFromFileStorage();
+                                }
+                            }
+                        },250);
 
-                        }else{
+                    }else{
+                        emojiKeyboard.hideBothKeyboard(this);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                            if (!hasStoragePermission) {
+                                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+
+                            }else{
+                                this.attachFromFileStorage();
+                            }
+                        }
+                        else{
                             this.attachFromFileStorage();
                         }
                     }
-                    else{
-                        this.attachFromFileStorage();
-                    }
+
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+//                        if (!hasStoragePermission) {
+//                            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},Constants.REQUEST_READ_STORAGE);
+//
+//                        }else{
+//                            this.attachFromFileStorage();
+//                        }
+//                    }
+//                    else{
+//                        this.attachFromFileStorage();
+//                    }
                 }
                 break;
             }

@@ -29,6 +29,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -146,13 +147,17 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         scaleW = Util.getScaleW(outMetrics, density);
         scaleH = Util.getScaleH(outMetrics, density);
 
-        int heightFrag;
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            heightFrag = Util.scaleWidthPx(65, outMetrics);
-        }else{
-            heightFrag = Util.scaleWidthPx(240, outMetrics);
+//        int heightFrag;
+//        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//            heightFrag = Util.scaleWidthPx(80, outMetrics);
+//        }else{
+//            heightFrag = Util.scaleWidthPx(240, outMetrics);
+//
+//        }
 
-        }
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity)context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int heightFrag = displayMetrics.heightPixels / 2 - getActionBarHeight();
 
         ((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
@@ -388,6 +393,17 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             }
         }
     }
+
+    private int getActionBarHeight() {
+        log("getActionBarHeight()");
+        int actionBarHeight = 0;
+        TypedValue tv = new TypedValue();
+        if (context != null && context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
+    }
+
     public void createImagesPath(String path){
         imagesPath.add(path);
     }
