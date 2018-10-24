@@ -183,6 +183,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     Handler handlerReceive;
     Handler handlerSend;
+    Handler handlerKeyboard;
+    Handler handlerEmojiKeyboard;
 
     TextView emptyTextView;
     ImageView emptyImageView;
@@ -630,6 +632,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         emojiKeyboard = (EmojiKeyboard)findViewById(R.id.emojiView);
         emojiKeyboard.init(this, textChat, keyboardTwemojiButton);
+        handlerKeyboard = new Handler();
+        handlerEmojiKeyboard = new Handler();
 
         callInProgressLayout = (RelativeLayout) findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
@@ -2421,6 +2425,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 fileStorageLayout.setVisibility(View.GONE);
             }else{
+                if (handlerEmojiKeyboard != null){
+                    handlerEmojiKeyboard.removeCallbacksAndMessages(null);
+                }
+                if (handlerKeyboard != null){
+                    handlerKeyboard.removeCallbacksAndMessages(null);
+                }
+
                 finish();
             }
         }
@@ -2493,7 +2504,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     fileStorageLayout.setVisibility(View.GONE);
                 }
-                emojiKeyboard.changeKeyboard(this);
+
+                if(emojiKeyboard.getLetterKeyboardShown()){
+                    emojiKeyboard.hideLetterKeyboard();
+                    handlerKeyboard.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            emojiKeyboard.showEmojiKeyboard();
+                        }
+                    },270);
+
+                }else if(emojiKeyboard.getEmojiKeyboardShown()){
+                    emojiKeyboard.showLetterKeyboard();
+
+                }else{
+                    emojiKeyboard.showEmojiKeyboard();
+
+                }
                 break;
             }
 
@@ -2589,7 +2616,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }else{
                     if(emojiKeyboard.getLetterKeyboardShown()){
                         emojiKeyboard.hideBothKeyboard(this);
-                        new Handler().postDelayed(new Runnable() {
+                        handlerEmojiKeyboard.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -2605,7 +2632,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     chatActivity.attachFromFileStorage();
                                 }
                             }
-                        },300);
+                        },270);
 
                     }else{
                         emojiKeyboard.hideBothKeyboard(this);
@@ -6010,6 +6037,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onDestroy(){
         emojiKeyboard.hideBothKeyboard(this);
+        if (handlerEmojiKeyboard != null){
+            handlerEmojiKeyboard.removeCallbacksAndMessages(null);
+        }
+        if (handlerKeyboard != null){
+            handlerKeyboard.removeCallbacksAndMessages(null);
+        }
+
         megaChatApi.closeChatRoom(idChat, this);
         MegaApplication.setClosedChat(true);
         log("removeChatListener");
