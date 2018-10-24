@@ -2172,4 +2172,7 @@
     <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private">[A]%1$s[/A][B] set chat to [/B][C]private[/C]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Invalid chat link</string>
+
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted key rotation</string>
+    <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.</string>
 </resources>

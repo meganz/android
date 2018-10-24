@@ -1021,7 +1021,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
 
-                    showChat();
+                    showChat(savedInstanceState);
                 }
             }
         }
@@ -1030,7 +1030,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showChat(){
+    public void showChat(Bundle savedInstanceState){
 
         if(idChat!=-1) {
 
@@ -6249,7 +6249,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
-                showChat();
+                showChat(null);
             }
             else {
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
@@ -6257,7 +6257,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     //ERROR_EXIST - If the user already participates in the chat.
                     idChat = request.getChatHandle();
                     MegaApplication.setOpenChatId(idChat);
-                    showChat();
+                    showChat(null);
                     MegaChatRoom chatActive = megaChatApi.getChatRoom(idChat);
                     if (chatActive.isActive()) {
                         showAlertChatLink(false);
@@ -6297,7 +6297,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(request.getUserHandle()!= -1){
                     //Rejoin option
-                    showChat();
+                    showChat(null);
                 }
                 else{
                     //Join

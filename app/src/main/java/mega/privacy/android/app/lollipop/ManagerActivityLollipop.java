@@ -14343,14 +14343,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("create group chat with participants: "+peers.size());
 
 					final String chatTitle = intent.getStringExtra(AddContactActivityLollipop.EXTRA_CHAT_TITLE);
-					if(chatTitle!=null){
+					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
 //						CreateGroupChatWithTitle listener = new CreateGroupChatWithTitle(this, chatTitle);
 //						megaChatApi.createChat(true, peers, listener);
-						megaChatApi.createPublicChat(peers, chatTitle, this);
-					}
-					else{
-						megaChatApi.createChat(true, peers, this);
-					}
+                    if (isEKR) {
+                        megaChatApi.createChat(true, peers, chatTitle, this);
+                    }
+                    else {
+                    	final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
+                        megaChatApi.createPublicChat(peers, chatTitle, this);
+                    }
 				}
 			}
 		}
