@@ -123,8 +123,7 @@
                             android:inputType="textMultiLine|textCapSentences"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:textColor="@color/black"
-                            android:imeOptions="flagNoExtractUi" />
+                            android:textColor="@color/black" />
 
                         <RelativeLayout
                             android:id="@+id/writing_disabled_linear_layout_chat"

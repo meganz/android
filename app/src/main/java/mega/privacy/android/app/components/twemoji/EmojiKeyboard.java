@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.twemoji;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.os.Build;
