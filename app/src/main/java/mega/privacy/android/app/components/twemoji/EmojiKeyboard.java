@@ -162,18 +162,6 @@ public class EmojiKeyboard extends LinearLayout {
         emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
     }
 
-    public void changeKeyboard(Activity activity){
-        if (activity == null) return;
-        log("changeKeyboard()");
-        if(isLetterKeyboardShown){
-            showEmojiKeyboard();
-        }else if(isEmojiKeyboardShown){
-            showLetterKeyboard();
-        }else{
-            showEmojiKeyboard();
-        }
-    }
-
     public void showLetterKeyboard(){
         if(!isLetterKeyboardShown){
             if (editInterface instanceof View){
@@ -197,22 +185,11 @@ public class EmojiKeyboard extends LinearLayout {
     public void showEmojiKeyboard(){
         if(!isEmojiKeyboardShown){
             log("showEmojiKeyboard()");
-            if(isLetterKeyboardShown){
-                hideLetterKeyboard();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        setVisibility(VISIBLE);
-                        isEmojiKeyboardShown = true;
-                        emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
-                    }
-                },300);
-            }else{
-                setVisibility(VISIBLE);
-                isEmojiKeyboardShown = true;
-                emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
-            }
-         }
+            hideLetterKeyboard();
+            setVisibility(VISIBLE);
+            isEmojiKeyboardShown = true;
+            emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+        }
     }
 
     public void hideLetterKeyboard() {
