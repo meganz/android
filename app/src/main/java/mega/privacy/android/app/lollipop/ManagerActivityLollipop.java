@@ -5522,13 +5522,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commitNowAllowingStateLoss();
     			}
             
-                sttFLol = new SettingsFragmentLollipop();
-                if (openSettingsStorage){
-                    sttFLol.goToCategoryStorage();
+                if (sttFLol != null && sttFLol.isAdded()){
+                    if (openSettingsStorage){
+                        sttFLol.goToCategoryStorage();
+                    }
+                    else if (openSettingsQR){
+                        log ("goToCategoryQR");
+                        sttFLol.goToCategoryQR();
+                    }else{
+                        //refresh setting to avoid cache issue
+                        sttFLol = new SettingsFragmentLollipop();
+                    }
                 }
-                else if (openSettingsQR){
-                    log ("goToCategoryQR");
-                    sttFLol.goToCategoryQR();
+                else {
+                    sttFLol = new SettingsFragmentLollipop();
                 }
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
