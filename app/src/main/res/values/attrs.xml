@@ -113,7 +113,7 @@
         <attr name="emojiSize"/>
     </declare-styleable>
 
-    <declare-styleable name="EmojiUniversal">
+    <declare-styleable name="EmojiKeyboard">
         <attr name="exampleString" format="string" />
         <attr name="exampleDimension" format="dimension" />
         <attr name="exampleColor" format="color" />
