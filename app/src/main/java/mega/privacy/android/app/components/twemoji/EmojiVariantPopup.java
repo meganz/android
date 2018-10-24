@@ -57,7 +57,7 @@ public final class EmojiVariantPopup {
             location.y - content.getMeasuredHeight()
     );
 
-    popupWindow.showAtLocation(rootView, Gravity.BOTTOM, desiredLocation.x, desiredLocation.y);
+    popupWindow.showAtLocation(rootView, Gravity.NO_GRAVITY, desiredLocation.x, desiredLocation.y);
     rootImageView.getParent().requestDisallowInterceptTouchEvent(true);
     Utils.fixPopupLocation(popupWindow, desiredLocation);
   }
