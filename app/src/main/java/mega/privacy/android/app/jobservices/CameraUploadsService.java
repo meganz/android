@@ -1174,18 +1174,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     dbH.setSecondaryFolderHandle(request.getNodeHandle());
                 }
             }
-        } else if (request.getType() == MegaRequest.TYPE_RENAME || request.getType() == MegaRequest.TYPE_COPY) {
+        } else if (request.getType() == MegaRequest.TYPE_COPY) {
             String nodeName = megaApi.getNodeByHandle(request.getNodeHandle()).getName();
             if (e.getErrorCode() == MegaError.API_OK) {
-                //todo copy have not path, use name?
-                dbH.deleteSyncRecordByFileName(nodeName); //todo need to verify real name too
+                dbH.deleteSyncRecordByFileName(nodeName);
             }
-            
-            updateProgressNotification();
-            totalUploaded++;
-            if (totalToUpload == totalUploaded) {
-                onQueueComplete(true,totalToUpload);
-            }
+            Log.d("Yuan", "updateProgressNotification 1" + request.getType() + " " + e.getErrorString());
+            updateUpload();
+        }else if(request.getType() == MegaRequest.TYPE_RENAME){
+            //No need to handle anything
         }
     }
 
@@ -1366,6 +1363,10 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
         }
     
+        updateUpload();
+    }
+    
+    private void updateUpload(){
         updateProgressNotification();
         totalUploaded++;
         if (totalToUpload == totalUploaded) {
