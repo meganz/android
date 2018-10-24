@@ -156,7 +156,7 @@ public class EmojiKeyboard extends LinearLayout {
     //KEYBOARDS:
     public void hideBothKeyboard(Activity activity){
         if (activity == null) return;
-        log("hideBothKeyboard() ");
+        log("hideBothKeyboard()");
         hideEmojiKeyboard();
         hideLetterKeyboard();
         emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
@@ -179,21 +179,15 @@ public class EmojiKeyboard extends LinearLayout {
             if (editInterface instanceof View){
                 log("showLetterKeyboard()");
                 hideEmojiKeyboard();
-
                 final View view = (View) editInterface;
                 view.setFocusableInTouchMode(true);
                 view.requestFocus();
 
                 final InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm == null) return;
-                view.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        imm.showSoftInput(view, 0, null);
-                        isLetterKeyboardShown = true;
-                        emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
-                    }
-                });
+                imm.showSoftInput(view, 0, null);
+                isLetterKeyboardShown = true;
+                emojiIcon.setImageResource(R.drawable.ic_emoticon_white);
             } else {
                 throw new IllegalArgumentException("The provided editInterace isn't a View instance.");
             }
@@ -202,7 +196,7 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void showEmojiKeyboard(){
         if(!isEmojiKeyboardShown){
-            log("showEmojiKeyboard() ");
+            log("showEmojiKeyboard()");
             if(isLetterKeyboardShown){
                 hideLetterKeyboard();
                 new Handler().postDelayed(new Runnable() {
@@ -212,7 +206,7 @@ public class EmojiKeyboard extends LinearLayout {
                         isEmojiKeyboardShown = true;
                         emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
                     }
-                },250);
+                },300);
             }else{
                 setVisibility(VISIBLE);
                 isEmojiKeyboardShown = true;

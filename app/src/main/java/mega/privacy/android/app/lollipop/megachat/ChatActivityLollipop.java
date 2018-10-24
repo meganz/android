@@ -2605,7 +2605,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     chatActivity.attachFromFileStorage();
                                 }
                             }
-                        },250);
+                        },300);
 
                     }else{
                         emojiKeyboard.hideBothKeyboard(this);
