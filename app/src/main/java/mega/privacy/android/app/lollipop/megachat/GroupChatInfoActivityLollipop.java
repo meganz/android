@@ -36,6 +36,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -94,6 +95,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     AlertDialog permissionsDialog;
     AlertDialog changeTitleDialog;
+    AlertDialog makePrivateDialog;
 
     MenuItem addParticipantItem;
     MenuItem changeTitleItem;
@@ -138,7 +140,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     String chatLink;
     ImageView chatLinkOptionsIcon;
 
-    RelativeLayout privateLayout;
+    LinearLayout privateLayout;
     View privateSeparator;
 
     RelativeLayout clearChatLayout;
@@ -313,7 +315,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             chatLinkOptionsIcon = (ImageView) findViewById(R.id.chat_group_contact_properties_chat_link_points);
 
             //Private chat
-            privateLayout = (RelativeLayout) findViewById(R.id.chat_group_contact_properties_private_layout);
+            privateLayout = (LinearLayout) findViewById(R.id.chat_group_contact_properties_private_layout);
             privateSeparator = (View) findViewById(R.id.divider_private_layout);
 
             //Clear chat Layout
@@ -1011,7 +1013,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 break;
             }
             case R.id.chat_group_contact_properties_private_layout:{
-                megaChatApi.closeChatLink(chatHandle, this);
+                log("Make chat private");
+                showConfirmationPrivateChatDialog();
                 break;
             }
         }
@@ -1524,6 +1527,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                     }
                     else{
                         log("Error TYPE_CHAT_LINK_HANDLE "+e.getErrorCode());
+                        showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
                 }
             }
@@ -1535,14 +1539,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         chatLinkTitleText.setText(getString(R.string.get_chat_link_option));
                         chatLinkOptionsIcon.setVisibility(View.INVISIBLE);
                     }
-                    else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
-                        log("NOT public chatroom");
-                    }
-                    else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-                        log("Chatroom not FOUND");
-                    }
-                    else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
-                        log("NOT privileges or private chatroom");
+                    else{
+                        if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+                            log("NOT public chatroom");
+                        }
+                        else if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+                            log("Chatroom not FOUND");
+                        }
+                        else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
+                            log("NOT privileges or private chatroom");
+                        }
+                        showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
                 }
             }
@@ -1573,6 +1580,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 else if(e.getErrorCode()==MegaChatError.ERROR_ACCESS){
                     log("NOT privileges or private chatroom");
                 }
+                showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
             }
         }
     }
@@ -1630,7 +1638,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                         showSnackbar(getString(R.string.error_own_email_as_contact));
                     }
                     else{
-                        showSnackbar(getString(R.string.general_error));
+                        showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
                     }
                     log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
                 }
@@ -1749,4 +1757,29 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 
     }
+
+    public void showConfirmationPrivateChatDialog(){
+        log("showConfirmationPrivateChatDialog");
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_make_chat_private, null);
+        dialogBuilder.setView(dialogView);
+
+        Button enableButton = (Button) dialogView.findViewById(R.id.make_private_button_enable);
+
+        makePrivateDialog = dialogBuilder.create();
+
+        enableButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                makePrivateDialog.dismiss();
+                megaChatApi.closeChatLink(chatHandle, groupChatInfoActivity);
+            }
+
+        });
+
+        makePrivateDialog.show();
+    }
+
 }

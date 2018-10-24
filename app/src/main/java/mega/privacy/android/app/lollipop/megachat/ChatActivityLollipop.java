@@ -1264,19 +1264,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 return;
             }
 
-            if(chatRoom.isPreview()){
-                log("setChatSubtitle:isPreview");
-                aB.setSubtitle(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
-                tB.setOnClickListener(this);
-
-                setBottomLayout(SHOW_JOIN_LAYOUT);
-
-                return;
-            }
-
             int permission = chatRoom.getOwnPrivilege();
 
             if (chatRoom.isGroup()) {
+
+                if(chatRoom.isPreview()){
+                    log("setChatSubtitle:isPreview");
+                    aB.setSubtitle(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                    tB.setOnClickListener(this);
+
+                    setBottomLayout(SHOW_JOIN_LAYOUT);
+
+                    return;
+                }
+
                 tB.setOnClickListener(this);
 
                 log("Check permissions group chat");
@@ -1394,6 +1395,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setBottomLayout(int show){
         log("setBottomLayout");
+
         if(show == SHOW_JOIN_LAYOUT){
             writingContainerLayout.setVisibility(View.GONE);
             joinChatLinkLayout.setVisibility(View.VISIBLE);

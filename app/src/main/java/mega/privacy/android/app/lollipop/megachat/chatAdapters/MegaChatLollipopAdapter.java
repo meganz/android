@@ -3422,6 +3422,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(androidMessage.getRichLinkMessage().getTitle());
+                        ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setMaxLines(1);
                         ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setVisibility(View.VISIBLE);
 
                         ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(context.getString(R.string.number_of_participants, numParticipants));
@@ -3447,12 +3448,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setVisibility(View.VISIBLE);
                         ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(context.getString(R.string.invalid_chat_link));
+                        ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setMaxLines(2);
                         ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setVisibility(View.INVISIBLE);
 
                         ((ViewHolderMessageChat) holder).urlOwnMessageImage.setVisibility(View.GONE);
-                        ((ViewHolderMessageChat) holder).urlOwnMessageGroupAvatarLayout.setVisibility(View.VISIBLE);
-
-                        createGroupChatAvatar(holder, "", true);
+                        ((ViewHolderMessageChat) holder).urlOwnMessageGroupAvatarLayout.setVisibility(View.GONE);
                     }
                 }
                 else{
@@ -3711,6 +3711,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (node != null) {
                 ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText(node.getName());
+                ((ViewHolderMessageChat) holder).urlContactMessageTitle.setMaxLines(1);
 
                 ((ViewHolderMessageChat) holder).urlContactMessageImage.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).urlContactMessageGroupAvatarLayout.setVisibility(View.GONE);
@@ -3755,6 +3756,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.VISIBLE);
 
                         ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText(androidMessage.getRichLinkMessage().getTitle());
+                        ((ViewHolderMessageChat) holder).urlContactMessageTitle.setMaxLines(1);
                         ((ViewHolderMessageChat) holder).urlContactMessageDescription.setVisibility(View.VISIBLE);
 
                         ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(context.getString(R.string.number_of_participants, numParticipants));
@@ -3778,9 +3780,10 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         ((ViewHolderMessageChat) holder).urlContactMessageTitle.setVisibility(View.VISIBLE);
 
                         ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText(context.getString(R.string.invalid_chat_link));
+                        ((ViewHolderMessageChat) holder).urlContactMessageTitle.setMaxLines(2);
                         ((ViewHolderMessageChat) holder).urlContactMessageDescription.setVisibility(View.INVISIBLE);
 
-                        createGroupChatAvatar(holder, "", false);
+                        holder.urlContactMessageGroupAvatarLayout.setVisibility(View.GONE);
                     }
                 }
                 else{
