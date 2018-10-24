@@ -2512,7 +2512,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         public void run() {
                             emojiKeyboard.showEmojiKeyboard();
                         }
-                    },270);
+                    },250);
 
                 }else if(emojiKeyboard.getEmojiKeyboardShown()){
                     emojiKeyboard.showLetterKeyboard();
@@ -2632,7 +2632,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     chatActivity.attachFromFileStorage();
                                 }
                             }
-                        },270);
+                        },250);
 
                     }else{
                         emojiKeyboard.hideBothKeyboard(this);

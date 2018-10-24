@@ -504,7 +504,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-//		if(Util.isChatEnabled()){
+//		if(Util.isChatEnabled()){}
 		EmojiManager.install(new TwitterEmojiProvider());
 
 		final EmojiCompat.Config config;
@@ -532,33 +532,6 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 					});
 		}
 		EmojiCompat.init(config);
-
-
-
-//		FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
-//
-//			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest)
-//					.setReplaceAll(false)
-//					.setEmojiSpanIndicatorEnabled(true)
-//					.setUseEmojiAsDefaultStyle(true)
-//					.registerInitCallback(new EmojiCompat.InitCallback() {
-//						@Override
-//						public void onInitialized() {
-//							Log.i(TAG, "EmojiCompat initialized");
-//						}
-//
-//						@Override
-//						public void onFailed(@Nullable Throwable throwable) {
-//							Log.e(TAG, "EmojiCompat initialization failed", throwable);
-//						}
-//					});
-//
-//			EmojiCompat.init(configDF);
-
-
-//			CharSequence processedSequence = EmojiCompat.get().process("U-F600");
-//		}
-
 
 
 //		initializeGA();
