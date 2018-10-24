@@ -2170,10 +2170,12 @@
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">This chat preview is not longer available</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private">[A]%1$s[/A][B] set chat to [/B][C]private[/C]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private">[A]%1$s[/A][B] enabled encrypted key rotation.[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">This conversation is no longer available</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Encrypted key rotation</string>
     <string name="ekr_explanation" context="When it is creating a new group chat, this option permits to establish it private or public">Key rotation is slightly more secure, but does not allow you to create a link to the chat and new participants will not see past messages.</string>
+
+    <string name="subtitle_chat_message_enabled_ERK" context="subtitle of the message shown when a user enables the encrypted key rotation">Key rotation is slightly more secure, but does not allow you to share a link to the chat and new participants will not see past messages.</string>
 </resources>
