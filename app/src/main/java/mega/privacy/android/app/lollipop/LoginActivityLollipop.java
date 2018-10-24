@@ -560,8 +560,8 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
 //		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
-        builder.setPositiveButton(R.string.general_cancel, dialogClickListener);
-        builder.setNegativeButton(R.string.general_dismiss, dialogClickListener);
+        builder.setPositiveButton(R.string.context_delete, dialogClickListener);
+        builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
 
         builder.show();
     }

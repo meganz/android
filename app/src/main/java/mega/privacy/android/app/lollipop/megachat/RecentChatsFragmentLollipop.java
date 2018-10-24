@@ -1364,11 +1364,22 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                         break;
                     }
                     case MegaChatApi.STATUS_INVALID:{
-                        if(!Util.isOnline(context) || megaApi == null || megaApi.getRootNode()==null){
+                        if(!Util.isOnline(context)){
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
-                        else{
-                            aB.setSubtitle(null);
+                        else {
+                            if(megaChatApi == null){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.CONNECTING){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                            }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.DISCONNECTED){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
+                            else{
+                                aB.setSubtitle(null);
+                            }
                         }
                         break;
                     }
@@ -1378,12 +1389,23 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
                             aB.setSubtitle(adjustForLargeFont(getString(R.string.error_server_connection_problem)));
                         }
                         else{
-                            int initStatus = megaChatApi.getInitState();
-                            if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE){
+                            if(megaChatApi == null){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.CONNECTING){
                                 aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
                             }
+                            else if(megaChatApi.getConnectionState()==MegaChatApi.DISCONNECTED){
+                                aB.setSubtitle(adjustForLargeFont(getString(R.string.invalid_connection_state)));
+                            }
                             else{
-                                aB.setSubtitle(null);
+                                int initStatus = megaChatApi.getInitState();
+                                if (initStatus == MegaChatApi.INIT_WAITING_NEW_SESSION || initStatus == MegaChatApi.INIT_NO_CACHE){
+                                    aB.setSubtitle(adjustForLargeFont(getString(R.string.chat_connecting)));
+                                }
+                                else{
+                                    aB.setSubtitle(null);
+                                }
                             }
                         }
                         break;

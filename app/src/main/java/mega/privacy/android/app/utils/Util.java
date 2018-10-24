@@ -1658,6 +1658,30 @@ public class Util {
 			return false;
 		}
 	}
+
+	public static long getLastPublicHandle(MegaAttributes attributes){
+		long lastPublicHandle = -1;
+
+		if (attributes != null){
+			if (attributes.getLastPublicHandle() != null){
+				try{
+					long currentTime = System.currentTimeMillis()/1000;
+					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
+					log("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
+					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
+						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
+							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
+						}
+					}
+				}
+				catch (Exception e){
+					lastPublicHandle = -1;
+				}
+			}
+		}
+
+		return lastPublicHandle;
+	}
 	
 	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
 		

@@ -31,7 +31,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 41;
+	private static final int DATABASE_VERSION = 42;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -104,6 +104,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_USE_HTTPS_ONLY = "usehttpsonly";
 	private static final String KEY_SHOW_COPYRIGHT = "showcopyright";
 	private static final String KEY_SHOW_NOTIF_OFF = "shownotifoff";
+	private static final String KEY_STAGING = "staging";
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
@@ -164,6 +165,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_CAMERA_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CAMERA_UPLOADS + "("
             + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER, " + KEY_SYNC_HANDLE + " TEXT," + KEY_SYNC_COPYONLY + " BOOLEAN," + KEY_SYNC_SECONDARY + " BOOLEAN"+ ")";
 
+	private static final String KEY_LAST_PUBLIC_HANDLE = "lastpublichandle";
+	private static final String KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp";
 
     private static DatabaseHandler instance;
     
@@ -221,7 +224,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT, " + 
         		KEY_ATTR_ASK_SIZE_DOWNLOAD+ "	BOOLEAN, "+KEY_ATTR_ASK_NOAPP_DOWNLOAD+ " BOOLEAN, " + KEY_FILE_LOGGER_SDK +" TEXT, " + KEY_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " +
 				KEY_PAYMENT_METHODS_TIMESTAMP +" TEXT, " + KEY_PRICING_TIMESTAMP +" TEXT, " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP +" TEXT, " + KEY_INVALIDATE_SDK_CACHE + " TEXT, " + KEY_FILE_LOGGER_KARERE +
-				" TEXT, " + KEY_USE_HTTPS_ONLY + " TEXT, " + KEY_SHOW_COPYRIGHT +" TEXT, " + KEY_SHOW_NOTIF_OFF +" TEXT" + ")";
+				" TEXT, " + KEY_USE_HTTPS_ONLY + " TEXT, " + KEY_SHOW_COPYRIGHT +" TEXT, " + KEY_SHOW_NOTIF_OFF +" TEXT, " + KEY_STAGING + " TEXT, " + KEY_LAST_PUBLIC_HANDLE + " TEXT, " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS + "("
@@ -580,7 +583,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SMALL_GRID_CAMERA + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + " = '" + encrypt("false") + "';");
 		}
-		if(oldVersion <= 40) {
+
+		if (oldVersion <= 40){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_STAGING + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + " = '" + encrypt("false") + "';");
+		}
+
+		if (oldVersion <= 41){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_LAST_PUBLIC_HANDLE + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE + " = '" + encrypt("-1") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " = '" + encrypt("-1") + "';");
+		}
+		if(oldVersion <= 42) {
 		    db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
         }
 	}
@@ -1727,6 +1742,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.getUseHttpsOnly()));
 		values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.getShowCopyright()));
 		values.put(KEY_SHOW_NOTIF_OFF, encrypt(attr.getShowNotifOff()));
+		values.put(KEY_STAGING, encrypt(attr.getStaging()));
+		values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(attr.getLastPublicHandle()));
+		values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(attr.getLastPublicHandleTimeStamp()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -1751,11 +1769,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String useHttpsOnly = decrypt(cursor.getString(12));
 			String showCopyright = decrypt(cursor.getString(13));
 			String showNotifOff = decrypt(cursor.getString(14));
+			String staging = decrypt(cursor.getString(15));
+			String lastPublicHandle = decrypt(cursor.getString(16));
+			String lastPublicHandleTimeStamp = decrypt(cursor.getString(17));
 			if(intents!=null){
-				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff);
+				attr = new MegaAttributes(online, Integer.parseInt(intents), askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff, staging, lastPublicHandle, lastPublicHandleTimeStamp);
 			}
 			else{
-				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff);
+				attr = new MegaAttributes(online, 0, askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp, paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp, invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff, staging, lastPublicHandle, lastPublicHandleTimeStamp);
 			}
 		}
 		cursor.close();
@@ -3214,6 +3235,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 
+	public void setLastPublicHandle (long handle){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE + "= '" + encrypt(handle + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+			values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(handle + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public void setLastPublicHandleTimeStamp(long lastPublicHandleTimeStamp){
+        String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + "= '" + encrypt(lastPublicHandleTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_ATTRIBUTE_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(lastPublicHandleTimeStamp + ""));
+            db.insert(TABLE_ATTRIBUTES, null, values);
+        }
+        cursor.close();
+    }
+
+	public void setLastPublicHandleTimeStamp (){
+		log("setLastPublicHandleTimeStamp");
+		long lastPublicHandleTimeStamp = System.currentTimeMillis()/1000;
+
+		setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
+	}
+
 	public String getShowNotifOff (){
 
 		String selectQuery = "SELECT " + KEY_SHOW_NOTIF_OFF + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
@@ -3226,6 +3286,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 
 		return "true";
+	}
+
+	public void setStaging (boolean staging){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + "='" + encrypt(staging + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_STAGING, encrypt(staging + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+
+	public String getStaging (){
+
+		String selectQuery = "SELECT " + KEY_STAGING + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+
+			String staging = decrypt(cursor.getString(0));
+			return staging;
+		}
+		cursor.close();
+
+		return "false";
 	}
 
 	public void setInvalidateSdkCache(boolean invalidateSdkCache){
@@ -3266,8 +3355,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //	}
 	
 	public void clearAttributes(){
+        long lastPublicHandle = -1;
+        long lastPublicHandleTimeStamp = -1;
+        try {
+            MegaAttributes attributes = getAttributes();
+            lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
+            lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
+        }
+        catch(Exception e){
+            lastPublicHandle = -1;
+        }
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
+		if ((lastPublicHandle != -1) && (lastPublicHandleTimeStamp != -1)){
+		    try{
+		        setLastPublicHandle(lastPublicHandle);
+		        setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
+            }
+            catch (Exception e){}
+        }
 	}
 	
 	public void clearContacts(){		
