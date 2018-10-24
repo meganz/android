@@ -48,7 +48,6 @@ public final class EmojiManager {
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0; i < size; i++) {
         existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
-        log("***** replaceWithImages()- existingSpanPositions.add("+text.getSpanStart(existingSpans[i]));
 
       }
       final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text, isTV);
