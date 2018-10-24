@@ -1846,8 +1846,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					textToShow = textToShow.replace("[/A]", "");
 					textToShow = textToShow.replace("[B]", "");
 					textToShow = textToShow.replace("[/B]", "");
-					textToShow = textToShow.replace("[C]", "");
-					textToShow = textToShow.replace("[/C]", "");
 				}
 				catch (Exception e){}
 

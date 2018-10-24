@@ -653,6 +653,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RoundedImageView contactManagementAvatarImage;
         TextView contactManagementAvatarInitialLetter;
         TextView contactManagementAvatarMessageText;
+        RelativeLayout contactManagementAvatarSubTextLayout;
 
         public String filePathUploading;
 
@@ -1067,6 +1068,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contactManagementAvatarImage = (RoundedImageView) v.findViewById(R.id.management_contact_thumbnail);
             holder.contactManagementAvatarInitialLetter = (TextView) v.findViewById(R.id.management_contact_initial_letter);
             holder.contactManagementAvatarMessageText = (TextView) v.findViewById(R.id.contact_management_message_text_with_avatar);
+            holder.contactManagementAvatarSubTextLayout = (RelativeLayout) v.findViewById(R.id.contact_subtext_layout_with_avatar);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holder.contentContactMessageText.setMaxWidth(Util.scaleWidthPx(310, outMetrics));
@@ -1312,6 +1314,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ((ViewHolderMessageChat) holder).forwardContactRichLinks.setVisibility(View.GONE);
 
         ((ViewHolderMessageChat) holder).contactManagementAvatarMainLayout.setVisibility(View.GONE);
+        ((ViewHolderMessageChat) holder).contactManagementAvatarSubTextLayout.setVisibility(View.GONE);
 
         AndroidMegaChatMessage androidMessage = messages.get(position - 1);
         MegaChatMessage message = messages.get(position - 1).getMessage();
@@ -6174,6 +6177,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }
+            ((ViewHolderMessageChat) holder).contactManagementAvatarSubTextLayout.setVisibility(View.GONE);
         }
         else if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE){
             textToShow = String.format(context.getString(R.string.message_deleted_chat_link), ((ViewHolderMessageChat) holder).fullNameTitle);
@@ -6184,18 +6188,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }
+            ((ViewHolderMessageChat) holder).contactManagementAvatarSubTextLayout.setVisibility(View.GONE);
         }
         else{
             textToShow = String.format(context.getString(R.string.message_set_chat_private), ((ViewHolderMessageChat) holder).fullNameTitle);
             try {
                 textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
-                textToShow = textToShow.replace("[/B]", "</font>");
-                textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
-                textToShow = textToShow.replace("[/C]", "</font>");
+                textToShow = textToShow.replace("[B]", "<b>");
+                textToShow = textToShow.replace("[/B]", "</b>");
             } catch (Exception e) {
             }
+            ((ViewHolderMessageChat) holder).contactManagementAvatarSubTextLayout.setVisibility(View.VISIBLE);
         }
 
         Spanned result = null;
