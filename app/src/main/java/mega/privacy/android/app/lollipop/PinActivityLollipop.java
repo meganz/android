@@ -1,8 +1,8 @@
 package mega.privacy.android.app.lollipop;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
 import mega.privacy.android.app.utils.Util;
@@ -10,7 +10,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
 
-public class PinActivityLollipop extends AppCompatActivity{
+public class PinActivityLollipop extends BaseActivity {
 	
 	private MegaApiAndroid megaApi;
 	private MegaChatApiAndroid megaChatApi;
