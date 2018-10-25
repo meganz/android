@@ -4387,7 +4387,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         playerLayout.setVisibility(View.GONE);
         fragmentContainer.setVisibility(View.VISIBLE);
         draggableView.setDraggable(false);
-        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.lollipop_primary_color));
+        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_primary_color));
         aB.setTitle(getString(R.string.section_playlist));
         supportInvalidateOptionsMenu();
 

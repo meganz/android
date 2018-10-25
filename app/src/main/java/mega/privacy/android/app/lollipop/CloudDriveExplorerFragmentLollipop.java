@@ -248,6 +248,18 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				if (listView.canScrollVertically(-1)){
+					((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
