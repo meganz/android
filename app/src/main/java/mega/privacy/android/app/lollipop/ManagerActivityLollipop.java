@@ -15292,7 +15292,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			log("Create chat request finish");
-			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
 			log("remove from chat finish!!!");
@@ -15408,7 +15408,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	}
 
-	public void onRequestFinishCreateChat(int errorCode, long chatHandle, boolean loadMessages){
+	public void onRequestFinishCreateChat(int errorCode, long chatHandle){
 		if(errorCode==MegaChatError.ERROR_OK){
 			log("Chat CREATED.");
 
@@ -15422,13 +15422,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 			log("open new chat: " + chatHandle);
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
-			if(loadMessages){
-				intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
-			}
-			else{
-				intent.setAction(Constants.ACTION_NEW_CHAT);
-			}
-
+			intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
 			intent.putExtra("CHAT_ID", chatHandle);
 			this.startActivity(intent);
 
