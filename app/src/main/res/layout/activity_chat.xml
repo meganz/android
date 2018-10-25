@@ -27,6 +27,18 @@
             android:layout_height="match_parent"
             android:layout_above="@id/chat_emoji_keyboard">
 
+            <!--<android.support.v7.widget.Toolbar-->
+                <!--android:id="@+id/toolbar_chat"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:minHeight="?attr/actionBarSize"-->
+                <!--android:background="?attr/colorPrimary"-->
+                <!--android:elevation="4dp"-->
+                <!--app:titleTextAppearance="@style/ToolbarTitle"-->
+                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
+                <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
+                <!--tools:context=".lollipop.megachat.ChatActivityLollipop" />-->
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
@@ -37,7 +49,49 @@
                 app:titleTextAppearance="@style/ToolbarTitle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                tools:context=".lollipop.megachat.ChatActivityLollipop" />
+                tools:context=".lollipop.megachat.ChatActivityLollipop" >
+
+                <LinearLayout
+                    android:id="@+id/toolbar_elements"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/title_toolbar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:fontFamily="sans-serif-light"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:maxLines="1"
+                            android:layout_marginRight="20dp"
+                            android:ellipsize="end"/>
+                        <ImageView
+                            android:id="@+id/state_icon_toolbar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:visibility="gone"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/subtitle_toolbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:layout_marginRight="8dp"/>
+                </LinearLayout>
+
+            </android.support.v7.widget.Toolbar>
+
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
