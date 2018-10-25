@@ -1449,6 +1449,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 					moveTaskToBack(true);
 					break;
 				}
+				case RESET_UNLOCK:
+				case RESET_SET:
+					MegaApplication.setShowPinScreen(false);
 				default:
 					finish();
 			}
@@ -1456,6 +1459,13 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		else{
 			log("attemps MORE 10");
 			moveTaskToBack(false);
+		}
+	}
+
+	@Override
+	protected void onUserLeaveHint() {
+		if (mode != UNLOCK) {
+			finish();
 		}
 	}
 
@@ -1609,6 +1619,16 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
 	}
+
+	@Override
+	protected void onDestroy() {
+		log("onDestroy");
+
+		MegaApplication.setShowPinScreen(isFinishing() ? true : false);
+
+		super.onDestroy();
+	}
+
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
