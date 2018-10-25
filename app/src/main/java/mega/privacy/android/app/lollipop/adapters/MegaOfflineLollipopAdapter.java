@@ -116,7 +116,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		public View fileLayout;
 		public ImageView imageViewIcon;
 		public RelativeLayout thumbLayoutForFile;
-		public ImageView fileGridIconForFile;
 		public ImageButton imageButtonThreeDotsForFile;
 		public TextView textViewFileNameForFile;
 		public ImageView fileGridSelected;
@@ -534,7 +533,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
 			
 			holder.imageViewIcon = (ImageView)v.findViewById(R.id.offline_grid_icon);
-			holder.fileGridIconForFile = (ImageView)v.findViewById(R.id.file_grid_icon_for_file);
 			holder.thumbLayoutForFile = (RelativeLayout)v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
 			holder.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
 			holder.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
@@ -742,8 +740,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 //			long nodeSize = currentNode.getSize();
 //			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			
-			holder.fileGridIconForFile.setVisibility(View.VISIBLE);
-			holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(currentNode.getName()).getIconResourceId());
 			holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
 			
             if (multipleSelect && isItemChecked(position)) {
@@ -1120,7 +1116,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 				}
 				else {
-					imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+                    if (MimeTypeThumbnail.typeForName(mOff.getName()).isImage()){
+                        imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
+                    }else{
+                        //videos don't have thumnail, only have icon.here should use the ImageView of icon.
+                        imageView = (ImageView) v.findViewById(R.id.file_grid_icon_for_file);
+                    }
 				}
 				imageView.getLocationOnScreen(screenPosition);
 				int[] dimens = new int[4];
