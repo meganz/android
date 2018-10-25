@@ -539,8 +539,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 		aB.show();
 		log("aB.setHomeAsUpIndicator_65");
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		aB.setHomeAsUpIndicator(Util.mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
@@ -554,7 +553,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				selectFile = false;
 				selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
-				aB.setTitle(getString(R.string.title_share_folder_explorer));
+				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 				cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 
@@ -654,7 +653,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = MOVE;
 					moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
@@ -695,7 +694,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = COPY;
 					copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
@@ -726,7 +725,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
 					mode = SELECT_CAMERA_FOLDER;
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
@@ -747,7 +746,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
@@ -768,7 +767,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = SELECT;
 					selectedContacts=intent.getStringArrayListExtra("SELECTED_CONTACTS");
 
-					aB.setTitle(getString(R.string.title_share_folder_explorer));
+					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
 						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
@@ -789,7 +788,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					mode = UPLOAD;
 					selectFile = false;
 
-					aB.setTitle(getString(R.string.title_cloud_explorer));
+					aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
 
 					cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 
@@ -830,7 +829,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 
 					if(isChatFirst){
-						aB.setTitle(getString(R.string.title_chat_explorer));
+						aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 
 						if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
@@ -845,7 +844,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 					}
 					else{
-						aB.setTitle(getString(R.string.title_upload_explorer));
+						aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
 						importFileF = true;
 						action = intent.getAction();
 						cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
@@ -943,6 +942,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			fabButton.setVisibility(View.GONE);
 		}
 	}
+
+	public void changeActionBarElevation(boolean whitElevation){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			if (whitElevation) {
+				tB.setElevation(Util.px2dp(4, outMetrics));
+			}
+			else {
+				tB.setElevation(0);
+			}
+		}
+	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -953,7 +963,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    inflater.inflate(R.menu.file_explorer_action, menu);
 	    
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+	    createFolderMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_create_new_folder_white, R.color.black));
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
+	    newChatMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_chat_w, R.color.black));
 
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
@@ -1175,32 +1187,32 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 			else{
-				aB.setTitle(getString(R.string.title_share_folder_explorer));
+				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 			}
 		}
 		else if(mode == MOVE || mode == COPY || mode == SELECT_CAMERA_FOLDER || mode == IMPORT){
-			aB.setTitle(getString(R.string.title_share_folder_explorer));
+			aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 		}
 		else if(mode == UPLOAD && !importFileF){
-			aB.setTitle(getString(R.string.title_cloud_explorer));
+			aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
 		}
 		else if (mode == UPLOAD && importFileF) {
 			if (importFragmentSelected != -1) {
 				switch (importFragmentSelected) {
 					case CLOUD_FRAGMENT: {
-						aB.setTitle(getString(R.string.section_cloud_drive));
+						aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
 						break;
 					}
 					case INCOMING_FRAGMENT:{
-						aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+						aB.setTitle(getString(R.string.title_incoming_shares_explorer).toUpperCase());
 						break;
 					}
 					case CHAT_FRAGMENT:{
-						aB.setTitle(getString(R.string.title_chat_explorer));
+						aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						break;
 					}
 					case IMPORT_FRAGMENT:{
-						aB.setTitle(getString(R.string.title_upload_explorer));
+						aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
 						break;
 					}
 				}
@@ -1281,7 +1293,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						if(((ChatExplorerFragment)f)!=null){
-							aB.setTitle(getString(R.string.title_chat_explorer));
+							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
 						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){
@@ -1356,7 +1368,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						}
 
 						if(((ChatExplorerFragment)f)!=null){
-							aB.setTitle(getString(R.string.title_chat_explorer));
+							aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
 						}
 
 						if(((ChatExplorerFragment)f).getSelectedChats().size() > 0){

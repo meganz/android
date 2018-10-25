@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -25,6 +26,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.Util;
@@ -39,6 +41,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
 
     Context context;
 
+    NestedScrollView scrollView;
     ImportFilesAdapter adapter;
 
     TextView contentText;
@@ -87,6 +90,19 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         }
 
         View v = inflater.inflate(R.layout.fragment_importfile, container, false);
+
+        scrollView = (NestedScrollView) v.findViewById(R.id.scroll_container_import);
+        new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollView.canScrollVertically(-1)){
+                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(true);
+                }
+                else {
+                    ((FileExplorerActivityLollipop) context).changeActionBarElevation(false);
+                }
+            }
+        });
 
         contentText = (TextView) v.findViewById(R.id.content_text);
         recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view);
