@@ -1021,7 +1021,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                     }
 
-                    showChat(savedInstanceState);
+                    showChat();
                 }
             }
         }
@@ -1030,7 +1030,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showChat(Bundle savedInstanceState){
+    public void showChat(){
 
         if(idChat!=-1) {
 
@@ -1133,15 +1133,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 aB.setTitle(chatRoom.getTitle());
                 setChatSubtitle();
 
-                if (intentAction.equals(Constants.ACTION_NEW_CHAT) && savedInstanceState==null) {
-                    log("ACTION_CHAT_NEW: for opening first time");
-                    textChat.setOnFocusChangeListener(focus);
-
-                    emptyTextView.setVisibility(View.GONE);
-                    emptyLayout.setVisibility(View.GONE);
-                    chatRelativeLayout.setVisibility(View.VISIBLE);
-                }
-                else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES) || intentAction.equals(Constants.ACTION_NEW_CHAT)) {
+                if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
                     log("ACTION_CHAT_SHOW_MESSAGES or rotating a new chat");
                     isOpeningChat = true;
 
@@ -6097,7 +6089,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("There is already a chat, open it!");
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-            intentOpenChat.setAction(Constants.ACTION_NEW_CHAT);
+            intentOpenChat.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
             intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
             this.startActivity(intentOpenChat);
             finish();
@@ -6237,7 +6229,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 log("open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
-                intent.setAction(Constants.ACTION_NEW_CHAT);
+                intent.setAction(Constants.ACTION_CHAT_SHOW_MESSAGES);
                 intent.putExtra("CHAT_ID", request.getChatHandle());
                 this.startActivity(intent);
                 finish();
@@ -6251,7 +6243,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
-                showChat(null);
+                showChat();
             }
             else {
                 log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
@@ -6259,7 +6251,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     //ERROR_EXIST - If the user already participates in the chat.
                     idChat = request.getChatHandle();
                     MegaApplication.setOpenChatId(idChat);
-                    showChat(null);
+                    showChat();
                     MegaChatRoom chatActive = megaChatApi.getChatRoom(idChat);
                     if (chatActive.isActive()) {
                         showAlertChatLink(false);
@@ -6299,7 +6291,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(request.getUserHandle()!= -1){
                     //Rejoin option
-                    showChat(null);
+                    showChat();
                 }
                 else{
                     //Join
@@ -6429,7 +6421,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     return;
                 }
-                else if((intent.getAction().equals(Constants.ACTION_NEW_CHAT)) || (intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES))){
+                else if((intent.getAction().equals(Constants.ACTION_CHAT_SHOW_MESSAGES))){
                     log("Intent to open new chat: "+intent.getAction());
                     finish();
                     long chatIdIntent = intent.getLongExtra("CHAT_ID", -1);

@@ -43,7 +43,7 @@ public class CreateGroupChatWithTitle implements MegaChatRequestListenerInterfac
             }
             else{
                 if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
+                    ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
                 }
                 else if(context instanceof FileExplorerActivityLollipop){
                     ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
@@ -56,7 +56,7 @@ public class CreateGroupChatWithTitle implements MegaChatRequestListenerInterfac
         else if(request.getType() == MegaChatRequest.TYPE_EDIT_CHATROOM_NAME) {
             log("Change title");
             if(context instanceof ManagerActivityLollipop){
-                ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), true);
+                ((ManagerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
             }
             else if(context instanceof FileExplorerActivityLollipop){
                 ((FileExplorerActivityLollipop) context).onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
