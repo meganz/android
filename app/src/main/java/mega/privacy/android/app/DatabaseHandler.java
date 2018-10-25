@@ -29,7 +29,7 @@ import nz.mega.sdk.MegaChatApi;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 42;
+	private static final int DATABASE_VERSION = 43;
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -66,7 +66,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp";
     private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
     private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
-    private static final String KEY_CONVERSION_CHARGING = "conversionCharging";
+    private static final String KEY_CONVERSION_ON_CHARGING = "conversionOnCharging";
     private static final String KEY_CHARGING_ON_SIZE = "chargingOnSize";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
@@ -217,7 +217,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN, " +
         		KEY_URI_EXTERNAL_SD_CARD + " TEXT, " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN, " + KEY_PIN_LOCK_TYPE + " TEXT, " +
 				KEY_PREFERRED_SORT_CLOUD + " TEXT, " + KEY_PREFERRED_SORT_CONTACTS + " TEXT, " +KEY_PREFERRED_SORT_OTHERS + " TEXT," +
-				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN" + ")";
+				KEY_FIRST_LOGIN_CHAT + " BOOLEAN, " + KEY_SMALL_GRID_CAMERA + " BOOLEAN," + KEY_UPLOAD_VIDEO_QUALITY + " TEXT," +
+                KEY_CONVERSION_ON_CHARGING + " BOOLEAN," + KEY_CHARGING_ON_SIZE + " TEXT" +")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -599,14 +600,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if(oldVersion <= 42) {
 		    db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
 
-            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_UPLOAD_VIDEO_QUALITY + " INTEGER;");
-            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + " = " + MegaPreferences.MEDIUM + ";");
-
-            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CONVERSION_CHARGING + " BOOLEAN;");
-            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_CHARGING + " = '" + encrypt("true") + "';");
-
-            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CHARGING_ON_SIZE + " INTEGER;");
-            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + " = " + MegaPreferences.CONVERSION_ON_CHARGING_WHEN_SIZE + ";");
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_UPLOAD_VIDEO_QUALITY + " TEXT;");
+//            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + " = " + MegaPreferences.MEDIUM + ";");
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CONVERSION_ON_CHARGING + " BOOLEAN;");
+//            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_ON_CHARGING + " = '" + encrypt("true") + "';");
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CHARGING_ON_SIZE + " TEXT;");
+//            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + " = " + MegaPreferences.CONVERSION_ON_CHARGING_WHEN_SIZE + ";");
 		}
 	}
 	
@@ -808,12 +807,49 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
     
-    public void setCameraUploadVideoQuality(boolean isOriginal){
-    
+    public void setCameraUploadVideoQuality(int quality){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + "= '" + encrypt(String.valueOf(quality)) + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(String.valueOf(quality)));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
     }
-    
-    public boolean getCameraUploadVideoQuality(){
-        return true;
+
+    public void setConversionOnCharging (boolean onCharging){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_ON_CHARGING + "= '" + encrypt(String.valueOf(onCharging)) + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_CONVERSION_ON_CHARGING, encrypt(String.valueOf(onCharging)));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
+    }
+
+    public void setChargingOnSize (int size){
+        String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()){
+            String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + "= '" + encrypt(String.valueOf(size)) + "' WHERE " + KEY_ID + " = '1'";
+            db.execSQL(UPDATE_PREFERENCES_TABLE);
+        }
+        else{
+            values.put(KEY_CHARGING_ON_SIZE, encrypt(String.valueOf(size)));
+            db.insert(TABLE_PREFERENCES, null, values);
+        }
+        cursor.close();
     }
     
 	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
@@ -1397,11 +1433,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String preferredSortOthers = decrypt(cursor.getString(28));
 			String firstTimeChat = decrypt(cursor.getString(29));
 			String smallGridCamera = decrypt(cursor.getString(30));
-			
-			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
-					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
+			String uploadVideoQuality = decrypt(cursor.getString(31));
+			String conversionOnCharging = decrypt(cursor.getString(32));
+			String chargingOnSize = decrypt(cursor.getString(33));
+
+			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
+					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera);
+					pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize);
 		}
 		cursor.close();
 		
