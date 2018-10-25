@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import java.util.regex.Pattern;
+
 public class Constants {
 
 	public static String PIN_4 = "4";
@@ -296,4 +298,15 @@ public class Constants {
 	public static String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
 	public static String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+
+	public static final Pattern EMAIL_ADDRESS
+			= Pattern.compile(
+			"[a-zA-Z0-9\\+\\.\\_\\%\\-\\&\\+]{1,256}" +
+					"\\@" +
+					"[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+					"(" +
+					"\\." +
+					"[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+					")+"
+	);
 }
