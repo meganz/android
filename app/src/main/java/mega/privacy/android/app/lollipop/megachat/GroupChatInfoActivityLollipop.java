@@ -528,9 +528,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             log("FullName of the peer: "+fullName + " privilege: "+peerPrivilege);
 
-            int status = megaChatApi.getUserOnlineStatus(peerHandle);
-
-            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege, status);
+            MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
 
             participants.add(participant);
         }
@@ -545,7 +543,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             myFullName =  megaChatApi.getMyEmail();
         }
 
-        MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege(), megaChatApi.getOnlineStatus());
+        MegaChatParticipant me = new MegaChatParticipant(megaChatApi.getMyUserHandle(), null, null, getString(R.string.chat_me_text_bracket, myFullName), megaChatApi.getMyEmail(), chat.getOwnPrivilege());
 
         participants.add(me);
 
@@ -1723,7 +1721,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if(userHandle == megaChatApi.getMyUserHandle()){
             log("My own status update");
             int position = participants.size()-1;
-            adapter.updateContactStatus(position, userHandle, status);
+            if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                adapter.updateContactStatus(position+1);
+            }
+            else{
+                adapter.updateContactStatus(position);
+            }
         }
         else{
             log("Status update for the user: "+userHandle);
@@ -1733,7 +1736,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 MegaChatParticipant participant = itrReplace.next();
                 if (participant != null) {
                     if (participant.getHandle() == userHandle) {
-                        participant.setStatus(status);
                         indexToReplace = itrReplace.nextIndex() - 1;
                         break;
                     }
@@ -1743,7 +1745,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             if (indexToReplace != -1) {
                 log("Index to replace: " + indexToReplace);
-                adapter.updateContactStatus(indexToReplace, userHandle, status);
+                if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                    adapter.updateContactStatus(indexToReplace+1);
+                }
+                else{
+                    adapter.updateContactStatus(indexToReplace);
+                }
             }
         }
     }

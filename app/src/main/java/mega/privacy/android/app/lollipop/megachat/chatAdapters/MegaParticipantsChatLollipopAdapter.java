@@ -192,7 +192,15 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 			log("participant: " + participant.getEmail() + " handle: " + participant.getHandle());
 			((ViewHolderParticipantsList)holder).fullName = participant.getFullName();
 
-			int userStatus = participant.getStatus();
+			int userStatus;
+
+			if(megaChatApi.getMyUserHandle() == participant.getHandle()){
+				userStatus = megaChatApi.getOnlineStatus();
+			}
+			else{
+				userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
+			}
+
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				log("This user is connected");
 				((ViewHolderParticipantsList) holder).statusImage.setVisibility(View.VISIBLE);
@@ -678,7 +686,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 		return info;
 	}
 
-	public void updateContactStatus(int position, long userHandle, int state){
+	public void updateContactStatus(int position){
 		log("updateContactStatus: "+position);
 
 		if(listFragment.findViewHolderForAdapterPosition(position) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList){

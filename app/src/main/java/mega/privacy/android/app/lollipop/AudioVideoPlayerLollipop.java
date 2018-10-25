@@ -1089,7 +1089,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         }
                     }
                     else if (playbackState == Player.STATE_ENDED) {
-                        if (creatingPlaylist){
+                        if (creatingPlaylist && playListCreated){
                            setPlaylist(currentWindowIndex + 1, 0);
                         }
                         else if (!loop && !onPlaylist && !creatingPlaylist) {

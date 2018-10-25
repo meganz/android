@@ -1878,12 +1878,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
 		usedSpaceLayout = (RelativeLayout) findViewById(R.id.nv_used_space_layout);
-		if (!Util.isOnline(this)){
-			usedSpaceLayout.setVisibility(View.GONE);
-		}
-		else{
-			usedSpaceLayout.setVisibility(View.VISIBLE);
-		}
 
 		View nVHeader = LayoutInflater.from(this).inflate(R.layout.nav_header, null);
 		nV.addHeaderView(nVHeader);
