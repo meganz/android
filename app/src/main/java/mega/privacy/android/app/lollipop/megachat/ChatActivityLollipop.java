@@ -1117,14 +1117,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 log("Result of open chat: " + result);
 
-                if(chatRoom.isPreview()){
-                    if(chatRoom.getNumPreviewers()>0){
-                        observersNumberText.setText(chatRoom.getNumPreviewers()+"");
-                        observersLayout.setVisibility(View.VISIBLE);
-                    }
-                    else{
-                        observersLayout.setVisibility(View.GONE);
-                    }
+                if(chatRoom.getNumPreviewers()>0){
+                    observersNumberText.setText(chatRoom.getNumPreviewers()+"");
+                    observersLayout.setVisibility(View.VISIBLE);
                 }
                 else{
                     observersLayout.setVisibility(View.GONE);
@@ -1132,7 +1127,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 aB.setTitle(chatRoom.getTitle());
                 setChatSubtitle();
-
 
                 isOpeningChat = true;
 
@@ -6244,7 +6238,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showChat();
             }
             else {
-                log("EEEERRRRROR WHEN CREATING CHAT " + e.getErrorString());
+                log("EEEERRRRROR WHEN LOADING CHAT LINK" + e.getErrorString());
                 if(e.getErrorCode()==MegaChatError.ERROR_EXIST) {
                     //ERROR_EXIST - If the user already participates in the chat.
                     idChat = request.getChatHandle();
