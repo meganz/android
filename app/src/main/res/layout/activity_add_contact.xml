@@ -58,7 +58,8 @@
 				android:layout_centerVertical="true"
 				android:inputType="textEmailAddress"
 				android:textCursorDrawable="@drawable/cursor_color"
-				android:backgroundTint="@color/white"/>
+				android:backgroundTint="@color/white"
+				android:singleLine="true"/>
 
 			<RelativeLayout
 				android:layout_width="match_parent"
