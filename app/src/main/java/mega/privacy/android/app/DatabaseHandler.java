@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
-import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,6 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessage;
 import mega.privacy.android.app.lollipop.megachat.PendingNodeAttachment;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -67,6 +65,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload";
     private static final String KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp";
     private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
+    private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
+    private static final String KEY_CONVERSION_CHARGING = "conversionCharging";
+    private static final String KEY_CHARGING_ON_SIZE = "chargingOnSize";
     private static final String KEY_KEEP_FILE_NAMES = "keepFileNames";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_TYPE = "pinlocktype";
@@ -597,7 +598,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		if(oldVersion <= 42) {
 		    db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
-        }
+
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_UPLOAD_VIDEO_QUALITY + " INTEGER;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + " = " + MegaPreferences.MEDIUM + ";");
+
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CONVERSION_CHARGING + " BOOLEAN;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_CHARGING + " = '" + encrypt("true") + "';");
+
+            db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CHARGING_ON_SIZE + " INTEGER;");
+            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + " = " + MegaPreferences.CONVERSION_ON_CHARGING_WHEN_SIZE + ";");
+		}
 	}
 	
 //	public MegaOffline encrypt(MegaOffline off){
