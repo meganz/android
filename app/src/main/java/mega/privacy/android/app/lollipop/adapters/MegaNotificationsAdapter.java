@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -138,6 +140,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		switch (alertType){
 
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:{
+				//New contact request
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
@@ -146,15 +149,109 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
 				String email = alert.getEmail();
-				description = context.getString(R.string.notification_new_contact_request, email);
+
+				String textToShow = String.format(context.getString(R.string.notification_new_contact_request), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:{
+				//Contact request cancelled
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setText(context.getString(R.string.title_contact_request_notification_cancelled));
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.subtitle_contact_request_notification_cancelled), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
+
+				break;
+			}
+			case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:{
+				//New contact
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+				holder.titleText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.notification_new_contact), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
+
+				break;
+			}
+			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:{
+				//Account deleted android100@yopmail.com
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setText(context.getString(R.string.title_account_notification_deleted));
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.subtitle_account_notification_deleted), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:{
@@ -165,35 +262,36 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:{
+				//Contact deleted you
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				break;
-			}
-			case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:{
-				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
-				holder.sectionIcon.setVisibility(View.GONE);
-				holder.titleIcon.setVisibility(View.GONE);
-				holder.titleText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
+
+				holder.titleText.setText(context.getString(R.string.title_contact_notification_deleted));
 
 				String email = alert.getEmail();
-				description = context.getString(R.string.notification_new_contact, email);
-				break;
-			}
-			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:{
-				//android100@yopmail.com
-				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
-				holder.sectionIcon.setVisibility(View.GONE);
-				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.titleText.setText(alert.getEmail());
+				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_deleted), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
+
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:{
@@ -280,6 +378,35 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				break;
 			}
 			case MegaUserAlert.TYPE_TAKEDOWN:{
+				//Link takedown android100
+
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+
+				holder.titleText.setText(context.getString(R.string.title_take_down_notification));
+
+				String name = alert.getName();
+
+				String textToShow = String.format(context.getString(R.string.subtitle_take_down_notification), name);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace("[C]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/C]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_TAKEDOWN_REINSTATED:{
@@ -294,7 +421,6 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		}
 
 		holder.sectionText.setText(section);
-		holder.descriptionText.setText(description);
 
 		String date = TimeChatUtils.formatDateAndTime(alert.getTimestamp(0), TimeChatUtils.DATE_LONG_FORMAT);
 		holder.dateText.setText(date);
