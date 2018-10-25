@@ -95,7 +95,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     AlertDialog permissionsDialog;
     AlertDialog changeTitleDialog;
-    AlertDialog makePrivateDialog;
+    AlertDialog chatLinkDialog;
 
     MenuItem addParticipantItem;
     MenuItem changeTitleItem;
@@ -632,7 +632,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 break;
             }
             case R.id.action_rename:{
-                showRenameGroupDialog();
+                showRenameGroupDialog(false);
                 break;
             }
         }
@@ -961,7 +961,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         switch (view.getId()) {
 
             case R.id.chat_group_contact_properties_edit_icon: {
-                showRenameGroupDialog();
+                showRenameGroupDialog(false);
                 break;
             }
             case R.id.chat_group_contact_properties_leave_layout: {
@@ -1001,7 +1001,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
             case R.id.chat_group_contact_properties_chat_link_layout:{
                 if(chatLink==null){
-                    megaChatApi.exportChatLink(chatHandle, this);
+                    if(chat.hasCustomTitle()){
+                        showConfirmationCreateChatLinkDialog();
+                    }
+                    else{
+                        showRenameGroupDialog(true);
+                    }
                 }
                 else{
                     //Show options
@@ -1110,13 +1115,28 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
-    public void showRenameGroupDialog(){
+    public void showRenameGroupDialog(boolean fromGetLink){
         log("showRenameGroupDialog");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        if(fromGetLink){
+            final TextView alertRename = new TextView(this);
+            alertRename.setText("Set a title to the chat before getting the chat link");
+
+            LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            paramsText.setMargins(Util.scaleWidthPx(24, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(12, outMetrics), 0);
+            alertRename.setLayoutParams(paramsText);
+            layout.addView(alertRename);
+
+            params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(8, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+        }
+        else{
+            params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(16, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        }
 
         final EditText input = new EditText(this);
         int maxLength = 30;
@@ -1132,7 +1152,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -1771,22 +1791,84 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_make_chat_private, null);
+        View dialogView = inflater.inflate(R.layout.dialog_chat_link_options, null);
         dialogBuilder.setView(dialogView);
 
-        Button enableButton = (Button) dialogView.findViewById(R.id.make_private_button_enable);
+        Button actionButton = (Button) dialogView.findViewById(R.id.chat_link_button_action);
+        actionButton.setText(getString(R.string.general_enable));
 
-        makePrivateDialog = dialogBuilder.create();
+        TextView title = (TextView) dialogView.findViewById(R.id.chat_link_title);
+        title.setText(getString(R.string.make_chat_private_option));
 
-        enableButton.setOnClickListener(new View.OnClickListener(){
+        TextView text = (TextView) dialogView.findViewById(R.id.text_chat_link);
+
+        chatLinkDialog = dialogBuilder.create();
+
+        actionButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                makePrivateDialog.dismiss();
+                chatLinkDialog.dismiss();
                 megaChatApi.closeChatLink(chatHandle, groupChatInfoActivity);
             }
 
         });
 
-        makePrivateDialog.show();
+        chatLinkDialog.show();
+    }
+
+    public void showConfirmationCreateChatLinkDialog(){
+        log("showConfirmationCreateChatLinkDialog");
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_chat_link_options, null);
+        dialogBuilder.setView(dialogView);
+
+        Button actionButton = (Button) dialogView.findViewById(R.id.chat_link_button_action);
+        actionButton.setText(getString(R.string.general_create));
+
+        TextView title = (TextView) dialogView.findViewById(R.id.chat_link_title);
+        title.setText(getString(R.string.get_chat_link_option));
+
+        TextView text = (TextView) dialogView.findViewById(R.id.text_chat_link);
+
+        chatLinkDialog = dialogBuilder.create();
+
+        actionButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                chatLinkDialog.dismiss();
+                megaChatApi.exportChatLink(chatHandle, groupChatInfoActivity);
+            }
+
+        });
+
+        chatLinkDialog.show();
+    }
+
+    public void showConfirmationDeleteLink (final MegaChatRoom c){
+        log("showConfirmationDeleteLink");
+
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE: {
+                        ChatController chatC = new ChatController(groupChatInfoActivity);
+                        chatC.leaveChat(c);
+                        break;
+                    }
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
+        String message= getResources().getString(R.string.confirmation_leave_group_chat);
+        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
 }

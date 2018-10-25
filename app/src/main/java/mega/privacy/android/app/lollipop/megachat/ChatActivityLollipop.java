@@ -1133,47 +1133,45 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 aB.setTitle(chatRoom.getTitle());
                 setChatSubtitle();
 
-                if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
-                    log("ACTION_CHAT_SHOW_MESSAGES or rotating a new chat");
-                    isOpeningChat = true;
 
-                    LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyImageView.getLayoutParams();
+                isOpeningChat = true;
 
-                    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                        emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
-                        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
-                    }else{
-                        emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
-                        emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(100, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
-                    }
+                LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyImageView.getLayoutParams();
 
-                    emptyImageView.setLayoutParams(emptyTextViewParams1);
-
-                    String textToShowB = String.format(getString(R.string.chat_loading_messages));
-
-                    try{
-                        textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
-                        textToShowB = textToShowB.replace("[/A]", "</font>");
-                        textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
-                        textToShowB = textToShowB.replace("[/B]", "</font>");
-                    }
-                    catch (Exception e){}
-                    Spanned resultB = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                        resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
-                    } else {
-                        resultB = Html.fromHtml(textToShowB);
-                    }
-
-                    emptyTextView.setText(resultB);
-                    emptyTextView.setVisibility(View.VISIBLE);
-                    emptyLayout.setVisibility(View.VISIBLE);
-
-                    chatRelativeLayout.setVisibility(View.GONE);
-
-                    loadHistory();
-                    log("On create: stateHistory: "+stateHistory);
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+                    emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
+                }else{
+                    emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+                    emptyTextViewParams1.setMargins(0, Util.scaleHeightPx(100, outMetrics), 0, Util.scaleHeightPx(24, outMetrics));
                 }
+
+                emptyImageView.setLayoutParams(emptyTextViewParams1);
+
+                String textToShowB = String.format(getString(R.string.chat_loading_messages));
+
+                try{
+                    textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    textToShowB = textToShowB.replace("[/A]", "</font>");
+                    textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+                    textToShowB = textToShowB.replace("[/B]", "</font>");
+                }
+                catch (Exception e){}
+                Spanned resultB = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    resultB = Html.fromHtml(textToShowB,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    resultB = Html.fromHtml(textToShowB);
+                }
+
+                emptyTextView.setText(resultB);
+                emptyTextView.setVisibility(View.VISIBLE);
+                emptyLayout.setVisibility(View.VISIBLE);
+
+                chatRelativeLayout.setVisibility(View.GONE);
+
+                loadHistory();
+                log("On create: stateHistory: "+stateHistory);
             }
         }
         else{
