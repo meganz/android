@@ -6044,6 +6044,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rubbishBinMenuItem.setVisible(true);
 					upgradeAccountMenuItem.setVisible(true);
 					importLinkMenuItem.setVisible(true);
+					importLinkMenuItem.setTitle(getString(R.string.action_open_link));
 					if(!firstTimeCam){
 						takePicture.setVisible(true);
 					}else{
@@ -6995,6 +6996,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 
+					importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
+					importLinkMenuItem.setVisible(true);
+
 					//Hide
 					searchByDate.setVisible(false);
 					searchMenuItem.setVisible(false);
@@ -7006,7 +7010,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					addMenuItem.setEnabled(false);
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
-					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);
 					refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
@@ -10981,7 +10984,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		input.getBackground().mutate().clearColorFilter();
 		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(input, params);
-		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+		if(drawerItem == DrawerItem.CLOUD_DRIVE){
+			input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
+		}
+		else if(drawerItem == DrawerItem.CHAT){
+			input.setImeActionLabel(getString(R.string.action_open_chat_link),EditorInfo.IME_ACTION_DONE);
+		}
 
 		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params1.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(17, outMetrics), 0);
@@ -11039,7 +11047,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.context_open_link_title));
+		if(drawerItem == DrawerItem.CLOUD_DRIVE){
+			builder.setTitle(getString(R.string.context_open_link_title));
+		}
+		else if(drawerItem == DrawerItem.CHAT){
+			builder.setTitle(getString(R.string.action_open_chat_link));
+		}
+
 		builder.setPositiveButton(getString(R.string.context_open_link),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -11052,7 +11066,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							openLinkDialog.dismiss();
 						}
 						catch(Exception e){}
-						nC.importLink(value);
+						if(drawerItem == DrawerItem.CLOUD_DRIVE){
+							nC.importLink(value);
+						}
+						else if(drawerItem == DrawerItem.CHAT){
+							showChatLink(value);
+						}
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -11074,7 +11093,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						input.requestFocus();
 						return true;
 					}
-					nC.importLink(value);
+					if(drawerItem == DrawerItem.CLOUD_DRIVE){
+						nC.importLink(value);
+					}
+					else if(drawerItem == DrawerItem.CHAT){
+						showChatLink(value);
+					}
 					try{
 						openLinkDialog.dismiss();
 					}
@@ -11107,9 +11131,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					openLinkDialog.dismiss();
 				}
 				catch(Exception e){}
-				nC.importLink(value);
+
+				if(drawerItem == DrawerItem.CLOUD_DRIVE){
+					nC.importLink(value);
+				}
+				else if(drawerItem == DrawerItem.CHAT){
+					showChatLink(value);
+				}
 			}
 		});
+	}
+
+	public void showChatLink(String link){
+		log("showChatLink: "+link);
+		Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
+		openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
+		openChatLinkIntent.setData(Uri.parse(link));
+		startActivity(openChatLinkIntent);
 	}
 
 	public void takePicture(){
