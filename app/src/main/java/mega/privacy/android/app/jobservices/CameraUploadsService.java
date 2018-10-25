@@ -198,6 +198,45 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             e.printStackTrace();
         }
     }
+    
+    private void extractMedia(Cursor cursorCamera, boolean isSecondary, boolean isVideo){
+        try{
+            log("if (cursorCamera != null)");
+            String path = isSecondary ? localPathSecondary : localPath;
+    
+            int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            int timestampColumn = 0;
+            if (cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED) == 0) {
+                log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) == 0)");
+                timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED);
+            } else {
+                log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) != 0)");
+                timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
+            }
+    
+            while (cursorCamera.moveToNext()) {
+        
+                Media media = new Media();
+                media.filePath = cursorCamera.getString(dataColumn);
+                media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
+        
+                log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + path);
+        
+                //Check files of the Camera Uploads
+                if (checkFile(media,path)) {
+                    log("if (checkFile(media," + path + "))");
+                    if(isSecondary){
+                        mediaFilesSecondary.add(media);
+                    }else{
+                        cameraFiles.add(media);
+                    }
+                    log("Camera Files added: " + media.filePath);
+                }
+            }
+        }catch (Exception  e){
+            log("Exception cursorSecondary:" + e.getMessage() + "____" + e.getStackTrace());
+        }
+    }
 
     private void getFilesFromMediaStore() {
         log("getFilesFromMediaStore()");
@@ -217,7 +256,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         String selectionCamera = null;
         String selectionSecondary = null;
         String[] selectionArgs = null;
-
         prefs = dbH.getPreferences();
 
         if (prefs != null) {
@@ -240,7 +278,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
 
         String order = MediaStore.MediaColumns.DATE_MODIFIED + " ASC";
-
         ArrayList<Uri> uris = new ArrayList<>();
         if (prefs.getCamSyncFileUpload() == null) {
             log("if (prefs.getCamSyncFileUpload() == null)");
@@ -274,66 +311,21 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
 
         for (int i = 0;i < uris.size();i++) {
-            log("for(int i=0; i<uris.size(); i++)");
-            Cursor cursorCamera = app.getContentResolver().query(uris.get(i),projection,selectionCamera,selectionArgs,order);
+            Uri uri = uris.get(i);
+            boolean isVideo = uri.equals(MediaStore.Video.Media.EXTERNAL_CONTENT_URI) || uri.equals(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            
+            //Primary Media Folder
+            Cursor cursorCamera = app.getContentResolver().query(uri,projection,selectionCamera,selectionArgs,order);
             if (cursorCamera != null) {
-                log("if (cursorCamera != null)");
-                int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                int timestampColumn = 0;
-                if (cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED) == 0) {
-                    log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) == 0)");
-                    timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED);
-                } else {
-                    log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) != 0)");
-                    timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
-                }
-
-                while (cursorCamera.moveToNext()) {
-
-                    Media media = new Media();
-                    media.filePath = cursorCamera.getString(dataColumn);
-                    media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
-
-                    log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + localPath);
-
-                    //Check files of the Camera Uploads
-                    if (checkFile(media,localPath)) {
-                        log("if (checkFile(media," + localPath + "))");
-                        cameraFiles.add(media);
-                        log("Camera Files added: " + media.filePath);
-                    }
-                }
+                extractMedia(cursorCamera, false, isVideo);
             }
 
             //Secondary Media Folder
             if (secondaryEnabled) {
                 log("if(secondaryEnabled)");
-                Cursor cursorSecondary = app.getContentResolver().query(uris.get(i),projection,selectionSecondary,selectionArgs,order);
+                Cursor cursorSecondary = app.getContentResolver().query(uri,projection,selectionSecondary,selectionArgs,order);
                 if (cursorSecondary != null) {
-                    try {
-                        log("SecondaryEnabled en initsync COUNT: " + cursorSecondary.getCount());
-                        int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                        int timestampColumn = 0;
-                        if (cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED) == 0) {
-                            timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED);
-                        } else {
-                            timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
-                        }
-                        while (cursorSecondary.moveToNext()) {
-
-                            Media media = new Media();
-                            media.filePath = cursorSecondary.getString(dataColumn);
-                            media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;
-                            log("Check: " + media.filePath + " in localPath: " + localPathSecondary);
-                            //Check files of Secondary Media Folder
-                            if (checkFile(media,localPathSecondary)) {
-                                mediaFilesSecondary.add(media);
-                                log("-----SECONDARY MEDIA Files added: " + media.filePath + " in localPath: " + localPathSecondary);
-                            }
-                        }
-                    } catch (Exception e) {
-                        log("Exception cursorSecondary:" + e.getMessage() + "____" + e.getStackTrace());
-                    }
+                    extractMedia(cursorSecondary, true, isVideo);
                 }
             }
         }
