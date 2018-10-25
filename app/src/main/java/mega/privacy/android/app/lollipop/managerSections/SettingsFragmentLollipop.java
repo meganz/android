@@ -1285,6 +1285,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			setOnlineOptions(false);
 		}
 
+		refreshAccountInfo();
+
 		return v;
 	}
 
@@ -2620,6 +2622,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.setEnabled(false);
 		}
 		super.onResume();
+	}
+
+	private void refreshAccountInfo(){
+		log("refreshAccountInfo");
+
+		//Check if the call is recently
+		log("Check the last call to getAccountDetails");
+		if(DBUtil.callToAccountDetails(context)){
+			log("megaApi.getAccountDetails SEND");
+			((MegaApplication) ((Activity)context).getApplication()).askForAccountDetails();
+		}
 	}
 
 	public void update2FAPreference(boolean enabled) {

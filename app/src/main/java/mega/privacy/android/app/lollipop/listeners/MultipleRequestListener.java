@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -87,10 +88,14 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_moved_to_rubbish, max_items);
                         }
-                        if(context instanceof ManagerActivityLollipop)
-                            ((ManagerActivityLollipop) context).refreshAfterMovingToRubbish();
-                        else
+                        if(context instanceof ManagerActivityLollipop) {
+                            ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                            managerActivity.refreshAfterMovingToRubbish();
+                            ((MegaApplication) managerActivity.getApplication()).askForAccountDetails();
+                        }
+                        else {
                             ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
+                        }
                     }
                     else if (actionListener== Constants.MULTIPLE_RESTORED_FROM_RUBBISH){
                         log("restore nodes from rubbish request finished");
@@ -100,7 +105,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items);
                         }
-                        ((ManagerActivityLollipop) context).refreshAfterMovingToRubbish();
+
+                        ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                        managerActivity.refreshAfterMovingToRubbish();
+                        ((MegaApplication) managerActivity.getApplication()).askForAccountDetails();
                     }
                     else{
                         log("move nodes request finished");
@@ -133,7 +141,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         else{
                             message = context.getString(R.string.number_correctly_removed, max_items);
                         }
-                        ((ManagerActivityLollipop) context).refreshAfterRemoving();
+
+                        ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                        managerActivity.refreshAfterRemoving();
+                        ((MegaApplication) managerActivity.getApplication()).askForAccountDetails();
                     }
 
                     break;

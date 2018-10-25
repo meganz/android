@@ -16143,12 +16143,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							setInboxNavigationDrawer();
 						}
 						moveToRubbish = false;
+						((MegaApplication) getApplication()).askForAccountDetails();
 					}
 					else if(restoreFromRubbish){
 						log("Not moved to rubbish");
 						MegaNode destination = megaApi.getNodeByHandle(request.getParentHandle());
 						showSnackbar(getString(R.string.context_correctly_node_restored, destination.getName()));
 						restoreFromRubbish = false;
+						((MegaApplication) getApplication()).askForAccountDetails();
 					}
 					else{
 						log("Not moved to rubbish");
@@ -16286,6 +16288,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				refreshAfterRemoving();
 				showSnackbar(getString(R.string.context_correctly_removed));
+				((MegaApplication) getApplication()).askForAccountDetails();
 			}
 			else{
 				showSnackbar(getString(R.string.context_no_removed));
