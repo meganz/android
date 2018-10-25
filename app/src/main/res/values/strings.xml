@@ -2157,10 +2157,22 @@
     <string name="general_show_more" context="Label that indicates show more items">Show more</string>
     <string name="general_show_less" context="Label that indicates show less items">Show less</string>
 
-    <string name="notification_new_contact_request" context="Text of the historic notification for a new contact request">%s send you a contact request.</string>
-    <string name="notification_new_contact" context="Text of the historic notification for a new contact">%s is now a contact.</string>
+    <string name="notification_new_contact_request" context="Text of the historic notification for a new contact request">[A]%s [/A][B]send you a contact request.[/B]</string>
+    <string name="notification_new_contact" context="Text of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
     <string name="notification_new_shared_folder" context="Text of the historic notification for a new shared folder">New shared folder from %s</string>
 
+    <string name="title_contact_request_notification_cancelled" context="title of contact request notification">Contact request cancelled</string>
+    <string name="subtitle_contact_request_notification_cancelled" context="title of contact request notification">[A]%s [/A][B]cancelled the contact request.[/B]</string>
+
+    <string name="title_contact_notification_deleted" context="title of contact request notification">Contact deleted</string>
+    <string name="subtitle_contact_notification_deleted" context="title of contact request notification">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+
+    <string name="title_account_notification_deleted" context="title of contact request notification">Account deleted</string>
+    <string name="subtitle_account_notification_deleted" context="title of contact request notification">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
+
+    <string name="title_take_down_notification" context="title of contact request notification">Takedown</string>
+    <string name="subtitle_take_down_notification" context="title of contact request notification">[A]Your publicly shared [/A][B]%s[/B][C] has been taken down.[/C]</string>
 
 </resources>

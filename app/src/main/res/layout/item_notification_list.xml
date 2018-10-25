@@ -68,8 +68,8 @@
 				android:maxLines="1"
 				android:layout_marginTop="2dp"
 				android:text="BBBBBBBB ouhygloiu igtilygiku iygti8ylky iylfgliogt iylgli Brand design assets laaargeeeeee"
-				android:textStyle="bold"
 				android:singleLine="true"
+				android:fontFamily="sans-serif-medium"
 				android:ellipsize="end"
 				android:textSize="16sp"/>
 		</RelativeLayout>
@@ -109,6 +109,7 @@
 		android:layout_marginLeft="16dp"
 		android:layout_marginRight="16dp"
 		android:textColor="@color/name_my_account"
+		android:fontFamily="sans-serif-medium"
 		android:maxLines="2"
 		android:text="vdjvbkdskivjbhadskvb vadsjklvbnhadñsvl lojvshdvñaoldhsv ovlhsdvads Cycle Rodes added Logo_32x32.pdf"
 		android:ellipsize="end"
