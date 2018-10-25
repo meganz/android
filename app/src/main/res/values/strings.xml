@@ -700,7 +700,7 @@
         <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
 
-    <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
+    <string name="settings_camera_upload_charging" context="Option to choose that the video compression will only be enable when the device is charging">Video compression notification</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
@@ -1776,11 +1776,17 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat media quality</string>
+	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded ">Video Quality</string>
 
     <string-array name="settings_chat_upload_quality_entries" context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat">
         <item context="the options of what to upload.">Original</item>
         <item context="the options of what to upload.">Medium</item>
     </string-array>
+
+	<string-array name="settings_video_upload_quality_entries" context="the options for the option on setting to set up the quality of video files to be uploaded ">
+		<item context="the options of what to upload.">Original</item>
+		<item context="the options of what to upload.">Medium</item>
+	</string-array>
 
     <string name="missed_call_notification_title" context="Title of the notification for a missed call">Missed call</string>
     <string name="file_properties_info_location" cotext="Refers to a location of file">Location</string>
@@ -2133,13 +2139,18 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days and your maximum period is 30 days.</string>
+	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings">The minimum size is 100MB and the maximum size is 1000MB.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remove files older than</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d days</string>
+	<string name="settings_video_compression_queue_size_popup_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Notice me when queue is larger than</string>
 
-    <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable Rubbish bin cleaning scheduler or set a longer retention period you need to subscribe to a PRO plan.</string>
+	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">Notice me when queue is larger than</string>
+
+	<string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable Rubbish bin cleaning scheduler or set a longer retention period you need to subscribe to a PRO plan.</string>
 
     <string name="hint_days" context="Hint of the field to write the days of the rubbish bin scheduler">days</string>
+	<string name="hint_MB" context="Hint of the field to write the size of the compression queue">MB</string>
 
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
