@@ -2105,11 +2105,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CHAT_LINK)){
-						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
-						openChatLinkIntent.setData(Uri.parse(getIntent().getDataString()));
-						startActivity(openChatLinkIntent);
-						finish();
+
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+//						finish();
 						return;
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_CANCEL_CAM_SYNC)){
@@ -2478,10 +2476,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 
-						Intent openChatLinkIntent = new Intent(this, ChatActivityLollipop.class);
-						openChatLinkIntent.setAction(Constants.ACTION_OPEN_CHAT_LINK);
-						openChatLinkIntent.setData(Uri.parse(getIntent().getDataString()));
-						startActivity(openChatLinkIntent);
+						megaChatApi.checkChatLink(getIntent().getDataString(), this);
 
 						getIntent().setAction(null);
 						setIntent(null);
@@ -11070,7 +11065,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							nC.importLink(value);
 						}
 						else if(drawerItem == DrawerItem.CHAT){
-							showChatLink(value);
+							megaChatApi.checkChatLink(value, managerActivity);
 						}
 					}
 				});
@@ -11097,7 +11092,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						nC.importLink(value);
 					}
 					else if(drawerItem == DrawerItem.CHAT){
-						showChatLink(value);
+						megaChatApi.checkChatLink(value, managerActivity);
 					}
 					try{
 						openLinkDialog.dismiss();
@@ -11136,7 +11131,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					nC.importLink(value);
 				}
 				else if(drawerItem == DrawerItem.CHAT){
-					showChatLink(value);
+					megaChatApi.checkChatLink(value, managerActivity);
 				}
 			}
 		});
@@ -15436,6 +15431,31 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					log("EEEERRRRROR WHEN UNARCHIVING CHAT " + e.getErrorString());
 					showSnackbar(getString(R.string.error_unarchive_chat, chatTitle));
+				}
+			}
+		}
+		else if(request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+
+				showChatLink(request.getLink());
+			}
+			else {
+				log("EEEERRRRROR WHEN LOADING CHAT LINK" + e.getErrorString());
+				if(e.getErrorCode()==MegaChatError.ERROR_EXIST) {
+					//ERROR_EXIST - If the user already participates in the chat.
+					showChatLink(request.getLink());
+				}
+				else{
+
+					if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
+						Util.showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
+					}
+					else if(e.getErrorCode()==MegaChatError.ERROR_ARGS){
+						Util.showAlert(this, getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
+					}
+					else{
+						Util.showAlert(this, "Error: "+getString(R.string.invalid_chat_link_args), getString(R.string.title_alert_chat_link_error));
+					}
 				}
 			}
 		}
