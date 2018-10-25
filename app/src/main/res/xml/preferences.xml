@@ -38,6 +38,20 @@
 	        android:title="@string/settings_camera_upload_what_to_upload" 
 	        android:entries="@array/settings_camera_upload_file_upload_entries"
 	        android:entryValues="@array/settings_camera_upload_file_upload_values" />
+
+	    <ListPreference
+		    android:key="settings_video_upload_quality"
+		    android:title="@string/settings_video_upload_quality"
+		    android:entries="@array/settings_video_upload_quality_entries"
+		    android:entryValues="@array/settings_video_upload_quality_values" />
+
+	    <SwitchPreference
+		    android:key="settings_camera_upload_charging"
+		    android:title="@string/settings_camera_upload_charging"/>
+
+	    <Preference
+		    android:key="video_compression_queue_size"
+		    android:title="@string/settings_video_compression_queue_size_title" />
 		
 		<mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_camera_upload_charging"

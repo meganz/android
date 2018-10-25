@@ -798,6 +798,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
     
+    public void setCameraUploadVideoQuality(boolean isOriginal){
+    
+    }
+    
+    public boolean getCameraUploadVideoQuality(){
+        return true;
+    }
+    
 	public void saveEphemeral(EphemeralCredentials ephemeralCredentials) {
 		ContentValues values = new ContentValues();
 		if (ephemeralCredentials.getEmail() != null){

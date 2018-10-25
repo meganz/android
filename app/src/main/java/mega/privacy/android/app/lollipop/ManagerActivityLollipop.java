@@ -1507,6 +1507,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 
                 break;
             }
+    
+            case Constants.REQUEST_CAMERA_ON_OFF:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(cuFL != null && cuFL.isAdded()){
+                        cuFL.cameraOnOff();
+                    }
+                }
+        
+                break;
+            }
+    
+            case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(cuFL != null && cuFL.isAdded()){
+                        cuFL.cameraOnOffFirstTime();
+                    }
+                }
+        
+                break;
+            }
         }
     }
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -86,9 +85,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.Constants.BOOT_JOB_ID;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
-import static mega.privacy.android.app.utils.JobUtil.isJobScheduled;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
 
 
@@ -1373,7 +1370,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
     }
 	
 	@SuppressLint("NewApi")
-	private void cameraOnOffFirstTime(){
+	public void cameraOnOffFirstTime(){
 		((ManagerActivityLollipop) context).setFirstTimeCam(false);
 //		firstTimeCam = false;
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
@@ -1405,7 +1402,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	@SuppressLint("NewApi")
-	private void cameraOnOff(){
+	public void cameraOnOff(){
 		final DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
 		boolean isEnabled = false;
@@ -1488,7 +1485,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					dbH.setCamSyncTimeStamp(0);
 					dbH.setCamSyncEnabled(true);
                     dbH.deleteAllSyncRecords();
-					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
 					File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 					String localPath = localFile.getAbsolutePath();
 					dbH.setCamSyncLocalPath(localPath);
@@ -1540,14 +1537,19 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
     public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
         super.onRequestPermissionsResult(requestCode,permissions,grantResults);
         switch (requestCode) {
-            case Constants.REQUEST_WRITE_STORAGE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (((ManagerActivityLollipop)context).getFirstTimeCam()) {
-                        this.cameraOnOffFirstTime();
-                    } else {
-                        this.cameraOnOff();
-                    }
+            case Constants.REQUEST_CAMERA_ON_OFF:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    cameraOnOff();
                 }
+        
+                break;
+            }
+    
+            case Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    cameraOnOffFirstTime();
+                }
+        
                 break;
             }
         }
@@ -1555,68 +1557,56 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	@SuppressLint("NewApi")
 	@Override
-	public void onClick(View v) {
-		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
-
-		switch(v.getId()){
-			case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
-			case R.id.relative_layout_file_list_browser_camera_upload_on_off:{
-				if(type==TYPE_CAMERA){
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-						if (!hasStoragePermission) {
-							ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-									Constants.REQUEST_WRITE_STORAGE);
-						}
-
-						boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-						if (!hasCameraPermission){
-							ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-									new String[]{Manifest.permission.CAMERA},
-									Constants.REQUEST_CAMERA);
-						}
-
-						if (hasStoragePermission){
-							cameraOnOff();
-						}
-					}
-					else{
-						cameraOnOff();
-					}
-				}
-				else{
-					((ManagerActivityLollipop)context).moveToSettingsSection();
-				}
-				break;
-			}
-
-			case R.id.cam_sync_button_ok:{
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								Constants.REQUEST_WRITE_STORAGE);
-					}
-
-					if (hasStoragePermission){
-						cameraOnOffFirstTime();
-					}
-				}
-				else{
-					cameraOnOffFirstTime();					
-				}
-				break;
-			}
-			case R.id.cam_sync_button_skip:{
-				((ManagerActivityLollipop) context).setFirstTimeCam(false);
-				dbH.setCamSyncEnabled(false);
-				((ManagerActivityLollipop)context).setInitialCloudDrive();
-				break;
-			}
-		}
-	}
+    public void onClick(View v) {
+        ((MegaApplication)((Activity)context).getApplication()).sendSignalPresenceActivity();
+        String[] permissions = {android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        
+        switch (v.getId()) {
+            case R.id.relative_layout_file_grid_browser_camera_upload_on_off:
+            case R.id.relative_layout_file_list_browser_camera_upload_on_off: {
+                if (type == TYPE_CAMERA) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        
+                        if (Util.hasPermissions(context,permissions)) {
+                            cameraOnOff();
+                        } else {
+                            requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF);
+                        }
+                    } else {
+                        cameraOnOff();
+                    }
+                } else {
+                    ((ManagerActivityLollipop)context).moveToSettingsSection();
+                }
+                break;
+            }
+            case R.id.cam_sync_button_ok: {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    
+                    if (Util.hasPermissions(context,permissions)) {
+                        cameraOnOffFirstTime();
+                    }else{
+                        requestCameraUploadPermission(permissions, Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME);
+                    }
+                } else {
+                    cameraOnOffFirstTime();
+                }
+                break;
+            }
+            case R.id.cam_sync_button_skip: {
+                ((ManagerActivityLollipop)context).setFirstTimeCam(false);
+                dbH.setCamSyncEnabled(false);
+                ((ManagerActivityLollipop)context).setInitialCloudDrive();
+                break;
+            }
+        }
+    }
+    
+    private void requestCameraUploadPermission(String[] permissions, int requestCode){
+        ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+                permissions,
+                requestCode);
+    }
 	
 	public void itemClick(int position, ImageView imageView, int[] screenPosition) {
 
