@@ -13354,6 +13354,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         if(outSFLol != null && outSFLol.isAdded()){
                             outSFLol.refresh();
                         }
+
+                        if (sttFLol != null && sttFLol.isAdded()) {
+                        	sttFLol.taskGetSizeOffline();
+                        }
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13391,6 +13395,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							nC.deleteOffline(documents.get(i), pathNavigation);
 						}
 						updateOfflineView(documents.get(0));
+						if (sttFLol != null && sttFLol.isAdded()) {
+							sttFLol.taskGetSizeOffline();
+						}
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {

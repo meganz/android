@@ -44,6 +44,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
+import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
@@ -1563,6 +1564,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						}
 
 						refreshOfflineFragment();
+						refreshSettingsFragment();
 					}
 				}
 				else
@@ -2368,6 +2370,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private void refreshOfflineFragment(){
 		Intent intent = new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+	}
+
+	private void refreshSettingsFragment() {
+		Intent intent = new Intent(SettingsFragmentLollipop.REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }

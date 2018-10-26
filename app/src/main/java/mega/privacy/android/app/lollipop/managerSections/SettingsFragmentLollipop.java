@@ -4,10 +4,12 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -25,6 +27,7 @@ import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -70,6 +73,8 @@ import nz.mega.sdk.MegaNode;
 
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
+
+	public static final String REFRESH_CLEAR_OFFLINE_SETTING = "refresh_clear_offline_setting";
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -2581,10 +2586,21 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			
 		}
 	}
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			taskGetSizeOffline();
+		}
+	};
 	
 	@Override
 	public void onResume() {
 	    log("onResume");
+
+		IntentFilter filter = new IntentFilter(REFRESH_CLEAR_OFFLINE_SETTING);
+		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+
 	    prefs=dbH.getPreferences();
 	    
 	    if (prefs.getPinLockEnabled() == null){
@@ -2622,6 +2638,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadCategory.setEnabled(false);
 		}
 		super.onResume();
+	}
+
+	@Override
+	public void onPause(){
+		super.onPause();
+		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
 	}
 
 	private void refreshAccountInfo(){
