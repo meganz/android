@@ -92,7 +92,6 @@ import javax.crypto.spec.SecretKeySpec;
 import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
-import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -1806,6 +1805,25 @@ public class Util {
 			return pInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
+		}
+	}
+
+	public static boolean isFile (String path){
+		if (path == null) {
+			path = "";
+		}
+		String fixedName = path.trim().toLowerCase();
+		String extension = null;
+		int index = fixedName.lastIndexOf(".");
+		if((index != -1) && ((index+1)<fixedName.length())) {
+			extension = fixedName.substring(index + 1);
+		}
+
+		if(extension!=null){
+			return true;
+		}
+		else{
+			return false;
 		}
 	}
 

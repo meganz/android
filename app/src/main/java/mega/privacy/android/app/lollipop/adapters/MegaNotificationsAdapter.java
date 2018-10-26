@@ -135,17 +135,22 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		log("****" + alert.getHeading()+ " " +alert.getTypeString() + " " + alert.getTitle() + " "+alert.getString(0));
 		log("****"+ alert.getTypeString() + ": " + alert.getNodeHandle() + " " + alert.getPath());
 
-		String description = alert.getTitle();
+		final LinearLayout.LayoutParams params;
 
 		switch (alertType){
 
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:{
 				//New contact request
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
+				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
 				String email = alert.getEmail();
@@ -170,11 +175,16 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:{
 				//Contact request cancelled
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
+				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification_cancelled));
 
 				String email = alert.getEmail();
@@ -199,10 +209,16 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:{
 				//New contact
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
 
 				String email = alert.getEmail();
@@ -227,11 +243,16 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:{
 				//Account deleted android100@yopmail.com
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
+				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setText(context.getString(R.string.title_account_notification_deleted));
 
 				String email = alert.getEmail();
@@ -255,19 +276,52 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				break;
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:{
-				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
-				holder.sectionIcon.setVisibility(View.GONE);
-				holder.titleIcon.setVisibility(View.GONE);
-				break;
-			}
-			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:{
-				//Contact deleted you
+				//Contact request reminder
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.notification_reminder_contact_request), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace("[C]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/C]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
+				break;
+			}
+			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:{
+				//Contact deleted you
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
+				section = context.getString(R.string.section_contacts).toUpperCase();
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setText(context.getString(R.string.title_contact_notification_deleted));
 
 				String email = alert.getEmail();
@@ -290,77 +344,162 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				break;
 			}
-			case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
-
-				break;
-			}
-			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:{
-				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
-				holder.sectionIcon.setVisibility(View.GONE);
-				holder.titleIcon.setVisibility(View.GONE);
-				break;
-			}
-			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:{
-				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
-				holder.sectionIcon.setVisibility(View.GONE);
-				holder.titleIcon.setVisibility(View.GONE);
-				break;
-			}
-			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:{
-				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
-				holder.sectionIcon.setVisibility(View.GONE);
-				holder.titleIcon.setVisibility(View.GONE);
-				break;
-			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:{
+				//Outgoing contact request accepted by the other user
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setText(context.getString(R.string.title_outgoing_contact_request));
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_accepted), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:{
+				//Outgoing contact request denied by the other user
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.section_contacts).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setText(context.getString(R.string.title_outgoing_contact_request));
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_denied), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHARE:{
+				//New shared folder
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
-				holder.sectionIcon.setVisibility(View.VISIBLE);
-				holder.titleIcon.setVisibility(View.VISIBLE);
-				holder.titleText.setText("Folder name");
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.GONE);
 
 				String email = alert.getEmail();
-				description = context.getString(R.string.notification_new_shared_folder, email);
+
+				String textToShow = String.format(context.getString(R.string.notification_new_shared_folder), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_DELETEDSHARE:{
+				//Removed shared folder
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
-				holder.sectionIcon.setVisibility(View.VISIBLE);
-				holder.titleIcon.setVisibility(View.VISIBLE);
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.GONE);
+
+				String email = alert.getEmail();
+
+				String textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), email);
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+				holder.descriptionText.setText(result);
 
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHAREDNODES:{
+
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
-				holder.sectionIcon.setVisibility(View.VISIBLE);
-				holder.titleIcon.setVisibility(View.VISIBLE);
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.GONE);
+
+				String email = alert.getEmail();
 
 				break;
 			}
 			case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:{
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
@@ -370,26 +509,88 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				break;
 			}
 			case MegaUserAlert.TYPE_PAYMENT_SUCCEEDED:{
-				section = alert.getHeading();
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
 
-				break;
-			}
-			case MegaUserAlert.TYPE_PAYMENT_FAILED:{
-				break;
-			}
-			case MegaUserAlert.TYPE_TAKEDOWN:{
-				//Link takedown android100
+				section = alert.getHeading().toUpperCase();
 
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-				holder.titleText.setText(context.getString(R.string.title_take_down_notification));
+				holder.titleText.setVisibility(View.GONE);
+
+				holder.descriptionText.setText(alert.getTitle());
+
+				break;
+			}
+			case MegaUserAlert.TYPE_PAYMENT_FAILED:{
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
+				section = alert.getHeading().toUpperCase();;
+
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+
+				holder.titleText.setVisibility(View.GONE);
+
+				holder.descriptionText.setText(alert.getTitle());
+
+				break;
+			}
+			case MegaUserAlert.TYPE_PAYMENTREMINDER:{
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
+				section = alert.getHeading();
+
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+
+				holder.titleText.setVisibility(View.GONE);
+
+				holder.descriptionText.setText(alert.getTitle());
+				break;
+			}
+			case MegaUserAlert.TYPE_TAKEDOWN:{
+				//Link takedown android100
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
+				section = section.toUpperCase();
+
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
+
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+
+				holder.titleText.setVisibility(View.GONE);
 
 				String name = alert.getName();
+				String path = alert.getPath();
+				String textToShow = "";
+				if(path!=null){
+					if(Util.isFile(path)){
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_notification), name);
+					}
+					else{
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+					}
+				}
+				else{
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_notification), name);
+				}
 
-				String textToShow = String.format(context.getString(R.string.subtitle_take_down_notification), name);
 				try{
 					textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
@@ -410,12 +611,65 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				break;
 			}
 			case MegaUserAlert.TYPE_TAKEDOWN_REINSTATED:{
+                //Link takedown reinstated android100
+				section = section.toUpperCase();
+
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.VISIBLE);
+
+                holder.sectionIcon.setVisibility(View.GONE);
+                holder.titleIcon.setVisibility(View.GONE);
+
+                holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+
+				holder.titleText.setVisibility(View.GONE);
+
+                String name = alert.getName();
+                String path = alert.getPath();
+				String textToShow = "";
+				if(path!=null){
+					if(Util.isFile(path)){
+						textToShow = String.format(context.getString(R.string.subtitle_file_takedown_reinstated_notification), name);
+					}
+					else{
+						textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+					}
+				}
+				else{
+					textToShow = String.format(context.getString(R.string.subtitle_folder_takedown_reinstated_notification), name);
+				}
+
+                try{
+                    textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
+                    textToShow = textToShow.replace("[/A]", "</font>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[/B]", "</font>");
+                    textToShow = textToShow.replace("[C]", "<font color=\'#686868\'>");
+                    textToShow = textToShow.replace("[/C]", "</font>");
+                }
+                catch (Exception e){}
+                Spanned result = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+                } else {
+                    result = Html.fromHtml(textToShow);
+                }
+                holder.descriptionText.setText(result);
+
 				break;
 			}
-			case MegaUserAlert.TYPE_PAYMENTREMINDER:{
-				break;
-			}
-			case MegaUserAlert.TOTAL_OF_ALERT_TYPES:{
+			default:{
+//				case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:
+//				case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
+//				case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:
+//				case MegaUserAlert.TOTAL_OF_ALERT_TYPES:{
+//				case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:
+
+				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+				params.height = 0;
+				holder.itemLayout.setLayoutParams(params);
+				holder.itemLayout.setVisibility(View.GONE);
 				break;
 			}
 		}
