@@ -183,7 +183,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_download"
+                    android:src="@drawable/ic_b_save_to_device"
                     android:visibility="visible" />
 
                 <TextView
@@ -192,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:text="@string/general_download"
+                    android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
@@ -244,7 +244,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_saved_offline"
+                    android:src="@drawable/ic_b_save_offline"
                     android:visibility="visible" />
 
                 <TextView

@@ -554,7 +554,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
 		fileLinkDownloadButton.setOnClickListener(this);
-		fileLinkDownloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		fileLinkDownloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
 		downloadTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
@@ -850,7 +850,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
@@ -964,7 +964,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;

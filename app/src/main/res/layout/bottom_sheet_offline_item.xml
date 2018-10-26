@@ -199,7 +199,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/baseline_open_in"
+                    android:src="@drawable/ic_b_open_with"
                     android:visibility="visible" />
 
                 <TextView

@@ -1977,6 +1977,14 @@ public class Util {
 		return icon;
 	}
 
+	public static Drawable mutateIconSecondary(Context context, int idDrawable, int idColor) {
+		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+		icon = icon.mutate();
+		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.SRC_ATOP);
+
+		return icon;
+	}
+
 	//Notice user that any transfer prior to login will be destroyed
 	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
 		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
