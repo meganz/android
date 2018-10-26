@@ -19,6 +19,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.utils.conversion.ProgressUpdateCallback;
 
+import static android.media.MediaFormat.KEY_COLOR_FORMAT;
+import static android.media.MediaFormat.KEY_FRAME_RATE;
+import static android.media.MediaFormat.KEY_I_FRAME_INTERVAL;
+import static android.media.MediaFormat.KEY_MIME;
+
 public class VideoCompressor {
 
     private static final int TIMEOUT_USEC = 10000;
@@ -96,7 +101,7 @@ public class VideoCompressor {
         ChangerWrapper.changeResolutionInSeparatedThread(this);
     }
 
-    public void changeResolutionSingleThread(String[] inputPath) throws Throwable {
+    public void changeResolutionSingleThread(String[] inputPath) {
         totalCount = inputPath.length;
         for (int i = 0;i < inputPath.length;i++) {
             totalInputSize += new File(inputPath[i]).length();
@@ -105,8 +110,15 @@ public class VideoCompressor {
         for (int i = 0;i < inputPath.length;i++) {
             currentFileIndex = i + 1;
             String path = inputPath[i];
-            VideoUpload video = new VideoUpload(path,outputRoot + getFileNameFromPath(path),new File(path).length());
-            prepareAndChangeResolutionSingleThread(video);
+            long size = new File(path).length();
+            VideoUpload video = new VideoUpload(path,outputRoot + getFileNameFromPath(path),size);
+            try {
+                prepareAndChangeResolutionSingleThread(video);
+            } catch (Throwable th) {
+                th.printStackTrace();
+                currentFileIndex++;
+                totalRead += size;
+            }
         }
         updater.finish(totalCount + "/" + totalCount);
     }
@@ -194,10 +206,10 @@ public class VideoCompressor {
             }
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE,mWidth,mHeight);
-            outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,OUTPUT_VIDEO_COLOR_FORMAT);
+            outputVideoFormat.setInteger(KEY_COLOR_FORMAT,OUTPUT_VIDEO_COLOR_FORMAT);
             outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE,OUTPUT_VIDEO_BIT_RATE);
-            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE,OUTPUT_VIDEO_FRAME_RATE);
-            outputVideoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL,OUTPUT_VIDEO_IFRAME_INTERVAL);
+            outputVideoFormat.setInteger(KEY_FRAME_RATE,OUTPUT_VIDEO_FRAME_RATE);
+            outputVideoFormat.setInteger(KEY_I_FRAME_INTERVAL,OUTPUT_VIDEO_IFRAME_INTERVAL);
 
             AtomicReference<Surface> inputSurfaceReference = new AtomicReference<Surface>();
             videoEncoder = createVideoEncoder(videoCodecInfo,outputVideoFormat,inputSurfaceReference);
@@ -210,7 +222,7 @@ public class VideoCompressor {
             audioExtractor = createExtractor(mInputFile);
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
             MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
-            MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
+            MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(KEY_MIME),
                     inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
                     inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
             outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE,OUTPUT_AUDIO_BIT_RATE);
@@ -352,10 +364,10 @@ public class VideoCompressor {
             }
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE,mWidth,mHeight);
-            outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,OUTPUT_VIDEO_COLOR_FORMAT);
+            outputVideoFormat.setInteger(KEY_COLOR_FORMAT,OUTPUT_VIDEO_COLOR_FORMAT);
             outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE,OUTPUT_VIDEO_BIT_RATE);
-            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE,OUTPUT_VIDEO_FRAME_RATE);
-            outputVideoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL,OUTPUT_VIDEO_IFRAME_INTERVAL);
+            outputVideoFormat.setInteger(KEY_FRAME_RATE,OUTPUT_VIDEO_FRAME_RATE);
+            outputVideoFormat.setInteger(KEY_I_FRAME_INTERVAL,OUTPUT_VIDEO_IFRAME_INTERVAL);
 
             AtomicReference<Surface> inputSurfaceReference = new AtomicReference<Surface>();
             videoEncoder = createVideoEncoder(videoCodecInfo,outputVideoFormat,inputSurfaceReference);
@@ -368,7 +380,7 @@ public class VideoCompressor {
             audioExtractor = createExtractor(mInputFile);
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
             MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
-            MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
+            MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(KEY_MIME),
                     inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
                     inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
             outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE,OUTPUT_AUDIO_BIT_RATE);
@@ -468,6 +480,11 @@ public class VideoCompressor {
         return extractor;
     }
 
+    /**
+     * "video/avc" - H.264/AVC video
+     * "video/hevc" - H.265/HEVC video
+     * "video/mp4v-es" - MPEG4 video
+     */
     private MediaCodec createVideoDecoder(MediaFormat inputFormat,Surface surface) throws IOException {
         MediaCodec decoder = MediaCodec.createDecoderByType(getMimeTypeFor(inputFormat));
         decoder.configure(inputFormat,surface,null,0);
@@ -993,7 +1010,7 @@ public class VideoCompressor {
     }
 
     private static String getMimeTypeFor(MediaFormat format) {
-        return format.getString(MediaFormat.KEY_MIME);
+        return format.getString(KEY_MIME);
     }
 
     private static MediaCodecInfo selectCodec(String mimeType) {
