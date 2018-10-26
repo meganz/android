@@ -301,23 +301,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 					}
 
-					boolean isCharging = Util.isCharging(this);
-					if (prefs.getCamSyncCharging() == null){
-						if (!isCharging){
-							log("not charging...");
-							finish();
-							return START_REDELIVER_INTENT;
-						}
-					}
-					else{
-						if (Boolean.parseBoolean(prefs.getCamSyncCharging())){
-							if (!isCharging){
-								log("not charging...");
-								finish();
-								return START_REDELIVER_INTENT;
-							}
-						}
-					}
+//					boolean isCharging = Util.isCharging(this);
+//					if (prefs.getCamSyncCharging() == null){
+//						if (!isCharging){
+//							log("not charging...");
+//							finish();
+//							return START_REDELIVER_INTENT;
+//						}
+//					}
+//					else{
+//						if (Boolean.parseBoolean(prefs.getCamSyncCharging())){
+//							if (!isCharging){
+//								log("not charging...");
+//								finish();
+//								return START_REDELIVER_INTENT;
+//							}
+//						}
+//					}
 
 					if (prefs.getCameraFolderExternalSDCard() != null){
 						isExternalSDCard = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());

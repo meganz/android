@@ -2718,21 +2718,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	
-	public void setCamSyncCharging (boolean charging){
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-        ContentValues values = new ContentValues();
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_CHARGING + "= '" + encrypt(charging + "") + "' WHERE " + KEY_ID + " = '1'";
-			db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC CHARGING: " + UPDATE_PREFERENCES_TABLE);
-		}
-		else{
-	        values.put(KEY_CAM_SYNC_CHARGING, encrypt(charging + ""));
-	        db.insert(TABLE_PREFERENCES, null, values);
-		}
-		cursor.close();
-	}
+//	public void setCamSyncCharging (boolean charging){
+//		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+//        ContentValues values = new ContentValues();
+//		Cursor cursor = db.rawQuery(selectQuery, null);
+//		if (cursor.moveToFirst()){
+//			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_CHARGING + "= '" + encrypt(charging + "") + "' WHERE " + KEY_ID + " = '1'";
+//			db.execSQL(UPDATE_PREFERENCES_TABLE);
+////			log("UPDATE_PREFERENCES_TABLE SYNC CHARGING: " + UPDATE_PREFERENCES_TABLE);
+//		}
+//		else{
+//	        values.put(KEY_CAM_SYNC_CHARGING, encrypt(charging + ""));
+//	        db.insert(TABLE_PREFERENCES, null, values);
+//		}
+//		cursor.close();
+//	}
 	
 	public void setKeepFileNames (boolean charging){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
