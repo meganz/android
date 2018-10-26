@@ -57,12 +57,11 @@
                     android:layout_width="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="vertical">
-                    <LinearLayout
+                    <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:layout_gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_gravity="center_vertical">
                         <TextView
                             android:id="@+id/title_toolbar"
                             android:layout_width="wrap_content"
@@ -70,23 +69,30 @@
                             android:textColor="@color/white"
                             android:fontFamily="sans-serif-light"
                             android:textStyle="bold"
+                            android:gravity="center_vertical"
                             android:textSize="20sp"
                             android:maxLines="1"
-                            android:layout_marginRight="20dp"
+                            android:layout_toLeftOf="@+id/state_icon_toolbar"
                             android:ellipsize="end"/>
                         <ImageView
                             android:id="@+id/state_icon_toolbar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="top"
+                            android:background="@null"
+                            android:layout_marginTop="7dp"
+                            android:layout_marginRight="3dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginLeft="3dp"
+                            android:layout_alignParentTop="true"
                             android:visibility="gone"/>
-                    </LinearLayout>
+                    </RelativeLayout>
                     <TextView
                         android:id="@+id/subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="14sp"
+                        android:visibility="gone"
                         android:layout_marginRight="8dp"/>
                 </LinearLayout>
 
