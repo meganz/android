@@ -16069,7 +16069,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("Code: "+e.getErrorString());
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
-						showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+						boolean found = false;
+						ArrayList<MegaContactRequest> outgoingContactRequests = megaApi.getOutgoingContactRequests();
+						if (outgoingContactRequests != null){
+							for (int i=0; i< outgoingContactRequests.size(); i++) {
+								if (outgoingContactRequests.get(i).getTargetEmail().equals(request.getEmail())) {
+									found = true;
+									break;
+								}
+							}
+						}
+						if (found) {
+							showSnackbar(getString(R.string.invite_not_sent_already_sent, request.getEmail()));
+						}
+						else {
+							showSnackbar(getString(R.string.context_contact_already_exists, request.getEmail()));
+						}
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD && e.getErrorCode()==MegaError.API_EARGS)
 					{
