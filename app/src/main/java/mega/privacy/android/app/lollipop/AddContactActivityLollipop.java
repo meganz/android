@@ -833,6 +833,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         showSnackbar(getString(R.string.contact_not_added));
                         break;
                     }
+                    case isMegaContact: {
+                        showSnackbar(getString(R.string.context_contact_already_exists, confirmAddMail));
+                        break;
+                    }
                 }
             }
         }
