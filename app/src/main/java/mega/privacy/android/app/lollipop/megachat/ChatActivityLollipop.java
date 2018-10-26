@@ -3101,14 +3101,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             inflater.inflate(R.menu.messages_chat_action, menu);
 
             importIcon = menu.findItem(R.id.chat_cab_menu_import);
-//            Drawable drawable = importIcon.getIcon();
-//            if (drawable != null) {
-//                // If we don't mutate the drawable, then all drawable's with this id will have a color
-//                // filter applied to it.
-//                drawable.mutate();
-//                drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-//                drawable.setAlpha(255);
-//            }
+            menu.findItem(R.id.chat_cab_menu_offline).setIcon(Util.mutateIconSecondary(chatActivity, R.drawable.ic_b_save_offline, R.color.white));
+
             Util.changeStatusBarColorActionMode(chatActivity, getWindow(), handler, 1);
             return true;
         }
@@ -6380,7 +6374,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //				builder.setTitle(getString(R.string.confirmation_required));
 
         builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_download),
+        builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if(dontShowAgain.isChecked()){

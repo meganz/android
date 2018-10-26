@@ -2913,7 +2913,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 //				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -2961,7 +2961,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 //				builder.setTitle(getString(R.string.confirmation_required));
 		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -3308,7 +3308,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, currentDocument.getSize(), currentDocument.getHandle());
 										}
 										break;
@@ -3409,7 +3409,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, currentDocument.getSize(), currentDocument.getHandle());
 										}
 										break;

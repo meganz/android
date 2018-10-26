@@ -480,22 +480,22 @@ public class NodeController {
                                         File defaultPathF = new File(path);
                                         defaultPathF.mkdirs();
                                         if(context instanceof ManagerActivityLollipop){
-                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                            ((ManagerActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         else if(context instanceof FullScreenImageViewerLollipop){
-                                            ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                            ((FullScreenImageViewerLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         else if(context instanceof FileInfoActivityLollipop){
-                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                            ((FileInfoActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         else if(context instanceof ContactFileListActivityLollipop){
-                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                            ((ContactFileListActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         else if(context instanceof PdfViewerActivityLollipop){
-                                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                            ((PdfViewerActivityLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         else if(context instanceof AudioVideoPlayerLollipop){
-                                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath());
+                                            ((AudioVideoPlayerLollipop) context).showSnackbar(context.getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath());
                                         }
                                         checkSizeBeforeDownload(path, null, sizeFinal, hashesFinal, highPriority);
                                     }

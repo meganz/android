@@ -54,7 +54,8 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_make_private_small"
+                    android:alpha="0.54"
+                    android:src="@drawable/ic_b_from_device"
                     android:visibility="visible" />
 
                 <TextView
@@ -85,7 +86,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_upload_pick_file"
+                    android:src="@drawable/ic_b_pick_file_system"
                     android:visibility="visible" />
 
                 <TextView
@@ -122,6 +123,8 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    android:alpha="0.54"
+                    android:src="@drawable/ic_b_scan_document"
                     android:visibility="visible" />
 
                 <TextView
@@ -186,7 +189,8 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_menu_shared"
+                    android:alpha="0.54"
+                    android:src="@drawable/ic_b_new_folder"
                     android:visibility="visible" />
 
                 <TextView

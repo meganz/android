@@ -95,7 +95,7 @@
                 android:minWidth="0dp"
                 android:layout_marginRight="16dp"
                 android:background="@color/participants_layout"
-                android:text="@string/general_download"/>
+                android:text="@string/general_save_to_device"/>
         </LinearLayout>
 
         <View

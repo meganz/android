@@ -9888,7 +9888,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 //				builder.setTitle(getString(R.string.confirmation_required));
 		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -9934,7 +9934,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -9980,7 +9980,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){

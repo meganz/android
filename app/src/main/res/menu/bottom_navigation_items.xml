@@ -23,7 +23,7 @@
 
 	<item
 		android:id="@+id/bottom_navigation_item_offline"
-		android:icon="@drawable/ic_saved_offline"
+		android:icon="@drawable/ic_b_save_offline"
 		android:title="@string/section_saved_for_offline_new"/>
 
 </menu>

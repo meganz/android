@@ -3100,7 +3100,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         builder.setView(confirmationLayout);
 
         builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_download),
+        builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if(dontShowAgain.isChecked()){
@@ -3147,7 +3147,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         builder.setView(confirmationLayout);
 
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-        builder.setPositiveButton(getString(R.string.general_download),
+        builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if(dontShowAgain.isChecked()){
