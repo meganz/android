@@ -2157,22 +2157,35 @@
     <string name="general_show_more" context="Label that indicates show more items">Show more</string>
     <string name="general_show_less" context="Label that indicates show less items">Show less</string>
 
-    <string name="notification_new_contact_request" context="Text of the historic notification for a new contact request">[A]%s [/A][B]send you a contact request.[/B]</string>
-    <string name="notification_new_contact" context="Text of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
-    <string name="notification_new_shared_folder" context="Text of the historic notification for a new shared folder">New shared folder from %s</string>
+    <string name="notification_new_contact_request" context="Subtitle of the historic notification for a new contact request">[A]%s [/A][B]sent you a contact request.[/B]</string>
+    <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
+    <string name="notification_new_shared_folder" context="Subtitle of the historic notification for a new shared folder">[B]New shared folder from [/B][A]%s[/A]</string>
 
-    <string name="title_contact_request_notification_cancelled" context="title of contact request notification">Contact request cancelled</string>
-    <string name="subtitle_contact_request_notification_cancelled" context="title of contact request notification">[A]%s [/A][B]cancelled the contact request.[/B]</string>
+    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]Reminder: [/A][B]%s [/B][C]sent you a contact request.[/C]</string>
 
-    <string name="title_contact_notification_deleted" context="title of contact request notification">Contact deleted</string>
-    <string name="subtitle_contact_notification_deleted" context="title of contact request notification">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+    <string name="title_contact_request_notification_cancelled" context="Title of the historic notification for a contact request cancelled">Contact request cancelled</string>
+    <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]cancelled the contact request.[/B]</string>
+
+    <string name="title_contact_notification_deleted" context="Title of the historic notification for a contact request deleted">Contact deleted</string>
+    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification for a contact request deleted">[A]%s [/A][B]deleted you as a contact.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
 
-    <string name="title_account_notification_deleted" context="title of contact request notification">Account deleted</string>
-    <string name="subtitle_account_notification_deleted" context="title of contact request notification">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
+    <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account deleted</string>
+    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
 
-    <string name="title_take_down_notification" context="title of contact request notification">Takedown</string>
-    <string name="subtitle_take_down_notification" context="title of contact request notification">[A]Your publicly shared [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_file_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
+
+    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+
+    <string name="title_outgoing_contact_request" context="Title of the historic notification for contact requests">Sent request</string>
+
+    <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]denied your contact request.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
+
+    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for a deleted shared folder">[B]Access to folder shared by [/B][A]%s[/A][B] was removed.[/B]</string>
+
 
 </resources>

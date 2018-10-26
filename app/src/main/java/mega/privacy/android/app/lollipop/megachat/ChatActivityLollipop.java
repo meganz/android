@@ -1712,7 +1712,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
             case R.id.cab_menu_call_chat:{
 
-
                 if (chatRoom.isGroup())
                 {
                     showSnackbar("Coming soon...!");
