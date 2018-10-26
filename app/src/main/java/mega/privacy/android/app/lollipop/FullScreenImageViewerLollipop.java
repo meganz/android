@@ -1727,7 +1727,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
                     getImageView(i, -1);
@@ -1790,7 +1790,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
