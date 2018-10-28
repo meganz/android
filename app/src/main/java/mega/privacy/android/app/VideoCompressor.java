@@ -17,7 +17,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-import mega.privacy.android.app.utils.TL;
 import mega.privacy.android.app.utils.conversion.ProgressUpdateCallback;
 
 import static android.media.MediaFormat.KEY_COLOR_FORMAT;
@@ -118,9 +117,9 @@ public class VideoCompressor {
                 prepareAndChangeResolutionSingleThread(video);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                if(ex instanceof android.media.MediaCodec.CodecException) {
-                    if("Error 0xfffffc0e".equals(ex.getMessage())) {
-                        TL.log(this,"This device doesn't support 4K! The 4K file is " + path);
+                if (ex instanceof android.media.MediaCodec.CodecException) {
+                    if ("Error 0xfffffc0e".equals(ex.getMessage())) {
+                        //TODO get path here, for following operation.
                     }
                 }
                 currentFileIndex++;
