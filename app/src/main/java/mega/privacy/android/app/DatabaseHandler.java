@@ -45,6 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_MSG_NODES = "msgnodes";
 	private static final String TABLE_NODE_ATTACHMENTS = "nodeattachments";
 	private static final String TABLE_CAMERA_UPLOADS = "camerauploads";
+	private static final String TABLE_VIDEO_UPLOADS = "videouploads";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -164,7 +165,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SYNC_COPYONLY = "sync_copyonly";
     private static final String KEY_SYNC_SECONDARY = "sync_secondary";
     private static final String CREATE_CAMERA_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CAMERA_UPLOADS + "("
-            + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_SYNC_FILEPATH + " TEXT," + KEY_SYNC_FILENAME + " TEXT," + KEY_SYNC_TIMESTAMP + " TEXT," + KEY_SYNC_STATE + " INTEGER, " + KEY_SYNC_HANDLE + " TEXT," + KEY_SYNC_COPYONLY + " BOOLEAN," + KEY_SYNC_SECONDARY + " BOOLEAN"+ ")";
+            + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_SYNC_FILEPATH + " TEXT,"
+            + KEY_SYNC_FILENAME + " TEXT,"
+            + KEY_SYNC_TIMESTAMP + " TEXT,"
+            + KEY_SYNC_STATE + " INTEGER, "
+            + KEY_SYNC_HANDLE + " TEXT,"
+            + KEY_SYNC_COPYONLY + " BOOLEAN,"
+            + KEY_SYNC_SECONDARY + " BOOLEAN"+ ")";
+
+    //columns for table videouploads
+    private static final String KEY_VIDEO_FILEPATH_ORI = "video_filepath_origin";
+    private static final String KEY_VIDEO_FILEPATH_CON = "video_filepath_conversion";
+    private static final String KEY_VIDEO_FP_ORI = "video_filepath_original_conversioned";
+    private static final String KEY_VIDEO_FP_CON = "video_filepath";
+    private static final String KEY_VIDEO_TIMESTAMP = "video_timestamp";
+    private static final String KEY_VIDEO_STATE = "video_state";
+    private static final String KEY_VIDEO_FILENAME = "video_filename";
+    private static final String KEY_VIDEO_HANDLE = "video_handle";
+    private static final String KEY_VIDEO_COPYONLY = "video_copyonly";
+    private static final String KEY_VIDEO_SECONDARY = "video_secondary";
+    private static final String CREATE_VIDEO_UPLOADS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_VIDEO_UPLOADS + "("
+            + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_VIDEO_FILEPATH_ORI + " TEXT,"
+            + KEY_VIDEO_FILEPATH_CON + " TEXT,"
+            + KEY_VIDEO_FP_ORI + " TEXT,"
+            + KEY_VIDEO_FP_CON + " TEXT,"
+            + KEY_VIDEO_TIMESTAMP + " TEXT,"
+            + KEY_VIDEO_FILENAME + " TEXT,"
+            + KEY_VIDEO_STATE + " INTEGER,"
+            + KEY_VIDEO_HANDLE + " TEXT,"
+            + KEY_VIDEO_COPYONLY + " BOOLEAN,"
+            + KEY_VIDEO_SECONDARY + " BOOLEAN"+ ")";
 
 	private static final String KEY_LAST_PUBLIC_HANDLE = "lastpublichandle";
 	private static final String KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp";
@@ -272,6 +304,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE);
 
         db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
+        db.execSQL(CREATE_VIDEO_UPLOADS_TABLE);
 	}
 
 	@Override
@@ -599,6 +632,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		if(oldVersion <= 42) {
 		    db.execSQL(CREATE_CAMERA_UPLOADS_TABLE);
+            db.execSQL(CREATE_VIDEO_UPLOADS_TABLE);
 
             db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_UPLOAD_VIDEO_QUALITY + " TEXT;");
 //            db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + " = " + MegaPreferences.MEDIUM + ";");
