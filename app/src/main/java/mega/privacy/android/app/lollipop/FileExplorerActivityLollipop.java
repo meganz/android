@@ -963,9 +963,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    inflater.inflate(R.menu.file_explorer_action, menu);
 	    
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-	    createFolderMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_create_new_folder_white, R.color.black));
+	    createFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
-	    newChatMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_chat_w, R.color.black));
 
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);

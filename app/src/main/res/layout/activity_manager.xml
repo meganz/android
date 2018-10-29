@@ -187,7 +187,8 @@
                 app:elevation="6dp"
                 app:backgroundTint="@color/accentColor"
                 app:pressedTranslationZ="12dp"
-                android:src="@drawable/ic_chat_white"/>
+                android:tint="@color/white"
+                android:src="@drawable/ic_chat"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/main_fab_chat"
