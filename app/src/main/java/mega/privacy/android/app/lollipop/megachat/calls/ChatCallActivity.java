@@ -2559,7 +2559,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 cont++;
             }
         }
-        participantText.setText(cont+"/5");
+        participantText.setText(cont+"/6");
         linearParticipants.setVisibility(View.VISIBLE);
 
     }
