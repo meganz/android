@@ -318,6 +318,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			return true;
 		}
 
@@ -327,6 +328,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((ManagerActivityLollipop)context).showFabButton();
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 		}
 
 		@Override

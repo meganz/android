@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cell_photosync_grid">
 
     <RelativeLayout
@@ -25,15 +26,15 @@
         android:id="@+id/cell_item_grid_title_layout"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        android:layout_margin="3dp">
+        android:layout_margin="2dp">
 
-        <ImageView
+        <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/cell_photosync_grid_title_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:background="@color/white"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -46,8 +47,9 @@
             android:id="@+id/cell_photosync_title_menu_long_click_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:src="@drawable/media_select_ic"/>
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_select_folder"/>
 
         <RelativeLayout
             android:layout_width="match_parent"

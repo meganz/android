@@ -804,6 +804,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 //                    holder.itemLayout.setForeground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
                 holder.fileGridSelected.setVisibility(View.VISIBLE);
+
             } else {
 //                    holder.itemLayout.setForeground(new ColorDrawable());
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
@@ -847,7 +848,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                 Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
 
                 if (temp != null) {
-                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
@@ -857,7 +858,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                     if (temp != null) {
-                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                         holder.fileGridIconForFile.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
@@ -871,7 +872,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                         } // Too many AsyncTasks
 
                         if (temp != null) {
-                            thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                            thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                             holder.imageViewIcon.setVisibility(View.GONE);
                             holder.imageViewThumb.setVisibility(View.VISIBLE);
                             holder.imageViewThumb.setImageBitmap(thumb);
@@ -884,7 +885,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
 
 //				thumb = ThumbnailUtils.getThumbnailFromCache(node);
                 if (temp != null) {
-                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                    thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
@@ -893,7 +894,7 @@ public class CloudDriveAdapter extends MegaBrowserLollipopAdapter implements OnC
                     temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
                     if (temp != null) {
-                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,3);
+                        thumb = ThumbnailUtilsLollipop.getRoundedRectBitmap(context,temp,2);
                         holder.fileGridIconForFile.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
