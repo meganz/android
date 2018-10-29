@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.jobservices.SyncRecord;
+import mega.privacy.android.app.jobservices.VideoRecord;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -722,6 +723,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_CAMERA_UPLOADS,null,values);
     }
 
+    public void savePendingVideoRecord(VideoRecord record) {
+        ContentValues values = new ContentValues();
+        if (record.getOriginLocalPath() != null) {
+            values.put(KEY_VIDEO_FILEPATH_ORI,encrypt(record.getOriginLocalPath()));
+        }
+        if (record.getConversionLocalPath() != null) {
+            values.put(KEY_VIDEO_FILEPATH_CON,encrypt(record.getConversionLocalPath()));
+        }
+        if (record.getOriginFingerprint() != null) {
+            values.put(KEY_VIDEO_FP_ORI,encrypt(record.getOriginFingerprint()));
+        }
+        if (record.getConversionFingerprint() != null) {
+            values.put(KEY_VIDEO_FP_CON,encrypt(record.getConversionFingerprint()));
+        }
+        if (record.getFileName() != null) {
+            values.put(KEY_VIDEO_FILENAME,encrypt(record.getFileName()));
+        }
+        if(record.getNodeHandle() != null) {
+            values.put(KEY_VIDEO_HANDLE,encrypt(String.valueOf(record.getNodeHandle())));
+        }
+        if(record.getTimestamp() != null) {
+            values.put(KEY_VIDEO_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
+        }
+        if(record.getCopyOnly() != null) {
+            values.put(KEY_VIDEO_COPYONLY,encrypt(String.valueOf(record.getCopyOnly())));
+        }
+        if(record.getSecondary() != null) {
+            values.put(KEY_VIDEO_SECONDARY,encrypt(String.valueOf(record.getSecondary())));
+        }
+        values.put(KEY_VIDEO_STATE,record.getStatus());
+        db.insert(TABLE_VIDEO_UPLOADS,null,values);
+    }
+
     public boolean pendingUploadRecordNameExist(String name,boolean isSecondary) {
         String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILENAME + " ='" + encrypt(name) + "'"+ " AND " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
@@ -729,8 +763,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public boolean pendingUploadRecordPathExist(String filepath) {
-        String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filepath) + "'";
+    public boolean pendingVideoRecordNameExist(String name,boolean isSecondary) {
+        String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_FILENAME + " ='" + encrypt(name) + "'"+ " AND " + KEY_VIDEO_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
             return cursor != null && cursor.getCount() == 1;
         }
@@ -743,6 +777,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public boolean pendingVideoRecordExist(String originFilepath, boolean isSecondary) {
+        String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_FILEPATH_ORI + " ='" + encrypt(originFilepath) + "'" + " AND " + KEY_VIDEO_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
+        try (Cursor cursor = db.rawQuery(selectQuery,null)) {
+            return cursor != null && cursor.getCount() == 1;
+        }
+    }
+
     public List<SyncRecord> findUnsuccessfulUploads() {
         String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS;
         Cursor cursor = db.rawQuery(selectQuery,null);
@@ -750,7 +791,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                SyncRecord record = extract(cursor);
+                SyncRecord record = extractSyncRecord(cursor);
+                records.add(record);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return records;
+    }
+
+    public List<VideoRecord> findVideoRecordsByState(int state) {
+        String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_STATE + " = " + state + ")";
+        Cursor cursor = db.rawQuery(selectQuery,null);
+
+        List<VideoRecord> records = new ArrayList<>();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                VideoRecord record = extractVideoRecord(cursor);
                 records.add(record);
             } while (cursor.moveToNext());
             cursor.close();
@@ -763,23 +819,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
-    private SyncRecord extract(Cursor cursor) {
+    public void deleteVideoRecordsByState(int state){
+        String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_STATE + " = " + state + ")";
+        db.execSQL(sql);
+    }
+
+    private SyncRecord extractSyncRecord(Cursor cursor) {
         SyncRecord record = new SyncRecord();
         record.setId(cursor.getInt(0));
         record.setLocalPath(decrypt(cursor.getString(1)));
         record.setFileName(decrypt(cursor.getString(2)));
         String timestamp = decrypt(cursor.getString(3));
-        if (timestamp == null) {
-            record.setTimestamp(null);
-        } else {
+        if (timestamp != null) {
             record.setTimestamp(Long.valueOf(timestamp));
         }
 
         record.setStatus(cursor.getInt(4));
         String nodeHandle = decrypt(cursor.getString(5));
-        if (nodeHandle == null) {
-            record.setNodeHandle(null);
-        } else {
+        if (nodeHandle != null) {
             record.setNodeHandle(Long.valueOf(nodeHandle));
         }
         record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(6))));
@@ -787,11 +844,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return record;
     }
 
+    private VideoRecord extractVideoRecord(Cursor cursor) {
+        VideoRecord record = new VideoRecord();
+        record.setId(cursor.getInt(0));
+        record.setOriginLocalPath(decrypt(cursor.getString(1)));
+        record.setConversionLocalPath(decrypt(cursor.getString(2)));
+        record.setOriginFingerprint(decrypt(cursor.getString(3)));
+        record.setConversionFingerprint(decrypt(cursor.getString(4)));
+        String timestamp = decrypt(cursor.getString(5));
+        if (timestamp != null) {
+            record.setTimestamp(Long.valueOf(timestamp));
+        }
+        record.setFileName(decrypt(cursor.getString(6)));
+        record.setStatus(cursor.getInt(7));
+        String nodeHandle = decrypt(cursor.getString(8));
+        if (nodeHandle != null) {
+            record.setNodeHandle(Long.valueOf(nodeHandle));
+        }
+        record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(9))));
+        record.setSecondary(Boolean.valueOf(decrypt(cursor.getString(10))));
+        return record;
+    }
+
     public SyncRecord findRecordByPath(String filePath) {
         String selectQuery = "SELECT * FROM " + TABLE_CAMERA_UPLOADS + " WHERE " + KEY_SYNC_FILEPATH + " ='" + encrypt(filePath) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
-            SyncRecord record = extract(cursor);
+            SyncRecord record = extractSyncRecord(cursor);
             cursor.close();
             return record;
         }
@@ -808,8 +887,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
+    public void deleteVideoRecordByPath(String originFilepath) {
+        String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS + "  WHERE " + KEY_VIDEO_FILEPATH_ORI + " = '" + encrypt(originFilepath) + "'";
+        db.execSQL(sql);
+    }
+
+    public void deleteVideoRecordByFileName(String fileName) {
+        String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS + "  WHERE " + KEY_VIDEO_FILENAME + " = '" + encrypt(fileName) + "'" + " OR " + KEY_VIDEO_FILEPATH_ORI +  " LIKE '%" + encrypt(fileName) + "'";
+        db.execSQL(sql);
+    }
+
     public Long findMaxTimestamp(Boolean isSecondary) {
         String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_CAMERA_UPLOADS + "  WHERE " + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            List<Long> timestamps = new ArrayList<>(cursor.getCount());
+            do {
+                String timestamp = decrypt(cursor.getString(0));
+                if(timestamp == null) {
+                    timestamps.add(0L);
+                }else{
+                    timestamps.add(Long.valueOf(timestamp));
+                }
+            } while (cursor.moveToNext());
+            cursor.close();
+
+            if(timestamps.isEmpty()) {
+                return null;
+            }
+            Collections.sort(timestamps,new Comparator<Long>() {
+
+                @Override
+                public int compare(Long o1,Long o2) {
+                    if(o1.equals(o2)) {
+                        return 0;
+                    }
+                    return (o1 > o2) ? -1 : 1;
+                }
+            });
+            return timestamps.get(0);
+        }
+        return null;
+    }
+
+    public Long findMaxVideoTimestamp(Boolean isSecondary) {
+        String selectQuery = "SELECT " + KEY_VIDEO_TIMESTAMP + " FROM " + TABLE_VIDEO_UPLOADS + "  WHERE " + KEY_VIDEO_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "'";
         Cursor cursor = db.rawQuery(selectQuery,null);
         if (cursor != null && cursor.moveToFirst()) {
             List<Long> timestamps = new ArrayList<>(cursor.getCount());
