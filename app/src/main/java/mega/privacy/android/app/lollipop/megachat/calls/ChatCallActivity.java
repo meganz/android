@@ -1215,6 +1215,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if (customHandler != null){
             customHandler.removeCallbacksAndMessages(null);
         }
+        clearHandlers();
 
         peerSelected = null;
         isManualMode = false;
@@ -1248,6 +1249,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         if (customHandler != null){
             customHandler.removeCallbacksAndMessages(null);
         }
+        clearHandlers();
+
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             super.finishAndRemoveTask();
@@ -1707,24 +1710,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("onClick video FAB");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
-                    if (handlerArrow1 != null){
-                        handlerArrow1.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow2 != null){
-                        handlerArrow2.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow3 != null){
-                        handlerArrow3.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow4 != null){
-                        handlerArrow4.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow5 != null){
-                        handlerArrow5.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow6 != null){
-                        handlerArrow6.removeCallbacksAndMessages(null);
-                    }
+                    clearHandlers();
+
                     answerCallFAB.clearAnimation();
                     videoFAB.clearAnimation();
                 }else{
@@ -1768,24 +1755,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("Click on answer fab");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, false, this);
-                    if (handlerArrow1 != null){
-                        handlerArrow1.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow2 != null){
-                        handlerArrow2.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow3 != null){
-                        handlerArrow3.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow4 != null){
-                        handlerArrow4.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow5 != null){
-                        handlerArrow5.removeCallbacksAndMessages(null);
-                    }
-                    if (handlerArrow6 != null){
-                        handlerArrow6.removeCallbacksAndMessages(null);
-                    }
+                    clearHandlers();
+
                     answerCallFAB.clearAnimation();
                     videoFAB.clearAnimation();
                 }else{
@@ -1881,6 +1852,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 videoFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
                     public void onSwipeTop() {
                         log("onSwipeTop");
+
                         videoFAB.clearAnimation();
 
                         TranslateAnimation translateAnim = new TranslateAnimation( 0, 0 , 0, -380 );
@@ -2569,6 +2541,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void answerAudioCall(){
+        clearHandlers();
+
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
@@ -2576,6 +2550,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
     public void answerVideoCall(){
         log("answerVideoCall");
+        clearHandlers();
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
@@ -3020,5 +2995,27 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         contactFirstLetter = contactFirstLetter.toUpperCase(Locale.getDefault());
         avatarBigCameraGroupCallInitialLetter.setText(contactFirstLetter);
         avatarBigCameraGroupCallInitialLetter.setVisibility(View.VISIBLE);
+    }
+
+    public void clearHandlers(){
+        log("clearHandlers");
+        if (handlerArrow1 != null){
+            handlerArrow1.removeCallbacksAndMessages(null);
+        }
+        if (handlerArrow2 != null){
+            handlerArrow2.removeCallbacksAndMessages(null);
+        }
+        if (handlerArrow3 != null){
+            handlerArrow3.removeCallbacksAndMessages(null);
+        }
+        if (handlerArrow4 != null){
+            handlerArrow4.removeCallbacksAndMessages(null);
+        }
+        if (handlerArrow5 != null){
+            handlerArrow5.removeCallbacksAndMessages(null);
+        }
+        if (handlerArrow6 != null){
+            handlerArrow6.removeCallbacksAndMessages(null);
+        }
     }
 }
