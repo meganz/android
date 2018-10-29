@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -34,6 +35,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
 
 public class NotificationsFragmentLollipop extends Fragment implements View.OnClickListener {
@@ -245,8 +247,72 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     public void itemClick(int position) {
         log("itemClick: "+position);
+        MegaUserAlert notif = notifications.get(position);
 
+        int alertType = notif.getType();
 
+        switch (alertType) {
+
+            case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST:
+            case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:
+            case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER:
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED:
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:{
+                log("Go to Received requests");
+                ((ManagerActivityLollipop)context).navigateToContacts(2);
+                break;
+            }
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:{
+                log("Go to Sent requests");
+                ((ManagerActivityLollipop)context).navigateToContacts(1);
+                break;
+            }
+            case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:
+            case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:
+            case MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED:
+            case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:
+            case MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU:{
+                log("Go to Contacts");
+                ((ManagerActivityLollipop)context).navigateToContacts(0);
+                break;
+            }
+            case MegaUserAlert.TYPE_PAYMENT_SUCCEEDED:
+            case MegaUserAlert.TYPE_PAYMENT_FAILED:
+            case MegaUserAlert.TYPE_PAYMENTREMINDER:{
+                log("Go to My Account");
+                ((ManagerActivityLollipop)context).navigateToMyAccount();
+                break;
+            }
+            case MegaUserAlert.TYPE_TAKEDOWN:
+            case MegaUserAlert.TYPE_TAKEDOWN_REINSTATED:{
+                if(notif.getNodeHandle()!=-1){
+                    MegaNode node =  megaApi.getNodeByHandle(notif.getNodeHandle());
+                    if(node!=null){
+                        if(node.isFile()){
+                            ((ManagerActivityLollipop)context).openLocation(node.getParentHandle());
+                        }
+                        else{
+                            ((ManagerActivityLollipop)context).openLocation(notif.getNodeHandle());
+                        }
+                    }
+                }
+                break;
+            }
+            case MegaUserAlert.TYPE_NEWSHARE:
+            case MegaUserAlert.TYPE_NEWSHAREDNODES:
+            case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:{
+                log("Go to open corresponding location");
+                if(notif.getNodeHandle()!=-1 && megaApi.getNodeByHandle(notif.getNodeHandle())!=null){
+                    ((ManagerActivityLollipop)context).openLocation(notif.getNodeHandle());
+                }
+                break;
+            }
+            case MegaUserAlert.TYPE_DELETEDSHARE:{
+                log("Do not navigate");
+                break;
+            }
+        }
     }
 
     @Override
@@ -264,13 +330,50 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
         aB = ((AppCompatActivity)context).getSupportActionBar();
     }
 
-    public void updateNotifications() {
+    public void updateNotifications(ArrayList<MegaUserAlert> updatedUserAlerts) {
         log("updateNotifications: ");
 
         if(!isAdded()){
             log("return!");
             return;
         }
+
+        for(int i = 0;i<updatedUserAlerts.size();i++){
+
+            long idToUpdate = updatedUserAlerts.get(i).getId();
+            int indexToReplace = -1;
+
+            ListIterator<MegaUserAlert> itrReplace = notifications.listIterator();
+            while (itrReplace.hasNext()) {
+                MegaUserAlert notification = itrReplace.next();
+
+                if(notification!=null){
+                    if(notification.getId()==idToUpdate){
+                        indexToReplace = itrReplace.nextIndex()-1;
+                        break;
+                    }
+                }
+                else{
+                    break;
+                }
+            }
+            if(indexToReplace!=-1){
+                log("Index to replace: "+indexToReplace);
+
+                notifications.set(indexToReplace, updatedUserAlerts.get(i));
+                if(adapterList!=null){
+                    adapterList.notifyItemChanged(indexToReplace);
+                }
+
+                megaApi.acknowledgeUserAlerts();
+
+            }
+            else{
+                addNotification(updatedUserAlerts.get(i));
+            }
+
+        }
+
 
     }
 

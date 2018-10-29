@@ -20,7 +20,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
 import mega.privacy.android.app.utils.TimeChatUtils;
@@ -171,6 +170,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 				holder.descriptionText.setText(result);
 
+				holder.itemLayout.setOnClickListener(this);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED:{
@@ -204,6 +205,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 
 				break;
 			}
@@ -239,6 +242,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 				holder.descriptionText.setText(result);
 
+				holder.itemLayout.setOnClickListener(this);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED:{
@@ -272,6 +277,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 
 				break;
 			}
@@ -308,6 +315,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU:{
@@ -341,6 +350,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 
 				break;
 			}
@@ -376,6 +387,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 				holder.descriptionText.setText(result);
 
+				holder.itemLayout.setOnClickListener(this);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED:{
@@ -409,6 +422,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED:{
@@ -442,6 +457,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED: {
@@ -475,6 +492,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED:{
@@ -508,6 +527,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED:{
@@ -541,6 +562,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHARE:{
@@ -573,6 +596,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				//Allow navigation to the folder
+				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
+					holder.itemLayout.setOnClickListener(this);
+				}
 
 				break;
 			}
@@ -608,10 +636,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 				holder.descriptionText.setText(result);
 
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 			case MegaUserAlert.TYPE_NEWSHAREDNODES:{
-
+				//New files added to a shared folder
 				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 				holder.itemLayout.setLayoutParams(params);
 				holder.itemLayout.setVisibility(View.VISIBLE);
@@ -625,6 +654,38 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.GONE);
 
 				String email = alert.getEmail();
+				int numFiles = (int) alert.getNumber(1);
+				int numFolders = (int) alert.getNumber(0);
+
+				String textToShow = "";
+
+				if(numFolders>0){
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, email, numFolders);
+				}
+				else{
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_files, numFiles, email, numFiles);
+				}
+
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.descriptionText.setText(result);
+
+				//Allow navigation to the folder
+				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
+					holder.itemLayout.setOnClickListener(this);
+				}
 
 				break;
 			}
@@ -638,6 +699,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
 				holder.sectionIcon.setVisibility(View.VISIBLE);
 				holder.titleIcon.setVisibility(View.VISIBLE);
+
+				holder.descriptionText.setText(alert.getTitle());
+
+				//Allow navigation to the folder
+				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
+					holder.itemLayout.setOnClickListener(this);
+				}
 
 				break;
 			}
@@ -657,6 +725,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				holder.descriptionText.setText(alert.getTitle());
 
+				holder.itemLayout.setOnClickListener(this);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_PAYMENT_FAILED:{
@@ -675,6 +745,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				holder.descriptionText.setText(alert.getTitle());
 
+				holder.itemLayout.setOnClickListener(this);
+
 				break;
 			}
 			case MegaUserAlert.TYPE_PAYMENTREMINDER:{
@@ -692,6 +764,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.GONE);
 
 				holder.descriptionText.setText(alert.getTitle());
+
+				holder.itemLayout.setOnClickListener(this);
 				break;
 			}
 			case MegaUserAlert.TYPE_TAKEDOWN:{
@@ -740,6 +814,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+
+				//Allow navigation to the folder
+				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
+					holder.itemLayout.setOnClickListener(this);
+				}
 
 				break;
 			}
@@ -790,6 +869,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
                 }
                 holder.descriptionText.setText(result);
 
+				//Allow navigation to the folder
+				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
+					holder.itemLayout.setOnClickListener(this);
+				}
+
 				break;
 			}
 			default:{
@@ -798,6 +882,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				params.height = 0;
 				holder.itemLayout.setLayoutParams(params);
 				holder.itemLayout.setVisibility(View.GONE);
+
+				holder.itemLayout.setOnClickListener(null);
 				break;
 			}
 		}
@@ -878,12 +964,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		ViewHolderNotifications holder = (ViewHolderNotifications) v.getTag();
 		int currentPosition = holder.getAdapterPosition();
 		try {
-			MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
+//			MegaNotificationsAdapter notificationsAdapter = (MegaNotificationsAdapter) getItem(currentPosition);
 
 			switch (v.getId()){
-				case R.id.contact_list_item_layout:
-				case R.id.contact_grid_item_layout:{
-					log("contact_item_layout");
+				case R.id.notification_list_item_layout:{
+					log("notification_list_item_layout");
 					if (fragment != null){
 						fragment.itemClick(currentPosition);
 					}
