@@ -225,6 +225,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_storage_action, menu);
+			MenuItem newFolderItem = menu.findItem(R.id.cab_menu_create_folder);
+			newFolderItem.setIcon(Util.mutateIconSecondary(getApplicationContext(), R.drawable.ic_b_new_folder, R.color.white));
 			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
@@ -293,6 +295,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
 	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+		newFolderMenuItem.setIcon(Util.mutateIcon(this, R.drawable.ic_b_new_folder, R.color.white));
 		
 		if (mode == Mode.PICK_FOLDER) {
 			boolean writable = path.canWrite();

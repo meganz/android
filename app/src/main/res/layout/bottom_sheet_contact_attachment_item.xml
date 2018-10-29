@@ -190,7 +190,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_start_chat"
+                    android:src="@drawable/ic_chat"
                     android:visibility="visible" />
 
                 <TextView

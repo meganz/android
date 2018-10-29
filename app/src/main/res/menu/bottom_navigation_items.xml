@@ -3,27 +3,27 @@
 	tools:context="mega.privacy.android.app.lollipop.ManagerActivityLollipop">
 	<item
 		android:id="@+id/bottom_navigation_item_cloud_drive"
-		android:icon="@drawable/ic_cloud_drive_black"
+		android:icon="@drawable/ic_cloud_drive"
 		android:title="@string/section_cloud_drive"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_camera_uploads"
-		android:icon="@drawable/camera_uploads_red"
+		android:icon="@drawable/ic_camera_uploads"
 		android:title="@string/section_photo_sync"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_chat"
-		android:icon="@drawable/ic_start_chat"
+		android:icon="@drawable/ic_chat"
 		android:title="@string/section_chat"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_shared_items"
-		android:icon="@drawable/shared_items_red"
+		android:icon="@drawable/ic_shared"
 		android:title="@string/section_shared_items"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_offline"
-		android:icon="@drawable/ic_b_save_offline"
+		android:icon="@drawable/ic_saved"
 		android:title="@string/section_saved_for_offline_new"/>
 
 </menu>

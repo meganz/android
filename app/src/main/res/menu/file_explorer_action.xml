@@ -10,7 +10,7 @@
     <item
         android:id="@+id/cab_menu_new_chat"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_chat_w"
+        android:icon="@drawable/ic_chat"
         MEGA:showAsAction="always" />
 
 </menu>

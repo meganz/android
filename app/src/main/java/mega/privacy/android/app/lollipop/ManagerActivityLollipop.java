@@ -17831,7 +17831,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case CHAT:{
 				if(megaChatApi!=null){
 					if(megaChatApi.getChatRooms().size()==0){
-						fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_chat_white));
+						fabButton.setImageDrawable(Util.mutateIcon(this, R.drawable.ic_chat, R.color.white));
 					}
 					lp.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 					fabButton.setVisibility(View.VISIBLE);
