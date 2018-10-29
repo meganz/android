@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.jobservices.VideoRecord;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -723,10 +722,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_CAMERA_UPLOADS,null,values);
     }
 
-    public void savePendingVideoRecord(VideoRecord record) {
+    public void savePendingVideoRecord(SyncRecord record) {
         ContentValues values = new ContentValues();
-        if (record.getOriginLocalPath() != null) {
-            values.put(KEY_VIDEO_FILEPATH_ORI,encrypt(record.getOriginLocalPath()));
+        if (record.getLocalPath() != null) {
+            values.put(KEY_VIDEO_FILEPATH_ORI,encrypt(record.getLocalPath()));
         }
         if (record.getConversionLocalPath() != null) {
             values.put(KEY_VIDEO_FILEPATH_CON,encrypt(record.getConversionLocalPath()));
@@ -746,8 +745,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(record.getTimestamp() != null) {
             values.put(KEY_VIDEO_TIMESTAMP,encrypt(String.valueOf(record.getTimestamp())));
         }
-        if(record.getCopyOnly() != null) {
-            values.put(KEY_VIDEO_COPYONLY,encrypt(String.valueOf(record.getCopyOnly())));
+        if(record.isCopyOnly() != null) {
+            values.put(KEY_VIDEO_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
         }
         if(record.getSecondary() != null) {
             values.put(KEY_VIDEO_SECONDARY,encrypt(String.valueOf(record.getSecondary())));
@@ -799,14 +798,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return records;
     }
 
-    public List<VideoRecord> findVideoRecordsByState(int state) {
+    public List<SyncRecord> findVideoRecordsByState(int state) {
         String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_STATE + " = " + state + ")";
         Cursor cursor = db.rawQuery(selectQuery,null);
 
-        List<VideoRecord> records = new ArrayList<>();
+        List<SyncRecord> records = new ArrayList<>();
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                VideoRecord record = extractVideoRecord(cursor);
+                SyncRecord record = extractVideoRecord(cursor);
                 records.add(record);
             } while (cursor.moveToNext());
             cursor.close();
@@ -844,10 +843,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return record;
     }
 
-    private VideoRecord extractVideoRecord(Cursor cursor) {
-        VideoRecord record = new VideoRecord();
+    private SyncRecord extractVideoRecord(Cursor cursor) {
+        SyncRecord record = new SyncRecord();
         record.setId(cursor.getInt(0));
-        record.setOriginLocalPath(decrypt(cursor.getString(1)));
+        record.setLocalPath(decrypt(cursor.getString(1)));
         record.setConversionLocalPath(decrypt(cursor.getString(2)));
         record.setOriginFingerprint(decrypt(cursor.getString(3)));
         record.setConversionFingerprint(decrypt(cursor.getString(4)));

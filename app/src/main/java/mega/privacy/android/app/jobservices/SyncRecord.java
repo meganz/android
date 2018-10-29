@@ -13,6 +13,12 @@ public class SyncRecord {
 
     private String localPath;
 
+    private String conversionLocalPath;
+
+    private String originFingerprint;
+
+    private String conversionFingerprint;
+
     private String fileName;
 
     private Long timestamp;
@@ -114,18 +120,27 @@ public class SyncRecord {
         this.timestamp = timestamp;
     }
 
-//    public static List<SyncRecord> convert(List<CameraUploadsService.PendingUpload> pending) {
-//        if (pending == null || pending.size() == 0) {
-//            return null;
-//        }
-//        List<SyncRecord> list = new ArrayList<>(pending.size());
-//        for (CameraUploadsService.PendingUpload p : pending) {
-//            list.add(convert(p));
-//        }
-//        return list;
-//    }
-//
-//    public static SyncRecord convert(CameraUploadsService.PendingUpload pending) {
-//        return new SyncRecord(pending.media.filePath,pending.media.timestamp);
-//    }
+    public String getConversionLocalPath() {
+        return conversionLocalPath;
+    }
+
+    public void setConversionLocalPath(String conversionLocalPath) {
+        this.conversionLocalPath = conversionLocalPath;
+    }
+
+    public String getOriginFingerprint() {
+        return originFingerprint;
+    }
+
+    public void setOriginFingerprint(String originFingerprint) {
+        this.originFingerprint = originFingerprint;
+    }
+
+    public String getConversionFingerprint() {
+        return conversionFingerprint;
+    }
+
+    public void setConversionFingerprint(String conversionFingerprint) {
+        this.conversionFingerprint = conversionFingerprint;
+    }
 }
