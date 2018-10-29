@@ -2166,8 +2166,11 @@
     <string name="title_contact_request_notification_cancelled" context="Title of the historic notification for a contact request cancelled">Contact request cancelled</string>
     <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]cancelled the contact request.[/B]</string>
 
-    <string name="title_contact_notification_deleted" context="Title of the historic notification for a contact request deleted">Contact deleted</string>
-    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification for a contact request deleted">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+    <string name="title_contact_notification_deleted" context="Title of the historic notification when an user deletes you as contact">Contact deleted</string>
+    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+
+    <string name="title_contact_notification_blocked" context="Title of the historic notification when an user blocks you as contact">Contact blocked</string>
+    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]blocked you as a contact.[/B]</string>
 
     <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
 
@@ -2180,12 +2183,16 @@
     <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
     <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
 
-    <string name="title_outgoing_contact_request" context="Title of the historic notification for contact requests">Sent request</string>
+    <string name="title_outgoing_contact_request" context="Title of the historic notification for outgoing contact requests">Sent request</string>
+    <string name="title_incoming_contact_request" context="Title of the historic notification for incoming contact requests">Received request</string>
 
     <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]denied your contact request.[/B]</string>
     <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
 
     <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for a deleted shared folder">[B]Access to folder shared by [/B][A]%s[/A][B] was removed.[/B]</string>
 
+    <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]</string>
+    <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
+    <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
 
 </resources>
