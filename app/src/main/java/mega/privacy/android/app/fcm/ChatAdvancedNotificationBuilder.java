@@ -1155,7 +1155,11 @@ public final class ChatAdvancedNotificationBuilder {
     public void generateChatNotification(MegaChatRequest request){
         log("generateChatNotification");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            log("generateChatNotification:POST Android O");
+            newGenerateChatNotification(request);
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             String manufacturer = "xiaomi";
             if(!manufacturer.equalsIgnoreCase(Build.MANUFACTURER)) {
