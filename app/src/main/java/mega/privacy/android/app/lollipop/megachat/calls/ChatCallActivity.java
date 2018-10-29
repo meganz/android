@@ -128,7 +128,7 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     MegaChatCall callChat;
     private MegaApiAndroid megaApi = null;
     MegaChatApiAndroid megaChatApi = null;
-    private Handler handler;
+    private Handler handlerArrow1, handlerArrow2, handlerArrow3, handlerArrow4, handlerArrow5, handlerArrow6;
     Display display;
     DisplayMetrics outMetrics;
     float density;
@@ -539,8 +539,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
         myUser = megaApi.getMyUser();
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-        handler = new Handler();
-
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
@@ -1709,17 +1707,32 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 log("onClick video FAB");
                 if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
                     megaChatApi.answerChatCall(chatId, true, this);
+                    if (handlerArrow1 != null){
+                        handlerArrow1.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow2 != null){
+                        handlerArrow2.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow3 != null){
+                        handlerArrow3.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow4 != null){
+                        handlerArrow4.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow5 != null){
+                        handlerArrow5.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow6 != null){
+                        handlerArrow6.removeCallbacksAndMessages(null);
+                    }
                     answerCallFAB.clearAnimation();
-                }
-                else{
+                    videoFAB.clearAnimation();
+                }else{
                     if(callChat.hasLocalVideo()){
                         log(" disableVideo");
-
                         megaChatApi.disableVideo(chatId, this);
-                    }
-                    else{
+                    }else{
                         log(" enableVideo");
-
                         megaChatApi.enableVideo(chatId, this);
                     }
                 }
@@ -1753,10 +1766,36 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
             }
             case R.id.answer_call_fab:{
                 log("Click on answer fab");
-                megaChatApi.answerChatCall(chatId, false, this);
-                videoFAB.clearAnimation();
+                if(callChat.getStatus()==MegaChatCall.CALL_STATUS_RING_IN){
+                    megaChatApi.answerChatCall(chatId, false, this);
+                    if (handlerArrow1 != null){
+                        handlerArrow1.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow2 != null){
+                        handlerArrow2.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow3 != null){
+                        handlerArrow3.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow4 != null){
+                        handlerArrow4.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow5 != null){
+                        handlerArrow5.removeCallbacksAndMessages(null);
+                    }
+                    if (handlerArrow6 != null){
+                        handlerArrow6.removeCallbacksAndMessages(null);
+                    }
+                    answerCallFAB.clearAnimation();
+                    videoFAB.clearAnimation();
+                }else{
 
-                ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                }
+
+                if((callChat.getStatus()==MegaChatCall.CALL_STATUS_IN_PROGRESS)||(callChat.getStatus()==MegaChatCall.CALL_STATUS_REQUEST_SENT)){
+                    ((MegaApplication) getApplication()).sendSignalPresenceActivity();
+                }
+
                 break;
             }
         }
@@ -1819,16 +1858,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 linearFAB.setOrientation(LinearLayout.HORIZONTAL);
 
                 animationAlphaArrows(fourArrowVideo);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                handlerArrow1 = new Handler();
+                handlerArrow1.postDelayed(new Runnable() {
                     public void run() {
                         animationAlphaArrows(thirdArrowVideo);
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
+                        handlerArrow2 = new Handler();
+                        handlerArrow2.postDelayed(new Runnable() {
                             public void run() {
                                 animationAlphaArrows(secondArrowVideo);
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
+                                handlerArrow3 = new Handler();
+                                handlerArrow3.postDelayed(new Runnable() {
                                     public void run() {
                                         animationAlphaArrows(firstArrowVideo);
                                     }
@@ -1837,6 +1876,8 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         }, 250);
                     }
                 }, 250);
+
+
                 videoFAB.setOnTouchListener(new OnSwipeTouchListener(this) {
                     public void onSwipeTop() {
                         log("onSwipeTop");
@@ -1906,16 +1947,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 
                 linearArrowCall.setVisibility(View.VISIBLE);
                 animationAlphaArrows(fourArrowCall);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                handlerArrow4 = new Handler();
+                handlerArrow4.postDelayed(new Runnable() {
                     public void run() {
                         animationAlphaArrows(thirdArrowCall);
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
+                        handlerArrow5 = new Handler();
+                        handlerArrow5.postDelayed(new Runnable() {
                             public void run() {
                                 animationAlphaArrows(secondArrowCall);
-                                Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
+                                handlerArrow6 = new Handler();
+                                handlerArrow6.postDelayed(new Runnable() {
                                     public void run() {
                                         animationAlphaArrows(firstArrowCall);
                                     }
