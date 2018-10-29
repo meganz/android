@@ -359,6 +359,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("ActionBarCallBack::onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.offline_browser_action, menu);
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			return true;
 		}
 		
@@ -367,6 +368,7 @@ public class OfflineFragmentLollipop extends Fragment{
 			log("ActionBarCallBack::onDestroyActionMode");
 			hideMultipleSelect();
 			adapter.setMultipleSelect(false);
+			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 		}
 
 		@Override

@@ -12,16 +12,17 @@
 		    android:background="@drawable/statelist_item_layout">
 
 			<RelativeLayout
-				android:layout_width="36dp"
-				android:layout_height="match_parent"
-				android:layout_marginLeft="18dp"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:layout_marginLeft="12dp"
 				android:layout_marginRight="18dp"
+				android:layout_centerVertical="true"
 				android:id="@+id/container_thumbnail">
 
 				<ImageView
 					android:id="@+id/photo_sync_list_thumbnail"
-					android:layout_width="36dp"
-					android:layout_height="36dp"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
 					android:scaleType="fitCenter"
 					android:layout_centerVertical="true"/>
 			</RelativeLayout>

@@ -5421,15 +5421,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case CAMERA_UPLOADS:{
 				tB.setVisibility(View.VISIBLE);
-    			if (cuFL == null){
-                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
-                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
-                        cuFL = ((CameraUploadFragmentLollipop) currentFragment);
-                    }
-                    else{
-                        cuFL = new CameraUploadFragmentLollipop();
-                    }
-				}
+				cuFL = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_CAMERA);
+
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, cuFL, "cuFLol");
+				ft.commitNow();
 
 				tabLayoutContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -5442,20 +5438,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
-				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
-				if (currentFragment != null) {
-					fragTransaction.detach(currentFragment);
-					fragTransaction.commitNowAllowingStateLoss();
-
-					fragTransaction = getSupportFragmentManager().beginTransaction();
-					fragTransaction.attach(currentFragment);
-					fragTransaction.commitNowAllowingStateLoss();
-				}
-				else{
-					fragTransaction.replace(R.id.fragment_container, cuFL, "cuFLol");
-					fragTransaction.commitNowAllowingStateLoss();
-				}
+//				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+//				if (currentFragment != null) {
+//					fragTransaction.detach(currentFragment);
+//					fragTransaction.commitNowAllowingStateLoss();
+//
+//					fragTransaction = getSupportFragmentManager().beginTransaction();
+//					fragTransaction.attach(currentFragment);
+//					fragTransaction.commitNowAllowingStateLoss();
+//				}
+//				else{
+//					fragTransaction.replace(R.id.fragment_container, cuFL, "cuFLol");
+//					fragTransaction.commitNowAllowingStateLoss();
+//				}
 
     			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -5489,16 +5485,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 
-    			if (muFLol == null){
-                    Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
-                    if(currentFragment != null && currentFragment instanceof CameraUploadFragmentLollipop){
-                        muFLol = (CameraUploadFragmentLollipop) currentFragment;
-                    }
-                    else {
-//    					cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
-                        muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
-                    }
-				}
+				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
+
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, muFLol, "muFLol");
+				ft.commitNowAllowingStateLoss();
 
 				tabLayoutContacts.setVisibility(View.GONE);
     			viewPagerContacts.setVisibility(View.GONE);
@@ -5511,20 +5502,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
-				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
-				if (currentFragment != null) {
-					fragTransaction.detach(currentFragment);
-					fragTransaction.commitNowAllowingStateLoss();
-
-					fragTransaction = getSupportFragmentManager().beginTransaction();
-					fragTransaction.attach(currentFragment);
-					fragTransaction.commitNowAllowingStateLoss();
-				}
-				else{
-					fragTransaction.replace(R.id.fragment_container, muFLol, "muFLol");
-					fragTransaction.commitNowAllowingStateLoss();
-				}
+//				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
+//				if (currentFragment != null) {
+//					fragTransaction.detach(currentFragment);
+//					fragTransaction.commitNowAllowingStateLoss();
+//
+//					fragTransaction = getSupportFragmentManager().beginTransaction();
+//					fragTransaction.attach(currentFragment);
+//					fragTransaction.commitNowAllowingStateLoss();
+//				}
+//				else{
+//					fragTransaction.replace(R.id.fragment_container, muFLol, "muFLol");
+//					fragTransaction.commitNowAllowingStateLoss();
+//				}
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
