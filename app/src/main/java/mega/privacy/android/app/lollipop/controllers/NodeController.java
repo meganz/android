@@ -1581,7 +1581,7 @@ public class NodeController {
     public void openFolderFromSearch(long folderHandle){
         log("openFolderFromSearch: "+folderHandle);
         ((ManagerActivityLollipop)context).textSubmitted = true;
-        ((ManagerActivityLollipop)context).openFolderFromSearch = true;
+        ((ManagerActivityLollipop)context).openFolderRefresh = true;
         boolean firstNavigationLevel=true;
         int access = -1;
         ManagerActivityLollipop.DrawerItem drawerItem = ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE;

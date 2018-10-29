@@ -21,7 +21,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -333,7 +332,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     ArrayList<MegaUser> contacts = new ArrayList<>();
     ArrayList<MegaUser> visibleContacts = new ArrayList<>();
 
-    public boolean openFolderFromSearch = false;
+    public boolean openFolderRefresh = false;
 
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
@@ -5314,9 +5313,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	switch (item){
 			case CLOUD_DRIVE:{
 				selectDrawerItemCloudDrive();
-				if (openFolderFromSearch){
+				if (openFolderRefresh){
 					onNodesCloudDriveUpdate();
-					openFolderFromSearch = false;
+					openFolderRefresh = false;
 				}
     			supportInvalidateOptionsMenu();
 				setToolbarTitle();
@@ -5351,9 +5350,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 				drawerLayout.closeDrawer(Gravity.LEFT);
 
-				if (openFolderFromSearch){
+				if (openFolderRefresh){
 					onNodesCloudDriveUpdate();
-					openFolderFromSearch = false;
+					openFolderRefresh = false;
 				}
 				supportInvalidateOptionsMenu();
 				setToolbarTitle();
@@ -5549,9 +5548,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			drawerLayout.closeDrawer(Gravity.LEFT);
 
-				if (openFolderFromSearch){
+				if (openFolderRefresh){
 					onNodesInboxUpdate();
-					openFolderFromSearch = false;
+					openFolderRefresh = false;
 				}
     			supportInvalidateOptionsMenu();
 				setToolbarTitle();
@@ -5560,9 +5559,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case SHARED_ITEMS:{
 				selectDrawerItemSharedItems();
-				if (openFolderFromSearch){
+				if (openFolderRefresh){
 					onNodesSharedUpdate();
-					openFolderFromSearch = false;
+					openFolderRefresh = false;
 				}
     			supportInvalidateOptionsMenu();
 
@@ -13129,6 +13128,24 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		startActivity(intent);
 	}
 
+	public void navigateToContacts(int index){
+		drawerItem = DrawerItem.CONTACTS;
+		indexContacts = index;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
+	public void navigateToMyAccount(){
+		log("navigateToMyAccount");
+		drawerItem = DrawerItem.ACCOUNT;
+		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+
+		getProLayout.setVisibility(View.GONE);
+		drawerItem = DrawerItem.ACCOUNT;
+		accountFragment = Constants.MY_ACCOUNT_FRAGMENT;
+		displayedAccountType = -1;
+		selectDrawerItemLollipop(drawerItem);
+	}
+
 	@Override
 	public void onClick(View v) {
 		log("onClick");
@@ -16856,22 +16873,55 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void openLocation(long nodeHandle){
+		log("openLocation");
+
+		MegaNode node = megaApi.getNodeByHandle(nodeHandle);
+		if(node == null){
+			return;
+		}
+		MegaNode parent = nC.getParent(node);
+		if (parent.getHandle() == megaApi.getRootNode().getHandle()){
+			//Cloud Drive
+			drawerItem = DrawerItem.CLOUD_DRIVE;
+			openFolderRefresh = true;
+			setParentHandleBrowser(nodeHandle);
+			selectDrawerItemLollipop(drawerItem);
+		}
+		else if (parent.getHandle() == megaApi.getRubbishNode().getHandle()){
+			//Rubbish
+			drawerItem = DrawerItem.RUBBISH_BIN;
+			openFolderRefresh = true;
+			setParentHandleBrowser(nodeHandle);
+			selectDrawerItemLollipop(drawerItem);
+		}
+		else if (parent.getHandle() == megaApi.getInboxNode().getHandle()){
+			//Inbox
+			drawerItem = DrawerItem.INBOX;
+			openFolderRefresh = true;
+			setParentHandleBrowser(nodeHandle);
+			selectDrawerItemLollipop(drawerItem);
+		}
+		else{
+			//Incoming Shares
+			drawerItem = DrawerItem.SHARED_ITEMS;
+			indexShares = 0;
+			if (parent != null){
+				deepBrowserTreeIncoming = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this);
+			}
+			openFolderRefresh = true;
+			setParentHandleIncoming(nodeHandle);
+			selectDrawerItemLollipop(drawerItem);
+		}
+	}
+
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
 		log("onUserAlertsUpdate");
 		setNotificationsTitleSection();
 
 		if(notificFragment!=null && notificFragment.isAdded()){
-			ListIterator<MegaUserAlert> itrReplace = userAlerts.listIterator();
-			while (itrReplace.hasNext()) {
-				MegaUserAlert alert = itrReplace.next();
-				if (alert != null) {
-					if (alert.getSeen()==false) {
-						//Add the new notification
-						notificFragment.addNotification(alert);
-					}
-				}
-			}
+            notificFragment.updateNotifications(userAlerts);
 		}
 
 		updateNavigationToolbarIcon();
