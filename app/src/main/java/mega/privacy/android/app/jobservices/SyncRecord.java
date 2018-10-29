@@ -59,7 +59,7 @@ public class SyncRecord {
         this.copyOnly = copyOnly;
     }
     
-    public Boolean getSecondary() {
+    public Boolean isSecondary() {
         return isSecondary;
     }
     

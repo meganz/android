@@ -715,8 +715,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(record.isCopyOnly() != null) {
             values.put(KEY_SYNC_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
         }
-        if(record.getSecondary() != null) {
-            values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.getSecondary())));
+        if(record.isSecondary() != null) {
+            values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.isSecondary())));
         }
         values.put(KEY_SYNC_STATE,record.getStatus());
         db.insert(TABLE_CAMERA_UPLOADS,null,values);
@@ -748,8 +748,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(record.isCopyOnly() != null) {
             values.put(KEY_VIDEO_COPYONLY,encrypt(String.valueOf(record.isCopyOnly())));
         }
-        if(record.getSecondary() != null) {
-            values.put(KEY_VIDEO_SECONDARY,encrypt(String.valueOf(record.getSecondary())));
+        if(record.isSecondary() != null) {
+            values.put(KEY_VIDEO_SECONDARY,encrypt(String.valueOf(record.isSecondary())));
         }
         values.put(KEY_VIDEO_STATE,record.getStatus());
         db.insert(TABLE_VIDEO_UPLOADS,null,values);
@@ -799,7 +799,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public List<SyncRecord> findVideoRecordsByState(int state) {
-        String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_STATE + " = " + state + ")";
+        String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_STATE + " = " + state ;
         Cursor cursor = db.rawQuery(selectQuery,null);
 
         List<SyncRecord> records = new ArrayList<>();
@@ -886,14 +886,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
-    public void deleteVideoRecordByPath(String originFilepath) {
-        String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS + "  WHERE " + KEY_VIDEO_FILEPATH_ORI + " = '" + encrypt(originFilepath) + "'";
+    public void deleteVideoRecordByNewPath(String newPath) {
+        String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS + "  WHERE " + KEY_VIDEO_FILEPATH_CON + " = '" + encrypt(newPath) + "'";
+        db.execSQL(sql);
+    }
+    
+    public void updateVideoRecordStatusByPath(int status, String path) {
+        String sql = "UPDATE " + TABLE_VIDEO_UPLOADS + " SET " + KEY_VIDEO_STATE + " = " + status + "  WHERE " + KEY_VIDEO_FILEPATH_ORI + " = '" + encrypt(path) + "'";
         db.execSQL(sql);
     }
 
     public void deleteVideoRecordByFileName(String fileName) {
         String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS + "  WHERE " + KEY_VIDEO_FILENAME + " = '" + encrypt(fileName) + "'" + " OR " + KEY_VIDEO_FILEPATH_ORI +  " LIKE '%" + encrypt(fileName) + "'";
         db.execSQL(sql);
+    }
+    
+    public SyncRecord findVideoByNewPath(String filePath) {
+        String selectQuery = "SELECT * FROM " + TABLE_VIDEO_UPLOADS + " WHERE " + KEY_VIDEO_FILEPATH_CON + " ='" + encrypt(filePath) + "'";
+        Cursor cursor = db.rawQuery(selectQuery,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            SyncRecord record = extractSyncRecord(cursor);
+            cursor.close();
+            return record;
+        }
+        return null;
     }
 
     public Long findMaxTimestamp(Boolean isSecondary) {

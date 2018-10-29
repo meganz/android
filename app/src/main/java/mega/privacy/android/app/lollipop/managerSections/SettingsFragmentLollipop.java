@@ -100,7 +100,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	private final int COMPRESSION_QUEUE_SIZE_MIN = 100;
 	private final int COMPRESSION_QUEUE_SIZE_MAX = 1000;
-	public final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
+	public static final int DEFAULT_CONVENTION_QUEUE_SIZE = 200;
 	
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
 	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
@@ -180,8 +180,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public final static int CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS = 1001;
 	public final static int CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS = 1002;
 	public final static int CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS = 1003;
-	private final int VIDEO_QUALITY_ORIGINAL = 0;
-	private final int VIDEO_QUALITY_MEDIUM = 1;
+	public final static int VIDEO_QUALITY_ORIGINAL = 0;
+    public final static int VIDEO_QUALITY_MEDIUM = 1;
 	
 	public final static int STORAGE_DOWNLOAD_LOCATION_INTERNAL_SD_CARD = 1001;
 	public final static int STORAGE_DOWNLOAD_LOCATION_EXTERNAL_SD_CARD = 1002;

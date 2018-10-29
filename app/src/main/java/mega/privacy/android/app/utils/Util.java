@@ -2050,4 +2050,9 @@ public class Util {
             }
         }, 50);
     }
+    
+    public static String getFileNameFromPath(String path) {
+        String[] paths = path.split(File.separator);
+        return paths[paths.length - 1];
+    }
 }

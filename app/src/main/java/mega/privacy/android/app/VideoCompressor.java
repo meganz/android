@@ -14,10 +14,11 @@ import android.view.Surface;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-import mega.privacy.android.app.utils.conversion.ProgressUpdateCallback;
+import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 import static android.media.MediaFormat.KEY_COLOR_FORMAT;
 import static android.media.MediaFormat.KEY_FRAME_RATE;
@@ -47,7 +48,7 @@ public class VideoCompressor {
 
     static ConcurrentLinkedQueue<VideoUpload> queue;
 
-    private ProgressUpdateCallback updater;
+    private VideoCompressionCallback updater;
 
     private long totalInputSize;
 
@@ -89,7 +90,7 @@ public class VideoCompressor {
         }
     }
 
-    public VideoCompressor(Context context,ProgressUpdateCallback callback) {
+    public VideoCompressor(Context context,VideoCompressionCallback callback) {
         this.context = context;
         this.updater = callback;
         outputRoot = context.getCacheDir().toString() + File.separator;
@@ -101,20 +102,21 @@ public class VideoCompressor {
         ChangerWrapper.changeResolutionInSeparatedThread(this);
     }
 
-    public void changeResolutionSingleThread(String[] inputPath) {
-        totalCount = inputPath.length;
-        for (int i = 0;i < inputPath.length;i++) {
-            totalInputSize += new File(inputPath[i]).length();
+    public void changeResolutionSingleThread(ArrayList<String> inputPath) {
+        totalCount = inputPath.size();
+        for (int i = 0;i < totalCount;i++) {
+            totalInputSize += new File(inputPath.get(i)).length();
         }
 
-        for (int i = 0;i < inputPath.length;i++) {
+        for (int i = 0;i < totalCount;i++) {
             currentFileIndex = i + 1;
-            String path = inputPath[i];
+            String path = inputPath.get(i);
             long size = new File(path).length();
 
             VideoUpload video = new VideoUpload(path,outputRoot + getFileNameFromPath(path),size);
             try {
                 prepareAndChangeResolutionSingleThread(video);
+                updater.onCompressSuccessful(path);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 if (ex instanceof android.media.MediaCodec.CodecException) {
@@ -124,9 +126,10 @@ public class VideoCompressor {
                 }
                 currentFileIndex++;
                 totalRead += size;
+                updater.onCompressFailed(path);
             }
         }
-        updater.finish(totalCount + "/" + totalCount);
+        updater.onCompressFinished(totalCount + "/" + totalCount);
     }
 
     private static class ChangerWrapper implements Runnable {
@@ -769,7 +772,7 @@ public class VideoCompressor {
                 muxing = true;
             }
             int percentage = (int)Math.round((double)totalRead / totalInputSize * 100);
-            updater.updateProgress(percentage,currentFileIndex + "/" + totalCount);
+            updater.onCompressUpdateProgress(percentage,currentFileIndex + "/" + totalCount);
         }
     }
 

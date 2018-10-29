@@ -244,13 +244,11 @@ public class Constants {
 	public static int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
 	public static int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
 	public static int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
-//	public static int NOTIFICATION_PUSH_CONTACT = 9;
 	public static int NOTIFICATION_SUMMARY_INCOMING_CONTACT = 9;
 	public static int NOTIFICATION_STREAMING_OVERQUOTA= 10;
 	public static int NOTIFICATION_CALL_IN_PROGRESS = 11;
 	public static int NOTIFICATION_MISSED_CALL = 12;
 	public static int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
-//	public static int NOTIFICATION_PRE_N_CHAT = 13;
 	public static int NOTIFICATION_STORAGE_OVERQUOTA = 14;
 	public static int NOTIFICATION_CHAT_UPLOAD = 15;
 
