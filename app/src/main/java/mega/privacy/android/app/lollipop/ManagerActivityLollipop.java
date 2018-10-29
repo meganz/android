@@ -16664,6 +16664,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
 									log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
 									megaApi.getContactLinksOption(this);
+								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
+									log("Change on CHANGE_TYPE_RUBBISH_TIME");
+									megaApi.getRubbishBinAutopurgePeriod(this);
 								}
 							}
 						}
