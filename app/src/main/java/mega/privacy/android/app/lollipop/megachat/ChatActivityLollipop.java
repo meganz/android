@@ -1067,15 +1067,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         aB.setTitle(chatRoom.getTitle());
                         setChatSubtitle();
 
-                        if (intentAction.equals(Constants.ACTION_NEW_CHAT)) {
-                            log("ACTION_CHAT_NEW");
+                        if (intentAction.equals(Constants.ACTION_NEW_CHAT) && savedInstanceState==null) {
+                            log("ACTION_CHAT_NEW: for opening first time");
                             textChat.setOnFocusChangeListener(focus);
 
                             emptyTextView.setVisibility(View.GONE);
                             emptyLayout.setVisibility(View.GONE);
                             chatRelativeLayout.setVisibility(View.VISIBLE);
-                        } else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES)) {
-                            log("ACTION_CHAT_SHOW_MESSAGES");
+                        }
+                        else if (intentAction.equals(Constants.ACTION_CHAT_SHOW_MESSAGES) || intentAction.equals(Constants.ACTION_NEW_CHAT)) {
+                            log("ACTION_CHAT_SHOW_MESSAGES or rotating a new chat");
                             isOpeningChat = true;
 
                             String text = newIntent.getStringExtra("showSnackbar");
