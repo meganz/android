@@ -87,7 +87,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="72dp"
         android:background="@color/sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -100,38 +99,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/item_list_bottom_sheet_contact_file">
-
-            <!-- Options -->
-            <LinearLayout
-                android:id="@+id/option_download_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_download_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.54"
-                    android:paddingBottom="2dp"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_download"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_download_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/general_download"
-                    android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
-            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/option_properties_layout"
@@ -164,6 +131,54 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
+
+            <!-- Options -->
+            <LinearLayout
+                android:id="@+id/option_download_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_download_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.54"
+                    android:paddingBottom="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_b_save_to_device"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/option_download_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/general_save_to_device"
+                    android:layout_marginLeft="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_download"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
+
+            <LinearLayout
                 android:id="@+id/option_leave_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -193,6 +208,14 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_leave"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
@@ -286,6 +309,14 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_modify"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/option_rubbish_bin_layout"

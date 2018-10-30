@@ -20,7 +20,7 @@
         android:icon="@drawable/ic_menu_download_dark"
         android:orderInCategory="105"
         android:showAsAction="never"
-        android:title="@string/general_download"
+        android:title="@string/general_save_to_device"
         MEGA:showAsAction="never" />
         
 </menu>

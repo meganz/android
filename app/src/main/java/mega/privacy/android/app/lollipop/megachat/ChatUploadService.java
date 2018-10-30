@@ -67,6 +67,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_CHAT_ID = "CHAT_ID";
 	public static String EXTRA_ID_PEND_MSG = "ID_PEND_MSG";
+	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
 
 	private boolean isForeground = false;
 	private boolean canceled;

@@ -264,13 +264,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				Window window = this.getWindow();
-				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-				window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-			}
-
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
@@ -2267,7 +2260,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         builder.setView(confirmationLayout);
         
         builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_download),
+        builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if(dontShowAgain.isChecked()){
@@ -2314,7 +2307,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         builder.setView(confirmationLayout);
         
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-        builder.setPositiveButton(getString(R.string.general_download),
+        builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         if(dontShowAgain.isChecked()){
