@@ -60,6 +60,8 @@ public class VideoCompressor {
 
     private int currentFileIndex;
 
+    private boolean isRunning;
+
     private class VideoUpload {
 
         String original;
@@ -91,6 +93,10 @@ public class VideoCompressor {
                     '}';
         }
 
+    }
+
+    public void stop() {
+        isRunning = false;
     }
 
     public VideoCompressor(Context context) {
@@ -133,7 +139,8 @@ public class VideoCompressor {
 
 
     public void start() {
-        for (int i = 0;i < totalCount;i++) {
+        isRunning = true;
+        for (int i = 0;i < totalCount && isRunning;i++) {
             currentFileIndex = i + 1;
             String path = pendingList.get(i);
             long size = new File(path).length();
@@ -144,12 +151,25 @@ public class VideoCompressor {
                 updater.onCompressSuccessful(path);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                if (ex instanceof IllegalStateException) {
+                    handleIllegalStateException();
+                } else {
+                    handleException();
+                }
                 currentFileIndex++;
                 totalRead += size;
                 updater.onCompressFailed(path);
             }
         }
         updater.onCompressFinished(totalCount + "/" + totalCount);
+    }
+
+    private void handleException() {
+        //TODO
+    }
+
+    private void handleIllegalStateException() {
+        //TODO
     }
 
     private static class ChangerWrapper implements Runnable {
@@ -215,24 +235,7 @@ public class VideoCompressor {
             int videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor);
             MediaFormat inputFormat = videoExtractor.getTrackFormat(videoInputTrack);
 
-            MediaMetadataRetriever m = new MediaMetadataRetriever();
-            m.setDataSource(mInputFile);
-            Bitmap thumbnail = m.getFrameAtTime();
-            int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
-
-            if (inputWidth > inputHeight) {
-                if (mWidth < mHeight) {
-                    int w = mWidth;
-                    mWidth = mHeight;
-                    mHeight = w;
-                }
-            } else {
-                if (mWidth > mHeight) {
-                    int w = mWidth;
-                    mWidth = mHeight;
-                    mHeight = w;
-                }
-            }
+            resetWidthAndHeight(mInputFile);
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE,mWidth,mHeight);
             outputVideoFormat.setInteger(KEY_COLOR_FORMAT,OUTPUT_VIDEO_COLOR_FORMAT);
@@ -341,6 +344,26 @@ public class VideoCompressor {
         }
         if (exception != null) {
             throw exception;
+        }
+    }
+
+    private void resetWidthAndHeight(String mInputFile) {
+        MediaMetadataRetriever m = new MediaMetadataRetriever();
+        m.setDataSource(mInputFile);
+        Bitmap thumbnail = m.getFrameAtTime();
+        int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
+        if (inputWidth > inputHeight) {
+            if (mWidth < mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
+        } else {
+            if (mWidth > mHeight) {
+                int w = mWidth;
+                mWidth = mHeight;
+                mHeight = w;
+            }
         }
     }
 
@@ -790,6 +813,9 @@ public class VideoCompressor {
                 outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat);
                 muxer.start();
                 muxing = true;
+            }
+            if (!isRunning) {
+                break;
             }
             int percentage = (int)Math.round((double)totalRead / totalInputSize * 100);
             updater.onCompressUpdateProgress(percentage,currentFileIndex + "/" + totalCount);
