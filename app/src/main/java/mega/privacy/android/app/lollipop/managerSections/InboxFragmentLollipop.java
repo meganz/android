@@ -51,8 +51,8 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
+import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -79,7 +79,7 @@ public class InboxFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	CloudDriveAdapter adapter;
-    FloatingItemDecoration floatingItemDecoration;
+    NewHeaderItemDecoration headerItemDecoration;
     private int placeholderCount;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
@@ -142,8 +142,7 @@ public class InboxFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+
         if (type == CloudDriveAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -151,7 +150,7 @@ public class InboxFragmentLollipop extends Fragment{
             }
             if(folderCount > 0) {
                 for (int i = 0;i < spanCount;i++) {
-                    sections.put(i,folderCount + " " + folderStr);
+                    sections.put(i, getString(R.string.general_folders));
                 }
             }
     
@@ -159,25 +158,26 @@ public class InboxFragmentLollipop extends Fragment{
                 placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
                 if (placeholderCount == 0) {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + i, getString(R.string.general_files));
                     }
                 } else {
                     for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i,fileCount + " " + fileStr);
+                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
                     }
                 }
             }
         } else {
             placeholderCount = 0;
-            sections.put(0,folderCount + " " + folderStr);
-            sections.put(folderCount,fileCount + " " + fileStr);
+            sections.put(0, getString(R.string.general_folders));
+            sections.put(folderCount, getString(R.string.general_files));
         }
-        if (floatingItemDecoration == null) {
-            floatingItemDecoration = new FloatingItemDecoration(context);
-            recyclerView.addItemDecoration(floatingItemDecoration);
-        }
-        floatingItemDecoration.setType(type);
-        floatingItemDecoration.setKeys(sections);
+
+		if (headerItemDecoration == null) {
+			headerItemDecoration = new NewHeaderItemDecoration(context);
+			recyclerView.addItemDecoration(headerItemDecoration);
+		}
+		headerItemDecoration.setType(type);
+		headerItemDecoration.setKeys(sections);
     }
 
 	public ImageView getImageDrag(int position) {
@@ -280,7 +280,7 @@ public class InboxFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -462,6 +462,17 @@ public class InboxFragmentLollipop extends Fragment{
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
+
+	public void checkScroll () {
+		if (recyclerView != null) {
+			if (recyclerView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -506,6 +517,13 @@ public class InboxFragmentLollipop extends Fragment{
 			recyclerView.setClipToPadding(false);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.inbox_list_empty_text);
@@ -536,6 +554,13 @@ public class InboxFragmentLollipop extends Fragment{
 			
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.inbox_grid_view);
 			recyclerView.setHasFixedSize(true);
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -603,7 +628,7 @@ public class InboxFragmentLollipop extends Fragment{
 			List<MegaNode> selectedNodes = adapter.getSelectedNodes();
 			if (selectedNodes.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{
@@ -990,7 +1015,7 @@ public class InboxFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}

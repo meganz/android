@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -52,6 +53,7 @@ import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -78,11 +80,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 	final int WIDTH = 500;
 
+	ScrollView scrollView;
 	Context context;
 	MyAccountInfo myAccountInfo;
 
 	RelativeLayout avatarLayout;
-	TextView initialLetter;
 	RoundedImageView myAccountImage;
 
 	TextView nameView;
@@ -136,7 +138,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		super.onCreate(savedInstanceState);
 	}
-	
+
+	public void checkScroll () {
+		if (scrollView != null) {
+			if (scrollView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -156,6 +168,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
+
+		scrollView = (ScrollView) v.findViewById(R.id.my_account_complete_relative_layout);
+		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				if (scrollView.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		if(megaApi.getMyUser() == null){
 			return null;
@@ -199,8 +224,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail.setOnClickListener(this);
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
-
-		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -801,37 +824,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setDefaultAvatar(){
 		log("setDefaultAvatar");
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			log("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		}
 
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		myAccountImage.setImageBitmap(defaultAvatar);
-
-		int avatarTextSize = getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		initialLetter.setText(myAccountInfo.getFirstLetter());
-		initialLetter.setTextSize(30);
-		initialLetter.setTextColor(Color.WHITE);
-		initialLetter.setVisibility(View.VISIBLE);
+		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
@@ -866,7 +862,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				else{
 					log("Show my avatar");
 					myAccountImage.setImageBitmap(imBitmap);
-					initialLetter.setVisibility(View.GONE);
 				}
 			}
 		}else{
