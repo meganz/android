@@ -390,13 +390,17 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onResume() {
+        super.onResume();
         setNotifications();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
         if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
             megaApi.acknowledgeUserAlerts();
         }
-
-        super.onResume();
     }
 
     public int getItemCount(){
