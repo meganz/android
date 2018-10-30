@@ -2638,20 +2638,37 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
-                //7 + peers
-                recyclerView.setAdapter(null);
-                recyclerView.setVisibility(GONE);
 
-                parentBigCameraGroupCall.setOnClickListener(this);
-                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                if((peersOnCall.size() == 7) && (recyclerView.isShown())){
+                    recyclerView.setAdapter(null);
+                    recyclerView.setVisibility(GONE);
 
-                bigRecyclerView.setVisibility(View.VISIBLE);
+                    parentBigCameraGroupCall.setOnClickListener(this);
+                    parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
-//                bigRecyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
-                bigRecyclerView.setAdapter(adapter);
+                    bigRecyclerView.setVisibility(View.VISIBLE);
+                    adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
+                    bigRecyclerView.setAdapter(adapter);
 
+                }else{
+                    adapter.notifyDataSetChanged();
+                }
                 updateUserSelected(flag);
+
+//                //7 + peers
+//                recyclerView.setAdapter(null);
+//                recyclerView.setVisibility(GONE);
+//
+//                parentBigCameraGroupCall.setOnClickListener(this);
+//                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+//
+//                bigRecyclerView.setVisibility(View.VISIBLE);
+//
+////                bigRecyclerView.setAdapter(null);
+//                adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
+//                bigRecyclerView.setAdapter(adapter);
+//
+//                updateUserSelected(flag);
             }
 
         }else{
@@ -2713,19 +2730,36 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                 }
 
             }else{
-                //7 + peers
-                recyclerView.setAdapter(null);
-                recyclerView.setVisibility(GONE);
+                if((peersBeforeCall.size() == 7) && (recyclerView.isShown())){
+                    recyclerView.setAdapter(null);
+                    recyclerView.setVisibility(GONE);
 
-                parentBigCameraGroupCall.setOnClickListener(this);
-                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+                    parentBigCameraGroupCall.setOnClickListener(this);
+                    parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
-                bigRecyclerView.setVisibility(View.VISIBLE);
+                    bigRecyclerView.setVisibility(View.VISIBLE);
+                    adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
+                    bigRecyclerView.setAdapter(adapter);
 
-//                bigRecyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
-                bigRecyclerView.setAdapter(adapter);
+                }else{
+                    adapter.notifyDataSetChanged();
+                }
                 updateUserSelected(flag);
+
+
+//                //7 + peers
+//                recyclerView.setAdapter(null);
+//                recyclerView.setVisibility(GONE);
+//
+//                parentBigCameraGroupCall.setOnClickListener(this);
+//                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+//
+//                bigRecyclerView.setVisibility(View.VISIBLE);
+//
+////                bigRecyclerView.setAdapter(null);
+//                adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
+//                bigRecyclerView.setAdapter(adapter);
+//                updateUserSelected(flag);
             }
         }
     }
