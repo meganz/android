@@ -14,7 +14,7 @@ import android.view.Surface;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -43,6 +43,8 @@ public class VideoCompressor {
     private int mHeight = 720;
 
     private Context context;
+
+    private List<String> pendingList;
 
     private String outputRoot;
 
@@ -88,6 +90,13 @@ public class VideoCompressor {
                     ", sizeRead=" + sizeRead +
                     '}';
         }
+
+    }
+
+    public VideoCompressor(Context context) {
+        this.context = context;
+        outputRoot = context.getCacheDir().toString() + File.separator;
+        queue = new ConcurrentLinkedQueue<>();
     }
 
     public VideoCompressor(Context context,VideoCompressionCallback callback) {
@@ -97,20 +106,36 @@ public class VideoCompressor {
         queue = new ConcurrentLinkedQueue<>();
     }
 
+    public void setPendingList(List<String> pendingList) {
+        this.pendingList = pendingList;
+        totalCount = pendingList.size();
+        calculateTotalSize();
+    }
+
+    private void calculateTotalSize() {
+        for (int i = 0;i < totalCount;i++) {
+            totalInputSize += new File(pendingList.get(i)).length();
+        }
+    }
+
+    public long getTotalInputSize() {
+        return this.totalInputSize;
+    }
+
+    public void setOutputRoot(String root) {
+        this.outputRoot = root;
+    }
+
     public void changeResolution(File f,String inputFile) throws Throwable {
         queue.add(new VideoUpload(f.getAbsolutePath(),inputFile,f.length()));
         ChangerWrapper.changeResolutionInSeparatedThread(this);
     }
 
-    public void changeResolutionSingleThread(ArrayList<String> inputPath) {
-        totalCount = inputPath.size();
-        for (int i = 0;i < totalCount;i++) {
-            totalInputSize += new File(inputPath.get(i)).length();
-        }
 
+    public void start() {
         for (int i = 0;i < totalCount;i++) {
             currentFileIndex = i + 1;
-            String path = inputPath.get(i);
+            String path = pendingList.get(i);
             long size = new File(path).length();
 
             VideoUpload video = new VideoUpload(path,outputRoot + getFileNameFromPath(path),size);
@@ -119,11 +144,6 @@ public class VideoCompressor {
                 updater.onCompressSuccessful(path);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                if (ex instanceof android.media.MediaCodec.CodecException) {
-                    if ("Error 0xfffffc0e".equals(ex.getMessage())) {
-                        //TODO get path here, for following operation.
-                    }
-                }
                 currentFileIndex++;
                 totalRead += size;
                 updater.onCompressFailed(path);
