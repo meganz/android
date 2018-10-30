@@ -18265,7 +18265,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public boolean isMkLayoutVisible() {
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+        log("onChatConnectionStateUpdate");
+    }
+
+    public boolean isMkLayoutVisible() {
 		return mkLayoutVisible;
 	}
 
