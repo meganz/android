@@ -294,7 +294,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
 		if (view != null) {
 			log("toggleSelection Start animation: " + pos);
-			Animation flipAnimation = AnimationUtils.loadAnimation(context.getApplicationContext(), R.anim.multiselect_flip);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
 				public void onAnimationStart(Animation animation) {

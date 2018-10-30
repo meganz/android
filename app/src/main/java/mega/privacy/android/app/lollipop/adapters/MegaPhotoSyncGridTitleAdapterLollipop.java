@@ -251,18 +251,17 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             multipleSelect = false;
             actionMode = null;
             ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                final Window window = ((ManagerActivityLollipop) context).getWindow();
-//                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        window.setStatusBarColor(0);
-//                    }
-//                }, 300);
-//            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                final Window window = ((ManagerActivityLollipop) context).getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        window.setStatusBarColor(0);
+                    }
+                }, 350);
+            }
         }
 
         @Override
