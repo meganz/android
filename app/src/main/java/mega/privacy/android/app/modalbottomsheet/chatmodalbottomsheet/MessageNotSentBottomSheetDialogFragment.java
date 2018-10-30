@@ -115,6 +115,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteLayout = (LinearLayout) contentView.findViewById(R.id.msg_not_sent_delete_layout);
         optionDeleteLayout.setOnClickListener(this);
 
+        LinearLayout separator = (LinearLayout) contentView.findViewById(R.id.separator);
+
         if(selectedMessage!=null&&selectedChat!=null){
             if(selectedMessage.getMessage().isEdited()){
                 log("Message edited : final id: "+selectedMessage.getMessage().getMsgId()+" temp id: "+selectedMessage.getMessage().getTempId());
@@ -147,6 +149,13 @@ public class MessageNotSentBottomSheetDialogFragment extends BottomSheetDialogFr
                     optionRetryLayout.setVisibility(View.GONE);
                 }
             }
+        }
+
+        if (optionRetryLayout.getVisibility() == View.GONE || optionDeleteLayout.getVisibility() == View.GONE) {
+            separator.setVisibility(View.GONE);
+        }
+        else {
+            separator.setVisibility(View.VISIBLE);
         }
 
         dialog.setContentView(contentView);
