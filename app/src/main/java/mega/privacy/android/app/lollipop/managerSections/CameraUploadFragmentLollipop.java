@@ -40,6 +40,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -146,6 +148,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private long photosyncHandle = -1;
 
 	ScrollView scrollView;
+
+	Handler handler;
 
 	public class PhotoSyncHolder{
 		public boolean isNode;
@@ -408,7 +412,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					adapterGrid.setMultipleSelect(false);
 				}
 			}
-			((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				final Window window = ((ManagerActivityLollipop) context).getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 350);
+			}
 		}
 
 		@Override
@@ -616,6 +630,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		handler = new Handler();
 		
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
@@ -2448,6 +2464,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if(megaApi != null)
 		{	
 			megaApi.removeRequestListener(this);
+		}
+		if (handler != null) {
+			handler.removeCallbacksAndMessages(null);
 		}
 		
 		super.onDestroy();
