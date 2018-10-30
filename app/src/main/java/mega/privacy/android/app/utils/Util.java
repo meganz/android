@@ -24,6 +24,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
@@ -32,6 +33,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
@@ -48,6 +50,8 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -88,6 +92,7 @@ import javax.crypto.spec.SecretKeySpec;
 import mega.privacy.android.app.AndroidLogger;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaAttributes;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
@@ -1655,6 +1660,30 @@ public class Util {
 			return false;
 		}
 	}
+
+	public static long getLastPublicHandle(MegaAttributes attributes){
+		long lastPublicHandle = -1;
+
+		if (attributes != null){
+			if (attributes.getLastPublicHandle() != null){
+				try{
+					long currentTime = System.currentTimeMillis()/1000;
+					long lastPublicHandleTimeStamp = Long.parseLong(attributes.getLastPublicHandleTimeStamp());
+					log("currentTime: " + currentTime + " _ " + lastPublicHandleTimeStamp);
+					if ((currentTime - lastPublicHandleTimeStamp) < 86400){
+						if (Long.parseLong(attributes.getLastPublicHandle()) != -1){
+							lastPublicHandle = Long.parseLong(attributes.getLastPublicHandle());
+						}
+					}
+				}
+				catch (Exception e){
+					lastPublicHandle = -1;
+				}
+			}
+		}
+
+		return lastPublicHandle;
+	}
 	
 	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
 		
@@ -1776,6 +1805,25 @@ public class Util {
 			return pInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
 			return 0;
+		}
+	}
+
+	public static boolean isFile (String path){
+		if (path == null) {
+			path = "";
+		}
+		String fixedName = path.trim().toLowerCase();
+		String extension = null;
+		int index = fixedName.lastIndexOf(".");
+		if((index != -1) && ((index+1)<fixedName.length())) {
+			extension = fixedName.substring(index + 1);
+		}
+
+		if(extension!=null){
+			return true;
+		}
+		else{
+			return false;
 		}
 	}
 
@@ -1947,6 +1995,14 @@ public class Util {
 		return icon;
 	}
 
+	public static Drawable mutateIconSecondary(Context context, int idDrawable, int idColor) {
+		Drawable icon = ContextCompat.getDrawable(context, idDrawable);
+		icon = icon.mutate();
+		icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.SRC_ATOP);
+
+		return icon;
+	}
+
 	//Notice user that any transfer prior to login will be destroyed
 	public static void checkPendingTransfer(MegaApiAndroid megaApi, Context context, final AbortPendingTransferCallback callback){
 		if(megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0){
@@ -1984,6 +2040,102 @@ public class Util {
 			callback.onAbortConfirm();
 		}
 	}
+
+	public static void changeStatusBarColorActionMode (final Context context, final Window window, Handler handler, int option) {
+		log("changeStatusBarColor");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+			if (option ==  1) {
+				window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+			}
+			else if (option == 2) {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 500);
+			}
+			else {
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(ContextCompat.getColor(context, R.color.dark_primary_color_secondary));
+					}
+				}, 500);
+			}
+		}
+	}
+
+	public static Bitmap createDefaultAvatar (String color, String firstLetter) {
+		log("createDefaultAvatar color: '"+color+"' firstLetter: '"+firstLetter+"'");
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT,Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint paintText = new Paint();
+		Paint paintCircle = new Paint();
+
+		paintText.setColor(Color.WHITE);
+		paintText.setTextSize(150);
+		paintText.setAntiAlias(true);
+		paintText.setTextAlign(Paint.Align.CENTER);
+		Typeface face = Typeface.SANS_SERIF;
+		paintText.setTypeface(face);
+		paintText.setAntiAlias(true);
+		paintText.setSubpixelText(true);
+		paintText.setStyle(Paint.Style.FILL);
+
+		if(color!=null){
+			log("The color to set the avatar is "+color);
+			paintCircle.setColor(Color.parseColor(color));
+			paintCircle.setAntiAlias(true);
+		}
+		else{
+			log("Default color to the avatar");
+			paintCircle.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+			paintCircle.setAntiAlias(true);
+		}
+
+
+		int radius;
+		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+			radius = defaultAvatar.getWidth()/2;
+		else
+			radius = defaultAvatar.getHeight()/2;
+
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius,paintCircle);
+
+		log("Draw letter: "+firstLetter);
+		Rect bounds = new Rect();
+
+		paintText.getTextBounds(firstLetter,0,firstLetter.length(),bounds);
+		int xPos = (c.getWidth()/2);
+		int yPos = (int)((c.getHeight()/2)-((paintText.descent()+paintText.ascent()/2))+20);
+		c.drawText(firstLetter.toUpperCase(Locale.getDefault()), xPos, yPos, paintText);
+
+		return defaultAvatar;
+	}
+
+	public static String getDownloadLocation (Context context) {
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+        MegaPreferences prefs = dbH.getPreferences();
+
+        if (prefs != null){
+            log("prefs != null");
+            if (prefs.getStorageAskAlways() != null){
+                if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+                    log("askMe==false");
+                    if (prefs.getStorageDownloadLocation() != null){
+                        if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+                            return prefs.getStorageDownloadLocation();
+                        }
+                    }
+                }
+            }
+        }
+        return Util.downloadDIR;
+    }
 
 	private static void log(String message) {
 		log("Util", message);

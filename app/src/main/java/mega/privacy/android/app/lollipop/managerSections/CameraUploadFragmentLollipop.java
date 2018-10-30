@@ -21,7 +21,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -33,8 +32,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,11 +40,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,11 +65,12 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.DividerItemDecoration;
+import mega.privacy.android.app.components.DividerItemDecorationV2;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaPhotoSyncGridTitleAdapterLollipop;
@@ -87,7 +88,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
 
-public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
+public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, MegaRequestListenerInterface{
 
 	public static ImageView imageDrag;
 
@@ -102,7 +103,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private Context context;
 	private ActionBar aB;
 	private RecyclerView listView;
-	private GestureDetectorCompat detector;
 	RecyclerView.LayoutManager mLayoutManager;
 	FastScroller fastScroller;
 
@@ -146,6 +146,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 	private ProgressDialog statusDialog;
 	private long photosyncHandle = -1;
+
+	ScrollView scrollView;
+
+	Handler handler;
 
 	public class PhotoSyncHolder{
 		public boolean isNode;
@@ -200,29 +204,13 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		return null;
 	}
-	
-	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
-		public void onLongPress(MotionEvent e) {
-			log("onLongPress");
-			if (((ManagerActivityLollipop)context).isListCameraUploads()){
-				log("onLongPress:isList");
-		        View view = listView.findChildViewUnder(e.getX(), e.getY());
-		        int position = listView.getChildPosition(view);
-	
-		        // handle long press
-		        if (!adapterList.isMultipleSelect()){
-					adapterList.setMultipleSelect(true);
-				
-					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
-	
-			        itemClick(position, null, null);
-			        super.onLongPress(e);
-		        }
-			}
-			else{
-				log("onLongPress:isGrid");
-			}
-	    }
+
+	public void activateActionMode(){
+		log("activateActionMode");
+		if (!adapterList.isMultipleSelect()){
+			adapterList.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+		}
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -384,7 +372,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 
 					break;
@@ -401,6 +388,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
+			if (type == TYPE_CAMERA) {
+				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+			}
 			return true;
 		}
 
@@ -408,7 +399,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public void onDestroyActionMode(ActionMode mode) {
 			log("onDestroyActionMode");
 			clearSelections();
-      
+			if (type == TYPE_CAMERA) {
+				((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+			}
 			if(((ManagerActivityLollipop)context).isListCameraUploads()){
 				if(adapterList!=null){
 					adapterList.setMultipleSelect(false);
@@ -418,6 +411,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if(adapterGrid!=null){
 					adapterGrid.setMultipleSelect(false);
 				}
+			}
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				final Window window = ((ManagerActivityLollipop) context).getWindow();
+				window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						window.setStatusBarColor(0);
+					}
+				}, 350);
 			}
 		}
 
@@ -608,7 +612,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 
 	//int TYPE_CAMERA= 0;
-	//int TYPE_MEDIA = 1;	
+	//int TYPE_MEDIA = 1;
 	public static CameraUploadFragmentLollipop newInstance(int type) {
 		log("newInstance type: "+type);
 		CameraUploadFragmentLollipop myFragment = new CameraUploadFragmentLollipop();
@@ -626,6 +630,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+
+		handler = new Handler();
 		
 		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
@@ -681,10 +687,25 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		log("After recovering bundle type: "+type);
 	}
+
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		log("onCreateView");		
+		log("onCreateView");
+
+		if(!isAdded()){
+			return null;
+		}
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -713,8 +734,21 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if (type == TYPE_CAMERA) {
 			if (((ManagerActivityLollipop) context).getFirstTimeCam()) {
+				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 				setInitialPreferences();
 				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
+				scrollView = (ScrollView) v.findViewById(R.id.cam_sync_scroll_view);
+				new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+					@Override
+					public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+						if (scrollView.canScrollVertically(-1)){
+							((ManagerActivityLollipop) context).changeActionBarElevation(true);
+						}
+						else {
+							((ManagerActivityLollipop) context).changeActionBarElevation(false);
+						}
+					}
+				});
 
 				initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
 
@@ -742,8 +776,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (((ManagerActivityLollipop) context).isListCameraUploads()) {
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
@@ -752,11 +784,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator());
-			listView.addItemDecoration(new DividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new DividerItemDecorationV2(context, outMetrics));
 
 			listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
 			listView.setClipToPadding(false);
 			listView.setHasFixedSize(true);
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_list_browser_camera_upload_on_off);
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
@@ -945,13 +984,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		} else {
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid_camerauploads, container, false);
 
-			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
-
 			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
 			fastScroller = (FastScroller) v.findViewById(R.id.fastscroll);
 
 			listView.setDrawingCacheEnabled(true);
 			listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			final RelativeLayout relativeLayoutTurnOnOff = (RelativeLayout) v.findViewById(R.id.relative_layout_file_grid_browser_camera_upload_on_off);
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
@@ -1366,6 +1410,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
+
+	@Override
+	public void onAttach(Context context) {
+		log("onAttach2");
+
+		super.onAttach(context);
+		this.context = context;
+		aB = ((AppCompatActivity)context).getSupportActionBar();
+	}
 	
 	@SuppressLint("NewApi")
 	private void cameraOnOffFirstTime(){
@@ -1624,6 +1677,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				else{
 					cameraOnOffFirstTime();					
 				}
+                ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 				break;
 			}
 			case R.id.cam_sync_button_skip:{
@@ -1648,8 +1702,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
 				if (documents.size() > 0){
 					updateActionModeTitle();
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
-                    adapterList.notifyDataSetChanged();
 				}
 				else{
 					clearSelections();
@@ -1951,19 +2003,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		log("hideMultipleSelect");
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				adapterList.setMultipleSelect(false);
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 			}
 		}
 		else{
 			if (adapterGrid != null){
 				adapterGrid.setMultipleSelect(false);
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 			}
 		}
@@ -2415,46 +2465,16 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		{	
 			megaApi.removeRequestListener(this);
 		}
+		if (handler != null) {
+			handler.removeCallbacksAndMessages(null);
+		}
 		
 		super.onDestroy();
 	}
 
 	@Override
-	public boolean onDown(MotionEvent e) {
-		return false;
-	}
-
-	@Override
-	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-			float velocityY) {
-		return false;
-	}
-
-	@Override
-	public void onLongPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-
-	}
-
-	@Override
-	public boolean onSingleTapUp(MotionEvent e) {
-		return false;
-	}
-
-	@Override
 	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
 		log("onInterceptTouchEvent");
-		detector.onTouchEvent(e);
 		return false;
 	}
 
