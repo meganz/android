@@ -56,8 +56,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
     ArrayList<MegaUserAlert> notifications;
 
-    int lastFirstVisiblePosition;
-
     int numberOfClicks = 0;
 
     //Empty screen
@@ -224,7 +222,9 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
             listView.smoothScrollToPosition(0);
         }
 
-        megaApi.acknowledgeUserAlerts();
+        if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
+            megaApi.acknowledgeUserAlerts();
+        }
     }
 
     @Override
@@ -365,8 +365,9 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     adapterList.notifyItemChanged(indexToReplace);
                 }
 
-                megaApi.acknowledgeUserAlerts();
-
+                if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
+                    megaApi.acknowledgeUserAlerts();
+                }
             }
             else{
                 addNotification(updatedUserAlerts.get(i));
@@ -388,26 +389,12 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     }
 
     @Override
-    public void onPause() {
-        log("onPause");
-        lastFirstVisiblePosition = ((LinearLayoutManager)listView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-
-        super.onPause();
-    }
-
-    @Override
     public void onResume() {
-        log("onResume: lastFirstVisiblePosition " +lastFirstVisiblePosition);
         setNotifications();
 
-        if(lastFirstVisiblePosition>0){
-            (listView.getLayoutManager()).scrollToPosition(lastFirstVisiblePosition);
-        }else{
-            (listView.getLayoutManager()).scrollToPosition(0);
+        if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
+            megaApi.acknowledgeUserAlerts();
         }
-        lastFirstVisiblePosition=0;
-
-        megaApi.acknowledgeUserAlerts();
 
         super.onResume();
     }
