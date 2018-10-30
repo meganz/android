@@ -398,9 +398,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     public void onDestroy() {
         super.onDestroy();
 
-        if((((ManagerActivityLollipop)context).getDrawerItem()== ManagerActivityLollipop.DrawerItem.NOTIFICATIONS)){
-            megaApi.acknowledgeUserAlerts();
-        }
+        megaApi.acknowledgeUserAlerts();
     }
 
     public int getItemCount(){
