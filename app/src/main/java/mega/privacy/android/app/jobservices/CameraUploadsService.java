@@ -1503,16 +1503,18 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         megaApi.resetTotalUploads();
         totalUploaded = 0;
 
+        List<SyncRecord> fullList = dbH.findVideoRecordsByState(STATUS_PENDING);
         final VideoCompressor compressor = new VideoCompressor(getApplicationContext(),CameraUploadsService.this);
-        final List<SyncRecord> fullList = dbH.findVideoRecordsByState(STATUS_PENDING);
+        compressor.setPendingList(getVideoPaths(fullList));
+//        compressor.setOutputRoot(getCacheDir().toString() + File.separator);
+        long totalPendingSizeInBye = compressor.getTotalInputSize();
+        Log.d("Yuan",totalPendingSizeInBye + "byte to Conversion");
+        totalToUpload = fullList.size();
 
         showNotification("Preparing to perform compression"," compressing");
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                compressor.setPendingList(getVideoPaths(fullList));
-//                compressor.setOutputRoot(getCacheDir().toString() + File.separator);
-                totalToUpload = fullList.size();
                 compressor.start();
             }
         });
