@@ -2532,6 +2532,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
 						log("IPC link - go to received request in Contacts");
+						megaApi.acknowledgeUserAlerts();
 						drawerItem=DrawerItem.CONTACTS;
 						indexContacts=2;
 						selectDrawerItemLollipop(drawerItem);
@@ -2573,7 +2574,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
-						log("IPC link - go to received request in Contacts");
+						log("onCreate: ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION");
+						megaApi.acknowledgeUserAlerts();
+
 						drawerItem=DrawerItem.SHARED_ITEMS;
 						indexShares=0;
 						selectDrawerItemLollipop(drawerItem);
@@ -2658,6 +2661,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						setIntent(null);
 					}
 					else if (getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
+						megaApi.acknowledgeUserAlerts();
+
 						handleInviteContact = getIntent().getLongExtra("handle", 0);
 
 						drawerItem = DrawerItem.CONTACTS;
@@ -3346,6 +3351,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_IPC)){
 					log("IPC - go to received request in Contacts");
+					megaApi.acknowledgeUserAlerts();
 					drawerItem=DrawerItem.CONTACTS;
 					indexContacts=2;
 					selectDrawerItemLollipop(drawerItem);
@@ -3365,13 +3371,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)){
-					log("IPC - go to received request in Contacts");
+					log("onPostResume: ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION");
+					megaApi.acknowledgeUserAlerts();
+
 					drawerItem=DrawerItem.SHARED_ITEMS;
 					indexShares = 0;
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(Constants.ACTION_OPEN_CONTACTS_SECTION)){
 					log("onPostResume: ACTION_OPEN_CONTACTS_SECTION");
+					megaApi.acknowledgeUserAlerts();
+
 					handleInviteContact = getIntent().getLongExtra("handle", 0);
 
 					drawerItem = DrawerItem.CONTACTS;
