@@ -288,10 +288,10 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 			((MegaApplication) ((Activity)context).getApplication()).askForPricing();
 			return;
 		}
+		log("parameterType: "+parameterType);
 
 		switch(parameterType){
 			case 1:{
-
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -394,7 +394,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 2:{
-
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -497,7 +496,6 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 3:{
-
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -527,6 +525,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 							priceMonthlyInteger.setText(s[0]);
 							priceMonthlyDecimal.setText("." + s[1] + " €");
 						}
+
 
 						storageInteger.setText(sizeTranslation(account.getStorage(),0));
 						storageGb.setText(" TB");
@@ -562,6 +561,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 							priceAnnualyInteger.setText(s[0]);
 							priceAnnualyDecimal.setText("." + s[1] + " €");
 						}
+
 					}
 				}
 
@@ -599,6 +599,8 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			case 4:{
+				log("case 4 -> accounts.size() "+accounts.size());
+
 				for (int i=0;i<accounts.size();i++){
 
 					Product account = accounts.get(i);
@@ -644,6 +646,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						perMonth.setTextColor(ContextCompat.getColor(context, R.color.upgrade_orange));
 					}
 					if (account.getLevel()==4 && account.getMonths()==12){
+
 						double price = account.getAmount()/100.00;
 						String priceString = df.format(price);
 						String [] s = priceString.split("\\.");
@@ -694,6 +697,8 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements OnClickL
 						break;
 					}
 					case MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET:{
+						log("PAYMENT_METHOD_GOOGLE_WALLET");
+
 						if (myAccountInfo.getProLiteMonthly() != null) {
 							log("ProLiteMonthly already subscribed: " + myAccountInfo.getProLiteMonthly().getOriginalJson());
 							priceMonthlyLayout.setVisibility(View.GONE);

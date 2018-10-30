@@ -215,7 +215,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 			switch(myAccountInfo.getAccountType()){
 
 				case 0:{
-					typeAccountText.setText(R.string.free_account);
+					typeAccountText.setText(getString(R.string.free_account).toUpperCase());
 					typeAccountIcon.setVisibility(View.VISIBLE);
 					typeAccountIcon.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_free_crest));
 					expirationAccountLayout.setVisibility(View.GONE);

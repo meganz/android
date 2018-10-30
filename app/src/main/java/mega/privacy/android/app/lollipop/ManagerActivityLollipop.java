@@ -5987,7 +5987,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void showmyF(int paymentMethod, int type){
-		log("showmyF");
+		log("showmyF: paymentMethod "+paymentMethod+", type "+type);
 
 		accountFragment = Constants.MONTHLY_YEARLY_FRAGMENT;
 		setToolbarTitle();
