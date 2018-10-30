@@ -130,8 +130,10 @@ public class Constants {
 	public static final int PRO_II = 2;
 	public static final int PRO_III = 3;
 
-	public static final int COLOR_STATUS_BAR_RED = 1;
-	public static final int COLOR_STATUS_BAR_TRANSPARENT_BLACK = 2;
+	public static final int COLOR_STATUS_BAR_ACCENT = 1;
+	public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
+	public static final int COLOR_STATUS_BAR_SEARCH = 3;
+	public static final int COLOR_STATUS_BAR_ZERO = 4;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";

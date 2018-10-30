@@ -6108,7 +6108,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
 				backToDrawerItem(bottomNavigationCurrentItem);
 				textSubmitted = true;
-				changeStatusBarColor(4);
+				changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
 				return true;
 			}
 		});
@@ -7797,7 +7797,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (fbFLol.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -7813,7 +7813,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (rubbishBinFLol.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -7834,7 +7834,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (cFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
-									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -7851,7 +7851,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (sRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
-									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -7868,7 +7868,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (rRFLol.showSelectMenuItem()){
 									selectMenuItem.setVisible(true);
 									unSelectMenuItem.setVisible(false);
-									changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+									changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 								}
 								else{
 									selectMenuItem.setVisible(false);
@@ -7888,7 +7888,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			if (inSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
@@ -7903,7 +7903,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			if (outSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
-								changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+								changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 							}
 		        			else{
 		        				selectMenuItem.setVisible(false);
@@ -7919,7 +7919,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (oFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 	        			else{
 							selectMenuItem.setVisible(false);
@@ -7933,7 +7933,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (rChatFL.showSelectMenuItem()){
 							selectMenuItem.setVisible(true);
 							unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 						else{
 							selectMenuItem.setVisible(false);
@@ -7947,7 +7947,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (iFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -7961,7 +7961,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -7975,7 +7975,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			if (muFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 						}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -7989,7 +7989,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			if (cuFL.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
-							changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+							changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 	        			}
 	        			else{
 	        				selectMenuItem.setVisible(false);
@@ -9758,7 +9758,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		if (sFLol != null && sFLol.isAdded()){
     			if (sFLol.onBackPressed() == 0){
 					backToDrawerItem(bottomNavigationCurrentItem);
-					changeStatusBarColor(4);
+					changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO);
     				return;
     			}
     		}
@@ -16892,14 +16892,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Rubbish
 			drawerItem = DrawerItem.RUBBISH_BIN;
 			openFolderRefresh = true;
-			setParentHandleBrowser(nodeHandle);
+			setParentHandleRubbish(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
 		else if (parent.getHandle() == megaApi.getInboxNode().getHandle()){
 			//Inbox
 			drawerItem = DrawerItem.INBOX;
 			openFolderRefresh = true;
-			setParentHandleBrowser(nodeHandle);
+			setParentHandleInbox(nodeHandle);
 			selectDrawerItemLollipop(drawerItem);
 		}
 		else{
@@ -18321,11 +18321,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final Window window = this.getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			if (option ==  1) {
+			if (option ==  Constants.COLOR_STATUS_BAR_ACCENT) {
 				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.accentColorDark));
 				changeActionBarElevation(true);
 			}
-			else if (option == 2){
+			else if (option == Constants.COLOR_STATUS_BAR_ZERO_DELAY){
 				handler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
@@ -18334,10 +18334,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}, 300);
 				checkScrollElevation();
 			}
-			else if (option == 3) {
+			else if (option == Constants.COLOR_STATUS_BAR_SEARCH) {
 				window.setStatusBarColor(ContextCompat.getColor(managerActivity, R.color.status_bar_search));
 			}
-			else if (option == 4) {
+			else if (option == Constants.COLOR_STATUS_BAR_ZERO) {
 				window.setStatusBarColor(0);
 			}
 		}

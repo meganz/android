@@ -368,7 +368,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 					selectAll();
 
 					break;
@@ -385,6 +384,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			if (type == TYPE_CAMERA) {
 				((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			}
@@ -408,6 +408,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					adapterGrid.setMultipleSelect(false);
 				}
 			}
+			((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		}
 
 		@Override
@@ -1685,7 +1686,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				List<PhotoSyncHolder> documents = adapterList.getSelectedDocuments();
 				if (documents.size() > 0){
 					updateActionModeTitle();
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 				}
 				else{
 					clearSelections();
@@ -1992,14 +1992,12 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (((ManagerActivityLollipop)context).isListCameraUploads()){
 			if (adapterList != null){
 				adapterList.setMultipleSelect(false);
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 			}
 		}
 		else{
 			if (adapterGrid != null){
 				adapterGrid.setMultipleSelect(false);
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 
 			}
 		}
