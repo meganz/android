@@ -666,7 +666,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             switch(item.getItemId()){
                 case R.id.cab_menu_select_all:{
                     if(context instanceof ManagerActivityLollipop){
-                        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+                        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
                     }
                     else if(context instanceof ArchivedChatsActivity){
                         ((ArchivedChatsActivity)context).changeStatusBarColor(1);
@@ -905,7 +905,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
         log("hideMultipleSelect");
         adapterList.setMultipleSelect(false);
         if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+            ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
         }
         else if(context instanceof ArchivedChatsActivity){
             ((ArchivedChatsActivity)context).changeStatusBarColor(0);
@@ -942,7 +942,7 @@ public class RecentChatsFragmentLollipop extends Fragment implements View.OnClic
             if (chats.size() > 0){
                 updateActionModeTitle();
                 if(context instanceof ManagerActivityLollipop){
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
                 }
                 else if(context instanceof ArchivedChatsActivity){
                     ((ArchivedChatsActivity)context).changeStatusBarColor(1);

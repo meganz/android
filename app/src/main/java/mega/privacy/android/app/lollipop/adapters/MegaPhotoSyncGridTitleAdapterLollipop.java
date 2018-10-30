@@ -218,7 +218,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     break;
                 }
                 case R.id.cab_menu_select_all:{
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                     selectAll();
                     break;
                 }
@@ -240,14 +239,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                 final Window window = ((ManagerActivityLollipop) context).getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-                    }
-                }, 300);
-
-//                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
             }
             return true;
         }
@@ -259,18 +251,18 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             multipleSelect = false;
             actionMode = null;
             ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                final Window window = ((ManagerActivityLollipop) context).getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        window.setStatusBarColor(0);
-                    }
-                }, 700);
-            }
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                final Window window = ((ManagerActivityLollipop) context).getWindow();
+//                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        window.setStatusBarColor(0);
+//                    }
+//                }, 300);
+//            }
         }
 
         @Override
@@ -1105,7 +1097,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         this.multipleSelect = false;
-        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 //        clearSelections();
 
         if (actionMode != null) {
@@ -1459,7 +1450,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
 
             updateActionModeTitle();
-            ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 
             notifyItemChanged(holder.getPositionOnAdapter());
         }

@@ -55,7 +55,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.FloatingItemDecoration;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -342,7 +341,7 @@ public class OfflineFragmentLollipop extends Fragment{
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					break;
 				}
@@ -1070,7 +1069,7 @@ public class OfflineFragmentLollipop extends Fragment{
 				List<MegaOffline> selectedNodes = adapter.getSelectedOfflineNodes();
 				if (selectedNodes.size() > 0){
 					updateActionModeTitle();
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 
 				}
 			}
@@ -1523,7 +1522,7 @@ public class OfflineFragmentLollipop extends Fragment{
 	public void hideMultipleSelect() {
 		adapter.clearSelections();
 		adapter.setMultipleSelect(false);
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 
 		if (actionMode != null) {
 			actionMode.finish();
