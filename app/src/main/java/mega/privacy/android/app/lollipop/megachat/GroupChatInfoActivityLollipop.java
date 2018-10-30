@@ -1513,4 +1513,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 
     }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+        log("onChatPresenceLastGreen");
+    }
 }

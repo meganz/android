@@ -18,7 +18,7 @@
 			android:layout_marginTop="46dp"
 			android:layout_marginBottom="32dp"
 			android:src="@drawable/ic_copyright"
-			android:tint="@color/copyright_title"/>
+			android:tint="@color/dark_primary_color"/>
 
 		<TextView
 			android:id="@+id/copyright_title"
@@ -29,7 +29,7 @@
 			android:text="@string/copyright_alert_title"
 			android:gravity="left"
 			android:textSize="20dp"
-			android:textColor="@color/copyright_title"
+			android:textColor="@color/dark_primary_color"
 			android:layout_gravity="left"/>
 
 		<TextView

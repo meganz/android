@@ -30,6 +30,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -1209,13 +1210,38 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		log("onViewCreated");
+		listView = (ListView) view.findViewById(android.R.id.list);
 		if (((ManagerActivityLollipop) context).openSettingsStorage) {
-			listView = (ListView) view.findViewById(android.R.id.list);
+//			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryStorage();
 		}
 		else if (((ManagerActivityLollipop) context).openSettingsQR){
-			listView = (ListView) view.findViewById(android.R.id.list);
+//			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryQR();
+		}
+		if (listView != null) {
+			listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+				}
+
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+					checkScroll();
+				}
+			});
+		}
+	}
+
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
 		}
 	}
 
@@ -1297,6 +1323,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		cameraUploadCategory.setEnabled(isOnline);
 		securityCategory.setEnabled(isOnline);
 		qrCodeCategory.setEnabled(isOnline);
+		twoFACategory.setEnabled(isOnline);
 
 		//Rubbish bin scheduler
 		daysRbSchedulerPreference.setEnabled(isOnline);

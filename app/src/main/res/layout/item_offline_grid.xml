@@ -51,6 +51,7 @@
 		android:id="@+id/item_file_grid_file"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:background="@drawable/background_item_grid_new"
 		android:visibility="gone">
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout_for_file"
@@ -82,6 +83,11 @@
 				android:background="@null"
 				android:scaleType="fitCenter"/>
 		</RelativeLayout>
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@color/divider_upgrade_account"
+			android:layout_below="@+id/file_grid_thumbnail_layout_for_file"/>
 		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="47dp"
