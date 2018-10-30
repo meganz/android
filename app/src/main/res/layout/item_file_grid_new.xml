@@ -1,5 +1,5 @@
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/file_grid_item_layout"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
@@ -11,6 +11,7 @@
 		android:id="@+id/item_file_grid_folder"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:background="@drawable/background_item_grid_new"
 		android:visibility="gone">
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout"
@@ -32,7 +33,7 @@
 				android:layout_width="110dp"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:layout_marginRight="8dp"
+				android:layout_marginRight="16dp"
 				android:layout_toRightOf="@+id/file_grid_icon"
 				android:ellipsize="middle"
 				android:singleLine="true"
@@ -52,11 +53,13 @@
 		android:id="@+id/item_file_grid_file"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:background="@drawable/background_item_grid_new"
 		android:visibility="gone">
 		<RelativeLayout
 			android:id="@+id/file_grid_thumbnail_layout_for_file"
 			android:layout_width="match_parent"
-			android:layout_height="172dp">
+			android:layout_height="172dp"
+			android:layout_margin="1dp">
 			<ImageView
 				android:id="@+id/file_grid_thumbnail"
 				android:layout_width="match_parent"
@@ -106,6 +109,11 @@
 					android:src="@drawable/ic_play_arrow_white_24dp"/>
 			</RelativeLayout>
 		</RelativeLayout>
+		<View
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@color/divider_upgrade_account"
+			android:layout_below="@+id/file_grid_thumbnail_layout_for_file"/>
 		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="47dp"

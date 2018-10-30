@@ -1120,7 +1120,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 					imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
 				}
 				else {
-					imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+					imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
 				}
 				imageView.getLocationOnScreen(screenPosition);
 				int[] dimens = new int[4];

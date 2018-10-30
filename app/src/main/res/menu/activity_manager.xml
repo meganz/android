@@ -174,7 +174,7 @@
 		android:orderInCategory="120"
 		android:title="@string/action_grid"
 		android:icon="@drawable/ic_action_bar_null"
-		MEGA:showAsAction="never" />
+		MEGA:showAsAction="always" />
 
 	<!--
         <item

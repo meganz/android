@@ -79,6 +79,14 @@
                         android:textSize="16sp"/>
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="72dp"
+                    android:orientation="vertical"
+                    android:background="@color/chat_sliding_panel_separator"/>
+
 
                 <!--Delete-->
                 <LinearLayout

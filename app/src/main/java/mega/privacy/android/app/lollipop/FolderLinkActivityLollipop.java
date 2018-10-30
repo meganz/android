@@ -226,6 +226,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 1);
 			return true;
 		}
 
@@ -235,6 +236,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(getApplicationContext(), getWindow(), handler, 0);
 		}
 
 		@Override
@@ -369,6 +371,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		else{
 			scaleText = scaleW;
 		}
+
+		handler = new Handler();
 
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
@@ -550,7 +554,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
 		fileLinkDownloadButton.setOnClickListener(this);
-		fileLinkDownloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		fileLinkDownloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
 		downloadTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0);
@@ -737,6 +741,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		}
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+		handler.removeCallbacksAndMessages(null);
 
 		super.onDestroy();
 	}
@@ -845,7 +850,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
@@ -959,7 +964,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, null, sizeFinal, hashesFinal);
 										}
 										break;
@@ -1353,6 +1358,14 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (e.getErrorCode() == MegaError.API_OK) {
+				log("DOCUMENTNODEHANDLEPUBLIC: " + request.getNodeHandle());
+				if (dbH == null){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				}
+
+				dbH.setLastPublicHandle(request.getNodeHandle());
+				dbH.setLastPublicHandleTimeStamp();
+
 				MegaNode rootNode = megaApiFolder.getRootNode();
 				if (rootNode != null){
 
