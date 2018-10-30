@@ -160,6 +160,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionClearHistory.setOnClickListener(this);
         optionArchiveChat.setOnClickListener(this);
 
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+
         titleNameContactChatPanel.setText(chat.getTitle());
 
 		if(chat.isGroup()){
@@ -169,6 +171,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
             infoChatText.setText(getString(R.string.group_chat_info_label));
             optionInfoChat.setVisibility(View.GONE);
+            separatorInfo.setVisibility(View.GONE);
 
             if(chat.isActive()){
                 optionLeaveChat.setVisibility(View.VISIBLE);

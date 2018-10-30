@@ -133,16 +133,22 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
         optionDeleteOffline.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
+        LinearLayout separatorRK = (LinearLayout) contentView.findViewById(R.id.separator_rk);
+        LinearLayout separatorOpen = (LinearLayout) contentView.findViewById(R.id.separator_open);
+
         nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
 
         if(nodeOffline!=null){
 
-            if (MimeTypeList.typeForName(nodeOffline.getName()).isVideoReproducible() || MimeTypeList.typeForName(nodeOffline.getName()).isVideo() || MimeTypeList.typeForName(nodeOffline.getName()).isAudio()) {
+            if (MimeTypeList.typeForName(nodeOffline.getName()).isVideoReproducible() || MimeTypeList.typeForName(nodeOffline.getName()).isVideo() || MimeTypeList.typeForName(nodeOffline.getName()).isAudio()
+                    || MimeTypeList.typeForName(nodeOffline.getName()).isImage() || MimeTypeList.typeForName(nodeOffline.getName()).isPdf()) {
                 optionOpenWith.setVisibility(View.VISIBLE);
+                separatorOpen.setVisibility(View.VISIBLE);
             }
             else {
                 optionOpenWith.setVisibility(View.GONE);
+                separatorOpen.setVisibility(View.GONE);
             }
 
             nodeName.setText(nodeOffline.getName());
@@ -166,12 +172,14 @@ public class OfflineOptionsBottomSheetDialogFragment extends BottomSheetDialogFr
                 }
                 copyClip.setVisibility(View.VISIBLE);
                 saveFilesystem.setVisibility(View.VISIBLE);
+                separatorRK.setVisibility(View.VISIBLE);
             }
             else{
 
                 optionPrint.setVisibility(View.GONE);
                 copyClip.setVisibility(View.GONE);
                 saveFilesystem.setVisibility(View.GONE);
+                separatorRK.setVisibility(View.GONE);
 
                 log("Set node info");
                 String path=null;

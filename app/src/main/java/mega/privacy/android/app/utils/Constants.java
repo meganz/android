@@ -130,8 +130,10 @@ public class Constants {
 	public static final int PRO_II = 2;
 	public static final int PRO_III = 3;
 
-	public static final int COLOR_STATUS_BAR_RED = 1;
-	public static final int COLOR_STATUS_BAR_TRANSPARENT_BLACK = 2;
+	public static final int COLOR_STATUS_BAR_ACCENT = 1;
+	public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
+	public static final int COLOR_STATUS_BAR_SEARCH = 3;
+	public static final int COLOR_STATUS_BAR_ZERO = 4;
 
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
@@ -211,9 +213,9 @@ public class Constants {
 	final public static int SEARCH_BY_ADAPTER = 2018;
 	final public static int FILE_LINK_ADAPTER = 2019;
 	final public static int FROM_CHAT = 2020;
-
+	final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
     final public static int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
-    final public static int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
+	final public static int GENERAL_OTHERS_ADAPTER = 2023;
 
 	final public static int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
 	final public static int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
@@ -296,4 +298,8 @@ public class Constants {
 	public static String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
 	public static String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+
+
+	public static int FROM_INCOMING_SHARES= 140;
+	public static int FROM_INBOX= 150;
 }

@@ -154,6 +154,10 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
         optionEditProfileChat.setOnClickListener(this);
         optionLeaveChat.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
+
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+        LinearLayout separatorOptions = (LinearLayout) contentView.findViewById(R.id.separator_options);
+        LinearLayout separatorLeave = (LinearLayout) contentView.findViewById(R.id.separator_leave);
         //////
 
         if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -305,6 +309,28 @@ public class ParticipantBottomSheetDialogFragment extends BottomSheetDialogFragm
             }
 
             addAvatarParticipantPanel(participantHandle, selectedChat.getPeerEmailByHandle(participantHandle), fullName);
+        }
+
+        if ((optionContactInfoChat.getVisibility() == View.GONE && optionEditProfileChat.getVisibility() == View.GONE)
+                || (optionChangePermissionsChat.getVisibility() == View.GONE && optionStartConversationChat.getVisibility() == View.GONE && optionInvite.getVisibility() == View.GONE
+                    && optionLeaveChat.getVisibility() == View.GONE && optionRemoveParticipantChat.getVisibility() == View.GONE)) {
+            separatorInfo.setVisibility(View.GONE);
+        }
+        else {
+            separatorInfo.setVisibility(View.VISIBLE);
+        }
+        if ((optionChangePermissionsChat.getVisibility() == View.GONE && optionStartConversationChat.getVisibility() == View.GONE && optionInvite.getVisibility() == View.GONE)
+                || (optionLeaveChat.getVisibility() == View.GONE && optionRemoveParticipantChat.getVisibility() == View.GONE)){
+            separatorOptions.setVisibility(View.GONE);
+        }
+        else {
+            separatorOptions.setVisibility(View.VISIBLE);
+        }
+        if (optionLeaveChat.getVisibility() == View.GONE || optionRemoveParticipantChat.getVisibility() == View.GONE) {
+            separatorLeave.setVisibility(View.GONE);
+        }
+        else {
+            separatorLeave.setVisibility(View.VISIBLE);
         }
 
         dialog.setContentView(contentView);

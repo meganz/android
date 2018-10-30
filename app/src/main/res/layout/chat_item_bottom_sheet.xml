@@ -88,7 +88,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="72dp"
         android:background="@color/chat_sliding_panel_separator"/>
 
     <android.support.v4.widget.NestedScrollView
@@ -131,6 +130,14 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="72dp"
+                android:orientation="vertical"
+                android:background="@color/chat_sliding_panel_separator"/>
 
             <LinearLayout
                 android:id="@+id/chat_list_clear_history_chat_layout"
