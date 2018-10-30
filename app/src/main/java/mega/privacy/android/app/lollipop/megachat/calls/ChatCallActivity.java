@@ -2718,8 +2718,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
 //                recyclerView.setAdapter(null);
                     adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag);
                     recyclerView.setAdapter(adapter);
-
-
                 }else{
                     recyclerView.setAdapter(null);
                     recyclerView.setVisibility(GONE);
@@ -2840,16 +2838,16 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                             }
                         }
                     }
-                    //Rest of cases:
+
                     if(peerSelected.isVideoOn()){
                         //Video ON
                         createBigFragment(peerSelected.getHandle());
                         if(peerSelected.isAudioOn()){
-                            //Disable audio icon GONE
+                            //Audio on, icon GONE
                             avatarBigCameraGroupCallMicro.setVisibility(GONE);
                             microFragmentBigCameraGroupCall.setVisibility(GONE);
                         }else{
-                            //Disable audio icon VISIBLE
+                            //Audio off, icon VISIBLE
                             avatarBigCameraGroupCallMicro.setVisibility(GONE);
                             microFragmentBigCameraGroupCall.setVisibility(View.VISIBLE);
                         }
@@ -2857,11 +2855,11 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         //Video OFF
                         createBigAvatar(peerSelected.getHandle(), peerSelected.getName());
                         if(peerSelected.isAudioOn()){
-                            //Disable audio icon GONE
+                            //Audio on, icon GONE
                             avatarBigCameraGroupCallMicro.setVisibility(GONE);
                             microFragmentBigCameraGroupCall.setVisibility(GONE);
                         }else{
-                            //Disable audio icon VISIBLE
+                            //Audio off, icon VISIBLE
                             avatarBigCameraGroupCallMicro.setVisibility(View.VISIBLE);
                             microFragmentBigCameraGroupCall.setVisibility(GONE);
                         }
