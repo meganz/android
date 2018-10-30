@@ -2055,4 +2055,8 @@ public class Util {
         String[] paths = path.split(File.separator);
         return paths[paths.length - 1];
     }
+    
+    public static boolean isDeviceSupportCompression(){
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    }
 }

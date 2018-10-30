@@ -90,6 +90,7 @@ import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
+import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
 
 
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
@@ -1394,11 +1395,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		else{
 			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 		}
-        
-        //video quality
-        dbH.setCameraUploadVideoQuality(MEDIUM);
-        dbH.setConversionOnCharging(true);
-        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+  
+		if(isDeviceSupportCompression()){
+            //video quality
+            dbH.setCameraUploadVideoQuality(MEDIUM);
+            dbH.setConversionOnCharging(true);
+            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+        }else{
+            dbH.setCameraUploadVideoQuality(ORIGINAL);
+            dbH.setConversionOnCharging(false);
+            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+        }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             context.startService(new Intent(context,CameraSyncService.class));
@@ -1453,9 +1460,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 										dbH.setCamSyncEnabled(true);
                                         dbH.deleteAllSyncRecords();
                                         //video quality
-                                        dbH.setCameraUploadVideoQuality(MEDIUM);
-                                        dbH.setConversionOnCharging(true);
-                                        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                                        if(isDeviceSupportCompression()){
+                                            dbH.setCameraUploadVideoQuality(MEDIUM);
+                                            dbH.setConversionOnCharging(true);
+                                            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                                        }else{
+                                            dbH.setCameraUploadVideoQuality(ORIGINAL);
+                                            dbH.setConversionOnCharging(false);
+                                            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                                        }
 
                                         Handler handler = new Handler();
                                         handler.postDelayed(new Runnable() {

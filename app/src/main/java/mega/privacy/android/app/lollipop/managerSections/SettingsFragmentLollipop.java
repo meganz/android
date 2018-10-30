@@ -79,6 +79,7 @@ import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.utils.JobUtil.cancelAllJobs;
 import static mega.privacy.android.app.utils.JobUtil.startJob;
+import static mega.privacy.android.app.utils.Util.isDeviceSupportCompression;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
 //import android.support.v4.preference.PreferenceFragment;
@@ -682,40 +683,47 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 				
 				//todo check video quality setting Yuan
-                //video quality
-                String uploadQuality = prefs.getUploadVideoQuality();
-				if(uploadQuality == null){
-				    dbH.setCameraUploadVideoQuality(MEDIUM);
-                    videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-                }else{
-                    if(Integer.parseInt(uploadQuality) == ORIGINAL){
-                        videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
-                    }else{
+                if(isDeviceSupportCompression()){
+                    //video quality
+                    String uploadQuality = prefs.getUploadVideoQuality();
+                    if(uploadQuality == null){
+                        dbH.setCameraUploadVideoQuality(MEDIUM);
                         videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+                    }else{
+                        if(Integer.parseInt(uploadQuality) == ORIGINAL){
+                            videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+                        }else{
+                            videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+                        }
                     }
-                }
-                videoQuality.setSummary(videoQuality.getEntry());
-				
-				//convention on charging
-				if (prefs.getConversionOnCharging() == null){
-					dbH.setConversionOnCharging(true);
-					charging = true;
-				}
-				else{
-					charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
-				}
-                cameraUploadCharging.setChecked(charging);
-                
-				//convention queue size
-                String sizeInDB = prefs.getChargingOnSize();
-                int size;
-                if(sizeInDB == null){
-                    dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-                    size = DEFAULT_CONVENTION_QUEUE_SIZE;
+                    videoQuality.setSummary(videoQuality.getEntry());
+    
+                    //convention on charging
+                    if (prefs.getConversionOnCharging() == null){
+                        dbH.setConversionOnCharging(true);
+                        charging = true;
+                    }
+                    else{
+                        charging = Boolean.parseBoolean(prefs.getConversionOnCharging());
+                    }
+                    cameraUploadCharging.setChecked(charging);
+    
+                    //convention queue size
+                    String sizeInDB = prefs.getChargingOnSize();
+                    int size;
+                    if(sizeInDB == null){
+                        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+                        size = DEFAULT_CONVENTION_QUEUE_SIZE;
+                    }else{
+                        size = Integer.parseInt(sizeInDB);
+                    }
+                    cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
                 }else{
-                    size = Integer.parseInt(sizeInDB);
+				    disableVideoQualitySettings();
+                    dbH.setCameraUploadVideoQuality(ORIGINAL);
+                    dbH.setConversionOnCharging(false);
+                    dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
                 }
-                cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
                 
 				// keep file name
 				if (prefs.getKeepFileNames() == null){
@@ -1051,9 +1059,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			keepFileNames.setChecked(fileNames);
 			cameraUploadCategory.addPreference(cameraUploadHow);
 			cameraUploadCategory.addPreference(cameraUploadWhat);
-            cameraUploadCategory.addPreference(videoQuality);
-            cameraUploadCategory.addPreference(cameraUploadCharging);
-			cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
+            enableVideoQualitySettings();
 			cameraUploadCategory.addPreference(keepFileNames);
 			
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1158,9 +1164,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadWhat.setSummary("");
 			cameraUploadCategory.removePreference(localCameraUploadFolder);
 			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-            cameraUploadCategory.removePreference(videoQuality);
-            cameraUploadCategory.removePreference(cameraUploadCharging);
-            cameraUploadCategory.removePreference(cameraUploadVideoQueueSize);
+            disableVideoQualitySettings();
 			cameraUploadCategory.removePreference(keepFileNames);
 			cameraUploadCategory.removePreference(megaCameraFolder);
 			cameraUploadCategory.removePreference(cameraUploadHow);
@@ -1461,30 +1465,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
             dbH.deleteAllSyncRecords();
-
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
-			}else{
-			    cancelAllJobs(context);
-            }
-
-			handler.postDelayed(new Runnable() {
-
-				@Override
-				public void run() {
-					log("Now I start the service");
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-						context.startService(new Intent(context, CameraSyncService.class));
-					}else{
-					    startJob(context);
-                    }
-				}
-			}, 5 * 1000);
+            dbH.deleteAllVideoRecords();
+            
+            restartCameraUpload();
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
-		    //TODO preference clicked
             
             Log.d("Yuan", "video quality selected");
             switch(Integer.parseInt((String)newValue)){
@@ -1507,8 +1491,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
             }
             
             videoQuality.setSummary(videoQuality.getEntry());
+            dbH.deleteAllVideoRecords();
             
-            //todo if change to original, clear table?
+            restartCameraUpload();
             
         } else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			pinLockCodeTxt = (String) newValue;
@@ -1555,7 +1540,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				chatAttachmentsChatListPreference.setValue(1+"");
 			}
 			chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
-//			dbH.setSendOriginalAttachments();
 		}
 		return true;
 	}
@@ -3030,9 +3014,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         cameraUploadWhat.setValueIndex(2);
         
         //todo add new settings here
-        dbH.setCameraUploadVideoQuality(MEDIUM);
-        videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-        videoQuality.setSummary(videoQuality.getEntry());
+        if(isDeviceSupportCompression()){
+            dbH.setCameraUploadVideoQuality(MEDIUM);
+            videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
+            videoQuality.setSummary(videoQuality.getEntry());
+        }else{
+            disableVideoQualitySettings();
+            dbH.setCameraUploadVideoQuality(ORIGINAL);
+            dbH.setConversionOnCharging(false);
+            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
+        }
         
         dbH.setCamSyncWifi(true);
         wifi = getString(R.string.cam_sync_wifi);
@@ -3215,6 +3206,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
                 newFolderDialog.dismiss();
                 cameraUploadVideoQueueSize.setSummary(size + getResources().getString(R.string.hint_MB));
                 dbH.setChargingOnSize(size);
+                prefs.setChargingOnSize(size + "");
+                restartCameraUpload();
             }else{
                 resetSizeInput(input);
             }
@@ -3250,18 +3243,50 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
     }
     
     private void enableVideoQualitySettings(){
-        cameraUploadCategory.addPreference(videoQuality);
-        if(Integer.parseInt(prefs.getUploadVideoQuality()) == VIDEO_QUALITY_MEDIUM){
-            enableChargingSettings();
+	    if(isDeviceSupportCompression()){
+            cameraUploadCategory.addPreference(videoQuality);
+            if(Integer.parseInt(prefs.getUploadVideoQuality()) == VIDEO_QUALITY_MEDIUM){
+                enableChargingSettings();
+            }
         }
     }
     
     private void enableChargingSettings(){
-        cameraUploadCategory.addPreference(cameraUploadCharging);
-        enableVideoCompressionSizeSettings();
+        if(isDeviceSupportCompression()) {
+            cameraUploadCategory.addPreference(cameraUploadCharging);
+            enableVideoCompressionSizeSettings();
+        }
     }
     
     private void enableVideoCompressionSizeSettings(){
-        cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
+        if(isDeviceSupportCompression()){
+            cameraUploadCategory.addPreference(cameraUploadVideoQueueSize);
+        }
     }
+    
+    private void restartCameraUpload(){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            Intent photosVideosIntent = null;
+            photosVideosIntent = new Intent(context, CameraSyncService.class);
+            photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+            context.startService(photosVideosIntent);
+        }else{
+            cancelAllJobs(context);
+        }
+    
+        handler.postDelayed(new Runnable() {
+        
+            @Override
+            public void run() {
+                log("Now I start the service");
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    context.startService(new Intent(context, CameraSyncService.class));
+                }else{
+                    startJob(context);
+                }
+            }
+        }, 5 * 1000);
+    }
+    
+    
 }

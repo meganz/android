@@ -18,6 +18,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.StatFs;
 import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -135,6 +136,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     Intent mIntent;
     PendingIntent mPendingIntent;
     private String mCompressionPath;
+    Context mContext;
 
     @Override
     public boolean onStartJob(JobParameters params) {
@@ -172,7 +174,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private void startCameraUploads() {
-        showNotification(getString(R.string.section_photo_sync),getString(R.string.settings_camera_notif_title));
+        showNotification(getString(R.string.section_photo_sync), getString(R.string.settings_camera_notif_title), mPendingIntent);
         startForeground(notificationId,mNotification);
         try {
             getFilesFromMediaStore();
@@ -398,7 +400,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             } else {
                 path = file.getLocalPath();
             }
-            retrieveLocationDetails(file.getLocalPath());
+            
             if (file.isCopyOnly()) {
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),parent,file.getFileName(),this);
             } else {
@@ -1005,7 +1007,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void initService() {
         log("initService()");
-
+        mContext = getApplicationContext();
         totalUploaded = 0;
         totalToUpload = 0;
         canceled = false;
@@ -1030,12 +1032,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
         }
 
-        WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
         lock = wifiManager.createWifiLock(wifiLockMode,"MegaDownloadServiceWifiLock");
-        PowerManager pm = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MegaDownloadServicePowerLock:");
 
-        dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        dbH = DatabaseHandler.getDbHandler(mContext);
 
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
@@ -1052,7 +1054,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         mIntent = new Intent(this,ManagerActivityLollipop.class);
         mIntent.setAction(Constants.ACTION_CANCEL_CAM_SYNC);
         mPendingIntent = PendingIntent.getActivity(this,0,mIntent,0);
-        mCompressionPath = getApplicationContext().getCacheDir().toString() + File.separator;
+        mCompressionPath = mContext.getCacheDir().toString() + File.separator;
     }
 
     private void finish() {
@@ -1108,11 +1110,11 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
+            NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(mContext,notificationChannelId);
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
+                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentText(contentText)
                     .setOngoing(false);
@@ -1121,7 +1123,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         } else {
             mBuilder
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)
-                    .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,0))
+                    .setContentIntent(PendingIntent.getActivity(mContext,0,intent,0))
                     .setAutoCancel(true).setTicker(contentText)
                     .setContentTitle(message).setContentText(contentText)
                     .setOngoing(false);
@@ -1492,33 +1494,71 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     }
 
     private boolean isCompressedVideoPending() {
-        return dbH.findVideoRecordsByState(STATUS_PENDING).size() > 0;
+        return dbH.findVideoRecordsByState(STATUS_PENDING).size() > 0 && prefs.getUploadVideoQuality().equals(VIDEO_QUALITY_MEDIUM);
     }
 
     private void startVideoCompression() {
-        //todo start compress process if compression queue is not empty
-        Log.d("Yuan","startVideoCompression");
-
-        //todo remove hardcoded text
+        Log.d("Yuan", "startVideoCompression");
+    
+        List<SyncRecord> fullList = dbH.findVideoRecordsByState(STATUS_PENDING);
         megaApi.resetTotalUploads();
         totalUploaded = 0;
-
-        List<SyncRecord> fullList = dbH.findVideoRecordsByState(STATUS_PENDING);
+        totalToUpload = fullList.size();
+        
         final VideoCompressor compressor = new VideoCompressor(getApplicationContext(),CameraUploadsService.this);
         compressor.setPendingList(getVideoPaths(fullList));
-//        compressor.setOutputRoot(getCacheDir().toString() + File.separator);
-        long totalPendingSizeInBye = compressor.getTotalInputSize();
-        Log.d("Yuan",totalPendingSizeInBye + "byte to Conversion");
-        totalToUpload = fullList.size();
-
-        showNotification("Preparing to perform compression"," compressing");
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                compressor.start();
+        long totalPendingSizeInMB = compressor.getTotalInputSize() / (1024 * 1024);
+        Log.d("Yuan",totalPendingSizeInMB + "byte to Conversion");
+    
+        double availableFreeSpace = Double.MAX_VALUE;
+        try{
+            StatFs stat = new StatFs(mCompressionPath);
+            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+    
+        if(availableFreeSpace < compressor.getTotalInputSize()) {
+            stopForeground(true);
+            Intent intent = new Intent(this,ManagerActivityLollipop.class);
+            intent.setAction(Constants.ACTION_SHOW_SETTINGS);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+            showNotification("No Space", "Not enough space to perform compression.", pendingIntent);
+            return;
+        }
+        
+        if (shouldStartVideoCompression(totalPendingSizeInMB)) {
+            showNotification("Start compression", "Starting", mPendingIntent);
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    compressor.start();
+                }
+            });
+            t.start();
+        }else{
+            //todo
+            stopForeground(true);
+            Intent intent = new Intent(this,ManagerActivityLollipop.class);
+            intent.setAction(Constants.ACTION_SHOW_SETTINGS);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
+            showNotification("Over limit", "Do you want to charge or change setting", pendingIntent);
+        }
+        
+    }
+    
+    private boolean shouldStartVideoCompression(long queueSize){
+        
+        if(Boolean.parseBoolean(prefs.getConversionOnCharging())){
+            int queueSizeLimit = Integer.parseInt(prefs.getChargingOnSize());
+            if(queueSize > queueSizeLimit && !Util.isCharging(mContext)){
+                return false;
             }
-        });
-        t.start();
+            return true;
+        }else{
+            return true;
+        }
     }
 
     private List<String> getVideoPaths(List<SyncRecord> list) {
@@ -1532,7 +1572,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     public synchronized void onCompressUpdateProgress(int progress,String currentIndexString) {
         String message = progress + "% compression has been completed";
-        //todo add pending intent
         showProgressNotification(progress,mPendingIntent,message,currentIndexString,"");
     }
 
@@ -1551,8 +1590,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoRecordsByState(STATUS_SUCCESS));
         startParallelUpload(compressedList,true);
     }
-
-    private void showNotification(String title,String content) {
+    
+    private void showNotification(String title, String content, PendingIntent intent){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
@@ -1560,14 +1599,16 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             mNotificationManager.createNotificationChannel(channel);
         }
 
-        mBuilder = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
+        mBuilder = new NotificationCompat.Builder(mContext,notificationChannelId);
         mBuilder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-                .setContentIntent(mPendingIntent)
+                .setContentIntent(intent)
                 .setOngoing(false)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setOnlyAlertOnce(true);
         mNotification = mBuilder.build();
+    
+        mNotificationManager.notify(notificationId,mNotification);
     }
 
     private void showProgressNotification(int progressPercent,PendingIntent pendingIntent,String message,String subText,String contentText) {
@@ -1579,7 +1620,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             channel.setSound(null,null);
             mNotificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(),notificationChannelId);
+            NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(mContext,notificationChannelId);
 
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_camera_sync)

@@ -891,6 +891,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
     
+    public void deleteAllVideoRecords(){
+        String sql = "DELETE FROM " + TABLE_VIDEO_UPLOADS;
+        db.execSQL(sql);
+    }
+    
     public void updateVideoRecordStatusByPath(int status, String path) {
         String sql = "UPDATE " + TABLE_VIDEO_UPLOADS + " SET " + KEY_VIDEO_STATE + " = " + status + "  WHERE " + KEY_VIDEO_FILEPATH_ORI + " = '" + encrypt(path) + "'";
         db.execSQL(sql);

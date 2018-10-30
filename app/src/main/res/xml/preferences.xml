@@ -54,10 +54,6 @@
 		    android:title="@string/settings_video_compression_queue_size_title" />
 		
 		<mega.privacy.android.app.components.TwoLineCheckPreference
-            android:key="settings_camera_upload_charging"
-        	android:title="@string/settings_camera_upload_charging" />
-		
-		<mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_keep_file_names"
         	android:title="@string/settings_keep_file_names" />
 		
