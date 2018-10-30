@@ -289,8 +289,7 @@
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
     <string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
-    <string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with:&#160;</string>
-    -->
+    
     <string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions</string>
     <string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Share Permissions</string>
     <string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
@@ -427,7 +426,7 @@
     -->
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
-    <string name="context_contact_request_sent" context="success message when sending a contact request">Request correctly sent to %s. The status can be consulted in the Sent Requests tab.</string>
+    <string name="context_contact_request_sent" context="success message when sending a contact request">Request successfully sent to %s. The status can be consulted in the Sent Requests tab.</string>
 
     <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
@@ -723,7 +722,7 @@
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN Lock</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your MEGA\'s local files will be deleted and you will be logged out after 10 failed attempts</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
     <string name="pin_lock_incorrect_alert" context="error message when not typing the pin code correctly">Wrong PIN code, please try again. You have %2d attempts left</string>
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Codes don’t match</string>
@@ -849,8 +848,8 @@
     <string name="backup_title" context="Title of the screen to backup the master key">Backup your Recovery Key</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Your password unlocks your Recovery Key</string>
 
-    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.</string>
-    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
+    <string name="backup_first_paragraph" context="First paragraph of the screen to backup the master key">Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your Recovery Key can no longer be decrypted, and you can no longer decrypt your data.</string>
+    <string name="backup_second_paragraph" context="Second paragraph of the screen to backup the master key">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
     <string name="backup_third_paragraph" context="Third paragraph of the screen to backup the master key">An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your e-mail.</string>
     <string name="backup_action" context="Sentence to inform the user the available actions in the screen to backup the master key">Copy the Recovery Key to clipboard or save it as text file</string>
 
@@ -924,7 +923,7 @@
     <string name="next_ime_action" context="Action to pass focus to the next field in a form">Next</string>
     -->
 
-    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">This email address is already in use.</string>
+    <string name="mail_already_used" context="Error shown when the user tries to change his mail to one that is already used">Error. This email address is already in use.</string>
 
     <string name="change_mail_text_last_step" context="Text shown in the last alert dialog to change the email associated to an account">This is the last step to change your email. Please enter your password below.</string>
     <string name="change_mail_title_last_step" context="Title of the alert dialog to change the email associated to an account">Change email</string>
@@ -1071,7 +1070,7 @@
     <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">The contact %s will be removed from the shared folder.</string>
     <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts will be removed from the shared folder.</string>
 
-    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed correctly from the shared folder</string>
+    <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed successfully from the shared folder</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">&#160;and %d contacts were not successfully removed</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Loading contacts from the phone&#8230;</string>
@@ -1101,7 +1100,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">The history of the chat has been cleared</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Error. The history of the chat has not been cleared correctly</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn't been successfully deleted">Error. The history of the chat has not been cleared successfully</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Add participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Remove participant</string>
@@ -1139,7 +1138,7 @@
     <string name="group_chat_info_label" context="Label for the option of the sliding panel to show the info of a chat group">Group info</string>
     <string name="group_chat_start_conversation_label" context="Label for the option of the sliding panel to start a one to one chat">Start conversation</string>
     <string name="group_chat_edit_profile_label" context="Label for the option of the sliding panel to edit the profile">Edit profile</string>
-    <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Leave group</string>
+    <string name="title_properties_chat_leave_chat" context="Title of the section to leave a group content in the Contact Properties screen">Leave Group</string>
     <string name="participants_chat_label" context="Label for participants of a group chat">Participants</string>
 
     <string name="confirmation_remove_chat_contact" context="confirmation message before removing a contact from a chat.">Remove %s from this chat?</string>
@@ -1170,7 +1169,7 @@
     <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
     <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] was removed from group chat by [/B][C]%2$s[/C]</string>
 
-    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]”%2$s”[/C]</string>
+    <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]“%2$s”[/C]</string>
 
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] left the group chat[/B]</string>
 
@@ -1221,14 +1220,14 @@
     <string name="non_format_message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">%1$s was added to this group chat by invitation from %2$s</string>
     <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s was removed from group chat by %2$s</string>
 
-    <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s changed the group chat name to ”%2$s”</string>
+    <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s changed the group chat name to “%2$s”</string>
 
     <string name="non_format_message_participant_left_group_chat" context="chat message when a participant left a group chat">%1$s left the group chat</string>
 
     <string name="messages_copied_clipboard" context="success alert when the user copy some messages to the clipboard">Copied to the clipboard</string>
 
     <string name="chat_error_open_title" context="Title of the error dialog when opening a chat">Chat Error!</string>
-    <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">The chat could not be opened correctly</string>
+    <string name="chat_error_open_message" context="Message of the error dialog when opening a chat">The chat could not be opened successfully</string>
 
     <string name="menu_choose_contact" context="Menu option to add a contact to your contact list.">Choose contact</string>
 
@@ -1281,7 +1280,7 @@
 
     <string name="my_account_of_string" context="String to show the transfer quota and the used space in My Account section">%1$s [A]of %2$s[/A]</string>
 
-    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for offline?</string>
+    <string name="confirmation_delete_from_save_for_offline" context="confirmation message before removing a something for the Save for offline section">Remove from Save for Offline?</string>
 
     <string name="recent_chat_empty_no_connection_text" context="Text of chat section when the app has no connection">Chat is disabled and it cannot be enabled without a connection.</string>
 
@@ -1668,9 +1667,9 @@
     <string name="setting_subtitle_qrcode_reset" context="Subtitle of QR code settings that reset the code">Previous QR code will no longer be valid</string>
     <string name="qrcode_link_copied" context="Text shown when it has been copied the QR code link">Link copied to the clipboard</string>
     <string name="qrcode_reset_successfully" context="Text shown when it has been reseted the QR code successfully">QR code successfully reset</string>
-    <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully delete</string>
-    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to any error. Please, try again.</string>
-    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not delete due to any error. Please, try again.</string>
+    <string name="qrcode_delete_successfully" context="Text shown when it has been deleted the QR code successfully">QR code successfully deleted</string>
+    <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to an error. Please, try again.</string>
+    <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not deleted due to an error. Please, try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
     <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error occurred while trying to share the QR file. Perhaps the file does not exist. Please, try again later.</string>
@@ -1680,12 +1679,12 @@
     <string name="invite_not_sent" context="Title of dialog shown when a contact request has not been sent with QR code">Invite not sent</string>
     <string name="invite_not_sent_text" context="Text of dialog shown when a contact request has not been sent with QR code">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <string name="invite_not_sent_text_already_contact" context="Text of dialog shown when a contact request has not been sent with QR code because of is already a contact">The invitation has not been sent. %s is already in your contacts list.</string>
-    <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. Some error occurred processing it.</string>
+    <string name="invite_not_sent_text_error" context="Text of dialog shown when a contact request has not been sent with QR code because of some error">The invitation has not been sent. An error occurred processing it.</string>
     <string name="generatin_qr" context="Text of alert dialog informing that the qr is generating">Generating QR Code&#8230;</string>
     <string name="menu_item_scan_code" context="Title of QR code scan menu item">Scan QR code</string>
     <string name="button_copy_link" context="get the contact link and copy it">Copy link</string>
     <string name="button_create_qr" context="Create QR code">Create QR code</string>
-    <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully create</string>
+    <string name="qrcode_create_successfully" context="Text shown when it has been created the QR code successfully">QR code successfully created</string>
     <string name="qrcode_scan_help" context="Text shown in QR code scan fragment to help and guide the user in the action">Line up the QR code to scan it with your device’s camera</string>
     <string name="contact_view" context="positive button on dialog to view a contact">View</string>
 
@@ -1736,7 +1735,7 @@
     <string name="action_notification_call_in_progress" context="Subtitle of the notification shown on the action bar when there is a call in progress">Click to go back to the call</string>
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">Return to the call</string>
 
-    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">On Mega</string>
+    <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list's header">On MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list's header">Phone contacts</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
@@ -1825,7 +1824,7 @@
     <string name="recovery_key_exported_dialog_text" context="Text of the dialog 'Recovery Key exported'">The Recovery Key has been exported into the Offline section as MEGARecoveryKey.txt.\nNote: It will be deleted if you log out, please store it in a safe place.</string>
     <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog 'Recovery Key exported' when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copy to clipboard</string>
-    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export recovery key</string>
+    <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export Recovery Key</string>
     <string name="option_logout_anyway" context="Option that permits user logout">Logout anyway</string>
     <string name="recovery_key_bottom_sheet" context="Title of the bottom sheet dialog 'Recovery Key'">Recovery Key</string>
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Save on File System</string>
@@ -1856,7 +1855,7 @@
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security options</string>
     <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Recovery Key</string>
-    <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.</string>
+    <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Unable to reach MEGA. Please check your connectivity or try again later.</string>
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Servers are too busy. Please wait.</string>
@@ -1878,8 +1877,8 @@
 
     <string name="option_enable_chat_rich_preview" context="Option in Settings section to enable the rick links previews">Rich URL previews</string>
 
-    <string name="button_always_rich_links" context="Button to allow the rich links previews on chat">Always allow</string>
-    <string name="button_not_now_rich_links" context="Button do not allow now the rich links previews on chat">Not now</string>
+    <string name="button_always_rich_links" context="Button to allow the rich links previews on chat">Always Allow</string>
+    <string name="button_not_now_rich_links" context="Button do not allow now the rich links previews on chat">Not Now</string>
     <string name="button_never_rich_links" context="Button do not allow the rich links previews on chat">Never</string>
 
     <string name="title_enable_rich_links" context="Title of the dialog to enable the rich links previews on chat">Enable rich URL previews</string>
@@ -1894,7 +1893,7 @@
     <string name="error_password" context="when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak">Please enter a stronger password</string>
 
     <string name="title_acceptance_contact_request_notification" context="title of the notification for an acceptance of a contact request">New contact</string>
-    <string name="title_storage_usage" context="title of usage storage section in Storage">Usage Storage</string>
+    <string name="title_storage_usage" context="title of usage storage section in Storage">Storage Usage</string>
 
     <plurals name="plural_number_contact_request_notification" context="Notification title to show the number of incoming contact request">
         <item context="contact request" quantity="one">%1$d pending contact request</item>
@@ -1903,41 +1902,41 @@
 
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
 
-    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen">Write message to ”%s”&#8230;</string>
+    <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen">Write message to “%s”&#8230;</string>
     <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]No active[/B][A] Transfers[/A][B].[/B]</string>
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]No completed[/B][A] Transfers[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Empty[/B][A] Folder[/A][B].[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Write message to ”%s”&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Write message to “%s”&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Two-Factor Authentication</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Two-Factor Authentication is a second layer of security for your account.</string>
-    <string name="title_2fa" context="Title of the screen Two-Factor Authentication">Why you need two-factor authentication?</string>
+    <string name="title_2fa" context="Title of the screen Two-Factor Authentication">Why do you need two-factor authentication?</string>
     <string name="two_factor_authentication_explain">Two-factor authentication is a second layer of security for your account. Which means that even if someone knows your password they cannot access it, without also having access to the six digit code only you have access to.</string>
-    <string name="button_setup_2fa" context="Button that permits user begin with the process of enable Two-Factor Authentication">Begin setup</string>
-    <string name="explain_qr_seed_2fa_1" context="Text that explain how to do with Two-Factor Authentication seed">Scan or copy the seed to your Authenticator App.</string>
+    <string name="button_setup_2fa" context="Button that permits user begin with the process of enable Two-Factor Authentication">Begin Setup</string>
+    <string name="explain_qr_seed_2fa_1" context="Text that explain how to do with Two-Factor Authentication QR">Scan or copy the seed to your Authentication App.</string>
     <string name="explain_qr_seed_2fa_2" context="Text that explain how to do with Two-Factor Authentication seed">Be sure to backup this seed to a safe place in case you lose your phone.</string>
-    <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Please enter the code generated by your authenticator app.</string>
+    <string name="explain_confirm_2fa" context="Text that explain how to confirm Two-Factor Authentication">Please enter the code generated by your Authentication App.</string>
     <string name="general_verify" context="Text button">Verify</string>
     <string name="general_next" context="Text button">Next</string>
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code. Not translate">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
     <string name="qr_seed_text_error" context="Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication">An error occurred generating the seed or QR code, please try again.</string>
-    <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Two-Factor Authentication enabled</string>
+    <string name="title_2fa_enabled" context="Title of the screen shown when the user enabled correctly Two-Factor Authentication">Two-Factor Authentication Enabled</string>
     <string name="description_2fa_enabled" context="Description of the screen shown when the user enabled correctly Two-Factor Authentication">Next time you login to your account you will be asked to enter a 6-digit code provided by your authentication app.</string>
-    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Back up your recovery key.</b></string>
-    <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Invalid code!</string>
-    <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Lost your authenticator device?</string>
-    <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Login verification</string>
+    <string name="recommendation_2fa_enabled" context="Recommendation for export the Recovery Key shown when the user enabled correctly Two-Factor Authentication">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\'t help you gain access to it again.\n<b>Backup your Recovery Key</b></string>
+    <string name="pin_error_2fa" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Invalid code</string>
+    <string name="lost_your_authenticator_device" context="When a user tries to login with Two-Factor Authentication and lost his device, button that permits get information about how login">Lost your Authenticator device?</string>
+    <string name="login_verification" context="Title of screen Login verification with Two-Factor Authentication">Login Verification</string>
     <string name="change_password_verification" context="Title of screen Change password verification with Two-Factor Authentication">Two-Factor Authentication\nChange password</string>
     <string name="cancel_account_verification" context="Title of screen Cancel account verification with Two-Factor Authentication">Two-Factor Authentication\nCancel account</string>
     <string name="change_mail_verification" context="Title of screen Change mail verification with Two-Factor Authentication">Two-Factor Authentication\nChange email</string>
     <string name="disable_2fa_verification" context="Title of screen Disable Two-Factor Authentication">Disable Two-Factor Authentication</string>
-    <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Lost your authenticator device?</string>
+    <string name="title_lost_authenticator_device" context="Title of screen Lost authenticator decive">Lost your Authenticator device?</string>
     <string name="error_disable_2fa" context="When the user tries to disable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to disable Two-Factor Authentication. Please try again.</string>
     <string name="error_enable_2fa" context="When the user tries to enable Two-Factor Authentication and some error ocurr in the process">An error occurred trying to enable Two-Factor Authentication. Please try again.</string>
     <string name="title_enable_2fa" context="Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication">Enable Two-Factor Authentication</string>
-    <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">Two-Factor Authentication disabled</string>
+    <string name="label_2fa_disabled" context="Label shown when it disables the Two-Factor Authentication">Two-Factor Authentication Disabled</string>
     <string name="open_app_button" context="Text of the button which action is to show the authentication apps">Open in</string>
     <string name="intent_not_available_2fa" context="message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn\'t any app that open it">There isn’t any available app to enable Two-Factor Authentication on your device</string>
     <string name="general_close" context="Text button">Close</string>
@@ -1951,7 +1950,7 @@
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d files shared successfully</string>
     <string name="number_no_imported_from_chat" context="error message when importing multiple files from chat">%d files were not shared</string>
-    <string name="preview_content" context="button's text to open a full screen image">PREVIEW CONTENT</string>
+    <string name="preview_content" context="button's text to open a full screen image">Preview Content</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">The streaming can not be executed and the file has not been downloaded</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File already exists in Saved for Offline</string>
@@ -1962,7 +1961,7 @@
     </plurals>
 
     <string name="title_confirmation_disable_rich_links" context="Title of the dialog to disable the rich links previews on chat">Rich URL previews</string>
-    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to continue?</string>
+    <string name="text_confirmation_disable_rich_links" context="Text of the dialog to disable the rich links previews on chat">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?</string>
 
     <string name="call_missed_messages" context="Message shown when a call ends.">[A]Missed call[/A]</string>
     <string name="call_rejected_messages" context="Message shown when a call ends.">[A]Call was rejected[/A]</string>
@@ -1996,7 +1995,7 @@
     <string name="error_message_invalid_format" context="Content of a normal message that cannot be recognized">Invalid message format</string>
     <string name="error_message_invalid_signature" context="Content of a normal message that cannot be recognized">Invalid message signature</string>
 
-    <string name="add_to_cloud_import" context="Menu option">Add to Cloud</string>
+    <string name="add_to_cloud_import" context="Menu option">Add to Cloud Drive</string>
 
     <string name="error_streaming" context="When the user tries to reproduce a file through streaming and ocurred an error creating it">An error occurred trying to create the stream</string>
 
@@ -2005,7 +2004,7 @@
     <string name="context_correctly_node_restored" context="success message when a node was restore from Rubbish bin">Restored to %s</string>
     <string name="context_no_restored" context="error message when a node was restore from Rubbish bin">Error. Not restored</string>
 
-    <string name="context_send_message" context="menu item from contact section to send a message to a contact">Send message</string>
+    <string name="context_send_message" context="menu item from contact section to send a message to a contact">Send Message</string>
 
     <plurals name="plural_contact_sent_to_chats" context="Message shown when a contact is successfully sent to several chats">
         <item context="one contact" quantity="one">Contact sent to chats successfully</item>
@@ -2020,8 +2019,8 @@
 
     <string name="archived_chats_show_option" context="Text of the option to show the arhived chat, it shows the number of archived chats">Archived chats (%d)</string>
 
-    <string name="archive_chat_option" context="Title of the option on the chat list to archive a chat">Archive chat</string>
-    <string name="unarchive_chat_option" context="Title of the option on the chat list to unarchive a chat">Unarchive chat</string>
+    <string name="archive_chat_option" context="Title of the option on the chat list to archive a chat">Archive Chat</string>
+    <string name="unarchive_chat_option" context="Title of the option on the chat list to unarchive a chat">Unarchive Chat</string>
 
     <string name="general_archive" context="Confirmation button of the dialog to archive a chat">Archive</string>
     <string name="general_unarchive" context="Confirmation button of the dialog to unarchive a chat">Unarchive</string>
@@ -2051,7 +2050,7 @@
     <string name="settings_file_management_file_versions_title" context="Settings preference title to show file versions info of the account">File versions</string>
     <string name="settings_file_management_file_versions_subtitle" context="Settings preference subtitle to show file versions info of the account">%1d file versions, taking a total of %2s</string>
 
-    <string name="settings_file_management_category" context="Title of the section File management on Settings section">File management</string>
+    <string name="settings_file_management_category" context="Title of the section File management on Settings section">File Management</string>
 
     <string name="settings_file_management_delete_versions" context="Option in Settings to delete all the versions of the account">Delete all my older versions of files</string>
     <string name="settings_file_management_subtitle_delete_versions" context="subtitle of the option in Settings to delete all the versions of the account">All current files will remain. Only historic versions of your files will be deleted.</string>
@@ -2059,7 +2058,7 @@
     <string name="text_confirmation_dialog_delete_versions" context="Text of the dialog to delete all the file versions of the account">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
 
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">File versions deleted successfully</string>
-    <string name="error_delete_versions" context="error message when deleting all the versions of the account">Error. The file versions were not able to be deleted</string>
+    <string name="error_delete_versions" context="error message when deleting all the versions of the account">An error occurred while trying to delete all old versions of your files, please try again later.</string>
 
     <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">File versioning</string>
     <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">Enable or disable file versioning for your entire account.\nYou may still receive file versions from shared folders if your contacts have this enabled.</string>
@@ -2075,8 +2074,8 @@
     <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Add contacts</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Logged out</string>
-    <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Your account has already been confirmed. Please login</string>
-    <string name="confirm_account" context="Text shown to indicate user that his account should be confirmed typing his password">Your account must be confirmed. Please enter your password</string>
+    <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Your account has been activated. Please log in.</string>
+    <string name="confirm_account" context="Text shown to indicate user that his account should be confirmed typing his password">Please enter your password to confirm your account</string>
 
     <string name="error_own_email_as_contact" context="Error shown if a user tries to add their own email address as a contact">There’s no need to add your own email address</string>
 
@@ -2085,7 +2084,7 @@
     <string name="text_almost_full_warning" context="Text of the dialog shown when the storage is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to 8 TB of storage and 16 TB of transfer quota.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
     <string name="button_custom_almost_full_warning" context="Button of the dialog shown when the storage is almost full to custom a plan">Custom plan</string>
-    <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get bonus</string>
+    <string name="button_bonus_almost_full_warning" context="Button of the dialog shown when the storage is almost full to get bonus">Get Bonus</string>
 
     <string name="title_mail_upgrade_plan" context="Mail title to upgrade to a custom plan">Upgrade to a custom plan</string>
     <string name="subject_mail_upgrade_plan" context="Mail subject to upgrade to a custom plan">Ask us how you can upgrade to a custom plan:</string>
@@ -2102,7 +2101,7 @@
 	<string name="contact_info_button_more" context="More button in contact info page">More</string>
 
     <plurals name="plural_select_file" context="Section title to select a file to perform an action">
-        <item context="one file" quantity="one">Choose file</item>
+        <item context="one file" quantity="one">Choose File</item>
         <item context="more files" quantity="other">Choose Files</item>
     </plurals>
 
@@ -2125,7 +2124,7 @@
     <string name="notification_chat_undefined_content" context="Content of the notification when there is unknown activity on the Chat">You may have new messages</string>
 
     <string name="settings_rb_scheduler_enable_title" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality">Rubbish bin clearing scheduler</string>
-    <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">The Rubbish Bin is cleaned for you automatically. </string>
+    <string name="settings_rb_scheduler_enable_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts">The Rubbish Bin is cleaned for you automatically.</string>
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days and your maximum period is 30 days.</string>

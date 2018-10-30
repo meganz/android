@@ -4357,6 +4357,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case CHAT:{
 				tB.setVisibility(View.VISIBLE);
 				aB.setTitle(getString(R.string.section_chat).toUpperCase());
+
 				firstNavigationLevel = true;
 				break;
 			}
@@ -4583,6 +4584,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 					case DialogInterface.BUTTON_NEGATIVE:
                         log("showConfirmationConnect: BUTTON_NEGATIVE");
+                        setToolbarTitle();
 						break;
 				}
 			}
@@ -5629,7 +5631,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
     			ft.replace(R.id.fragment_container, sttFLol, "sttF");
-    			ft.commitNowAllowingStateLoss();
+    			ft.commitAllowingStateLoss();
 
 				fragmentContainer.setVisibility(View.VISIBLE);
 
@@ -9650,8 +9652,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				showOfflineMode();
 			}
 			else{
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				selectDrawerItemLollipop(drawerItem);
+				if(megaApi!=null && megaApi.getRootNode()!=null){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItemLollipop(drawerItem);
+				}
+				else{
+					drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+					selectDrawerItemLollipop(DrawerItem.SAVED_FOR_OFFLINE);
+				}
 			}
 		}
 		else if (drawerItem == DrawerItem.CONTACTS){
