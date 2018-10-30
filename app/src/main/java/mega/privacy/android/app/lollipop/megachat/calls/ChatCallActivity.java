@@ -830,7 +830,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                                 createNewAdapter(false);
                             }
                         }
-
                     }else{
                         log("Incoming individual call");
 
@@ -871,7 +870,6 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
                         if((peersOnCall != null)&&(peersOnCall.size() != 0)){
                             peersOnCall.clear();
                         }
-
 
                         InfoPeerGroupCall myPeer = new InfoPeerGroupCall(megaChatApi.getMyUserHandle(),  megaChatApi.getMyFullname(), callChat.hasLocalVideo(), callChat.hasLocalAudio(), false,null, null);
                         peersOnCall.add(myPeer);
@@ -2579,139 +2577,154 @@ public class ChatCallActivity extends AppCompatActivity implements MegaChatReque
     }
 
     public void createNewAdapter(boolean flag){
-        log("createNewAdapter() ----> peersOnCall: "+peersOnCall.size());
 
         if(flag){
+            log("createNewAdapter() ----> call in progress: peersOnCall("+peersOnCall.size()+")");
+
             //Call IN PROGRESS
             updateSubtitleToolbar();
             //arrayList-> peersOnCall
             if(peersOnCall.size() < 7){
-                //1-6 peers
-                bigRecyclerView.setAdapter(null);
-                bigRecyclerView.setVisibility(GONE);
-                parentBigCameraGroupCall.setOnClickListener(null);
-                parentBigCameraGroupCall.setVisibility(View.GONE);
 
-                if(peersOnCall.size() < 4){
-                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                    recyclerView.setLayoutParams(params);
+                if(peersOnCall.size()!=0){
+                    //1-6 peers
+                    bigRecyclerView.setAdapter(null);
+                    bigRecyclerView.setVisibility(GONE);
 
-                }else if(peersOnCall.size()==4){
-                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.height = Util.scaleWidthPx(360, outMetrics);
-                    recyclerView.setLayoutParams(params);
+                    parentBigCameraGroupCall.setOnClickListener(null);
+                    parentBigCameraGroupCall.setVisibility(View.GONE);
 
-                }else{
-                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.height = Util.scaleWidthPx(540, outMetrics);
-                    recyclerView.setLayoutParams(params);
-                }
-
-                if(peersOnCall.size() <= 3){
-                    recyclerView.setColumnWidth((int) widthScreenPX);
-                }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
-                    recyclerView.setColumnWidth((int) widthScreenPX/2);
-                }
-
-                recyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag);
-                recyclerView.setAdapter(adapter);
-                if (adapter.getItemCount() == 0){
-                    recyclerView.setVisibility(View.GONE);
-                }else{
                     recyclerView.setVisibility(View.VISIBLE);
+
+                    if(peersOnCall.size() < 4){
+                        //1-3 peers
+                        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                        recyclerView.setLayoutParams(params);
+
+                    }else if(peersOnCall.size()==4){
+                        //4 peers
+                        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.height = Util.scaleWidthPx(360, outMetrics);
+                        recyclerView.setLayoutParams(params);
+
+                    }else{
+                        //5-6 peers
+                        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.height = Util.scaleWidthPx(540, outMetrics);
+                        recyclerView.setLayoutParams(params);
+                    }
+
+                    if(peersOnCall.size() <= 3){
+                        recyclerView.setColumnWidth((int) widthScreenPX);
+                    }else if((peersOnCall.size() > 3)&&(peersOnCall.size() <= 6)){
+                        recyclerView.setColumnWidth((int) widthScreenPX/2);
+                    }
+
+                    //recyclerView.setAdapter(null);
+                    adapter = new GroupCallAdapter(this, recyclerView, peersOnCall, chatId, flag);
+                   recyclerView.setAdapter(adapter);
+
+                }else{
+                    recyclerView.setAdapter(null);
+                    recyclerView.setVisibility(View.GONE);
+                    bigRecyclerView.setAdapter(null);
+                    bigRecyclerView.setVisibility(GONE);
+                    parentBigCameraGroupCall.setOnClickListener(null);
+                    parentBigCameraGroupCall.setVisibility(View.GONE);
                 }
 
             }else{
-
                 //7 + peers
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
+
                 parentBigCameraGroupCall.setOnClickListener(this);
                 parentBigCameraGroupCall.setVisibility(View.VISIBLE);
 
-                bigRecyclerView.setAdapter(null);
+                bigRecyclerView.setVisibility(View.VISIBLE);
+
+//                bigRecyclerView.setAdapter(null);
                 adapter = new GroupCallAdapter(this, bigRecyclerView, peersOnCall, chatId, flag);
                 bigRecyclerView.setAdapter(adapter);
 
-                if (adapter.getItemCount() == 0){
-                    bigRecyclerView.setVisibility(View.GONE);
-                }else{
-                    bigRecyclerView.setVisibility(View.VISIBLE);
-                }
                 updateUserSelected(flag);
-
             }
 
         }else{
             //Call INCOMING
+            log("createNewAdapter() ----> call incoming: peersBeforeCall("+peersBeforeCall.size()+")");
 
             linearParticipants.setVisibility(View.GONE);
 
             //arrayList-> peersBeforeCall
             if(peersBeforeCall.size() < 7) {
-                //1-6 peers
-                bigRecyclerView.setAdapter(null);
-                bigRecyclerView.setVisibility(GONE);
-                parentBigCameraGroupCall.setOnClickListener(null);
-                parentBigCameraGroupCall.setVisibility(View.GONE);
 
-                if(peersBeforeCall.size() < 4){
-                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                    recyclerView.setLayoutParams(params);
+                if(peersBeforeCall.size() != 0){
+                    //1-6 peers
+                    bigRecyclerView.setAdapter(null);
+                    bigRecyclerView.setVisibility(GONE);
 
-                }else if(peersBeforeCall.size()==4){
-                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.height = Util.scaleWidthPx(360, outMetrics);
-                    recyclerView.setLayoutParams(params);
+                    parentBigCameraGroupCall.setOnClickListener(null);
+                    parentBigCameraGroupCall.setVisibility(View.GONE);
 
-                }else{
-                    ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.height = Util.scaleWidthPx(540, outMetrics);
-                    recyclerView.setLayoutParams(params);
-                }
-
-                if(peersBeforeCall.size() <= 3){
-                    recyclerView.setColumnWidth((int) widthScreenPX);
-                }else if((peersBeforeCall.size() > 3)&&(peersBeforeCall.size() <= 6)){
-                    recyclerView.setColumnWidth((int) widthScreenPX/2);
-
-                }
-
-                recyclerView.setAdapter(null);
-                adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag);
-
-                recyclerView.setAdapter(adapter);
-                if (adapter.getItemCount() == 0){
-                    recyclerView.setVisibility(View.GONE);
-                }else{
                     recyclerView.setVisibility(View.VISIBLE);
+
+                    if(peersBeforeCall.size() < 4){
+                        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                        recyclerView.setLayoutParams(params);
+
+                    }else if(peersBeforeCall.size()==4){
+                        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.height = Util.scaleWidthPx(360, outMetrics);
+                        recyclerView.setLayoutParams(params);
+
+                    }else{
+                        ViewGroup.LayoutParams params = recyclerView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.height = Util.scaleWidthPx(540, outMetrics);
+                        recyclerView.setLayoutParams(params);
+                    }
+
+                    if(peersBeforeCall.size() <= 3){
+                        recyclerView.setColumnWidth((int) widthScreenPX);
+                    }else if((peersBeforeCall.size() > 3)&&(peersBeforeCall.size() <= 6)){
+                        recyclerView.setColumnWidth((int) widthScreenPX/2);
+                    }
+
+//                recyclerView.setAdapter(null);
+                    adapter = new GroupCallAdapter(this, recyclerView, peersBeforeCall, chatId, flag);
+                    recyclerView.setAdapter(adapter);
+
+
+                }else{
+                    recyclerView.setAdapter(null);
+                    recyclerView.setVisibility(GONE);
+                    bigRecyclerView.setAdapter(null);
+                    bigRecyclerView.setVisibility(GONE);
+                    parentBigCameraGroupCall.setOnClickListener(null);
+                    parentBigCameraGroupCall.setVisibility(View.GONE);
                 }
 
             }else{
                 //7 + peers
-                parentBigCameraGroupCall.setOnClickListener(this);
-                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
                 recyclerView.setAdapter(null);
                 recyclerView.setVisibility(GONE);
 
-                bigRecyclerView.setAdapter(null);
+                parentBigCameraGroupCall.setOnClickListener(this);
+                parentBigCameraGroupCall.setVisibility(View.VISIBLE);
+
+                bigRecyclerView.setVisibility(View.VISIBLE);
+
+//                bigRecyclerView.setAdapter(null);
                 adapter = new GroupCallAdapter(this, bigRecyclerView, peersBeforeCall, chatId, flag);
                 bigRecyclerView.setAdapter(adapter);
-
-                if (adapter.getItemCount() == 0){
-                    bigRecyclerView.setVisibility(View.GONE);
-                }else{
-                    bigRecyclerView.setVisibility(View.VISIBLE);
-                }
                 updateUserSelected(flag);
             }
         }
