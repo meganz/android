@@ -128,6 +128,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     ChatController cC;
 
     long myUserHandle = -1;
+    private boolean isPreviewAlready = false;
 
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
@@ -718,6 +719,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT = 18;
             }
 
+            isPreviewAlready = false;
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
             holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
@@ -4424,7 +4426,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void bindNodeAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        log("bindNodeAttachmentMessage()");
+        log("bindNodeAttachmentMessage()--> position: "+position);
 
         MegaChatMessage message = androidMessage.getMessage();
         if (message.getUserHandle() == myUserHandle) {
@@ -4577,7 +4579,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     Bitmap preview = null;
                     if (node.hasPreview()) {
-                        log("bindNodeAttachmentMessage() - hasPreview()");
 
                         preview = PreviewUtils.getPreviewFromCache(node);
                         if (preview != null) {
@@ -4594,7 +4595,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.forwardOwnFile.setVisibility(View.GONE);
                                 holder.forwardOwnPortrait.setVisibility(View.GONE);
                                 holder.forwardOwnLandscape.setVisibility(View.GONE);
-
                             }
                             try {
                                 new MegaChatLollipopAdapter.ChatPreviewAsyncTask(holder).execute(node);
@@ -4602,15 +4602,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 //Too many AsyncTasks
                                 log("Too many AsyncTasks");
                             }
+
+
                         }
                     } else {
-
                         log("Node has no preview on servers");
 
                         preview = PreviewUtils.getPreviewFromCache(node);
                         if (preview != null) {
+
                             PreviewUtils.previewCache.put(node.getHandle(), preview);
                             if (preview.getWidth() < preview.getHeight()) {
+
                                 log("Portrait");
                                 holder.contentOwnMessageThumbPort.setImageBitmap(preview);
                                 holder.contentOwnMessageThumbPort.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -4677,7 +4680,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                             } else {
                                 log("Landscape");
-
                                 holder.contentOwnMessageThumbLand.setImageBitmap(preview);
                                 holder.contentOwnMessageThumbLand.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
@@ -4741,7 +4743,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.videoIconOwnMessageThumbPort.setVisibility(View.GONE);
                                 holder.videoTimecontentOwnMessageThumbPort.setVisibility(View.GONE);
                             }
-                        } else {
+                        }else {
                             if ((status == MegaChatMessage.STATUS_SERVER_REJECTED) || (status == MegaChatMessage.STATUS_SENDING_MANUAL)) {
                                 holder.ownTriangleIconFile.setVisibility(View.VISIBLE);
                                 holder.retryAlert.setVisibility(View.VISIBLE);
