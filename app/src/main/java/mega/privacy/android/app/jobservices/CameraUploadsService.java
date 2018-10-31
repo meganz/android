@@ -16,6 +16,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.StatFs;
@@ -171,6 +172,22 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         }
 
         return false;
+    }
+
+    private String getFileNameFromPath(String path) {
+        String[] paths = path.split(File.separator);
+        return paths[paths.length - 1];
+    }
+
+    private String getTempStorageRoot(String folderName) {
+        String rootPath = Environment.getExternalStorageDirectory() + File.separator + folderName + File.separator;
+        File root = new File(rootPath);
+        if (!root.exists()) {
+            if (!root.mkdirs()) {
+                return null;
+            }
+        }
+        return rootPath;
     }
 
     private void startCameraUploads() {
@@ -400,7 +417,27 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             } else {
                 path = file.getLocalPath();
             }
-            
+            String newPath = createTempFile(path);
+            //IOException occurs.
+            if ("copy file failed!".equals(newPath)) {
+                return;
+            }
+//            if("space isn't enough!".equals(newPath)) {
+//                //TODO show dialog.
+//                return;
+//            }
+            while ("space isn't enough!".equals(newPath)) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (megaApi.getNumPendingUploads() == 0) {
+                    //TODO show dialog.
+                    return;
+                }
+                newPath = createTempFile(path);
+            }
             if (file.isCopyOnly()) {
                 megaApi.copyNode(megaApi.getNodeByHandle(file.getNodeHandle()),parent,file.getFileName(),this);
             } else {
@@ -1499,17 +1536,17 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void startVideoCompression() {
         Log.d("Yuan", "startVideoCompression");
-    
+
         List<SyncRecord> fullList = dbH.findVideoRecordsByState(STATUS_PENDING);
         megaApi.resetTotalUploads();
         totalUploaded = 0;
         totalToUpload = fullList.size();
-        
+
         final VideoCompressor compressor = new VideoCompressor(getApplicationContext(),CameraUploadsService.this);
         compressor.setPendingList(getVideoPaths(fullList));
         long totalPendingSizeInMB = compressor.getTotalInputSize() / (1024 * 1024);
         Log.d("Yuan",totalPendingSizeInMB + "byte to Conversion");
-    
+
         double availableFreeSpace = Double.MAX_VALUE;
         try{
             StatFs stat = new StatFs(mCompressionPath);
@@ -1518,7 +1555,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         catch(Exception ex){
             ex.printStackTrace();
         }
-    
+
         if(availableFreeSpace < compressor.getTotalInputSize()) {
             stopForeground(true);
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
@@ -1527,7 +1564,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             showNotification("No Space", "Not enough space to perform compression.", pendingIntent);
             return;
         }
-        
+
         if (shouldStartVideoCompression(totalPendingSizeInMB)) {
             showNotification("Start compression", "Starting", mPendingIntent);
             Thread t = new Thread(new Runnable() {
@@ -1545,11 +1582,11 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
             showNotification("Over limit", "Do you want to charge or change setting", pendingIntent);
         }
-        
+
     }
-    
+
     private boolean shouldStartVideoCompression(long queueSize){
-        
+
         if(Boolean.parseBoolean(prefs.getConversionOnCharging())){
             int queueSizeLimit = Integer.parseInt(prefs.getChargingOnSize());
             if(queueSize > queueSizeLimit && !Util.isCharging(mContext)){
@@ -1590,7 +1627,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         ArrayList<SyncRecord> compressedList = new ArrayList<>(dbH.findVideoRecordsByState(STATUS_SUCCESS));
         startParallelUpload(compressedList,true);
     }
-    
+
     private void showNotification(String title, String content, PendingIntent intent){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId,notificationChannelName,NotificationManager.IMPORTANCE_DEFAULT);
@@ -1607,7 +1644,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 .setContentText(content)
                 .setOnlyAlertOnce(true);
         mNotification = mBuilder.build();
-    
+
         mNotificationManager.notify(notificationId,mNotification);
     }
 
@@ -1661,5 +1698,28 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String createTempFile(String srcPath) {
+        File srcFile = new File(srcPath);
+        try {
+            StatFs stat = new StatFs(mCompressionPath);
+            double availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+            if (availableFreeSpace <= srcFile.length()) {
+                return "space isn't enough!";
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        String destPath = mCompressionPath + getFileNameFromPath(srcPath);
+        File destFile = new File(destPath);
+        try {
+            Util.copyFile(srcFile,destFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "copy file failed!";
+        }
+        return destPath;
     }
 }
