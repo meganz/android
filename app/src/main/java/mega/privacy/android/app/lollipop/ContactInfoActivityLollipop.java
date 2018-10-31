@@ -14,7 +14,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
@@ -39,8 +38,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -77,6 +74,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.modalbottomsheet.ContactInfoBottomSheetDialogFragment;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -84,7 +82,10 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
@@ -106,7 +107,7 @@ import static mega.privacy.android.app.utils.Util.context;
 
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
 
 	ContactController cC;
     private android.support.v7.app.AlertDialog downloadConfirmationDialog;
@@ -238,6 +239,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				finish();
 				return;
 			}
+
+
+			megaChatApi.addChatListener(this);
 		}
 
 		handler = new Handler();
@@ -479,41 +483,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				setDefaultAvatar(fullName);
 			}
 
-			 if(Util.isChatEnabled()){
-				 contactStateIcon.setVisibility(View.VISIBLE);
-			 	if (megaChatApi != null){
-			 		int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
-			 		if(userStatus == MegaChatApi.STATUS_ONLINE){
-			 			log("This user is connected");
-						contactStateIcon.setVisibility(View.VISIBLE);
-			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-			 		}else if(userStatus == MegaChatApi.STATUS_AWAY){
-			 			log("This user is away");
-						contactStateIcon.setVisibility(View.VISIBLE);
-			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
-			 		} else if(userStatus == MegaChatApi.STATUS_BUSY){
-			 			log("This user is busy");
-						contactStateIcon.setVisibility(View.VISIBLE);
-			 			contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
-			 		}
-			 		else if(userStatus == MegaChatApi.STATUS_OFFLINE){
-						log("This user is offline");
-						contactStateIcon.setVisibility(View.VISIBLE);
-						contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_offline));
-					}
-					else if(userStatus == MegaChatApi.STATUS_INVALID){
-						log("INVALID status: "+userStatus);
-						contactStateIcon.setVisibility(View.GONE);
-					}
-					else{
-						log("This user status is: "+userStatus);
-						contactStateIcon.setVisibility(View.GONE);
-					}
-			 	}
-			 } else{
-			 	contactStateIcon.setVisibility(View.GONE);
-			 }
-
 			if(Util.isOnline(this)){
 				log("online -- network connection");
 				setAvatar();
@@ -620,7 +589,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					} else {
 						generalChatNotifications = Boolean.parseBoolean(chatSettings.getNotificationsEnabled());
-
 					}
 
 					if (generalChatNotifications) {
@@ -644,6 +612,51 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		} else {
 			log("Extras is NULL");
+		}
+	}
+
+	public void setContactPresenceStatus(){
+		log("setContactPresenceStatus");
+		contactStateIcon.setVisibility(View.VISIBLE);
+		if (megaChatApi != null){
+			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
+			if(userStatus == MegaChatApi.STATUS_ONLINE){
+				log("This user is connected");
+				contactStateIcon.setVisibility(View.VISIBLE);
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+				emailContact.setVisibility(View.VISIBLE);
+				emailContact.setText(getString(R.string.online_status));
+
+			}else if(userStatus == MegaChatApi.STATUS_AWAY){
+				log("This user is away");
+				contactStateIcon.setVisibility(View.VISIBLE);
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+				emailContact.setVisibility(View.VISIBLE);
+				emailContact.setText(getString(R.string.away_status));
+			} else if(userStatus == MegaChatApi.STATUS_BUSY){
+				log("This user is busy");
+				contactStateIcon.setVisibility(View.VISIBLE);
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+				emailContact.setVisibility(View.VISIBLE);
+				emailContact.setText(getString(R.string.busy_status));
+			}
+			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
+				log("This user is offline");
+				contactStateIcon.setVisibility(View.VISIBLE);
+				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_offline));
+				emailContact.setVisibility(View.VISIBLE);
+				emailContact.setText(getString(R.string.offline_status));
+			}
+			else if(userStatus == MegaChatApi.STATUS_INVALID){
+				log("INVALID status: "+userStatus);
+				contactStateIcon.setVisibility(View.GONE);
+				emailContact.setVisibility(View.GONE);
+			}
+			else{
+				log("This user status is: "+userStatus);
+				contactStateIcon.setVisibility(View.GONE);
+				emailContact.setVisibility(View.GONE);
+			}
 		}
 	}
 
@@ -1688,11 +1701,31 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		super.onResume();
 
 		((MegaApplication) getApplication()).sendSignalPresenceActivity();
+
+		if(Util.isChatEnabled()){
+			setContactPresenceStatus();
+		} else{
+			contactStateIcon.setVisibility(View.GONE);
+		}
+
+		requestLastGreen(-1);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+	}
+
+	public void requestLastGreen(int state){
+		log("requestLastGreen: "+state);
+		if(state == -1){
+			state = megaChatApi.getUserOnlineStatus(user.getHandle());
+		}
+
+		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
+			log("Request last green for user");
+			megaChatApi.requestLastGreen(user.getHandle(), this);
+		}
 	}
 
 	public void showConfirmationClearChat(){
@@ -2371,4 +2404,49 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
     public void onEvent(MegaApiJava api,MegaEvent event) {
     
     }
+
+	@Override
+	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+	}
+
+	@Override
+	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+	}
+
+	@Override
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+        log("onChatConnectionStateUpdate: "+status);
+		setContactPresenceStatus();
+		requestLastGreen(status);
+	}
+
+	@Override
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+	}
+
+	@Override
+	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+	}
+
+	@Override
+	public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+		if(userhandle == user.getHandle()){
+			log("Update last green");
+
+			int state = megaChatApi.getUserOnlineStatus(user.getHandle());
+
+			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
+				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+
+				emailContact.setVisibility(View.VISIBLE);
+				emailContact.setText(formattedDate);
+
+				log("Date last green: "+formattedDate);
+			}
+		}
+	}
 }
