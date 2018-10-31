@@ -54,8 +54,10 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
 
     private NotificationCompat.Builder mBuilderCompat;
 
-    private String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CONTACTS_ID;
-    private String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CONTACTS_NAME;
+    private String notificationChannelIdSimple = Constants.NOTIFICATION_CHANNEL_CONTACTS_ID;
+    private String notificationChannelNameSimple = Constants.NOTIFICATION_CHANNEL_CONTACTS_NAME;
+    private String notificationChannelIdSummary = Constants.NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_ID;
+    private String notificationChannelNameSummary = Constants.NOTIFICATION_CHANNEL_CONTACTS_SUMMARY_NAME;
 
     public static ContactsAdvancedNotificationBuilder newInstance(Context context, MegaApiAndroid megaApi) {
         Context appContext = context.getApplicationContext();
@@ -284,14 +286,14 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)crToShow.getHandle() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.title_contact_request_notification))
@@ -377,14 +379,14 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(title)
@@ -544,14 +546,14 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelIdSummary, notificationChannelNameSummary, NotificationManager.IMPORTANCE_HIGH);
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSummary);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setShowWhen(true)
@@ -592,14 +594,14 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 2 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelIdSummary, notificationChannelNameSummary, NotificationManager.IMPORTANCE_HIGH);
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSummary);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setShowWhen(true)
@@ -638,56 +640,6 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationManager.cancel(Constants.NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT);
     }
 
-    public void showSimpleNotification(){
-        log("showSimpleNotification");
-
-        Intent intent = new Intent(context, ManagerActivityLollipop.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.setAction(Constants.ACTION_CHAT_SUMMARY);
-        intent.putExtra("CHAT_ID", -1);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setShowBadge(true);
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-            notificationManager.createNotificationChannel(channel);
-
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
-            notificationBuilderO
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true).setTicker("Chat activity")
-                    .setContentTitle("Chat activity").setContentText("You may have new messages")
-                    .setOngoing(false)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
-
-            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
-        }
-        else {
-            mBuilderCompat = new NotificationCompat.Builder(context);
-
-            if (notificationManager == null) {
-                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            }
-
-            mBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true).setTicker("Chat activity")
-                    .setContentTitle("Chat activity").setContentText("You may have new messages")
-                    .setOngoing(false);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.mega));
-            }
-
-            notificationManager.notify(Constants.NOTIFICATION_GENERAL_PUSH_CHAT, mBuilderCompat.build());
-        }
-    }
-
     public void showSimpleNotificationAPC(){
         log("showSimpleNotificationAPC");
 
@@ -711,14 +663,14 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)email.hashCode() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelIdSimple, notificationChannelNameSimple, NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(true);
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelId);
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdSimple);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentIntent(pendingIntent)
