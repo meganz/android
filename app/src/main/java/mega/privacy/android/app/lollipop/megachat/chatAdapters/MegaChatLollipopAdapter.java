@@ -7714,17 +7714,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 messageArray.add(messages.get(currentPosition - 1));
                 ((ChatActivityLollipop) context).prepareMessagesToForward(messageArray);
-                this.notifyItemChanged(currentPosition);
                 break;
             }
             case R.id.content_own_message_text:
             case R.id.content_contact_message_text:
             case R.id.url_own_message_text:
-            case R.id.url_contact_message_text:{
-                ((ChatActivityLollipop) context).itemClick(currentPosition);
-                this.notifyItemChanged(currentPosition);
-                break;
-            }
+            case R.id.url_contact_message_text:
             case R.id.message_chat_item_layout:{
                 ((ChatActivityLollipop) context).itemClick(currentPosition);
                 break;
@@ -7733,7 +7728,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ChatActivityLollipop) context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
                 megaApi.enableRichPreviews(true);
                 this.notifyItemChanged(currentPosition);
-
                 break;
             }
             case R.id.url_no_disable_button:
@@ -7747,20 +7741,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
                 megaApi.setRichLinkWarningCounterValue(counter);
                 this.notifyItemChanged(currentPosition);
-
                 break;
             }
             case R.id.url_never_button: {
                 ((ChatActivityLollipop) context).showRichLinkWarning = Constants.RICH_WARNING_CONFIRMATION;
                 this.notifyItemChanged(currentPosition);
-
                 break;
             }
             case R.id.url_yes_disable_button: {
                 ((ChatActivityLollipop) context).showRichLinkWarning = Constants.RICH_WARNING_FALSE;
                 megaApi.enableRichPreviews(false);
                 this.notifyItemChanged(currentPosition);
-
                 break;
             }
 
