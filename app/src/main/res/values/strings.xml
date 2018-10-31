@@ -2218,4 +2218,7 @@
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+
+    <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
+
 </resources>
