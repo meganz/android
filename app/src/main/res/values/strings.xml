@@ -269,9 +269,7 @@
     -->
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
 
-    <!--
-    <string name="choose_account_activity" context="Title of the activity Choose Account">Choose Account</string>
-    -->
+    <string name="choose_account_fragment" context="Title of the fragment Choose Account">CHOOSE ACCOUNT</string>
 
     <!--
     <string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
