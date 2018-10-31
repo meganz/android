@@ -2,14 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/new_background_fragment"
+    android:background="@color/white"
     tools:context=".OfflineFragmentLollipop" >
 
   	<RelativeLayout
         android:id="@+id/offline_content_grid_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="36dp"
-        android:background="@color/content_text_background">
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/offline_content_text_grid"

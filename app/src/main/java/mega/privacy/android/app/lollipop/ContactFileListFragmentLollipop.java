@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
@@ -73,6 +74,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
     public void setCurrNodePosition(int currNodePosition) {
         this.currNodePosition = currNodePosition;
     }
+
+	Handler handler;
 
 	public void activateActionMode(){
 		log("activateActionMode");
@@ -171,6 +174,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			fab.setVisibility(View.GONE);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
 
@@ -180,6 +184,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			fab.setVisibility(View.VISIBLE);
+			Util.changeStatusBarColorActionMode(context, ((ContactFileListActivityLollipop) context).getWindow(), handler, 0);
 		}
 
 		@Override
@@ -271,9 +276,16 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		handler.removeCallbacksAndMessages(null);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 		View v = null;
+		handler = new Handler();
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_file_list, container, false);
 
