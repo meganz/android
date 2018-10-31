@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +31,11 @@ import nz.mega.sdk.MegaUserAlert;
 
 public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificationsAdapter.ViewHolderNotifications> implements OnClickListener{
 
-	public static int MAX_WIDTH_CONTACT_NAME_LAND=270;
-	public static int MAX_WIDTH_CONTACT_NAME_PORT=230;
+	public static int MAX_WIDTH_FIRST_LINE_NEW_LAND =306;
+	public static int MAX_WIDTH_FIRST_LINE_SEEN_LAND =336;
+
+	public static int MAX_WIDTH_FIRST_LINE_NEW_PORT =276;
+	public static int MAX_WIDTH_FIRST_LINE_SEEN_PORT =328;
 
 	private Context context;
 	private int positionClicked;
@@ -104,14 +108,6 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		holder.descriptionText = (TextView) v.findViewById(R.id.notifications_text);
 		holder.dateText = (TextView) v.findViewById(R.id.notifications_date);
 
-		if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			log("onCreate: Landscape configuration");
-			holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-		}
-		else{
-			holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-		}
-
 		holder.separator = (LinearLayout) v.findViewById(R.id.notifications_separator);
 
 		holder.itemLayout.setTag(holder);
@@ -150,6 +146,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
 				String email = alert.getEmail();
@@ -169,6 +166,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -186,6 +205,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification_cancelled));
 
 				String email = alert.getEmail();
@@ -205,6 +225,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -222,6 +264,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_acceptance_contact_request_notification));
 
 				String email = alert.getEmail();
@@ -241,6 +284,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -258,6 +323,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_account_notification_deleted));
 
 				String email = alert.getEmail();
@@ -277,6 +343,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -294,6 +382,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_request_notification));
 
 				String email = alert.getEmail();
@@ -315,6 +404,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -331,6 +442,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_notification_deleted));
 
 				String email = alert.getEmail();
@@ -350,6 +462,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -367,6 +501,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_contact_notification_blocked));
 
 				String email = alert.getEmail();
@@ -386,6 +521,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -403,6 +560,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_outgoing_contact_request));
 
 				String email = alert.getEmail();
@@ -422,6 +580,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -438,6 +618,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_outgoing_contact_request));
 
 				String email = alert.getEmail();
@@ -457,6 +638,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -473,6 +676,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_incoming_contact_request));
 
 				String email = alert.getEmail();
@@ -492,6 +696,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -508,6 +734,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_incoming_contact_request));
 
 				String email = alert.getEmail();
@@ -527,6 +754,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -543,6 +792,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.GONE);
 
 				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
 				holder.titleText.setText(context.getString(R.string.title_incoming_contact_request));
 
 				String email = alert.getEmail();
@@ -562,6 +812,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 				holder.descriptionText.setText(result);
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -577,7 +849,9 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
-				holder.titleText.setVisibility(View.GONE);
+
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
 				String email = alert.getEmail();
 
@@ -595,7 +869,27 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				} else {
 					result = Html.fromHtml(textToShow);
 				}
-				holder.descriptionText.setText(result);
+				holder.titleText.setText(result);
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				//Allow navigation to the folder
 				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
@@ -616,7 +910,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
 				String email = alert.getEmail();
 
@@ -634,7 +929,27 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				} else {
 					result = Html.fromHtml(textToShow);
 				}
-				holder.descriptionText.setText(result);
+				holder.titleText.setText(result);
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(null);
 				break;
@@ -651,7 +966,8 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
 				String email = alert.getEmail();
 				int numFiles = (int) alert.getNumber(1);
@@ -680,7 +996,27 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					result = Html.fromHtml(textToShow);
 				}
 
-				holder.descriptionText.setText(result);
+				holder.titleText.setText(result);
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				//Allow navigation to the folder
 				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
@@ -701,6 +1037,28 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleIcon.setVisibility(View.VISIBLE);
 
 				holder.descriptionText.setText(alert.getTitle());
+				holder.descriptionText.setVisibility(View.VISIBLE);
+
+				//Description set to max, adjust title
+				holder.titleText.setMaxLines(1);
+				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+				}
+				else{
+					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					if(alert.getSeen()==false){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				//Allow navigation to the folder
 				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
@@ -721,9 +1079,30 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				holder.descriptionText.setText(alert.getTitle());
+				holder.titleText.setText(alert.getTitle());
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -741,9 +1120,31 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				holder.descriptionText.setText(alert.getTitle());
+				holder.titleText.setText(alert.getTitle());
+
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 
@@ -761,9 +1162,30 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				holder.descriptionText.setText(alert.getTitle());
+				holder.titleText.setText(alert.getTitle());
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				holder.itemLayout.setOnClickListener(this);
 				break;
@@ -781,9 +1203,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				String name = alert.getName();
+//				String name = alert.getName();
+				String name = "name";
 				String path = alert.getPath();
 				String textToShow = "";
 				if(path!=null){
@@ -813,7 +1237,27 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				} else {
 					result = Html.fromHtml(textToShow);
 				}
-				holder.descriptionText.setText(result);
+				holder.titleText.setText(result);
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				//Allow navigation to the folder
 				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){
@@ -835,9 +1279,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
                 holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
 
-				holder.titleText.setVisibility(View.GONE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-                String name = alert.getName();
+//                String name = alert.getName();
+				String name = "name";
                 String path = alert.getPath();
 				String textToShow = "";
 				if(path!=null){
@@ -867,7 +1313,27 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
                 } else {
                     result = Html.fromHtml(textToShow);
                 }
-                holder.descriptionText.setText(result);
+				holder.titleText.setText(result);
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					}
+				}
+				else{
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+					}
+					else{
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
+					}
+				}
 
 				//Allow navigation to the folder
 				if(alert.getNodeHandle()!=-1 && megaApi.getNodeByHandle(alert.getNodeHandle())!=null){

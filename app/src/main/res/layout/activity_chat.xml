@@ -26,6 +26,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <!--<android.support.v7.widget.Toolbar-->
+                <!--android:id="@+id/toolbar_chat"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:minHeight="?attr/actionBarSize"-->
+                <!--android:background="?attr/colorPrimary"-->
+                <!--android:elevation="4dp"-->
+                <!--app:titleTextAppearance="@style/ToolbarTitle"-->
+                <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
+                <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
+                <!--tools:context=".lollipop.megachat.ChatActivityLollipop" />-->
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
@@ -40,33 +52,49 @@
 
                 <LinearLayout
                     android:id="@+id/toolbar_elements"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="vertical">
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/title_toolbar"
+                    <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/white"
                         android:gravity="center_vertical"
-                        android:layout_gravity="center_vertical"
-                        android:textSize="20sp"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:fontFamily="sans-serif-light"
-                        android:textStyle="bold"
-                        android:layout_marginRight="20dp"
-                        android:lineSpacingMultiplier="1.20"/>
-
+                        android:layout_gravity="center_vertical">
+                        <TextView
+                            android:id="@+id/title_toolbar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:fontFamily="sans-serif-light"
+                            android:textStyle="bold"
+                            android:gravity="center_vertical"
+                            android:textSize="20sp"
+                            android:maxLines="1"
+                            android:layout_toLeftOf="@+id/state_icon_toolbar"
+                            android:ellipsize="end"/>
+                        <ImageView
+                            android:id="@+id/state_icon_toolbar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:layout_marginTop="7dp"
+                            android:layout_marginRight="3dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginLeft="3dp"
+                            android:layout_alignParentTop="true"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
                     <TextView
                         android:id="@+id/subtitle_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:layout_marginRight="8dp"
-                        android:visibility="gone"/>
+                        android:visibility="gone"
+                        android:layout_marginRight="8dp"/>
                 </LinearLayout>
+
             </android.support.v7.widget.Toolbar>
 
 
