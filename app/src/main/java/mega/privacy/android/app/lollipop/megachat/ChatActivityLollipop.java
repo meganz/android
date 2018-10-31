@@ -598,16 +598,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
+//        toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
 //        titleToolbar = (EmojiTextView) tB.findViewById(R.id.title_toolbar);
 //        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 //            titleToolbar.setEmojiSize(Util.scaleWidthPx(12, outMetrics));
 //        }else{
 //            titleToolbar.setEmojiSize(Util.scaleWidthPx(25, outMetrics));
 //        }
-        titleToolbar.setText(" ");
-        subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
+//        titleToolbar.setText(" ");
+//        subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
 
         emptyLayout = (LinearLayout) findViewById(R.id.empty_messages_layout);
         emptyTextView = (TextView) findViewById(R.id.empty_text_chat_recent);
