@@ -128,7 +128,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     ChatController cC;
 
     long myUserHandle = -1;
-    private boolean isPreviewAlready = false;
 
     DisplayMetrics outMetrics;
     DatabaseHandler dbH = null;
@@ -7719,15 +7718,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 this.notifyItemChanged(currentPosition);
                 break;
             }
-//            case R.id.content_own_message_text:
-//            case R.id.content_contact_message_text:
-//            case R.id.url_own_message_text:
-//            case R.id.url_contact_message_text:
-//            case R.id.message_chat_item_layout:{
-//                ((ChatActivityLollipop) context).itemClick(currentPosition);
-//                break;
-//            }
-
             case R.id.content_own_message_text:
             case R.id.content_contact_message_text:
             case R.id.url_own_message_text:
