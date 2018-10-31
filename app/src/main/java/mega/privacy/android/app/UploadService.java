@@ -528,8 +528,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					inProgress = inProgress + currentTransfer.getTransferredBytes();
 				}
 			}
-			long inProgressTemp = inProgress *100;
-			progressPercent = inProgressTemp/total;
+
+			long inProgressTemp = 0;
+			if(total>0){
+				inProgressTemp = inProgress *100;
+				progressPercent = inProgressTemp/total;
+			}
 
 			String message = "";
 			if (inProgress == 0){
