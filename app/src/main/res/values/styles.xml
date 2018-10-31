@@ -217,4 +217,9 @@
         <item name="android:windowMinWidthMajor">90%</item>
         <item name="android:windowMinWidthMinor">90%</item>
     </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="colorControlActivated">@color/accentColor</item>
+        <item name="colorControlNormal">#000000</item>
+    </style>
 </resources>

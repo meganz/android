@@ -2221,4 +2221,6 @@
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
 
+    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Error. The value typed should be mayour than 0</string>
+
 </resources>
