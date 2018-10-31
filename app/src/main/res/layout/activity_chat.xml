@@ -55,13 +55,13 @@
                     android:id="@+id/toolbar_elements"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:gravity="center_vertical"
+                    android:gravity="center_vertical|left"
                     android:orientation="vertical">
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="center_vertical">
+                        android:gravity="center_vertical|left"
+                        android:layout_gravity="center_vertical|left">
                         <TextView
                             android:id="@+id/title_toolbar"
                             android:layout_width="wrap_content"
@@ -69,7 +69,8 @@
                             android:textColor="@color/white"
                             android:fontFamily="sans-serif-light"
                             android:textStyle="bold"
-                            android:gravity="center_vertical"
+                            android:gravity="center_vertical|left"
+                            android:layout_gravity="left"
                             android:textSize="20sp"
                             android:maxLines="1"
                             android:layout_toLeftOf="@+id/state_icon_toolbar"
