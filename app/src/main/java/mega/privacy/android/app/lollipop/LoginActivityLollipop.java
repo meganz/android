@@ -316,6 +316,7 @@ public class LoginActivityLollipop extends AppCompatActivity implements MegaGlob
                     window.setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_login));
                 }
                 break;
+
             }
             case Constants.TOUR_FRAGMENT: {
                 log("Show TOUR_FRAGMENT");
