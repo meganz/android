@@ -2374,7 +2374,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void refreshSettingsFragment() {
-		Intent intent = new Intent(SettingsFragmentLollipop.REFRESH_CLEAR_OFFLINE_SETTING);
+		Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+		intent.setAction(SettingsFragmentLollipop.ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 	}
 }

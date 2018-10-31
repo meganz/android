@@ -75,7 +75,8 @@ import nz.mega.sdk.MegaNode;
 @SuppressLint("NewApi")
 public class SettingsFragmentLollipop extends PreferenceFragment implements OnPreferenceClickListener, OnPreferenceChangeListener{
 
-	public static final String REFRESH_CLEAR_OFFLINE_SETTING = "refresh_clear_offline_setting";
+	public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING";
+	public static final String ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING";
 
 	Context context;
 	private MegaApiAndroid megaApi;
@@ -158,7 +159,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public static String KEY_RECOVERY_KEY= "settings_recovery_key";
 	public static String KEY_CHANGE_PASSWORD= "settings_change_password";
-	
+
+	public static final String CAMERA_UPLOADS_STATUS = "CAMERA_UPLOADS_STATUS";
+
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
 	
@@ -1804,181 +1807,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setCamSyncTimeStamp(0);			
 			cameraUpload = !cameraUpload;			
 			
-			if (cameraUpload){
-				log("Camera ON");
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					log("Lollipop version");
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						log("No storage permission");
-						ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								Constants.REQUEST_WRITE_STORAGE);
-					}
-					
-					boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-	        		if (!hasCameraPermission){
-						log("No camera permission");
-	        			ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
-				                new String[]{Manifest.permission.CAMERA},
-								Constants.REQUEST_CAMERA);
-	        		}
-				}
-				
-				if (camSyncLocalPath!=null){
-
-					if (!isExternalSDCard){
-						File checkFile = new File(camSyncLocalPath);
-						if(!checkFile.exists()){
-							//Local path does not exist, then Camera folder by default
-							log("local path not exist, default camera folder");
-							File cameraDownloadLocation = null;
-							if (Environment.getExternalStorageDirectory() != null){
-								cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-							}
-
-							cameraDownloadLocation.mkdirs();
-
-							dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-
-							camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-							localCameraUploadFolder.setSummary(camSyncLocalPath);
-							localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
-						}
-					}
-					else{
-						Uri uri = Uri.parse(prefs.getUriExternalSDCard());
-
-						DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
-						String pickedDirName = pickedDir.getName();
-						if(pickedDirName!=null){
-							camSyncLocalPath = pickedDir.getName();
-							localCameraUploadFolder.setSummary(pickedDir.getName());
-							localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
-						}
-						else{
-							log("pickedDirNAme NULL");
-						}
-					}
-				}
-				else{
-					log("local parh is NULL");
-					//Local path not valid = null, then Camera folder by default
-					File cameraDownloadLocation = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-					}
-					
-					cameraDownloadLocation.mkdirs();
-					
-					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
-					dbH.setCameraFolderExternalSDCard(false);
-					isExternalSDCard = false;
-					
-					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
-				}
-
-				if(camSyncHandle!=null){
-					if(camSyncHandle==-1){
-						camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
-					}
-				}		
-				else{
-					camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
-				}
-				
-				megaCameraFolder.setSummary(camSyncMegaPath);
-					
-				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-				fileUpload = getString(R.string.settings_camera_upload_only_photos);
-				cameraUploadWhat.setValueIndex(0);
-				
-				dbH.setCamSyncWifi(true);
-				wifi = getString(R.string.cam_sync_wifi);
-				cameraUploadHow.setValueIndex(1);
-				
-				dbH.setCamSyncCharging(true);
-				charging = true;
-				cameraUploadCharging.setChecked(charging);
-				
-				dbH.setCamSyncEnabled(true);
-				
-				handler.postDelayed(new Runnable() {
-					
-					@Override
-					public void run() {
-						log("Now I start the service");
-						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-							context.startService(new Intent(context, CameraSyncService.class));
-						}
-					}
-				}, 5 * 1000);
-				
-				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
-				cameraUploadHow.setSummary(wifi);
-				localCameraUploadFolder.setSummary(camSyncLocalPath);
-				localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
-					
-				cameraUploadWhat.setSummary(fileUpload);
-				cameraUploadCategory.addPreference(cameraUploadHow);
-				cameraUploadCategory.addPreference(cameraUploadWhat);
-				cameraUploadCategory.addPreference(cameraUploadCharging);
-				cameraUploadCategory.addPreference(keepFileNames);
-				cameraUploadCategory.addPreference(megaCameraFolder);								
-				cameraUploadCategory.addPreference(secondaryMediaFolderOn);
-				cameraUploadCategory.removePreference(localSecondaryFolder);
-				cameraUploadCategory.removePreference(megaSecondaryFolder);		
-				
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					File[] fs = context.getExternalFilesDirs(null);
-					if (fs.length == 1){
-						cameraUploadCategory.addPreference(localCameraUploadFolder);
-						cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-					}
-					else{
-						if (fs.length > 1){
-							if (fs[1] == null){
-								cameraUploadCategory.addPreference(localCameraUploadFolder);
-								cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-							}
-							else{
-								cameraUploadCategory.removePreference(localCameraUploadFolder);
-								cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
-							}
-						}
-					}			
-				}
-				else{
-					cameraUploadCategory.addPreference(localCameraUploadFolder);
-					cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-				}
-
-			}
-			else{
-				log("Camera OFF");
-				dbH.setCamSyncEnabled(false);
-				dbH.setSecondaryUploadEnabled(false);
-				secondaryUpload = false;
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-					Intent stopIntent = null;
-					stopIntent = new Intent(context, CameraSyncService.class);
-					stopIntent.setAction(CameraSyncService.ACTION_STOP);
-					context.startService(stopIntent);
-				}
-				
-				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
-				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
-				cameraUploadCategory.removePreference(cameraUploadHow);
-				cameraUploadCategory.removePreference(cameraUploadWhat);
-				cameraUploadCategory.removePreference(localCameraUploadFolder);
-				cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
-				cameraUploadCategory.removePreference(cameraUploadCharging);
-				cameraUploadCategory.removePreference(keepFileNames);
-				cameraUploadCategory.removePreference(megaCameraFolder);
-				cameraUploadCategory.removePreference(secondaryMediaFolderOn);
-				cameraUploadCategory.removePreference(localSecondaryFolder);
-				cameraUploadCategory.removePreference(megaSecondaryFolder);
-			}			
+			refreshCameraUploadsSettings(cameraUpload);
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
 			log("KEY_PIN_LOCK_ENABLE");
@@ -2398,6 +2227,190 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		return true;
 	}
+
+	/**
+	 * Refresh the Camera Uploads service settings depending on the service status.
+	 * @param status Service status: TRUE if enabled or FALSE if disabled.
+	 */
+	private void refreshCameraUploadsSettings(boolean status) {
+		log("refreshCameraUploadsSettings");
+
+		if (status){
+			log("Camera ON");
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				log("Lollipop version");
+				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+				if (!hasStoragePermission) {
+					log("No storage permission");
+					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+							Constants.REQUEST_WRITE_STORAGE);
+				}
+
+				boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+				if (!hasCameraPermission){
+					log("No camera permission");
+					ActivityCompat.requestPermissions((ManagerActivityLollipop)context,
+							new String[]{Manifest.permission.CAMERA},
+							Constants.REQUEST_CAMERA);
+				}
+			}
+
+			if (camSyncLocalPath!=null){
+
+				if (!isExternalSDCard){
+					File checkFile = new File(camSyncLocalPath);
+					if(!checkFile.exists()){
+						//Local path does not exist, then Camera folder by default
+						log("local path not exist, default camera folder");
+						File cameraDownloadLocation = null;
+						if (Environment.getExternalStorageDirectory() != null){
+							cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+						}
+
+						cameraDownloadLocation.mkdirs();
+
+						dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
+
+						camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
+						localCameraUploadFolder.setSummary(camSyncLocalPath);
+						localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
+					}
+				}
+				else{
+					Uri uri = Uri.parse(prefs.getUriExternalSDCard());
+
+					DocumentFile pickedDir = DocumentFile.fromTreeUri(context, uri);
+					String pickedDirName = pickedDir.getName();
+					if(pickedDirName!=null){
+						camSyncLocalPath = pickedDir.getName();
+						localCameraUploadFolder.setSummary(pickedDir.getName());
+						localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
+					}
+					else{
+						log("pickedDirNAme NULL");
+					}
+				}
+			}
+			else{
+				log("local parh is NULL");
+				//Local path not valid = null, then Camera folder by default
+				File cameraDownloadLocation = null;
+				if (Environment.getExternalStorageDirectory() != null){
+					cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+				}
+
+				cameraDownloadLocation.mkdirs();
+
+				dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
+				dbH.setCameraFolderExternalSDCard(false);
+				isExternalSDCard = false;
+
+				camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
+			}
+
+			if(camSyncHandle!=null){
+				if(camSyncHandle==-1){
+					camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+				}
+			}
+			else{
+				camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
+			}
+
+			megaCameraFolder.setSummary(camSyncMegaPath);
+
+			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+			fileUpload = getString(R.string.settings_camera_upload_only_photos);
+			cameraUploadWhat.setValueIndex(0);
+
+			dbH.setCamSyncWifi(true);
+			wifi = getString(R.string.cam_sync_wifi);
+			cameraUploadHow.setValueIndex(1);
+
+			dbH.setCamSyncCharging(true);
+			charging = true;
+			cameraUploadCharging.setChecked(charging);
+
+			dbH.setCamSyncEnabled(true);
+
+			handler.postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					log("Now I start the service");
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
+				}
+			}, 5 * 1000);
+
+			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
+			cameraUploadHow.setSummary(wifi);
+			localCameraUploadFolder.setSummary(camSyncLocalPath);
+			localCameraUploadFolderSDCard.setSummary(camSyncLocalPath);
+
+			cameraUploadWhat.setSummary(fileUpload);
+			cameraUploadCategory.addPreference(cameraUploadHow);
+			cameraUploadCategory.addPreference(cameraUploadWhat);
+			cameraUploadCategory.addPreference(cameraUploadCharging);
+			cameraUploadCategory.addPreference(keepFileNames);
+			cameraUploadCategory.addPreference(megaCameraFolder);
+			cameraUploadCategory.addPreference(secondaryMediaFolderOn);
+			cameraUploadCategory.removePreference(localSecondaryFolder);
+			cameraUploadCategory.removePreference(megaSecondaryFolder);
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				File[] fs = context.getExternalFilesDirs(null);
+				if (fs.length == 1){
+					cameraUploadCategory.addPreference(localCameraUploadFolder);
+					cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+				}
+				else{
+					if (fs.length > 1){
+						if (fs[1] == null){
+							cameraUploadCategory.addPreference(localCameraUploadFolder);
+							cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+						}
+						else{
+							cameraUploadCategory.removePreference(localCameraUploadFolder);
+							cameraUploadCategory.addPreference(localCameraUploadFolderSDCard);
+						}
+					}
+				}
+			}
+			else{
+				cameraUploadCategory.addPreference(localCameraUploadFolder);
+				cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+			}
+
+		}
+		else{
+			log("Camera OFF");
+			dbH.setCamSyncEnabled(false);
+			dbH.setSecondaryUploadEnabled(false);
+			secondaryUpload = false;
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent stopIntent = null;
+				stopIntent = new Intent(context, CameraSyncService.class);
+				stopIntent.setAction(CameraSyncService.ACTION_STOP);
+				context.startService(stopIntent);
+			}
+
+			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
+			secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
+			cameraUploadCategory.removePreference(cameraUploadHow);
+			cameraUploadCategory.removePreference(cameraUploadWhat);
+			cameraUploadCategory.removePreference(localCameraUploadFolder);
+			cameraUploadCategory.removePreference(localCameraUploadFolderSDCard);
+			cameraUploadCategory.removePreference(cameraUploadCharging);
+			cameraUploadCategory.removePreference(keepFileNames);
+			cameraUploadCategory.removePreference(megaCameraFolder);
+			cameraUploadCategory.removePreference(secondaryMediaFolderOn);
+			cameraUploadCategory.removePreference(localSecondaryFolder);
+			cameraUploadCategory.removePreference(megaSecondaryFolder);
+		}
+	}
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -2617,7 +2630,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			taskGetSizeOffline();
+			if (intent != null) {
+				switch (intent.getAction()) {
+					case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
+						boolean status = intent.getBooleanExtra(CAMERA_UPLOADS_STATUS, false);
+						refreshCameraUploadsSettings(status);
+						break;
+					case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
+						taskGetSizeOffline();
+						break;
+				}
+			}
 		}
 	};
 	
@@ -2625,7 +2648,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public void onResume() {
 	    log("onResume");
 
-		IntentFilter filter = new IntentFilter(REFRESH_CLEAR_OFFLINE_SETTING);
+		IntentFilter filter = new IntentFilter(Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
+		filter.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
+		filter.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
 		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
 
 	    prefs=dbH.getPreferences();
