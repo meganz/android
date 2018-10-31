@@ -718,7 +718,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 PADDING_RIGHT_HOUR_OF_OWN_MESSAGE_PORT = 18;
             }
 
-            isPreviewAlready = false;
             //Own messages
             holder.ownMessageLayout = (RelativeLayout) v.findViewById(R.id.message_chat_own_message_layout);
             holder.titleOwnMessage = (RelativeLayout) v.findViewById(R.id.title_own_message_layout);
