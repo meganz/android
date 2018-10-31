@@ -11745,31 +11745,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void showAutoAwayValueDialog(){
 		log("showAutoAwayValueDialog");
 
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.dialog_autoaway, null);
+        builder.setView(v);
 
-		final EditText input = new EditText(this);
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layout.addView(input, params);
+        final RelativeLayout error = (RelativeLayout) v.findViewById(R.id.autoaway_error);
+        final EditText input = v.findViewById(R.id.autoaway_edittext);
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.hint_minutes));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (error.getVisibility() == View.VISIBLE) {
+                    error.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
-					if (value.length() != 0) {
-						return true;
+					if (validAutoaway(value)) {
+						setAutoAwayValue(value, false);
+						newFolderDialog.dismiss();
 					}
-					setAutoAwayValue(value, false);
-					newFolderDialog.dismiss();
+					else {
+						error.setVisibility(View.VISIBLE);
+					}
 					return true;
 				}
 				return false;
@@ -11784,29 +11796,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		});
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
-		builder.setPositiveButton(getString(R.string.button_set),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						setAutoAwayValue(value, false);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						setAutoAwayValue("-1", true);
-					}
-				});
-		builder.setView(layout);
+		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
+		set.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String value = input.getText().toString().trim();
+                if (validAutoaway(value)) {
+                    setAutoAwayValue(value, false);
+					newFolderDialog.dismiss();
+                }
+                else {
+                    error.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
+	    cancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAutoAwayValue("-1", true);
+				newFolderDialog.dismiss();
+            }
+        });
+
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 	}
+
+	boolean validAutoaway(String value) {
+		if (Integer.parseInt(value) > 0) {
+			return true;
+		}
+	    return false;
+    }
 
 	public void setAutoAwayValue(String value, boolean cancelled){
 		log("setAutoAwayValue: "+ value);
@@ -12860,11 +12883,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				result = Html.fromHtml(textToShow);
 			}
 			spaceTV.setText(result);
-			usedSpacePB.setProgress(((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc());
-			usedSpaceLayout.setVisibility(View.VISIBLE);
-
+			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
+			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
+			usedSpacePB.setProgress(progress);
+			if (progress >=0 && usedSpace >=0) {
+				usedSpaceLayout.setVisibility(View.VISIBLE);
+			}
+			else {
+				usedSpaceLayout.setVisibility(View.GONE);
+			}
 //				String usedSpaceString = getString(R.string.used_space, used, total);
-
 		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
