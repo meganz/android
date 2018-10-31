@@ -48,6 +48,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -822,7 +823,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         }
                         fileStorageLayout.setVisibility(View.GONE);
                     }
-
                     emojiKeyboard.showLetterKeyboard();
                 }
                 return false;
@@ -1485,71 +1485,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return -1;
         }
     }
-
-//    EmojiconsFragment emojiconsFragment = null;
-//    boolean firstTimeEmoji = true;
-//    boolean shouldShowEmojiKeyboard = false;
-
-//    private void setEmojiconFragment(boolean useSystemDefault) {
-//        log("setEmojiconFragment(" + useSystemDefault + ")");
-//        if (firstTimeEmoji) {
-//            emojiconsFragment = EmojiconsFragment.newInstance(useSystemDefault);
-//
-//
-//            getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .replace(R.id.chat_emoji_keyboard, emojiconsFragment)
-//                    .commitNow();
-//            firstTimeEmoji = false;
-//        }
-//
-//        if (keyboardSize != -1) {
-//            if (keyboardSize == 0){
-//                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-//                    params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
-//                    emojiKeyboardLayout.setLayoutParams(params);
-//                }else{
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-//                    params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
-//                    emojiKeyboardLayout.setLayoutParams(params);
-//                }
-//            }else {
-//                if (emojiKeyboardLayout != null) {
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-//                    params.height = keyboardSize;
-//                    emojiKeyboardLayout.setLayoutParams(params);
-//                }
-//            }
-//        }else{
-//            if (emojiKeyboardLayout != null) {
-//                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-//                    params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
-//                    emojiKeyboardLayout.setLayoutParams(params);
-//                }else{
-//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-//                    params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300, getResources().getDisplayMetrics());
-//                    emojiKeyboardLayout.setLayoutParams(params);
-//                }
-//            }
-//        }
-//        emojiKeyboardShown = true;
-//    }
-//
-//    private void removeEmojiconFragment(){
-//        log("removeEmojiconFragment");
-//        if (emojiconsFragment != null){
-////            getSupportFragmentManager().beginTransaction().remove(emojiconsFragment).commitNow();
-//
-//            if (emojiKeyboardLayout != null) {
-//                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emojiKeyboardLayout.getLayoutParams();
-//                params.height = 0;
-//                emojiKeyboardLayout.setLayoutParams(params);
-//            }
-//        }
-//        emojiKeyboardShown = false;
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -6611,6 +6546,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             textChat.setHint(getString(R.string.type_message_hint_with_default_title, chatRoom.getTitle()));
         }
+
        emojiKeyboard.hideBothKeyboard(this);
 
         //Update last seen position if different and there is unread messages
