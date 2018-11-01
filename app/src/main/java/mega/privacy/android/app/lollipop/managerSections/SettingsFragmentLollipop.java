@@ -52,6 +52,7 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -1464,9 +1465,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			cameraUploadWhat.setSummary(fileUpload);
 			dbH.setCamSyncTimeStamp(0);
 			dbH.setSecSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords();
-            dbH.deleteAllVideoRecords();
-            
+            dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
+
             restartCameraUpload();
 		}else if(preference.getKey().compareTo(KEY_CAMERA_UPLOAD_VIDEO_QUALITY) == 0){
             
@@ -1491,7 +1491,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
             }
             
             videoQuality.setSummary(videoQuality.getEntry());
-            dbH.deleteAllVideoRecords();
+            dbH.setCamSyncTimeStamp(0);
+            dbH.setSecSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords(SyncRecord.TYPE_VIDEO);
             
             restartCameraUpload();
             
@@ -2340,7 +2342,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords();
+			dbH.setSecSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -2398,7 +2401,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
-            dbH.deleteAllSyncRecords();
+            dbH.setSecSyncTimeStamp(0);
+            dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent photosVideosIntent = null;
@@ -2508,7 +2512,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
-                dbH.deleteAllSyncRecords();
+                dbH.setSecSyncTimeStamp(0);
+                dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 					Intent photosVideosIntent = null;
@@ -3092,7 +3097,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         log("Camera OFF");
         cameraUpload = false;
         dbH.setCamSyncTimeStamp(0);
-        dbH.deleteAllSyncRecords();
+        dbH.setSecSyncTimeStamp(0);
+        dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
         dbH.setCamSyncEnabled(false);
         dbH.setSecondaryUploadEnabled(false);
         secondaryUpload = false;

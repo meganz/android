@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 import static android.media.MediaFormat.KEY_COLOR_FORMAT;
@@ -44,7 +45,7 @@ public class VideoCompressor {
 
     private Context context;
 
-    private List<String> pendingList;
+    private List<SyncRecord> pendingList;
 
     private String outputRoot;
 
@@ -112,7 +113,7 @@ public class VideoCompressor {
         queue = new ConcurrentLinkedQueue<>();
     }
 
-    public void setPendingList(List<String> pendingList) {
+    public void setPendingList(List<SyncRecord> pendingList) {
         this.pendingList = pendingList;
         totalCount = pendingList.size();
         calculateTotalSize();
@@ -120,7 +121,7 @@ public class VideoCompressor {
 
     private void calculateTotalSize() {
         for (int i = 0;i < totalCount;i++) {
-            totalInputSize += new File(pendingList.get(i)).length();
+            totalInputSize += new File(pendingList.get(i).getLocalPath()).length();
         }
     }
 
@@ -142,10 +143,12 @@ public class VideoCompressor {
         isRunning = true;
         for (int i = 0;i < totalCount && isRunning;i++) {
             currentFileIndex = i + 1;
-            String path = pendingList.get(i);
-            long size = new File(path).length();
+            SyncRecord record = pendingList.get(i);
+            String path = record.getLocalPath();
+            File src = new File(path);
+            long size = src.length();
 
-            VideoUpload video = new VideoUpload(path,outputRoot + getFileNameFromPath(path),size);
+            VideoUpload video = new VideoUpload(path,record.getNewPath(),size);
             try {
                 prepareAndChangeResolutionSingleThread(video);
                 updater.onCompressSuccessful(path);

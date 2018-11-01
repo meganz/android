@@ -1,55 +1,63 @@
 package mega.privacy.android.app.jobservices;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SyncRecord {
 
     public static final int STATUS_SUCCESS = 1;
     public static final int STATUS_PENDING = 0;
+    public static final int STATUS_TO_COMPRESS = 3;
     public static final int STATUS_FAILED = 2;
+
+    public static final int TYPE_PHOTO = 1;
+    public static final int TYPE_VIDEO = 2;
+    public static final int TYPE_OTHER = 3;
+    public static final int TYPE_ANY = -1;
 
     private int id;
 
     private String localPath;
 
-    private String conversionLocalPath;
+    private String newPath;
 
     private String originFingerprint;
 
-    private String conversionFingerprint;
+    private String newFingerprint;
 
     private String fileName;
 
     private Long timestamp;
 
     private Long nodeHandle;
-    
-    private Boolean isSecondary = false;
+
+    private Boolean secondary = false;
 
     private Boolean copyOnly = false;
-    
+
     private int status = STATUS_PENDING;
+
+    private int type;
 
     public SyncRecord() {
 
     }
 
-    public SyncRecord(String localPath,String fileName,Long timestamp, Boolean isSecondary) {
+    public SyncRecord(String localPath,String fileName,Long timestamp,Boolean secondary,int type) {
         this.localPath = localPath;
         this.fileName = fileName;
         this.timestamp = timestamp;
-        this.isSecondary = isSecondary;
+        this.secondary = secondary;
+        this.type = type;
     }
 
-    public SyncRecord(Long handle,String name,boolean copyOnly,String filePath,Long timestamp, Boolean isSecondary) {
+    public SyncRecord(Long handle,String name,boolean copyOnly,String filePath,Long timestamp,Boolean secondary,int type) {
         this.copyOnly = copyOnly;
         this.nodeHandle = handle;
         this.fileName = name;
         this.localPath = filePath;
         this.timestamp = timestamp;
-        this.isSecondary = isSecondary;
+        this.secondary = secondary;
+        this.type = type;
     }
+
 
     public Boolean isCopyOnly() {
         return copyOnly;
@@ -58,15 +66,23 @@ public class SyncRecord {
     public void setCopyOnly(Boolean copyOnly) {
         this.copyOnly = copyOnly;
     }
-    
+
     public Boolean isSecondary() {
-        return isSecondary;
+        return secondary;
     }
-    
+
     public void setSecondary(Boolean secondary) {
-        isSecondary = secondary;
+        this.secondary = secondary;
     }
-    
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public String getFileName() {
         return fileName;
     }
@@ -115,19 +131,6 @@ public class SyncRecord {
         this.status = status;
     }
 
-    public SyncRecord(String localPath,Long timestamp) {
-        this.localPath = localPath;
-        this.timestamp = timestamp;
-    }
-
-    public String getConversionLocalPath() {
-        return conversionLocalPath;
-    }
-
-    public void setConversionLocalPath(String conversionLocalPath) {
-        this.conversionLocalPath = conversionLocalPath;
-    }
-
     public String getOriginFingerprint() {
         return originFingerprint;
     }
@@ -136,11 +139,19 @@ public class SyncRecord {
         this.originFingerprint = originFingerprint;
     }
 
-    public String getConversionFingerprint() {
-        return conversionFingerprint;
+    public String getNewPath() {
+        return newPath;
     }
 
-    public void setConversionFingerprint(String conversionFingerprint) {
-        this.conversionFingerprint = conversionFingerprint;
+    public void setNewPath(String newPath) {
+        this.newPath = newPath;
+    }
+
+    public String getNewFingerprint() {
+        return newFingerprint;
+    }
+
+    public void setNewFingerprint(String newFingerprint) {
+        this.newFingerprint = newFingerprint;
     }
 }

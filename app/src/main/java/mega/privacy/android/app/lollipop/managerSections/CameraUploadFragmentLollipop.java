@@ -67,6 +67,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.DividerItemDecoration;
 import mega.privacy.android.app.components.MegaLinearLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -1431,8 +1432,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 		if (isEnabled){
 			dbH.setCamSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);
 			dbH.setCamSyncEnabled(false);
-			dbH.deleteAllSyncRecords();
+			dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
 				Intent stopIntent = null;
@@ -1457,8 +1459,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 								if (prefs.getCamSyncWifi() != null){
 									if (prefs.getCamSyncWifi().compareTo("") != 0){
 										dbH.setCamSyncTimeStamp(0);
+										dbH.setSecSyncTimeStamp(0);
 										dbH.setCamSyncEnabled(true);
-                                        dbH.deleteAllSyncRecords();
+                                        dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
                                         //video quality
                                         if(isDeviceSupportCompression()){
                                             dbH.setCameraUploadVideoQuality(MEDIUM);
@@ -1508,8 +1511,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				public void onClick(DialogInterface dialog, int which) {
 					log("onClick AlertDialog");
 					dbH.setCamSyncTimeStamp(0);
+					dbH.setSecSyncTimeStamp(0);
 					dbH.setCamSyncEnabled(true);
-                    dbH.deleteAllSyncRecords();
+                    dbH.deleteAllSyncRecords(SyncRecord.TYPE_ANY);
 					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
 					File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 					String localPath = localFile.getAbsolutePath();
