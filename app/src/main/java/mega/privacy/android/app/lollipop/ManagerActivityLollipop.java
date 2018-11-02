@@ -15434,7 +15434,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-		else if(request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
+		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 
 				showChatLink(request.getLink());

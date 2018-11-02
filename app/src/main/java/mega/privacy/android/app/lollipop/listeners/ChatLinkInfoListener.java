@@ -212,7 +212,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
     @Override
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        if (request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
+        if (request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
             String link = request.getLink();
             if (e.getErrorCode() == MegaError.API_OK){
 
