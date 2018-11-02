@@ -975,7 +975,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = "";
 
-				if(numFolders>0){
+				if(numFolders>0 && numFiles>0){
+					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders_and_files, numFolders, email, numFolders, numFiles);
+
+				}
+				else if(numFolders>0){
 					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, email, numFolders);
 				}
 				else{
