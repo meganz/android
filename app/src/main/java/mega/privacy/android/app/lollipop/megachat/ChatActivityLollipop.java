@@ -7004,7 +7004,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
 
 
-            if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
+            if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
                 String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
 
                 setLastGreen(formattedDate);

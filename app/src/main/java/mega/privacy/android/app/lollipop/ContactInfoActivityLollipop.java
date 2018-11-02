@@ -2451,7 +2451,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			int state = megaChatApi.getUserOnlineStatus(user.getHandle());
 
-			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
+			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
 				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
