@@ -1575,8 +1575,8 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             updatePreviewers();
 
         }
-        else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_CLOSE){
-            log("MegaChatRequest.TYPE_CHAT_LINK_CLOSE finished!!!");
+        else if (request.getType() == MegaChatRequest.TYPE_SET_PRIVATE_MODE){
+            log("MegaChatRequest.TYPE_SET_PRIVATE_MODE finished!!!");
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 chatLink = null;
                 log("Chat is PRIVATE now");
@@ -1807,7 +1807,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         actionButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 chatLinkDialog.dismiss();
-                megaChatApi.closeChatLink(chatHandle, groupChatInfoActivity);
+                megaChatApi.setPublicChatToPrivate(chatHandle, groupChatInfoActivity);
             }
 
         });
@@ -1837,7 +1837,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         actionButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 chatLinkDialog.dismiss();
-                megaChatApi.exportChatLink(chatHandle, groupChatInfoActivity);
+                megaChatApi.createChatLink(chatHandle, groupChatInfoActivity);
             }
 
         });

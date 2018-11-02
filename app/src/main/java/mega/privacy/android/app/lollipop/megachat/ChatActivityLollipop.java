@@ -977,7 +977,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if (intentAction.equals(Constants.ACTION_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
-                    megaChatApi.loadChatLink(link, this);
+                    megaChatApi.openChatPreview(link, this);
                 }
                 else{
                     idChat = newIntent.getLongExtra("CHAT_ID", -1);
@@ -2494,7 +2494,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE: {
                         log("Rejoin chat!: " + publicHandle);
-                        megaChatApi.rejoinChatLink(idChat, publicHandle, chatActivity);
+                        megaChatApi.autorejoinPublicChat(idChat, publicHandle, chatActivity);
                         break;
                     }
                     case DialogInterface.BUTTON_NEGATIVE: {
@@ -2851,7 +2851,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case R.id.join_button:{
-                megaChatApi.joinChatLink(idChat, this);
+                megaChatApi.autojoinPublicChat(idChat, this);
                 break;
             }
 		}
@@ -6231,7 +6231,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showSnackbar(getString(R.string.create_chat_error));
             }
         }
-        else if(request.getType() == MegaChatRequest.TYPE_LOAD_CHAT_LINK){
+        else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 idChat = request.getChatHandle();
                 MegaApplication.setOpenChatId(idChat);
@@ -6278,7 +6278,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
-        else if(request.getType() == MegaChatRequest.TYPE_CHAT_LINK_JOIN){
+        else if(request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT){
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
 
                 if(request.getUserHandle()!= -1){
@@ -6351,7 +6351,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         if(chatRoom!=null){
             if(chatRoom.isPreview()){
-                megaChatApi.closePreview(idChat);
+                megaChatApi.closeChatPreview(idChat);
             }
         }
 
