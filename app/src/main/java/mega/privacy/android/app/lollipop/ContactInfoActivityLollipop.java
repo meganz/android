@@ -130,6 +130,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	ImageView contactPropertiesImage;
 	LinearLayout optionsLayout;
 
+	//Info of the user
+	TextView nameText;
+	TextView emailText;
+
 	LinearLayout chatOptionsLayout;
 	View dividerChatOptionsLayout;
 	RelativeLayout sendMessageLayout;
@@ -154,12 +158,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	RelativeLayout shareContactLayout;
 	View dividerShareContactLayout;
 
-	TextView emailContact;
-	TextView nameContact;
+	//Toolbar elements
 	ImageView contactStateIcon;
-
-	TextView nameLength;
-	TextView emailLength;
+	TextView firstLineTextToolbar;
+	TextView firstLineLengthToolbar;
+	TextView secondLineTextToolbar;
+	TextView secondLineLengthToolbar;
 
 	RelativeLayout clearChatLayout;
 	View dividerClearChatLayout;
@@ -265,19 +269,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
 
-
 			imageLayout = (RelativeLayout) findViewById(R.id.chat_contact_properties_image_layout);
 
 			collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 			contactStateIcon = (ImageView) findViewById(R.id.contact_drawable_state);
 
 			/*TITLE*/
-			nameContact = (TextView) findViewById(R.id.name_contact);
-			nameLength = (TextView) findViewById(R.id.name_length);
+			firstLineTextToolbar = (TextView) findViewById(R.id.first_line_toolbar);
+			firstLineLengthToolbar = (TextView) findViewById(R.id.first_line_length_toolbar);
 
 			/*SUBTITLE*/
-			emailContact = (TextView) findViewById(R.id.email_contact);
-			emailLength =(TextView) findViewById(R.id.email_length);
+			secondLineTextToolbar = (TextView) findViewById(R.id.second_line_toolbar);
+			secondLineLengthToolbar =(TextView) findViewById(R.id.second_line_length_toolbar);
+
+			nameText = (TextView) findViewById(R.id.chat_contact_properties_name_text);
+			emailText =(TextView) findViewById(R.id.chat_contact_properties_email_text);
 
 			if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 				log("Landscape configuration");
@@ -287,14 +293,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				appBarLayout.setLayoutParams(params);
 
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_LAND, getResources().getDisplayMetrics());
-				nameContact.setMaxWidth((int) width);
-				nameLength.setMaxWidth((int) width);
-				emailContact.setMaxWidth((int) width);
-				emailLength.setMaxWidth((int) width);
+				firstLineTextToolbar.setMaxWidth((int) width);
+				firstLineLengthToolbar.setMaxWidth((int) width);
+				secondLineTextToolbar.setMaxWidth((int) width);
+				secondLineLengthToolbar.setMaxWidth((int) width);
 
-				emailContact.setPadding(0,0,0,5);
-				emailLength.setPadding(0,0,0,5);
-
+				secondLineTextToolbar.setPadding(0,0,0,5);
+				secondLineLengthToolbar.setPadding(0,0,0,5);
 			}
 			else{
 				log("Portrait configuration");
@@ -304,13 +309,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				appBarLayout.setLayoutParams(params);
 
 				float width = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MAX_WIDTH_FILENAME_PORT, getResources().getDisplayMetrics());
-				nameContact.setMaxWidth((int) width);
-				nameLength.setMaxWidth((int) width);
-				emailContact.setMaxWidth((int) width);
-				emailLength.setMaxWidth((int) width);
+				firstLineTextToolbar.setMaxWidth((int) width);
+				firstLineLengthToolbar.setMaxWidth((int) width);
+				secondLineTextToolbar.setMaxWidth((int) width);
+				secondLineLengthToolbar.setMaxWidth((int) width);
 
-				emailContact.setPadding(0,0,0,11);
-				emailLength.setPadding(0,0,0,11);
+				secondLineTextToolbar.setPadding(0,0,0,11);
+				secondLineLengthToolbar.setPadding(0,0,0,11);
 			}
 
 			imageGradient = (View) findViewById(R.id.gradient_view);
@@ -405,17 +410,19 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
 
 				if (chat.getTitle() != null && !chat.getTitle().isEmpty() && !chat.getTitle().equals("")){
-					nameContact.setText(chat.getTitle());
-					nameLength.setText(chat.getTitle());
+					firstLineTextToolbar.setText(chat.getTitle());
+					firstLineLengthToolbar.setText(chat.getTitle());
+					nameText.setText(chat.getTitle());
 				}
 				else {
 					if (userEmailExtra != null) {
 
-						nameContact.setText(userEmailExtra);
-						nameLength.setText(userEmailExtra);
+						firstLineTextToolbar.setText(userEmailExtra);
+						firstLineLengthToolbar.setText(userEmailExtra);
+						nameText.setText(userEmailExtra);
 					}
 				}
-				String fullname = (String)nameContact.getText();
+				String fullname = (String)firstLineTextToolbar.getText();
 				setDefaultAvatar(fullname);
 			}
 			else{
@@ -448,8 +455,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 							fullName= user.getEmail();
 						}
 
-						nameContact.setText(fullName);
-						nameLength.setText(fullName);
+						firstLineTextToolbar.setText(fullName);
+						firstLineLengthToolbar.setText(fullName);
+						nameText.setText(fullName);
 					}
 					else{
 						log("The contactDB is null: ");
@@ -493,8 +501,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					ArrayList<MegaNode> nodes = megaApi.getInShares(user);
                     setFoldersButtonText(nodes);
-					emailContact.setText(user.getEmail());
-					emailLength.setText(user.getEmail());
+					secondLineLengthToolbar.setText(user.getEmail());
+					emailText.setText(user.getEmail());
 
 					if(Util.isChatEnabled()){
 						if(chat!=null){
@@ -530,8 +538,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					if(Util.isChatEnabled()){
 						if(chat!=null){
 							//shareContactText.setText(chat.getPeerEmail(0));
-							emailContact.setText(chat.getPeerEmail(0));
-							emailLength.setText(chat.getPeerEmail(0));
+							secondLineLengthToolbar.setText(chat.getPeerEmail(0));
+
+							emailText.setText(user.getEmail());
 
 							clearChatLayout.setVisibility(View.VISIBLE);
 							dividerClearChatLayout.setVisibility(View.VISIBLE);
@@ -558,8 +567,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					String userEmail = chat.getPeerEmail(0);
 					setOfflineAvatar(userEmail);
 				//	shareContactText.setText(userEmail);
-					emailContact.setText(userEmail);
-					emailLength.setText(userEmail);
+					emailText.setText(user.getEmail());
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
 				dividerSharedFoldersLayout.setVisibility(View.GONE);
@@ -624,38 +632,42 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				log("This user is connected");
 				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-				emailContact.setVisibility(View.VISIBLE);
-				emailContact.setText(getString(R.string.online_status));
+				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				secondLineTextToolbar.setText(getString(R.string.online_status));
+				secondLineLengthToolbar.setText(getString(R.string.online_status));
 
 			}else if(userStatus == MegaChatApi.STATUS_AWAY){
 				log("This user is away");
 				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
-				emailContact.setVisibility(View.VISIBLE);
-				emailContact.setText(getString(R.string.away_status));
+				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				secondLineTextToolbar.setText(getString(R.string.away_status));
+				secondLineLengthToolbar.setText(getString(R.string.away_status));
 			} else if(userStatus == MegaChatApi.STATUS_BUSY){
 				log("This user is busy");
 				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
-				emailContact.setVisibility(View.VISIBLE);
-				emailContact.setText(getString(R.string.busy_status));
+				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				secondLineTextToolbar.setText(getString(R.string.busy_status));
+				secondLineLengthToolbar.setText(getString(R.string.busy_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				log("This user is offline");
 				contactStateIcon.setVisibility(View.VISIBLE);
 				contactStateIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_offline));
-				emailContact.setVisibility(View.VISIBLE);
-				emailContact.setText(getString(R.string.offline_status));
+				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				secondLineTextToolbar.setText(getString(R.string.offline_status));
+				secondLineLengthToolbar.setText(getString(R.string.offline_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_INVALID){
 				log("INVALID status: "+userStatus);
 				contactStateIcon.setVisibility(View.GONE);
-				emailContact.setVisibility(View.GONE);
+				secondLineTextToolbar.setVisibility(View.GONE);
 			}
 			else{
 				log("This user status is: "+userStatus);
 				contactStateIcon.setVisibility(View.GONE);
-				emailContact.setVisibility(View.GONE);
+				secondLineTextToolbar.setVisibility(View.GONE);
 			}
 		}
 	}
@@ -2442,8 +2454,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
 				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
 
-				emailContact.setVisibility(View.VISIBLE);
-				emailContact.setText(formattedDate);
+				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				secondLineTextToolbar.setText(formattedDate);
+				secondLineLengthToolbar.setText(formattedDate);
 
 				log("Date last green: "+formattedDate);
 			}
