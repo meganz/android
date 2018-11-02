@@ -1420,7 +1420,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
 
-        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
+        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
             log("Request last green for user");
             megaChatApi.requestLastGreen(chatRoom.getPeerHandle(0), this);
         }

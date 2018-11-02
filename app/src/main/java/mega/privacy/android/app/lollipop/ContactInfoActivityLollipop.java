@@ -1734,7 +1734,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			state = megaChatApi.getUserOnlineStatus(user.getHandle());
 		}
 
-		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_INVALID){
+		if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
 			log("Request last green for user");
 			megaChatApi.requestLastGreen(user.getHandle(), this);
 		}
