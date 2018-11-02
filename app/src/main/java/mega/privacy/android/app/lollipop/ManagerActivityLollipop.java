@@ -18263,10 +18263,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Config persist: "+config.isPersist());
 			log("Config lastGreen: "+config.isLastGreenVisible());
 			boolean isLastGreen = config.isLastGreenVisible();
-			if(sttFLol!=null){
-				if(sttFLol.isAdded()){
-					if(config!=null){
-						sttFLol.updatePresenceConfigChat(false, config);
+			if(config.isPending()){
+				log("Config is pending - do not update UI");
+			}
+			else{
+				if(sttFLol!=null){
+					if(sttFLol.isAdded()){
+						if(config!=null){
+							sttFLol.updatePresenceConfigChat(false, config);
+						}
 					}
 				}
 			}
