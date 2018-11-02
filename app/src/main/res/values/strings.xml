@@ -2201,6 +2201,11 @@
         <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
     </plurals>
 
+    <plurals name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of folder. 1 folder" quantity="one">[A]%s[/A][B] added %2$d folder and %3$d files[/B]</item>
+        <item context="Plural of folder. 2 folders" quantity="other">[A]%s[/A][B] added %2$d folder and %3$d files[/B]</item>
+    </plurals>
+
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">[A]%s[/A] is your current account</string>
     <string name="type_month" context=" ">[A]From[/A] %s [A]month[/A][B] *[/B]</string>
     <string name="upgrade_account_comment" context="the meaning of the asterisk in month*">[A]* [/A]Recurring subscription can be cancelled anytime before renewal date.</string>
