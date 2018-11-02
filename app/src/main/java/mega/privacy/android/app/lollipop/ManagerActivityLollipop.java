@@ -11742,6 +11742,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
+	public void enableLastGreen(boolean enable){
+		log("enableLastGreen: "+ enable);
+
+		if(megaChatApi!=null){
+			megaChatApi.setLastGreenVisible(enable, this);
+		}
+	}
+
 	public void showAutoAwayValueDialog(){
 		log("showAutoAwayValueDialog");
 
@@ -15479,6 +15487,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+		else if(request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE){
+
+			if(e.getErrorCode()==MegaChatError.ERROR_OK){
+				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: "+request.getFlag());
+            }
+            else{
+				log("onRequestFinish(CHAT):MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: "+e.getErrorType());
+			}
+		}
+
 	}
 
 	@Override
@@ -18258,6 +18276,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("Config status: "+config.getOnlineStatus());
 			log("Config autoway: "+config.isAutoawayEnabled());
 			log("Config persist: "+config.isPersist());
+			log("Config lastGreen: "+config.isLastGreenVisible());
+			boolean isLastGreen = config.isLastGreenVisible();
 			if(sttFLol!=null){
 				if(sttFLol.isAdded()){
 					if(config!=null){

@@ -185,6 +185,55 @@ public class TimeChatUtils implements Comparator<Calendar> {
         return formattedDate;
     }
 
+    public static String lastGreenDate (int minutesAgo){
+//        minutesAgo = 1442;
+        Calendar calGreen = Calendar.getInstance();
+        calGreen.add(Calendar.MINUTE, -minutesAgo);
+
+        Calendar calToday = Calendar.getInstance();
+        Calendar calYesterday = Calendar.getInstance();
+        calYesterday.add(Calendar.DATE, -1);
+        TimeChatUtils tc = new TimeChatUtils(TimeChatUtils.DATE);
+        long ts = calGreen.getTimeInMillis();
+        log("Ts last green: "+ts);
+        if(tc.compare(calGreen, calToday)==0) {
+
+            TimeZone tz = calGreen.getTimeZone();
+
+            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            df.setTimeZone(tz);
+
+            String time = df.format(calGreen.getTime());
+
+            String formattedDate = "Last seen today at" + " " + time;
+
+            return formattedDate;
+        }
+        //Impossible to fit yesterday
+//        else if(tc.compare(calGreen, calYesterday)==0){
+//            TimeZone tz = calGreen.getTimeZone();
+//
+//            java.text.DateFormat df = new SimpleDateFormat("HH:mm", Locale.getDefault());
+//            df.setTimeZone(tz);
+//
+//            String time = df.format(calGreen.getTime());
+//
+//            String formattedDate = "Last seen yesterday at" + " " + time;
+//
+//            return formattedDate;
+//        }
+        else{
+            TimeZone tz = calGreen.getTimeZone();
+
+            java.text.DateFormat df = new SimpleDateFormat("dd MMM yy HH:mm", Locale.getDefault());
+            df.setTimeZone(tz);
+
+            String formattedDate = "Last seen " + df.format(calGreen.getTime());
+            return formattedDate;
+        }
+
+    }
+
     public static String formatDateAndTime(long ts, int format){
 
         java.text.DateFormat df;
