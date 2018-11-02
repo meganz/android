@@ -2137,6 +2137,24 @@ public class Util {
         return Util.downloadDIR;
     }
 
+    public static boolean askMe (Context context) {
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		MegaPreferences prefs = dbH.getPreferences();
+
+		if (prefs != null){
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	private static void log(String message) {
 		log("Util", message);
 	}
