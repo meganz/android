@@ -1727,7 +1727,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
                     getImageView(i, -1);
@@ -1790,7 +1790,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
@@ -2045,23 +2045,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				int oldPosition = positionG;
 				int newPosition = viewPager.getCurrentItem();
 				positionG = newPosition;
-
-				try{
-					if ((adapterType == Constants.OFFLINE_ADAPTER)){
-						fileNameTextView.setText(mOffListImages.get(positionG).getName());
-					}
-					else if(adapterType == Constants.ZIP_ADAPTER){
-						fileNameTextView.setText(new File(paths.get(positionG)).getName());
-					}
-					else{
+				if ((adapterType == Constants.OFFLINE_ADAPTER)){
+					fileNameTextView.setText(mOffListImages.get(positionG).getName());
+				}
+				else if(adapterType == Constants.ZIP_ADAPTER){
+					fileNameTextView.setText(new File(paths.get(positionG)).getName());
+				}
+				else{
+					try {
 						TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
-						if (tIV != null){
+						if (tIV != null) {
 							tIV.setZoom(1);
 						}
-						fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 					}
+					catch (Exception e) {}
+					fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 				}
-				catch(Exception e){}
 //				title.setText(names.get(positionG));
 				updateScrollPosition();
 			}

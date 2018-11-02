@@ -433,7 +433,6 @@
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
     <string name="context_permissions_not_changed" context="error message">Error. Permissions not changed</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
-    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">%s is already a contact</string>
     <string name="context_send_no_permission" context="message when trying to send a file without full access">You do not have permission to send this file</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
     <string name="context_folder_no_created" context="error message when creating a folder">Error. Folder not created</string>
@@ -2220,5 +2219,10 @@
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+
+    <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
+
+    <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
+    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
 
 </resources>
