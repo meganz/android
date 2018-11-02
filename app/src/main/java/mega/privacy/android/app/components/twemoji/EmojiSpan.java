@@ -42,9 +42,7 @@ final class EmojiSpan extends ReplacementSpan {
     }
     return (int) size;
   }
-  @Override public void draw(final Canvas canvas, final CharSequence text, final int start,
-                             final int end, final float x, final int top, final int y,
-                             final int bottom, final Paint paint) {
+  @Override public void draw(final Canvas canvas, final CharSequence text, final int start, final int end, final float x, final int top, final int y, final int bottom, final Paint paint) {
     final Drawable drawable = getDrawable();
     final Paint.FontMetrics paintFontMetrics = paint.getFontMetrics();
     final float fontHeight = paintFontMetrics.descent - paintFontMetrics.ascent;

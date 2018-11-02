@@ -101,10 +101,6 @@
 
     <attr name="emojiSize" format="dimension"/>
 
-    <declare-styleable name="EmojiButton">
-        <attr name="emojiSize"/>
-    </declare-styleable>
-
     <declare-styleable name="EmojiEditText">
         <attr name="emojiSize"/>
     </declare-styleable>

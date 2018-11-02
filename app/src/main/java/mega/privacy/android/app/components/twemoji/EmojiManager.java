@@ -39,7 +39,7 @@ public final class EmojiManager {
     }
   };
   private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = new EmojiReplacer() {
-    @Override public void replaceWithImages(final Context context, Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback, boolean isTV) {
+    @Override public void replaceWithImages(final Context context, Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback) {
       final EmojiManager emojiManager = EmojiManager.getInstance();
       final EmojiSpan[] existingSpans = text.getSpans(0, text.length(), EmojiSpan.class);
       final List<Integer> existingSpanPositions = new ArrayList<>(existingSpans.length);
@@ -48,12 +48,12 @@ public final class EmojiManager {
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0; i < size; i++) {
         existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
-
       }
-      final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text, isTV);
+      final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
       if(findAllEmojis.size() == 0){
 
       }else{
+
         for (int i = 0; i < findAllEmojis.size(); i++) {
           final EmojiRange location = findAllEmojis.get(i);
           if (!existingSpanPositions.contains(location.start)) {
@@ -139,10 +139,9 @@ public final class EmojiManager {
       emoji.destroy();
     }
   }
-  public void replaceWithImages(final Context context, final Spannable text, final float emojiSize, final float defaultEmojiSize,boolean isTV) {
-    log("replaceWithImages() text: "+text+", emojiSize: "+emojiSize+", defaultEmojiSize: "+defaultEmojiSize);
+  public void replaceWithImages(final Context context, final Spannable text, final float emojiSize, final float defaultEmojiSize) {
     verifyInstalled();
-    emojiReplacer.replaceWithImages(context, text, emojiSize, defaultEmojiSize, DEFAULT_EMOJI_REPLACER, isTV);
+    emojiReplacer.replaceWithImages(context, text, emojiSize, defaultEmojiSize, DEFAULT_EMOJI_REPLACER);
   }
   EmojiCategory[] getCategories() {
     verifyInstalled();
@@ -166,12 +165,12 @@ public final class EmojiManager {
   }
 
   public int getNumEmojis(@Nullable final CharSequence text){
-    List<EmojiRange> emojis =findAllEmojis(text,false);
+    List<EmojiRange> emojis = findAllEmojis(text);
     int num = emojis.size();
     return num;
   }
-  @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text, boolean isTV) {
-    log("findAllEmojis() - text: "+text+", isTV: "+isTV);
+  @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
+    log("findAllEmojis() - text: "+text);
     verifyInstalled();
     final List<EmojiRange> result = new ArrayList<>();
     if (!TextUtils.isEmpty(text)) {
@@ -182,9 +181,9 @@ public final class EmojiManager {
           result.add(new EmojiRange(matcher.start(), matcher.end(), found));
         }
       }
-      if(isTV){
-        CharSequence processed = EmojiCompat.get().process(text);
-      }
+//      if(isTV){
+//        CharSequence processed = EmojiCompat.get().process(text);
+//      }
 
     }else{
 

@@ -705,8 +705,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 if (s != null) {
+
                     if (s.length() > 0) {
                         String temp = s.toString();
                         if(temp.trim().length()>0){
@@ -747,7 +747,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         textChat.setMinLines(1);
                         textChat.setMaxLines(1);
-
                     }
                 }else{
                     sendIcon.setEnabled(false);
@@ -766,8 +765,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 }
 
-                if(getCurrentFocus() == textChat)
-                {
+                if(getCurrentFocus() == textChat){
                     // is only executed if the EditText was directly changed by the user
 
                     if(sendIsTyping){

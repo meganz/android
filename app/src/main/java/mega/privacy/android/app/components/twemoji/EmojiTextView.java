@@ -8,6 +8,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.DimenRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
+import android.support.text.emoji.EmojiCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
@@ -21,7 +22,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
 
 public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInterface{
-
 
   private float emojiSize;
   public static final int LAST_MESSAGE_TEXTVIEW_WIDTH_PORTRAIT = 190;
@@ -75,11 +75,15 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   @Override public void setText(CharSequence rawText, BufferType type) {
     log("setText()-  rawText: "+rawText);
     CharSequence text = rawText == null ? "" : rawText;
-    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+    CharSequence textEmojiCompat = EmojiCompat.get().process(text);
+
+//    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(textEmojiCompat);
 
     Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
     float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-    EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize,true);
+
+    EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
     if (mContext instanceof ManagerActivityLollipop) {
       //format text if too long
