@@ -444,6 +444,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void saveDataToDB(ArrayList<SyncRecord> list) {
         for (SyncRecord file : list) {
+            if(dbH.shouldAddToDb(file)) {
+                continue;
+            }
             boolean isSec = file.isSecondary();
             MegaNode parent;
             if (isSec) {
@@ -1323,15 +1326,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 log("IMAGESYNCFILE: " + path);
 
                 dbH.deleteSyncRecordByPath(path);
-
-                if (Util.isVideoFile(path)) {
+                File file = new File(path);
+                if (file.exists() && Util.isVideoFile(path)) {
                     log("Is video!!!");
                     File previewDir = PreviewUtils.getPreviewFolder(this);
                     File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
-                    megaApi.createPreview(path,preview.getAbsolutePath());
+//                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
+//                    megaApi.createPreview(path,preview.getAbsolutePath());
 
                     MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if (node != null) {
@@ -1377,15 +1380,15 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                             log("No location info");
                         }
                     }
-                } else if (MimeTypeList.typeForName(path).isImage()) {
+                } else if (file.exists() && MimeTypeList.typeForName(path).isImage()) {
                     log("Is image!!!");
 
                     File previewDir = PreviewUtils.getPreviewFolder(this);
                     File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
-                    megaApi.createPreview(path,preview.getAbsolutePath());
+//                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
+//                    megaApi.createPreview(path,preview.getAbsolutePath());
 
                     MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if (node != null) {

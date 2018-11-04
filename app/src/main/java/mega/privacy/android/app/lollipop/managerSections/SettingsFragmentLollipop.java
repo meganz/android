@@ -3251,7 +3251,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
     private void enableVideoQualitySettings(){
 	    if(isDeviceSupportCompression()){
             cameraUploadCategory.addPreference(videoQuality);
-            if(Integer.parseInt(prefs.getUploadVideoQuality()) == VIDEO_QUALITY_MEDIUM){
+            if(prefs.getUploadVideoQuality() == null){
+                dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
+            }else if(Integer.parseInt(prefs.getUploadVideoQuality()) == VIDEO_QUALITY_MEDIUM){
                 enableChargingSettings();
             }
         }
