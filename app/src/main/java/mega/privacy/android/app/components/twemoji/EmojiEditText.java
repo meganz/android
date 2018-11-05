@@ -46,6 +46,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
     }
     @Override public void setText(CharSequence rawText, BufferType type) {
         isInput = false;
+
         super.setText(rawText, type);
     }
 
