@@ -6999,10 +6999,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             log("Update last green");
             minutesLastGreen = lastGreen;
 
-
             int state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
-
-
 
             if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
                 String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
