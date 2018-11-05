@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -81,11 +82,16 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -95,7 +101,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface{
+public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
@@ -105,7 +111,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
-    int contactType = 0;
+    public int contactType = 0;
     int multipleSelectIntent;
     long nodeHandle = -1;
     long[] nodeHandles;
@@ -1398,14 +1404,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         addContactActivityLollipop = this;
 
-        log("retryPendingConnections()");
-        if (megaApi != null){
-            log("---------retryPendingConnections");
-            megaApi.retryPendingConnections();
-        }
-
         if (megaChatApi != null){
-            megaChatApi.retryPendingConnections(false, null);
+            megaChatApi.addChatListener(this);
         }
 
         dbH = DatabaseHandler.getDbHandler(this);
@@ -2177,6 +2177,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                                 log("Added to list: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                                 visibleContactsMEGA.add(megaContactAdapter);
+
+                                if (contactType == Constants.CONTACT_TYPE_MEGA) {
+                                    //Ask for presence info and last green
+                                    int userStatus = megaChatApi.getUserOnlineStatus(contactsMEGA.get(i).getHandle());
+                                    if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+                                        log("Request last green for user");
+                                        megaChatApi.requestLastGreen(contactsMEGA.get(i).getHandle(), null);
+                                    }
+                                }
                             }
                             else{
                                 MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
@@ -2213,6 +2222,15 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                             MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                             visibleContactsMEGA.add(megaContactAdapter);
+
+                            if (contactType == Constants.CONTACT_TYPE_MEGA) {
+                                //Ask for presence info and last green
+                                int userStatus = megaChatApi.getUserOnlineStatus(contactsMEGA.get(i).getHandle());
+                                if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+                                    log("Request last green for user");
+                                    megaChatApi.requestLastGreen(contactsMEGA.get(i).getHandle(), null);
+                                }
+                            }
 
                         }
                     }
@@ -2278,6 +2296,14 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                     visibleContactsMEGA.add(megaContactAdapter);
 
+                    if (contactType == Constants.CONTACT_TYPE_MEGA) {
+                        //Ask for presence info and last green
+                        int userStatus = megaChatApi.getUserOnlineStatus(contactsMEGA.get(i).getHandle());
+                        if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+                            log("Request last green for user");
+                            megaChatApi.requestLastGreen(contactsMEGA.get(i).getHandle(), null);
+                        }
+                    }
                 }
             }
         }
@@ -3169,6 +3195,65 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+    }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+        log("onChatPresenceLastGreen");
+        int state = megaChatApi.getUserOnlineStatus(userhandle);
+        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
+            String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+            if(userhandle != megaChatApi.getMyUserHandle()){
+                log("Status last green for the user: "+userhandle);
+                int indexToReplace = -1;
+                ListIterator<MegaContactAdapter> itrReplace = visibleContactsMEGA.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaContactAdapter contactToUpdate = itrReplace.next();
+                    if (contactToUpdate != null) {
+                        if (contactToUpdate.getMegaUser().getHandle() == userhandle) {
+                            contactToUpdate.setLastGreen(formattedDate);
+                            indexToReplace = itrReplace.nextIndex() - 1;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (indexToReplace != -1) {
+                    log("Index to replace: " + indexToReplace);
+                    if(adapterMEGA!=null){
+                        adapterMEGA.updateContactStatus(indexToReplace);
+                    }
+                }
+            }
+            log("Date last green: "+formattedDate);
+        }
     }
 
     public static void log(String message) {
