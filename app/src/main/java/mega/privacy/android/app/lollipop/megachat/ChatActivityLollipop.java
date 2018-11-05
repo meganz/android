@@ -146,14 +146,8 @@ import static mega.privacy.android.app.utils.Util.adjustForLargeFont;
 
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatCallListenerInterface, MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface,  View.OnClickListener, EmojiconGridFragment.OnEmojiconClickedListener,EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
-    public static final String OWN_PREVIEW_LANDSCAPE = "OWN_PREVIEW_LANDSCAPE";
-    public static final String OWN_PREVIEW_PORTRAIT = "OWN_PREVIEW_PORTRAIT";
-    public static final String OWN_THUMBNAIL = "OWN_THUMBNAIL";
-    public static final String CONTACT_PREVIEW_LANDSCAPE = "CONTACT_PREVIEW_LANDSCAPE";
-    public static final String CONTACT_PREVIEW_PORTRAIT = "CONTACT_PREVIEW_PORTRAIT";
-    public static final String CONTACT_THUMBNAIL = "CONTACT_THUMBNAIL";
-
-    public String type_imageDrag;
+    public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
+    public int position_imageDrag = -1;
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -989,6 +983,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     typeMessageJump = savedInstanceState.getInt("typeMessageJump",-1);
                     visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
                     mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
+//                    position_imageDrag = savedInstanceState.getInt("position_imageDrag", -1);
+//                    holder_imageDrag = (MegaChatLollipopAdapter.ViewHolderMessageChat) savedInstanceState.getSerializable("holder_imageDrag");
 
                     if(visibilityMessageJump){
                         if(typeMessageJump == TYPE_MESSAGE_NEW_MESSAGE){
@@ -1161,6 +1157,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("INTENT is NULL");
         }
+//        if (savedInstanceState != null && adapter != null && mLayoutManager != null) {
+//            if (position_imageDrag != -1 && holder_imageDrag != null) {
+//                log("update ImageDrag: "+position_imageDrag);
+//                mLayoutManager.scrollToPosition(position_imageDrag);
+//                adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position_imageDrag);
+//            }
+//        }
         log("FINISH on Create");
     }
 
@@ -3782,6 +3785,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                             }
                                         }
                                         overridePendingTransition(0,0);
+                                        if (adapter != null) {
+                                            adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position);
+                                        }
                                     }
                                     else if (MimeTypeList.typeForName(node.getName()).isPdf()){
                                         log("itemClick:isFile:isPdf");
@@ -4016,6 +4022,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         intent.putExtra("messageIds", array);
         startActivity(intent);
+        overridePendingTransition(0,0);
+        if (adapter !=  null) {
+            adapter.setNodeAttachmentVisibility(false, holder_imageDrag, position);
+        }
     }
 
 //    @Override
@@ -6450,6 +6460,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putLong("generalUnreadCount", generalUnreadCount);
         outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
+//        outState.putInt("position_imageDrag", position_imageDrag);
+//        outState.putSerializable("holder_imageDrag", holder_imageDrag);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -6752,6 +6764,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     protected void onResume(){
         log("onResume");
         super.onResume();
+
+        setNodeAttachmentVisibile();
 
         MegaApplication.setShowPinScreen(true);
         MegaApplication.setOpenChatId(idChat);
@@ -7443,5 +7457,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 screen = 0;
         }
         return screen;
+    }
+
+    public void setNodeAttachmentVisibile() {
+        log("setNodeAttachmentVisibile");
+        if (adapter != null && holder_imageDrag != null && position_imageDrag != -1) {
+            adapter.setNodeAttachmentVisibility(true, holder_imageDrag, position_imageDrag);
+            holder_imageDrag = null;
+            position_imageDrag = -1;
+        }
     }
 }

@@ -48,6 +48,7 @@ import com.vdurmont.emoji.EmojiParser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -481,11 +482,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         log("MegaChatLollipopAdapter: MyUserHandle: " + myUserHandle);
     }
 
-    public static class ViewHolderMessageChat extends RecyclerView.ViewHolder {
+    public static class ViewHolderMessageChat extends RecyclerView.ViewHolder{
         public ViewHolderMessageChat(View view) {
             super(view);
         }
 
+        boolean contentVisible;
         int currentPosition;
         long userHandle;
         String fullNameTitle;
@@ -695,6 +697,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_chat, parent, false);
             holder = new ViewHolderMessageChat(v);
+            holder.contentVisible = true;
             holder.itemLayout = (RelativeLayout) v.findViewById(R.id.message_chat_item_layout);
             holder.dateLayout = (RelativeLayout) v.findViewById(R.id.message_chat_date_layout);
             //Margins
@@ -5339,6 +5342,26 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
         }
+        if (!((ViewHolderMessageChat) holder).contentVisible) {
+            if (((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.getVisibility() == View.VISIBLE) {
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbLand.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
+            }
+            if (((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.getVisibility() == View.VISIBLE) {
+                ((ViewHolderMessageChat) holder).contentOwnMessageThumbPort.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
+            }
+            if (((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.getVisibility() == View.VISIBLE) {
+                ((ViewHolderMessageChat) holder).contentOwnMessageFileThumb.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
+            }
+            if (((ViewHolderMessageChat) holder).contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
+                ((ViewHolderMessageChat) holder).contentContactMessageThumbLand.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
+            }
+            if (((ViewHolderMessageChat) holder).contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
+                ((ViewHolderMessageChat) holder).contentContactMessageThumbPort.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
+            }
+            if (((ViewHolderMessageChat) holder).contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
+                ((ViewHolderMessageChat) holder).contentContactMessageFileThumb.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.background_node_attachment));
+            }
+        }
     }
 
     public void bindContactAttachmentMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
@@ -7927,35 +7950,29 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (message.getMessage().getMegaNodeList().get(0) != null) {
                         if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
                             if (holder.contentOwnMessageThumbPort.getVisibility() == View.VISIBLE) {
-                                log("contentOwnMessageThumbPort");
-                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_PREVIEW_PORTRAIT;
+                                log("checkItem: contentOwnMessageThumbPort");
                                 imageView = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_portrait);
                             }
                             else if (holder.contentOwnMessageThumbLand.getVisibility() == View.VISIBLE) {
-                                log("contentOwnMessageThumbLand");
-                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_PREVIEW_LANDSCAPE;
+                                log("checkItem: contentOwnMessageThumbLand");
                                 imageView = (RoundedImageView) v.findViewById(R.id.content_own_message_thumb_landscape);
                             }
                             else if (holder.contentOwnMessageFileThumb.getVisibility() == View.VISIBLE) {
-                                log("contentOwnMessageFileThumb");
-                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.OWN_THUMBNAIL;
+                                log("checkItem: contentOwnMessageFileThumb");
                                 imageView = (ImageView) v.findViewById(R.id.content_own_message_file_thumb);
                             }
                         }
                         else {
                             if (holder.contentContactMessageThumbPort.getVisibility() == View.VISIBLE) {
-                                log("contentContactMessageThumbPort");
-                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_PREVIEW_PORTRAIT;
+                                log("checkItem: contentContactMessageThumbPort");
                                 imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_portrait);
                             }
                             else if (holder.contentContactMessageThumbLand.getVisibility() == View.VISIBLE) {
-                                log("contentContactMessageThumbLand");
-                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_PREVIEW_LANDSCAPE;
+                                log("checkItem: contentContactMessageThumbLand");
                                 imageView = (RoundedImageView) v.findViewById(R.id.content_contact_message_thumb_landscape);
                             }
                             else if (holder.contentContactMessageFileThumb.getVisibility() == View.VISIBLE) {
-                                log("contentContactMessageFileThumb");
-                                ((ChatActivityLollipop) context).type_imageDrag = ChatActivityLollipop.CONTACT_THUMBNAIL;
+                                log("checkItem: contentContactMessageFileThumb");
                                 imageView = (ImageView) v.findViewById(R.id.content_contact_message_file_thumb);
                             }
                         }
@@ -7966,6 +7983,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             log("messages removed");
         }
 
+        ((ChatActivityLollipop) context).holder_imageDrag = holder;
+        ((ChatActivityLollipop) context).position_imageDrag = position;
 //        ((ChatActivityLollipop) context).imageDrag = imageView;
         if (imageView != null) {
             imageView.getLocationOnScreen(screenPosition);
@@ -7973,6 +7992,14 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             dimens[1] = screenPosition[1] + (imageView.getHeight() / 2);
             dimens[2] = imageView.getWidth();
             dimens[3] = imageView.getHeight();
+        }
+    }
+
+    public void setNodeAttachmentVisibility (boolean visible, ViewHolderMessageChat holder, int position){
+        log("setNodeAttachmentVisibility: "+position);
+        if (holder != null) {
+            holder.contentVisible = visible;
+            notifyItemChanged(position);
         }
     }
 

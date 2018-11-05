@@ -158,6 +158,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener{
 
+    boolean fromChatSavedInstance = false;
     int[] screenPosition;
     int mLeftDelta;
     int mTopDelta;
@@ -715,6 +716,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     return true;
                 }
             });
+        }
+        else {
+            if (fromChat) {
+                fromChatSavedInstance = true;
+            }
         }
     }
 
@@ -4011,7 +4017,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             playerLayout.setBackgroundColor(TRANSPARENT);
             appBarLayout.setBackgroundColor(TRANSPARENT);
-            draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
+            if (fromChatSavedInstance) {
+                draggableView.setCurrentView(null);
+            }
+            else {
+                draggableView.setCurrentView(simpleExoPlayerView.getVideoSurfaceView());
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 containerAudioVideoPlayer.setElevation(0);
                 playerLayout.setElevation(0);
