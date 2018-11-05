@@ -70,31 +70,38 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
       }
     }
     setText(getText());
-
   }
   @Override public void setText(CharSequence rawText, BufferType type) {
-    log("setText()-  rawText: "+rawText);
     CharSequence text = rawText == null ? "" : rawText;
-    CharSequence textEmojiCompat = EmojiCompat.get().process(text);
-
-//    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(textEmojiCompat);
-
+    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
     Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
     float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
 
+    CharSequence textEmojiCompat = EmojiCompat.get().process(spannableStringBuilder);
     EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
     if (mContext instanceof ManagerActivityLollipop) {
       //format text if too long
       CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
       super.setText(textF, type);
-
     }else{
       super.setText(spannableStringBuilder, type);
 
     }
   }
+
+  @Override
+  protected void onTextChanged(CharSequence rawText, int start, int lengthBefore, int lengthAfter) {
+    CharSequence text = rawText == null ? "" : rawText;
+    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+
+    Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+    float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+    EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
+
+    super.onTextChanged(text, start, lengthBefore, lengthAfter);
+  }
+
   @Override @CallSuper public void backspace() {
     final KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0, KeyEvent.KEYCODE_ENDCALL);
     dispatchKeyEvent(event);
