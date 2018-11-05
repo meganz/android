@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -135,6 +136,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	DatabaseHandler dbH = null;
 
+	AppBarLayout abL;
 	Toolbar tB;
     ActionBar aB;
 	DisplayMetrics outMetrics;
@@ -202,7 +204,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 	//Tabs in Cloud
 	TabLayout tabLayoutExplorer;
-	LinearLayout fileExplorerSectionLayout;
 	FileExplorerPagerAdapter mTabsAdapterExplorer;
 	ViewPager viewPagerExplorer;
 
@@ -409,7 +410,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		setContentView(R.layout.activity_file_explorer);
 		
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_file_explorer);
-				
+
+		abL = (AppBarLayout) findViewById(R.id.app_bar_layout_explorer);
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
 		setSupportActionBar(tB);
@@ -425,7 +427,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		fabButton.setOnClickListener(this);
 		fabButton.setVisibility(View.GONE);
 		//TABS
-		fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
 		tabLayoutExplorer =  (TabLayout) findViewById(R.id.sliding_tabs_file_explorer);
 		viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);
 		viewPagerExplorer.setOffscreenPageLimit(3);
@@ -456,7 +457,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				MegaApplication.setLoggingIn(true);
 
 				getSupportActionBar().hide();
-				fileExplorerSectionLayout.setVisibility(View.GONE);
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
@@ -567,13 +569,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-				if(fileExplorerSectionLayout!=null){
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
-				else{
-					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 
 				tabShown=NO_TABS;
 
@@ -601,13 +598,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-				if(fileExplorerSectionLayout!=null){
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
-				else{
-					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 
 				tabShown=NO_TABS;
 			}
@@ -636,13 +628,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 				cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-				if(fileExplorerSectionLayout!=null){
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
-				else{
-					fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-					fileExplorerSectionLayout.setVisibility(View.GONE);
-				}
+				tabLayoutExplorer.setVisibility(View.GONE);
+				viewPagerExplorer.setVisibility(View.GONE);
 
 				tabShown=NO_TABS;
 			}
@@ -656,7 +643,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -697,7 +684,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -728,7 +714,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -749,7 +735,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -770,7 +756,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 
 					if (mTabsAdapterExplorer == null){
-						fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+						tabLayoutExplorer.setVisibility(View.VISIBLE);
 						viewPagerExplorer.setVisibility(View.VISIBLE);
 						mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this);
 						viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -802,13 +788,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-					if(fileExplorerSectionLayout!=null){
-						fileExplorerSectionLayout.setVisibility(View.GONE);
-					}
-					else{
-						fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-						fileExplorerSectionLayout.setVisibility(View.GONE);
-					}
+					tabLayoutExplorer.setVisibility(View.GONE);
+					viewPagerExplorer.setVisibility(View.GONE);
 
 					tabShown=NO_TABS;
 				}
@@ -834,7 +815,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 						if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
 							if (mTabsAdapterExplorer == null){
-								fileExplorerSectionLayout.setVisibility(View.VISIBLE);
+								tabLayoutExplorer.setVisibility(View.VISIBLE);
 								viewPagerExplorer.setVisibility(View.VISIBLE);
 								mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
 								viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
@@ -863,13 +844,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 						cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
-						if(fileExplorerSectionLayout!=null){
-							fileExplorerSectionLayout.setVisibility(View.GONE);
-						}
-						else{
-							fileExplorerSectionLayout= (LinearLayout)findViewById(R.id.tabhost_explorer);
-							fileExplorerSectionLayout.setVisibility(View.GONE);
-						}
+						tabLayoutExplorer.setVisibility(View.GONE);
+						viewPagerExplorer.setVisibility(View.GONE);
 						tabShown=NO_TABS;
 					}
 				}
@@ -946,10 +922,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void changeActionBarElevation(boolean whitElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (whitElevation) {
-				tB.setElevation(Util.px2dp(4, outMetrics));
+				abL.setElevation(Util.px2dp(4, outMetrics));
 			}
 			else {
-				tB.setElevation(0);
+				abL.setElevation(0);
 			}
 		}
 	}
@@ -963,7 +939,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	    inflater.inflate(R.menu.file_explorer_action, menu);
 	    
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
-	    createFolderMenuItem.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_new_folder, R.color.white));
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
 
 		createFolderMenuItem.setVisible(false);
