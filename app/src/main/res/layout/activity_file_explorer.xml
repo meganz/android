@@ -12,47 +12,49 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_explorer"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            tools:context=".FileProviderActivityLollipop"
-            app:popupTheme="@style/Theme.Megaactionbar"
-            app:titleTextAppearance="@style/ToolbarTitle"
-            app:theme="@style/Theme.Megaactionbar"/>
-
-
-        <!-- THE Cloud Drive TABS -->
         <LinearLayout
-            android:id="@+id/tabhost_explorer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar_explorer"
-            android:gravity="center"
             android:orientation="vertical">
 
-            <android.support.design.widget.TabLayout
-                android:id="@+id/sliding_tabs_file_explorer"
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/app_bar_layout_explorer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/MyCustomTabLayout"/>
+                android:theme="@style/Theme.Megaactionbar">
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar_explorer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    tools:context=".FileProviderActivityLollipop"
+                    app:popupTheme="@style/Theme.Megaactionbar"
+                    app:titleTextAppearance="@style/ToolbarTitle"
+                    app:theme="@style/Theme.Megaactionbar"/>
+
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/sliding_tabs_file_explorer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/MyCustomTabLayout"/>
+
+            </android.support.design.widget.AppBarLayout>
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/explorer_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
+
+            <FrameLayout
+                android:id="@+id/cloudDriveFrameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
         </LinearLayout>
-
-
-        <FrameLayout
-            android:id="@+id/cloudDriveFrameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/toolbar_explorer"
-            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/file_logging_in_layout"
