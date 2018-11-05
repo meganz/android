@@ -85,6 +85,7 @@ import static android.graphics.Color.TRANSPARENT;
 
 public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
 
+	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
 	int mLeftDelta;
 	int mTopDelta;
@@ -537,7 +538,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				}
 			});
 		}
-
+		else {
+			fromChatSavedInstance = true;
+		}
 	}
 
 	public void runEnterAnimation() {
@@ -1126,8 +1129,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				appBarLayout.setElevation(0);
 
 			}
-
-			draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
+			if (fromChatSavedInstance) {
+				draggableView.setCurrentView(null);
+			}
+			else {
+				draggableView.setCurrentView(adapterMega.getVisibleImage(positionG));
+			}
 		}
 		else {
 			handler.postDelayed(new Runnable() {
