@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
@@ -159,6 +160,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionClearHistory.setOnClickListener(this);
         optionArchiveChat.setOnClickListener(this);
 
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+
         titleNameContactChatPanel.setText(chat.getTitle());
 
 		if(chat.isGroup()){
@@ -168,6 +171,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
 
             infoChatText.setText(getString(R.string.group_chat_info_label));
             optionInfoChat.setVisibility(View.GONE);
+            separatorInfo.setVisibility(View.GONE);
 
             if(chat.isActive()){
                 optionLeaveChat.setVisibility(View.VISIBLE);
@@ -175,12 +179,42 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             else{
                 optionLeaveChat.setVisibility(View.GONE);
             }
+
+            if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
+                optionClearHistory.setVisibility(View.GONE);
+            }
+            else{
+                if(chat.isActive()){
+                    if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                        optionClearHistory.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        optionClearHistory.setVisibility(View.GONE);
+                    }
+                }
+                else{
+                    optionClearHistory.setVisibility(View.GONE);
+                }
+            }
 		}
 		else{
 			iconStateChatPanel.setVisibility(View.VISIBLE);
 
             long userHandle = chat.getPeerHandle();
             MegaUser contact = megaApi.getContact(MegaApiJava.userHandleToBase64(userHandle));
+
+            if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
+                optionClearHistory.setVisibility(View.GONE);
+            }
+            else{
+                if(chat.isActive()){
+                    optionClearHistory.setVisibility(View.VISIBLE);
+                }
+                else{
+                    optionClearHistory.setVisibility(View.GONE);
+                }
+            }
+
             if(contact!=null){
                 log("User email: "+contact.getEmail());
                 titleMailContactChatPanel.setText(contact.getEmail());
@@ -232,19 +266,6 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 iconStateChatPanel.setVisibility(View.GONE);
             }
 		}
-
-
-        if((chat.getLastMessageType()== MegaChatMessage.TYPE_INVALID) || (chat.getLastMessageType()== MegaChatMessage.TYPE_TRUNCATE)){
-            optionClearHistory.setVisibility(View.GONE);
-        }
-        else{
-            if(chat.isActive()){
-                optionClearHistory.setVisibility(View.VISIBLE);
-            }
-            else{
-                optionClearHistory.setVisibility(View.GONE);
-            }
-        }
 
 		chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
 		if(chatPrefs!=null) {

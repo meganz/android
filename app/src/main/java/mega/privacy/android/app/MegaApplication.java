@@ -1,15 +1,34 @@
 package mega.privacy.android.app;
 
-import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
+import android.support.multidex.MultiDexApplication;
+import android.support.text.emoji.EmojiCompat;
+import android.support.text.emoji.FontRequestEmojiCompatConfig;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.provider.FontRequest;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import org.webrtc.AndroidVideoTrackSourceObserver;
@@ -26,7 +45,9 @@ import java.util.Locale;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
@@ -57,13 +78,15 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPricing;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 
-public class MegaApplication extends Application implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
+public class MegaApplication extends MultiDexApplication implements MegaGlobalListenerInterface, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, MegaChatCallListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener {
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.3.8_205";
+	static final public String USER_AGENT = "MEGAAndroid/3.4.0_211";
 
 	DatabaseHandler dbH;
 	MegaApiAndroid megaApi;
@@ -367,8 +390,32 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		megaApiFolder = getMegaApiFolder();
 		megaChatApi = getMegaChatApi();
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+			long schedulerInterval = 60 * DateUtils.MINUTE_IN_MILLIS;
+
+			JobScheduler mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+			JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(1, new ComponentName(this, CameraUploadsService.class));
+			//			jobInfoBuilder.setMinimumLatency(15000);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+				jobInfoBuilder.setPeriodic(schedulerInterval);
+			}
+
+			if (mJobScheduler != null) {
+				int result = mJobScheduler.schedule(jobInfoBuilder.build());
+				if (result == JobScheduler.RESULT_SUCCESS) {
+					log("CameraUploadsService: Job scheduled SUCCESS");
+				} else {
+					log("CameraUploadsService: Job scheduled FAILED");
+				}
+			}
+		}
+
+
+
 		Util.setContext(getApplicationContext());
 		boolean fileLoggerSDK = false;
+		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null) {
@@ -381,9 +428,27 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				} else {
 					fileLoggerSDK = false;
 				}
-			} else {
-				fileLoggerSDK = false;
+
+				if (attrs.getStaging() != null){
+					try{
+						staging = Boolean.parseBoolean(attrs.getStaging());
+					} catch (Exception e){ staging = false;}
+				}
 			}
+			else {
+				fileLoggerSDK = false;
+				staging = false;
+			}
+		}
+
+		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, fileLoggerSDK));
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+
+		if (staging){
+			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+		}
+		else{
+			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 		}
 
 		if (Util.DEBUG){
@@ -416,6 +481,9 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 			}
 		}
 
+		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, fileLoggerKarere));
+		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
+
 		if (Util.DEBUG){
 			MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 		}
@@ -427,13 +495,6 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_ERROR);
 			}
 		}
-
-		//init logger only when pre-request are all ready
-		MegaApiAndroid.addLoggerObject(new AndroidLogger(AndroidLogger.LOG_FILE_NAME, Util.getFileLoggerSDK()));
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
-
-		MegaChatApiAndroid.setLoggerObject(new AndroidChatLogger(AndroidChatLogger.LOG_FILE_NAME, Util.getFileLoggerKarere()));
-		MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX);
 
 		boolean useHttpsOnly = false;
 		if (dbH != null) {
@@ -451,6 +512,14 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
 		this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+
+		if(Util.isChatEnabled()){
+			FontRequest fontRequest = new FontRequest("com.google.android.gms.fonts", "com.google.android.gms", "Noto Color Emoji Compat", R.array.com_google_android_gms_fonts_certs);
+			EmojiCompat.Config configDF = new FontRequestEmojiCompatConfig(this, fontRequest);
+			EmojiCompat.init(configDF);
+		}
+
+
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
@@ -822,9 +891,197 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	}
 
 	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
+		updateAppBadge();
+	}
+
+	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
+		if (updatedNodes != null) {
+			log("updatedNodes: " + updatedNodes.size());
+
+			for (int i = 0; i < updatedNodes.size(); i++) {
+				MegaNode n = updatedNodes.get(i);
+				if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
+					log("updatedNodes name: " + n.getName() + " isInshared: " + n.isInShare() + " getchanges: " + n.getChanges() + " haschanged(TYPE_INSHARE): " + n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE));
+
+					showSharedFolderNotification(n);
+				}
+			}
+		}
+		else{
+			log("Updated nodes is NULL");
+		}
 	}
+
+	public void showSharedFolderNotification(MegaNode n) {
+		log("showSharedFolderNotification");
+
+		try {
+			ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
+			String name = "";
+			for (int j = 0; j < sharesIncoming.size(); j++) {
+				MegaShare mS = sharesIncoming.get(j);
+				if (mS.getNodeHandle() == n.getHandle()) {
+					MegaUser user = megaApi.getContact(mS.getUser());
+					if (user != null) {
+						MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(user.getHandle()));
+
+						if (contactDB != null) {
+							if (!contactDB.getName().equals("")) {
+								name = contactDB.getName() + " " + contactDB.getLastName();
+
+							} else {
+								name = user.getEmail();
+
+							}
+						} else {
+							log("The contactDB is null: ");
+							name = user.getEmail();
+
+						}
+					} else {
+						name = user.getEmail();
+					}
+				}
+			}
+
+			String source = "<b>" + n.getName() + "</b> " + getString(R.string.incoming_folder_notification) + " " + name;
+			Spanned notificationContent;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+				notificationContent = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+			} else {
+				notificationContent = Html.fromHtml(source);
+			}
+
+			int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+			String notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID;
+			String notificationChannelName = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME;
+
+			Intent intent = new Intent(this, ManagerActivityLollipop.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+					PendingIntent.FLAG_ONE_SHOT);
+
+			Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+				NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_HIGH);
+				channel.setShowBadge(true);
+				NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+				notificationManager.createNotificationChannel(channel);
+
+				NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(this, notificationChannelId);
+				notificationBuilderO
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setContentTitle(getString(R.string.title_incoming_folder_notification))
+						.setContentText(notificationContent)
+						.setStyle(new NotificationCompat.BigTextStyle()
+								.bigText(notificationContent))
+						.setAutoCancel(true)
+						.setSound(defaultSoundUri)
+						.setContentIntent(pendingIntent)
+						.setColor(ContextCompat.getColor(this, R.color.mega));
+
+				Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+				notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
+
+				notificationManager.notify(notificationId, notificationBuilderO.build());
+			}
+			else {
+				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+						.setSmallIcon(R.drawable.ic_stat_notify)
+						.setContentTitle(getString(R.string.title_incoming_folder_notification))
+						.setContentText(notificationContent)
+						.setStyle(new NotificationCompat.BigTextStyle()
+								.bigText(notificationContent))
+						.setAutoCancel(true)
+						.setSound(defaultSoundUri)
+						.setContentIntent(pendingIntent);
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+				}
+
+				Drawable d;
+
+				if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+				} else {
+					d = ContextCompat.getDrawable(this, R.drawable.ic_folder_incoming);
+				}
+
+				notificationBuilder.setLargeIcon(((BitmapDrawable) d).getBitmap());
+
+
+				if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+					//API 25 = Android 7.1
+					notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+				} else {
+					notificationBuilder.setPriority(NotificationManager.IMPORTANCE_HIGH);
+				}
+
+				NotificationManager notificationManager =
+						(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+				notificationManager.notify(notificationId, notificationBuilder.build());
+			}
+		} catch (Exception e) {
+			log("Exception: " + e.toString());
+		}
+
+//        try{
+//            String source = "Tap to get more info";
+//            Spanned notificationContent;
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//                notificationContent = Html.fromHtml(source,Html.FROM_HTML_MODE_LEGACY);
+//            } else {
+//                notificationContent = Html.fromHtml(source);
+//            }
+//
+//            int notificationId = Constants.NOTIFICATION_PUSH_CLOUD_DRIVE;
+//
+//            Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            intent.setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//                    PendingIntent.FLAG_ONE_SHOT);
+//
+//            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+//                    .setSmallIcon(R.drawable.ic_stat_notify_download)
+//                    .setContentTitle(getString(R.string.title_incoming_folder_notification))
+//                    .setContentText(notificationContent)
+//                    .setStyle(new NotificationCompat.BigTextStyle()
+//                            .bigText(notificationContent))
+//                    .setAutoCancel(true)
+//                    .setSound(defaultSoundUri)
+//                    .setColor(ContextCompat.getColor(this,R.color.mega))
+//                    .setContentIntent(pendingIntent);
+//
+//            Drawable d;
+//
+//            if(android.os.Build.VERSION.SDK_INT >=  Build.VERSION_CODES.LOLLIPOP){
+//                d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
+//            } else {
+//                d = getResources().getDrawable(R.drawable.ic_folder_incoming);
+//            }
+//
+//            notificationBuilder.setLargeIcon(((BitmapDrawable)d).getBitmap());
+//
+//            NotificationManager notificationManager =
+//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//            notificationManager.notify(notificationId, notificationBuilder.build());
+//        }
+//        catch(Exception e){
+//            log("Exception when showing shared folder notification: "+e.getMessage());
+//        }
+	}
+
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
@@ -846,6 +1103,8 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
+
+		updateAppBadge();
 
 		if(requests!=null){
 			for (int i = 0; i < requests.size(); i++) {
@@ -989,7 +1248,6 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 				ChatAdvancedNotificationBuilder notificationBuilder;
 				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 
-				notificationBuilder.removeAllChatNotifications();
 				notificationBuilder.generateChatNotification(request);
 			}
 			else{
@@ -1008,23 +1266,44 @@ public class MegaApplication extends Application implements MegaGlobalListenerIn
 
 	}
 
-	@Override
-	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
-		log("onChatNotification");
+	public void updateAppBadge(){
+		log("updateAppBadge");
 
-		int unread = megaChatApi.getUnreadChats();
+		int totalHistoric = 0;
+		int totalIpc = 0;
+		if(megaApi!=null && megaApi.getRootNode()!=null){
+			totalHistoric = megaApi.getNumUnreadUserAlerts();
+			ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
+			if(requests!=null) {
+				totalIpc = requests.size();
+			}
+		}
+
+		int chatUnread = 0;
+		if(Util.isChatEnabled() && megaChatApi != null) {
+			chatUnread = megaChatApi.getUnreadChats();
+		}
+
+		int totalNotifications = totalHistoric + totalIpc + chatUnread;
 		//Add Android version check if needed
-		if (unread == 0) {
+		if (totalNotifications == 0) {
 			//Remove badge indicator - no unread chats
 			ShortcutBadger.applyCount(getApplicationContext(), 0);
 			//Xiaomi support
 			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
 		} else {
 			//Show badge with indicator = unread
-			ShortcutBadger.applyCount(getApplicationContext(), Math.abs(unread));
+			ShortcutBadger.applyCount(getApplicationContext(), Math.abs(totalNotifications));
 			//Xiaomi support
-			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", unread));
+			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", totalNotifications));
 		}
+	}
+
+	@Override
+	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
+		log("onChatNotification");
+
+		updateAppBadge();
 
 		if(MegaApplication.getOpenChatId() == chatid){
 			log("Do not update/show notification - opened chat");

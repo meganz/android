@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +26,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -63,6 +67,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
         public String filePath;
         public long timestamp;
     }
+
+    DisplayMetrics outMetrics;
 
     public static int PADDING_GRID_LARGE = 6;
     public static int PADDING_GRID_SMALL = 3;
@@ -114,6 +120,8 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     String downloadLocationDefaultPath;
     String defaultPath;
 
+    Handler handler;
+
     public static class ItemInformation{
         public int type = -1;
         public String name = null;
@@ -148,7 +156,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     }
                     clearSelections();
                     NodeController nC = new NodeController(context);
-                    nC.prepareForDownload(handleList);
+                    nC.prepareForDownload(handleList, false);
                     break;
                 }
                 case R.id.cab_menu_copy:{
@@ -210,7 +218,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                     break;
                 }
                 case R.id.cab_menu_select_all:{
-                    ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
                     selectAll();
                     break;
                 }
@@ -227,6 +234,13 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             log("onCreateActionMode");
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.file_browser_action, menu);
+            ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                final Window window = ((ManagerActivityLollipop) context).getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(ContextCompat.getColor(context, R.color.accentColorDark));
+            }
             return true;
         }
 
@@ -236,6 +250,18 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             clearSelections();
             multipleSelect = false;
             actionMode = null;
+            ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                final Window window = ((ManagerActivityLollipop) context).getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        window.setStatusBarColor(0);
+                    }
+                }, 350);
+            }
         }
 
         @Override
@@ -356,8 +382,10 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             }
         }
 
+        handler = new Handler();
+
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
+        outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
         float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
@@ -446,7 +474,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     public class ViewHolderPhotoTitleSyncGridTitle extends RecyclerView.ViewHolder implements ThumbnailUtilsLollipop.ThumbnailInterface{
         private RelativeLayout layout_title;
         private TextView title;
-        private ImageView photo;
+        private RoundedImageView photo;
         private RelativeLayout layout_videoInfo;
         private TextView videoDuration;
         private ImageView videoIcon;
@@ -468,7 +496,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             layout_title = (RelativeLayout) itemView.findViewById(R.id.cell_photosync_grid_title_layout);
             layout_title.setVisibility(View.GONE);
             title = (TextView) itemView.findViewById(R.id.cell_photosync_grid_title_title);
-            photo = (ImageView) itemView.findViewById(R.id.cell_photosync_grid_title_thumbnail);
+            photo = (RoundedImageView) itemView.findViewById(R.id.cell_photosync_grid_title_thumbnail);
             layout_videoInfo = (RelativeLayout) itemView.findViewById(R.id.cell_item_videoinfo_layout);
             layout_videoInfo.setVisibility(View.GONE);
             videoDuration = (TextView) itemView.findViewById(R.id.cell_photosync_grid_title_video_duration);
@@ -476,6 +504,18 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             gradient_effect.setVisibility(View.GONE);
             click_icon = (ImageView) itemView.findViewById(R.id.cell_photosync_title_menu_long_click_select);
             click_icon.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams paramsI = (RelativeLayout.LayoutParams) click_icon.getLayoutParams();
+            if (((ManagerActivityLollipop)context).isSmallGridCameraUploads){
+                paramsI.width = Util.px2dp(16, outMetrics);
+                paramsI.height = Util.px2dp(16, outMetrics);
+                paramsI.setMargins(Util.px2dp(3, outMetrics), Util.px2dp(3, outMetrics), 0, 0);
+            }
+            else {
+                paramsI.width = Util.px2dp(23, outMetrics);
+                paramsI.height = Util.px2dp(23, outMetrics);
+                paramsI.setMargins(Util.px2dp(7, outMetrics), Util.px2dp(7, outMetrics), 0, 0);
+            }
+            click_icon.setLayoutParams(paramsI);
             click_unselected = (RelativeLayout) itemView.findViewById(R.id.cell_photosync_title_menu_long_click_unselected);
             click_unselected.setVisibility(View.GONE);
             videoIcon = (ImageView) itemView.findViewById(R.id.cell_photosync_grid_title_video_icon);
@@ -561,15 +601,21 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             if (multipleSelect){
                 if (checked){
                     click_icon.setVisibility(View.VISIBLE);
+                    photo.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
+                    photo.setPadding(Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics));
                     click_unselected.setVisibility(View.GONE);
                 }
                 else{
                     click_icon.setVisibility(View.GONE);
+                    photo.setBackground(null);
+                    photo.setPadding(0, 0, 0, 0);
                     click_unselected.setVisibility(View.VISIBLE);
                 }
             }
             else{
                 click_icon.setVisibility(View.GONE);
+                photo.setBackground(null);
+                photo.setPadding(0, 0, 0, 0);
                 click_unselected.setVisibility(View.GONE);
             }
 
@@ -585,18 +631,34 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
             Bitmap thumb = null;
             photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+            if (multipleSelect && checked) {
+                photo.setCornerRadius(Util.px2dp(2, outMetrics));
+            }
+            else {
+                photo.setCornerRadius(0);
+            }
             postSetImageView();
 
             if (n.hasThumbnail()){
                 thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
                 if (thumb != null){
-                    photo.setImageBitmap(thumb);
+                    if (multipleSelect && checked){
+                        photo.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context,thumb,3));
+                    }
+                    else {
+                        photo.setImageBitmap(thumb);
+                    }
                     postSetImageView();
                 }
                 else{
                     thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
                     if (thumb != null){
-                        photo.setImageBitmap(thumb);
+                        if (multipleSelect && checked){
+                            photo.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context,thumb,3));
+                        }
+                        else {
+                            photo.setImageBitmap(thumb);
+                        }
                         postSetImageView();
                     }
                     else{
@@ -606,7 +668,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         catch(Exception e){} //Too many AsyncTasks
 
                         if (thumb != null){
-                            photo.setImageBitmap(thumb);
+                            if (multipleSelect && checked){
+                                photo.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context,thumb,3));
+                            }
+                            else {
+                                photo.setImageBitmap(thumb);
+                            }
                             postSetImageView();
                         }
                         else{
@@ -637,15 +704,24 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             if (multipleSelect){
                 if (checked){
                     click_icon.setVisibility(View.VISIBLE);
+                    photo.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid_selected));
+                    photo.setPadding(Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics), Util.px2dp(1, outMetrics));
+                    gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads_rounded));
                     click_unselected.setVisibility(View.GONE);
                 }
                 else{
                     click_icon.setVisibility(View.GONE);
+                    photo.setBackground(null);
+                    photo.setPadding(0, 0, 0, 0);
+                    gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
                     click_unselected.setVisibility(View.VISIBLE);
                 }
             }
             else{
                 click_icon.setVisibility(View.GONE);
+                photo.setBackground(null);
+                photo.setPadding(0, 0, 0, 0);
+                gradient_effect.setBackground(ContextCompat.getDrawable(context, R.drawable.gradient_cam_uploads));
                 click_unselected.setVisibility(View.GONE);
             }
 
@@ -661,17 +737,33 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
 
             Bitmap thumb = null;
             photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
+            if (multipleSelect && checked) {
+                photo.setCornerRadius(Util.px2dp(2, outMetrics));
+            }
+            else {
+                photo.setCornerRadius(0);
+            }
             postSetImageView();
             if (n.hasThumbnail()){
                 thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(n);
                 if (thumb != null){
-                    photo.setImageBitmap(thumb);
+                    if (multipleSelect && checked){
+                        photo.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context,thumb,3));
+                    }
+                    else {
+                        photo.setImageBitmap(thumb);
+                    }
                     postSetImageView();
                 }
                 else{
                     thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(n, context);
                     if (thumb != null){
-                        photo.setImageBitmap(thumb);
+                        if (multipleSelect && checked){
+                            photo.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context,thumb,3));
+                        }
+                        else {
+                            photo.setImageBitmap(thumb);
+                        }
                     }
                     else{
                         try{
@@ -680,7 +772,12 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         catch(Exception e){} //Too many AsyncTasks
 
                         if (thumb != null){
-                            photo.setImageBitmap(thumb);
+                            if (multipleSelect && checked){
+                                photo.setImageBitmap(ThumbnailUtilsLollipop.getRoundedBitmap(context,thumb,3));
+                            }
+                            else {
+                                photo.setImageBitmap(thumb);
+                            }
                         }
                         else{
                             photo.setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
@@ -999,7 +1096,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
     public void hideMultipleSelect() {
         log("hideMultipleSelect");
         this.multipleSelect = false;
-        ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
 //        clearSelections();
 
         if (actionMode != null) {
@@ -1189,7 +1285,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                                 ArrayList<Long> handleList = new ArrayList<Long>();
                                 handleList.add(n.getHandle());
                                 NodeController nC = new NodeController(context);
-                                nC.prepareForDownload(handleList);
+                                nC.prepareForDownload(handleList, true);
                             }
                         }
                         ((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -1199,7 +1295,7 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
                         ArrayList<Long> handleList = new ArrayList<Long>();
                         handleList.add(n.getHandle());
                         NodeController nC = new NodeController(context);
-                        nC.prepareForDownload(handleList);
+                        nC.prepareForDownload(handleList, true);
                     }
                     notifyDataSetChanged();
                 }
@@ -1353,7 +1449,6 @@ public class MegaPhotoSyncGridTitleAdapterLollipop extends RecyclerView.Adapter<
             actionMode = ((AppCompatActivity)context).startSupportActionMode(new MegaPhotoSyncGridTitleAdapterLollipop.ActionBarCallBack());
 
             updateActionModeTitle();
-            ((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
 
             notifyItemChanged(holder.getPositionOnAdapter());
         }

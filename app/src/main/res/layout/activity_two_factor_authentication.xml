@@ -15,7 +15,7 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextAppearance="@style/ToolbarTitle"
+        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".lollipop.TwoFactorAuthenticationActivity" />
 
@@ -122,24 +122,36 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/explain_qr_seed_2fa"
+                    android:id="@+id/explain_qr_seed_2fa_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/explain_qr_seed_2fa"
+                    android:text="@string/explain_qr_seed_2fa_1"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
-                    android:paddingTop="24dp"
+                    android:paddingTop="17dp"
                     android:fontFamily="roboto"/>
+
+                <TextView
+                    android:id="@+id/explain_qr_seed_2fa_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="3dp"
+                    android:fontFamily="roboto"
+                    android:layout_below="@+id/explain_qr_seed_2fa_1"/>
 
                 <RelativeLayout
                     android:id="@+id/layout_qr_2fa"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="14dp"
-                    android:layout_below="@+id/explain_qr_seed_2fa">
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/explain_qr_seed_2fa_2">
 
                     <ImageView
                         android:id="@+id/qr_2fa"

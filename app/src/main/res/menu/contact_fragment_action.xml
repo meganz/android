@@ -17,7 +17,6 @@
     <item
         android:id="@+id/cab_menu_start_conversation"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_chat_w"
         android:showAsAction="never"
         android:title="@string/group_chat_start_conversation_label"
         MEGA:showAsAction="never" />

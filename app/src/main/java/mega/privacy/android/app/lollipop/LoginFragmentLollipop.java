@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,7 +42,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.support.v7.widget.Toolbar;
 
 import java.util.Locale;
 
@@ -191,6 +191,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean is2FAEnabled = false;
     private boolean accountConfirmed = false;
     private boolean pinLongClick = false;
+
+    private boolean twoFA = false;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -873,6 +875,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     startLoginInProcess();
                     return v;
                 }
+                else if (intentReceived.getAction().equals(Constants.ACTION_REFRESH_STAGING)){
+                    twoFA = true;
+                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+                    startFastLogin();
+                    return v;
+                }
                 else if (intentReceived.getAction().equals(Constants.ACTION_ENABLE_CHAT)){
                     log("with credentials -> intentReceived ACTION_ENABLE_CHAT");
                     enableChat();
@@ -963,7 +971,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         }
 
-                        ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            ((LoginActivityLollipop) context).startCameraSyncService(false, 5 * 60 * 1000);
+                        }
 
                         log("Empty completed transfers data");
                         dbH.emptyCompletedTransfers();
@@ -1025,7 +1035,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     {
                         if (prefs.getCamSyncEnabled() != null){
                             if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                }
                             }
                         }
                     }
@@ -1990,11 +2002,15 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (prefs != null){
                             if (prefs.getCamSyncEnabled() != null){
                                 if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-                                    ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                        ((LoginActivityLollipop) context).startCameraSyncService(false, 30 * 1000);
+                                    }
                                 }
                             }
                             else{
-                                ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                    ((LoginActivityLollipop) context).startCameraSyncService(true, 30 * 1000);
+                                }
                                 initialCam = true;
                             }
                         }
@@ -2066,6 +2082,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                     log("(2) Empty completed transfers data");
                     dbH.emptyCompletedTransfers();
+
+                    if (twoFA){
+                        intent.setAction(Constants.ACTION_REFRESH_STAGING);
+                        twoFA = false;
+                    }
 
                     startActivity(intent);
                     ((LoginActivityLollipop)context).finish();
@@ -2406,7 +2427,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 prepareNodesText.setVisibility(View.GONE);
                 serversBusyText.setVisibility(View.GONE);
 
-                if (error.getErrorCode() == MegaError.API_ENOENT){
+                if (error.getErrorCode() == MegaError.API_ENOENT || error.getErrorCode() == MegaError.API_EKEY){
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.error_incorrect_email_or_password));
                 }
                 else{
@@ -2935,6 +2956,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
 
     }
 
