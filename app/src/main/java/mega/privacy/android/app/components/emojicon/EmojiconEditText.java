@@ -23,12 +23,13 @@ import android.content.res.TypedArray;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.style.DynamicDrawableSpan;
 import android.util.AttributeSet;
+import android.support.text.emoji.widget.EmojiAppCompatEditText;
 
 import mega.privacy.android.app.components.emojicon.EmojiconHandler;
 import mega.privacy.android.app.R;
 
 
-public class EmojiconEditText extends AppCompatEditText {
+public class EmojiconEditText extends EmojiAppCompatEditText {
     private int mEmojiconSize;
     private int mEmojiconAlignment;
     private int mEmojiconTextSize;

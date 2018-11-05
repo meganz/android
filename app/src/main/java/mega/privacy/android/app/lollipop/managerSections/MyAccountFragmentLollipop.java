@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -11,11 +12,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -26,6 +29,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -41,14 +45,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.interfaces.AbortPendingTransferCallback;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.utils.Constants;
@@ -71,11 +80,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 	final int WIDTH = 500;
 
+	ScrollView scrollView;
 	Context context;
 	MyAccountInfo myAccountInfo;
 
 	RelativeLayout avatarLayout;
-	TextView initialLetter;
 	RoundedImageView myAccountImage;
 
 	TextView nameView;
@@ -95,7 +104,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	LinearLayout typeLayout;
 	LinearLayout lastSessionLayout;
-	LinearLayout connectionsLayout;
+    RelativeLayout connectionsLayout;
+    private CustomizedGridRecyclerView lastContactsGridView;
 
 	LinearLayout achievementsLayout;
 	LinearLayout achievementsSeparator;
@@ -113,7 +123,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private Bitmap qrAvatarSave;
 
 	int numOfClicksLastSession = 0;
-	boolean stagingApiUrl = false;
+	boolean staging = false;
+
+	DatabaseHandler dbH;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -122,9 +134,21 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+		dbH = DatabaseHandler.getDbHandler(context);
+
 		super.onCreate(savedInstanceState);
 	}
-	
+
+	public void checkScroll () {
+		if (scrollView != null) {
+			if (scrollView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -144,6 +168,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
+
+		scrollView = (ScrollView) v.findViewById(R.id.my_account_complete_relative_layout);
+		new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				if (scrollView.canScrollVertically(-1)){
+					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				}
+				else {
+					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				}
+			}
+		});
 		
 		if(megaApi.getMyUser() == null){
 			return null;
@@ -152,6 +189,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		log("My user handle string: "+megaApi.getMyUserHandle());
 
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_relative_layout_avatar);
+		avatarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.avatar_qr_background));
 		avatarLayout.setOnClickListener(this);
 
 		if (savedInstanceState != null) {
@@ -186,8 +224,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		infoEmail.setOnClickListener(this);
 		
 		myAccountImage = (RoundedImageView) v.findViewById(R.id.my_account_thumbnail);
-
-		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
 
 		mkButton = (Button) v.findViewById(R.id.MK_button);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -250,8 +286,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		lastSessionLayout.setOnClickListener(this);
 		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
 
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
-
+		connectionsLayout = (RelativeLayout) v.findViewById(R.id.my_account_connections_layout);
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 
 		logoutButton = (Button) v.findViewById(R.id.logout_button);
@@ -290,19 +325,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		this.updateAvatar(true);
 
-		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
-
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}		
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		updateContactsCount();
 
 		lastContacted = MegaApiUtils.getLastContactedUsers(context);
 		//Draw contact's connection component if lastContacted.size > 0
+        lastContactsGridView = (CustomizedGridRecyclerView)v.findViewById(R.id.last_contacts_gridview);
+        
+        lastContactsGridView.setColumnCount(LastContactsAdapter.MAX_COLUMN);
+        lastContactsGridView.setClipToPadding(false);
+        lastContactsGridView.setHasFixedSize(false);
+        
+        lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
 
 		setAccountDetails();
 
@@ -311,6 +344,39 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		((MegaApplication) ((Activity)context).getApplication()).sendSignalPresenceActivity();
 
 		return v;
+	}
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Refresh
+		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+        updateView();
+    }
+    
+    /**
+     * Update last contacts list and refresh last contacts' avatar.
+     */
+    public void updateView() {
+
+        if(lastContactsGridView!=null){
+			lastContacted = MegaApiUtils.getLastContactedUsers(context);
+			lastContactsGridView.setAdapter(new LastContactsAdapter(getActivity(),lastContacted));
+		}
+    }
+
+    public void updateContactsCount(){
+    	log("updateContactsCounts");
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
+
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}
+		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 	}
 
 	public void setMkButtonText(){
@@ -574,21 +640,63 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				numOfClicksLastSession++;
 				if (numOfClicksLastSession == 5){
 					numOfClicksLastSession = 0;
-					if (!stagingApiUrl) {
-						stagingApiUrl = true;
-						megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-						Intent intent = new Intent(context, LoginActivityLollipop.class);
-						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setAction(Constants.ACTION_REFRESH);
-						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+					staging = false;
+					if (dbH != null){
+						MegaAttributes attrs = dbH.getAttributes();
+						if (attrs != null) {
+							if (attrs.getStaging() != null){
+								try{
+									staging = Boolean.parseBoolean(attrs.getStaging());
+								} catch (Exception e){ staging = false;}
+							}
+						}
+					}
+
+					if (!staging) {
+						DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which){
+									case DialogInterface.BUTTON_POSITIVE:
+										staging = true;
+										megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+										if (dbH != null){
+											dbH.setStaging(true);
+										}
+
+										Intent intent = new Intent(context, LoginActivityLollipop.class);
+										intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
+										intent.setAction(Constants.ACTION_REFRESH_STAGING);
+
+										startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH_STAGING);
+										break;
+
+									case DialogInterface.BUTTON_NEGATIVE:
+										//No button clicked
+										break;
+								}
+							}
+						};
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setTitle(getResources().getString(R.string.staging_api_url_title));
+						builder.setMessage(getResources().getString(R.string.staging_api_url_text));
+
+						builder.setPositiveButton(R.string.general_yes, dialogClickListener);
+						builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
+						builder.show();
 					}
 					else{
-						stagingApiUrl = false;
+						staging = false;
 						megaApi.changeApiUrl("https://g.api.mega.co.nz/");
+						if (dbH != null){
+							dbH.setStaging(false);
+						}
 						Intent intent = new Intent(context, LoginActivityLollipop.class);
 						intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-						intent.setAction(Constants.ACTION_REFRESH);
-						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH);
+						intent.setAction(Constants.ACTION_REFRESH_STAGING);
+
+						startActivityForResult(intent, Constants.REQUEST_CODE_REFRESH_STAGING);
 					}
 				}
 				break;
@@ -716,37 +824,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	public void setDefaultAvatar(){
 		log("setDefaultAvatar");
-		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
 
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
-		if(color!=null){
-			log("The color to set the avatar is "+color);
-			p.setColor(Color.parseColor(color));
-		}
-		else{
-			log("Default color to the avatar");
-			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
-		}
 
-		int radius;
-		if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-			radius = defaultAvatar.getWidth()/2;
-		else
-			radius = defaultAvatar.getHeight()/2;
-
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		myAccountImage.setImageBitmap(defaultAvatar);
-
-		int avatarTextSize = getAvatarTextSize(density);
-		log("DENSITY: " + density + ":::: " + avatarTextSize);
-
-		initialLetter.setText(myAccountInfo.getFirstLetter());
-		initialLetter.setTextSize(30);
-		initialLetter.setTextColor(Color.WHITE);
-		initialLetter.setVisibility(View.VISIBLE);
+		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
@@ -781,7 +862,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				else{
 					log("Show my avatar");
 					myAccountImage.setImageBitmap(imBitmap);
-					initialLetter.setVisibility(View.GONE);
 				}
 			}
 		}else{
@@ -886,19 +966,27 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			log("Contact link create BASE64: " + "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
 
 			String contactLink = "https://mega.nz/C!" + MegaApiAndroid.handleToBase64(request.getNodeHandle());
-			Bitmap qrCodeBitmap = queryQR(contactLink);
-			qrAvatarSave = qrCodeBitmap;
-			avatarLayout.setBackground(new BitmapDrawable(qrCodeBitmap));
+			new QRBackgroundTask().execute(contactLink);
 		}
 		else {
 			log("Error request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE: " + e.getErrorString());
 		}
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		megaApi.contactLinkCreate(false, (ManagerActivityLollipop) context);
+	class QRBackgroundTask extends AsyncTask<String, Void, Void> {
+
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			qrAvatarSave = queryQR(strings[0]);
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void aVoid) {
+			avatarLayout.setBackground(new BitmapDrawable(qrAvatarSave));
+		}
 	}
 
 	@Override

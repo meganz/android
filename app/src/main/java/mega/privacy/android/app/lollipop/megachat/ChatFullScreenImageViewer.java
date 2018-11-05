@@ -78,6 +78,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
@@ -162,6 +163,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		downloadIcon = menu.findItem(R.id.chat_full_image_viewer_download);
 		importIcon = menu.findItem(R.id.chat_full_image_viewer_import);
 		saveForOfflineIcon = menu.findItem(R.id.chat_full_image_viewer_save_for_offline);
+        saveForOfflineIcon.setIcon(Util.mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
 		removeIcon = menu.findItem(R.id.chat_full_image_viewer_remove);
 
 //		Drawable drawable = importIcon.getIcon();
@@ -643,7 +645,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		builder.setView(confirmationLayout);
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -1043,6 +1045,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {}
+
+	@Override
+	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
+		log("onUserAlertsUpdate");
+	}
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {}

@@ -492,10 +492,12 @@ public class AccountController implements View.OnClickListener{
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
-            Intent stopIntent = null;
-            stopIntent = new Intent(context, CameraSyncService.class);
-            stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
-            context.startService(stopIntent);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                Intent stopIntent = null;
+                stopIntent = new Intent(context, CameraSyncService.class);
+                stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
+                context.startService(stopIntent);
+            }
         }
         dbH.clearOffline();
 

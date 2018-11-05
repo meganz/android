@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Handler;
 
 
@@ -36,7 +37,9 @@ public class CameraEventReceiver extends BroadcastReceiver {
 			@Override
 			public void run() {
 				log("Now I start the service");
-				c.startService(new Intent(c, CameraSyncService.class));		
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					c.startService(new Intent(c, CameraSyncService.class));
+				}
 			}
 		}, 5 * 1000);
 	    

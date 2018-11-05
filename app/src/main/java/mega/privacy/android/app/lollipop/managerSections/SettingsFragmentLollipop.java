@@ -30,6 +30,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -48,16 +49,17 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatPreferencesActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
 import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
 import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
-import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -84,7 +86,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
 	public static String CATEGORY_CHAT_ENABLED = "settings_chat";
-	public static String CATEGORY_CHAT_STATUS = "settings_status_chat";
 	public static String CATEGORY_CHAT_NOTIFICATIONS = "settings_notifications_chat";
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
@@ -136,6 +137,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_FILE_VERSIONS = "settings_file_management_file_version";
 	public static String KEY_CLEAR_VERSIONS = "settings_file_management_clear_version";
 	public static String KEY_ENABLE_VERSIONS = "settings_file_versioning_switch";
+	public static String KEY_ENABLE_RB_SCHEDULER = "settings_rb_scheduler_switch";
+	public static String KEY_DAYS_RB_SCHEDULER = "settings_days_rb_scheduler";
+
+	public static String KEY_ENABLE_LAST_GREEN_CHAT = "settings_last_green_chat_switch";
 	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
@@ -172,7 +177,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory chatEnabledCategory;
-	PreferenceCategory chatStatusCategory;
 	PreferenceCategory chatNotificationsCategory;
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
@@ -188,6 +192,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	SwitchPreference richLinksSwitch;
 	TwoLineCheckPreference chatEnableCheck;
 	TwoLineCheckPreference richLinksCheck;
+
+	SwitchPreference enableLastGreenChatSwitch;
+	TwoLineCheckPreference enableLastGreenChatCheck;
+
 	//New autoaway
 	SwitchPreference autoAwaySwitch;
 	TwoLineCheckPreference autoAwayCheck;
@@ -229,6 +237,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	SwitchPreference enableVersionsSwitch;
 	TwoLineCheckPreference enableVersionsCheck;
 
+	SwitchPreference enableRbSchedulerSwitch;
+	TwoLineCheckPreference enableRbSchedulerCheck;
+	Preference daysRbSchedulerPreference;
+
 	ListPreference statusChatListPreference;
 	ListPreference chatAttachmentsChatListPreference;
 	
@@ -266,7 +278,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	String downloadLocationPath = "";
 	String ast = "";
 	String pinLockCodeTxt = "";
-	int chatStatus = -1;
 
 	boolean useHttpsOnlyValue = false;
 	
@@ -308,7 +319,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);	
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
 		chatEnabledCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_ENABLED);
-		chatStatusCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_STATUS);
 		chatNotificationsCategory = (PreferenceCategory) findPreference(CATEGORY_CHAT_NOTIFICATIONS);
 		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 		autoawayChatCategory = (PreferenceCategory) findPreference(CATEGORY_AUTOAWAY_CHAT);
@@ -469,6 +479,47 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 
 		updateEnabledFileVersions();
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableRbSchedulerSwitch = (SwitchPreference) findPreference(KEY_ENABLE_RB_SCHEDULER);
+		}
+		else{
+			enableRbSchedulerCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_RB_SCHEDULER);
+
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableLastGreenChatSwitch = (SwitchPreference) findPreference(KEY_ENABLE_LAST_GREEN_CHAT);
+		}
+		else{
+			enableLastGreenChatCheck = (TwoLineCheckPreference) findPreference(KEY_ENABLE_LAST_GREEN_CHAT);
+		}
+
+		daysRbSchedulerPreference = (Preference) findPreference(KEY_DAYS_RB_SCHEDULER);
+
+		if(megaApi.serverSideRubbishBinAutopurgeEnabled()){
+			log("RubbishBinAutopurgeEnabled --> request userAttribute info");
+			megaApi.getRubbishBinAutopurgePeriod((ManagerActivityLollipop)context);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fileManagementCategory.addPreference(enableRbSchedulerSwitch);
+			}
+			else{
+				fileManagementCategory.addPreference(enableRbSchedulerCheck);
+			}
+
+			fileManagementCategory.addPreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
+		}
+		else{
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				fileManagementCategory.removePreference(enableRbSchedulerSwitch);
+			}
+			else{
+				fileManagementCategory.removePreference(enableRbSchedulerCheck);
+			}
+
+			fileManagementCategory.removePreference(daysRbSchedulerPreference);
+		}
 
 		recoveryKey = findPreference(KEY_RECOVERY_KEY);
 		recoveryKey.setOnPreferenceClickListener(this);
@@ -860,12 +911,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			//Get chat status
 			statusConfig = megaChatApi.getPresenceConfig();
 			if(statusConfig!=null){
-				chatStatus = statusConfig.getOnlineStatus();
-				log("SETTINGS chatStatus pending: "+statusConfig.isPending());
-				log("---------------status: "+chatStatus);
 
-				statusChatListPreference.setValue(chatStatus+"");
-				if(chatStatus==MegaChatApi.STATUS_INVALID){
+				log("SETTINGS chatStatus pending: "+statusConfig.isPending());
+				log("---------------status: "+statusConfig.getOnlineStatus());
+
+				statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
+				if(statusConfig.getOnlineStatus()==MegaChatApi.STATUS_INVALID){
 					statusChatListPreference.setSummary(getString(R.string.recovering_info));
 				}
 				else{
@@ -900,7 +951,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 		}
 		else{
-			preferenceScreen.removePreference(chatStatusCategory);
 			preferenceScreen.removePreference(chatNotificationsCategory);
 			preferenceScreen.removePreference(autoawayChatCategory);
 			preferenceScreen.removePreference(persistenceChatCategory);
@@ -911,6 +961,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				chatEnabledCategory.removePreference(richLinksCheck);
 			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				chatEnabledCategory.removePreference(enableLastGreenChatSwitch);
+			}
+			else{
+				chatEnabledCategory.removePreference(enableLastGreenChatCheck);
+			}
+
+			chatEnabledCategory.removePreference(statusChatListPreference);
 
 			chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
 		}
@@ -1121,6 +1180,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		setAutoaccept = false;
 		autoAccept = true;
 		if (megaApi.multiFactorAuthAvailable()) {
+			preferenceScreen.addPreference(twoFACategory);
 			megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
 		}
 		else {
@@ -1168,13 +1228,38 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		log("onViewCreated");
+		listView = (ListView) view.findViewById(android.R.id.list);
 		if (((ManagerActivityLollipop) context).openSettingsStorage) {
-			listView = (ListView) view.findViewById(android.R.id.list);
+//			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryStorage();
 		}
 		else if (((ManagerActivityLollipop) context).openSettingsQR){
-			listView = (ListView) view.findViewById(android.R.id.list);
+//			listView = (ListView) view.findViewById(android.R.id.list);
 			goToCategoryQR();
+		}
+		if (listView != null) {
+			listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+				@Override
+				public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+				}
+
+				@Override
+				public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+					checkScroll();
+				}
+			});
+		}
+	}
+
+	public void checkScroll () {
+		if (listView != null) {
+			if (listView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
 		}
 	}
 
@@ -1231,18 +1316,55 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			lv.setPadding(0, 0, 0, 0);
 		}
 
-		setOnlineOptions(Util.isOnline(context));
+		if(Util.isOnline(context)){
+			if(megaApi==null || megaApi.getRootNode()==null){
+				setOnlineOptions(false);
+			}
+			else{
+				setOnlineOptions(true);
+			}
+		}
+		else{
+			log("Offline");
+			setOnlineOptions(false);
+		}
 
 		return v;
 	}
 
 	public void setOnlineOptions(boolean isOnline){
 		chatEnabledCategory.setEnabled(isOnline);
-		chatStatusCategory.setEnabled(isOnline);
 		chatNotificationsCategory.setEnabled(isOnline);
 		autoawayChatCategory.setEnabled(isOnline);
 		persistenceChatCategory.setEnabled(isOnline);
 		cameraUploadCategory.setEnabled(isOnline);
+		securityCategory.setEnabled(isOnline);
+		qrCodeCategory.setEnabled(isOnline);
+		twoFACategory.setEnabled(isOnline);
+
+		//Rubbish bin scheduler
+		daysRbSchedulerPreference.setEnabled(isOnline);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableRbSchedulerSwitch.setEnabled(isOnline);
+		}
+		else{
+			enableRbSchedulerCheck.setEnabled(isOnline);
+		}
+
+		//File versioning
+		fileVersionsFileManagement.setEnabled(isOnline);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableVersionsSwitch.setEnabled(isOnline);
+		}
+		else{
+			enableVersionsCheck.setEnabled(isOnline);
+		}
+
+		//Use of HTTP
+		useHttpsOnly.setEnabled(isOnline);
+
+		//Cancel account
+		cancelAccount.setEnabled(isOnline);
 	}
 
 	@Override
@@ -1283,7 +1405,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 30 * 1000);
 		}
@@ -1309,18 +1433,24 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 			cameraUploadWhat.setSummary(fileUpload);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+			dbH.setCamSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 30 * 1000);
 		}
@@ -1623,7 +1753,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -1786,7 +1918,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -1835,10 +1969,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setCamSyncEnabled(false);
 				dbH.setSecondaryUploadEnabled(false);
 				secondaryUpload = false;
-				Intent stopIntent = null;
-				stopIntent = new Intent(context, CameraSyncService.class);
-				stopIntent.setAction(CameraSyncService.ACTION_STOP);
-				context.startService(stopIntent);
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent stopIntent = null;
+					stopIntent = new Intent(context, CameraSyncService.class);
+					stopIntent.setAction(CameraSyncService.ACTION_STOP);
+					context.startService(stopIntent);
+				}
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_on));
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_on));
@@ -1889,7 +2025,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setEnabledChat(true+"");
 				((ManagerActivityLollipop)context).enableChat();
 				preferenceScreen.addPreference(chatNotificationsCategory);
-				preferenceScreen.addPreference(chatStatusCategory);
 				preferenceScreen.addPreference(chatAutoAwayPreference);
 				chatEnabledCategory.addPreference(chatAttachmentsChatListPreference);
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -1898,6 +2033,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				else{
 					chatEnabledCategory.addPreference(richLinksCheck);
 				}
+
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					chatEnabledCategory.addPreference(enableLastGreenChatSwitch);
+				}
+				else{
+					chatEnabledCategory.addPreference(enableLastGreenChatCheck);
+				}
+
+				chatEnabledCategory.addPreference(statusChatListPreference);
 			}
 			else{
 				log("DISCONNECT CHAT!!!");
@@ -1994,6 +2138,93 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 				else{
 					megaApi.setFileVersionsOption(false, (ManagerActivityLollipop)context);
+				}
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_RB_SCHEDULER) == 0){
+			log("Change KEY_ENABLE_RB_SCHEDULER");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableRbSchedulerSwitch.isChecked()){
+					log("Disable RB schedule");
+					//Check the account type
+					MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+					if(myAccountInfo!=null ){
+						if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							((ManagerActivityLollipop)context).showRBNotDisabledDialog();
+							enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+							enableRbSchedulerSwitch.setChecked(true);
+							enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+						}
+						else{
+							((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+						}
+					}
+				}
+				else{
+					log("ENABLE RB schedule");
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
+				}
+			}
+			else{
+				if(!enableRbSchedulerCheck.isChecked()){
+					MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+					if(myAccountInfo!=null ){
+						if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+							((ManagerActivityLollipop)context).showRBNotDisabledDialog();
+							enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+							enableRbSchedulerCheck.setChecked(true);
+							enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+						}
+						else{
+							((ManagerActivityLollipop)context).setRBSchedulerValue("0");
+						}
+					}
+				}
+				else{
+					((ManagerActivityLollipop)context).showRbSchedulerValueDialog(true);
+				}
+			}
+		}
+		else if (preference.getKey().compareTo(KEY_DAYS_RB_SCHEDULER) == 0){
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			((ManagerActivityLollipop)context).showRbSchedulerValueDialog(false);
+		}
+		else if (preference.getKey().compareTo(KEY_ENABLE_LAST_GREEN_CHAT) == 0){
+			log("Change KEY_ENABLE_LAST_GREEN_CHAT");
+
+			if (!Util.isOnline(context)){
+				((ManagerActivityLollipop)context).showSnackbar(getString(R.string.error_server_connection_problem));
+				return false;
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableLastGreenChatSwitch.isChecked()){
+					log("Disable last green");
+					((ManagerActivityLollipop)context).enableLastGreen(false);
+				}
+				else{
+					log("Enable last green");
+					((ManagerActivityLollipop)context).enableLastGreen(true);
+				}
+			}
+			else{
+				if(!enableLastGreenChatCheck.isChecked()){
+					log("Disable last green");
+					((ManagerActivityLollipop)context).enableLastGreen(false);
+				}
+				else{
+					log("Enable last green");
+					((ManagerActivityLollipop)context).enableLastGreen(true);
 				}
 			}
 		}
@@ -2252,18 +2483,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 
 			dbH.setCamSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}
@@ -2301,18 +2536,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			localCameraUploadFolder.setSummary(cameraPath);
 			localCameraUploadFolderSDCard.setSummary(cameraPath);
 			dbH.setCamSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
 			
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}
@@ -2323,18 +2562,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
 			dbH.setSecSyncTimeStamp(0);
-			
-			Intent photosVideosIntent = null;
-			photosVideosIntent = new Intent(context, CameraSyncService.class);
-			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-			context.startService(photosVideosIntent);
-			
+
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+			}
+
 			handler.postDelayed(new Runnable() {
 				
 				@Override
 				public void run() {
 					log("Now I start the service");
-					context.startService(new Intent(context, CameraSyncService.class));		
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+						context.startService(new Intent(context, CameraSyncService.class));
+					}
 				}
 			}, 5 * 1000);
 		}		
@@ -2351,18 +2594,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setSecSyncTimeStamp(0);
-				
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent photosVideosIntent = null;
+					photosVideosIntent = new Intent(context, CameraSyncService.class);
+					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+					context.startService(photosVideosIntent);
+				}
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -2386,18 +2633,22 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				
 				megaCameraFolder.setSummary(camSyncMegaPath);
 				dbH.setCamSyncTimeStamp(0);
-				
-				Intent photosVideosIntent = null;
-				photosVideosIntent = new Intent(context, CameraSyncService.class);
-				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
-				context.startService(photosVideosIntent);
+
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+					Intent photosVideosIntent = null;
+					photosVideosIntent = new Intent(context, CameraSyncService.class);
+					photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+					context.startService(photosVideosIntent);
+				}
 				
 				handler.postDelayed(new Runnable() {
 					
 					@Override
 					public void run() {
 						log("Now I start the service");
-						context.startService(new Intent(context, CameraSyncService.class));		
+						if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+							context.startService(new Intent(context, CameraSyncService.class));
+						}
 					}
 				}, 5 * 1000);
 				
@@ -2446,7 +2697,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		if(!Util.isOnline(context)){
 			chatEnabledCategory.setEnabled(false);
-			chatStatusCategory.setEnabled(false);
 			cameraUploadCategory.setEnabled(false);
 		}
 		super.onResume();
@@ -2461,7 +2711,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			twoFACheck.setChecked(enabled);
 		}
 	}
-	
+
+	public void update2FAVisibility(){
+		log("update2FAVisbility");
+		if (megaApi == null){
+			if (context != null){
+				if (((Activity)context).getApplication() != null){
+					megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+				}
+			}
+		}
+
+		if (megaApi != null) {
+			if (megaApi.multiFactorAuthAvailable()) {
+				log("update2FAVisbility true");
+				preferenceScreen.addPreference(twoFACategory);
+				megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
+			} else {
+				log("update2FAVisbility false");
+				preferenceScreen.removePreference(twoFACategory);
+			}
+		}
+	}
+
 	public void afterSetPinLock(){
 		log("afterSetPinLock");
 
@@ -2518,8 +2790,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		if(!cancelled){
 			statusConfig = config;
-			chatStatus = config.getOnlineStatus();
-			log("updatePresenceConfigChat status: "+chatStatus);
 		}
 
 		if(Util.isChatEnabled()){
@@ -2589,6 +2859,71 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 	}
 
+	public void updateRBScheduler(long daysCount){
+		log("updateRBScheduler: "+daysCount);
+
+		if(daysCount<1){
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+				enableRbSchedulerSwitch.setChecked(false);
+				enableRbSchedulerSwitch.setSummary(null);
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+			}
+			else{
+				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+				enableRbSchedulerCheck.setChecked(false);
+                enableRbSchedulerCheck.setSummary(null);
+				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+			}
+
+			//Hide preference to show days
+			fileManagementCategory.removePreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(null);
+		}
+		else{
+			MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+				enableRbSchedulerSwitch.setChecked(true);
+				if(myAccountInfo!=null ){
+
+					String subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle);
+
+					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+						enableRbSchedulerSwitch.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_FREE));
+					}
+					else{
+						enableRbSchedulerSwitch.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_PRO));
+					}
+				}
+
+				enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
+			}
+			else{
+				enableRbSchedulerCheck.setOnPreferenceClickListener(null);
+				enableRbSchedulerCheck.setChecked(true);
+				if(myAccountInfo!=null ){
+					String subtitle = getString(R.string.settings_rb_scheduler_enable_subtitle);
+
+					if(myAccountInfo.getAccountType()== MegaAccountDetails.ACCOUNT_TYPE_FREE){
+						enableRbSchedulerCheck.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_FREE));
+					}
+					else{
+						enableRbSchedulerCheck.setSummary(subtitle+ " "+getString(R.string.settings_rb_scheduler_enable_period_PRO));
+					}
+				}
+
+				enableRbSchedulerCheck.setOnPreferenceClickListener(this);
+			}
+
+			//Show and set preference to show days
+			fileManagementCategory.addPreference(daysRbSchedulerPreference);
+			daysRbSchedulerPreference.setOnPreferenceClickListener(this);
+			daysRbSchedulerPreference.setSummary(getString(R.string.settings_rb_scheduler_select_days_subtitle, daysCount));
+		}
+	}
+
 	public void waitPresenceConfig(){
 		log("waitPresenceConfig: ");
 
@@ -2600,14 +2935,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	}
 
 	public void showPresenceChatConfig(){
-		log("showPresenceChatConfig: "+chatStatus);
+		log("showPresenceChatConfig: "+statusConfig.getOnlineStatus());
 
-		statusChatListPreference.setValue(chatStatus+"");
+		statusChatListPreference.setValue(statusConfig.getOnlineStatus()+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
 
-		if(chatStatus!= MegaChatApi.STATUS_ONLINE){
+		if(statusConfig.getOnlineStatus()!= MegaChatApi.STATUS_ONLINE){
 			preferenceScreen.removePreference(autoawayChatCategory);
-			if(chatStatus== MegaChatApi.STATUS_OFFLINE){
+			if(statusConfig.getOnlineStatus()== MegaChatApi.STATUS_OFFLINE){
 				preferenceScreen.removePreference(persistenceChatCategory);
 			}
 			else{
@@ -2620,7 +2955,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				}
 			}
 		}
-		else if(chatStatus== MegaChatApi.STATUS_ONLINE){
+		else if(statusConfig.getOnlineStatus()== MegaChatApi.STATUS_ONLINE){
 			//I'm online
 			preferenceScreen.addPreference(persistenceChatCategory);
 			if(statusConfig.isPersist()){
@@ -2661,6 +2996,41 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else{
 			hidePreferencesChat();
 		}
+
+		//Show configuration last green
+		if(statusConfig.isLastGreenVisible()){
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(!enableLastGreenChatSwitch.isChecked()){
+					enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
+					enableLastGreenChatSwitch.setChecked(true);
+					enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
+				}
+			}
+			else{
+				if(!enableLastGreenChatCheck.isChecked()){
+					enableLastGreenChatCheck.setOnPreferenceClickListener(null);
+					enableLastGreenChatCheck.setChecked(true);
+					enableLastGreenChatCheck.setOnPreferenceClickListener(this);
+				}
+			}
+		}
+		else{
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if(enableLastGreenChatSwitch.isChecked()){
+					enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
+					enableLastGreenChatSwitch.setChecked(false);
+					enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
+				}
+			}
+			else{
+				if(enableLastGreenChatCheck.isChecked()){
+					enableLastGreenChatCheck.setOnPreferenceClickListener(null);
+					enableLastGreenChatCheck.setChecked(false);
+					enableLastGreenChatCheck.setOnPreferenceClickListener(this);
+				}
+			}
+		}
 	}
 
 
@@ -2682,7 +3052,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("hidePreferencesChat");
 
 		getPreferenceScreen().removePreference(chatNotificationsCategory);
-		getPreferenceScreen().removePreference(chatStatusCategory);
 		getPreferenceScreen().removePreference(autoawayChatCategory);
 		getPreferenceScreen().removePreference(persistenceChatCategory);
 		chatEnabledCategory.removePreference(chatAttachmentsChatListPreference);
@@ -2692,6 +3061,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else{
 			chatEnabledCategory.removePreference(richLinksCheck);
 		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			chatEnabledCategory.removePreference(enableLastGreenChatSwitch);
+		}
+		else{
+			chatEnabledCategory.removePreference(enableLastGreenChatCheck);
+		}
+
+		chatEnabledCategory.removePreference(statusChatListPreference);
 	}
 
 

@@ -31,6 +31,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -40,40 +41,34 @@ import nz.mega.sdk.MegaShare;
 
 public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
-    private Context context;
-    private MegaNode node = null;
-    private NodeController nC;
-
-    private BottomSheetBehavior mBehavior;
-
-    private LinearLayout mainLinearLayout;
-    private ImageView nodeThumb;
-    private TextView nodeName;
-    private TextView nodeInfo;
-    private RelativeLayout nodeIconLayout;
-    private ImageView nodeIcon;
-    private LinearLayout optionDownload;
-    private LinearLayout optionInfo;
-    private TextView optionInfoText;
-    private ImageView optionInfoImage;
-    private LinearLayout optionLeave;
-    private LinearLayout optionCopy;
-    private LinearLayout optionMove;
-    private LinearLayout optionRename;
-    private LinearLayout optionRubbish;
-    private LinearLayout items_layout;
-
-    private DisplayMetrics outMetrics;
-
-    private Bitmap thumb = null;
-
-    private int height = -1;
-    private boolean heightseted = false;
-    private int heightReal = -1;
-    private int heightDisplay;
-
-    private MegaApiAndroid megaApi;
-    private DatabaseHandler dbH;
+    protected Context context;
+    protected MegaNode node = null;
+    protected NodeController nC;
+    protected BottomSheetBehavior mBehavior;
+    protected LinearLayout mainLinearLayout;
+    protected ImageView nodeThumb;
+    protected TextView nodeName;
+    protected TextView nodeInfo;
+    protected RelativeLayout nodeIconLayout;
+    protected ImageView nodeIcon;
+    protected LinearLayout optionDownload;
+    protected LinearLayout optionInfo;
+    protected TextView optionInfoText;
+    protected ImageView optionInfoImage;
+    protected LinearLayout optionLeave;
+    protected LinearLayout optionCopy;
+    protected LinearLayout optionMove;
+    protected LinearLayout optionRename;
+    protected LinearLayout optionRubbish;
+    protected LinearLayout items_layout;
+    protected DisplayMetrics outMetrics;
+    protected Bitmap thumb = null;
+    protected int height = -1;
+    protected boolean heightseted = false;
+    protected int heightReal = -1;
+    protected int heightDisplay;
+    protected MegaApiAndroid megaApi;
+    protected DatabaseHandler dbH;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -148,6 +143,11 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         optionRename.setOnClickListener(this);
         optionLeave.setOnClickListener(this);
         optionRubbish.setOnClickListener(this);
+
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+        LinearLayout separatorDownload = (LinearLayout) contentView.findViewById(R.id.separator_download);
+        LinearLayout separatorLeave = (LinearLayout) contentView.findViewById(R.id.separator_leave);
+        LinearLayout separatorModify = (LinearLayout) contentView.findViewById(R.id.separator_modify);
 
         nodeName.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(Util.scaleWidthPx(200, outMetrics));
@@ -258,6 +258,39 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 }
             }
 
+            if (optionInfo.getVisibility() == View.GONE || (optionDownload.getVisibility() == View.GONE && optionLeave.getVisibility() == View.GONE
+                    && optionCopy.getVisibility() == View.GONE &&  optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE
+                    && optionRubbish.getVisibility() == View.GONE)){
+                separatorInfo.setVisibility(View.GONE);
+            }
+            else {
+                separatorInfo.setVisibility(View.VISIBLE);
+            }
+
+            if (optionDownload.getVisibility() == View.GONE || (optionLeave.getVisibility() == View.GONE && optionCopy.getVisibility() == View.GONE
+                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)){
+                separatorDownload.setVisibility(View.GONE);
+            }
+            else {
+                separatorDownload.setVisibility(View.VISIBLE);
+            }
+
+            if (optionLeave.getVisibility() == View.GONE || (optionCopy.getVisibility() == View.GONE
+                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE && optionRubbish.getVisibility() == View.GONE)) {
+                separatorLeave.setVisibility(View.GONE);
+            }
+            else {
+                separatorLeave.setVisibility(View.VISIBLE);
+            }
+
+            if ((optionCopy.getVisibility() == View.GONE
+                    && optionMove.getVisibility() == View.GONE && optionRename.getVisibility() == View.GONE) || optionRubbish.getVisibility() == View.GONE) {
+                separatorModify.setVisibility(View.GONE);
+            }
+            else {
+                separatorModify.setVisibility(View.VISIBLE);
+            }
+
             dialog.setContentView(contentView);
             mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
 //            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -348,7 +381,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
                 }
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra("handle", node.getHandle());
-                i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+                i.putExtra("from", Constants.FROM_INCOMING_SHARES);
                 boolean firstLevel = ((ContactFileListActivityLollipop) context).isEmptyParentHandleStack();
                 log("onClick File Info: First LEVEL is: "+firstLevel);
                 i.putExtra("firstLevel", firstLevel);
@@ -461,7 +494,7 @@ public class ContactFileListBottomSheetDialogFragment extends BottomSheetDialogF
         int getHeightToPanel(BottomSheetDialogFragment dialog);
     }
 
-    private static void log(String log) {
+    protected static void log(String log) {
         Util.log("ContactFileListBottomSheetDialogFragment", log);
     }
 }

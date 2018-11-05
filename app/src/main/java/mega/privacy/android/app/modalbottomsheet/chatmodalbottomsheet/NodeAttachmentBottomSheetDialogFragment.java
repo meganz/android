@@ -160,6 +160,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
         optionRemove = (LinearLayout) contentView.findViewById(R.id.option_remove_layout);
         optionForwardLayout = (LinearLayout) contentView.findViewById(R.id.option_forward_layout);
 
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+        LinearLayout separatorRemove = (LinearLayout) contentView.findViewById(R.id.separator_remove);
+
         if(message.getMessage()==null){
             return;
         }
@@ -317,6 +320,20 @@ public class NodeAttachmentBottomSheetDialogFragment extends BottomSheetDialogFr
                     nodeInfo.setText(Util.getSizeString(nodeSize));
 
                     optionView.setVisibility(View.GONE);
+                }
+
+                if (optionView.getVisibility() == View.GONE) {
+                    separatorInfo.setVisibility(View.GONE);
+                }
+                else {
+                    separatorInfo.setVisibility(View.VISIBLE);
+                }
+                if ((optionDownload.getVisibility() == View.GONE && optionImport.getVisibility() == View.GONE && optionForwardLayout.getVisibility() == View.GONE && optionSaveOffline.getVisibility() == View.GONE)
+                        || optionRemove.getVisibility() == View.GONE) {
+                    separatorRemove.setVisibility(View.GONE);
+                }
+                else {
+                    separatorRemove.setVisibility(View.VISIBLE);
                 }
 
                 dialog.setContentView(contentView);

@@ -28,8 +28,10 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 	public int columnWidth = -1;
 	private boolean isWrapContent = false;
 	private int widthTotal = 0;
-
-	public CustomizedGridRecyclerView(Context context) {
+	
+	private int columnCount = 2;
+    
+    public CustomizedGridRecyclerView(Context context) {
 		super(context);
 		init(context, null);
 	}
@@ -43,6 +45,10 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 		super(context, attrs, defStyle);
 		init(context, attrs);
 	}
+	
+	public void setColumnCount(int count) {
+        this.columnCount = count;
+    }
 
 	private void init(Context context, AttributeSet attrs) {
 		if (attrs != null) {
@@ -66,7 +72,7 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 				int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
 				manager.setSpanCount(spanCount);
 				if(spanCount == 1){
-					manager.setSpanCount(2);
+					manager.setSpanCount(columnCount);
 				}else{
 					manager.setSpanCount(spanCount);
 				}
@@ -78,7 +84,7 @@ public class CustomizedGridRecyclerView extends RecyclerView {
 				int spanCount = Math.max(1, getMeasuredWidth() / columnWidth);
 				manager.setSpanCount(spanCount);
 				if(spanCount == 1){
-					manager.setSpanCount(2);
+					manager.setSpanCount(columnCount);
 				}else{
 					manager.setSpanCount(spanCount);
 				}
