@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
