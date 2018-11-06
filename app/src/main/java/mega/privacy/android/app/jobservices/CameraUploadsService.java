@@ -543,13 +543,17 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             File file = new File(media.filePath);
             String localFingerPrint = megaApi.getFingerprint(media.filePath);
 
-            MegaNode nodeExists;
-            MegaNodeList nodeExist2;
+            MegaNode nodeExists = null;
+            MegaNodeList possibleNodeList;
             //Source file
             File sourceFile = new File(media.filePath);
 
-            nodeExists = megaApi.getNodeByFingerprint(localFingerPrint,uploadNode);
-            nodeExist2 = megaApi.getNodesByOriginalFingerprint(localFingerPrint);
+            //nodeExists = megaApi.getNodeByFingerprint(localFingerPrint,uploadNode);
+            possibleNodeList = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
+            if(possibleNodeList != null && possibleNodeList.size() > 0){
+                nodeExists = possibleNodeList.get(0);
+            }
+            
             if (nodeExists == null) {
                 log("if(nodeExists == null)");
                 //Check if the file is already uploaded in the correct folder but without a fingerprint
@@ -1329,8 +1333,8 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                 log("Image Sync OK: " + transfer.getFileName());
                 log("IMAGESYNCFILE: " + path);
                 MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                String orginalFingerprint = dbH.findSyncRecordByNewPath(path).getOriginFingerprint();
-                megaApi.setOriginalFingerprint(node, orginalFingerprint, this);
+                String originalFingerprint = dbH.findSyncRecordByNewPath(path).getOriginFingerprint();
+                megaApi.setOriginalFingerprint(node, originalFingerprint, this);
                 dbH.deleteSyncRecordByPath(path);
                 File file = new File(path);
                 if (file.exists() && Util.isVideoFile(path)) {
