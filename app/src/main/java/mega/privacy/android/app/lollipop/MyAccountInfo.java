@@ -19,7 +19,8 @@ import nz.mega.sdk.MegaPricing;
 
 public class MyAccountInfo {
 
-    int usedPerc = 0;
+    int usedPerc = -1;
+    long usedStorage = -1;
     int accountType = -1;
     MegaAccountDetails accountInfo = null;
     BitSet paymentBitSet = null;
@@ -92,11 +93,10 @@ public class MyAccountInfo {
         }
 
         long totalStorage = accountInfo.getStorageMax();
-        long usedStorage = 0;
-        long usedCloudDrive = 0;
-        long usedInbox = 0;
-        long usedRubbish = 0;
-        long usedIncoming = 0;
+        long usedCloudDrive = -1;
+        long usedInbox = -1;
+        long usedRubbish = -1;
+        long usedIncoming = -1;
         boolean totalGb = false;
 
         //Check size of the different nodes
@@ -132,22 +132,38 @@ public class MyAccountInfo {
 
         totalFormatted = Util.getSizeString(totalStorage);
 
-        usedStorage = usedCloudDrive+usedInbox+usedIncoming+usedRubbish;
-        usedFormatted=Util.getSizeString(usedStorage);
-
-        usedPerc = 0;
-        if (totalStorage != 0){
-            usedPerc = (int)((100 * usedStorage) / totalStorage);
+        if (usedCloudDrive == -1 && usedInbox == -1 && usedIncoming == -1 && usedRubbish == -1) {
+            usedStorage = -1;
         }
+        else {
+            if (usedCloudDrive == -1) {
+                usedCloudDrive = 0;
+            }
+            if (usedInbox == -1) {
+                usedInbox = 0;
+            }
+            if (usedIncoming == -1) {
+                usedIncoming = 0;
+            }
+            if (usedRubbish == -1) {
+                usedRubbish = 0;
+            }
+            usedStorage = usedCloudDrive + usedInbox + usedIncoming + usedRubbish;
+            usedFormatted=Util.getSizeString(usedStorage);
 
-        long availableSpace = totalStorage - usedStorage;
-        if (availableSpace < 0) {
-            formattedAvailableSpace = Util.getSizeString(0);
-        }
-        else{
-            formattedAvailableSpace = Util.getSizeString(availableSpace);
-        }
+            usedPerc = 0;
+            if (totalStorage != 0){
+                usedPerc = (int)((100 * usedStorage) / totalStorage);
+            }
 
+            long availableSpace = totalStorage - usedStorage;
+            if (availableSpace < 0) {
+                formattedAvailableSpace = Util.getSizeString(0);
+            }
+            else{
+                formattedAvailableSpace = Util.getSizeString(availableSpace);
+            }
+        }
 
 //        totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 //        totalFormatted="";
@@ -572,4 +588,9 @@ public class MyAccountInfo {
     public void setPricing(MegaPricing pricing) {
         this.pricing = pricing;
     }
+
+    public long getUsedStorage() {
+        return usedStorage;
+    }
+
 }

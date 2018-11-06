@@ -2206,6 +2206,8 @@
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
 
+    <string name="error_autoaway" context="Label shown when it types a wrong value setting the auto-away">Error. The value typed should be mayour than 0</string>
+
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
 
