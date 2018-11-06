@@ -737,13 +737,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
     
-    public boolean shouldAddToDb(SyncRecord record) {
+    public boolean recordExists(SyncRecord record) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FP_ORI + " ='" + encrypt(record.getOriginFingerprint()) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(record.isSecondary())) + "' AND "
                 + KEY_SYNC_COPYONLY + " = '" + encrypt(String.valueOf(false)) + "'";
         try (Cursor cursor = db.rawQuery(selectQuery,null)) {
-            return cursor != null && cursor.getCount() == 1;
+            return cursor != null && cursor.getCount() > 0;
         }
     }
 

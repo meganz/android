@@ -57,6 +57,7 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
@@ -444,7 +445,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void saveDataToDB(ArrayList<SyncRecord> list) {
         for (SyncRecord file : list) {
-            if(dbH.shouldAddToDb(file)) {
+            if(dbH.recordExists(file)) {
                 continue;
             }
             boolean isSec = file.isSecondary();
@@ -543,10 +544,12 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             String localFingerPrint = megaApi.getFingerprint(media.filePath);
 
             MegaNode nodeExists;
+            MegaNodeList nodeExist2;
             //Source file
             File sourceFile = new File(media.filePath);
 
             nodeExists = megaApi.getNodeByFingerprint(localFingerPrint,uploadNode);
+            nodeExist2 = megaApi.getNodesByOriginalFingerprint(localFingerPrint);
             if (nodeExists == null) {
                 log("if(nodeExists == null)");
                 //Check if the file is already uploaded in the correct folder but without a fingerprint
@@ -1204,6 +1207,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     @Override
     public void onRequestFinish(MegaApiJava api,MegaRequest request,MegaError e) {
         log("onRequestFinish: " + request.getRequestString());
+        boolean t = e.getErrorCode() == MegaError.API_OK;
         requestFinished(api,request,e);
 
     }
@@ -1324,7 +1328,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             if (e.getErrorCode() == MegaError.API_OK) {
                 log("Image Sync OK: " + transfer.getFileName());
                 log("IMAGESYNCFILE: " + path);
-
+                MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+                String orginalFingerprint = dbH.findSyncRecordByNewPath(path).getOriginFingerprint();
+                megaApi.setOriginalFingerprint(node, orginalFingerprint, this);
                 dbH.deleteSyncRecordByPath(path);
                 File file = new File(path);
                 if (file.exists() && Util.isVideoFile(path)) {
@@ -1336,7 +1342,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 //                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
 //                    megaApi.createPreview(path,preview.getAbsolutePath());
 
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if (node != null) {
                         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                         retriever.setDataSource(path);
@@ -1390,7 +1395,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 //                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
 //                    megaApi.createPreview(path,preview.getAbsolutePath());
 
-                    MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
                     if (node != null) {
                         try {
                             final ExifInterface exifInterface = new ExifInterface(path);
