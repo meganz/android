@@ -94,7 +94,6 @@
 									rounded:border_color="@color/border_file_properties"
 									rounded:border_width="0dp"
 									rounded:corner_radius="30dp" />
-
 						</RelativeLayout>
 					</RelativeLayout>
 				</LinearLayout>

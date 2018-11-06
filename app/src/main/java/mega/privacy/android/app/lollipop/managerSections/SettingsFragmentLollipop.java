@@ -1265,20 +1265,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void goToCategoryStorage(){
 		log("goToCategoryStorage");
-		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
-			String key = getPreferenceScreen().getPreference(i).getKey();
-			if (key.equals(storageCategory.getKey())){
+		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
+			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(storageCategory)){
 				((ManagerActivityLollipop) context).openSettingsStorage = false;
-				if (listView != null){
+				if (listView != null) {
 					listView.clearFocus();
 					final int finalI = i;
 					listView.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-//						listView.requestFocusFromTouch();
-
-							listView.setSelection(finalI + 8);
-//						listView.requestFocus();
+							listView.setSelection(finalI);
+							listView.smoothScrollToPositionFromTop(finalI, 0);
 						}
 					}, 200);
 				}
@@ -1289,9 +1286,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void goToCategoryQR(){
 		log("goToCategoryQR");
-		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
-			String key = getPreferenceScreen().getPreference(i).getKey();
-			if (key.equals(qrCodeCategory.getKey())){
+		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
+			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(qrCodeCategory)){
 				((ManagerActivityLollipop) context).openSettingsQR = false;
 				if (listView != null) {
 					listView.clearFocus();
@@ -1299,7 +1295,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					listView.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							listView.setSelection(finalI+13);
+							listView.setSelection(finalI);
+							listView.smoothScrollToPositionFromTop(finalI, 0);
 						}
 					}, 200);
 				}
