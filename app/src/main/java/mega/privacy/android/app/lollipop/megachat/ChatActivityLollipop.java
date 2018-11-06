@@ -2616,22 +2616,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void showAlertChatLink(boolean isInvalidPreview){
         log("showAlertChatLink");
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        closeChat();
-                        finish();
-                }
-            }
-        };
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String message="";
         if(isInvalidPreview){
             message= getResources().getString(R.string.alert_invalid_preview);
-            builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, dialogClickListener);
+            builder.setMessage(message).setPositiveButton(R.string.cam_sync_ok, null);
         }
         else{
             message= getResources().getString(R.string.alert_already_participant_chat_link);
