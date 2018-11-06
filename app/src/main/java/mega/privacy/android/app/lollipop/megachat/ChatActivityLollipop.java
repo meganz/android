@@ -706,7 +706,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null) {
-
                     if (s.length() > 0) {
                         String temp = s.toString();
                         if(temp.trim().length()>0){
@@ -813,6 +812,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                textChat.setInput(false);
+
                 //Hide fileStorageLayout
                 if(fileStorageLayout.isShown()){
                     if(fileStorageF != null){
