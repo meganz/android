@@ -102,7 +102,6 @@ public class EmojiKeyboard extends LinearLayout {
         emojiView.setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener() {
             @Override
             public void onEmojiBackspaceClick(final View v) {
-                log("onEmojiBackspaceClick()");
                 editInterface.backspace();
                 if (onEmojiBackspaceClickListener != null) {
                     onEmojiBackspaceClickListener.onEmojiBackspaceClick(v);
@@ -129,11 +128,9 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void setOnEmojiClickListener(OnEmojiClickListener onEmojiClickListener) {
-        log("setOnEmojiClickListener()");
         this.onEmojiClickListener = onEmojiClickListener;
     }
     public void setOnEmojiBackspaceClickListener(OnEmojiBackspaceClickListener onEmojiBackspaceClickListener) {
-        log("setOnEmojiBackspaceClickListener()");
         this.onEmojiBackspaceClickListener = onEmojiBackspaceClickListener;
     }
 
@@ -192,6 +189,11 @@ public class EmojiKeyboard extends LinearLayout {
             setVisibility(VISIBLE);
             isEmojiKeyboardShown = true;
             emojiIcon.setImageResource(R.drawable.ic_keyboard_white);
+            if (editInterface instanceof View){
+                final View view = (View) editInterface;
+                view.setFocusableInTouchMode(true);
+                view.requestFocus();
+            }
         }
     }
 
@@ -219,6 +221,10 @@ public class EmojiKeyboard extends LinearLayout {
             variantEmoji.persist();
             setVisibility(GONE);
             isEmojiKeyboardShown = false;
+            if (editInterface instanceof View) {
+                final View view = (View) editInterface;
+                view.clearFocus();
+            }
         }
     }
 
