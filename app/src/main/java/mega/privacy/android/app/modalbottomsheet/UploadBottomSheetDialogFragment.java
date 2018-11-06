@@ -1,12 +1,17 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
@@ -33,6 +38,9 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
     public TextView title;
     public LinearLayout optionFromDevice;
     public LinearLayout optionFromSystem;
+    public LinearLayout optionScanDocument;
+    public LinearLayout optionTakePicture;
+    public LinearLayout optionCreateFolder;
 
     DisplayMetrics outMetrics;
     private int heightDisplay;
@@ -64,11 +72,17 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
 
         optionFromDevice = (LinearLayout) contentView.findViewById(R.id.upload_from_device_layout);
         optionFromSystem = (LinearLayout) contentView.findViewById(R.id.upload_from_system_layout);
+        optionScanDocument = (LinearLayout) contentView.findViewById(R.id.scan_document_layout);
+        optionTakePicture = (LinearLayout) contentView.findViewById(R.id.take_picture_layout);
+        optionCreateFolder = (LinearLayout) contentView.findViewById(R.id.new_folder_layout);
 
         title = (TextView) contentView.findViewById(R.id.contact_list_contact_name_text);
 
         optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);
+        optionScanDocument.setOnClickListener(this);
+        optionTakePicture.setOnClickListener(this);
+        optionCreateFolder.setOnClickListener(this);
 
         dialog.setContentView(contentView);
         mBehavior = BottomSheetBehavior.from((View) mainLinearLayout.getParent());
@@ -123,6 +137,39 @@ public class UploadBottomSheetDialogFragment extends BottomSheetDialogFragment i
                 else if(context instanceof ContactFileListActivityLollipop){
                     ((ContactFileListActivityLollipop)context).startActivityForResult(intent, Constants.REQUEST_CODE_GET_LOCAL);
                 }
+                break;
+            }
+            case R.id.scan_document_layout:{
+                break;
+            }
+            case R.id.take_picture_layout:{
+                ((ManagerActivityLollipop) context).fromTakePicture = Constants.TAKE_PICTURE_OPTION;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasStoragePermission) {
+                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                Constants.REQUEST_WRITE_STORAGE);
+                    }
+
+                    boolean hasCameraPermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+                    if (!hasCameraPermission) {
+                        ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
+                                new String[]{Manifest.permission.CAMERA},
+                                Constants.REQUEST_CAMERA);
+                    }
+
+                    if (hasStoragePermission && hasCameraPermission){
+                        ((ManagerActivityLollipop) context).takePicture();
+                    }
+                }
+                else{
+                    ((ManagerActivityLollipop) context).takePicture();
+                }
+                break;
+            }
+            case R.id.new_folder_layout:{
+                ((ManagerActivityLollipop) context).showNewFolderDialog();
                 break;
             }
         }

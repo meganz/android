@@ -10,6 +10,8 @@ public class MegaChatParticipant {
     private int privilege;
     private boolean isContact;
 
+    private String lastGreen;
+
     public MegaChatParticipant(long handle, String firstName, String lastName, String fullName, String email, int privilege) {
         this.fullName = fullName;
         this.firstName = firstName;
@@ -17,6 +19,7 @@ public class MegaChatParticipant {
         this.handle = handle;
         this.email = email;
         this.privilege = privilege;
+        lastGreen = "";
     }
 
     public MegaChatParticipant(long handle) {
@@ -78,4 +81,13 @@ public class MegaChatParticipant {
     public void setContact(boolean contact) {
         isContact = contact;
     }
+
+    public String getLastGreen() {
+        return lastGreen;
+    }
+
+    public void setLastGreen(String lastGreen) {
+        this.lastGreen = lastGreen;
+    }
+
 }

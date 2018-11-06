@@ -15,7 +15,7 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextAppearance="@style/ToolbarTitle"
+        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".lollipop.TwoFactorAuthenticationActivity" />
 
