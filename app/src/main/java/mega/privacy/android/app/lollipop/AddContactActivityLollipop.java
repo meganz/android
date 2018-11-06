@@ -1024,7 +1024,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             return false;
         } else {
             log("isValid");
-            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+            return Constants.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
 
