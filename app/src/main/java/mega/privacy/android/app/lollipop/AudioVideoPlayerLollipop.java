@@ -173,6 +173,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     static AudioVideoPlayerLollipop audioVideoPlayerLollipop;
 
     private MegaApiAndroid megaApi;
+    MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
     MegaPreferences prefs = null;
@@ -538,14 +539,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         if (!isOffline && !isZip){
             MegaApplication app = (MegaApplication)getApplication();
-            if (isFolderLink){
-                log("isFolderLink");
-                megaApi = app.getMegaApiFolder();
-            }
-            else{
-                log("NOT isFolderLink");
-                megaApi = app.getMegaApi();
-            }
+            megaApi = app.getMegaApi();
 
             log("Add transfer listener");
             megaApi.addTransferListener(this);
@@ -625,15 +619,35 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
                 if (savedInstanceState != null && uri.toString().contains("http://")){
                     MegaNode node = null;
-                    if (fromChat) {
-                        node = nodeChat;
+
+                    if (isFolderLink){
+                        log("isFolderLink");
+                        megaApiFolder = app.getMegaApiFolder();
+
+                        log("Folder link node");
+                        MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(handle));
+                        if (currentDocumentAuth == null){
+                            log("CurrentDocumentAuth is null");
+                            showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                        }
+                        else{
+                            log("CurrentDocumentAuth is not null");
+                            node = currentDocumentAuth;
+                        }
                     }
-                    else if (adapterType == Constants.FILE_LINK_ADAPTER){
-                        node = currentDocument;
+                    else{
+                        log("NOT isFolderLink");
+                        if (fromChat) {
+                            node = nodeChat;
+                        }
+                        else if (adapterType == Constants.FILE_LINK_ADAPTER){
+                            node = currentDocument;
+                        }
+                        else {
+                            node = megaApi.getNodeByHandle(handle);
+                        }
                     }
-                    else {
-                        node = megaApi.getNodeByHandle(handle);
-                    }
+
                     if (node != null){
                         uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
                     }
@@ -641,15 +655,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         showSnackbar(getString(R.string.error_streaming));
                     }
                 }
-            }
 
-            log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
-            if(megaApi.getBandwidthOverquotaDelay()>0){
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else if (!(alertDialogTransferOverquota.isShowing())) {
-                    showTransferOverquotaDialog();
+                log("Overquota delay: "+megaApi.getBandwidthOverquotaDelay());
+                if(megaApi.getBandwidthOverquotaDelay()>0){
+                    if(alertDialogTransferOverquota==null){
+                        showTransferOverquotaDialog();
+                    }
+                    else if (!(alertDialogTransferOverquota.isShowing())) {
+                        showTransferOverquotaDialog();
+                    }
                 }
             }
         }
