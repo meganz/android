@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -81,11 +82,16 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -95,7 +101,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 
-public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface{
+public class AddContactActivityLollipop extends PinActivityLollipop implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface {
 
     public static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String BROADCAST_ACTION_INTENT_FILTER_INVITE_CONTACT = "INTENT_FILTER_INVITE_CONTACT";
@@ -105,7 +111,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
     DatabaseHandler dbH = null;
-    int contactType = 0;
+    public int contactType = 0;
     int multipleSelectIntent;
     long nodeHandle = -1;
     long[] nodeHandles;
@@ -1398,14 +1404,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         addContactActivityLollipop = this;
 
-        log("retryPendingConnections()");
-        if (megaApi != null){
-            log("---------retryPendingConnections");
-            megaApi.retryPendingConnections();
-        }
-
         if (megaChatApi != null){
-            megaChatApi.retryPendingConnections(false, null);
+            megaChatApi.addChatListener(this);
         }
 
         dbH = DatabaseHandler.getDbHandler(this);
@@ -2213,7 +2213,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                             MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                             visibleContactsMEGA.add(megaContactAdapter);
-
                         }
                     }
                 }
@@ -2277,7 +2276,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                     MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                     visibleContactsMEGA.add(megaContactAdapter);
-
                 }
             }
         }
@@ -2295,8 +2293,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         });
 
+        long handle;
         for (int i= 0; i<visibleContactsMEGA.size(); i++){
             filteredContactMEGA.add(visibleContactsMEGA.get(i));
+            if (contactType == Constants.CONTACT_TYPE_MEGA) {
+                //Ask for presence info and last green
+                handle = getMegaContactHandle(visibleContactsMEGA.get(i));
+                if (handle != -1) {
+                    int userStatus = megaChatApi.getUserOnlineStatus(handle);
+                    if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+                        log("Request last green for user");
+                        megaChatApi.requestLastGreen(handle, null);
+                    }
+                }
+            }
         }
     }
 
@@ -2706,6 +2716,19 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
         return mail;
+    }
+
+    public long getMegaContactHandle (MegaContactAdapter contact) {
+        long handle = -1;
+        if (contact != null) {
+            if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
+                handle = contact.getMegaUser().getHandle();
+            }
+            else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
+                handle = Long.parseLong(contact.getMegaContactDB().getHandle());
+            }
+        }
+        return handle;
     }
 
     @Override
@@ -3169,6 +3192,126 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 
+    }
+
+
+    @Override
+    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+    }
+
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+
+    }
+
+    @Override
+    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+    }
+
+    @Override
+    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+    }
+
+    @Override
+    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+    }
+
+    @Override
+    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+        log("onChatPresenceLastGreen");
+        int state = megaChatApi.getUserOnlineStatus(userhandle);
+        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
+            String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+            if(userhandle != megaChatApi.getMyUserHandle()){
+                log("Status last green for the user: "+userhandle);
+//                Replace on visible MEGA contacts (all my visible contacts)
+                ListIterator<MegaContactAdapter> itrReplace = visibleContactsMEGA.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaContactAdapter contactToUpdate = itrReplace.next();
+                    if (contactToUpdate != null) {
+                        if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                            contactToUpdate.setLastGreen(formattedDate);
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+//                Replace on list adapter (filtered or search filtered MEGA contacts)
+                int indexToReplace = -1;
+                if(adapterMEGA!=null && adapterMEGA.getContacts() != null){
+                    ListIterator<MegaContactAdapter> itrReplace2 = adapterMEGA.getContacts().listIterator();
+                    while (itrReplace2.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace2.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                indexToReplace = itrReplace2.nextIndex() -1;
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    if (indexToReplace != -1) {
+                        adapterMEGA.updateContactStatus(indexToReplace);
+                    }
+                }
+//                Replace on filtered MEGA contacts (without search)
+                if (filteredContactMEGA != null && filteredContactMEGA.size() > 0) {
+                    ListIterator<MegaContactAdapter> itrReplace3 = filteredContactMEGA.listIterator();
+                    while (itrReplace3.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace3.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+//                Replace, if exist, on search filtered MEGA contacts
+                if (queryContactMEGA != null && queryContactMEGA.size() > 0) {
+                    ListIterator<MegaContactAdapter> itrReplace4 = queryContactMEGA.listIterator();
+                    while (itrReplace4.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace4.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+//                Replace, if exist, on added adapter and added MEGA contacts
+                if (addedContactsMEGA != null && addedContactsMEGA.size() > 0) {
+                    ListIterator<MegaContactAdapter> itrReplace5 = addedContactsMEGA.listIterator();
+                    while (itrReplace5.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace5.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    if (adapterMEGAContacts != null) {
+                        adapterMEGAContacts.setContacts(addedContactsMEGA);
+                    }
+                }
+            }
+            log("Date last green: "+formattedDate);
+        }
     }
 
     public static void log(String message) {
