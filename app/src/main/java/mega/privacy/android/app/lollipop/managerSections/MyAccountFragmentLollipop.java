@@ -828,6 +828,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		String color = megaApi.getUserAvatarColor(megaApi.getMyUser());
 
 		myAccountImage.setImageBitmap(Util.createDefaultAvatar(color, myAccountInfo.getFirstLetter()));
+
 	}
 
 	public void setProfileAvatar(File avatar, boolean retry){
