@@ -7000,6 +7000,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								thumbViewMenuItem.setVisible(false);
 							}
 						}
+						else {
+                            selectMenuItem.setVisible(false);
+                            thumbViewMenuItem.setVisible(false);
+                        }
 					}
 				}
 			}
@@ -8198,6 +8202,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectDrawerItemLollipop(drawerItem);
 	    			}
 	        	}
+	        	supportInvalidateOptionsMenu();
 
 	        	return true;
 	        }

@@ -363,7 +363,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         @Override
         protected Void doInBackground(Void... voids) {
             if (searchExpand) {
-                inputString = searchAutoComplete.getText().toString();
+                if (searchAutoComplete != null) {
+                    inputString = searchAutoComplete.getText().toString();
+                }
             }
             else {
                 inputString = typeContactEditText.getText().toString();
@@ -1284,8 +1286,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         outState.putBoolean("fromAchievements", fromAchievements);
         outState.putStringArrayList("mailsFromAchievements", mailsFromAchievements);
         outState.putBoolean("searchExpand", searchExpand);
-        if (searchExpand) {
-            outState.putString("inputString", searchAutoComplete.getText().toString());
+        if (searchExpand ) {
+            if (searchAutoComplete != null) {
+                outState.putString("inputString", searchAutoComplete.getText().toString());
+            }
         }
         else {
             outState.putString("inputString", typeContactEditText.getText().toString());
@@ -2052,7 +2056,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         int index = filteredContactMEGA.indexOf(contact);
         if (searchExpand) {
-            inputString = searchAutoComplete.getText().toString();
+            if (searchAutoComplete !=  null) {
+                inputString = searchAutoComplete.getText().toString();
+            }
         }
         else {
             inputString = typeContactEditText.getText().toString();
@@ -2114,7 +2120,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         log("Size filteredContactsPhone: " +filteredContactsPhone.size());
 
         if (searchExpand) {
-            inputString = searchAutoComplete.getText().toString();
+            if (searchAutoComplete != null) {
+                inputString = searchAutoComplete.getText().toString();
+            }
         }
         else {
             inputString = typeContactEditText.getText().toString();
@@ -2545,7 +2553,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if (createNewGroup || comesFromChat) {
                 if (adapter == MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT) {
                     if (searchExpand) {
-                        inputString = searchAutoComplete.getText().toString();
+                        if (searchAutoComplete != null) {
+                            inputString = searchAutoComplete.getText().toString();
+                        }
                     }
                     else {
                         inputString = typeContactEditText.getText().toString();
@@ -2642,7 +2652,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     public void itemClick(View view, int position) {
         log("on item click");
         if (searchExpand) {
-            inputString = searchAutoComplete.getText().toString();
+            if (searchAutoComplete !=  null) {
+                inputString = searchAutoComplete.getText().toString();
+            }
         }
         else {
             inputString = typeContactEditText.getText().toString();
