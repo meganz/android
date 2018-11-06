@@ -16,7 +16,7 @@
 		android:background="@color/camera_uploads_list_view"
 		app:titleTextColor="@color/mail_my_account"
 		app:subtitleTextColor="@color/mail_my_account"
-		app:titleTextAppearance="@style/ToolbarTitle"
+		app:titleTextAppearance="@style/ToolbarTitle.Secondary"
 		app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
 		app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 		android:elevation="4dp"/>
@@ -181,6 +181,7 @@
 					android:layout_centerHorizontal="true"/>
 
 			</RelativeLayout>
+
 
 		</LinearLayout>
 

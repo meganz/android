@@ -53,7 +53,7 @@
     <item
         android:id="@+id/full_video_viewer_download"
         android:orderInCategory="100"
-        android:title="@string/general_download"
+        android:title="@string/general_save_to_device"
         android:icon="@drawable/ic_download_white"
         MEGA:showAsAction="always"
         android:visible="true"/>
@@ -113,7 +113,7 @@
         android:id="@+id/chat_full_video_viewer_save_for_offline"
         android:orderInCategory="110"
         android:title="@string/save_for_offline"
-        MEGA:showAsAction="never"
+        MEGA:showAsAction="always"
         android:visible="true"/>
 
     <item
