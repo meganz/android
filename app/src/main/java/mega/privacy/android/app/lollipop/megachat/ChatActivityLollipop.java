@@ -1289,7 +1289,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(chatRoom.isPreview()){
                     log("setChatSubtitle:isPreview");
-                    aB.setSubtitle(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
                     tB.setOnClickListener(this);
 
                     setBottomLayout(SHOW_JOIN_LAYOUT);
