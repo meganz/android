@@ -34,7 +34,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -104,8 +103,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
 
-	TextView contentText;
-	RelativeLayout contentTextLayout;
 	private ActionMode actionMode;
 	DatabaseHandler dbH = null;
 
@@ -642,7 +639,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					break;
 				}
 				case R.id.cab_menu_select_all:{
-					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+					((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 					selectAll();
 					actionMode.invalidate();
 					break;
@@ -662,6 +659,8 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
 			((ManagerActivityLollipop)context).hideFabButton();
+			MenuItem startChatItem = menu.findItem(R.id.cab_menu_start_conversation);
+			startChatItem.setIcon(Util.mutateIconSecondary(context, R.drawable.ic_chat, R.color.white));
 			return true;
 		}
 
@@ -727,7 +726,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			adapter.setMultipleSelect(false);
 		}
 
-		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_TRANSPARENT_BLACK);
+		((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -822,6 +821,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 		}
 	}
+
+	public void checkScroll () {
+		if (recyclerView != null) {
+			if (recyclerView.canScrollVertically(-1)) {
+				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+			}
+			else {
+				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+			}
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -889,12 +899,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);
 		    recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_list_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_list_empty_text_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_list_content_text_layout);
-			contentText = (TextView) v.findViewById(R.id.contact_list_content_text);
 
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -903,22 +918,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				adapter.setContacts(visibleContacts);
 				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
-
-			if (visibleContacts.size() > 0) {
-				contentTextLayout.setVisibility(View.VISIBLE);
-
-				contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
-			}else if(visibleContacts.size() == 0){
-				contentTextLayout.setVisibility(View.GONE);
-			}
-
 		
 			adapter.setPositionClicked(-1);
 			recyclerView.setAdapter(adapter);
 						
 			if (adapter.getItemCount() == 0){
                 recyclerView.setVisibility(View.GONE);
-                contentTextLayout.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
@@ -946,7 +951,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -980,13 +984,17 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			});
 
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+				@Override
+				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+					super.onScrolled(recyclerView, dx, dy);
+					checkScroll();
+				}
+			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (LinearLayout) v.findViewById(R.id.contact_grid_empty_text);
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.contact_grid_empty_text_first);
-			contentTextLayout = (RelativeLayout) v.findViewById(R.id.contact_content_grid_text_layout);
-
-			contentText = (TextView) v.findViewById(R.id.contact_content_text_grid);
 
 			if (adapter == null){
 				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -996,14 +1004,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 
-			if (visibleContacts.size() > 0) {
-				contentTextLayout.setVisibility(View.VISIBLE);
-
-				contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
-			}else if(visibleContacts.size() == 0){
-				contentTextLayout.setVisibility(View.GONE);
-			}
-
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 			recyclerView.setAdapter(adapter);
@@ -1011,7 +1011,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			if (adapter.getItemCount() == 0){
 
                 recyclerView.setVisibility(View.GONE);
-                contentTextLayout.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextView.setVisibility(View.VISIBLE);
 
@@ -1038,7 +1037,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 			}else{
 				recyclerView.setVisibility(View.VISIBLE);
-				contentTextLayout.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
@@ -1084,14 +1082,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		sortBy();
 		
 		adapter.setContacts(visibleContacts);
-
-		if (visibleContacts.size() > 0) {
-			contentTextLayout.setVisibility(View.VISIBLE);
-
-			contentText.setText(visibleContacts.size()+ " " +context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
-		}else if(visibleContacts.size() == 0){
-			contentTextLayout.setVisibility(View.GONE);
-		}
 	}
 
 	@Override
@@ -1111,7 +1101,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			List<MegaUser> users = adapter.getSelectedUsers();
 			if (users.size() > 0){
 				updateActionModeTitle();
-				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_RED);
+				((ManagerActivityLollipop)context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT);
 			}
 		}
 		else{

@@ -85,30 +85,15 @@
 							android:layout_alignParentRight="true"
 							android:orientation="horizontal">
 
-							<RelativeLayout
-								android:layout_width="40dp"
-								android:layout_height="40dp"
-								android:layout_centerInParent="true">
-
 								<mega.privacy.android.app.components.RoundedImageView
 									android:id="@+id/my_account_thumbnail"
-									android:layout_width="match_parent"
-									android:layout_height="match_parent"
+									android:layout_width="40dp"
+									android:layout_height="40dp"
 									android:scaleType="fitCenter"
 									android:layout_centerInParent="true"
 									rounded:border_color="@color/border_file_properties"
 									rounded:border_width="0dp"
 									rounded:corner_radius="30dp" />
-
-								<TextView
-									android:id="@+id/my_account_initial_letter"
-									android:layout_width="match_parent"
-									android:layout_height="match_parent"
-									android:layout_centerInParent="true"
-									android:gravity="center_horizontal|center_vertical"
-									android:paddingBottom="2.5dp" />
-
-							</RelativeLayout>
 						</RelativeLayout>
 					</RelativeLayout>
 				</LinearLayout>
