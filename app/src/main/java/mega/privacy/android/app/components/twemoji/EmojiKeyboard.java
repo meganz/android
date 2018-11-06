@@ -102,6 +102,7 @@ public class EmojiKeyboard extends LinearLayout {
         emojiView.setOnEmojiBackspaceClickListener(new OnEmojiBackspaceClickListener() {
             @Override
             public void onEmojiBackspaceClick(final View v) {
+                log("onEmojiBackspaceClick()");
                 editInterface.backspace();
                 if (onEmojiBackspaceClickListener != null) {
                     onEmojiBackspaceClickListener.onEmojiBackspaceClick(v);
@@ -128,9 +129,11 @@ public class EmojiKeyboard extends LinearLayout {
     }
 
     public void setOnEmojiClickListener(OnEmojiClickListener onEmojiClickListener) {
+        log("setOnEmojiClickListener()");
         this.onEmojiClickListener = onEmojiClickListener;
     }
     public void setOnEmojiBackspaceClickListener(OnEmojiBackspaceClickListener onEmojiBackspaceClickListener) {
+        log("setOnEmojiBackspaceClickListener()");
         this.onEmojiBackspaceClickListener = onEmojiBackspaceClickListener;
     }
 

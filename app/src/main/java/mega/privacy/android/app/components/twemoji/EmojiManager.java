@@ -49,20 +49,17 @@ public final class EmojiManager {
       for (int i = 0; i < size; i++) {
         existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
       }
+
       final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
       if(findAllEmojis.size() == 0){
-
+        EmojiCompat.get().process(text);
       }else{
-
+        EmojiCompat.get().process(text);
         for (int i = 0; i < findAllEmojis.size(); i++) {
           final EmojiRange location = findAllEmojis.get(i);
-          if (!existingSpanPositions.contains(location.start)) {
             text.setSpan(new EmojiSpan(context, location.emoji, emojiSize), location.start, location.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-          }
         }
       }
-
-
     }
   };
   private final Map<String, Emoji> emojiMap = new LinkedHashMap<>(GUESSED_UNICODE_AMOUNT);

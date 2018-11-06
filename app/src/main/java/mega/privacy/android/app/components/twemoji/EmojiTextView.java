@@ -30,6 +30,8 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   private DisplayMetrics mOutMetrics;
   private int textViewMaxWidth;
 
+  private boolean isInput = true;
+
   public EmojiTextView(final Context context) {
     this(context, null);
     mContext = context;
@@ -72,34 +74,29 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
     setText(getText());
   }
   @Override public void setText(CharSequence rawText, BufferType type) {
-    CharSequence text = rawText == null ? "" : rawText;
-    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-    Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-    float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-
-    CharSequence textEmojiCompat = EmojiCompat.get().process(spannableStringBuilder);
-    EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
-
-    if (mContext instanceof ManagerActivityLollipop) {
-      //format text if too long
-      CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
-      super.setText(textF, type);
+    if(rawText.toString().equals("")){
+      super.setText(rawText, type);
     }else{
-      super.setText(spannableStringBuilder, type);
+      CharSequence text = rawText == null ? "" : rawText;
+      SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+      Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+      float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+      EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
 
+      if (mContext instanceof ManagerActivityLollipop) {
+        //format text if too long
+        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, getPaint(), textViewMaxWidth, TextUtils.TruncateAt.END);
+        super.setText(textF, type);
+      }else{
+        super.setText(spannableStringBuilder, type);
+
+      }
     }
+
   }
 
   @Override
   protected void onTextChanged(CharSequence rawText, int start, int lengthBefore, int lengthAfter) {
-    CharSequence text = rawText == null ? "" : rawText;
-    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-
-    Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-    float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-    EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
-
-    super.onTextChanged(text, start, lengthBefore, lengthAfter);
   }
 
   @Override @CallSuper public void backspace() {
@@ -124,6 +121,7 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
   @Override public final void setEmojiSizeRes(@DimenRes final int res, final boolean shouldInvalidate) {
     setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
   }
+
   public static void log(String message) {
     Util.log("EmojiTextView", message);
   }
