@@ -15445,6 +15445,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Status changed to: "+request.getNumber());
 			}
+			else if (e.getErrorCode() == MegaChatError.ERROR_ARGS)
+			{
+				log("Status not changed, the chosen one is the same");
+			}
 			else{
 				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
 				showSnackbar(getString(R.string.changing_status_error));
@@ -18224,13 +18228,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("My own status update");
 					setContactStatus();
 					if(drawerItem == DrawerItem.CHAT){
-							if(rChatFL!=null){
-								if(rChatFL.isAdded()){
-									rChatFL.onlineStatusUpdate(status);
+						if(rChatFL!=null){
+							if(rChatFL.isAdded()){
+								rChatFL.onlineStatusUpdate(status);
 
-								}
 							}
 						}
+					}
 				}
 				else{
 					log("Status update for the user: "+userHandle);
@@ -18256,7 +18260,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		log("onPresenceConfigUpdate");
+		log("onChatPresenceConfigUpdate");
 		if(config!=null){
 			log("Config status: "+config.getOnlineStatus());
 			log("Config autoway: "+config.isAutoawayEnabled());
@@ -18267,12 +18271,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("Config is pending - do not update UI");
 			}
 			else{
-				if(sttFLol!=null){
-					if(sttFLol.isAdded()){
-						if(config!=null){
-							sttFLol.updatePresenceConfigChat(false, config);
-						}
-					}
+				if(sttFLol!=null && sttFLol.isAdded()){
+					sttFLol.updatePresenceConfigChat(false, config);
+				}
+				else{
+					log("sttFLol no added or null");
 				}
 			}
 		}
