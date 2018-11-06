@@ -233,9 +233,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     ActionBar aB;
     Toolbar tB;
     LinearLayout toolbarElements;
+    RelativeLayout toolbarElementsInside;
     TextView titleToolbar;
     TextView subtitleToobar;
     ImageView iconStateToolbar;
+    ImageView privateIconToolbar;
 
     float scaleH, scaleW;
     float density;
@@ -616,17 +618,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         tB.setOnClickListener(this);
         toolbarElements = (LinearLayout) tB.findViewById(R.id.toolbar_elements);
+        toolbarElementsInside = (RelativeLayout) findViewById(R.id.toolbar_elements_inside);
         titleToolbar = (TextView) tB.findViewById(R.id.title_toolbar);
         subtitleToobar = (TextView) tB.findViewById(R.id.subtitle_toolbar);
         iconStateToolbar = (ImageView) tB.findViewById(R.id.state_icon_toolbar);
+        privateIconToolbar = (ImageView) tB.findViewById(R.id.private_icon_toolbar);
 
         titleToolbar.setText(" ");
         subtitleToobar.setText(" ");
         subtitleToobar.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
+        privateIconToolbar.setVisibility(View.GONE);
 
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-
 
         emptyLayout = (LinearLayout) findViewById(R.id.empty_messages_layout);
         emptyTextView = (TextView) findViewById(R.id.empty_text_chat_recent);
@@ -1142,6 +1146,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 //                aB.setTitle(chatRoom.getTitle());
                 titleToolbar.setText(chatRoom.getTitle());
                 setChatSubtitle();
+
+                if(!chatRoom.isPublic() && chatRoom.isGroup()){
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titleToolbar.getLayoutParams();
+                    params.addRule(RelativeLayout.LEFT_OF, privateIconToolbar.getId());
+                    titleToolbar.setLayoutParams(params);
+                    privateIconToolbar.setVisibility(View.VISIBLE);
+                }
+                else{
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titleToolbar.getLayoutParams();
+                    params.addRule(RelativeLayout.LEFT_OF, iconStateToolbar.getId());
+                    titleToolbar.setLayoutParams(params);
+                    privateIconToolbar.setVisibility(View.GONE);
+                }
 
                 isOpeningChat = true;
 
