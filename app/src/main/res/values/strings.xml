@@ -2188,21 +2188,6 @@
     <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
     <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
 
-    <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
-        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d file.[/B]</item>
-        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]added %2$d files.[/B]</item>
-    </plurals>
-
-    <plurals name="subtitle_notification_deleted_files" context="Subtitle of the historic notification for deletions inside an existing shared folder">
-        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]deleted %2$d file.[/B]</item>
-        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]deleted %2$d files.[/B]</item>
-    </plurals>
-
-    <plurals name="subtitle_notification_added_folders" context="Subtitle of the historic notification for new additions inside an existing shared folder">
-        <item context="Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]added %2$d folder.[/B]</item>
-        <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
-    </plurals>
-
     <string name="type_of_my_account" context="Subtitle of the Upgrade account section">[A]%s[/A] is your current account</string>
     <string name="type_month" context=" ">[A]From[/A] %s [A]month[/A][B] *[/B]</string>
     <string name="upgrade_account_comment" context="the meaning of the asterisk in month*">[A]* [/A]Recurring subscription can be cancelled anytime before renewal date.</string>
@@ -2225,5 +2210,32 @@
 
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
+
+    <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
+        <item context="Singular of file. 1 file" quantity="one">%d file</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files</item>
+    </plurals>
+
+    <plurals name="num_folders_with_parameter"  context="on the section notifications indicates the number of folder added to a shared folder">
+        <item context="Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
+        <item context="Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
+    </plurals>
+
+    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
+
+    <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d file.[/B]</item>
+        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]added %2$d files.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_notification_deleted_items" context="Subtitle of the historic notification for deletions inside an existing shared folder">
+        <item context="Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]deleted %2$d item.[/B]</item>
+        <item context="Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]deleted %2$d items.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_notification_added_folders" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]added %2$d folder.[/B]</item>
+        <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
+    </plurals>
 
 </resources>
