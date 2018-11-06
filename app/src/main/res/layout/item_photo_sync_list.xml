@@ -12,16 +12,17 @@
 		    android:background="@drawable/statelist_item_layout">
 
 			<RelativeLayout
-				android:layout_width="36dp"
-				android:layout_height="match_parent"
-				android:layout_marginLeft="18dp"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:layout_marginLeft="12dp"
 				android:layout_marginRight="18dp"
+				android:layout_centerVertical="true"
 				android:id="@+id/container_thumbnail">
 
 				<ImageView
 					android:id="@+id/photo_sync_list_thumbnail"
-					android:layout_width="36dp"
-					android:layout_height="36dp"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
 					android:scaleType="fitCenter"
 					android:layout_centerVertical="true"/>
 			</RelativeLayout>
@@ -189,17 +190,16 @@
 		 android:layout_width="match_parent"
 		 android:layout_height="36dp"
 		 android:descendantFocusability="blocksDescendants"
-		 android:id="@+id/photo_sync_list_month_layout"
-		 android:background="@color/camera_uploads_list_view">
+		 android:id="@+id/photo_sync_list_month_layout">
 		 <TextView
 			 android:id="@+id/photo_sync_list_month_name"
 			 android:layout_width="match_parent"
 			 android:layout_height="wrap_content"
-			 android:layout_marginLeft="72dp"
+			 android:layout_marginLeft="16dp"
 			 android:singleLine="false"
-			 android:textColor="@color/mail_my_account"
-			 android:fontFamily="sans-serif"
-			 android:textSize="14sp"
+			 android:textColor="@color/name_my_account"
+			 android:fontFamily="roboto"
+			 android:textSize="12sp"
 			 android:layout_centerVertical="true"/>
 	 </RelativeLayout>
     

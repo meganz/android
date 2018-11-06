@@ -814,11 +814,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						fromIncoming = nC.nodeComesFromIncoming(node);
 					}
 					if (adapterType == Constants.INCOMING_SHARES_ADAPTER || fromIncoming) {
-						i.putExtra("from", FileInfoActivityLollipop.FROM_INCOMING_SHARES);
+						i.putExtra("from", Constants.FROM_INCOMING_SHARES);
 						i.putExtra("firstLevel", false);
 					}
 					else if(adapterType == Constants.INBOX_ADAPTER){
-						i.putExtra("from", FileInfoActivityLollipop.FROM_INBOX);
+						i.putExtra("from", Constants.FROM_INBOX);
 					}
 					startActivity(i);
 					break;
@@ -1727,7 +1727,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
                     getImageView(i, -1);
@@ -1790,7 +1790,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
         else {
             Long handle = adapterMega.getImageHandle(positionG);
             MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle));
-            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode);
+            ArrayList<MegaNode> listNodes = megaApi.getChildren(parentNode, orderGetChildren);
 
             for (int i=0; i<listNodes.size(); i++){
                 if (listNodes.get(i).getHandle() == handle){
@@ -2045,23 +2045,22 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				int oldPosition = positionG;
 				int newPosition = viewPager.getCurrentItem();
 				positionG = newPosition;
-
-				try{
-					if ((adapterType == Constants.OFFLINE_ADAPTER)){
-						fileNameTextView.setText(mOffListImages.get(positionG).getName());
-					}
-					else if(adapterType == Constants.ZIP_ADAPTER){
-						fileNameTextView.setText(new File(paths.get(positionG)).getName());
-					}
-					else{
+				if ((adapterType == Constants.OFFLINE_ADAPTER)){
+					fileNameTextView.setText(mOffListImages.get(positionG).getName());
+				}
+				else if(adapterType == Constants.ZIP_ADAPTER){
+					fileNameTextView.setText(new File(paths.get(positionG)).getName());
+				}
+				else{
+					try {
 						TouchImageView tIV = (TouchImageView) adapterMega.getVisibleImage(oldPosition);
-						if (tIV != null){
+						if (tIV != null) {
 							tIV.setZoom(1);
 						}
-						fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 					}
+					catch (Exception e) {}
+					fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 				}
-				catch(Exception e){}
 //				title.setText(names.get(positionG));
 				updateScrollPosition();
 			}
@@ -2913,7 +2912,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 //				builder.setTitle(getString(R.string.confirmation_required));
 
 		builder.setMessage(getString(R.string.alert_larger_file, Util.getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -2961,7 +2960,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 //				builder.setTitle(getString(R.string.confirmation_required));
 		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-		builder.setPositiveButton(getString(R.string.general_download),
+		builder.setPositiveButton(getString(R.string.general_save_to_device),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						if(dontShowAgain.isChecked()){
@@ -3308,7 +3307,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, currentDocument.getSize(), currentDocument.getHandle());
 										}
 										break;
@@ -3409,7 +3408,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, currentDocument.getSize(), currentDocument.getHandle());
 										}
 										break;

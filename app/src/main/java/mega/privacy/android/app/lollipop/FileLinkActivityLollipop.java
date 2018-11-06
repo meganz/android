@@ -207,14 +207,6 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-		}
-
-
 		/*Icon & image in Toolbar*/
 		iconViewLayout = (RelativeLayout) findViewById(R.id.file_link_icon_layout);
 		iconView = (ImageView) findViewById(R.id.file_link_icon);
@@ -232,7 +224,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		buttonPreviewContent.setVisibility(View.GONE);
 
 		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
-		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		downloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		downloadButton.setOnClickListener(this);
 		downloadButton.setVisibility(View.INVISIBLE);
 
@@ -977,7 +969,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, sizeFinal, hashesFinal);
 										}
 										break;
@@ -1076,7 +1068,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, sizeFinal, hashesFinal);
 										}
 										break;
@@ -1505,7 +1497,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, urlM, sizeFinal, hashesFinal);
 										}
 										break;
@@ -1614,7 +1606,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 											String path = fs[1].getAbsolutePath();
 											File defaultPathF = new File(path);
 											defaultPathF.mkdirs();
-											Toast.makeText(getApplicationContext(), getString(R.string.general_download) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
+											Toast.makeText(getApplicationContext(), getString(R.string.general_save_to_device) + ": "  + defaultPathF.getAbsolutePath() , Toast.LENGTH_LONG).show();
 											downloadTo(path, url, sizeFinal, hashesFinal);
 										}
 										break;

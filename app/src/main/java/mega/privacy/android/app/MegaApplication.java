@@ -1,6 +1,5 @@
 package mega.privacy.android.app;
 
-import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,9 +17,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.support.multidex.MultiDexApplication;
+import android.support.text.emoji.EmojiCompat;
+import android.support.text.emoji.FontRequestEmojiCompatConfig;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -873,6 +875,7 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
 		log("onUserAlertsUpdate");
+		updateAppBadge();
 	}
 
 	@Override
@@ -1083,6 +1086,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
 		log("onContactRequestUpdate");
 
+		updateAppBadge();
+
 		if(requests!=null){
 			for (int i = 0; i < requests.size(); i++) {
 				MegaContactRequest cr = requests.get(i);
@@ -1243,23 +1248,44 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 
 	}
 
-	@Override
-	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
-		log("onChatNotification");
+	public void updateAppBadge(){
+		log("updateAppBadge");
 
-		int unread = megaChatApi.getUnreadChats();
+		int totalHistoric = 0;
+		int totalIpc = 0;
+		if(megaApi!=null && megaApi.getRootNode()!=null){
+			totalHistoric = megaApi.getNumUnreadUserAlerts();
+			ArrayList<MegaContactRequest> requests = megaApi.getIncomingContactRequests();
+			if(requests!=null) {
+				totalIpc = requests.size();
+			}
+		}
+
+		int chatUnread = 0;
+		if(Util.isChatEnabled() && megaChatApi != null) {
+			chatUnread = megaChatApi.getUnreadChats();
+		}
+
+		int totalNotifications = totalHistoric + totalIpc + chatUnread;
 		//Add Android version check if needed
-		if (unread == 0) {
+		if (totalNotifications == 0) {
 			//Remove badge indicator - no unread chats
 			ShortcutBadger.applyCount(getApplicationContext(), 0);
 			//Xiaomi support
 			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", 0));
 		} else {
 			//Show badge with indicator = unread
-			ShortcutBadger.applyCount(getApplicationContext(), Math.abs(unread));
+			ShortcutBadger.applyCount(getApplicationContext(), Math.abs(totalNotifications));
 			//Xiaomi support
-			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", unread));
+			startService(new Intent(getApplicationContext(), BadgeIntentService.class).putExtra("badgeCount", totalNotifications));
 		}
+	}
+
+	@Override
+	public void onChatNotification(MegaChatApiJava api, long chatid, MegaChatMessage msg) {
+		log("onChatNotification");
+
+		updateAppBadge();
 
 		if(MegaApplication.getOpenChatId() == chatid){
 			log("Do not update/show notification - opened chat");
