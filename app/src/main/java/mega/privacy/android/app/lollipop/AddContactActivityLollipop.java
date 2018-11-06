@@ -2177,15 +2177,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                                 log("Added to list: " + contactsMEGA.get(i).getEmail() + "_" + contactsMEGA.get(i).getVisibility());
                                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                                 visibleContactsMEGA.add(megaContactAdapter);
-
-                                if (contactType == Constants.CONTACT_TYPE_MEGA) {
-                                    //Ask for presence info and last green
-                                    int userStatus = megaChatApi.getUserOnlineStatus(contactsMEGA.get(i).getHandle());
-                                    if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-                                        log("Request last green for user");
-                                        megaChatApi.requestLastGreen(contactsMEGA.get(i).getHandle(), null);
-                                    }
-                                }
                             }
                             else{
                                 MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(contactsMEGA.get(i).getHandle()+""));
@@ -2222,16 +2213,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                             MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                             visibleContactsMEGA.add(megaContactAdapter);
-
-                            if (contactType == Constants.CONTACT_TYPE_MEGA) {
-                                //Ask for presence info and last green
-                                int userStatus = megaChatApi.getUserOnlineStatus(contactsMEGA.get(i).getHandle());
-                                if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-                                    log("Request last green for user");
-                                    megaChatApi.requestLastGreen(contactsMEGA.get(i).getHandle(), null);
-                                }
-                            }
-
                         }
                     }
                 }
@@ -2295,15 +2276,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                     MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contactsMEGA.get(i), fullName);
                     visibleContactsMEGA.add(megaContactAdapter);
-
-                    if (contactType == Constants.CONTACT_TYPE_MEGA) {
-                        //Ask for presence info and last green
-                        int userStatus = megaChatApi.getUserOnlineStatus(contactsMEGA.get(i).getHandle());
-                        if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
-                            log("Request last green for user");
-                            megaChatApi.requestLastGreen(contactsMEGA.get(i).getHandle(), null);
-                        }
-                    }
                 }
             }
         }
@@ -2321,8 +2293,20 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         });
 
+        long handle;
         for (int i= 0; i<visibleContactsMEGA.size(); i++){
             filteredContactMEGA.add(visibleContactsMEGA.get(i));
+            if (contactType == Constants.CONTACT_TYPE_MEGA) {
+                //Ask for presence info and last green
+                handle = getMegaContactHandle(visibleContactsMEGA.get(i));
+                if (handle != -1) {
+                    int userStatus = megaChatApi.getUserOnlineStatus(handle);
+                    if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
+                        log("Request last green for user");
+                        megaChatApi.requestLastGreen(handle, null);
+                    }
+                }
+            }
         }
     }
 
@@ -2732,6 +2716,19 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
         return mail;
+    }
+
+    public long getMegaContactHandle (MegaContactAdapter contact) {
+        long handle = -1;
+        if (contact != null) {
+            if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
+                handle = contact.getMegaUser().getHandle();
+            }
+            else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
+                handle = Long.parseLong(contact.getMegaContactDB().getHandle());
+            }
+        }
+        return handle;
     }
 
     @Override
@@ -3231,24 +3228,85 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
             if(userhandle != megaChatApi.getMyUserHandle()){
                 log("Status last green for the user: "+userhandle);
-                int indexToReplace = -1;
+//                Replace on visible MEGA contacts (all my visible contacts)
                 ListIterator<MegaContactAdapter> itrReplace = visibleContactsMEGA.listIterator();
                 while (itrReplace.hasNext()) {
                     MegaContactAdapter contactToUpdate = itrReplace.next();
                     if (contactToUpdate != null) {
-                        if (contactToUpdate.getMegaUser().getHandle() == userhandle) {
+                        if (getMegaContactHandle(contactToUpdate) == userhandle) {
                             contactToUpdate.setLastGreen(formattedDate);
-                            indexToReplace = itrReplace.nextIndex() - 1;
                             break;
                         }
                     } else {
                         break;
                     }
                 }
-                if (indexToReplace != -1) {
-                    log("Index to replace: " + indexToReplace);
-                    if(adapterMEGA!=null){
+//                Replace on list adapter (filtered or search filtered MEGA contacts)
+                int indexToReplace = -1;
+                if(adapterMEGA!=null && adapterMEGA.getContacts() != null){
+                    ListIterator<MegaContactAdapter> itrReplace2 = adapterMEGA.getContacts().listIterator();
+                    while (itrReplace2.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace2.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                indexToReplace = itrReplace2.nextIndex() -1;
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    if (indexToReplace != -1) {
                         adapterMEGA.updateContactStatus(indexToReplace);
+                    }
+                }
+//                Replace on filtered MEGA contacts (without search)
+                if (filteredContactMEGA != null && filteredContactMEGA.size() > 0) {
+                    ListIterator<MegaContactAdapter> itrReplace3 = filteredContactMEGA.listIterator();
+                    while (itrReplace3.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace3.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+//                Replace, if exist, on search filtered MEGA contacts
+                if (queryContactMEGA != null && queryContactMEGA.size() > 0) {
+                    ListIterator<MegaContactAdapter> itrReplace4 = queryContactMEGA.listIterator();
+                    while (itrReplace4.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace4.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+//                Replace, if exist, on added adapter and added MEGA contacts
+                if (addedContactsMEGA != null && addedContactsMEGA.size() > 0) {
+                    ListIterator<MegaContactAdapter> itrReplace5 = addedContactsMEGA.listIterator();
+                    while (itrReplace5.hasNext()) {
+                        MegaContactAdapter contactToUpdate = itrReplace5.next();
+                        if (contactToUpdate != null) {
+                            if (getMegaContactHandle(contactToUpdate) == userhandle) {
+                                contactToUpdate.setLastGreen(formattedDate);
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                    if (adapterMEGAContacts != null) {
+                        adapterMEGAContacts.setContacts(addedContactsMEGA);
                     }
                 }
             }
