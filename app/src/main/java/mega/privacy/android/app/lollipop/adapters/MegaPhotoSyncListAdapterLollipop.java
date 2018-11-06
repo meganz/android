@@ -4,17 +4,20 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,7 +30,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.lollipop.MegaMonthPicLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import mega.privacy.android.app.utils.Constants;
@@ -35,12 +37,11 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 
 
-public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener, SectionTitleProvider {
-	
+public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList> implements OnClickListener, SectionTitleProvider, View.OnLongClickListener {
+
 	private class Media {
 		public String filePath;
 		public long timestamp;
@@ -233,18 +234,93 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		}
 		return nodes;
 	}
+
+	public void toggleAllSelection(int pos) {
+		log("toggleAllSelection: " + pos);
+		final int positionToflip = pos;
+
+		if (selectedItems.get(pos,false)) {
+			log("delete pos: " + pos);
+			selectedItems.delete(pos);
+
+		} else {
+			log("PUT pos: " + pos);
+			selectedItems.put(pos,true);
+		}
+
+		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
+		if (view != null) {
+			log("toggleSelection Start animation: " + pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+					log("toggleSelection onAnimationStart");
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					log("toggleSelection onAnimationEnd");
+					if (selectedItems.size() <= 0) {
+						((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
+					}
+					notifyItemChanged(positionToflip);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
+		else {
+			notifyItemChanged(pos);
+		}
+	}
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
 		if (selectedItems.get(pos, false)) {
-			log("delete pos: "+pos);
+			log("toggleSelection delete pos: "+pos);
 			selectedItems.delete(pos);
 		}
 		else {
-			log("PUT pos: "+pos);
+			log("toggleSelection PUT pos: "+pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
+
+		MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList view = (MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList)listFragment.findViewHolderForLayoutPosition(pos);
+		if (view != null) {
+			log("toggleSelection Start animation: " + pos);
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+					log("toggleSelection onAnimationStart");
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					log("toggleSelection onAnimationEnd");
+					if (selectedItems.size() <= 0) {
+						((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		}
+		else {
+			if (selectedItems.size() <= 0) {
+				((CameraUploadFragmentLollipop) fragment).hideMultipleSelect();
+			}
+		}
 	}
 	
 	private boolean isItemChecked(int position) {
@@ -253,19 +329,18 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
-
 			if(!isItemChecked(i)){
-				toggleSelection(i);
+				toggleAllSelection(i);
 			}
 		}
 	}
 	
 	public void clearSelections() {
-		if(selectedItems!=null){
-			selectedItems.clear();
+		for (int i= 0; i<this.getItemCount();i++){
+			if(isItemChecked(i)){
+				toggleAllSelection(i);
+			}
 		}
-
-		notifyDataSetChanged();
 	}
 	
 	private static void log(String log) {
@@ -319,47 +394,62 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			else{
 				long nodeSize = node.getSize();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-				
-				if (node.hasThumbnail()){
-					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-					if (thumb != null){
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-						if (thumb != null){
+				if (this.isItemChecked(position)) {
+					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
+					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
+					params.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
+					params.setMargins(0,0,0,0);
+					holder.imageView.setLayoutParams(params);
+					holder.imageView.setImageResource(R.drawable.ic_select_folder);
+				}
+				else {RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
+					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
+					params.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,36,context.getResources().getDisplayMetrics());
+					int left = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,6,context.getResources().getDisplayMetrics());
+					params.setMargins(left,0,0,0);
+					holder.imageView.setLayoutParams(params);
+					holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+
+					if (node.hasThumbnail()) {
+						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
+						if (thumb != null) {
 							holder.imageView.setImageBitmap(thumb);
 						}
-						else{ 
-							try{
-								thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
-							}
-							catch(Exception e){} //Too many AsyncTasks
-							
-							if (thumb != null){
+						else {
+							thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
+							if (thumb != null) {
 								holder.imageView.setImageBitmap(thumb);
 							}
+							else {
+								try {
+									thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
+								} catch (Exception e) {
+								} //Too many AsyncTasks
+
+								if (thumb != null) {
+									holder.imageView.setImageBitmap(thumb);
+								}
+							}
 						}
 					}
-				}
-				else{
-					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
-					if (thumb != null){
-						holder.imageView.setImageBitmap(thumb);
-					}
-					else{
-						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
-						if (thumb != null){
+					else {
+						thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
+						if (thumb != null) {
 							holder.imageView.setImageBitmap(thumb);
 						}
-						else{ 
-							try{
-								ThumbnailUtilsLollipop.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
+						else {
+							thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
+							if (thumb != null) {
+								holder.imageView.setImageBitmap(thumb);
 							}
-							catch(Exception e){} //Too many AsyncTasks
+							else {
+								try {
+									ThumbnailUtilsLollipop.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
+								} catch (Exception e) {
+								} //Too many AsyncTasks
+							}
 						}
-					}			
+					}
 				}
 			}
 		}
@@ -422,7 +512,21 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		
 		holder.itemLayout.setTag(holder);
 		holder.itemLayout.setOnClickListener(this);
+		holder.itemLayout.setOnLongClickListener(this);
 		
 		return holder;
 	}
+
+    @Override
+    public boolean onLongClick(View v) {
+        ViewHolderPhotoSyncList holder = (ViewHolderPhotoSyncList)v.getTag();
+        int currentPosition = holder.getAdapterPosition();
+        PhotoSyncHolder psHPosition = nodesArray.get(currentPosition);
+        if (psHPosition.isNode) {
+            ((CameraUploadFragmentLollipop) fragment).activateActionMode();
+            ((CameraUploadFragmentLollipop) fragment).itemClick(currentPosition, null, null);
+        }
+
+        return true;
+    }
 }

@@ -162,6 +162,8 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
         optionClearHistory.setOnClickListener(this);
         optionArchiveChat.setOnClickListener(this);
 
+        LinearLayout separatorInfo = (LinearLayout) contentView.findViewById(R.id.separator_info);
+
         titleNameContactChatPanel.setText(chat.getTitle());
 
         if(chat.isPreview()){
@@ -169,9 +171,9 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
             iconStateChatPanel.setVisibility(View.GONE);
             addAvatarChatPanel(null, chat);
 
-            infoChatText.setText(getString(R.string.group_chat_info_label));
-
+            separatorInfo.setVisibility(View.GONE);
             optionInfoChat.setVisibility(View.GONE);
+
             optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.VISIBLE);
             optionLeaveText.setText("Remove preview");
@@ -184,7 +186,7 @@ public class ChatBottomSheetDialogFragment extends BottomSheetDialogFragment imp
                 iconStateChatPanel.setVisibility(View.GONE);
                 addAvatarChatPanel(null, chat);
 
-                infoChatText.setText(getString(R.string.group_chat_info_label));
+                separatorInfo.setVisibility(View.GONE);
                 optionInfoChat.setVisibility(View.GONE);
 
                 if(chat.isActive()){

@@ -3,57 +3,6 @@
 
     <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
 
-    <style name="mySwitchStyle">
-        <item name="switchTextAppearanceAttrib">@style/mySwitchTextAppearance</item>
-        <item name="textOn">ON</item>
-        <item name="textOff">OFF</item>
-        <item name="pushStyle">false</item>
-        <item name="textOnThumb">true</item>
-        <item name="thumbExtraMovement">0dp</item>
-        <item name="thumbTextPaddingMySwitch">6dp</item>
-        <item name="trackTextPadding">6dp</item>
-        <item name="switchMinWidthMySwitch">69dp</item>
-        <item name="switchMinHeight">36dp</item>
-        <item name="switchPaddingMySwitch">6dp</item>
-    </style>
-
-    <style name="mySwitchTextAppearance">
-        <item name="textColor">#FFeeFFee</item>
-        <item name="textColorHighlight">#FFeeFFee</item>
-        <item name="textColorHint">#FFeeFFee</item>
-        <item name="textColorLink">#FFeeFFee</item>
-        <item name="textSize">16sp</item>
-        <item name="textStyle">normal</item>
-    </style>
-
-    <style name="SpinnerFieldCC">
-        <item name="android:layout_marginTop">0dp</item>
-        <item name="android:layout_marginBottom">0dp</item>
-        <item name="android:layout_marginLeft">20dp</item>
-        <item name="android:layout_marginRight">20dp</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="no_title_activity" parent="@style/Theme.AppCompat.Light">
-        <item name="android:windowNoTitle">true</item>
-        <item name="colorAccent">@color/accentColor</item>
-    </style>
-
-    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
-	    <item name="windowNoTitle">true</item>
-	    <item name="windowActionBar">false</item>
-	    <item name="android:windowFullscreen">true</item>
-	    <item name="android:windowContentOverlay">@null</item>
-	</style>
-
-    <style name="MEGAProgressBarTransfers" parent="Widget.AppCompat.ProgressBar.Horizontal">
-		 <item name="android:indeterminateOnly">false</item>
-          <item name="android:progressDrawable">@drawable/custom_progress_bar_horizontal_transfer</item>
-          <item name="android:minHeight">10dip</item>
-          <item name="android:maxHeight">20dip</item>
-	</style>
-
     <style name="MEGAProgressBarLogin" parent="Widget.AppCompat.ProgressBar.Horizontal">
 		 <item name="android:indeterminateOnly">false</item>
           <item name="android:minHeight">10dip</item>
@@ -81,104 +30,116 @@
         <!-- Customize your theme here. -->
 
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
+        <item name="colorPrimary">@color/white</item>
 
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+        <item name="colorPrimaryDark">@color/dark_primary_color</item>
 
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
         <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlNormal">@color/black</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
 
         <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/lollipop_primary_color</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="actionModeBackground">@color/accentColor</item>
+        <item name="android:actionModeBackground">@color/accentColor</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="elevation">0dp</item>
+        <item name="android:elevation">0dp</item>
 
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
     </style>
 
-    <style name="DropDownListView.Megaactionbar" parent="@style/Widget.AppCompat.Light.ListView.DropDown">
-        <item name="android:listSelector">@drawable/selectable_background_megaactionbar</item>
+    <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/dark_primary_color</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/dark_primary_color_secondary</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="colorControlNormal">@color/white</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/accentColor</item>
+        <item name="android:actionModeBackground">@color/accentColor</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
+        <item name="actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.ActionMode</item>
+        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
+        <!-- You can also set colorControlNormal, colorControlActivated
+             colorControlHighlight & colorSwitchThumbNormal. -->
     </style>
 
-    <style name="ActionBarTabStyle.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar.TabView">
-        <item name="android:background">@drawable/tab_indicator</item>
+    <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="Widget.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+    </style>
+
+    <style name="TitleTextStyle" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="textColor">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="textSize">20sp</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="ActionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="srcCompat">@drawable/ic_dots_vertical_white</item>
+        <item name="android:src">@drawable/ic_dots_vertical_white</item>
+        <item name="background">@drawable/ic_dots_vertical_white</item>
+        <item name="android:background">@drawable/ic_dots_vertical_white</item>
     </style>
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/white</item>
+        <item name="tabIndicatorColor">@color/dark_primary_color</item>
         <item name="tabIndicatorHeight">2dp</item>
-        <item name="tabBackground">@color/mega</item>
-        <item name="tabSelectedTextColor">@color/white</item>
+        <item name="tabBackground">@color/white</item>
+        <item name="tabSelectedTextColor">@color/dark_primary_color</item>
         <item name="tabPaddingStart">12dp</item>
         <item name="tabPaddingEnd">12dp</item>
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
     </style>
+
+    <style name="MyCustomTabLayout.Secondary" parent="MyCustomTabLayout">
+        <item name="tabIndicatorColor">@color/white</item>
+        <item name="tabBackground">@color/dark_primary_color</item>
+        <item name="tabSelectedTextColor">@color/white</item>
+        <item name="tabTextAppearance">@style/MyCustomTabTextAppearance.Secondary</item>
+    </style>
+
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/mail_my_account</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="MyCustomTabTextAppearance.Secondary" parent="MyCustomTabTextAppearance">
         <item name="android:textColor">@color/text_tab_alpha</item>
-        <item name="textAllCaps">true</item>
-    </style>
-
-    <style name="Theme.Megaactionbar.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
-
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
-
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
-
-        <item name="android:windowFullscreen">true</item>
-
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-
-        <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/lollipop_primary_color</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
-
-    </style>
-
-    <style name="Theme.Megaactionbar.Properties" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
-
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
-
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-
-        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
-
-    </style>
-
-    <style name="NavDrawerAccountInfoText">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#b9b9b9</item>
     </style>
 
     <style name="NavDrawerAccountUsedSpaceText">
@@ -200,6 +161,10 @@
     </style>
 
     <style name="ToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="ToolbarTitle.Secondary" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
 
@@ -234,17 +199,6 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Megaactionbar.General" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/lollipop_primary_color</item>
-
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
-
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-    </style>
 
     <style name="Theme.Add.Contacts" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor">@color/status_bar_login</item>
@@ -255,12 +209,17 @@
 
     <style name="AppCompatAlertDialogStyleAddContacts" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:background">@color/white</item>
-        <item name="android:positiveButtonText">@color/file_playlist_state</item>
-        <item name="android:negativeButtonText">@color/file_playlist_state</item>
+        <item name="android:positiveButtonText">@color/accentColor</item>
+        <item name="android:negativeButtonText">@color/accentColor</item>
         <item name="android:content">@color/mail_my_account</item>
         <item name="colorControlNormal">@color/mail_my_account</item>
         <item name="android:textColorPrimary">@color/mail_my_account</item>
         <item name="android:windowMinWidthMajor">90%</item>
         <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="colorControlActivated">@color/accentColor</item>
+        <item name="colorControlNormal">#000000</item>
     </style>
 </resources>

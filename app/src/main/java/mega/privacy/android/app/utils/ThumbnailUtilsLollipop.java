@@ -96,7 +96,7 @@ public class ThumbnailUtilsLollipop {
 		final float roundPx = pixels*densityMultiplier;
 		paint.setAntiAlias(true);
 		canvas.drawARGB(0, 0, 0, 0);
-		paint.setColor(ContextCompat.getColor(context, R.color.new_background_fragment));
+		paint.setColor(ContextCompat.getColor(context, R.color.white));
 		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 
 		//draw rectangles over the corners we want to be square
@@ -108,6 +108,26 @@ public class ThumbnailUtilsLollipop {
 
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, rect, rect, paint);
+		return result;
+	}
+
+	public static Bitmap getRoundedBitmap(Context context, final Bitmap bitmap,final int pixels){
+		log("getRoundedRectBitmap");
+		final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(result);
+		final Paint paint = new Paint();
+		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		final RectF rectF = new RectF(rect);
+
+		final float densityMultiplier = context.getResources().getDisplayMetrics().density;
+		final float roundPx = pixels*densityMultiplier;
+		paint.setAntiAlias(true);
+		canvas.drawARGB(0, 0, 0, 0);
+		paint.setColor(ContextCompat.getColor(context, R.color.white));
+		canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+		canvas.drawBitmap(bitmap, 0, 0, paint);
 		return result;
 	}
 

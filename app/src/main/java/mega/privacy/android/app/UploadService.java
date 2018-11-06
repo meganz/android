@@ -58,6 +58,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
 	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
+	public static String EXTRA_NAME_EDITED = "MEGA_FILE_NAME_EDITED";
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 
@@ -71,8 +72,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private boolean isForeground = false;
 	private boolean canceled;
-
-	private boolean isQRFile = false;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -196,17 +195,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		log("onHandleIntent");
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
-		isQRFile = intent.getBooleanExtra("qrfile", false);
+
 		if(file!=null){
 			log("File to manage: "+file.getAbsolutePath());
 		}
 
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
+		String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
+		String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
 
 		if (file.isDirectory()) {
 			totalUploads++;
 
-			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
 			if (nameInMEGA != null){
 				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
 			}
@@ -215,69 +215,133 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 		else {
-			switch(checkFileToUpload(file, parentHandle)){
-				case CHECK_FILE_TO_UPLOAD_UPLOAD:{
-					log("CHECK_FILE_TO_UPLOAD_UPLOAD");
+			if (nameInMEGAEdited != null){
+				switch (checkFileToUploadRenamed(file, parentHandle, nameInMEGAEdited)) {
+					case CHECK_FILE_TO_UPLOAD_UPLOAD: {
+						log("CHECK_FILE_TO_UPLOAD_UPLOAD");
 
-					if(!wl.isHeld()){
-						wl.acquire();
-					}
-					if(!lock.isHeld()){
-						lock.acquire();
-					}
+						if (!wl.isHeld()) {
+							wl.acquire();
+						}
+						if (!lock.isHeld()) {
+							lock.acquire();
+						}
 
-					totalUploads++;
+						totalUploads++;
 
-					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-					if (nameInMEGA != null){
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGAEdited, this);
+						break;
 					}
-					else{
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+					case CHECK_FILE_TO_UPLOAD_COPY: {
+						log("CHECK_FILE_TO_UPLOAD_COPY");
+						copiedCount++;
+						break;
 					}
-					break;
+					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
+						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
+						String sShow = nameInMEGAEdited + " " + getString(R.string.general_already_uploaded);
+						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
+
+						Intent i = new Intent(this, ManagerActivityLollipop.class);
+						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
+						i.putExtra("MESSAGE", sShow);
+						startActivity(i);
+						log("Return - file already uploaded");
+						return;
+
+					}
 				}
-				case CHECK_FILE_TO_UPLOAD_COPY:{
-					log("CHECK_FILE_TO_UPLOAD_COPY");
-					copiedCount++;
-					break;
+			}
+			else {
+				switch (checkFileToUpload(file, parentHandle)) {
+					case CHECK_FILE_TO_UPLOAD_UPLOAD: {
+						log("CHECK_FILE_TO_UPLOAD_UPLOAD");
+
+						if (!wl.isHeld()) {
+							wl.acquire();
+						}
+						if (!lock.isHeld()) {
+							lock.acquire();
+						}
+
+						totalUploads++;
+
+						if (nameInMEGA != null) {
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+						} else {
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+						}
+						break;
+					}
+					case CHECK_FILE_TO_UPLOAD_COPY: {
+						log("CHECK_FILE_TO_UPLOAD_COPY");
+						copiedCount++;
+						break;
+					}
+					case CHECK_FILE_TO_UPLOAD_OVERWRITE: {
+						log("CHECK_FILE_TO_UPLOAD_OVERWRITE");
+						MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));
+						megaApi.remove(nodeExistsInFolder);
+
+						if (!wl.isHeld()) {
+							wl.acquire();
+						}
+						if (!lock.isHeld()) {
+							lock.acquire();
+						}
+
+						totalUploads++;
+
+						if (nameInMEGA != null) {
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+						} else {
+							megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+						}
+						break;
+
+					}
+					case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER: {
+						log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
+						String sShow = file.getName() + " " + getString(R.string.general_already_uploaded);
+						//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
+
+						Intent i = new Intent(this, ManagerActivityLollipop.class);
+						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						i.setAction(Constants.SHOW_REPEATED_UPLOAD);
+						i.putExtra("MESSAGE", sShow);
+						startActivity(i);
+						log("Return - file already uploaded");
+						return;
+					}
 				}
-				case CHECK_FILE_TO_UPLOAD_OVERWRITE:{
-					log("CHECK_FILE_TO_UPLOAD_OVERWRITE");
-					MegaNode nodeExistsInFolder = megaApi.getNodeByPath(file.getName(), megaApi.getNodeByHandle(parentHandle));
-					megaApi.remove(nodeExistsInFolder);
+			}
+		}
+	}
 
-					if(!wl.isHeld()){
-						wl.acquire();
-					}
-					if(!lock.isHeld()){
-						lock.acquire();
-					}
-
-					totalUploads++;
-
-					String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
-					if (nameInMEGA != null){
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
-					}
-					else{
-						megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
-					}
-					break;
-				}
-				case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER:{
-					log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-					String sShow=file.getName() + " " + getString(R.string.general_already_uploaded);
-//					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
-
-					Intent i = new Intent(this, ManagerActivityLollipop.class);
-					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					i.setAction(Constants.SHOW_REPEATED_UPLOAD);
-					i.putExtra("MESSAGE", sShow);
-					startActivity(i);
-					log("Return - file already uploaded");
-					return;
-				}
+	int checkFileToUploadRenamed (File file, long parentHandle, String nameInMEGAEdited) {
+		MegaNode nodeEditedExistsInFolder = megaApi.getNodeByPath(nameInMEGAEdited, megaApi.getNodeByHandle(parentHandle));
+		if (nodeEditedExistsInFolder == null){
+			String localFingerPrint = megaApi.getFingerprint(file.getAbsolutePath());
+			MegaNode nodeExists = megaApi.getNodeByFingerprint(localFingerPrint);
+			if (nodeExists == null){
+				return CHECK_FILE_TO_UPLOAD_UPLOAD;
+			}
+			else if (nodeExists.getName().equals(nameInMEGAEdited)){
+				transfersCopy.put(localFingerPrint, nameInMEGAEdited);
+				megaApi.copyNode(nodeExists, megaApi.getNodeByHandle(parentHandle), this);
+				return CHECK_FILE_TO_UPLOAD_COPY;
+			}
+			else {
+				return CHECK_FILE_TO_UPLOAD_UPLOAD;
+			}
+		}
+		else{
+			if (file.length() == nodeEditedExistsInFolder.getSize()){
+				return CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER;
+			}
+			else{
+				return CHECK_FILE_TO_UPLOAD_UPLOAD;
 			}
 		}
 	}
@@ -462,8 +526,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					inProgress = inProgress + currentTransfer.getTransferredBytes();
 				}
 			}
-			long inProgressTemp = inProgress *100;
-			progressPercent = inProgressTemp/total;
+
+			long inProgressTemp = 0;
+			if(total>0){
+				inProgressTemp = inProgress *100;
+				progressPercent = inProgressTemp/total;
+			}
 
 			String message = "";
 			if (inProgress == 0){
@@ -789,15 +857,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 
-				if (getApplicationContext().getExternalCacheDir() != null && !isQRFile) {
+				String qrFileName = megaApi.getMyEmail() + "QRcode.jpg";
+
+				if (getApplicationContext().getExternalCacheDir() != null) {
 					File localFile = new File(getApplicationContext().getExternalCacheDir(), transfer.getFileName());
-					if (localFile.exists()) {
+					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}
-				} else if (!isQRFile){
+				} else {
 					File localFile = new File(getApplicationContext().getCacheDir(), transfer.getFileName());
-					if (localFile.exists()) {
+					if (localFile.exists() && !localFile.getName().equals(qrFileName)) {
 						log("Delete file!: " + localFile.getAbsolutePath());
 						localFile.delete();
 					}

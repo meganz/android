@@ -17,11 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:minHeight="?attr/actionBarSize"
-            app:titleTextAppearance="@style/ToolbarTitle"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            tools:context=".FileProviderActivityLollipop" />
+            tools:context=".FileProviderActivityLollipop"
+            app:popupTheme="@style/Theme.Megaactionbar"
+            app:titleTextAppearance="@style/ToolbarTitle"
+            app:theme="@style/Theme.Megaactionbar"/>
 
 
         <!-- THE Cloud Drive TABS -->
@@ -37,9 +37,7 @@
                 android:id="@+id/sliding_tabs_file_explorer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/mega"
-                android:elevation="4dp"
-                style="@style/MyCustomTabLayout"/>
+                style="@style/MyCustomTabLayout.Secondary"/>
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/explorer_tabs_pager"
