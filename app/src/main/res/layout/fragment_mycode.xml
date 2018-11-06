@@ -45,7 +45,7 @@
             android:id="@+id/qr_code_button_copy_link"
             android:layout_gravity="center"
             android:elevation="6dp"
-            android:background="@color/white"
+            android:background="@drawable/background_button_white"
             android:layout_marginBottom="40dp"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"

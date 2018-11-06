@@ -236,6 +236,7 @@
     <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
     <string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
+    <string name="section_saved_for_offline_new" context="title of the screen that shows the files saved for offline in the device">Offline</string>
     <!--
     <string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
     -->
@@ -519,7 +520,7 @@
     <!--
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
     -->
-    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
+    <string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">From file system</string>
     <!--
     <string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
     -->
@@ -597,13 +598,7 @@
 
     <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
 
-
-    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
     <string name="no_available_payment_method" context="choose the payment method option when no method is available">At this moment, no method of payment is available for this plan</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
-    <string name="payment_method_centili" context="one of the payment methods">Mobile Carrier (one-off)</string>
-    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet (subscription)</string>
 
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>
@@ -768,7 +763,7 @@
     <string name="my_account_title" context="title of the My Account screen">Account Type</string>
     <string name="renews_on" context="title of the Expiration Date">Renews on&#160;</string>
     <string name="expires_on" context="title of the Expiration Date">Expires on&#160;</string>
-    <string name="free_account">FREE</string>
+    <string name="free_account">Free</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
     <string name="pro2_account" context="Not translate">PRO II</string>
@@ -1659,8 +1654,6 @@
 
     <string name="no_contacts_permissions" context="Title of the section to invite contacts if the user has denied the contacts permmissions">No contact permissions granted</string>
 
-    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">* Subject to your participation in our achievement program</string>
-
     <string name="choose_qr_option_panel" context="Option of the sliding panel to go to QR code section">My QR code</string>
     <string name="section_qr_code" context="Title of the screen that shows the options to the QR code">QR Code</string>
     <string name="action_reset_qr" context="Option in menu of section  My QR code to reset the QR code">Reset QR code</string>
@@ -2119,6 +2112,8 @@
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
 
+    <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]of %2$s used[/B]</string>
+
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Change to a testing server?</string>
     <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Are you sure you want to change to a test server? Your account may run irrecoverable problems</string>
 
@@ -2143,5 +2138,102 @@
 
     <string name="confirmation_close_sessions_text" context="Text of the dialog to confirm after closing all other sessions">This will log you out on all other active sessions except the current one.</string>
     <string name="confirmation_close_sessions_title" context="Title of the dialog to confirm after closing all other sessions">Do you want to close all other sessions?</string>
+
+    <string name="general_folders" context="General label for folders">Folders</string>
+    <string name="general_files" context="General label for files">Files</string>
+    <string name="general_save_to_device" context="Item menu option upon right click on one or multiple files">Save to device</string>
+
+    <string name="title_upload_explorer" context="Title of cloud explorer to upload a file">Upload to MEGA</string>
+    <string name="choose_destionation" context="Label choose destination">Choose destination</string>
+    <string name="general_show_more" context="Label that indicates show more items">Show more</string>
+    <string name="general_show_less" context="Label that indicates show less items">Show less</string>
+
+    <string name="notification_new_contact_request" context="Subtitle of the historic notification for a new contact request">[A]%s [/A][B]sent you a contact request.[/B]</string>
+    <string name="notification_new_contact" context="Subtitle of the historic notification for a new contact">[A]%s [/A][B]is now a contact.[/B]</string>
+    <string name="notification_new_shared_folder" context="Subtitle of the historic notification for a new shared folder">[B]New shared folder from [/B][A]%s[/A]</string>
+
+    <string name="notification_reminder_contact_request" context="Subtitle of the historic notification for a reminder new contact request">[A]Reminder: [/A][B]%s [/B][C]sent you a contact request.[/C]</string>
+
+    <string name="title_contact_request_notification_cancelled" context="Title of the historic notification for a contact request cancelled">Contact request cancelled</string>
+    <string name="subtitle_contact_request_notification_cancelled" context="Subtitle of the historic notification for contact request cancelled">[A]%s [/A][B]cancelled the contact request.[/B]</string>
+
+    <string name="title_contact_notification_deleted" context="Title of the historic notification when an user deletes you as contact">Contact deleted</string>
+    <string name="subtitle_contact_notification_deleted" context="Subtitle of the historic notification when an user deletes you as contact">[A]%s [/A][B]deleted you as a contact.[/B]</string>
+
+    <string name="title_contact_notification_blocked" context="Title of the historic notification when an user blocks you as contact">Contact blocked</string>
+    <string name="subtitle_contact_notification_blocked" context="Subtitle of the historic notification when an user blocks you as contact">[A]%s [/A][B]blocked you as a contact.[/B]</string>
+
+    <string name="section_notification_with_unread" context="Item of the navigation title for the notification section when there is any unread">Notifications [A](%1$d)[/A]</string>
+
+    <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">Account deleted</string>
+    <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[A]%s [/A][B]account has been deleted/deactivated.[/B]</string>
+
+    <string name="subtitle_file_takedown_notification" context="Subtitle of folder takedown historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of file takedown historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
+
+    <string name="subtitle_file_takedown_reinstated_notification" context="Subtitle of a folder takedown reinstated historic notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification" context="Subtitle of a file takedown reinstated historic notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+
+    <string name="title_outgoing_contact_request" context="Title of the historic notification for outgoing contact requests">Sent request</string>
+    <string name="title_incoming_contact_request" context="Title of the historic notification for incoming contact requests">Received request</string>
+
+    <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]denied your contact request.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
+
+    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for a deleted shared folder">[B]Access to folder shared by [/B][A]%s[/A][B] was removed.[/B]</string>
+
+    <string name="subtitle_incoming_contact_request_ignored" context="Subtitle of the historic notification for incoming contact request ignored">[B]Contact request from [/B][A]%s [/A][B]was ignored[/B]</string>
+    <string name="subtitle_incoming_contact_request_accepted" context="Subtitle of the historic notification for incoming contact request accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
+    <string name="subtitle_incoming_contact_request_denied" context="Subtitle of the historic notification for incoming contact request declined">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
+
+    <string name="type_of_my_account" context="Subtitle of the Upgrade account section">[A]%s[/A] is your current account</string>
+    <string name="type_month" context=" ">[A]From[/A] %s [A]month[/A][B] *[/B]</string>
+    <string name="upgrade_account_comment" context="the meaning of the asterisk in month*">[A]* [/A]Recurring subscription can be cancelled anytime before renewal date.</string>
+
+    <string name="footnote_achievements" context="Footnote to clarify the storage space is subject to the achievement program">Subject to your participation in our achievement program.</string>
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Payment</string>
+
+    <string name="billing_period_title" context="title of billing period">Billing period</string>
+    <string name="billed_monthly_text" context="option of billing period, monthly">[A]Billed monthly[/A] %s /month</string>
+    <string name="billed_yearly_text" context="option of billing period, yearly">[A]Billed yearly[/A] %s /year</string>
+    <string name="button_cancel" context="dialog option cancel in alert dialog">Cancel</string>
+    <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
+
+    <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (subscription)</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+    <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
+
+    <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NEW</string>
+
+    <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show last active</string>
+    <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow my contacts to see the last time I was active on MEGA. If disabled you wont be able to see the activity status of your contacts.</string>
+
+    <plurals name="num_files_with_parameter" context="on the section notifications indicates the number of files added to a shared folder">
+        <item context="Singular of file. 1 file" quantity="one">%d file</item>
+        <item context="Plural of file. 2 files" quantity="other">%d files</item>
+    </plurals>
+
+    <plurals name="num_folders_with_parameter"  context="on the section notifications indicates the number of folder added to a shared folder">
+        <item context="Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
+        <item context="Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
+    </plurals>
+
+    <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
+
+    <plurals name="subtitle_notification_added_files" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of file. 1 file" quantity="one">[A]%1$s [/A][B]added %2$d file.[/B]</item>
+        <item context="Plural of file. 2 files" quantity="other">[A]%1$s [/A][B]added %2$d files.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_notification_deleted_items" context="Subtitle of the historic notification for deletions inside an existing shared folder">
+        <item context="Singular of item. 1 item" quantity="one">[A]%1$s [/A][B]deleted %2$d item.[/B]</item>
+        <item context="Plural of item. 2 items" quantity="other">[A]%1$s [/A][B]deleted %2$d items.[/B]</item>
+    </plurals>
+
+    <plurals name="subtitle_notification_added_folders" context="Subtitle of the historic notification for new additions inside an existing shared folder">
+        <item context="Singular of folder. 1 folder" quantity="one">[A]%1$s [/A][B]added %2$d folder.[/B]</item>
+        <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
+    </plurals>
 
 </resources>
