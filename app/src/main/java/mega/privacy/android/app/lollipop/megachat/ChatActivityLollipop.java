@@ -668,6 +668,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fragmentContainerFileStorage = (FrameLayout) findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
+        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
 //        imageView = (ImageView) findViewById(R.id.imageView);
 
@@ -801,11 +802,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     removeEmojiconFragment();
                 }
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
                 return false;
             }
@@ -821,11 +818,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     removeEmojiconFragment();
                 }
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
                 textChat.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -2536,11 +2529,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
             removeEmojiconFragment();
         }else if(fileStorageLayout.isShown()){
-            if(fileStorageF != null){
-                fileStorageF.clearSelections();
-                fileStorageF.hideMultipleSelect();
-            }
-            fileStorageLayout.setVisibility(View.GONE);
+            hideFileStorageSection();
         }else{
             finish();
         }
@@ -2612,11 +2601,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.rl_keyboard_icon_chat:{
                 log("onClick:keyboard_icon_chat:  " + emojiKeyboardShown);
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
                 if (emojiKeyboardShown){
                     removeEmojiconFragment();
@@ -2657,11 +2642,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.rl_media_icon_chat:{
                 log("onClick:media_icon_chat");
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2701,11 +2682,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.send_contact_icon_chat:
             case R.id.rl_send_contact_icon_chat:{
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2727,11 +2704,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_file_system_icon_chat:
             case R.id.rl_pick_file_system_icon_chat:{
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
                 if (emojiKeyboardShown) {
                     keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -2753,11 +2726,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.pick_cloud_drive_icon_chat:
             case R.id.rl_pick_cloud_drive_icon_chat:{
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
+                    hideFileStorageSection();
                 }
 
                 if (emojiKeyboardShown) {
@@ -2793,15 +2762,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
 
                 if(fileStorageLayout.isShown()){
-                    if(fileStorageF != null){
-                        fileStorageF.clearSelections();
-                        fileStorageF.hideMultipleSelect();
-                    }
-                    fileStorageLayout.setVisibility(View.GONE);
-
+                    hideFileStorageSection();
                 }else{
 
                     fileStorageLayout.setVisibility(View.VISIBLE);
+                    pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -7354,11 +7319,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void hideKeyboard() {
         if (fileStorageLayout.isShown()) {
-            if (fileStorageF != null) {
-                fileStorageF.clearSelections();
-                fileStorageF.hideMultipleSelect();
-            }
-            fileStorageLayout.setVisibility(View.GONE);
+            hideFileStorageSection();
         }
         if (emojiKeyboardShown) {
             keyboardButton.setImageResource(R.drawable.ic_emoticon_white);
@@ -7433,6 +7394,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 screen = 0;
         }
         return screen;
+    }
+
+    public void hideFileStorageSection(){
+        if (fileStorageF != null) {
+            fileStorageF.clearSelections();
+            fileStorageF.hideMultipleSelect();
+        }
+        fileStorageLayout.setVisibility(View.GONE);
+        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
     }
 
 }
