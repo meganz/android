@@ -1965,6 +1965,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         settingsSection = (RelativeLayout) findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
+		}
+		else {
+            upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
+		}
         upgradeAccount.setOnClickListener(this);
 
 //		badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
@@ -14804,7 +14810,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 		if (upgradeAccount != null) {
 			upgradeAccount.setEnabled(true);
-			upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_button_white));
+            }
+            else {
+                upgradeAccount.setBackground(ContextCompat.getDrawable(this, R.drawable.background_grey_button));
+            }
 			upgradeAccount.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
 		}
 	}
@@ -15654,7 +15665,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 						}
 					}
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
+					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 				}
 				else{
 					log("Error with first name");
@@ -15691,7 +15702,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 						}
 					}
-					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
+					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 				}
 				else{
 					log("Error with last name");
@@ -15910,7 +15921,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Name and First Name received!");
 
 						((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
+						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 
 						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
 						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
@@ -15949,7 +15960,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						log("Name and First Name received!");
 
 						((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName(), ((MegaApplication) getApplication()).getMyAccountInfo().getFirstLetter());
+						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 
 						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
 						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
@@ -17783,12 +17794,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 
-	public void updateUserNameNavigationView(String fullName, String firstLetter){
+	public void updateUserNameNavigationView(String fullName){
 		log("updateUserNameNavigationView");
 
 		nVDisplayName.setText(fullName);
-
-		nVPictureProfile.setImageBitmap(Util.createDefaultAvatar(megaApi.getUserAvatarColor(megaApi.getMyUser()), firstLetter));
+		setProfileAvatar();
 	}
 
 	public void updateMailNavigationView(String email){
