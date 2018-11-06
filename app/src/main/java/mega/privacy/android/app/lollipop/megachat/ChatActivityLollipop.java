@@ -150,10 +150,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
     public static int REQUEST_CODE_SELECT_CHAT = 1005;
 
+    public static int INITIAL_PRESENCE_STATUS = -55;
+
     String mOutputFilePath;
 
     boolean newVisibility = false;
     boolean getMoreHistory=false;
+
+    int minutesLastGreen = -1;
 
     boolean isLoadingHistory = false;
 
@@ -1404,6 +1408,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    public void setLastGreen(String date){
+        subtitleToobar.setText(date);
+        subtitleToobar.setVisibility(View.VISIBLE);
+    }
+
+    public void requestLastGreen(int state){
+        log("requestLastGreen: "+state);
+        if(state == INITIAL_PRESENCE_STATUS){
+            state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
+        }
+
+
+        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
+            log("Request last green for user");
+            megaChatApi.requestLastGreen(chatRoom.getPeerHandle(0), this);
+        }
+    }
+
     public void setStatus(long userHandle){
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED){
             log("Chat not connected");
@@ -1428,44 +1450,47 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     subtitleToobar.setVisibility(View.VISIBLE);
                     iconStateToolbar.setVisibility(View.VISIBLE);
                     iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-
-                }
-                else if(state == MegaChatApi.STATUS_AWAY){
-                    log("This user is away");
-                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
-                    subtitleToobar.setVisibility(View.VISIBLE);
-                    iconStateToolbar.setVisibility(View.VISIBLE);
-                    iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
-
-                }
-                else if(state == MegaChatApi.STATUS_BUSY){
-                    log("This user is busy");
-                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
-                    subtitleToobar.setVisibility(View.VISIBLE);
-                    iconStateToolbar.setVisibility(View.VISIBLE);
-                    iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
-
-                }
-                else if(state == MegaChatApi.STATUS_OFFLINE){
-                    log("This user is offline");
-                    subtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
-                    subtitleToobar.setVisibility(View.VISIBLE);
-                    iconStateToolbar.setVisibility(View.VISIBLE);
-                    iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
-
-                }
-                else if(state == MegaChatApi.STATUS_INVALID){
-                    log("INVALID status: "+state);
-                    subtitleToobar.setText(null);
-                    subtitleToobar.setVisibility(View.GONE);
-                    iconStateToolbar.setVisibility(View.GONE);
                 }
                 else{
-                    log("This user status is: "+state);
-                    subtitleToobar.setText(null);
-                    subtitleToobar.setVisibility(View.GONE);
-                    iconStateToolbar.setVisibility(View.GONE);
+
+                    if(state == MegaChatApi.STATUS_AWAY){
+                        log("This user is away");
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
+                        subtitleToobar.setVisibility(View.VISIBLE);
+                        iconStateToolbar.setVisibility(View.VISIBLE);
+                        iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+
+                    }
+                    else if(state == MegaChatApi.STATUS_BUSY){
+                        log("This user is busy");
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
+                        subtitleToobar.setVisibility(View.VISIBLE);
+                        iconStateToolbar.setVisibility(View.VISIBLE);
+                        iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+
+                    }
+                    else if(state == MegaChatApi.STATUS_OFFLINE){
+                        log("This user is offline");
+                        subtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
+                        subtitleToobar.setVisibility(View.VISIBLE);
+                        iconStateToolbar.setVisibility(View.VISIBLE);
+                        iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+
+                    }
+                    else if(state == MegaChatApi.STATUS_INVALID){
+                        log("INVALID status: "+state);
+                        subtitleToobar.setText(null);
+                        subtitleToobar.setVisibility(View.GONE);
+                        iconStateToolbar.setVisibility(View.GONE);
+                    }
+                    else{
+                        log("This user status is: "+state);
+                        subtitleToobar.setText(null);
+                        subtitleToobar.setVisibility(View.GONE);
+                        iconStateToolbar.setVisibility(View.GONE);
+                    }
                 }
+
             }
         }
     }
@@ -6128,6 +6153,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showSnackbar(getString(R.string.create_chat_error));
             }
         }
+        else if(request.getType() == MegaChatRequest.TYPE_LAST_GREEN){
+            log("TYPE_LAST_GREEN requested");
+        }
     }
 
     @Override
@@ -6724,6 +6752,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         log("Chat connection (" + idChat+ ") is: "+chatConnection);
         if(chatConnection==MegaChatApi.CHAT_CONNECTION_ONLINE) {
             setAsRead = true;
+            requestLastGreen(INITIAL_PRESENCE_STATUS);
         }
         else{
             setAsRead=false;
@@ -6941,6 +6970,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userHandle, int status, boolean inProgress) {
         log("onChatOnlineStatusUpdate: " + status + "___" + inProgress);
         setChatSubtitle();
+        requestLastGreen(status);
     }
 
     @Override
@@ -6964,7 +6994,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-        log("onChatPresenceLastGreen");
+        log("onChatPresenceLastGreen: "+lastGreen);
+        if(userhandle == chatRoom.getPeerHandle(0)){
+            log("Update last green");
+            minutesLastGreen = lastGreen;
+
+            int state = megaChatApi.getUserOnlineStatus(chatRoom.getPeerHandle(0));
+
+            if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
+                String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+
+                setLastGreen(formattedDate);
+
+                log("Date last green: "+formattedDate);
+            }
+        }
     }
 
     public void takePicture(){
