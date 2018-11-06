@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import mega.privacy.android.app.R;
