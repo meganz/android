@@ -40,15 +40,16 @@ public final class EmojiManager {
   };
   private static final EmojiReplacer DEFAULT_EMOJI_REPLACER = new EmojiReplacer() {
     @Override public void replaceWithImages(final Context context, Spannable text, final float emojiSize, final float defaultEmojiSize, final EmojiReplacer fallback) {
-      final EmojiManager emojiManager = EmojiManager.getInstance();
-      final EmojiSpan[] existingSpans = text.getSpans(0, text.length(), EmojiSpan.class);
-      final List<Integer> existingSpanPositions = new ArrayList<>(existingSpans.length);
-      final int size = existingSpans.length;
 
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0; i < size; i++) {
-        existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
-      }
+      final EmojiManager emojiManager = EmojiManager.getInstance();
+//      final EmojiSpan[] existingSpans = text.getSpans(0, text.length(), EmojiSpan.class);
+//      final List<Integer> existingSpanPositions = new ArrayList<>(existingSpans.length);
+//      final int size = existingSpans.length;
+
+//      //noinspection ForLoopReplaceableByForEach
+//      for (int i = 0; i < size; i++) {
+//        existingSpanPositions.add(text.getSpanStart(existingSpans[i]));
+//      }
 
       final List<EmojiRange> findAllEmojis = emojiManager.findAllEmojis(text);
       if(findAllEmojis.size() == 0){
