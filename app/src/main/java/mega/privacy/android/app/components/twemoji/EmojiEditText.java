@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.Util;
 //Reference implementation for an EditText with emoji support
 public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInterface {
     private float emojiSize;
-    private boolean isInput = false;
+
     public EmojiEditText(final Context context) {
         this(context, null);
     }
@@ -34,8 +34,10 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         if (!isInEditMode()) {
             EmojiManager.getInstance().verifyInstalled();
         }
+
         final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
         final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+
         if (attrs == null) {
             emojiSize = defaultEmojiSize;
         } else {
@@ -46,42 +48,32 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
                 a.recycle();
             }
         }
-
         setText(getText());
     }
-    @Override public void setText(CharSequence rawText, BufferType type) {
-        setInput(true);
-        CharSequence text = rawText == null ? "" : rawText;
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-        Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-        float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-        EmojiManager.getInstance().replaceWithImages(getContext(), spannableStringBuilder, emojiSize, defaultEmojiSize);
-        super.setText(spannableStringBuilder, type);
-    }
 
-    @Override @CallSuper protected void onTextChanged(CharSequence rawText, int start, int lengthBefore, int lengthAfter) {
-            if(!isInput()){
-                Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-                float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
+    @Override protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
+        if(text.toString().equals("")){
+        }else{
+            if(lengthAfter>lengthBefore){
+                final Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
+                final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
                 EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
-                super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
+                super.onTextChanged( getText(),start,lengthBefore,lengthAfter);
             }
+
+        }
     }
 
-    @Override @CallSuper public void input(Emoji emoji) {
+    @Override @CallSuper public void input(final Emoji emoji) {
         if (emoji != null) {
             final int start = getSelectionStart();
             final int end = getSelectionEnd();
+
             if (start < 0) {
                 append(emoji.getUnicode());
             } else {
                 getText().replace(Math.min(start, end), Math.max(start, end), emoji.getUnicode(), 0, emoji.getUnicode().length());
             }
-            setInput(true);
-            Paint.FontMetrics fontMetrics = getPaint().getFontMetrics();
-            float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
-            EmojiManager.getInstance().replaceWithImages(getContext(), getText(), emojiSize, defaultEmojiSize);
-
         }
     }
 
@@ -91,34 +83,33 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
 
     @Override @CallSuper public void backspace() {
         final KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0, KeyEvent.KEYCODE_ENDCALL);
-        setInput(true);
         dispatchKeyEvent(event);
     }
 
-    @Override public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-        return new SoftKeyboardInputConnection(super.onCreateInputConnection(outAttrs), true);
-    }
-
-    private class SoftKeyboardInputConnection extends InputConnectionWrapper {
-
-        public SoftKeyboardInputConnection(InputConnection target, boolean mutable) {
-            super(target, mutable);
-        }
-
-        @Override
-        public boolean sendKeyEvent(KeyEvent event) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-                backspace();
-            }
-            return false;
-        }
-
-        @Override
-        public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-            backspace();
-            return false;
-        }
-    }
+//    @Override public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+//        return new SoftKeyboardInputConnection(super.onCreateInputConnection(outAttrs), true);
+//    }
+//
+//    private class SoftKeyboardInputConnection extends InputConnectionWrapper {
+//
+//        public SoftKeyboardInputConnection(InputConnection target, boolean mutable) {
+//            super(target, mutable);
+//        }
+//
+//        @Override
+//        public boolean sendKeyEvent(KeyEvent event) {
+//            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+//                backspace();
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+//            backspace();
+//            return false;
+//        }
+//    }
 
     @Override public final void setEmojiSize(@Px final int pixels) {
         setEmojiSize(pixels, true);
@@ -136,16 +127,7 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
     }
 
-    public boolean isInput() {
-        return isInput;
-    }
-
-    public void setInput(boolean input) {
-        isInput = input;
-    }
     public static void log(String message) {
         Util.log("EmojiEditText", message);
     }
-
-
 }

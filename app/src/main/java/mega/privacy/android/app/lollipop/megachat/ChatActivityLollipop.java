@@ -676,35 +676,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         fileStorageLayout = (RelativeLayout) findViewById(R.id.relative_layout_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
 
-//        imageView = (ImageView) findViewById(R.id.imageView);
-
-
-       // GridView gallery = (GridView) findViewById(R.id.galleryGridView);
-
-        //gallery.setAdapter(new ImageAdapter(this));
-
-//        gallery.setOnItemClickListener(new OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> arg0, View arg1,
-//                                    int position, long arg3) {
-//                if (null != images && !images.isEmpty())
-//                    Toast.makeText(
-//                            getApplicationContext(),
-//                            "position " + position + " " + images.get(position),
-//                            300).show();
-//                ;
-//
-//            }
-//        });
 
         textChat.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
                 if (s != null) {
                     if (s.length() > 0) {
                         String temp = s.toString();
@@ -793,6 +774,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         });
 
+
         textChat.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -812,7 +794,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                textChat.setInput(false);
 
                 //Hide fileStorageLayout
                 if(fileStorageLayout.isShown()){

@@ -92,7 +92,6 @@ public class EmojiTextView extends AppCompatTextView implements EmojiTexViewInte
 
       }
     }
-
   }
 
   @Override
