@@ -26,8 +26,7 @@
              app:theme="@style/CollapsingToolbarContactInfo"
              app:layout_scrollFlags="scroll|exitUntilCollapsed"
              app:expandedTitleTextAppearance="@style/CollapsingToolbarContactInfo.TitleText"
-                app:titleEnabled="false">
-
+             app:titleEnabled="false">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -62,9 +61,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom">
 
-
                   <TextView
-                      android:id="@+id/name_length"
+                      android:id="@+id/first_line_length_toolbar"
                       android:visibility="invisible"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -77,12 +75,12 @@
                       android:textAppearance="@style/ToolbarTitle.Secondary"/>
 
                   <TextView
-                      android:id="@+id/email_length"
+                      android:id="@+id/second_line_length_toolbar"
                       android:visibility="invisible"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textSize="14sp"
-                      android:layout_below="@+id/name_length"
+                      android:layout_below="@+id/first_line_length_toolbar"
                       android:layout_marginLeft="72dp"
                       android:ellipsize="end"
                       android:maxLines="1"
@@ -90,14 +88,13 @@
                       android:textAppearance="@style/ToolbarTitle.Secondary"
                       android:paddingBottom="9dp"/>
 
-
                   <ImageView
                       android:id="@+id/contact_drawable_state"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_marginLeft="7dp"
-                      android:layout_toEndOf="@+id/name_length"
-                      android:layout_toRightOf="@+id/name_length"
+                      android:layout_toEndOf="@+id/first_line_length_toolbar"
+                      android:layout_toRightOf="@+id/first_line_length_toolbar"
                       android:background="@null"
                       android:src="@drawable/ic_offline"
                       app:layout_collapseMode="pin"
@@ -124,7 +121,7 @@
                     app:layout_collapseMode="pin">
 
                     <TextView
-                        android:id="@+id/name_contact"
+                        android:id="@+id/first_line_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="72dp"
@@ -137,11 +134,11 @@
                         android:textAppearance="@style/ToolbarTitle.Secondary" />
 
                     <TextView
-                        android:id="@+id/email_contact"
+                        android:id="@+id/second_line_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
-                        android:layout_below="@+id/name_contact"
+                        android:layout_below="@+id/first_line_toolbar"
                         android:layout_marginLeft="72dp"
                         android:textColor="@color/white"
                         android:maxLines="1"
