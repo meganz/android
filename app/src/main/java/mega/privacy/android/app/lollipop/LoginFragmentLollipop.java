@@ -469,7 +469,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
-        tB  =(Toolbar) v.findViewById(R.id.toolbar);
+        tB  =(Toolbar) v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
