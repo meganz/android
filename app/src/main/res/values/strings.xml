@@ -1632,7 +1632,7 @@
 
     <string name="user_account_feedback" context="Label to include info of the user email in the feedback form">User account</string>
 
-    <string name="save_to_mega" context="Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage">Save to my \nCloud Drive</string>
+    <string name="save_to_mega" context="Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage">Upload to \nMEGA</string>
 
     <string name="chat_already_exists" context="Error message when creating a chat one to one with a contact that already has a chat">The chat already exists</string>
 
