@@ -2464,6 +2464,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
 				secondLineLengthToolbar.setText(formattedDate);
 
