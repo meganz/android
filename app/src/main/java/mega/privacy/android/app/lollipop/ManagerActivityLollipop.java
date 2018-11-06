@@ -5143,7 +5143,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.replace(R.id.fragment_container, notificFragment, "notificFragment");
 			ft.commitNow();
-			notificFragment.setNotifications();
 		}
 
 		setToolbarTitle();
@@ -16978,6 +16977,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
 	public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
 		log("onUserAlertsUpdate");
+
 		setNotificationsTitleSection();
 
 		if(notificFragment!=null && notificFragment.isAdded()){
