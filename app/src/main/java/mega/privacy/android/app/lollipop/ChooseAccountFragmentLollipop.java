@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -18,18 +19,15 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Locale;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -48,6 +46,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     ActionBar aB;
+    Toolbar tB;
 
     public ArrayList<Product> accounts;
 
@@ -141,7 +140,21 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
         View v = inflater.inflate(R.layout.fragment_choose_account, container, false);
 
+        tB = (Toolbar) v.findViewById(R.id.toolbar_choose_account);
+        ((LoginActivityLollipop) context).showAB(tB);
+
         scrollView = (ScrollView) v.findViewById(R.id.scroll_view_choose_account);
+        new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollView.canScrollVertically(-1)){
+                    tB.setElevation(Util.px2dp(4, outMetrics));
+                }
+                else {
+                    tB.setElevation(0);
+                }
+            }
+        });
 
         mainLinearLayout = (LinearLayout) v.findViewById(R.id.choose_account_main_linear_layout);
 
@@ -227,9 +240,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         upgradeComment.setText(result);
 
-
         setPricingInfo();
-
         return v;
     }
 
