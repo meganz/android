@@ -135,7 +135,7 @@
 
                 </RelativeLayout>
 
-                <TextView
+                <Button
                     android:id="@+id/button_login_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -150,7 +150,9 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="10dp"
-                    android:paddingBottom="10dp"/>
+                    android:paddingBottom="10dp"
+                    style="@style/ButtonStyle"
+                    android:elevation="8dp"/>
 
                 <TextView
                     android:id="@+id/button_forgot_pass"

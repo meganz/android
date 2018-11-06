@@ -91,7 +91,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private EditText et_user;
     private EditText et_password;
     private TextView bRegister;
-    private TextView bLogin;
+    private Button bLogin;
     private TextView bForgotPass;
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
@@ -355,7 +355,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
-        bLogin = (TextView) v.findViewById(R.id.button_login_login);
+        bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
         bLogin.setOnClickListener(this);
 
