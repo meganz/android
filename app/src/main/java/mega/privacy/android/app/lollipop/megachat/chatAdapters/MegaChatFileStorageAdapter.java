@@ -67,7 +67,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         public ImageView photo;
         public RelativeLayout thumbLayout;
         public ImageView photoSelected;
-        public RelativeLayout photoUnselected;
+//        public RelativeLayout photoUnselected;
     }
 
     public void toggleSelection(int pos) {
@@ -191,8 +191,8 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         holderGrid.photo = (ImageView) v.findViewById(R.id.file_storage_grid_thumbnail);
         holderGrid.photoSelected = (ImageView) v.findViewById(R.id.thumbnail_selected);
         holderGrid.photoSelected.setVisibility(View.GONE);
-        holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
-        holderGrid.photoUnselected.setVisibility(View.GONE);
+//        holderGrid.photoUnselected = (RelativeLayout) v.findViewById(R.id.thumbnail_unselected);
+//        holderGrid.photoUnselected.setVisibility(View.GONE);
 
         holderGrid.photoSelected.setMaxHeight(dimPhotos);
         holderGrid.photoSelected.setMaxWidth(dimPhotos);
@@ -231,17 +231,17 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
 
         if (!multipleSelect) {
             holder.photoSelected.setVisibility(View.GONE);
-            holder.photoUnselected.setVisibility(View.GONE);
+//            holder.photoUnselected.setVisibility(View.GONE);
 
         }else {
 
             if(this.isItemChecked(position)){
                 holder.photoSelected.setVisibility(View.VISIBLE);
-                holder.photoUnselected.setVisibility(View.GONE);
+//                holder.photoUnselected.setVisibility(View.GONE);
 
             }else{
                 holder.photoSelected.setVisibility(View.GONE);
-                holder.photoUnselected.setVisibility(View.VISIBLE);
+//                holder.photoUnselected.setVisibility(View.VISIBLE);
             }
         }
 

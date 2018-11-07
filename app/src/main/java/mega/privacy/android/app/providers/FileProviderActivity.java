@@ -157,7 +157,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	EditText et_user;
 	EditText et_password;
 	TextView bRegisterLol;
-	TextView bLoginLol;
+	Button bLoginLol;
 
 	RelativeLayout relativeLayout;
 	
@@ -583,7 +583,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		});
 
 		
-		bLoginLol = (TextView) findViewById(R.id.button_login_login);
+		bLoginLol = (Button) findViewById(R.id.button_login_login);
 		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
 
 		bLoginLol.setOnClickListener(this);
@@ -1404,7 +1404,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_email);
 		}
-		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return getString(R.string.error_invalid_email);
 		}
 		return null;
