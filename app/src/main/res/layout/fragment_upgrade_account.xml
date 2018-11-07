@@ -15,7 +15,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical">
-
 			<RelativeLayout
 				android:id="@+id/title_my_account_type"
 				android:layout_width="match_parent"
@@ -31,7 +30,6 @@
 					android:textColor="@color/mail_my_account"
 					android:textSize="14sp"/>
 			</RelativeLayout>
-
 			<!-- Pro Lite -->
 			<RelativeLayout
 				android:id="@+id/upgrade_prolite_layout"
@@ -576,6 +574,7 @@
 		android:id="@+id/available_payment_methods_prolite"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="36dp"
 		android:layout_marginRight="8dp"
 		android:layout_marginLeft="8dp"
 		android:visibility="gone"
@@ -586,6 +585,7 @@
 		android:id="@+id/available_payment_methods_pro_i"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="36dp"
 		android:layout_marginRight="8dp"
 		android:layout_marginLeft="8dp"
 		android:visibility="gone"
@@ -596,6 +596,7 @@
 		android:id="@+id/available_payment_methods_pro_ii"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="36dp"
 		android:layout_marginRight="8dp"
 		android:layout_marginLeft="8dp"
 		android:visibility="gone"
@@ -606,6 +607,7 @@
 		android:id="@+id/available_payment_methods_pro_iii"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="36dp"
 		android:layout_marginRight="8dp"
 		android:layout_marginLeft="8dp"
 		android:visibility="gone"
