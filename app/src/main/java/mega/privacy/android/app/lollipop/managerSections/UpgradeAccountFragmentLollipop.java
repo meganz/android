@@ -66,8 +66,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private RelativeLayout pro2Layout;
 	private RelativeLayout pro3Layout;
 
-	TextView upgradeComment;
-
 	private RelativeLayout proLiteTransparentLayout;
 	private RelativeLayout pro1TransparentLayout;
 	private RelativeLayout pro3TransparentLayout;
@@ -223,21 +221,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		pro3TransparentLayout.setVisibility(View.GONE);
 		//END -- PRO III ACCOUNT
 
-		upgradeComment = (TextView) v.findViewById(R.id.upgrade_account_comment);
-		String text = getString(R.string.upgrade_account_comment);
-		try{
-			text = text.replace("[A]", "<font color=\'#ff333a\'>");
-			text = text.replace("[/A]", "</font>");
-		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
-		}else {
-			result = Html.fromHtml(text);
-		}
-		upgradeComment.setText(result);
-
 		setPricing();
 		log("setPricing ENDS");
 		showAvailableAccount();
@@ -331,8 +314,6 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					try{
 						textToShowA = textToShowA.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowA = textToShowA.replace("[/A]", "</font>");
-						textToShowA = textToShowA.replace("[B]", "<font color=\'#ff333a\'>");
-						textToShowA = textToShowA.replace("[/B]", "</font>");
 					}catch (Exception e){}
 					Spanned resultA = null;
 					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
