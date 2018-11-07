@@ -1743,7 +1743,7 @@ public class Util {
 		if (value.length() == 0) {
 			return context.getString(R.string.error_enter_email);
 		}
-		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+		if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
 			return context.getString(R.string.error_invalid_email);
 		}
 		return null;

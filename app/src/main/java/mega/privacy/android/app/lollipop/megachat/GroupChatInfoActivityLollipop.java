@@ -61,6 +61,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListe
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeChatUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -436,6 +437,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
 
             participants.add(participant);
+
+            int userStatus = megaChatApi.getUserOnlineStatus(participant.getHandle());
+            if(userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID){
+                log("Request last green for user");
+                megaChatApi.requestLastGreen(participant.getHandle(), null);
+            }
         }
 
         String myFullName =  megaChatApi.getMyFullname();
@@ -1479,12 +1486,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
         else{
             log("Status update for the user: "+userHandle);
+
             int indexToReplace = -1;
             ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
             while (itrReplace.hasNext()) {
                 MegaChatParticipant participant = itrReplace.next();
                 if (participant != null) {
                     if (participant.getHandle() == userHandle) {
+                        if(status != MegaChatApi.STATUS_ONLINE && status != MegaChatApi.STATUS_BUSY && status != MegaChatApi.STATUS_INVALID){
+                            log("Request last green for user");
+                            megaChatApi.requestLastGreen(userHandle, this);
+                        }
+                        else{
+                            participant.setLastGreen("");
+                        }
                         indexToReplace = itrReplace.nextIndex() - 1;
                         break;
                     }
@@ -1517,5 +1532,38 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
         log("onChatPresenceLastGreen");
+        int state = megaChatApi.getUserOnlineStatus(userhandle);
+        if(state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID){
+            String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
+
+            if(userhandle != megaChatApi.getMyUserHandle()){
+                log("Status last green for the user: "+userhandle);
+                int indexToReplace = -1;
+                ListIterator<MegaChatParticipant> itrReplace = participants.listIterator();
+                while (itrReplace.hasNext()) {
+                    MegaChatParticipant participant = itrReplace.next();
+                    if (participant != null) {
+                        if (participant.getHandle() == userhandle) {
+                            participant.setLastGreen(formattedDate);
+                            indexToReplace = itrReplace.nextIndex() - 1;
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (indexToReplace != -1) {
+                    log("Index to replace: " + indexToReplace);
+                    if(chat.getOwnPrivilege()==MegaChatRoom.PRIV_MODERATOR){
+                        adapter.updateContactStatus(indexToReplace+1);
+                    }
+                    else{
+                        adapter.updateContactStatus(indexToReplace);
+                    }
+                }
+            }
+
+            log("Date last green: "+formattedDate);
+        }
     }
 }
