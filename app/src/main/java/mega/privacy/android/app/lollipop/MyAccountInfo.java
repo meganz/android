@@ -43,8 +43,6 @@ public class MyAccountInfo {
 
     String firstNameText = "";
     String lastNameText = "";
-    boolean lastName = false;
-    boolean firstName = false;
     String firstLetter;
     String fullName = "";
 
@@ -333,14 +331,6 @@ public class MyAccountInfo {
         this.productAccounts = productAccounts;
     }
 
-    public boolean isFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(boolean firstName) {
-        this.firstName = firstName;
-    }
-
     public String getFirstNameText() {
         return firstNameText;
     }
@@ -348,14 +338,6 @@ public class MyAccountInfo {
     public void setFirstNameText(String firstNameText) {
         this.firstNameText = firstNameText;
         setFullName();
-    }
-
-    public boolean isLastName() {
-        return lastName;
-    }
-
-    public void setLastName(boolean lastName) {
-        this.lastName = lastName;
     }
 
     public String getLastNameText() {
