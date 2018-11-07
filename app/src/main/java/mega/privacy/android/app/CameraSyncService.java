@@ -2458,14 +2458,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					uploadNext();
 				}
 			}
-			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-				log("OVERQUOTA ERROR: "+e.getErrorCode());
-
-				isOverquota = true;
-
-				CameraSyncService.this.cancel();
-
-			}
 			else{
 				log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
@@ -2500,6 +2492,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + transfer.getFileName());
+
+		if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+			if (e.getValue() != 0)
+				log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+			else
+				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+
+			isOverquota = true;
+
+			CameraSyncService.this.cancel();
+		}
 	}
 
 	@SuppressWarnings("deprecation")

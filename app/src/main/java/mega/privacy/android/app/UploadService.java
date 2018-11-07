@@ -666,13 +666,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			mapProgressTransfers.put(transfer.getTag(), transfer);
 
-			if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-				isOverquota = 1;
-			}
-			else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-				isOverquota = 2;
-			}
-
 			if (!transfer.isFolderTransfer()) {
 
 				if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
@@ -940,6 +933,28 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
+		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			switch (e.getErrorCode())
+			{
+				case MegaError.API_EOVERQUOTA:
+				case MegaError.API_EGOINGOVERQUOTA:
+					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+						isOverquota = 1;
+					}
+					else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+						isOverquota = 2;
+					}
+
+					if (e.getValue() != 0) {
+						log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+					}
+					else {
+						log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+						showStorageOverquotaNotification();
+					}
+					break;
+			}
+		}
 	}
 
 	private void showStorageOverquotaNotification(){

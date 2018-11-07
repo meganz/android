@@ -1741,6 +1741,17 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
     @Override
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
         log("onTransferTemporaryError: " + transfer.getFileName());
+
+        if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+            if (e.getValue() != 0)
+                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+            else
+                log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+
+            isOverquota = true;
+
+            cancel();
+        }
     }
 
     @Override
@@ -1900,14 +1911,6 @@ public class CameraUploadsService extends JobService implements MegaGlobalListen
                 else{
                     uploadNext();
                 }
-            }
-            else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-                log("OVERQUOTA ERROR: "+e.getErrorCode());
-
-                isOverquota = true;
-
-                cancel();
-
             }
             else{
                 log("Image Sync FAIL: " + transfer.getFileName() + "___" + e.getErrorString());

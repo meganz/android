@@ -886,14 +886,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 							log("Transfer API_EEXIST: "+transfer.getNodeHandle());
 						}
 						else{
-
-							if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-								isOverquota = 1;
-							}
-							else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-								isOverquota = 2;
-							}
-
 							//Find the pending message
 							for(int i=0; i<pendingMessages.size();i++){
 								PendingMessage pendMsg = pendingMessages.get(i);
@@ -1141,9 +1133,31 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	}
 
 	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
+	public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log(transfer.getPath() + "\nUpload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
+
+		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			switch (e.getErrorCode())
+			{
+				case MegaError.API_EOVERQUOTA:
+				case MegaError.API_EGOINGOVERQUOTA:
+					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+						isOverquota = 1;
+					}
+					else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
+						isOverquota = 2;
+					}
+
+					if (e.getValue() != 0) {
+						log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+					}
+					else {
+						log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
+						showStorageOverquotaNotification();
+					}
+					break;
+			}
+		}
 	}
 
 	@Override
