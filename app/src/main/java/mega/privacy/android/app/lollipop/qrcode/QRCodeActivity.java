@@ -283,10 +283,12 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 }
                 String myEmail = megaApi.getMyEmail();
                 if (this.getExternalCacheDir() != null) {
-                    qrFile = new File(this.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                    File qrDir = new File (this.getExternalCacheDir(), "qrMEGA");
+                    qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
                 else {
-                    qrFile = new File(this.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                    File qrDir = this.getDir("qrMEGA", 0);
+                    qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
                 }
                 if (qrFile == null) {
                     showSnackbar(getString(R.string.general_error));

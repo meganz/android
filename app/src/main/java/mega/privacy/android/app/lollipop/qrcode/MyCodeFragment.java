@@ -134,10 +134,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         log("queryIfQRExists");
 
         if (context.getExternalCacheDir() != null){
-            qrFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
         }
         else{
-            qrFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+            File qrDir = context.getDir("qrMEGA", 0);
+            qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
         }
 
         if (qrFile.exists()){
@@ -511,10 +513,18 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             qrCodeBitmap = createQRCode(queryQR(), setUserAvatar());
             File qrCodeFile = null;
             if (context.getExternalCacheDir() != null){
-                qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+                if (qrDir != null){
+                    qrDir.mkdirs();
+                }
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             else{
-                qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = context.getDir("qrMEGA", 0);
+                if (qrDir != null){
+                    qrDir.mkdirs();
+                }
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
 
             if (qrCodeFile != null) {
@@ -553,10 +563,12 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             log("Contact link delete:" + e.getErrorCode() + "_" + request.getNodeHandle() + "_"  + MegaApiAndroid.handleToBase64(request.getNodeHandle()));
             File qrCodeFile = null;
             if (context.getExternalCacheDir() != null){
-                qrCodeFile = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = new File (context.getExternalCacheDir(), "qrMEGA");
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             else{
-                qrCodeFile = new File(context.getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+                File qrDir = context.getDir("qrMEGA", 0);
+                qrCodeFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
             }
             if (qrCodeFile != null && qrCodeFile.exists()){
                 qrCodeFile.delete();
