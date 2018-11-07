@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,6 +168,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SYNC_COPYONLY = "sync_copyonly";
     private static final String KEY_SYNC_SECONDARY = "sync_secondary";
     private static final String KEY_SYNC_TYPE = "sync_type";
+    private static final String KEY_SYNC_LONGITUDE = "sync_longitude";
+    private static final String KEY_SYNC_LATITUDE = "sync_latitude";
     private static final String CREATE_SYNC_RECORDS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_SYNC_RECORDS + "("
             + KEY_ID + " INTEGER PRIMARY KEY, "
             + KEY_SYNC_FILEPATH_ORI + " TEXT,"
@@ -175,6 +178,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_SYNC_FP_NEW + " TEXT,"
             + KEY_SYNC_TIMESTAMP + " TEXT,"
             + KEY_SYNC_FILENAME + " TEXT,"
+            + KEY_SYNC_LONGITUDE + " TEXT,"
+            + KEY_SYNC_LATITUDE + " TEXT,"
             + KEY_SYNC_STATE + " INTEGER,"
             + KEY_SYNC_TYPE + " INTEGER,"
             + KEY_SYNC_HANDLE + " TEXT,"
@@ -708,6 +713,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(record.isSecondary() != null) {
             values.put(KEY_SYNC_SECONDARY,encrypt(String.valueOf(record.isSecondary())));
         }
+        values.put(KEY_SYNC_LONGITUDE,record.getLongitude());
+        values.put(KEY_SYNC_LATITUDE,record.getLatitude());
         values.put(KEY_SYNC_STATE,record.getStatus());
         values.put(KEY_SYNC_TYPE,record.getType());
         db.insert(TABLE_SYNC_RECORDS,null,values);
@@ -802,18 +809,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         record.setOriginFingerprint(decrypt(cursor.getString(3)));
         record.setNewFingerprint(decrypt(cursor.getString(4)));
         String timestamp = decrypt(cursor.getString(5));
-        if (timestamp != null) {
+        if (!TextUtils.isEmpty(timestamp)) {
             record.setTimestamp(Long.valueOf(timestamp));
         }
         record.setFileName(decrypt(cursor.getString(6)));
-        record.setStatus(cursor.getInt(7));
-        record.setType(cursor.getInt(8));
-        String nodeHandle = decrypt(cursor.getString(9));
-        if (nodeHandle != null) {
+        String longitude = decrypt(cursor.getString(7));
+        if(!TextUtils.isEmpty(longitude)) {
+            record.setLongitude(Float.valueOf(longitude));
+        }
+        String latitude = decrypt(cursor.getString(8));
+        if(!TextUtils.isEmpty(latitude)) {
+            record.setLatitude(Float.valueOf(latitude));
+        }
+        record.setStatus(cursor.getInt(9));
+        record.setType(cursor.getInt(10));
+        String nodeHandle = decrypt(cursor.getString(11));
+        if (!TextUtils.isEmpty(nodeHandle)) {
             record.setNodeHandle(Long.valueOf(nodeHandle));
         }
-        record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(10))));
-        record.setSecondary(Boolean.valueOf(decrypt(cursor.getString(11))));
+        record.setCopyOnly(Boolean.valueOf(decrypt(cursor.getString(12))));
+        record.setSecondary(Boolean.valueOf(decrypt(cursor.getString(13))));
         return record;
     }
 

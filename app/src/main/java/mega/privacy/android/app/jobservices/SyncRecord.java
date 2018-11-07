@@ -26,6 +26,10 @@ public class SyncRecord {
 
     private Long timestamp;
 
+    private float latitude;
+
+    private float longitude;
+
     private Long nodeHandle;
 
     private Boolean secondary = false;
@@ -153,5 +157,21 @@ public class SyncRecord {
 
     public void setNewFingerprint(String newFingerprint) {
         this.newFingerprint = newFingerprint;
+    }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
     }
 }
