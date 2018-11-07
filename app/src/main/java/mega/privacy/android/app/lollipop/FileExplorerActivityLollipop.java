@@ -811,17 +811,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 					if(isChatFirst){
 						aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
-						String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+						if (mTabsAdapterExplorer == null){
+							tabLayoutExplorer.setVisibility(View.VISIBLE);
+							viewPagerExplorer.setVisibility(View.VISIBLE);
+							mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
+							viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
+							tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-						if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
-							if (mTabsAdapterExplorer == null){
-								tabLayoutExplorer.setVisibility(View.VISIBLE);
-								viewPagerExplorer.setVisibility(View.VISIBLE);
-								mTabsAdapterExplorer = new FileExplorerPagerAdapter(getSupportFragmentManager(),this, true);
-								viewPagerExplorer.setAdapter(mTabsAdapterExplorer);
-								tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
-
-							}
 						}
 					}
 					else{
@@ -1792,13 +1788,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					Bundle extras = intent.getExtras();
 					if(extras!=null){
 						if (!extras.containsKey(Intent.EXTRA_STREAM)) {
+							boolean isURL = false;
 							StringBuilder body = new StringBuilder();
-							String header = "[InternetShortcut]\n";
-							body.append(header);
-
 							String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 							if (sharedText != null) {
-								body.append("URL=");
+								if (URLUtil.isHttpsUrl(sharedText) || URLUtil.isHttpUrl(sharedText)) {
+									isURL = true;
+									String header = "[InternetShortcut]\n";
+									body.append(header);
+
+									body.append("URL=");
+								}
 //								body.append(getString(R.string.new_file_content_when_uploading)+": ");
 								body.append(sharedText);
 							}
@@ -1822,7 +1822,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 								parentNode = megaApi.getRootNode();
 							}
 
-							showNewFileDialog(parentNode,body.toString());
+							showNewFileDialog(parentNode,body.toString(), isURL);
 							return;
 						}
 					}
@@ -1937,9 +1937,14 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         snackbar.show();
     }
 
-    private void createFile(String name, String data, MegaNode parentNode){
-
-		File file = Util.createTemporalURLFile(name, data);
+    private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+		File file;
+		if (isURL){
+			file = Util.createTemporalURLFile(name, data);
+		}
+		else {
+			file = Util.createTemporalTextFile(name, data);
+		}
 		if(file!=null){
 			Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
 
@@ -2864,8 +2869,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		}
 	}
 
-	public void showNewFileDialog(final MegaNode parentNode, final String data){
+	public void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL){
 		log("showNewFileDialog");
+
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2928,7 +2934,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_link_name));
+		if (isURL) {
+			input.setHint(getString(R.string.context_new_link_name));
+		}
+		else {
+			input.setHint(getString(R.string.context_new_file_name_hint));
+		}
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 
@@ -2951,7 +2962,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 							input.requestFocus();
 
 						}else{
-							createFile(value, data, parentNode);
+							createFile(value, data, parentNode, isURL);
 							newFolderDialog.dismiss();
 						}
 					}
@@ -2972,7 +2983,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.dialog_title_new_link));
+		if (isURL) {
+			builder.setTitle(getString(R.string.dialog_title_new_link));
+		}
+		else {
+			builder.setTitle(getString(R.string.context_new_file_name));
+		}
 		builder.setPositiveButton(getString(R.string.cam_sync_ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -2980,7 +2996,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						if (value.length() == 0) {
 							return;
 						}
-						createFile(value, data, parentNode);
+						createFile(value, data, parentNode, isURL);
 					}
 				});
 
@@ -3012,7 +3028,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
 					}else{
-						createFile(value, data, parentNode);
+						createFile(value, data, parentNode, isURL);
 						newFolderDialog.dismiss();
 					}
 				}
