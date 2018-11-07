@@ -17605,9 +17605,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-			log("API_EOVERQUOTA error!!");
-			if (fbFLol != null && fbFLol.isAdded()){
-				fbFLol.setOverviewLayout();
+			if (e.getValue() != 0) {
+				log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
+				if (fbFLol != null && fbFLol.isAdded()){
+					fbFLol.setOverviewLayout();
+				}
+			}
+			else {
+				log("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
 			}
 		}
 	}

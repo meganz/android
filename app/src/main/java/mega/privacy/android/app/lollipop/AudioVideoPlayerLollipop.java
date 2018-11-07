@@ -3836,14 +3836,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         log("onTransferTemporaryError");
 
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
-            log("API_EOVERQUOTA error!!");
+            if (e.getValue() != 0) {
+                log("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 
-            if(alertDialogTransferOverquota==null){
-                showTransferOverquotaDialog();
-            }
-            else {
-                if (!(alertDialogTransferOverquota.isShowing())) {
+                if(alertDialogTransferOverquota==null){
                     showTransferOverquotaDialog();
+                }
+                else {
+                    if (!(alertDialogTransferOverquota.isShowing())) {
+                        showTransferOverquotaDialog();
+                    }
                 }
             }
         }
