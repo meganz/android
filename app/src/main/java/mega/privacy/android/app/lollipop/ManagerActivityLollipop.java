@@ -2349,12 +2349,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
-			if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
-				log("getUserAttribute FirstName");
-				((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
-				log("getUserAttribute LastName");
-				((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
-			}
+
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, this);
 
 			megaApi.getUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, this);
@@ -2874,9 +2869,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
 
-		if (savedInstanceState != null) {
-			updateAccountDetailsVisibleInfo();
-		}
+		updateAccountDetailsVisibleInfo();
+
 		setContactStatus();
 		log("END onCreate");
 	}
@@ -12899,14 +12893,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			spaceTV.setText(result);
 			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
 			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
+			log("*** "+progress+ " *** "+usedSpace);
 			usedSpacePB.setProgress(progress);
 			if (progress >=0 && usedSpace >=0) {
 				usedSpaceLayout.setVisibility(View.VISIBLE);
+				log("usedSpaceLayout is VISIBLE");
 			}
 			else {
 				usedSpaceLayout.setVisibility(View.GONE);
+				log("usedSpaceLayout is GONE");
 			}
 //				String usedSpaceString = getString(R.string.used_space, used, total);
+		}
+		else{
+			log("usedSpaceLayout is NULL");
 		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
@@ -15484,6 +15484,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				log("Status changed to: "+request.getNumber());
 			}
+			else if (e.getErrorCode() == MegaChatError.ERROR_ARGS)
+			{
+				log("Status not changed, the chosen one is the same");
+			}
 			else{
 				log("EEEERRRRROR WHEN TYPE_SET_ONLINE_STATUS " + e.getErrorString());
 				showSnackbar(getString(R.string.changing_status_error));
@@ -15904,7 +15908,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("(1)request.getText(): "+request.getText());
 					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
 						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText(request.getText());
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(true);
 					}
 					dbH.saveMyFirstName(request.getText());
 				}
@@ -15912,37 +15915,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("ERROR - (1)request.getText(): "+request.getText());
 					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
 						((MegaApplication) getApplication()).getMyAccountInfo().setFirstNameText("");
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(true);
 					}
 				}
 
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					if(((MegaApplication) getApplication()).getMyAccountInfo().isFirstName() && ((MegaApplication) getApplication()).getMyAccountInfo().isLastName()){
-						log("Name and First Name received!");
 
-						((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
+					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
-
-						//refresh MyAccountFragment if visible
-						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-						if(maFLol!=null && maFLol.isAdded()){
-							log("Update the account fragment");
-							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-						}
+					//refresh MyAccountFragment if visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					}
 				}
-
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){
 					log("(2)request.getText(): "+request.getText());
 					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
 						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText(request.getText());
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(true);
 					}
 
 					dbH.saveMyLastName(request.getText());
@@ -15951,27 +15945,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("ERROR - (2)request.getText(): "+request.getText());
 					if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
 						((MegaApplication) getApplication()).getMyAccountInfo().setLastNameText("");
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(true);
 					}
 				}
 
 				if(((MegaApplication) getApplication()).getMyAccountInfo()!=null){
-					if(((MegaApplication) getApplication()).getMyAccountInfo().isFirstName() && ((MegaApplication) getApplication()).getMyAccountInfo().isLastName()){
-						log("Name and First Name received!");
 
-						((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
-						updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-
-						((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
-						((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
-
-						//refresh MyAccountFragment if visible
-						String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
-						maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
-						if(maFLol!=null && maFLol.isAdded()){
-							log("Update the account fragment");
-							maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
-						}
+					((MegaApplication) getApplication()).getMyAccountInfo().setFullName();
+					updateUserNameNavigationView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
+					//refresh MyAccountFragment if visible
+					String myAccountTag = getFragmentTag(R.id.my_account_tabs_pager, 0);
+					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(myAccountTag);
+					if(maFLol!=null && maFLol.isAdded()){
+						log("Update the account fragment");
+						maFLol.updateNameView(((MegaApplication) getApplication()).getMyAccountInfo().getFullName());
 					}
 				}
 			}
@@ -16809,7 +16795,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
 									log("Change on CHANGE_TYPE_DISABLE_VERSIONS");
 									megaApi.getFileVersionsOption(this);
-								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
+								}
+
+								if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
 									log("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
 									megaApi.getContactLinksOption(this);
 								}
@@ -16817,41 +16805,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 
 						if (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME)){
-							log("The user: "+user.getEmail()+"changed his first name");
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my first name");
-								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null)
-								{
-									((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
-								}
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, this);
 							}
 							else{
-								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null)
-								{
-									((MegaApplication) getApplication()).getMyAccountInfo().setFirstName(false);
-								}
-
+								log("The user: "+user.getEmail()+"changed his first name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, new ContactNameListener(this));
 							}
 						}
-						else if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
-							log("The user: "+user.getEmail()+"changed his last name");
+
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME)){
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my last name");
-								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
-									((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
-								}
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, this);
 							}
 							else{
-								if(((MegaApplication) getApplication()).getMyAccountInfo()!=null) {
-									((MegaApplication) getApplication()).getMyAccountInfo().setLastName(false);
-								}
+								log("The user: "+user.getEmail()+"changed his last name");
 								megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, new ContactNameListener(this));
 							}
 						}
-						else if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
+
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)){
 							log("The user: "+user.getEmail()+"changed his AVATAR");
 
 							File avatar = null;
@@ -16895,7 +16870,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 								}
 							}
 						}
-						else if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
+
+						if (user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)){
 							log("CHANGE_TYPE_EMAIL");
 							if(user.getEmail().equals(megaApi.getMyUser().getEmail())){
 								log("I change my mail");
@@ -18262,13 +18238,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					log("My own status update");
 					setContactStatus();
 					if(drawerItem == DrawerItem.CHAT){
-							if(rChatFL!=null){
-								if(rChatFL.isAdded()){
-									rChatFL.onlineStatusUpdate(status);
+						if(rChatFL!=null){
+							if(rChatFL.isAdded()){
+								rChatFL.onlineStatusUpdate(status);
 
-								}
 							}
 						}
+					}
 				}
 				else{
 					log("Status update for the user: "+userHandle);
@@ -18294,7 +18270,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		log("onPresenceConfigUpdate");
+		log("onChatPresenceConfigUpdate");
 		if(config!=null){
 			log("Config status: "+config.getOnlineStatus());
 			log("Config autoway: "+config.isAutoawayEnabled());
@@ -18305,12 +18281,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("Config is pending - do not update UI");
 			}
 			else{
-				if(sttFLol!=null){
-					if(sttFLol.isAdded()){
-						if(config!=null){
-							sttFLol.updatePresenceConfigChat(false, config);
-						}
-					}
+				if(sttFLol!=null && sttFLol.isAdded()){
+					sttFLol.updatePresenceConfigChat(false, config);
+				}
+				else{
+					log("sttFLol no added or null");
 				}
 			}
 		}
