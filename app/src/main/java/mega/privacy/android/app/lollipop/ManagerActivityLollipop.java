@@ -2868,9 +2868,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			showVerifyPin2FA(verifyPin2FADialogType);
 		}
 
-		if (savedInstanceState != null) {
-			updateAccountDetailsVisibleInfo();
-		}
+		updateAccountDetailsVisibleInfo();
+
 		setContactStatus();
 		log("END onCreate");
 	}
@@ -12893,14 +12892,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			spaceTV.setText(result);
 			int progress = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedPerc();
 			long usedSpace = ((MegaApplication) getApplication()).getMyAccountInfo().getUsedStorage();
+			log("*** "+progress+ " *** "+usedSpace);
 			usedSpacePB.setProgress(progress);
 			if (progress >=0 && usedSpace >=0) {
 				usedSpaceLayout.setVisibility(View.VISIBLE);
+				log("usedSpaceLayout is VISIBLE");
 			}
 			else {
 				usedSpaceLayout.setVisibility(View.GONE);
+				log("usedSpaceLayout is GONE");
 			}
 //				String usedSpaceString = getString(R.string.used_space, used, total);
+		}
+		else{
+			log("usedSpaceLayout is NULL");
 		}
 
 		if (((MegaApplication) getApplication()).getMyAccountInfo().isInventoryFinished()){
