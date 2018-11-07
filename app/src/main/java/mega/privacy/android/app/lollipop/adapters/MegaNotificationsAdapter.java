@@ -976,8 +976,11 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = "";
 
 				if(numFolders>0 && numFiles>0){
-					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders_and_files, numFolders, email, numFolders, numFiles);
 
+					String numFilesString = context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
+					String numFoldersString = context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
+
+					textToShow = context.getResources().getString(R.string.subtitle_notification_added_folders_and_files, email, numFoldersString, numFilesString);
 				}
 				else if(numFolders>0){
 					textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_added_folders, numFolders, email, numFolders);
@@ -1030,6 +1033,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				break;
 			}
 			case MegaUserAlert.TYPE_REMOVEDSHAREDNODES:{
+				//New files added to a shared folder
 				params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 				holder.itemLayout.setLayoutParams(params);
 				holder.itemLayout.setVisibility(View.VISIBLE);
@@ -1037,27 +1041,47 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
 				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
-				holder.sectionIcon.setVisibility(View.VISIBLE);
-				holder.titleIcon.setVisibility(View.VISIBLE);
+				holder.sectionIcon.setVisibility(View.GONE);
+				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.descriptionText.setText(alert.getTitle());
-				holder.descriptionText.setVisibility(View.VISIBLE);
+				holder.titleText.setVisibility(View.VISIBLE);
+				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-				//Description set to max, adjust title
-				holder.titleText.setMaxLines(1);
-				if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
-					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+				String email = alert.getEmail();
+				int itemCount = (int) alert.getNumber(0);
+
+				String textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount, email, itemCount);
+
+				try{
+					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
+				}
+				catch (Exception e){}
+				Spanned result = null;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(textToShow);
+				}
+
+				holder.titleText.setText(result);
+				holder.descriptionText.setVisibility(View.GONE);
+
+				//Description not shown, adjust title
+				holder.titleText.setMaxLines(3);
+				if(alert.getSeen()==false){
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_LAND, outMetrics));
 					}
 					else{
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
 					}
 				}
 				else{
-					holder.descriptionText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
-					if(alert.getSeen()==false){
-						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_NEW_PORT, outMetrics));
+					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_LAND, outMetrics));
 					}
 					else{
 						holder.titleText.setMaxWidth(Util.scaleWidthPx(MAX_WIDTH_FIRST_LINE_SEEN_PORT, outMetrics));
@@ -1210,8 +1234,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-//				String name = alert.getName();
-				String name = "name";
+				String name = alert.getName();
 				String path = alert.getPath();
 				String textToShow = "";
 				if(path!=null){
@@ -1286,8 +1309,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
 
-//                String name = alert.getName();
-				String name = "name";
+                String name = alert.getName();
                 String path = alert.getPath();
 				String textToShow = "";
 				if(path!=null){
