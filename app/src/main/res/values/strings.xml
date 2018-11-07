@@ -2276,4 +2276,8 @@
         <item context="Plural of folder. 2 folders" quantity="other">[A]%1$s [/A][B]added %2$d folders.[/B]</item>
     </plurals>
 
+    <plurals name="subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions and not archived">
+        <item context="Singular of participant. 1 participant" quantity="one">%d participant</item>
+        <item context="Plural of participant. 2 participants" quantity="other">%d participants</item>
+    </plurals>
 </resources>

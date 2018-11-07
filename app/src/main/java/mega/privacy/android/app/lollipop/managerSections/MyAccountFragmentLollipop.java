@@ -64,7 +64,6 @@ import mega.privacy.android.app.utils.DBUtil;
 import mega.privacy.android.app.utils.MegaApiUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -299,27 +298,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
 		}
 
-		if(myAccountInfo!=null){
-			log("myAccountInfo!=NULL");
-			if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
-				log("MyName is:"+ myAccountInfo.getFullName());
-				nameView.setText(myAccountInfo.getFullName());
-			}
-			else{
-				myAccountInfo.setFirstName(false);
-				myAccountInfo.setLastName(false);
-
-				megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_FIRSTNAME, (ManagerActivityLollipop)context);
-				megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_LASTNAME, (ManagerActivityLollipop)context);
-			}
-		}
-		else{
-			log("myAccountInfo is NULL");
-			myAccountInfo.setFirstName(false);
-			myAccountInfo.setLastName(false);
-
-			megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_FIRSTNAME, (ManagerActivityLollipop)context);
-			megaApi.getUserAttribute(megaApi.getMyUser(), MegaApiJava.USER_ATTR_LASTNAME, (ManagerActivityLollipop)context);
+		if((myAccountInfo.getFullName()!=null) && (!myAccountInfo.getFullName().isEmpty())){
+			log("MyName is:"+ myAccountInfo.getFullName());
+			nameView.setText(myAccountInfo.getFullName());
 		}
 
 		this.updateAvatar(true);
