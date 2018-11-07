@@ -1247,7 +1247,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		}
 		if (indexToReplace != -1) {
 			log("Index to replace: " + indexToReplace);
-			adapter.updateContactStatus(indexToReplace, userHandle, status);
+			adapter.updateContactStatus(indexToReplace);
 		}
 	}
 

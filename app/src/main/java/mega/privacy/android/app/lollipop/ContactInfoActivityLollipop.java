@@ -626,6 +626,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public void setContactPresenceStatus(){
 		log("setContactPresenceStatus");
 		contactStateIcon.setVisibility(View.VISIBLE);
+		boolean statusGONE = false;
 		if (megaChatApi != null){
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
@@ -663,12 +664,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				log("INVALID status: "+userStatus);
 				contactStateIcon.setVisibility(View.GONE);
 				secondLineTextToolbar.setVisibility(View.GONE);
+				statusGONE = true;
 			}
 			else{
 				log("This user status is: "+userStatus);
 				contactStateIcon.setVisibility(View.GONE);
 				secondLineTextToolbar.setVisibility(View.GONE);
+				statusGONE = true;
 			}
+		}
+		if (statusGONE) {
+			firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, Util.px2dp(15, outMetrics));
+		}
+		else {
+			firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 		}
 	}
 
@@ -2455,6 +2464,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				String formattedDate = TimeChatUtils.lastGreenDate(lastGreen);
 
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
+				firstLineTextToolbar.setPadding(0, Util.px2dp(6, outMetrics), 0, 0);
 				secondLineTextToolbar.setText(formattedDate);
 				secondLineLengthToolbar.setText(formattedDate);
 
