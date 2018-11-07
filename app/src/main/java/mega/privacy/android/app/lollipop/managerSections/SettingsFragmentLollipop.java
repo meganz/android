@@ -1265,20 +1265,17 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void goToCategoryStorage(){
 		log("goToCategoryStorage");
-		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
-			String key = getPreferenceScreen().getPreference(i).getKey();
-			if (key.equals(storageCategory.getKey())){
+		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
+			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(storageCategory)){
 				((ManagerActivityLollipop) context).openSettingsStorage = false;
-				if (listView != null){
+				if (listView != null) {
 					listView.clearFocus();
 					final int finalI = i;
 					listView.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-//						listView.requestFocusFromTouch();
-
-							listView.setSelection(finalI + 8);
-//						listView.requestFocus();
+							listView.setSelection(finalI);
+							listView.smoothScrollToPositionFromTop(finalI, 0);
 						}
 					}, 200);
 				}
@@ -1289,9 +1286,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	public void goToCategoryQR(){
 		log("goToCategoryQR");
-		for (int i=0; i<getPreferenceScreen().getPreferenceCount(); i++){
-			String key = getPreferenceScreen().getPreference(i).getKey();
-			if (key.equals(qrCodeCategory.getKey())){
+		for (int i=0; i<getPreferenceScreen().getRootAdapter().getCount(); i++){
+			if (getPreferenceScreen().getRootAdapter().getItem(i).equals(qrCodeCategory)){
 				((ManagerActivityLollipop) context).openSettingsQR = false;
 				if (listView != null) {
 					listView.clearFocus();
@@ -1299,7 +1295,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 					listView.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							listView.setSelection(finalI+13);
+							listView.setSelection(finalI);
+							listView.smoothScrollToPositionFromTop(finalI, 0);
 						}
 					}, 200);
 				}
@@ -2932,6 +2929,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		statusChatListPreference.setValue(MegaChatApi.STATUS_OFFLINE+"");
 		statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			enableLastGreenChatSwitch.setEnabled(false);
+		}
+		else{
+			enableLastGreenChatCheck.setEnabled(false);
+		}
 	}
 
 	public void showPresenceChatConfig(){
@@ -2969,7 +2973,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				preferenceScreen.removePreference(autoawayChatCategory);
 			}
 			else{
-				log("addAutoaway 3");
 				preferenceScreen.addPreference(autoawayChatCategory);
 				if(statusConfig.isAutoawayEnabled()){
 					int timeout = (int)statusConfig.getAutoawayTimeout()/60;
@@ -2999,36 +3002,41 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 		//Show configuration last green
 		if(statusConfig.isLastGreenVisible()){
-
+			log("Last visible ON");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableLastGreenChatSwitch.setEnabled(true);
 				if(!enableLastGreenChatSwitch.isChecked()){
 					enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
 					enableLastGreenChatSwitch.setChecked(true);
-					enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
 				}
+				enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
 			}
 			else{
+				enableLastGreenChatCheck.setEnabled(true);
 				if(!enableLastGreenChatCheck.isChecked()){
 					enableLastGreenChatCheck.setOnPreferenceClickListener(null);
 					enableLastGreenChatCheck.setChecked(true);
-					enableLastGreenChatCheck.setOnPreferenceClickListener(this);
 				}
+				enableLastGreenChatCheck.setOnPreferenceClickListener(this);
 			}
 		}
 		else{
+			log("Last visible OFF");
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				enableLastGreenChatSwitch.setEnabled(true);
 				if(enableLastGreenChatSwitch.isChecked()){
 					enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
 					enableLastGreenChatSwitch.setChecked(false);
-					enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
 				}
+				enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
 			}
 			else{
+				enableLastGreenChatCheck.setEnabled(true);
 				if(enableLastGreenChatCheck.isChecked()){
 					enableLastGreenChatCheck.setOnPreferenceClickListener(null);
 					enableLastGreenChatCheck.setChecked(false);
-					enableLastGreenChatCheck.setOnPreferenceClickListener(this);
 				}
+				enableLastGreenChatCheck.setOnPreferenceClickListener(this);
 			}
 		}
 	}
