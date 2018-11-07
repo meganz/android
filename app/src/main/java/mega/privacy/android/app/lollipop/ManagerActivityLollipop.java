@@ -14303,11 +14303,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				File qrFile = null;
 				if (getExternalCacheDir() != null){
 					newPath = getExternalCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
-					qrFile = new File(getExternalCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+					File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
+					qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
 				}else{
 					log("getExternalCacheDir() is NULL");
 					newPath = getCacheDir().getAbsolutePath() + "/" + myEmail + "Temp.jpg";
-					qrFile = new File(getCacheDir().getAbsolutePath(), myEmail + "QRcode.jpg");
+					File qrDir = getApplicationContext().getDir("qrMEGA", 0);
+					qrFile = new File(qrDir.getAbsolutePath(), myEmail + "QRcode.jpg");
 				}
 				if (qrFile.exists()) {
 					qrFile.delete();
@@ -15225,12 +15227,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						File qrFile = null;
 						if (getExternalCacheDir() != null){
 							newPath = getExternalCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
-							qrFile = new File(getExternalCacheDir().getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
+							File qrDir = new File (getApplicationContext().getExternalCacheDir(), "qrMEGA");
+							qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
 						}
 						else{
 							log("getExternalCacheDir() is NULL");
 							newPath = getCacheDir().getAbsolutePath() + "/" + megaApi.getMyUser().getEmail() + "Temp.jpg";
-							qrFile = new File(getCacheDir().getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
+							File qrDir = getApplicationContext().getDir("qrMEGA", 0);
+							qrFile = new File(qrDir.getAbsolutePath(), megaApi.getMyUser().getEmail() + "QRcode.jpg");
 						}
 
 						if (qrFile.exists()) {
