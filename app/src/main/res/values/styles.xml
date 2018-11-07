@@ -222,4 +222,9 @@
         <item name="colorControlActivated">@color/accentColor</item>
         <item name="colorControlNormal">#000000</item>
     </style>
+
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:minHeight">24dp</item>
+        <item name="android:minWidth">44dp</item>
+    </style>
 </resources>
