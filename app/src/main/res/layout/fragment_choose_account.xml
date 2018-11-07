@@ -1,7 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent"
+	android:layout_height="wrap_content"
 	android:orientation="vertical"
+	android:background="@color/white"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools">
 
@@ -19,7 +20,7 @@
 
 	<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"
 		android:background="@color/white"
 		android:id="@+id/scroll_view_choose_account">
 
@@ -34,8 +35,10 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_free_layout"
 				android:layout_width="match_parent"
+				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="10dp">
+				android:layout_marginTop="8dp"
+				android:paddingTop="8dp">
 
 				<RelativeLayout
 					android:id="@+id/choose_account_free_layout_content"
@@ -45,16 +48,16 @@
 					<!-- Left side (title) -->
 					<RelativeLayout
 						android:id="@+id/choose_account_free_left_side"
-						android:layout_width="128dp"
+						android:layout_width="121dp"
 						android:layout_height="wrap_content"
-						android:layout_centerVertical="true"
-						android:gravity="center">
-
+						android:gravity="center_horizontal">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content">
-							<ImageView
+							android:layout_height="wrap_content"
+							android:paddingTop="4dp">
+
+						<ImageView
 								android:id="@+id/image_free"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
@@ -78,35 +81,21 @@
 						android:id="@+id/choose_account_free_layout_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
+						android:layout_toRightOf="@id/choose_account_free_left_side"
 						android:gravity="center_vertical"
-						android:layout_toRightOf="@id/choose_account_free_left_side">
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_free"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_centerVertical="true">
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
 									android:layout_marginBottom="6dp">
-									<TextView
-										android:id="@+id/month_free"
-										android:layout_width="wrap_content"
-										android:layout_height="wrap_content"
-										android:textColor="@color/name_my_account"
-										android:textSize="15sp"/>
-								</RelativeLayout>
-							</TableRow>
-							<TableRow>
-								<RelativeLayout
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_gravity="left"
-									android:layout_marginBottom="8dp">
 									<TextView
 										android:id="@+id/storage_free"
 										android:layout_width="wrap_content"
@@ -133,7 +122,8 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/achievements_free"
 										android:layout_width="wrap_content"
@@ -145,18 +135,18 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
-
-						<LinearLayout
-							android:id="@+id/linear_divider"
-							android:orientation="horizontal"
-							android:layout_width="match_parent"
-							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
-							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_free"/>
-
 					</RelativeLayout>
 				</RelativeLayout>
+
+				<LinearLayout
+					android:id="@+id/linear_divider"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"
+					android:layout_alignBottom="@id/choose_account_free_layout_content"
+					android:background="@color/grid_item_separator"
+					android:orientation="horizontal" />
 
 				<RelativeLayout
 					android:id="@+id/choose_account_free_layout_transparent"
@@ -172,7 +162,10 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_prolite_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:background="@android:color/transparent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:paddingTop="8dp">
 
 				<RelativeLayout
 					android:id="@+id/choose_account_prolite_layout_content"
@@ -182,14 +175,14 @@
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/choose_account_prolite_left_side"
-						android:layout_width="128dp"
+						android:layout_width="121dp"
 						android:layout_height="wrap_content"
-						android:gravity="center"
-						android:layout_centerVertical="true">
+						android:gravity="center_horizontal">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content">
+							android:layout_height="wrap_content"
+							android:paddingTop="4dp">
 							<ImageView
 								android:id="@+id/image_lite"
 								android:layout_width="wrap_content"
@@ -216,24 +209,26 @@
 						android:id="@+id/choose_account_prolite_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
+						android:layout_toRightOf="@id/choose_account_prolite_left_side"
 						android:gravity="center_vertical"
-						android:layout_toRightOf="@id/choose_account_prolite_left_side">
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_lite"
 							android:layout_width="match_parent"
-							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_height="match_parent"
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:background="@drawable/border_lite"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/month_lite"
+										android:textStyle="bold"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textColor="@color/name_my_account"
@@ -245,6 +240,7 @@
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:paddingLeft="8dp"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/storage_lite"
@@ -258,7 +254,9 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:paddingLeft="8dp"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_lite"
 										android:layout_width="wrap_content"
@@ -268,17 +266,19 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
-						<LinearLayout
-							android:id="@+id/linear_divider_lite"
-							android:orientation="horizontal"
-							android:layout_width="match_parent"
-							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
-							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_lite"/>
+
 					</RelativeLayout>
 				</RelativeLayout>
 
+				<LinearLayout
+					android:id="@+id/linear_divider_lite"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"
+					android:layout_alignBottom="@id/choose_account_prolite_layout_content"
+					android:background="@color/grid_item_separator"
+					android:orientation="horizontal" />
 				<RelativeLayout
 					android:id="@+id/choose_account_prolite_layout_transparent"
 					android:layout_width="match_parent"
@@ -294,8 +294,10 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_pro_i_layout"
 				android:layout_width="match_parent"
+				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
-				android:background="@android:color/transparent">
+				android:layout_marginTop="8dp"
+				android:paddingTop="8dp">
 
 				<RelativeLayout
 					android:id="@+id/choose_account_pro_i_layout_content"
@@ -305,15 +307,15 @@
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/choose_account_pro_i_left_side"
-						android:layout_width="128dp"
+						android:layout_width="121dp"
 						android:layout_height="wrap_content"
-						android:gravity="center"
-						android:layout_centerVertical="true">
+						android:gravity="center_horizontal">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content">
-							<ImageView
+							android:layout_height="wrap_content"
+							android:layout_marginTop="4dp">
+						<ImageView
 								android:id="@+id/image_pro_i"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
@@ -338,26 +340,28 @@
 						android:id="@+id/choose_account_pro_i_right_side"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
+						android:layout_toRightOf="@id/choose_account_pro_i_left_side"
 						android:gravity="center_vertical"
-						android:layout_toRightOf="@id/choose_account_pro_i_left_side">
+						android:layout_centerVertical="true">
 
 						<TableLayout
 							android:id="@+id/table_pro_i"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:background="@drawable/border_pro"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/month_pro_i"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
+										android:textStyle="bold"
 										android:textColor="@color/name_my_account"
 										android:textSize="15sp"/>
 								</RelativeLayout>
@@ -367,6 +371,7 @@
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:paddingLeft="8dp"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/storage_pro_i"
@@ -380,7 +385,9 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:paddingLeft="8dp"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_pro_i"
 										android:layout_width="wrap_content"
@@ -390,18 +397,18 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
-
-						<LinearLayout
-							android:id="@+id/linear_divider_pro_i"
-							android:orientation="horizontal"
-							android:layout_width="match_parent"
-							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
-							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_pro_i"/>
-
 					</RelativeLayout>
 				</RelativeLayout>
+
+				<LinearLayout
+					android:id="@+id/linear_divider_pro_i"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"
+					android:layout_alignBottom="@id/choose_account_pro_i_layout_content"
+					android:background="@color/grid_item_separator"
+					android:orientation="horizontal" />
 
 				<RelativeLayout
 					android:id="@+id/choose_account_pro_i_layout_transparent"
@@ -417,7 +424,10 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_pro_ii_layout"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
+				android:background="@android:color/transparent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:paddingTop="8dp">
 
 				<RelativeLayout
 					android:id="@+id/choose_account_pro_ii_layout_content"
@@ -427,14 +437,15 @@
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/choose_account_pro_ii_left_side"
-						android:layout_width="128dp"
+						android:layout_width="121dp"
 						android:layout_height="wrap_content"
-						android:gravity="center"
-						android:layout_centerVertical="true">
+						android:gravity="center_horizontal">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content">
+							android:layout_height="wrap_content"
+							android:layout_marginTop="4dp">
+
 							<ImageView
 								android:id="@+id/image_pro_ii"
 								android:layout_width="wrap_content"
@@ -461,25 +472,27 @@
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:gravity="center_vertical"
+						android:layout_centerVertical="true"
 						android:layout_toRightOf="@id/choose_account_pro_ii_left_side">
 
 						<TableLayout
 							android:id="@+id/table_pro_ii"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:background="@drawable/border_pro"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/month_pro_ii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
+										android:textStyle="bold"
 										android:textColor="@color/name_my_account"
 										android:textSize="15sp"/>
 								</RelativeLayout>
@@ -489,6 +502,7 @@
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:paddingLeft="8dp"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/storage_pro_ii"
@@ -502,7 +516,9 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:paddingLeft="8dp"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_pro_ii"
 										android:layout_width="wrap_content"
@@ -512,18 +528,17 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
-
-						<LinearLayout
-							android:id="@+id/linear_divider_pro_ii"
-							android:orientation="horizontal"
-							android:layout_width="match_parent"
-							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
-							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_pro_ii"/>
-
 					</RelativeLayout>
 				</RelativeLayout>
+				<LinearLayout
+					android:id="@+id/linear_divider_pro_ii"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"
+					android:layout_alignBottom="@id/choose_account_pro_ii_layout_content"
+					android:background="@color/grid_item_separator"
+					android:orientation="horizontal" />
 
 				<RelativeLayout
 					android:id="@+id/choose_account_pro_ii_layout_transparent"
@@ -540,10 +555,12 @@
 			<RelativeLayout
 				android:id="@+id/choose_account_pro_iii_layout"
 				android:layout_width="match_parent"
+				android:background="@android:color/transparent"
 				android:layout_height="wrap_content"
-				android:background="@android:color/transparent">
+				android:layout_marginTop="8dp"
+				android:paddingTop="8dp">
 
-				<RelativeLayout
+			<RelativeLayout
 					android:id="@+id/choose_account_pro_iii_layout_content"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content">
@@ -551,14 +568,14 @@
 					<!-- Left side (image and title) -->
 					<RelativeLayout
 						android:id="@+id/choose_account_pro_iii_left_side"
-						android:layout_width="128dp"
+						android:layout_width="121dp"
 						android:layout_height="wrap_content"
-						android:layout_centerVertical="true"
-						android:gravity="center">
+						android:gravity="center_horizontal">
 						<RelativeLayout
 							android:background="@android:color/transparent"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content">
+							android:layout_height="wrap_content"
+							android:paddingTop="4dp">
 							<ImageView
 								android:id="@+id/image_pro_iii"
 								android:layout_width="wrap_content"
@@ -585,25 +602,27 @@
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
 						android:gravity="center_vertical"
+						android:layout_centerVertical="true"
 						android:layout_toRightOf="@id/choose_account_pro_iii_left_side">
 
 						<TableLayout
 							android:id="@+id/table_pro_iii"
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
-							android:layout_centerVertical="true"
-							android:layout_marginTop="20dp">
+							android:layout_centerVertical="true">
 
 							<TableRow>
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:background="@drawable/border_pro"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/month_pro_iii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
+										android:textStyle="bold"
 										android:textColor="@color/name_my_account"
 										android:textSize="15sp"/>
 								</RelativeLayout>
@@ -613,6 +632,7 @@
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									android:layout_gravity="left"
+									android:paddingLeft="8dp"
 									android:layout_marginBottom="6dp">
 									<TextView
 										android:id="@+id/storage_pro_iii"
@@ -626,7 +646,9 @@
 								<RelativeLayout
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
-									android:layout_gravity="left">
+									android:layout_gravity="left"
+									android:paddingLeft="8dp"
+									android:layout_marginBottom="16dp">
 									<TextView
 										android:id="@+id/bandwidth_pro_iii"
 										android:layout_width="wrap_content"
@@ -636,18 +658,17 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
-
-						<LinearLayout
-							android:id="@+id/linear_divider_pro_iii"
-							android:orientation="horizontal"
-							android:layout_width="match_parent"
-							android:layout_height="1dp"
-							android:layout_marginTop="20dp"
-							android:background="@color/grid_item_separator"
-							android:layout_alignBottom="@id/table_pro_iii"/>
-
 					</RelativeLayout>
 				</RelativeLayout>
+				<LinearLayout
+					android:id="@+id/linear_divider_pro_iii"
+					android:layout_width="match_parent"
+					android:layout_height="1dp"
+					android:layout_marginLeft="16dp"
+					android:layout_marginRight="16dp"
+					android:background="@color/grid_item_separator"
+					android:layout_alignBottom="@id/choose_account_pro_iii_layout_content"
+					android:orientation="horizontal"/>
 
 				<RelativeLayout
 					android:id="@+id/choose_account_pro_iii_layout_transparent"
@@ -664,19 +685,18 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@android:color/transparent"
-				android:layout_below="@+id/choose_account_pro_iii_layout"
-				android:layout_marginLeft="128dp"
-				android:layout_marginRight="8dp"
-				android:layout_marginTop="16dp">
+				android:layout_marginLeft="16dp"
+				android:layout_marginRight="16dp"
+				android:layout_marginTop="10dp"
+				android:layout_marginBottom="30dp">
 				<TextView
-					android:id="@+id/upgrade_account_comment"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
+					android:text="@string/upgrade_comment"
 					android:textColor="@color/mail_my_account"
 					android:gravity="left"
-					android:textSize="11sp"/>
+					android:textSize="12sp"/>
 			</RelativeLayout>
-
 
 		</LinearLayout>
 	</ScrollView>

@@ -57,7 +57,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     private RelativeLayout freeLayout;
     private RelativeLayout freeTransparentLayout;
     private TextView titleFree;
-    private TextView monthSectionFree;
     private TextView storageSectionFree;
     private TextView bandwidthSectionFree;
     private TextView achievementsSectionFree;
@@ -93,8 +92,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
     private TextView monthSectionPro3;
     private TextView storageSectionPro3;
     private TextView bandwidthSectionPro3;
-
-    TextView upgradeComment;
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -169,7 +166,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         freeLayout.setOnClickListener(this);
         titleFree = (TextView) v.findViewById(R.id.choose_account_free_title_text);
         titleFree.setText(getString(R.string.free_account).toUpperCase());
-        monthSectionFree = (TextView) v.findViewById(R.id.month_free);
         storageSectionFree = (TextView) v.findViewById(R.id.storage_free);
         bandwidthSectionFree = (TextView) v.findViewById(R.id.bandwidth_free);
         achievementsSectionFree = (TextView) v.findViewById(R.id.achievements_free);
@@ -224,21 +220,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro3TransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_iii_layout_transparent);
         pro3TransparentLayout.setVisibility(View.INVISIBLE);
         //END -- PRO III ACCOUNT
-
-        upgradeComment = (TextView) v.findViewById(R.id.upgrade_account_comment);
-        String text = getString(R.string.upgrade_account_comment);
-        try{
-            text = text.replace("[A]", "<font color=\'#ff333a\'>");
-            text = text.replace("[/A]", "</font>");
-        }
-        catch (Exception e){}
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
-        }else {
-            result = Html.fromHtml(text);
-        }
-        upgradeComment.setText(result);
 
         setPricingInfo();
         return v;
@@ -364,19 +345,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
             log("Return - getPricing NULL");
             return;
         }
-        //Free
-        String textToShowFreeMonth = "[A]"+getString(R.string.free_account)+"[/A]";
-        try{
-            textToShowFreeMonth = textToShowFreeMonth.replace("[A]", "<font color=\'#31b404\'>");
-            textToShowFreeMonth = textToShowFreeMonth.replace("[/A]", "</font>");
-        }catch (Exception e){}
-        Spanned resultFreeMonth = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultFreeMonth = Html.fromHtml(textToShowFreeMonth,Html.FROM_HTML_MODE_LEGACY);
-        }else {
-            resultFreeMonth = Html.fromHtml(textToShowFreeMonth);
-        }
-        monthSectionFree.setText(resultFreeMonth);
+
 
         String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.tab_my_account_storage)+" ";
         try{
@@ -444,9 +413,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 try{
                     textToShowPro1Month = textToShowPro1Month.replace("[A]", "<font color=\'#ff333a\'>");
                     textToShowPro1Month = textToShowPro1Month.replace("[/A]", "</font>");
-                    textToShowPro1Month = textToShowPro1Month.replace("[B]", "<font color=\'#ff333a\'>");
-                    textToShowPro1Month = textToShowPro1Month.replace("[/B]", "</font>");
-                }catch (Exception e){}
+                 }catch (Exception e){}
                 Spanned resultPro1Month = null;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     resultPro1Month = Html.fromHtml(textToShowPro1Month,Html.FROM_HTML_MODE_LEGACY);
