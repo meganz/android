@@ -148,13 +148,6 @@
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
 
-				<RelativeLayout
-					android:id="@+id/choose_account_free_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
-				</RelativeLayout>
 			</RelativeLayout>
 			<!-- End FREE -->
 
@@ -279,14 +272,6 @@
 					android:layout_alignBottom="@id/choose_account_prolite_layout_content"
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
-				<RelativeLayout
-					android:id="@+id/choose_account_prolite_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
-				</RelativeLayout>
-
 			</RelativeLayout>
 			<!-- End PRO LITE -->
 
@@ -409,14 +394,6 @@
 					android:layout_alignBottom="@id/choose_account_pro_i_layout_content"
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
-
-				<RelativeLayout
-					android:id="@+id/choose_account_pro_i_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
-				</RelativeLayout>
 			</RelativeLayout>
 			<!-- END PRO I -->
 
@@ -539,15 +516,6 @@
 					android:layout_alignBottom="@id/choose_account_pro_ii_layout_content"
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
-
-				<RelativeLayout
-					android:id="@+id/choose_account_pro_ii_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
-				</RelativeLayout>
-
 			</RelativeLayout>
 			<!--END PRO II-->
 
@@ -669,15 +637,6 @@
 					android:background="@color/grid_item_separator"
 					android:layout_alignBottom="@id/choose_account_pro_iii_layout_content"
 					android:orientation="horizontal"/>
-
-				<RelativeLayout
-					android:id="@+id/choose_account_pro_iii_layout_transparent"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:visibility="invisible"
-					android:background="#80ffffff">
-				</RelativeLayout>
-
 			</RelativeLayout>
 			<!--END PRO III-->
 

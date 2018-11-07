@@ -55,7 +55,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     //free elements:
     private RelativeLayout freeLayout;
-    private RelativeLayout freeTransparentLayout;
     private TextView titleFree;
     private TextView storageSectionFree;
     private TextView bandwidthSectionFree;
@@ -63,7 +62,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     //pro lite elements:
     private RelativeLayout proLiteLayout;
-    private RelativeLayout proLiteTransparentLayout;
     private TextView titleProLite;
     private TextView monthSectionProLite;
     private TextView storageSectionProLite;
@@ -71,7 +69,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     //pro i elements:
     private RelativeLayout pro1Layout;
-    private RelativeLayout pro1TransparentLayout;
     private TextView titlePro1;
     private TextView monthSectionPro1;
     private TextView storageSectionPro1;
@@ -79,7 +76,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     //pro ii elements:
     private RelativeLayout pro2Layout;
-    private RelativeLayout pro2TransparentLayout;
     private TextView titlePro2;
     private TextView monthSectionPro2;
     private TextView storageSectionPro2;
@@ -87,7 +83,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     //pro iii elements:
     private RelativeLayout pro3Layout;
-    private RelativeLayout pro3TransparentLayout;
     private TextView titlePro3;
     private TextView monthSectionPro3;
     private TextView storageSectionPro3;
@@ -169,8 +164,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         storageSectionFree = (TextView) v.findViewById(R.id.storage_free);
         bandwidthSectionFree = (TextView) v.findViewById(R.id.bandwidth_free);
         achievementsSectionFree = (TextView) v.findViewById(R.id.achievements_free);
-        freeTransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout_transparent);
-        freeTransparentLayout.setVisibility(View.INVISIBLE);
         //END -- PRO LITE ACCOUNT
 
         //PRO LITE ACCOUNT
@@ -181,8 +174,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         monthSectionProLite = (TextView) v.findViewById(R.id.month_lite);
         storageSectionProLite = (TextView) v.findViewById(R.id.storage_lite);
         bandwidthSectionProLite = (TextView) v.findViewById(R.id.bandwidth_lite);
-        proLiteTransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout_transparent);
-        proLiteTransparentLayout.setVisibility(View.INVISIBLE);
         //END -- PRO LITE ACCOUNT
 
         //PRO I ACCOUNT
@@ -193,8 +184,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         monthSectionPro1 = (TextView) v.findViewById(R.id.month_pro_i);
         storageSectionPro1 = (TextView) v.findViewById(R.id.storage_pro_i);
         bandwidthSectionPro1 = (TextView) v.findViewById(R.id.bandwidth_pro_i);
-        pro1TransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_i_layout_transparent);
-        pro1TransparentLayout.setVisibility(View.INVISIBLE);
+
         //END -- PRO I ACCOUNT
 
         //PRO II ACCOUNT
@@ -205,8 +195,6 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         monthSectionPro2 = (TextView) v.findViewById(R.id.month_pro_ii);
         storageSectionPro2 = (TextView) v.findViewById(R.id.storage_pro_ii);
         bandwidthSectionPro2 = (TextView) v.findViewById(R.id.bandwidth_pro_ii);
-        pro2TransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_ii_layout_transparent);
-        pro2TransparentLayout.setVisibility(View.INVISIBLE);
         //END -- PRO II ACCOUNT
 
         //PRO III ACCOUNT
@@ -217,8 +205,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         monthSectionPro3 = (TextView) v.findViewById(R.id.month_pro_iii);
         storageSectionPro3 = (TextView) v.findViewById(R.id.storage_pro_iii);
         bandwidthSectionPro3 = (TextView) v.findViewById(R.id.bandwidth_pro_iii);
-        pro3TransparentLayout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_iii_layout_transparent);
-        pro3TransparentLayout.setVisibility(View.INVISIBLE);
+
         //END -- PRO III ACCOUNT
 
         setPricingInfo();

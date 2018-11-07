@@ -44,7 +44,8 @@
 				<RelativeLayout
 					android:id="@+id/upgrade_prolite_layout_content"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+					android:layout_height="wrap_content"
+					android:background="@android:color/transparent">
 
 					<!-- Left side (image and title) -->
 					<RelativeLayout
@@ -139,7 +140,6 @@
 								</RelativeLayout>
 							</TableRow>
 						</TableLayout>
-
 					</RelativeLayout>
 				</RelativeLayout>
 
@@ -152,13 +152,13 @@
 					android:layout_alignBottom="@id/upgrade_prolite_layout_content"
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
+
 				<RelativeLayout
 					android:id="@+id/upgrade_prolite_layout_transparent"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
+					android:layout_height="95dp"
 					android:visibility="gone"
-					android:background="#90ffffff">
-				</RelativeLayout>
+					android:background="#90ffffff"/>
 
 			</RelativeLayout>
 
@@ -279,13 +279,14 @@
 					android:layout_alignBottom="@id/upgrade_pro_i_layout_content"
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
+
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_i_layout_transparent"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
+					android:layout_height="93dp"
 					android:visibility="gone"
-					android:background="#90ffffff">
-				</RelativeLayout>
+					android:background="#90ffffff"/>
+
 			</RelativeLayout>
 
 			<!-- Pro II -->
@@ -410,10 +411,9 @@
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_ii_layout_transparent"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
+					android:layout_height="93dp"
 					android:visibility="gone"
-					android:background="#90ffffff">
-				</RelativeLayout>
+					android:background="#90ffffff"/>
 			</RelativeLayout>
 
 			<!-- Pro III -->
@@ -535,13 +535,13 @@
 					android:layout_alignBottom="@id/upgrade_pro_iii_layout_content"
 					android:background="@color/grid_item_separator"
 					android:orientation="horizontal" />
+
 				<RelativeLayout
 					android:id="@+id/upgrade_pro_iii_layout_transparent"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
+					android:layout_height="93dp"
 					android:visibility="gone"
-					android:background="#90ffffff">
-				</RelativeLayout>
+					android:background="#90ffffff"/>
 
 			</RelativeLayout>
 
