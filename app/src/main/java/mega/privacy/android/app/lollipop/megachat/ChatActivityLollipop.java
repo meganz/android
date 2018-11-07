@@ -605,7 +605,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         display.getMetrics(outMetrics);
         density  = getResources().getDisplayMetrics().density;
 
-
         //Set toolbar
         tB = (Toolbar) findViewById(R.id.toolbar_chat);
         setSupportActionBar(tB);
@@ -1268,8 +1267,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void setChatSubtitle(){
         log("setChatSubtitle");
+        if(chatRoom==null){
+            return;
+        }
+
         if(megaChatApi.getConnectionState()!=MegaChatApi.CONNECTED||megaChatApi.getChatConnectionState(idChat)!=MegaChatApi.CHAT_CONNECTION_ONLINE){
             log("Chat not connected");
+
+            if(chatRoom.isPreview()){
+                log("Chat not connected:setChatSubtitle:isPreview");
+                subtitleToobar.setText(adjustForLargeFont(getString(R.string.number_of_participants, chatRoom.getPeerCount())));
+                tB.setOnClickListener(this);
+
+                setBottomLayout(SHOW_NOTHING_LAYOUT);
+                return;
+            }
+
             subtitleToobar.setText(adjustForLargeFont(getString(R.string.invalid_connection_state)));
             subtitleToobar.setVisibility(View.VISIBLE);
             iconStateToolbar.setVisibility(View.GONE);
@@ -1279,9 +1292,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         else{
             log("karere connection state: "+megaChatApi.getConnectionState());
             log("chat connection state: "+megaChatApi.getChatConnectionState(idChat));
-            if(chatRoom==null){
-                return;
-            }
 
             int permission = chatRoom.getOwnPrivilege();
 
