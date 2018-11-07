@@ -140,6 +140,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
+    MegaApiAndroid megaApiFolder;
     MegaChatApiAndroid megaChatApi;
     MegaPreferences prefs = null;
 
@@ -338,12 +339,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
         if (!isOffLine && type != Constants.ZIP_ADAPTER) {
             app = (MegaApplication) getApplication();
-            if (isFolderLink){
-                megaApi = app.getMegaApiFolder();
-            }
-            else {
-                megaApi = app.getMegaApi();
-            }
+            megaApi = app.getMegaApi();
 
             if (Util.isChatEnabled()) {
                 megaChatApi = app.getMegaChatApi();
@@ -366,7 +362,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
 
-            if (savedInstanceState != null && uri.toString().contains("http://")){
+            if (uri.toString().contains("http://")) {
                 if (megaApi.httpServerIsRunning() == 0) {
                     megaApi.httpServerStart();
                 }
@@ -383,23 +379,41 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     log("Total mem: "+mi.totalMem+" allocate 16 MB");
                     megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
                 }
+                if (savedInstanceState != null) {
+                    if (isFolderLink){
+                        megaApiFolder = app.getMegaApiFolder();
 
-                if (savedInstanceState != null && uri.toString().contains("http://")){
-                    MegaNode node = null;
-                    if (fromChat) {
-                        node = nodeChat;
-                    }
-                    else if (type == Constants.FILE_LINK_ADAPTER) {
-                        node = currentDocument;
+                        log("Folder link node");
+                        MegaNode currentDocumentAuth = megaApiFolder.authorizeNode(megaApi.getNodeByHandle(handle));
+                        if (currentDocumentAuth == null){
+                            log("CurrentDocumentAuth is null");
+                            showSnackbar(getString(R.string.error_streaming)+ ": node not authorized");
+                        }
+                        else{
+                            log("CurrentDocumentAuth is not null");
+                            String url = megaApi.httpServerGetLocalLink(currentDocumentAuth);
+                            if (url != null) {
+                                uri = Uri.parse(url);
+                            }
+                        }
                     }
                     else {
-                        node = megaApi.getNodeByHandle(handle);
-                    }
-                    if (node != null){
-                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
-                    }
-                    else {
-                        showSnackbar(getString(R.string.error_streaming));
+                        MegaNode node = null;
+                        if (fromChat) {
+                            node = nodeChat;
+                        }
+                        else if (type == Constants.FILE_LINK_ADAPTER) {
+                            node = currentDocument;
+                        }
+                        else {
+                            node = megaApi.getNodeByHandle(handle);
+                        }
+                        if (node != null){
+                            uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+                        }
+                        else {
+                            showSnackbar(getString(R.string.error_streaming));
+                        }
                     }
                 }
             }
