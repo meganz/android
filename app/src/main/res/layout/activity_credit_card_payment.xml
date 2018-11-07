@@ -97,7 +97,8 @@
 	        android:layout_gravity="center" 
 
 	        android:imeOptions="actionNext"
-	        android:singleLine="true" />
+	        android:singleLine="true"
+			android:theme="@style/EditTextStyle" />
         
         <EditText
 	        android:id="@+id/address2_cc"
@@ -107,7 +108,8 @@
 	        android:layout_gravity="center" 
 
 	        android:imeOptions="actionNext"
-	        android:singleLine="true" />
+	        android:singleLine="true"
+			android:theme="@style/EditTextStyle" />
         
         <EditText
 	        android:id="@+id/city_cc"
@@ -117,7 +119,8 @@
 	        android:layout_gravity="center" 
 
 	        android:imeOptions="actionNext"
-	        android:singleLine="true" />
+	        android:singleLine="true"
+			android:theme="@style/EditTextStyle" />
         
         <EditText
 	        android:id="@+id/state_cc"
@@ -127,7 +130,8 @@
 	        android:layout_gravity="center" 
 
 	        android:imeOptions="actionNext"
-	        android:singleLine="true" />
+	        android:singleLine="true"
+			android:theme="@style/EditTextStyle" />
         
         <Spinner 
             android:id="@+id/country_cc"
@@ -142,7 +146,8 @@
 	        android:hint="@string/postal_code_cc"
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
-	       	android:singleLine="true" />
+	       	android:singleLine="true"
+			android:theme="@style/EditTextStyle"/>
         
         <TextView
             android:id="@+id/payment_details_cc"
@@ -177,7 +182,8 @@
 	        android:hint="@string/first_name_cc"
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
-	        android:singleLine="true" />
+	        android:singleLine="true"
+			android:theme="@style/EditTextStyle" />
         
         <EditText
 	        android:id="@+id/last_name_cc"
@@ -186,7 +192,8 @@
 	        android:hint="@string/last_name_cc"
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
-	        android:singleLine="true" />
+	        android:singleLine="true"
+			android:theme="@style/EditTextStyle" />
         
         <EditText
 	        android:id="@+id/credit_card_number_cc"
@@ -196,7 +203,8 @@
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-	        android:inputType="number" />
+	        android:inputType="number"
+			android:theme="@style/EditTextStyle" />
         
         <LinearLayout 
             android:layout_width="match_parent"
@@ -230,7 +238,8 @@
 		        android:layout_weight="1"
 		        android:inputType="number"
 		        android:imeOptions="actionDone"
-	        	android:singleLine="true" />
+	        	android:singleLine="true"
+				android:theme="@style/EditTextStyle" />
             
         </LinearLayout>
         

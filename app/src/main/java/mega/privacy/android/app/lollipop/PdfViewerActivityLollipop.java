@@ -521,7 +521,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             public void onClick(View v) {
                 log("onClick uploadContainer");
                 Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
-                intent1.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                intent1.setAction(Intent.ACTION_SEND);
                 intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent1.setDataAndType(uri, "application/pdf");
                 startActivity(intent1);
@@ -818,7 +818,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 public void onClick(View v) {
                     log("onClick uploadContainer");
                     Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
-                    intent1.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                    intent1.setAction(Intent.ACTION_SEND);
                     intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent1.setDataAndType(uri, "application/pdf");
                     startActivity(intent1);

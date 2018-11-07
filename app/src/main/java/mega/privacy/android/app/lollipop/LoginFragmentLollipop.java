@@ -91,7 +91,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private EditText et_user;
     private EditText et_password;
     private TextView bRegister;
-    private TextView bLogin;
+    private Button bLogin;
     private TextView bForgotPass;
     private LinearLayout loginLogin;
     private LinearLayout loginLoggingIn;
@@ -355,7 +355,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginPasswordErrorText = (TextView) v.findViewById(R.id.login_password_text_error_text);
 
-        bLogin = (TextView) v.findViewById(R.id.button_login_login);
+        bLogin = (Button) v.findViewById(R.id.button_login_login);
         bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
         bLogin.setOnClickListener(this);
 
@@ -469,7 +469,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
-        tB  =(Toolbar) v.findViewById(R.id.toolbar);
+        tB  =(Toolbar) v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
@@ -1628,7 +1628,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (value.length() == 0) {
             return getString(R.string.error_enter_email);
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
             return getString(R.string.error_invalid_email);
         }
         return null;
