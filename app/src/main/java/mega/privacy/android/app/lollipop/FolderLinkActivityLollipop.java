@@ -1806,7 +1806,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					if(f.exists() && (f.length() == file.getSize())){
 						isOnMegaDownloads = true;
 					}
-					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApi.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
+					if (localPath != null && (isOnMegaDownloads || (megaApiFolder.getFingerprint(file) != null && megaApiFolder.getFingerprint(file).equals(megaApiFolder.getFingerprint(localPath))))){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -1818,8 +1818,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApiFolder.httpServerIsRunning() == 0) {
-							megaApiFolder.httpServerStart();
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -1828,15 +1828,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 						if(mi.totalMem>Constants.BUFFER_COMP){
 							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 						}
 						else{
 							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 						}
 
-						String url = megaApiFolder.httpServerGetLocalLink(file);
-						mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+						String url = megaApi.httpServerGetLocalLink(file);
+						if (url != null) {
+							mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+						}
 					}
 					if (opusFile){
 						mediaIntent.setDataAndType(mediaIntent.getData(), "audio/*");
@@ -1884,8 +1886,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
-						if (megaApiFolder.httpServerIsRunning() == 0) {
-							megaApiFolder.httpServerStart();
+						if (megaApi.httpServerIsRunning() == 0) {
+							megaApi.httpServerStart();
 						}
 
 						ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -1894,15 +1896,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 						if(mi.totalMem>Constants.BUFFER_COMP){
 							log("Total mem: "+mi.totalMem+" allocate 32 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_32MB);
 						}
 						else{
 							log("Total mem: "+mi.totalMem+" allocate 16 MB");
-							megaApiFolder.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
+							megaApi.httpServerSetMaxBufferSize(Constants.MAX_BUFFER_16MB);
 						}
 
-						String url = megaApiFolder.httpServerGetLocalLink(file);
-						pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+						String url = megaApi.httpServerGetLocalLink(file);
+						if (url != null) {
+							pdfIntent.setDataAndType(Uri.parse(url), mimeType);
+						}
 					}
 					pdfIntent.putExtra("HANDLE", file.getHandle());
 					pdfIntent.putExtra("isFolderLink", true);

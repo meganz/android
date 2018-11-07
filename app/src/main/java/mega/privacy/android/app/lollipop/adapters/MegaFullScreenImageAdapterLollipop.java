@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
@@ -65,11 +66,13 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	
 	private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
 	private ArrayList<Long> pendingFullImages = new ArrayList<Long>();
-	
+
+	MegaApiAndroid megaApiFolder;
 	MegaApiAndroid megaApi;
 	Context context;
 	boolean isFileLink = false;
 	MegaNode fileLink = null;
+	boolean isFolderLink = false;
 
 	String downloadLocationDefaultPath = Util.downloadDIR;
 	DatabaseHandler dbH;
@@ -308,14 +311,15 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 	
 	// constructor
-	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi, boolean isFileLink, MegaNode fileLink) {
+	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
 		this.activity = activity;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
 		this.megaFullScreenImageAdapter = this;
 		this.context = context;
-		this.isFileLink = isFileLink;
-		this.fileLink = fileLink;
+		this.isFileLink = ((FullScreenImageViewerLollipop) context).isFileLink();
+		this.fileLink = ((FullScreenImageViewerLollipop) context).getCurrentDocument();
+		this.isFolderLink = ((FullScreenImageViewerLollipop) context).isFolderLink();
 
 		dbH = DatabaseHandler.getDbHandler(context);
 
@@ -357,6 +361,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
         log ("instantiateItem POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
+		if (isFolderLink){
+			MegaApplication app = (MegaApplication) ((FullScreenImageViewerLollipop) context).getApplication();
+			megaApiFolder = app.getMegaApiFolder();
+			MegaNode nodeAuth = megaApiFolder.authorizeNode(node);
+			if (nodeAuth != null) {
+				node = nodeAuth;
+			}
+		}
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
@@ -520,7 +532,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 						final ProgressBar pb = holder.progressBar;
 
 						if (drawable != null) {
-							Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							Glide.with(context).load(Uri.parse(url)).listener(new RequestListener<Uri, GlideDrawable>() {
 								@Override
 								public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
 									return false;
@@ -534,7 +546,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 							}).placeholder(drawable).diskCacheStrategy(DiskCacheStrategy.SOURCE).crossFade().into(holder.gifImgDisplay);
 						}
 						else {
-							Glide.with(context).load(Uri.parse(url.toString())).listener(new RequestListener<Uri, GlideDrawable>() {
+							Glide.with(context).load(Uri.parse(url)).listener(new RequestListener<Uri, GlideDrawable>() {
 								@Override
 								public boolean onException(Exception e, Uri model, Target<GlideDrawable> target, boolean isFirstResource) {
 									return false;
