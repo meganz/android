@@ -259,7 +259,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:elevation="6dp"
-            android:background="@drawable/background_button_white"
             android:textColor="@color/accentColor"
             android:fontFamily="sans-serif-light"
             android:textStyle="bold"
