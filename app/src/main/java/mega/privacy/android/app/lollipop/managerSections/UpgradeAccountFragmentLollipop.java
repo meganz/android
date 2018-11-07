@@ -826,22 +826,33 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 	private void hideProLite(){
 		log("hideProLite");
 		proLiteTransparentLayout.setVisibility(View.VISIBLE);
+		pro1TransparentLayout.setVisibility(View.GONE);
+		pro2TransparentLayout.setVisibility(View.GONE);
+		pro3TransparentLayout.setVisibility(View.GONE);
+
 	}
 
 	private void hideProI(){
 		log("hideProI");
+		proLiteTransparentLayout.setVisibility(View.GONE);
 		pro1TransparentLayout.setVisibility(View.VISIBLE);
+		pro2TransparentLayout.setVisibility(View.GONE);
+		pro3TransparentLayout.setVisibility(View.GONE);
 	}
 
 	private void hideProII(){
 		log("hideProII");
+		proLiteTransparentLayout.setVisibility(View.GONE);
+		pro1TransparentLayout.setVisibility(View.GONE);
 		pro2TransparentLayout.setVisibility(View.VISIBLE);
-	}
+		pro3TransparentLayout.setVisibility(View.GONE);	}
 
 	private void hideProIII(){
 		log("hideProIII");
-		pro3TransparentLayout.setVisibility(View.VISIBLE);
-	}
+		proLiteTransparentLayout.setVisibility(View.GONE);
+		pro1TransparentLayout.setVisibility(View.GONE);
+		pro2TransparentLayout.setVisibility(View.GONE);
+		pro3TransparentLayout.setVisibility(View.VISIBLE);	}
 
 	public String sizeTranslation(long size, int type) {
 		log("sizeTranslation");
