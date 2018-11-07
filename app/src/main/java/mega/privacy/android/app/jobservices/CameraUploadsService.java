@@ -210,24 +210,26 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
 
     private void extractMedia(Cursor cursorCamera,boolean isSecondary,boolean isVideo) {
         try {
+            
             log("if (cursorCamera != null)");
             String path = isSecondary ? localPathSecondary : localPath;
 
-            int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            int timestampColumn;
-            if (cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED) == 0) {
-                log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) == 0)");
-                timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED);
-            } else {
-                log("if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED) != 0)");
-                timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED);
+            int dataColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATA);
+            int modifiedColumn = 0, addedColumn = 0;
+            if (cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED) != -1) {
+                modifiedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
+            }
+            if(cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED) != -1){
+                addedColumn = cursorCamera.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
             }
 
             while (cursorCamera.moveToNext()) {
 
                 Media media = new Media();
                 media.filePath = cursorCamera.getString(dataColumn);
-                media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
+                long addedTime = cursorCamera.getLong(addedColumn) * 1000;
+                long modifiedTime = cursorCamera.getLong(modifiedColumn) * 1000;
+                media.timestamp = addedTime > modifiedTime ? addedTime : modifiedTime;
 
                 log("while(cursorCamera.moveToNext()) - media.filePath: " + media.filePath + "_localPath: " + path);
 
@@ -400,7 +402,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             } else {
                 parent = cameraUploadNode;
             }
-            if (file.getType() == SyncRecord.TYPE_PHOTO) {
+            if (file.getType() == SyncRecord.TYPE_PHOTO && !file.isCopyOnly()) {
                 String newPath = createTempFile(file);
                 //IOException occurs.
                 if (ERROR_CREATE_FILE_IO_ERROR.equals(newPath)) {
@@ -467,13 +469,21 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
 
             String fileName;
+            boolean inCloud;
+            boolean inDatabase;
+            int photoIndex = 0;
             if (Boolean.parseBoolean(prefs.getKeepFileNames())) {
-                //Keep the file names as device
-                fileName = file.getFileName();
+                //Keep the file names as device but need to handle same file name in different location
+                String tempFileName = file.getFileName();
+                
+                do {
+                    fileName = getNoneDuplicatedDeviceFileName(tempFileName, photoIndex);
+                    photoIndex++;
+        
+                    inCloud = megaApi.getChildNode(parent,fileName) != null;
+                    inDatabase = dbH.fileNameExists(fileName,isSec,SyncRecord.TYPE_ANY);
+                } while ((inCloud || inDatabase));
             } else {
-                int photoIndex = 0;
-                boolean inCloud;
-                boolean inDatabase;
                 do {
                     fileName = Util.getPhotoSyncNameWithIndex(file.getTimestamp(),file.getLocalPath(),photoIndex);
                     photoIndex++;
@@ -482,8 +492,17 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     inDatabase = dbH.fileNameExists(fileName,isSec,SyncRecord.TYPE_ANY);
                 } while ((inCloud || inDatabase));
             }
+    
+            String extension = "";
+            String[] s = fileName.split("\\.");
+            if (s != null){
+                if (s.length > 0){
+                    extension = s[s.length-1];
+                }
+            }
+            
             file.setFileName(fileName);
-            file.setNewPath(tempRoot + fileName);
+            file.setNewPath(tempRoot + System.nanoTime() + "." + extension);
             dbH.saveSyncRecord(file);
         }
     }
@@ -549,7 +568,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             File sourceFile = new File(media.filePath);
 
             //nodeExists = megaApi.getNodeByFingerprint(localFingerPrint,uploadNode);
-            possibleNodeList = megaApi.getNodesByOriginalFingerprint(localFingerPrint, uploadNode);
+            possibleNodeList = megaApi.getNodesByOriginalFingerprint(localFingerPrint, null);
             if(possibleNodeList != null && possibleNodeList.size() > 0){
                 nodeExists = possibleNodeList.get(0);
             }
@@ -635,6 +654,9 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
                     if (shouldCompressVideo() && type == SyncRecord.TYPE_VIDEO) {
                         record.setStatus(STATUS_TO_COMPRESS);
                     }
+                    float gpsData[] = getGPSCoordinates(file.getAbsolutePath(), isVideo);
+                    record.setLatitude(gpsData[0]);
+                    record.setLongitude(gpsData[1]);
                     record.setOriginFingerprint(localFingerPrint);
                     pendingList.add(record);
                     log("MediaFinalName: " + file.getName());
@@ -1330,93 +1352,28 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             }
 
             if (e.getErrorCode() == MegaError.API_OK) {
-                log("Image Sync OK: " + transfer.getFileName());
-                log("IMAGESYNCFILE: " + path);
+                log("Image Sync OK: " + transfer.getFileName() + " IMAGESYNCFILE: " + path);
                 MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-                String originalFingerprint = dbH.findSyncRecordByNewPath(path).getOriginFingerprint();
-                megaApi.setOriginalFingerprint(node, originalFingerprint, this);
-                dbH.deleteSyncRecordByPath(path);
+                SyncRecord record = dbH.findSyncRecordByNewPath(path);
+                if(record != null){
+                    String originalFingerprint = record.getOriginFingerprint();
+                    megaApi.setOriginalFingerprint(node, originalFingerprint, this);
+                }else{
+                    record = dbH.findSyncRecordByLocalPath(path);
+                }
+                megaApi.setNodeCoordinates(node,record.getLatitude(),node.getLongitude(),null);
                 File file = new File(path);
-                if (file.exists() && Util.isVideoFile(path)) {
-                    log("Is video!!!");
+                if(file.exists()){
+                    log("Creating preview");
                     File previewDir = PreviewUtils.getPreviewFolder(this);
                     File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
                     File thumbDir = ThumbnailUtils.getThumbFolder(this);
                     File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
 //                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
 //                    megaApi.createPreview(path,preview.getAbsolutePath());
-
-                    if (node != null) {
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(path);
-
-                        String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
-                        if (location != null) {
-                            log("Location: " + location);
-
-                            boolean secondTry = false;
-                            try {
-                                final int mid = location.length() / 2; //get the middle of the String
-                                String[] parts = {location.substring(0,mid),location.substring(mid)};
-
-                                Double lat = Double.parseDouble(parts[0]);
-                                Double lon = Double.parseDouble(parts[1]);
-                                log("Lat: " + lat); //first part
-                                log("Long: " + lon); //second part
-
-                                megaApi.setNodeCoordinates(node,lat,lon,null);
-                            } catch (Exception exc) {
-                                secondTry = true;
-                                log("Exception, second try to set GPS coordinates");
-                            }
-
-                            if (secondTry) {
-                                try {
-                                    String latString = location.substring(0,7);
-                                    String lonString = location.substring(8,17);
-
-                                    Double lat = Double.parseDouble(latString);
-                                    Double lon = Double.parseDouble(lonString);
-                                    log("Lat2: " + lat); //first part
-                                    log("Long2: " + lon); //second part
-
-                                    megaApi.setNodeCoordinates(node,lat,lon,null);
-                                } catch (Exception ex) {
-                                    log("Exception again, no chance to set coordinates of video");
-                                }
-                            }
-                        } else {
-                            log("No location info");
-                        }
-                    }
-                } else if (file.exists() && MimeTypeList.typeForName(path).isImage()) {
-                    log("Is image!!!");
-
-                    File previewDir = PreviewUtils.getPreviewFolder(this);
-                    File preview = new File(previewDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-                    File thumbDir = ThumbnailUtils.getThumbFolder(this);
-                    File thumb = new File(thumbDir,MegaApiAndroid.handleToBase64(transfer.getNodeHandle()) + ".jpg");
-//                    megaApi.createThumbnail(path,thumb.getAbsolutePath());
-//                    megaApi.createPreview(path,preview.getAbsolutePath());
-
-                    if (node != null) {
-                        try {
-                            final ExifInterface exifInterface = new ExifInterface(path);
-                            float[] latLong = new float[2];
-                            if (exifInterface.getLatLong(latLong)) {
-                                log("Latitude: " + latLong[0] + " Longitude: " + latLong[1]);
-                                megaApi.setNodeCoordinates(node,latLong[0],latLong[1],null);
-                            }
-
-                        } catch (Exception exception) {
-                            log("Couldn't read exif info: " + path);
-                        }
-                    }
-                } else {
-                    log("NOT video or image!");
                 }
             } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-                log("OVERQUOTA ERROR: " + e.getErrorCode());
+                log("over quota error: " + e.getErrorCode());
                 isOverquota = true;
                 cancel();
             } else {
@@ -1574,7 +1531,7 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             Intent intent = new Intent(this,ManagerActivityLollipop.class);
             intent.setAction(Constants.ACTION_SHOW_SETTINGS);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,0);
-            showNotification("Over limit","Do you want to charge or change setting",pendingIntent);
+            showNotification("Over limit","Do you want to change the setting",pendingIntent);
         }
 
     }
@@ -1675,12 +1632,6 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
     private void removeGPSCoordinates(String filePath) {
         try {
             ExifInterface exif = new ExifInterface(filePath);
-            float output[] = new float[2];
-            exif.getLatLong(output);
-            
-            //todo save data to DB
-            //dbH.setGPSByNewPath(output[1], output[2]);
-            
             exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE,"0/1,0/1,0/1000");
             exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF,"0");
             exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE,"0/1,0/1,0/1000");
@@ -1719,5 +1670,70 @@ public class CameraUploadsService extends JobService implements MegaChatRequestL
             return ERROR_CREATE_FILE_IO_ERROR;
         }
         return destPath;
+    }
+    
+    private String getNoneDuplicatedDeviceFileName(String fileName,int index){
+        if(index == 0){
+            return fileName;
+        }
+        
+        String name = "", extension = "";
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            name = fileName.substring(0, pos);
+            extension = fileName.substring(pos);
+        }
+        
+        fileName = name + "_" + index + extension;
+        return fileName;
+    }
+    
+    private float[] getGPSCoordinates(String filePath, boolean isVideo) {
+        float output[] = new float[2];
+        try {
+            if (isVideo) {
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(filePath);
+    
+                String location = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION);
+                if (location != null) {
+                    log("Location: " + location);
+        
+                    boolean secondTry = false;
+                    try {
+                        final int mid = location.length() / 2; //get the middle of the String
+                        String[] parts = {location.substring(0,mid),location.substring(mid)};
+    
+                        output[0] = Float.parseFloat(parts[0]);
+                        output[1] = Float.parseFloat(parts[1]);
+            
+                    } catch (Exception exc) {
+                        secondTry = true;
+                        log("Exception, second try to set GPS coordinates");
+                    }
+        
+                    if (secondTry) {
+                        try {
+                            String latString = location.substring(0,7);
+                            String lonString = location.substring(8,17);
+    
+                            output[0] = Float.parseFloat(latString);
+                            output[1] = Float.parseFloat(lonString);
+                
+                        } catch (Exception ex) {
+                            log("Exception again, no chance to set coordinates of video");
+                        }
+                    }
+                } else {
+                    log("No location info");
+                }
+            } else {
+                ExifInterface exif = new ExifInterface(filePath);
+                exif.getLatLong(output);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }

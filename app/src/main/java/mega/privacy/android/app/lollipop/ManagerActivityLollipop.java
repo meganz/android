@@ -3463,7 +3463,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else if (getIntent().getAction().equals(Constants.ACTION_REFRESH_STAGING)){
 					update2FASetting();
-				}
+				}else if(getIntent().getAction().equals(Constants.ACTION_SHOW_SETTINGS)) {
+                    log("camera notification: SHOW_SETTINGS");
+                    moveToSettingsSection();
+                    getIntent().setAction(null);
+                    setIntent(null);
+                
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(Constants.NOTIFICATION_CAMERA_UPLOADS);
+                }
 
     			intent.setAction(null);
 				setIntent(null);
