@@ -451,6 +451,8 @@ public class MegaApplication extends MultiDexApplication implements MegaGlobalLi
 			megaApi.changeApiUrl("https://g.api.mega.co.nz/");
 		}
 
+		megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
+
 		if (Util.DEBUG){
 			MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 		}

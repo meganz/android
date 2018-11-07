@@ -179,16 +179,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaApi = app.getMegaApi();
         }
 
-        if(megaApi==null||megaApi.getRootNode()==null){
-            log("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
         if (megaChatApi == null) {
             MegaApplication app = (MegaApplication) getApplication();
             megaChatApi = app.getMegaChatApi();
@@ -231,6 +221,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             }
 
             chat = megaChatApi.getChatRoom(chatHandle);
+
+            if(chat==null){
+                log("Chatroom NULL cannot be recovered");
+                finish();
+                return;
+            }
 
             dbH = DatabaseHandler.getDbHandler(getApplicationContext());
             chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chatHandle));
@@ -527,7 +523,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             String fullName = getParticipantFullName(i);
             String participantEmail = chat.getPeerEmail(i);
 
-            log("FullName of the peer: "+fullName + " privilege: "+peerPrivilege);
+            log(i+"FullName of the peer: "+fullName + "email " + chat.getPeerEmail(i) + " privilege: "+peerPrivilege);
 
             MegaChatParticipant participant = new MegaChatParticipant(peerHandle, "", "", fullName, participantEmail, peerPrivilege);
 
